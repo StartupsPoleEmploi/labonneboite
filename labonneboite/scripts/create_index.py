@@ -1,7 +1,6 @@
 # coding: utf8
 import argparse
 import logging
-from itertools import groupby
 
 from elasticsearch import Elasticsearch
 from elasticsearch import TransportError
@@ -546,24 +545,24 @@ def add_offices_geolocations(index=INDEX_NAME):
 
     # Add multiple locations.
     updated_sirets = []
-    extra_geolocations = db_session.query(OfficeAdminExtraGeoLocation).all()
-    for siret, grouped_extra_geolocations in groupby(extra_geolocations, lambda item: item.siret_id):
-        office = Office.query.filter_by(siret=siret).first()
+
+    for extra_geolocation in db_session.query(OfficeAdminExtraGeoLocation).all():
+        office = Office.query.filter_by(siret=extra_geolocation.siret).first()
         if office:
             location = []
             if office.y and office.x:
                 location.append({'lat': office.y, 'lon': office.x})  # Keep the initial geolocation of the office.
-            for extra_geolocation in grouped_extra_geolocations:
-                location.append({'lat': extra_geolocation.latitude, 'lon': extra_geolocation.longitude})
+            for coords in extra_geolocation.geolocations_as_python():
+                location.append({'lat': coords[0], 'lon': coords[1]})
             # Apply changes in ElasticSearch.
             es.update(
                 index=index,
                 doc_type=OFFICE_TYPE,
-                id=siret,
+                id=office.siret,
                 body={'doc': {'location': location, 'location_size': len(location)}},
                 ignore=404,
             )
-            updated_sirets.append(siret)
+            updated_sirets.append(office.siret)
 
     # Reset multiple locations.
     body = {"query": {"range": {"location_size": {"gt": 1}}}}
