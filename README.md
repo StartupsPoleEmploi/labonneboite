@@ -16,6 +16,8 @@ Le « potentiel d'embauche » est un indicateur basé une technique d'intelligen
 
 La Bonne Boite a été déployée en France avec des premiers résultats encourageants, et est en cours de développement pour d'autres pays (Luxembourg).
 
+La Bonne Boite c’est un [site web](https://labonneboite.pole-emploi.fr) mais aussi une [API](https://www.emploi-store-dev.fr/portail-developpeur/detailapicatalogue/labonneboite)
+
 La Bonne Boite, [on en parle dans la presse](https://labonneboite.pole-emploi.fr/espace-presse)
 
 # Project overview
