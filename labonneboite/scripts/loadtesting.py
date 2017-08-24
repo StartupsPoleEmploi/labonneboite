@@ -5,7 +5,7 @@ import csv
 import math
 from operator import itemgetter
 import urllib
-import requests
+import logging
 
 from slugify import slugify
 import MySQLdb as mdb
@@ -13,19 +13,15 @@ from locust import HttpLocust, TaskSet, task
 from locust.exception import StopLocust
 
 from labonneboite.conf import settings
-from labonneboite.common import geocoding
-import logging
-
 
 logger = logging.getLogger(__name__)
 logger.info("loading locustfile")
 
 
 def create_cursor():
-    con = mdb.connect('localhost', settings.USER, settings.PASSWORD, settings.DB)
-    cur = con.cursor()
-    return con, cur
-
+    connector = mdb.connect('localhost', settings.USER, settings.PASSWORD, settings.DB)
+    cursor = con.cursor()
+    return connector, cursor
 
 
 con, cur = create_cursor()
@@ -39,7 +35,7 @@ def generate_city_choices():
     city_file = open(fullname, "r")
     reader = csv.reader(city_file)
     cities = []
-    for city_name, first_zipcode, population, latitude, longitude in reader:
+    for city_name, first_zipcode, population, _, _ in reader:
         cities.append([city_name, first_zipcode, int(population)])
     cities_by_population = sorted(cities, key=itemgetter(2), reverse=True)
     city_choices = []
@@ -63,14 +59,14 @@ to_number = 100000
 
 
 def weighted_choice(choices):
-   total = sum(w for c, w in choices)
-   r = random.uniform(0, total)
-   upto = 0
-   for c, w in choices:
-      if upto + w >= r:
-         return c
-      upto += w
-   assert False, "Shouldn't get here"
+    total = sum(w for c, w in choices)
+    r = random.uniform(0, total)
+    upto = 0
+    for c, w in choices:
+        if upto + w >= r:
+            return c
+        upto += w
+    assert False, "Shouldn't get here"
 
 
 def pick_location():
@@ -114,7 +110,7 @@ class UserBehavior(TaskSet):
         }
         param_string = urllib.urlencode(args)
         url = "/recherche?%s" % param_string
-        logger.info("GET %s" % url)
+        logger.info("GET %s", url)
         self.client.get(url)
 
     @task(25)
@@ -129,7 +125,7 @@ class UserBehavior(TaskSet):
         slugified_city = slugify(city.lower())
         slugified_job = slugify(job.lower())
         url = "/entreprises/%s-%s/%s?from=1&to=10" % (slugified_city, zipcode, slugified_job)
-        logger.info("GET %s" % url)
+        logger.info("GET %s", url)
         self.client.get(url)
 
 
@@ -137,38 +133,38 @@ class UserBehavior(TaskSet):
     def suggest_job_labels(self):
         logger.info("URL:suggest_job_labels")
 
-        term  = pick_job()
-        index = random.choice([3,4,5,6])
+        term = pick_job()
+        index = random.choice([3, 4, 5, 6])
         if not len(term) > index:
             index = len(term) - 1
 
         url = "/suggest_job_labels?term=%s" % term[:index]
-        logger.info("GET %s" % url)
+        logger.info("GET %s", url)
         self.client.get(url)
 
     @task(16)
     def suggest_cities(self):
         logger.info("URL:suggest_cities")
 
-        city_name, zipcode  = pick_location()
-        index = random.choice([3,4,5,6])
+        city_name, _ = pick_location()
+        index = random.choice([3, 4, 5, 6])
         if not len(city_name) > index:
             index = len(city_name) - 1
 
         url = "/suggest_locations?term=%s" % urllib.quote_plus(city_name)[:index]
-        logger.info("GET %s" % url)
+        logger.info("GET %s", url)
         self.client.get(url)
 
     @task(4)
     def download_company(self):
         logger.info("URL:download")
-        siret = random.choice(SIRET_NUMBERS)
+        siret = random.choice(SIRET_NUMBERS)  # FIXME SIRET_NUMBERS undefined
         url = "/%s/download" % siret
-        logger.info("GET %s" % url)
+        logger.info("GET %s", url)
         self.client.get(url)
 
 
 class WebsiteUser(HttpLocust):
     task_set = UserBehavior
-    min_wait=1000
-    max_wait=27000
+    min_wait = 1000
+    max_wait = 27000
