@@ -22,13 +22,17 @@ La Bonne Boite, [on en parle dans la presse](https://labonneboite.pole-emploi.fr
 
 # Project overview
 
-La Bonne Boite (LBB) is a project launched by Pole Emploi (french national employment agency) to offer a new way for job seekers to look for a new job. Instead of searching for job offers, the job seeker can look directly for companies that have a high "hiring potential". The "hiring potential" is an algorithm exclusivity created by Pole Emploi that estimates how many contracts a given company is likely to hire in the next 6 months.
+La Bonne Boite (LBB) is a service launched by Pole Emploi (french national employment agency) to offer a new way for job seekers to look for a new job. Instead of searching for job offers, the job seeker can look directly for companies that have a high "hiring potential". The "hiring potential" is an algorithm exclusivity created by Pole Emploi that estimates how many contracts a given company is likely to hire in the next 6 months.
 
 By only contacting companies with a high "hiring potential", job seekers can focus their efforts only on companies that are likely to hire them. Instead of targeting every and any company that might potentially be interested by their profile, La Bonne Boite drastically reduces the number of companies a job seeker needs to have in mind when looking for a job.
 
-The "hiring potential" score is based on a machine learning algorithm, in this case a regression.
+The "hiring potential" is an indicator based on a machine learning regression, in this case a regression. La Bonne Boite processes millions of recrutements of all french companies over years to compute this "hiring potentiel".
 
 It has already been deployed in France with early results that are very promising. Early development is being made for new countries (Luxembourg).
+
+La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API](https://www.emploi-store-dev.fr/portail-developpeur/detailapicatalogue/labonneboite).
+
+[Press Coverage on La Bonne Boite](https://labonneboite.pole-emploi.fr/espace-presse)
 
 # Install a new development environment
 
