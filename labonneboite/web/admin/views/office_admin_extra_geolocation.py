@@ -8,7 +8,7 @@ from flask_login import current_user
 
 from labonneboite.common import geocoding
 from labonneboite.common.models import OfficeAdminExtraGeoLocation
-from labonneboite.web.admin.forms import nospace_filter, strip_filter
+from labonneboite.web.admin.forms import strip_filter
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 
 
@@ -61,7 +61,7 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
     }
 
     column_descriptions = {
-        'codes': u"Liste de départements et/ou de code postaux",
+        'codes': u"Veuillez entrer un département ou un code postal par ligne.",
     }
 
     # `geolocations` is not included, it will be populated based on the `codes` content.
@@ -73,7 +73,7 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
 
     form_args = {
         'codes': {
-            'filters': [strip_filter, nospace_filter],
+            'filters': [strip_filter],
         },
         'reason': {
             'filters': [strip_filter],
@@ -81,6 +81,9 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
     }
 
     def on_model_change(self, form, model, is_created):
+        # Remove empty lines.
+        model.codes = '\n'.join(OfficeAdminExtraGeoLocation.codes_as_list(model.codes))
+        # Store geolocations as JSON.
         model.geolocations = OfficeAdminExtraGeoLocation.codes_as_json_geolocations(model.codes)
         if is_created:
             model.created_by = current_user

@@ -156,6 +156,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     # Stores a list of french zipcodes or departements as a string separated by `GEOLOCATIONS_TEXT_SEPARATORS`.
     codes = Column(Text, nullable=False)
     # Stores a JSON object of latitude/longitude coordinates for each entry in `geolocations_text`.
+    # See `codes_as_json_geolocations` for the suitable format.
     geolocations = Column(Text, nullable=False)
 
     reason = Column(Text, default='', nullable=False)
@@ -170,54 +171,66 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     created_by = relationship('User', foreign_keys=[created_by_id])
     updated_by = relationship('User', foreign_keys=[updated_by_id])
 
-    def geolocations_as_python(self):
+    def geolocations_as_lat_lon_properties(self):
         """
-        Returns the content of the `geolocations` field as a Python array.
+        Returns the content of the `geolocations` field as a Python `list` of `lat/lon dicts`.
+        This stucture maps to an Elasticsearch's geo_point "Lat Lon as Properties" format.
+        E.g.:
+        [
+            {"lat" : 48.85, "lon" : 2.35},
+            {"lat" : 48.86, "lon" : 2.35},
+        ]
         """
-        return json.loads(self.geolocations)
+        return sorted([{'lat': coords[0], 'lon': coords[1]} for coords in json.loads(self.geolocations)])
 
     def geolocations_as_html_links(self):
         """
-        Returns the content of the `geolocations` field as a string of HTML links separated by a <br> element.
+        Returns the content of the `geolocations` field as HTML links.
         """
         links = []
-        link = '<a href="https://maps.google.com/maps?q={lat},{long}" target="_blank">{lat},{long}</a>'
-        for coords in self.geolocations_as_python():
-            links.append(link.format(lat=coords[0], long=coords[1]))
+        link = '<a href="https://maps.google.com/maps?q={lat},{lon}" target="_blank">{lat},{lon}</a>'
+        for coords in self.geolocations_as_lat_lon_properties():
+            links.append(link.format(lat=coords['lat'], lon=coords['lon']))
         return '<br>'.join(links)
 
     @staticmethod
-    def is_departement(code):
+    def is_departement(value):
         """
-        Returns true if the given code is a departement, false otherwise.
+        Returns true if the given value is a departement, false otherwise.
         """
-        return len(code) == 2
+        return len(value) == 2
 
     @staticmethod
-    def is_zipcode(code):
+    def is_zipcode(value):
         """
-        Returns true if the given code is a zipcode, false otherwise.
+        Returns true if the given value is a zipcode, false otherwise.
         """
-        return len(code) == 5
+        return len(value) == 5
 
     @staticmethod
-    def codes_as_list(codes_string):
+    def codes_as_list(codes):
         """
-        Converts the given string of codes to a Python array.
+        Converts the given `string` of codes to a Python `list` of codes.
         """
-        if not codes_string:
+        if not codes:
             return []
         separators = OfficeAdminExtraGeoLocation.GEOLOCATIONS_TEXT_SEPARATORS
-        codes = [v.strip() for v in re.split('|'.join(separators), codes_string) if v.strip()]
+        codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
         return sorted(set(codes))
 
     @staticmethod
-    def codes_as_geolocations(codes_string):
+    def codes_as_geolocations(codes):
         """
-        Returns an array of all the (latitude, longitude) couples that can be deduced from the given `codes_string`.
+        Converts the given `string` of codes to an `array` of `lat/lon tuples`.
+        E.g.:
+        [
+            ('48.68', '6.17'),
+            ('49.15', '6.22'),
+        ]
         """
         geolocations = []
-        for code in OfficeAdminExtraGeoLocation.codes_as_list(codes_string):
+        codes_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
+        for code in codes_list:
             if OfficeAdminExtraGeoLocation.is_departement(code):
                 geolocations.extend(geocoding.get_all_lat_long_from_departement(code))
             elif OfficeAdminExtraGeoLocation.is_zipcode(code):
@@ -225,8 +238,10 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         return geolocations
 
     @staticmethod
-    def codes_as_json_geolocations(codes_string):
+    def codes_as_json_geolocations(codes):
         """
-        Converts the given string of codes to a JSON object that can be stored in the `geolocations` field.
+        Converts the given string of codes to a JSON object suitable to be stored in the `geolocations` field.
+        E.g.:
+        '[["48.68", "6.17"], ["49.15", "6.22"]]'
         """
-        return json.dumps(OfficeAdminExtraGeoLocation.codes_as_geolocations(codes_string))
+        return json.dumps(OfficeAdminExtraGeoLocation.codes_as_geolocations(codes))

@@ -543,25 +543,18 @@ def add_offices_geolocations(index=INDEX_NAME):
     """
     es = Elasticsearch(timeout=ES_TIMEOUT)
 
-    # Add multiple locations.
     updated_sirets = []
 
+    # Add multiple locations.
     for extra_geolocation in db_session.query(OfficeAdminExtraGeoLocation).all():
         office = Office.query.filter_by(siret=extra_geolocation.siret).first()
         if office:
-            location = []
+            location = extra_geolocation.geolocations_as_lat_lon_properties()
             if office.y and office.x:
-                location.append({'lat': office.y, 'lon': office.x})  # Keep the initial geolocation of the office.
-            for coords in extra_geolocation.geolocations_as_python():
-                location.append({'lat': coords[0], 'lon': coords[1]})
+                location.insert(0, {'lat': office.y, 'lon': office.x})  # Prepend the initial geolocation.
             # Apply changes in ElasticSearch.
-            es.update(
-                index=index,
-                doc_type=OFFICE_TYPE,
-                id=office.siret,
-                body={'doc': {'location': location, 'location_size': len(location)}},
-                ignore=404,
-            )
+            body = {'doc': {'location': location, 'location_size': len(location)}}
+            es.update(index=index, doc_type=OFFICE_TYPE, id=office.siret, body=body, ignore=404)
             updated_sirets.append(office.siret)
 
     # Reset multiple locations.
@@ -577,13 +570,8 @@ def add_offices_geolocations(index=INDEX_NAME):
             if office.y and office.x:
                 location.append({'lat': office.y, 'lon': office.x})
             # Apply changes in ElasticSearch.
-            es.update(
-                index=index,
-                doc_type=OFFICE_TYPE,
-                id=siret,
-                body={'doc': {'location': location, 'location_size': len(location)}},
-                ignore=404,
-            )
+            body = {'doc': {'location': location, 'location_size': len(location)}}
+            es.update(index=index, doc_type=OFFICE_TYPE, id=siret, body=body, ignore=404)
 
 
 def display_performance_stats():
