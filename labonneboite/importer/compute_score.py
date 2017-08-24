@@ -1,9 +1,9 @@
 # coding: utf-8
 """Machine learning module.
 
-The outside world uses the "run" function which will predict the probability of a company to hire.
-We try to predict whether a company will hire at all or not in the next 6 months. By doing so we create
-a "score" value for each office ("etablissement").
+The outside world uses the "run" function which will predict how many hirings a company will make in the next 6 months,
+and we use a regression model to do so. The predicted number of hirings is then transformed into a "score" value
+between 0 and 100 for each office ("etablissement").
 
 We train a machine learning algorithm on companies and employment data to create this score.
 
