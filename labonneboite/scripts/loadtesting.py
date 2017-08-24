@@ -8,30 +8,23 @@ import urllib
 import logging
 
 from slugify import slugify
-import MySQLdb as mdb
 from locust import HttpLocust, TaskSet, task
 from locust.exception import StopLocust
 
+from labonneboite.importer import util as import_util
 from labonneboite.conf import settings
 
 logger = logging.getLogger(__name__)
 logger.info("loading locustfile")
 
-
-def create_cursor():
-    connector = mdb.connect('localhost', settings.USER, settings.PASSWORD, settings.DB)
-    cursor = con.cursor()
-    return connector, cursor
-
-
-con, cur = create_cursor()
+con, cur = import_util.create_cursor()
 cur.execute("select count(1) from %s" % (settings.OFFICE_TABLE))
 con.commit()
 OFFICE_COUNT = cur.fetchone()[0]
 
 
 def generate_city_choices():
-    fullname = os.path.join(settings.PROJECT_BASE, "labonneboite/common/data/consolidated_cities.csv")
+    fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../labonneboite/common/data/consolidated_cities.csv")
     city_file = open(fullname, "r")
     reader = csv.reader(city_file)
     cities = []
@@ -167,4 +160,4 @@ class UserBehavior(TaskSet):
 class WebsiteUser(HttpLocust):
     task_set = UserBehavior
     min_wait = 1000
-    max_wait = 27000
+    max_wait = 10000
