@@ -26,7 +26,7 @@ La Bonne Boite (LBB) is a service launched by Pole Emploi (french national emplo
 
 By only contacting companies with a high "hiring potential", job seekers can focus their efforts only on companies that are likely to hire them. Instead of targeting every and any company that might potentially be interested by their profile, La Bonne Boite drastically reduces the number of companies a job seeker needs to have in mind when looking for a job.
 
-The "hiring potential" is an indicator based on a machine learning regression, in this case a regression. La Bonne Boite processes millions of recrutements of all french companies over years to compute this "hiring potentiel".
+The "hiring potential" is an indicator based on a machine learning model, in this case a regression. La Bonne Boite processes millions of recrutements of all french companies over years to compute this "hiring potential".
 
 It has already been deployed in France with early results that are very promising. Early development is being made for new countries (Luxembourg).
 
