@@ -1,0 +1,67 @@
+/* Grid system.
+
+Examples:
+
+  <div class="grid-row">
+    <div class="grid-col-4">
+      Col 1 content
+    </div>
+    <div class="grid-col-4">
+      Col 2 content
+    </div>
+    <div class="grid-col-4">
+      Col 3 content
+    </div>
+  </div>
+
+  <div class="grid-row grid-spacing">
+    <div class="grid-col-3">
+      Col 1 content
+    </div>
+    <div class="grid-col-3">
+      Col 2 content
+    </div>
+    <div class="grid-col-3">
+      Col 3 content
+    </div>
+    <div class="grid-col-3">
+      Col 4 content
+    </div>
+  </div>
+=========================================================================== */
+
+@media (min-width: 800px) {  /* Activate the grid system only for browsers >= 800px. */
+
+    /* See http://cahnory.tumblr.com/post/127064896532/supprimer-les-espaces-efficacement */
+
+    .grid-row {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .grid-row [class^="grid-col-"] {
+        display: inline-block;
+        margin-top: 0;
+        vertical-align: top;
+    }
+
+    .grid-spacing [class^="grid-col-"] {
+        padding-right: 30px;  /* Fallback in `px` for browsers that don't support rem. */
+        padding-right: 1.875rem;
+    }
+
+    .grid-col-1  { width: 8.33%; }
+    .grid-col-2  { width: 16.66%; }
+    .grid-col-3  { width: 25%; }
+    .grid-col-4  { width: 33.33%; }
+    .grid-col-5  { width: 41.66%; }
+    .grid-col-6  { width: 50%; }
+    .grid-col-7  { width: 58.33%; }
+    .grid-col-8  { width: 66.66%; }
+    .grid-col-9  { width: 75%; }
+    .grid-col-10 { width: 83.33%; }
+    .grid-col-11 { width: 91.66%; }
+    .grid-col-12 { width: 100%; }
+
+}

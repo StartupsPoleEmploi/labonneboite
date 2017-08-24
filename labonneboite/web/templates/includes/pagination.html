@@ -1,0 +1,37 @@
+{% if pagination and pagination.pages > 1 %}
+  <nav class="pagination-wrapper">
+    <ul class="pagination">
+      {% if pagination.show_first %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1">1</a>
+        </li>
+        {% if pagination.show_first_ellipsis %}
+          <li class="page-item">
+            <span class="page-link">...</span>
+          </li>
+        {% endif %}
+      {% endif %}
+      {% for page in pagination.pages_range %}
+        {% if page != pagination.page %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+          </li>
+        {% else %}
+          <li class="page-item active">
+            <span class="page-link">{{ page }}</span>
+          </li>
+        {% endif %}
+      {% endfor %}
+      {% if pagination.show_last %}
+        {% if pagination.show_last_ellipsis %}
+          <li class="page-item">
+            <span class="page-link">...</span>
+          </li>
+        {% endif %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ pagination.pages }}">{{ pagination.pages }}</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

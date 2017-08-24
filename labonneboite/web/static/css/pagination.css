@@ -1,0 +1,42 @@
+/* Pagination.
+=========================================================================== */
+
+.pagination-wrapper {
+    color: #fff;
+    text-align: right;
+    font-size: 15px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 0.9375;
+}
+
+.pagination {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0 20px;
+    display: inline-block;
+}
+
+.page-item {
+    display: inline-block;
+}
+
+.page-link {
+    display: inline-block;
+    padding: 10px 15px;
+}
+
+a.page-link {
+    color: #fff;
+    text-decoration: none;
+}
+
+a.page-link:active,
+a.page-link:visited,
+a.page-link:focus,
+a.page-link:hover {
+    text-decoration: underline;
+}
+
+.page-item.active .page-link {
+    color: #7c408b;
+    background: #fff;
+}

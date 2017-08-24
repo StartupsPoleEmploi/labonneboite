@@ -1,0 +1,1561 @@
+<!DOCTYPE HTML>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="google-site-verification" content="u049KXeNisFhYyb2alIBRJGWP1E6Y0YFfgyk1nWH1Xs" />
+    <title>CookBook</title>
+    {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
+</head>
+<body>
+
+  <div class="cookies-banner">
+    <p>Les cookies assurent le bon fonctionnement de nos services. En utilisant ces derniers, vous acceptez l'utilisation des cookies.</p>
+    <p>
+      <a href="#">En savoir plus</a>
+      -
+      <a href="#" class="cookies-accept"><b>J'ai compris</b></a>
+    </p>
+  </div>
+
+  <!-- ********************************** Header ********************************** -->
+  <header class="lbb-header-wrapper">
+    <ul class="lbb-header">
+
+      <li class="lbb-header-logo-lbb">
+        <a href="#">
+          <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boîte">
+        </a>
+      </li>
+
+      <li class="text-left">
+        <small class="badge badge-info" data-toggle="tooltip" data-placement="bottom" title="Tooltip.">Version PRO</small>
+        <small class="badge badge-alternance" data-toggle="tooltip" data-placement="bottom" title="Tooltip.">Alternance</small>
+      </li>
+
+      <li>
+
+        <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
+          <a href="#" class="lbb-header-btn">
+            <img src="{{ url_for('static', filename='images/user.svg') }}" alt="">
+            <span>Connexion &#x25BE;</span>
+          </a>
+          <div class="lbb-dropdown lbb-dropdown-right text-right">
+            <p>
+              <a class="logo-pe-connect" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ request.url | urlencode }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.png') }}" alt="Pôle emploi Connect"></a><br>
+              <i>Connectez-vous à La Bonne Boîte en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
+            </p>
+          </div>
+        </div>
+
+        <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
+          <a href="#" class="lbb-header-btn">
+            <img src="{{ url_for('static', filename='images/user-color.svg') }}" alt="">
+            <span>Mon compte &#x25BE;</span>
+          </a>
+          <div class="lbb-dropdown lbb-dropdown-right text-right">
+            <p>
+              <a href="#"><b>John Doe</b></a>
+            </p>
+            <p>
+              <a href="#">Mes favoris</a>
+            </p>
+            <hr>
+            <p>
+              <a href="#" class="logout">Se déconnecter</a>
+            </p>
+          </div>
+        </div>
+
+      </li>
+
+      <li class="lbb-header-logo-pole-emploi">
+        <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
+      </li>
+
+    </ul>
+  </header>
+
+  <!-- ********************************** Flash alerts ********************************** -->
+  <div class="lbb-flash-alerts">
+    <div class="alert">
+      <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+    </div>
+    <div class="alert alert-warning js-alert-close">
+      <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+    </div>
+    <div class="alert alert-success js-alert-close">
+      <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+    </div>
+    <div class="alert alert-info js-alert-close">
+      <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+    </div>
+    <div class="alert alert-error js-alert-close">
+      <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+    </div>
+  </div>
+
+  <!-- ********************************** Alerts ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+
+      <div class="cookbook-title">Alerts</div>
+
+      <div class="alert js-alert-close">
+        <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+      </div>
+
+      <div class="alert alert-warning js-alert-close">
+        <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+      </div>
+
+      <div class="alert alert-success js-alert-close">
+        <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+      </div>
+
+      <div class="alert alert-info js-alert-close">
+        <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+      </div>
+
+      <div class="alert alert-error js-alert-close">
+        <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ********************************** Home ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content text-center">
+
+      <div class="cookbook-title">Home Page</div>
+
+      <h1 class="lbb-home-title">
+        N'envoyez plus vos CV au hasard
+        <small class="sub-heading">Découvrez notre sélection d'entreprises à fort potentiel d'embauche*</small>
+      </h1>
+      <form class="lbb-home-form-search">
+        <div class="form-search">
+          <div>
+            <input class="input-icon input-icon-suitcase form-error"
+                   type="text"
+                   placeholder="Métier recherché : (boucher, cariste, secrétaire, ...)">
+            <input class="input-icon input-icon-location"
+                   type="text"
+                   placeholder="Autour de : (Paris, Pau, ...)">
+          </div>
+          <button class="btn" type="submit">
+            <img src="{{ url_for('static', filename='images/input-icons/magnifier-white.svg') }}" alt="Chercher">
+          </button>
+        </div>
+        <ul class="form-errorlist">
+          <li>Ce champ est obligatoire.</li>
+          <li>Ce champ est obligatoire bis.</li>
+        </ul>
+        <div class="form-search-additional-fields">
+          <input type="checkbox" class="custom-checkbox" id="id_flag_alternance1" name="flag_alternance" value="1">
+          <label for="id_flag_alternance1">Limiter la recherche aux entreprises recrutant notamment des <b>contrats en alternance</b></label>
+        </div>
+      </form>
+
+      <form class="lbb-home-form-search">
+        <div class="form-search">
+          <div>
+            <input class="input-icon input-icon-suitcase"
+                   type="text"
+                   placeholder="Métier recherché : (boucher, cariste, secrétaire, ...)">
+            <input class="input-icon input-icon-location"
+                   type="text"
+                   placeholder="Autour de : (Paris, Pau, ...)">
+          </div>
+          <button class="btn" type="submit" disabled>
+            <span class="spinner"></span>
+          </button>
+        </div>
+        <div class="form-search-additional-fields">
+          <input type="checkbox" class="custom-checkbox" id="id_flag_alternance2" name="flag_alternance" value="1">
+          <label for="id_flag_alternance2">Limiter la recherche aux entreprises recrutant notamment des <b>contrats en alternance</b></label>
+        </div>
+      </form>
+
+      <p class="lbb-home-explanation lbb-grey">
+        <small>*Potentiel d'embauche : algorithme exclusif de Pôle emploi détectant les entreprises qui vont probablement embaucher ces 6 prochains mois.</small>
+      </p>
+    </div>
+  </div>
+
+  <!-- ********************************** Colors ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+      <div class="cookbook-title">Colors</div>
+      <ul>
+        <li><span class="cookbook-color" style="background: #006cff;"></span> <b>#006cff</b> blue (links)</li>
+        <li><span class="cookbook-color" style="background: #7c408b;"></span> <b>#7c408b</b> purple (buttons)</li>
+        <li><span class="cookbook-color" style="background: #183152;"></span> <b>#183152</b> dark blue (buttons hover)</li>
+        <li><span class="cookbook-color" style="background: #5d5d5d;"></span> <b>#5d5d5d</b> mid grey (text)</li>
+        <li><span class="cookbook-color" style="background: #222;"></span> <b>#222</b> dark grey, almost black (text, buttons active)</li>
+        <li><span class="cookbook-color" style="background: #cbcbcb;"></span> <b>#cbcbcb</b> light grey</li>
+        <li><span class="cookbook-color" style="background: #e0e0e0;"></span> <b>#e0e0e0</b> extra light grey</li>
+        <li><span class="cookbook-color" style="background: #efefef;"></span> <b>#efefef</b> light white (used on :hover in search results)</li>
+        <li><span class="cookbook-color" style="background: #fff;"></span> <b>#fff</b> white</li>
+        <li><span class="cookbook-color" style="background: #19c158;"></span> <b>#19c158</b> green (potentiel d'embauche, alert success)</li>
+        <li><span class="cookbook-color" style="background: #f03c69;"></span> <b>#f03c69</b> red (form errors, alert errors)</li>
+        <li><span class="cookbook-color" style="background: #f7ba45;"></span> <b>#f7ba45</b> yellow (alert warning)</li>
+        <li><span class="cookbook-color" style="background: #1c86f2;"></span> <b>#1c86f2</b> blue (alert info)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ********************************** Buttons ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+      <div class="cookbook-title">Buttons</div>
+      <!-- Links -->
+      <p>
+        <a class="btn btn-large" href="#">Default &lt;a&gt; large</a>
+        <a class="btn" href="#">Default &lt;a&gt;</a>
+        <a class="btn btn-small" href="#">Default &lt;a&gt; small</a>
+      </p>
+      <p>
+        <a class="btn btn-light btn-large" href="#">Light &lt;a&gt; large</a>
+        <a class="btn btn-light" href="#">Light &lt;a&gt;</a>
+        <a class="btn btn-light btn-small" href="#">Light &lt;a&gt; small</a>
+      </p>
+      <p>
+        <a class="btn btn-dark btn-large" href="#">Dark &lt;a&gt; large</a>
+        <a class="btn btn-dark" href="#">Dark &lt;a&gt;</a>
+        <a class="btn btn-dark btn-small" href="#">Dark &lt;a&gt; small</a>
+      </p>
+      <p>
+        <a class="btn btn-success btn-large" href="#">Success &lt;a&gt; large</a>
+        <a class="btn btn-success" href="#">Success &lt;a&gt;</a>
+        <a class="btn btn-success btn-small" href="#">Success &lt;a&gt; small</a>
+      </p>
+      <p>
+        <a class="btn btn-error btn-large" href="#">Error &lt;a&gt; large</a>
+        <a class="btn btn-error" href="#">Error &lt;a&gt;</a>
+        <a class="btn btn-error btn-small" href="#">Error &lt;a&gt; small</a>
+      </p>
+      <hr>
+      <!-- Buttons -->
+      <div>
+        <form>
+          <button class="btn btn-large" type="submit">Default &lt;button&gt; large</button>
+          <button class="btn" type="submit">Default &lt;button&gt;</button>
+          <button class="btn btn-small" type="submit">Default &lt;button&gt; small</button>
+        </form>
+      </div>
+      <div>
+        <form>
+          <button class="btn btn-light btn-large" type="submit">Light &lt;button&gt; large</button>
+          <button class="btn btn-light" type="submit">Light &lt;button&gt;</button>
+          <button class="btn btn-light btn-small" type="submit">Light &lt;button&gt; small</button>
+        </form>
+      </div>
+      <div>
+        <form>
+          <button class="btn btn-dark btn-large" type="submit">Dark &lt;button&gt; large</button>
+          <button class="btn btn-dark" type="submit">Dark &lt;button&gt;</button>
+          <button class="btn btn-dark btn-small" type="submit">Dark &lt;button&gt; small</button>
+        </form>
+      </div>
+      <div>
+        <form>
+          <button class="btn btn-success btn-large" type="submit">Success &lt;button&gt; large</button>
+          <button class="btn btn-success" type="submit">Success &lt;button&gt;</button>
+          <button class="btn btn-success btn-small" type="submit">Success &lt;button&gt; small</button>
+        </form>
+      </div>
+      <div>
+        <form>
+          <button class="btn btn-error btn-large" type="submit">Error &lt;button&gt; large</button>
+          <button class="btn btn-error" type="submit">Error &lt;button&gt;</button>
+          <button class="btn btn-error btn-small" type="submit">Error &lt;button&gt; small</button>
+        </form>
+      </div>
+      <hr>
+      <!-- Input -->
+      <div>
+        <form>
+          <input class="btn btn-large" type="submit" value="Default &lt;input&gt; large">
+          <input class="btn" type="submit" value="Default &lt;input&gt;">
+          <input class="btn btn-small" type="submit" value="Default &lt;input&gt; small">
+        </form>
+      </div>
+      <div>
+        <form>
+          <input class="btn btn-light btn-large" type="submit" value="Light &lt;input&gt; large">
+          <input class="btn btn-light" type="submit" value="Light &lt;input&gt;">
+          <input class="btn btn-light btn-small" type="submit" value="Light &lt;input&gt; small">
+        </form>
+      </div>
+      <div>
+        <form>
+          <input class="btn btn-dark btn-large" type="submit" value="Dark &lt;input&gt; large">
+          <input class="btn btn-dark" type="submit" value="Dark &lt;input&gt;">
+          <input class="btn btn-dark btn-small" type="submit" value="Dark &lt;input&gt; small">
+        </form>
+      </div>
+      <div>
+        <form>
+          <input class="btn btn-success btn-large" type="submit" value="Success &lt;input&gt; large">
+          <input class="btn btn-success" type="submit" value="Success &lt;input&gt;">
+          <input class="btn btn-success btn-small" type="submit" value="Success &lt;input&gt; small">
+        </form>
+      </div>
+      <div>
+        <form>
+          <input class="btn btn-error btn-large" type="submit" value="Error &lt;input&gt; large">
+          <input class="btn btn-error" type="submit" value="Error &lt;input&gt;">
+          <input class="btn btn-error btn-small" type="submit" value="Error &lt;input&gt; small">
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ********************************** Images list ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+      <div class="cookbook-title">Images list</div>
+      <ul class="img-list">
+        <li>
+          <a href="#">
+            <img src="{{ url_for('static', filename='images/press/les-echos.png') }}" alt="Les Echos">
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <img src="{{ url_for('static', filename='images/press/france-info.jpg') }}" alt="Franceinfo">
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <img src="{{ url_for('static', filename='images/press/france-inter.png') }}" alt="France Inter">
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <img src="{{ url_for('static', filename='images/press/liaisons-sociales.png') }}" alt="Liaisons Sociales Magazine">
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <img src="{{ url_for('static', filename='images/press/rtl.png') }}" alt="RTL">
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <img src="{{ url_for('static', filename='images/press/usine-nouvelle.png') }}" alt="L'Usine Nouvelle">
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <img src="{{ url_for('static', filename='images/press/apec.png') }}" alt="Apec.fr">
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ********************************** Dropdowns ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+
+      <div class="cookbook-title">Dropdowns</div>
+
+      <div>
+        <div class="lbb-dropdown-wrapper">
+          <a href="#">Dropdown on link &#x25BE;</a>
+          <div class="lbb-dropdown">
+            <p>
+              <b>John Doe</b>
+            </p>
+            <p>
+              john@doe.com
+            </p>
+            <hr>
+            <p>
+              <a href="#">Se déconnecter</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="lbb-dropdown-wrapper">
+          <a class="btn" href="#">Dropdown on button &#x25BE;</a>
+          <div class="lbb-dropdown">
+            <p>
+              <b>John Doe</b>
+            </p>
+            <p>
+              john@doe.com
+            </p>
+            <hr>
+            <p>
+              <a href="#">Se déconnecter</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="lbb-dropdown-wrapper">
+          <a href="#">Dropdown on link (on right) &#x25BE;</a>
+          <div class="lbb-dropdown lbb-dropdown-right text-right">
+            <p>
+              <b>John Doe</b>
+            </p>
+            <p>
+              john@doe.com
+            </p>
+            <hr>
+            <p>
+              <a href="#">Se déconnecter</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="lbb-dropdown-wrapper">
+          <a class="button" href="#">Dropdown on button (large and on top) &#x25B4;</a>
+          <div class="lbb-dropdown lbb-dropdown-top lbb-dropdown-large">
+            <p><b>Lorem ipsum dolor sit amet :</b></p>
+            <ul>
+              <li>Morbi rutrum, ex pulvinar elementum varius</li>
+              <li>Quisque varius urna a sagittis facilisis</li>
+              <li>Vestibulum ante nisi, tempus sit amet faucibus sed...</li>
+            </ul>
+            <p>Integer ac malesuada dui. Curabitur sodales risus ut lorem varius auctor. Etiam id luctus arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
+            <p><a target="_blank" href="#">Lorem ipsum dolor sit amet.</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="lbb-dropdown-wrapper">
+          <a href="#">Dropdown on link (large, on top and on right) &#x25B4;</a>
+          <div class="lbb-dropdown lbb-dropdown-top-right lbb-dropdown-large">
+            <p><b>Lorem ipsum dolor sit amet :</b></p>
+            <ul>
+              <li>Morbi rutrum, ex pulvinar elementum varius</li>
+              <li>Quisque varius urna a sagittis facilisis</li>
+              <li>Vestibulum ante nisi, tempus sit amet faucibus sed...</li>
+            </ul>
+            <p>Integer ac malesuada dui. Curabitur sodales risus ut lorem varius auctor. Etiam id luctus arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
+            <p><a target="_blank" href="#">Lorem ipsum dolor sit amet.</a></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ********************************** Badges ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+      <div class="cookbook-title">Badges</div>
+      <p>
+        <span class="badge badge-warning">Badge-warning</span>
+      </p>
+      <p>
+        <span class="badge badge-success">Badge-success</span>
+      </p>
+      <p>
+        <span class="badge badge-info">Badge-info</span>
+      </p>
+      <p>
+        <span class="badge badge-error">Badge-error</span>
+      </p>
+      <p>
+        <span class="badge badge-alternance">Badge-alternance</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- ********************************** Ratings ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+
+      <div class="cookbook-title">Ratings</div>
+
+      <p>
+        <span class="rating-stars">
+          <b style="width: {{ 100 * 0 / 5 }}%;">0</b>
+        </span>
+        <span class="rating-value">0</span>
+      </p>
+
+      <p>
+        <span class="rating-stars">
+          <b style="width: {{ 100 * 1 / 5 }}%;">1</b>
+        </span>
+        <span class="rating-value">1</span>
+      </p>
+
+      <p>
+        <span class="rating-stars">
+          <b style="width: {{ 100 * 2.5 / 5 }}%;">2.5</b>
+        </span>
+        <span class="rating-value">2.5</span>
+      </p>
+
+      <p>
+        <span class="rating-stars">
+          <b style="width: {{ 100 * 5 / 5 }}%;">5</b>
+        </span>
+        <span class="rating-value">5</span>
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ********************************** Tooltips ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+
+      <div class="cookbook-title">Tooltips</div>
+
+      <p>
+        <span data-toggle="tooltip" title="Ceci est un tooltip.">Survolez ce texte avec la souris pour voir apparaitre un tooltip.</span>
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ********************************** Breadcrumb ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+      <div class="cookbook-title">Breadcrumb</div>
+      <ol class="breadcrumb">
+          <li><a href="#">Mon compte</a></li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+          <li>Mes favoris</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ********************************** Common HTML elements ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+
+      <div class="cookbook-title">Common HTML elements</div>
+
+      <p>This is a test page filled with common HTML elements to be used to provide visual feedback whilst building CSS systems and frameworks.</p>
+
+      <main>
+
+        <div>
+
+          <div>
+            <div class="cookbook-title">Headings</div>
+            <h1>Heading 1</h1>
+            <h2>Heading 2</h2>
+            <h3>Heading 3</h3>
+            <h4>Heading 4</h4>
+            <h5>Heading 5</h5>
+            <h6>Heading 6</h6>
+          </div>
+
+          <div>
+            <div class="cookbook-title">Long headings</div>
+            <h1>Heading 1 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h1>
+            <h2>Heading 2 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h2>
+            <h3>Heading 3 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h3>
+            <h4>Heading 4 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h4>
+            <h5>Heading 5 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h5>
+            <h6>Heading 6 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h6>
+          </div>
+
+          <div class="cookbook-title">Paragraphs</div>
+          <div>
+            <p>A paragraph (from the Greek paragraphos, “to write beside” or “written beside”) is a self-contained unit of a discourse in writing dealing with a particular point or idea. A paragraph consists of one or more sentences. Though not required by the syntax of any language, paragraphs are usually an expected part of formal writing, used to organize longer prose.</p>
+          </div>
+
+          <section>
+            <h2 class="cookbook-title">Section / Article</h2>
+            <article>
+              <header>
+                <h3>Article</h3>
+              </header>
+              <div>
+                <p>A paragraph (from the Greek paragraphos, “to write beside” or “written beside”) is a self-contained unit of a discourse in writing dealing with a particular point or idea. A paragraph consists of one or more sentences. Though not required by the syntax of any language, paragraphs are usually an expected part of formal writing, used to organize longer prose.</p>
+              </div>
+              <footer>
+                <p>Footer</p>
+              </footer>
+            </article>
+          </section>
+
+          <div class="cookbook-title">Blockquotes</div>
+          <div>
+            <blockquote>
+              <p>A block quotation (also known as a long quotation or extract) is a quotation in a written document, that is set off from the main text as a paragraph, or block of text.</p>
+              <p>It is typically distinguished visually using indentation and a different typeface or smaller size quotation. It may or may not include a citation, usually placed at the bottom.</p>
+              <cite><a href="#!">Said no one, ever.</a></cite>
+            </blockquote>
+          </div>
+
+          <div class="cookbook-title">Lists</div>
+          <div>
+            <h3>Definition list</h3>
+            <dl>
+              <dt>Definition list title</dt>
+              <dd>This is a definition list division.</dd>
+            </dl>
+            <h3>Ordered list</h3>
+            <ol>
+              <li>List Item 1</li>
+              <li>List Item 2</li>
+              <li>List Item 3</li>
+            </ol>
+            <h3>Unordered list</h3>
+            <ul>
+              <li>List Item 1</li>
+              <li>List Item 2</li>
+              <li>List Item 3</li>
+            </ul>
+            <h3>Unordered list in list with links</h3>
+            <ul>
+              <li>
+                <a href="#">List item</a>
+                <ul>
+                  <li><a href="#">Lorem</a></li>
+                  <li><a href="#">Ipsum</a></li>
+                  <li><a href="#">Dolor</a></li>
+                  <li><a href="#">Amet</a></li>
+                  <li><a href="#">Lorem</a></li>
+                  <li><a href="#">Ipsum</a></li>
+                  <li><a href="#">Dolor</a></li>
+                </ul>
+              </li>
+              <li><a href="#">List item</a></li>
+            </ul>
+
+          </div>
+
+          <div class="cookbook-title">Horizontal rules</div>
+          <div>
+            <hr>
+          </div>
+
+          <div class="cookbook-title">Tabular data</div>
+          <table>
+            <caption>Table Caption</caption>
+            <thead>
+              <tr>
+                <th>Table Heading 1</th>
+                <th>Table Heading 2</th>
+                <th>Table Heading 3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Table Cell 1</td>
+                <td>Table Cell 2</td>
+                <td>Table Cell 3</td>
+              </tr>
+              <tr>
+                <td>Table Cell 1</td>
+                <td>Table Cell 2</td>
+                <td>Table Cell 3</td>
+              </tr>
+              <tr>
+                <td>Table Cell 1</td>
+                <td>Table Cell 2</td>
+                <td>Table Cell 3</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>Table Footer 1</th>
+                <th>Table Footer 2</th>
+                <th>Table Footer 3</th>
+              </tr>
+            </tfoot>
+          </table>
+
+          <div class="cookbook-title">Inline elements</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Element</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code>&lt;a&gt;</code>
+                </td>
+                <td>
+                  <a href="#!">This is a text link</a>.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;strong&gt;</code>
+                </td>
+                <td>
+                  <strong>Strong is used to indicate strong importance.</strong>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;em&gt;</code>
+                </td>
+                <td>
+                  <em>This text has added emphasis.</em>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;b&gt;</code>
+                </td>
+                <td>
+                  The <b>b element</b> is stylistically different text from normal text, without any special importance.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;i&gt;</code>
+                </td>
+                <td>
+                  The <i>i element</i> is text that is offset from the normal text.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;u&gt;</code>
+                </td>
+                <td>
+                  The <u>u element</u> is text with an unarticulated, though explicitly rendered, non-textual annotation.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;del&gt;</code> / <code>&lt;ins&gt;</code>
+                </td>
+                <td>
+                  <del>This text is deleted</del> and <ins>This text is inserted</ins>.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;s&gt;</code>
+                </td>
+                <td>
+                  <s>This text has a strikethrough</s>.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;sup&gt;</code>
+                </td>
+                <td>
+                  Superscript<sup>®</sup>.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;sub&gt;</code>
+                </td>
+                <td>
+                  Subscript for things like H<sub>2</sub>O.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;small&gt;</code>
+                </td>
+                <td>
+                  <small>This small text is small for for fine print, etc.</small>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;abbr&gt;</code>
+                </td>
+                <td>
+                  Abbreviation: <abbr title="HyperText Markup Language">HTML</abbr>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;q&gt;</code>
+                </td>
+                <td>
+                  <q cite="https://developer.mozilla.org/en-US/docs/HTML/Element/q">This text is a short inline quotation.</q>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;cite&gt;</code>
+                </td>
+                <td>
+                  <cite>This is a citation.</cite>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;dfn&gt;</code>
+                </td>
+                <td>
+                  The <dfn>dfn element</dfn> indicates a definition.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;mark&gt;</code>
+                </td>
+                <td>
+                  The <mark>mark element</mark> indicates a highlight.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;var&gt;</code>
+                </td>
+                <td>
+                  The <var>variable element</var>, such as <var>x</var> = <var>y</var>.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>&lt;time&gt;</code>
+                </td>
+                <td>
+                  The time element: <time datetime="2013-04-06T12:32+00:00">2 weeks ago</time>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div>
+
+            <div class="cookbook-title">Image - No <code>&lt;figure&gt;</code> element</div>
+            <p>
+              <img src="{{ url_for('static', filename='images/cookbook/construction.jpg') }}" alt="Image alt text">
+            </p>
+
+            <div class="cookbook-title">Image - Wrapped in a <code>&lt;figure&gt;</code> element, no <code>&lt;figcaption&gt;</code></div>
+            <figure>
+              <img src="{{ url_for('static', filename='images/cookbook/construction.jpg') }}" alt="Image alt text">
+            </figure>
+
+            <div class="cookbook-title">Image - Wrapped in a <code>&lt;figure&gt;</code> element, with a <code>&lt;figcaption&gt;</code></div>
+            <figure>
+              <img src="{{ url_for('static', filename='images/cookbook/construction.jpg') }}" alt="Image alt text">
+              <figcaption>Here is a caption for this image.</figcaption>
+            </figure>
+
+          </div>
+
+          <div class="cookbook-title">Meter</div>
+          <div><meter value="2" min="0" max="10">2 out of 10</meter></div>
+
+          <div class="cookbook-title">Progress</div>
+          <div><progress>progress</progress></div>
+
+          <div class="cookbook-title">Inline SVG</div>
+          <div><svg width="100px" height="100px"><circle cx="100" cy="100" r="100" fill="#1fa3ec"></circle></svg></div>
+
+        </div>
+
+        <div>
+
+          <div class="cookbook-title">Form elements in fieldsets</div>
+
+          <form>
+
+            <fieldset>
+              <legend>Input fields</legend>
+              <p>
+                <label for="input__text">Text Input</label>
+                <input id="input__text" type="text" placeholder="Text Input">
+              </p>
+              <p>
+                <label for="input__password">Password</label>
+                <input id="input__password" type="password" placeholder="Type your Password">
+              </p>
+              <p>
+                <label for="input__webaddress">Web Address</label>
+                <input id="input__webaddress" type="url" placeholder="http://yoursite.com">
+              </p>
+              <p>
+                <label for="input__emailaddress">Email Address</label>
+                <input id="input__emailaddress" type="email" placeholder="name@email.com">
+              </p>
+              <p>
+                <label for="input__phone">Phone Number</label>
+                <input id="input__phone" type="tel" placeholder="(999) 999-9999">
+              </p>
+              <p>
+                <label for="input__search">Search</label>
+                <input id="input__search" type="search" placeholder="Enter Search Term">
+              </p>
+              <p>
+                <label for="input__text2">Number Input</label>
+                <input id="input__text2" type="number" placeholder="Enter a Number">
+              </p>
+              <p>
+                <label for="input__text3">Error</label>
+                <input id="input__text3" type="text" placeholder="Text Input">
+              </p>
+              <p>
+                <label for="input__text4">Valid</label>
+                <input id="input__text4" type="text" placeholder="Text Input">
+              </p>
+            </fieldset>
+
+            <fieldset>
+              <!-- Without legend -->
+              <p>
+                <label for="input__text__without_legend">Text Input</label>
+                <input id="input__text__without_legend" type="text" placeholder="Text Input">
+              </p>
+              <p>
+                <label for="input__password__without_legend">Password</label>
+                <input id="input__password__without_legend" type="password" placeholder="Type your Password">
+              </p>
+              <p>
+                <label for="input__webaddress__without_legend">Web Address</label>
+                <input id="input__webaddress__without_legend" type="url" placeholder="http://yoursite.com">
+              </p>
+            </fieldset>
+
+            <fieldset>
+              <legend>Select menus</legend>
+              <p>
+                <label for="select">Select</label>
+                <select id="select">
+                  <optgroup label="Option Group">
+                    <option>Option One</option>
+                    <option>Option Two</option>
+                    <option>Option Three</option>
+                  </optgroup>
+                </select>
+              </p>
+            </fieldset>
+
+            <fieldset>
+              <legend>Checkboxes</legend>
+              <ul>
+                <li><label for="checkbox1"><input id="checkbox1" name="checkbox" type="checkbox" checked="checked"> Choice A</label></li>
+                <li><label for="checkbox2"><input id="checkbox2" name="checkbox" type="checkbox"> Choice B</label></li>
+                <li><label for="checkbox3"><input id="checkbox3" name="checkbox" type="checkbox"> Choice C</label></li>
+              </ul>
+            </fieldset>
+
+            <fieldset>
+              <legend>Radio buttons</legend>
+              <ul>
+                <li><label for="radio1"><input id="radio1" name="radio" type="radio" checked="checked">Option 1</label></li>
+                <li><label for="radio2"><input id="radio2" name="radio" type="radio">Option 2</label></li>
+                <li><label for="radio3"><input id="radio3" name="radio" type="radio">Option 3</label></li>
+              </ul>
+            </fieldset>
+
+            <fieldset>
+              <legend>Textareas</legend>
+              <p>
+                <label for="textarea">Textarea</label>
+                <textarea id="textarea" rows="8" cols="48" placeholder="Enter your message here"></textarea>
+              </p>
+            </fieldset>
+
+            <fieldset>
+              <legend>HTML5 inputs</legend>
+              <p>
+                <label for="in">Number input</label>
+                <input type="number" id="in" min="0" max="10" value="5">
+              </p>
+              <p>
+                <label for="ir">Range input</label>
+                <input type="range" id="ir" value="10">
+              </p>
+            </fieldset>
+
+            <fieldset>
+              <legend>Action buttons</legend>
+              <p>
+                <input class="btn" type="submit" value="<input type=submit class=btn>">
+              </p>
+              <p>
+                <input class="btn" type="button" value="<input type=button class=btn>">
+              </p>
+              <p>
+                <input class="btn" type="reset" value="<input type=reset class=btn>">
+              </p>
+              <p>
+                <input class="btn" type="submit" value="<input disabled class=btn>" disabled>
+              </p>
+              <hr>
+              <p>
+                <button class="btn" type="submit">&lt;button type=submit class=btn&gt;</button>
+              </p>
+              <p>
+                <button class="btn" type="button">&lt;button type=button class=btn&gt;</button>
+              </p>
+              <p>
+                <button class="btn" type="reset">&lt;button type=reset class=btn&gt;</button>
+              </p>
+              <p>
+                <button class="btn" type="button" disabled>&lt;button disabled class=btn&gt;</button>
+              </p>
+              <hr>
+              <p>
+                <a class="btn" href="#">&lt;a class=btn&gt;</a>
+              </p>
+            </fieldset>
+
+          </form>
+        </div>
+
+        <section>
+          <h2 class="cookbook-title">Form elements without fieldsets</h2>
+          <form>
+            <p>
+              <label>Text Input</label>
+              <input type="text" placeholder="Text Input">
+            </p>
+            <p>
+              <label>Password</label>
+              <input type="password" placeholder="Type your Password">
+            </p>
+          </form>
+          <form>
+            <div>
+              <input type="text" placeholder="Text Input 1">
+              <input type="text" placeholder="Text Input 2">
+              <button class="btn" type="submit">Rechercher les entreprises</button>
+            </div>
+            <div>
+              <label>Textarea</label>
+              <textarea rows="8" cols="48" placeholder="Enter your message here"></textarea>
+            </div>
+          </form>
+        </section>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- ********************************** Grid system without padding ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+
+      <div class="cookbook-title">Grid system without padding</div>
+
+      <div class="grid-row">
+        <div class="grid-col-12">
+          <p>Size 12</p>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-col-11">
+          <p>Size 11</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-col-10">
+          <p>Size 10</p>
+        </div>
+        <div class="grid-col-2">
+          <p>Size 2</p>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-col-9">
+          <p>Size 9</p>
+        </div>
+        <div class="grid-col-3">
+          <p>Size 3</p>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-col-8">
+          <p>Size 8</p>
+        </div>
+        <div class="grid-col-4">
+          <p>Size 4</p>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-col-7">
+          <p>Size 7</p>
+        </div>
+        <div class="grid-col-5">
+          <p>Size 5</p>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-col-6">
+          <p>Size 6</p>
+        </div>
+        <div class="grid-col-6">
+          <p>Size 6</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="grid-row">
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+        <div class="grid-col-1">
+          <p>Size 1</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="grid-row">
+        <div class="grid-col-3">
+          <p>Size 3</p>
+        </div>
+        <div class="grid-col-3">
+          <p>Size 3</p>
+        </div>
+        <div class="grid-col-3">
+          <p>Size 3</p>
+        </div>
+        <div class="grid-col-3">
+          <p>Size 3</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ********************************** Grid system with padding ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+
+      <div class="cookbook-title">Grid system with padding</div>
+
+      <div class="grid-row grid-spacing">
+        <div class="grid-col-3">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+        <div class="grid-col-3">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+        <div class="grid-col-3">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+        <div class="grid-col-3">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ********************************** Results list ********************************** -->
+  <div class="lbb-content-purple-wrapper">
+    <div class="lbb-content">
+      <div class="lbb-content-with-sidebar">
+
+        <h1 class="lbb-result-info">
+          <b>166 entreprises</b>
+          susceptibles de recruter en
+          <b>Réalisation de contenus multimédias</b>
+          autour de
+          <b>Paris (75000)</b>
+        </h1>
+
+        <form>
+
+          <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
+            <div class="lbb-sidebar">
+              <div class="lbb-sidebar-toggle-wrapper">
+                <a class="lbb-sidebar-toggle" href="#">« Retour</a>
+                <hr>
+              </div>
+              <h2>Trier par</h2>
+              <div class="lbb-sidebar-item">
+                <ul>
+                  <li><label><input name="radio" type="radio" checked="checked">Distance</label></li>
+                  <li><label><input name="radio" type="radio">Potentiel</label></li>
+                  <li><label><input name="radio" type="radio">Taille d'entreprise</label></li>
+                </ul>
+              </div>
+              <hr>
+              <h2>Filtrer par</h2>
+              <div class="lbb-sidebar-item">
+                <p>
+                  <label for="potentiel">Potentiel d'embauche</label>
+                </p>
+                <select id="potentiel">
+                  <option>Option One</option>
+                  <option>Option Two</option>
+                  <option>Option Three</option>
+                </select>
+              </div>
+              <div class="lbb-sidebar-item">
+                <p>Tendance</p>
+                <ul>
+                  <li><label><input name="radio" type="radio" checked="checked"> Distance</label></li>
+                  <li><label><input name="radio" type="radio"> Potentiel</label></li>
+                  <li><label><input name="radio" type="radio"> Taille d'entreprise</label></li>
+                </ul>
+              </div>
+              <div class="lbb-sidebar-item">
+                <p>
+                  Distance
+                  <small class="badge badge-info" data-toggle="tooltip" data-placement="top" title="Tooltip">TOOLTIP</small>
+                </p>
+                <ul>
+                  <li><label><input name="checkbox" type="checkbox" checked="checked"> Choice A</label></li>
+                  <li><label><input name="checkbox" type="checkbox"> Choice B</label></li>
+                  <li><label><input name="checkbox" type="checkbox"> Choice C</label></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="lbb-bright-container">
+            <div class="form-search">
+              <div>
+                <input class="input-icon input-icon-suitcase"
+                       type="text"
+                       placeholder="Métier recherché : (boucher, cariste, secrétaire, ...)">
+                <input class="input-icon input-icon-location"
+                       type="text"
+                       placeholder="Autour de : (Paris, Pau, ...)">
+              </div>
+              <button class="btn" type="submit">
+                <img src="{{ url_for('static', filename='images/input-icons/magnifier-white.svg') }}" alt="Chercher">
+              </button>
+            </div>
+            <div class="lbb-sidebar-toggle-wrapper">
+              <a class="lbb-sidebar-toggle" href="#lbb-sidebar-wrapper">Trier / Filtrer »</a>
+            </div>
+          </div>
+
+        </form>
+
+        <!-- Header NOT wrapped in a link -->
+        <div class="lbb-bright-container lbb-result">
+          <div class="lbb-result__header">
+            <h2>
+              <span>INTERMARCHE MAGNY</span> - <small>METZ</small>
+            </h2>
+            <div class="grid-row grid-spacing">
+              <div class="grid-col-4">
+                <h3>Supermarchés</h3>
+                <p>20 à 49 salariés</p>
+              </div>
+              <div class="grid-col-4">
+                <h3 class="lbb-green">
+                  Potentiel d'embauche<br>
+                  <span class="rating-stars">
+                    <b style="width: 80%;">4</b>
+                  </span>
+                  <span class="rating-value">4</span>
+                </h3>
+              </div>
+              <div class="grid-col-4">
+                <h3>4 Km</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Header wrapped in a link -->
+        <div class="lbb-bright-container lbb-result">
+          <div class="lbb-result__header">
+            <h2>
+              <span>SIMPLY MARKET</span> - <small>METZ</small>
+              - <span class="badge badge-alternance" data-toggle="tooltip" title="Cette entreprise recrute notamment des contrats en alternance">Alternance</span>
+            </h2>
+            <div class="grid-row grid-spacing">
+              <div class="grid-col-4">
+                <h3>Supermarchés</h3>
+                <p>20 à 49 salariés</p>
+              </div>
+              <div class="grid-col-4">
+                <h3 class="lbb-green">
+                  Potentiel d'embauche<br>
+                  <span class="rating-stars">
+                    <b style="width: 80%;">4</b>
+                  </span>
+                  <span class="rating-value">4</span>
+                </h3>
+              </div>
+              <div class="grid-col-4">
+                <h3>2 Km</h3>
+              </div>
+            </div>
+          </div>
+          <div class="lbb-result__actions">
+            <a class="btn btn-small js-result-toggle-details" href="#">Plus d'infos</a>
+            <a class="btn btn-light btn-small" href="#">Télécharger la fiche en PDF</a>
+            <a class="btn btn-light btn-small" href="#">Ajouter aux favoris</a>
+          </div>
+        </div>
+
+        <!-- Header wrapped in a link -->
+        <div class="lbb-bright-container lbb-result active">
+          <div class="lbb-result__header">
+            <h2>
+              <span>SIMPLY MARKET</span> - <small>METZ</small>
+            </h2>
+            <div class="grid-row grid-spacing">
+              <div class="grid-col-4">
+                <h3>Supermarchés</h3>
+                <p>20 à 49 salariés</p>
+              </div>
+              <div class="grid-col-4">
+                <h3 class="lbb-green">
+                  Potentiel d'embauche<br>
+                  <span class="rating-stars">
+                    <b style="width: 80%;">4</b>
+                  </span>
+                  <span class="rating-value">4</span>
+                </h3>
+              </div>
+              <div class="grid-col-4">
+                <h3>2 Km</h3>
+              </div>
+            </div>
+          </div>
+          <div class="lbb-result__actions">
+            <a class="btn btn-small js-result-toggle-details" href="#">Plus d'infos</a>
+            <a class="btn btn-light btn-small" href="#">Télécharger la fiche en PDF</a>
+            <a class="btn btn-light btn-small" href="#">Ajouter aux favoris</a>
+          </div>
+          <div class="lbb-result__details">
+            <div class="lbb-result__content">
+              <div class="grid-row grid-spacing">
+                <div class="grid-col-4">
+                  <h3>Raison sociale</h3>
+                  <p>ATAC</p>
+                  <h3>Enseigne</h3>
+                  <p>SIMPLY MARKET</p>
+                  <h3>Adresse</h3>
+                  <p>
+                      ATAC<br>
+                      SIMPLY MARKET<br>
+                      Service des ressources humaines<br>
+                      23 RUE DU XXE CORPS AMERICAIN<br>
+                      57000 METZ<br>
+                  </p>
+                </div>
+                <div class="grid-col-4">
+                  <h3 class="lbb-purple">C'est mon entreprise !</h3>
+                  <p><a href="#">Modifier ces informations</a></p>
+                </div>
+                <div class="grid-col-4">
+                  <h3>Mode de contact à privilégier</h3>
+                  <p>Se présenter spontanément</p>
+                  <h3>Informations supplémentaires</h3>
+                  <ul>
+                    <li>
+                      <a href="#">Google</a>
+                    </li>
+                    <li>
+                      <a href="#">Kompass</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div><!-- END .result__content -->
+          </div>
+        </div>
+
+        <div class="lbb-bright-container">
+          <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
+          <p>...dans d'autres métiers :</p>
+          <ul>
+            <li><a href="#">Plonge en restauration (52)</a></li>
+            <li><a href="#">Vente en gros de produits frais (1)</a></li>
+            <li><a href="#">Vente en alimentation (60)</a></li>
+          </ul>
+          <p>...plus loin :</p>
+          <ul>
+            <li><a href="#">Etendre à 30 km (32)</a></li>
+            <li><a href="#">Etendre à 50 km (57)</a></li>
+            <li><a href="#">Etendre à France entière (4419)</a></li>
+          </ul>
+        </div>
+
+        <nav class="pagination-wrapper" aria-label="Page navigation">
+          <b>Plus d'entreprises</b>
+          <ul class="pagination">
+            <li class="page-item active">
+              <span class="page-link">1</span>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">2</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">3</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">4</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">5</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">6</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">7</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">8</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">9</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">10</a>
+            </li>
+            <li class="page-item">
+              <span class="page-link">...</span>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">89</a>
+            </li>
+          </ul>
+        </nav>
+
+      </div><!-- END .lbb-content-with-sidebar -->
+    </div><!-- END .lbb-content -->
+  </div><!-- END .lbb-content-purple-wrapper -->
+
+
+  <!-- ********************************** Horizontal form ********************************** -->
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+
+      <div class="cookbook-title">Horizontal form</div>
+
+      <h2>Demande de modification des informations de mon entreprise</h2>
+      <form class="form-vertical">
+        <div class="form-error">
+          <label for="action">Je souhaite :</label>
+          <select id="action" name="action">
+            <option selected="" value="promouvoir">Que mon entreprise soit davantage mise en avant</option>
+            <option value="enlever">Supprimer mon entreprise des résultats</option>
+            <option value="modifier">Mettre à jour les informations de mon entreprise</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+        <div>
+          <label for="siret">Siret (14 chiffres)</label>
+          <input id="siret" name="siret" pattern="[0-9]{10,14}" required="" type="text" value="">
+        </div>
+        <div>
+          <label for="first_name">Prénom</label>
+          <input id="first_name" name="first_name" required="" type="text" value="">
+        </div>
+        <div class="form-error">
+          <label for="last_name">Nom</label>
+          <input id="last_name" name="last_name" required="" type="text" value="">
+          <p class="form-help-text">Help text</p>
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" required="" type="email" value="">
+        </div>
+        <div>
+          <label for="phone">Téléphone</label>
+          <input id="phone" name="phone" type="tel" value="">
+        </div>
+        <div class="form-error">
+          <label for="comment">Commentaires</label>
+          <textarea id="comment" name="comment"></textarea>
+          <p class="form-help-text">Help text</p>
+          <ul class="form-errorlist">
+            <li>Ce champ est obligatoire.</li>
+            <li>Ce champ est obligatoire bis.</li>
+          </ul>
+        </div>
+        <p>
+          <input class="btn" type="submit" value="Envoyer">
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ********************************** Footer ********************************** -->
+  <footer class="lbb-footer-wrapper">
+    <div class="lbb-footer">
+      <ul>
+        <li>
+          <a href="#">Conseils</a>
+        </li>
+        <li>
+          <a href="#">F.A.Q</a>
+        </li>
+        <li>
+          <a href="#">API LBB</a>
+        </li>
+        <li>
+          <a href="#">C.G.U</a>
+        </li>
+        <li>
+          <a href="#">Contact</a>
+        </li>
+        <li>
+          <a href="#">Espace Presse</a>
+        </li>
+      </ul>
+    </div>
+  </footer>
+
+  {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+
+</body>
+</html>

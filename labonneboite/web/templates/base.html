@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="google-site-verification" content="u049KXeNisFhYyb2alIBRJGWP1E6Y0YFfgyk1nWH1Xs">
+    <title>{% block title %} | La Bonne Boite{% endblock %}</title>
+    {% block extrahead %}{% endblock %}
+    {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
+</head>
+<body>
+
+  <div class="cookies-banner">
+    <p>Les cookies assurent le bon fonctionnement de nos services. En utilisant ces derniers, vous acceptez l'utilisation des cookies.</p>
+    <p>
+      <a href="{{ url_for('root.cgu') }}">En savoir plus</a>
+      -
+      <a href="#" class="cookies-accept"><b>J'ai compris</b></a>
+    </p>
+  </div>
+
+  <header class="lbb-header-wrapper">
+    <ul class="lbb-header">
+      <li class="lbb-header-logo-lbb">
+        <a href="/">
+          {# The hardcoded width attribute is required by IE 11. #}
+          <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boîte" width="74">
+        </a>
+      </li>
+      <li class="text-left">
+        {% if user_is_pro %}
+          <small class="badge badge-info" data-toggle="tooltip" data-placement="bottom" title="La version PRO de LBB affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visible aux conseillers Pôle emploi et à une sélection d'acteurs.">Version PRO</small>
+        {% endif %}
+        {% if is_alternance %}
+          <small class="badge badge-alternance" data-toggle="tooltip" data-placement="bottom" title="La recherche est limitée aux entreprises recrutant notamment des contrats en alternance">Alternance</small>
+        {% endif %}
+      </li>
+      <li>
+        {# START LOGIN ZONE #}
+        {% if not user.is_authenticated %}
+          <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
+            <a href="#" class="lbb-header-btn">
+              <img src="{{ url_for('static', filename='images/user.svg') }}" alt="">
+              <span>Connexion</span>
+            </a>
+            <div class="lbb-dropdown lbb-dropdown-right text-right">
+              <p>
+                <a class="logo-pe-connect" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ request.url | urlencode }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.png') }}" alt="Pôle emploi Connect"></a><br>
+                <i>Connectez-vous à La Bonne Boîte en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
+              </p>
+            </div>
+          </div>
+        {% else %}
+          <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
+            <a href="#" class="lbb-header-btn">
+              <img src="{{ url_for('static', filename='images/user-color.svg') }}" alt="">
+              <span>Mon compte &#x25BE;</span>
+            </a>
+            <div class="lbb-dropdown lbb-dropdown-right text-right">
+              <p>
+                <a href="{{ url_for('user.account') }}"><b>{{ user.first_name | title }} {{ user.last_name }}</b></a>
+              </p>
+              <p>
+                <a href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
+              </p>
+              <hr>
+              <p>
+                <a href="{{ url_for('auth.logout') }}" class="logout">Se déconnecter</a>
+              </p>
+            </div>
+          </div>
+        {% endif %}
+        {# END LOGIN ZONE #}
+      </li>
+      <li class="lbb-header-logo-pole-emploi">
+        {# The hardcoded width attribute is required by IE 11. #}
+        <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi" width="74">
+      </li>
+    </ul>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="lbb-flash-alerts">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} js-alert-close">
+            <p>{{ message }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <footer class="lbb-footer-wrapper">
+    <div class="lbb-footer">
+      <ul>
+        <li>
+          <a href="{{ url_for('root.lbb_help') }}">Conseils</a>
+        </li>
+        <li>
+          <a href="{{ url_for('root.faq') }}">F.A.Q</a>
+        </li>
+        <li>
+          <a href="https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api-la-bonne-boite-v1.html">API</a>
+        </li>
+        <li>
+          <a href="{{ url_for('root.cgu') }}">C.G.U</a>
+        </li>
+        <li>
+          <a href="{{ url_for('root.press') }}">Espace Presse</a>
+        </li>
+        <li>
+          <span class="js-obfuscated-email">rf.iolpme-elop@etiobennobal</span>
+        </li>
+      </ul>
+    </div>
+  </footer>
+
+  {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+
+  {% block scripts %}{% endblock %}
+
+  {# Google Analytics Tracking Code for labonneboite.pole-emploi.fr #}
+  <script type="text/javascript">
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-69464544-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  {# Hotjar Tracking Code for labonneboite.pole-emploi.fr #}
+  <script type="text/javascript">
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:381821,hjsv:5};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+    hj('tagRecording', ['{{ hotjar_tag }}']);
+  </script>
+
+  {# Memo button code https://memo.pole-emploi.fr/jsp/testButton.jsp #}
+  <script type="text/javascript">
+    (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://memo.pole-emploi.fr/js/ctj-button.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }
+    })(document, "script", "ctj-script");
+  </script>
+
+</body>
+</html>

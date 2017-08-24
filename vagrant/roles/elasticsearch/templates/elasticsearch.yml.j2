@@ -1,0 +1,5 @@
+{% if es_config_file %}
+{% for key, value in es_config_file|dictsort(by="key") %}
+{{key}}: {{value}}
+{% endfor %}
+{% endif %}

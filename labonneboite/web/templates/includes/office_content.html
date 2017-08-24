@@ -1,0 +1,89 @@
+<div class="lbb-result__details">
+  <div class="lbb-result__content">
+
+    <div class="grid-row grid-spacing">
+      <div class="grid-col-4">
+
+        <h3>Raison sociale</h3>
+        <p>{{ company.company_name }}</p>
+
+        {% if company.office_name %}
+        <h3>Enseigne</h3>
+        <p>{{ company.office_name }}</p>
+        {% endif %}
+
+        <h3>Adresse</h3>
+        <p class="easy-copy-paste">
+          {% for f in company.address_fields %}
+            {{ f }}<br>
+          {% endfor %}
+        </p>
+
+      </div>
+      <div class="grid-col-4">
+
+        {% if company.email or company.phone or company.website %}
+        <h3>Contact</h3>
+        <ul>
+          {% if company.email %}
+          <li>
+            <a href="mailto:{{ company.email }}">E-mail</a>
+          </li>
+          {% endif %}
+          {% if company.phone %}
+          <li>
+            <a href="tel:{{ company.phone }}">{{ company.phone }}</a>
+          </li>
+          {% endif %}
+          {% if company.website %}
+          <li>
+            <a href="{{ company.website }}" target="_blank">Site internet</a>
+          </li>
+          {% endif %}
+        </ul>
+        {% endif %}
+
+        <h3 class="lbb-purple">C'est mon entreprise !</h3>
+        <p><a href="{{ url_for('office.change_info') }}" target="_blank">Modifier ces informations</a></p>
+
+      </div>
+      <div class="grid-col-4">
+
+        {% if company.contact_mode %}{# Not available everywhere, we can live without it most of the time. #}
+        <h3>Mode de contact à privilégier</h3>
+        <p>{{ company.contact_mode }}</p>
+        {% endif %}
+
+        <h3>Informations supplémentaires</h3>
+        <ul>
+          <li>
+            <a href="{{ company.google_url }}" target="_blank" onclick="trackOutboundLink('{{ company.google_url }}');">Google</a>
+          </li>
+          <li>
+            <a href="{{ company.kompass_url }}" target="_blank" onclick="trackOutboundLink('{{ company.kompass_url }}');">Kompass</a>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+
+    {# Map. #}
+    <div class="js-map-container lbb-result__content__map">
+      {# Hidden input are used in JavaScript. #}
+      <input name="company-name" type="hidden" value="{{ company.name }}">
+      <input name="company-longitude" type="hidden" value="{{ company.x }}">
+      <input name="company-latitude" type="hidden" value="{{ company.y }}">
+      <input name="company-siret" type="hidden" value="{{ company.siret }}">
+      <input name="position" type="hidden" value ="{{ company.position }}">
+      <input name="headcount" type="hidden" value ="{{ company.headcount_text }}">
+      <input name="company_distance" type="hidden" value ="{{ company.distance }}">
+      {# Map placeholder. #}
+      <div class="map"></div>
+    </div>
+
+    <div class="lbb-result__content__actions">
+      <a class="btn btn-small ga-pdf-download-link" href="{{ url_for('office.download', siret=company.siret) }}">Télécharger la fiche en PDF</a>
+    </div>
+
+  </div>
+</div>

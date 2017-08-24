@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block extrahead %}
+  {{ super() }}
+  <link href="{{ mapbox_css_url }}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ mapbox_js_url }}"></script>
+{% endblock %}
+
+{% block title %}{{ company.name }} - {{ company.city }}{{ super() }}{% endblock %}
+
+{% block content %}
+
+<div class="lbb-content-purple-wrapper">
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+
+      <div class="lbb-bright-container lbb-result active">
+        {% with show_more_info=0 %}
+          {% include "includes/office_header.html" %}
+          {% include "includes/office_content.html" %}
+        {% endwith %}
+      </div>
+
+      <div class="lbb-bright-container">
+        <p class="text-center">
+          <a href="/" class="btn">Faire une autre recherche</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

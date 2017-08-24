@@ -1,0 +1,91 @@
+/* Flash alerts.
+=========================================================================== */
+
+.lbb-flash-alerts {
+    margin: 0 auto;
+    padding: 0;
+}
+
+.lbb-flash-alerts * + * {
+    margin: 0;  /* Cancel default spacing across block-level elements inside. */
+}
+
+/* Alerts.
+=========================================================================== */
+
+.alert {
+    background: #e0e0e0;
+    color: #222;
+    padding: 16px 20px;  /* Fallback in `px` for browsers that don't support rem. */
+    padding: 1rem;
+}
+
+.alert-warning {
+    background: #f7ba45;
+    color: #222;
+}
+
+.alert-success {
+    background: #19c158;
+    color: #fff;
+}
+
+.alert-info {
+    background: #1c86f2;
+    color: #fff;
+}
+
+.alert-error {
+    background: #f03c69;
+    color: #fff;
+}
+
+/* Links etc. inside an alert. */
+
+.alert a:link,
+.alert a:visited,
+.alert a:active,
+.alert a:hover {
+    color: #222;
+}
+
+/*success*/
+.alert-success a:link,
+.alert-success a:visited,
+.alert-success a:active,
+.alert-success a:hover,
+/*info*/
+.alert-info a:link,
+.alert-info a:visited,
+.alert-info a:active,
+.alert-info a:hover,
+/*error*/
+.alert-error a:link,
+.alert-error a:visited,
+.alert-error a:active,
+.alert-error a:hover {
+    color: #fff;
+}
+
+/* Close marks in alerts.
+=========================================================================== */
+
+.alert a.alert__close:link,
+.alert a.alert__close:visited,
+.alert a.alert__close:active {
+    display: inline-block;
+    margin: 0 10px;
+    float: right;
+    color: #5d5d5d;
+    font-size: 20px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1.25rem;
+    text-decoration: none;
+}
+
+.alert a.alert__close:hover {
+    color: #222;
+}
+
+.alert__close + * {
+    margin-top: 0;  /* Cancel default spacing across block-level elements inside. */
+}

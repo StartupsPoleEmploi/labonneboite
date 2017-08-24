@@ -1,0 +1,8 @@
+---
+project_name: labonneboite
+user_home: /home/vagrant
+project_dir: /srv/lbb
+project_repo: https://github.com/StartupsPoleEmploi/labonneboite.git
+branch: master
+db_dir: /srv/lbb/vagrant
+virtual_env: /home/vagrant/venvs/labonneboite

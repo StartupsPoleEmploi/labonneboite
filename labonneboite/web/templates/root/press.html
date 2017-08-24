@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Espace Presse{{ super() }}{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% include "includes/doorbell.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="lbb-content">
+  <div class="lbb-single-column-content">
+
+    <h2>Ils parlent de nous</h2>
+
+    <ul class="img-list">
+      <li>
+        <a href="http://www.lesechos.fr/politique-societe/societe/0211312752248-comment-letat-pourrait-mettre-a-profit-le-numerique-2029310.php" target="_blank">
+          <img src="{{ url_for('static', filename='images/press/les-echos.png') }}" alt="Les Echos">
+        </a>
+      </li>
+      <li>
+        <a href="http://www.franceinfo.fr/emission/la-boite-outils-de-l-emploi/2016-ete/pour-les-amateurs-de-candidature-spontanee-labonneboite-pole-emploi-fr-19-07-2016" target="_blank">
+          <img src="{{ url_for('static', filename='images/press/france-info.jpg') }}" alt="Franceinfo">
+        </a>
+      </li>
+      <li>
+        <a target="_blank"href="https://www.franceinter.fr/emissions/on-n-arrete-pas-l-eco/on-n-arrete-pas-l-eco-10-septembre-2016" target="_blank">
+          <img src="{{ url_for('static', filename='images/press/france-inter.png') }}" alt="France Inter">
+        </a>
+      </li>
+      <li>
+        <a href="http://www.wk-rh.fr/actualites/detail/90526/pole-emploi-lance-une-application-pour-faciliter-les-candidatures-spontanees.html" target="_blank">
+          <img src="{{ url_for('static', filename='images/press/liaisons-sociales.png') }}" alt="Liaisons Sociales Magazine">
+        </a>
+      </li>
+      <li>
+        <a href="http://www.rtl.fr/actu/conso/eric-barthelemy-conseiller-pole-emploi-a-metz-voir-les-gens-changer-d-etat-d-esprit-est-une-satisfaction-7784599371" target="_blank">
+          <img src="{{ url_for('static', filename='images/press/rtl.png') }}" alt="RTL">
+        </a>
+      </li>
+      <li>
+        <a href="http://www.usinenouvelle.com/article/start-up-et-hackathon-pour-inverser-la-courbe-du-chomage.N386528" target="_blank">
+          <img src="{{ url_for('static', filename='images/press/usine-nouvelle.png') }}" alt="L'Usine Nouvelle">
+        </a>
+      </li>
+      <li>
+        <a href="http://blog-experts.cadres.apec.fr/2016/01/25/la-bonne-boite-une-experimentation-qui-pourrait-vous-seduire/" target="_blank">
+          <img src="{{ url_for('static', filename='images/press/apec.png') }}" alt="Apec.fr">
+        </a>
+      </li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+/* Buttons.
+=========================================================================== */
+
+.btn,
+.btn:link,
+.btn:visited {
+
+    cursor: pointer;
+    vertical-align: bottom;
+
+    display: inline-block;
+    margin: 0 5px 0 0;
+
+    background-color: #7c408b;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+
+    border: 1px solid #7c408b;
+    border-radius: 2px;
+
+    font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1rem;
+
+    padding: 5px 15px;  /* Fallback in `px` for browsers that don't support rem. */
+    padding: 0.3125rem 0.9375rem;
+
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
+
+.btn:focus,
+.btn:hover {
+    background-color: #183152;
+    border-color: #183152;
+    color: #fff;
+}
+
+.btn:active {
+    background-color: #222;
+    border-color: #222;
+    color: #fff;
+}
+
+.btn[disabled] {
+    cursor: not-allowed;
+    opacity: .5;
+}
+
+/* Sizes.
+=========================================================================== */
+
+.btn.btn-large {
+    font-size: 20px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1.25rem;
+}
+
+.btn.btn-small {
+    font-size: 13px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 0.8125rem;
+}
+
+/* Colors: light color.
+=========================================================================== */
+
+.btn.btn-light,
+.btn.btn-light:link,
+.btn.btn-light:visited {
+    background-color: #e0e0e0;
+    border-color: #e0e0e0;
+    color: #222;
+}
+
+.btn.btn-light:focus,
+.btn.btn-light:hover {
+    background-color: #cbcbcb;
+    border-color: #cbcbcb;
+}
+
+/* Colors: dark color.
+=========================================================================== */
+
+.btn.btn-dark,
+.btn.btn-dark:link,
+.btn.btn-dark:visited {
+    background-color: #222;
+    border-color: #222;
+    color: #efefef;
+}
+
+.btn.btn-dark:focus,
+.btn.btn-dark:hover {
+    background-color: #000;
+    border-color: #000;
+}
+
+/* Colors: success.
+=========================================================================== */
+
+.btn.btn-success,
+.btn.btn-success:link,
+.btn.btn-success:visited {
+    background-color: #19c158;
+    border-color: #19c158;
+    color: #efefef;
+}
+
+.btn.btn-success:focus,
+.btn.btn-success:hover {
+    background-color: #0d7936;
+    border-color: #0d7936;
+}
+
+/* Colors: error.
+=========================================================================== */
+
+.btn.btn-error,
+.btn.btn-error:link,
+.btn.btn-error:visited {
+    background-color: #f03c69;
+    border-color: #f03c69;
+    color: #efefef;
+}
+
+.btn.btn-error:focus,
+.btn.btn-error:hover {
+    background-color: #d5385f;
+    border-color: #d5385f;
+}

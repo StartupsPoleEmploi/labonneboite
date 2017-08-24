@@ -1,0 +1,171 @@
+/* Layout.
+=========================================================================== */
+
+.lbb-header,
+.lbb-content,
+.lbb-footer {
+    max-width: 1400px;
+    margin: auto;
+}
+
+.lbb-header,
+.lbb-content,
+.lbb-footer {
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+.lbb-header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.lbb-content {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+@media (min-width: 800px) {  /* Only for browsers >= 800px. */
+    .lbb-content {
+        padding-bottom: 60px;
+    }
+}
+
+.lbb-footer {
+    padding-top: 30px;
+    padding-bottom: 60px;  /* Let some space to display the doorbell button under the footer. */
+}
+
+/*
+This is a wrapper because it can't have a fixed width in order to apply a full color background:
+  <div class="lbb-content-purple-wrapper">
+    <div class="lbb-content">
+    ...
+    </div>
+  </div>
+*/
+.lbb-content-purple-wrapper {
+    background: #7c408b;
+    margin: 0;
+}
+
+.lbb-content-alternance-wrapper {
+    background: linear-gradient(180deg, #991766, #801356);
+    margin: 0;
+}
+
+.lbb-single-column-content {
+    max-width: 930px;
+    margin: auto;
+}
+
+/* Header.
+=========================================================================== */
+
+.lbb-header-wrapper {
+    width: 100%;
+    background: #fff;
+    border-bottom: 1px solid #cbcbcb;
+}
+
+.lbb-header-wrapper * + * {
+    margin-top: 0;  /* Cancel default spacing across block-level elements inside. */
+}
+
+ul.lbb-header {
+    list-style: none;
+    display: table;
+    width: 100%;
+}
+
+.lbb-header > li {
+    display: table-cell;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+    vertical-align: middle;
+}
+
+.lbb-header-logo-lbb,
+.lbb-header-logo-pole-emploi {
+    width: 74px;  /* This width will give a height of ~ 70px for each logos since they have the same proportions. */
+}
+
+/* User buttons. */
+
+.lbb-header-btn-wrapper {
+    margin-right: 10px;
+}
+
+.lbb-header-btn,
+.lbb-header-btn:link {
+    display: inline-block;
+    padding: 5px;
+    text-decoration: none;
+    text-align: center;
+    font-size: 12px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #5d5d5d;
+}
+
+.lbb-header-btn:active,
+.lbb-header-btn:hover {
+    background-color: #cbcbcb;
+}
+
+.lbb-header-btn img {
+    width: 35px;
+    display: block;
+    margin: 0 auto 5px auto;
+}
+
+.logout {
+    background: url(../images/logout.svg) no-repeat 0 50%;
+    background-size: 12px 12px;
+    padding-left: 16px;
+}
+
+/* Footer.
+=========================================================================== */
+
+.lbb-footer-wrapper {
+    margin: 0;
+    border-top: 1px solid #cbcbcb;
+}
+
+.lbb-footer {
+    font-size: 13px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 0.8125rem;
+}
+
+.lbb-footer a:link,
+.lbb-footer a:visited,
+.lbb-footer a:active,
+.lbb-footer a:hover {
+    color: #5d5d5d;
+}
+
+.lbb-footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+.lbb-footer ul:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.lbb-footer ul li {
+    float: left;
+    width: 33%;
+    padding-left: 10%;
+    margin: 0;
+}
+
+@media (max-width: 800px) {  /* Only for browsers <= 800px. */
+    .lbb-footer ul li {
+        width: 50%;
+    }
+}

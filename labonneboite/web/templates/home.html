@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}La Bonne Boite | N'envoyez plus vos CV au hasard{% endblock %}
+
+{% block extrahead %}
+<meta name="description" content="Envoyez votre CV à la bonne entreprise ! Découvrez en un clic les entreprises qui recrutent dans votre métier près de chez vous">
+<meta name="title" content=">La Bonne Boite | Les entreprises qui recrutent près de chez vous">
+{% endblock %}
+
+{% block content %}
+
+<div class="lbb-content">
+  <div class="lbb-single-column-content text-center">
+
+    <h1 class="lbb-home-title">
+      N'envoyez plus vos CV au hasard
+      <small class="sub-heading">Découvrez notre sélection d'entreprises à fort potentiel d'embauche*</small>
+    </h1>
+
+    <form action="{{ url_for('search.search') }}" class="lbb-home-form-search js-search-form" method="get">
+
+      {% include "includes/search_form.html" %}
+
+      <div class="form-search-additional-fields">
+        <input type="checkbox" class="custom-checkbox" id="id_flag_alternance" name="flag_alternance" value="1"{% if is_alternance %} checked{% endif %}>
+        <label for="id_flag_alternance">Limiter la recherche aux entreprises recrutant notamment des <b>contrats en alternance</b></label>
+      </div>
+
+      {{ form.hidden_tag() }}
+
+    </form>
+
+    <p class="lbb-home-explanation lbb-grey">
+      <small>*Potentiel d'embauche : algorithme exclusif de Pôle emploi détectant les entreprises qui vont probablement embaucher ces 6 prochains mois.</small>
+    </p>
+  </div>
+</div>
+
+{% endblock %}

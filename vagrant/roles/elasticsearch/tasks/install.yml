@@ -1,0 +1,17 @@
+---
+
+- name: install apt-transport-https
+  apt: name=apt-transport-https state=installed
+
+- name: adding elasticsearch gpg key
+  apt_key: url="{{es_apt_gpg_url}}" state=present
+  become: yes
+
+- name: add elasticsearch repository 
+  apt_repository: repo="{{es_apt_repo}}" state=present
+  become: yes
+
+- name: install elasticsearch
+  apt: name=elasticsearch state=present update_cache=yes cache_valid_time=3600
+  become: yes
+  notify: init elasticsearch

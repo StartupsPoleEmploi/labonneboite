@@ -1,0 +1,23 @@
+<script type="text/javascript">
+    window.doorbellOptions = {
+        {% if 'press' in doorbell_tags %}
+        strings: {
+          'feedback-button-text': "Vous voulez parler de La Bonne Boîte ?",
+          'title': "Vous voulez parler de La Bonne Boîte ?",
+          'feedback-textarea-placeholder': "Votre message",
+          'submit-button-text': "Envoyer",
+          'message-success' : "Message envoyé",
+        },
+        {% endif %}
+        appKey: 'THXAF5JYNl5PXqaQIsyBwXhJwudQIPl55JENDymGK0LQobxnS4b3GUNa5B6xSztm',
+        tags: "{{ ','.join(doorbell_tags) }}"
+    };
+    (function(d, t) {
+        var g = d.createElement(t);
+        g.id = 'doorbellScript';
+        g.type = 'text/javascript';
+        g.async = true;
+        g.src = 'https://embed.doorbell.io/button/3346?t=' + (new Date().getTime());
+        (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(g);
+    }(document, 'script'));
+</script>

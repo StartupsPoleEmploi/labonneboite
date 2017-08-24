@@ -1,0 +1,301 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic");
+/* Web Fonts.
+The @import line of code should be the very first line in your CSS file.
+http://stackoverflow.com/a/14676665
+TODO: load local font instead?
+https://calendar.perfplanet.com/2016/no-font-face-bulletproof-syntax/
+--------------------------------------------------------------------------- */
+
+/* Base global styles.
+=========================================================================== */
+
+/*
+
+Inspiration:
+https://github.com/necolas/normalize.css
+https://github.com/milligram/milligram
+https://github.com/owenversteeg/min
+
+Colors:
+#006cff     => blue (links)
+#183152     => dark blue (buttons hover)
+#7c408b     => purple (buttons)
+#5d5d5d     => mid grey (text)
+#222        => dark grey, almost black (text, buttons active)
+#cbcbcb     => light grey
+#e0e0e0     => extra light grey
+#fff        => white
+#5d5d5d     => light white (used on :hover in search results)
+#19c158     => green (potentiel d'embauche, alert success)
+#f03c69     => red (form errors, alert errors)
+#f7ba45     => yellow (alert warning)
+#1c86f2     => blue (alert info)
+
+*/
+
+/* Box-model.
+
+Use the `border-box-model` where `width` = `element-width` + `padding` + `borders`.
+--------------------------------------------------------------------------- */
+
+*,
+*:after,
+*:before {
+    box-sizing: border-box;
+}
+
+/* Force inheritance.
+
+Some types of properties are not inherited by default, and some elements do not inherit some properties.
+We can use `inherit` to force inheritance in some cases.
+
+For example, the input element doesn't inherit any of the font properties. In order to make sure all elements
+inherit these properties from the global scope, we use the universal selector and the inherit keyword.
+
+We omit font-size, we don't want font-size to be inherited directly because it would override user-agent styles
+for e.g. heading elements, the small element and others.
+--------------------------------------------------------------------------- */
+
+* {
+    font-family: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+}
+
+/* Spacing across block-level elements.
+
+Set uniform default spacing across all block-level elements that appear in succession with just a few exceptions:
+https://www.smashingmagazine.com/2016/11/css-inheritance-cascade-global-scope-new-old-worst-best-friends/#layout
+--------------------------------------------------------------------------- */
+
+* + * {
+    margin-top: 24px;  /* Fallback in `px` for browsers that don't support rem. */
+    margin-top: 1.5rem;
+}
+
+/* Exceptions. */
+body,
+br,
+figcaption,
+legend + *,  /* Any element immediately preceded by a <legend> element. */
+li, li ul, li ol, dt, dd,
+option,
+th, td {
+    margin-top: 0;
+}
+
+/* Font size.
+
+Setting the font size on the body to 100% sets the text size to the browser's default font size: usually 16px.
+
+Then:
+16px = 1rem
+20px = 1.25rem => (20 * 1) / 16
+--------------------------------------------------------------------------- */
+
+html {
+    font-size: 100%;
+    font-family: "Open Sans", sans-serif;
+    line-height: 1.5;  /* Unitless line-height: http://meyerweb.com/eric/thoughts/2006/02/08/unitless-line-heights/ */
+    overflow-y: scroll;
+    -webkit-text-size-adjust: 100%;  /* Prevent font scaling in landscape while allowing user zoom. */
+}
+
+@media (max-width: 800px) {  /* For any browser width under 800px. */
+    html {
+        font-size: 90%;
+    }
+}
+
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: 40px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 2.5rem;
+}
+h2 {
+    font-size: 34px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 2.125rem;
+}
+h3 {
+    font-size: 28px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1.75rem;
+}
+h4 {
+    font-size: 26px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1.625rem;
+}
+h5 {
+    font-size: 24px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1.5rem;
+}
+h6 {
+    font-size: 20px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1.25rem;
+}
+
+/*
+Use this class inside a heading, e.g.:
+  <h1>
+    Main title
+    <small class="sub-heading">Sub heading</small>
+  </h1>
+*/
+.sub-heading {
+    display: block;
+    font-weight: lighter;
+    font-size: 18px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1.125rem;
+}
+
+/* Elements (global).
+--------------------------------------------------------------------------- */
+
+body {
+    background: #fff;
+}
+
+html {
+    color: #222;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #7c408b;
+}
+
+hr {
+    width: 100%;
+    border: 1px solid #cbcbcb;
+    border-width: 1px 0 0 0;
+}
+
+iframe {
+    width: 100%;
+    border: 1px solid #cbcbcb;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Links (global).
+--------------------------------------------------------------------------- */
+
+a:link {
+    color: #006cff;
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #006cff;
+    text-decoration: none;
+}
+
+a:active,
+a:hover {
+    color: #222;
+    text-decoration: none;
+}
+
+/* Tables (global).
+--------------------------------------------------------------------------- */
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    empty-cells: show;
+    text-align: left;
+    border: 1px solid #cbcbcb;
+}
+
+table caption {
+    font-style: italic;
+    text-align: center;
+    border: 1px solid #cbcbcb;
+    border-width: 1px 1px 0 1px;
+    padding: 10px 0;  /* Fallback in `px` for browsers that don't support rem. */
+    padding: 0.625rem 0;
+}
+
+table td,
+table th {
+    border: 1px solid #cbcbcb;
+    padding: 10px 16px;  /* Fallback in `px` for browsers that don't support rem. */
+    padding: 0.625rem 1rem;
+}
+
+table thead,
+table tfoot {
+    background: #e0e0e0;
+    vertical-align: bottom;
+    padding: 10px 16px;  /* Fallback in `px` for browsers that don't support rem. */
+    padding: 0.625rem 1rem;
+}
+
+table tfoot {
+    vertical-align: top;
+}
+
+/* Forms (global).
+--------------------------------------------------------------------------- */
+
+label[for] {
+    cursor: pointer;
+}
+
+fieldset {
+    /*
+    Width and min-width are required here to respect 100% textarea max-width within fieldset.
+    http://codepen.io/tmsdnl/pen/ByqJgO
+    */
+    width: 100%;
+    min-width: 100%;
+    border: 1px solid #cbcbcb;
+    padding: 20px 16px;  /* Fallback in `px` for browsers that don't support rem. */
+    padding: 1.25rem 1rem;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    background: #fff;
+    margin: 0;
+    max-width: 100%;
+    font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1rem;
+}
+
+button,
+input[type='search'],
+input[type='button'],
+input[type='reset'],
+input[type='submit'],
+optgroup,
+textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+input[type='email'],
+input[type='number'],
+input[type='password'],
+input[type='search'],
+input[type='tel'],
+input[type='text'],
+input[type='url'],
+textarea {
+    border: 1px solid #cbcbcb;
+    border-radius: 2px;
+    padding: 5px 10px;  /* Fallback in `px` for browsers that don't support rem. */
+    padding: 0.3125rem 0.625rem;
+}
+
+textarea {
+    min-height: 150px;
+}

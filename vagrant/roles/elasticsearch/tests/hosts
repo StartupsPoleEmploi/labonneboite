@@ -1,0 +1,5 @@
+[local]
+localhost   ansible_connection=local ansible_python_interpreter=python2
+
+[esnodes]
+node1       ansible_connection=docker ansible_user=root ansible_python_interpreter=python2

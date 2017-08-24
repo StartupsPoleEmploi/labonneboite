@@ -1,0 +1,27 @@
+/* Breadcrumb.
+=========================================================================== */
+
+.breadcrumb {
+    padding: 0;
+    list-style: none;
+    font-size: 13px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 0.8125rem;
+    color: #5d5d5d;
+}
+
+.breadcrumb li {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+.breadcrumb li:not(:last-child):after {
+    content: '/';
+    display: inline-block;
+    padding: 0 5px 0 8px;
+    margin: 0;
+    font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1rem;
+    position: relative;
+    top: 2px;
+}

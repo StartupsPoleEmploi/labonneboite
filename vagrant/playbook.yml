@@ -1,0 +1,93 @@
+---
+- vars_files:
+    - vars.yml
+    - elasticsearch.yml
+  hosts: all
+  roles:
+    - {role: elasticsearch, become: yes}
+  environment:
+    LBB_ENV: development
+
+  tasks:
+
+    - name: Update apt.
+      apt: update_cache=yes
+      become: yes
+
+    - name: Install APT packages.
+      apt: name={{ item }} state=present
+      with_items:
+        - git
+        - python
+        - python-dev
+        - python-virtualenv
+        - mysql-server
+        - libmysqlclient-dev
+        - libncurses5-dev
+        - build-essential
+        - python-numpy
+        - python-scipy
+        - python-mysqldb
+        - chromium-chromedriver
+        - xvfb
+      become: true
+
+    - name: Install french locale.
+      shell: "locale-gen fr_FR"
+      become: yes
+
+    - name: Update locales.
+      shell: "update-locale"
+      become: yes
+
+    - name: Install python package requirements with pip.
+      pip: requirements={{project_dir}}/requirements.txt virtualenv={{ virtual_env }}
+
+    - name: Install Labonneboite package.
+      shell: "cd {{project_dir}}; {{ virtual_env }}/bin/python setup.py develop"
+
+    - name: Configure MySQL `utf8mb4` support.
+      copy: src=mysql/lbb_utf8mb4.cnf dest=/etc/mysql/conf.d/lbb_utf8mb4.cnf owner=vagrant mode=0644
+      become: yes
+
+    - name: Configure MySQL user-specific options.
+      copy: src=mysql/my.cnf dest={{user_home}}/.my.cnf owner=vagrant mode=0644
+      become: yes
+
+    - name: Start the MySQL service
+      become: yes
+      service:
+        name: mysql
+        state: started
+        enabled: true
+
+    - name: create mysql dev user
+      mysql_user: name=labonneboite password=labonneboite priv=*.*:ALL state=present
+
+    - name: create mysql dev db
+      mysql_db: name=labonneboite state=present encoding=utf8mb4 collation=utf8mb4_unicode_ci
+
+    - name: import labonneboite_dev_etablissements.sql
+      mysql_db: state=import name=labonneboite target={{ db_dir }}/labonneboite_dev_etablissements.sql
+
+    - name: create mysql test user
+      mysql_user: name=lbb_test password=lbb_test priv=*.*:ALL state=present
+
+    - name: create mysql test db
+      mysql_db: name=lbb_test2 state=present encoding=utf8mb4 collation=utf8mb4_unicode_ci
+
+    - name: import labonneboite_test.sql
+      mysql_db: state=import name=lbb_test2 target={{ db_dir }}/labonneboite_test.sql
+
+    - name: Run database migrations
+      shell: "cd {{project_dir}}; {{ virtual_env }}/bin/alembic upgrade head"
+
+    - name: create elastic search indexes.
+      shell: "{{ virtual_env }}/bin/create_index -d 1"
+
+    - name: Link chromedriver so that it is in PATH.
+      file:
+        src: /usr/lib/chromium-browser/chromedriver
+        dest: /usr/local/bin/chromedriver
+        state: link
+      become: yes

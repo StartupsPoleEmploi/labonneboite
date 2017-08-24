@@ -1,0 +1,95 @@
+<div class="lbb-result__header">
+
+  <h2>
+    <span>{{ company.name }}</span>
+    - <small>{{ company.city }}</small>
+    {% if company.flag_alternance %}
+      - <span class="badge badge-alternance" data-toggle="tooltip" title="Cette entreprise recrute notamment des contrats en alternance">Alternance</span>
+    {% endif %}
+    {% if user_is_pro %}
+      {% if company.flag_junior %}
+        - <small class="badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute une proportion élevée de juniors (moins de 26 ans) - indicateur exclusif version PRO">
+        Junior</small>
+      {% endif %}
+      {% if company.flag_senior %}
+        - <small class="badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute une proportion élevée de seniors (plus de 50 ans) - indicateur exclusif version PRO">
+        Senior</small>
+      {% endif %}
+      {% if company.flag_handicap %}
+        - <small class="badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute des BOE (Bénéficiaire de l'Obligation d'Emploi) - indicateur exclusif version PRO">
+        BOE</small>
+      {% endif %}
+    {% endif %}
+  </h2>
+
+  <div class="grid-row grid-spacing">
+    <div class="grid-col-4">
+      <h3>{{ company.naf_text }}</h3>
+      <p>{{ company.headcount_text }}</p>
+    </div>
+    <div class="grid-col-4">
+      <h3 class="lbb-green">
+        Potentiel d'embauche<br>
+        <span class="rating-stars">
+          <b style="width: {{ company.get_stars_for_rome_code_as_percentage(rome_code) }}%;">
+            {{ company.get_stars_for_rome_code(rome_code) }}
+          </b>
+        </span>
+        <span class="rating-value">{{ '%0.1f' % company.get_stars_for_rome_code(rome_code) }}</span>
+      </h3>
+    </div>
+    <div class="grid-col-4">
+      {% if company.distance %}<h3>{{ company.distance }} Km</h3>{% endif %}
+    </div>
+  </div>
+
+  <div class="lbb-result__actions">
+
+    {% if show_more_info %}
+      <a href="#" class="btn btn-small js-result-toggle-details">Plus d'infos</a>
+    {% endif %}
+
+    {# START favorites. #}
+    {% if show_favorites and user.is_authenticated %}
+      {% if (user_favs_as_sirets is defined) and (company.siret not in user_favs_as_sirets) %}
+        <form action="{{ url_for('user.favorites_add', siret=company.siret) }}" method="post" class="form-inline">
+          <button class="btn btn-success btn-small" type="submit">Ajouter aux favoris</button>
+          <input type="hidden" name="next" value ="{{ request.url | urlencode }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+      {% else %}
+        <form action="{{ url_for('user.favorites_delete', siret=company.siret) }}" method="post" class="form-inline">
+          <button class="btn btn-error btn-small" type="submit">Supprimer des favoris</button>
+          <input type="hidden" name="next" value ="{{ request.url | urlencode }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+      {% endif %}
+    {% endif %}
+    {# END favorites. #}
+
+    {# START Memo button. #}
+    <a
+      class="ctj-import-button"
+      data-url="{{ url_for('api.office_details', siret=company.siret, _external=True) }}"
+      {% if rome_description %}data-job="{{ rome_description }}"{% endif %}
+      data-height="31"
+      data-width="180"><!-- Empty on purpose. -->
+    </a>
+    <div class="lbb-dropdown-wrapper">
+      <a href="#"><small>MEMO ? &#x25B4;</small></a>
+      <div class="lbb-dropdown lbb-dropdown-top-right lbb-dropdown-large">
+        <p><b>En cliquant sur le bouton "Importer dans MEMO" :</b></p>
+        <ul>
+          <li>Vous pouvez suivre toutes vos candidatures en un seul endroit</li>
+          <li>Vous recevez des alertes sur ce que vous devez faire cette semaine</li>
+          <li>Vous faîtes la différence auprès du recruteur en suivant les conseils : relancer, se préparer à l'entretien...</li>
+        </ul>
+        <p>Pour plus de transparence, le partage de données se fait après consentement du demandeur d'emploi lorsqu'il importe sa première offre dans MEMO depuis La Bonne Boîte.</p>
+        <p><a target="_blank" href="https://memo.pole-emploi.fr">En savoir plus sur MEMO.</a></p>
+      </div>
+    </div>
+    {# END Memo button. #}
+
+  </div>
+
+</div>

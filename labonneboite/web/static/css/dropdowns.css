@@ -1,0 +1,89 @@
+/* Dropdowns.
+=========================================================================== */
+
+.lbb-dropdown-wrapper {
+    display: inline-block;
+    position: relative;
+    text-align: left;
+}
+
+.lbb-dropdown {
+    margin: 0;
+    position: absolute;
+    /* A dropdown is automatically positioned 100% from the top and along the left side of its parent. */
+    top: 100%;
+    left: 0;
+    min-width: 10rem;
+    z-index: 1000;
+    padding: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    border: 1px solid #cbcbcb;
+    background: #fff;
+    border-radius: 4px;
+    display: none;
+}
+
+/* Dropdowns positions.
+=========================================================================== */
+
+/* Add .lbb-dropdown-right to a .lbb-dropdown to right align the dropdown. */
+.lbb-dropdown-right {
+    left: auto;  /* Cancel left. */
+    right: 0;
+}
+
+/* Add .lbb-dropdown-top to a .lbb-dropdown to put the dropdown on the top. */
+.lbb-dropdown-top {
+    bottom: 100%;
+    top: auto;  /* Cancel up. */
+}
+
+/* Add .lbb-dropdown-top to a .lbb-dropdown to put the dropdown on the top and on the right. */
+.lbb-dropdown-top-right {
+    bottom: 100%;
+    left: auto;  /* Cancel left. */
+    right: 0;
+    top: auto;  /* Cancel up. */
+}
+
+/* Dropdowns sizes.
+=========================================================================== */
+
+.lbb-dropdown-large {
+    width: 300px;
+}
+
+/* Dropdowns content.
+=========================================================================== */
+
+.lbb-dropdown * {
+    font-size: 13px !important;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 0.8125rem !important;
+}
+
+.lbb-dropdown * + * {
+    margin-top: 5px !important;
+}
+
+.lbb-dropdown ul {
+    padding-left: 20px !important;
+    list-style: disc !important;
+}
+
+/* Buttons inside dropdowns. */
+.lbb-dropdown .btn,
+.lbb-dropdown button {
+    white-space: nowrap;
+}
+
+/* Dropdowns > PE Connect logo (temporary)
+=========================================================================== */
+
+.lbb-dropdown .logo-pe-connect {
+    display: inline-block;
+    width: 200px;
+}
+
+.lbb-dropdown .logo-pe-connect img {
+    display: block;
+}

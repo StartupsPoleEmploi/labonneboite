@@ -1,0 +1,33 @@
+/* Cookies banner.
+=========================================================================== */
+
+.cookies-banner {
+    text-align: center;
+    background: #000;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 32px;  /* Fallback in `px` for browsers that don't support rem. */
+    padding: 2rem;
+    z-index: 2000;
+    width: 100%;
+    color: #fff;
+    font-size: 0.9em;
+    opacity: 0.9;
+    display: none;
+}
+
+.cookies-banner + * {
+    margin-top: 0;  /* Cancel default spacing for the next block-level element. */
+}
+
+.cookies-banner * + * {
+    margin-top: 0;  /* Cancel default spacing across block-level elements inside. */
+}
+
+.cookies-banner a:link,
+.cookies-banner a:visited,
+.cookies-banner a:active,
+.cookies-banner a:hover {
+    color: #fff;
+}

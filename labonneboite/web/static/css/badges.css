@@ -1,0 +1,42 @@
+/* Badges.
+=========================================================================== */
+
+[class^="badge"] {
+    background-color: #636c72;
+    border-radius: 0.25rem;
+    color: #fff;
+    display: inline-block;
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 1;
+    padding: 0.25em 0.4em;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    margin: 0 !important;
+}
+
+.badge-warning {
+    background: #f7ba45;
+    color: #222;
+}
+
+.badge-success {
+    background: #19c158;
+    color: #fff;
+}
+
+.badge-info {
+    background: #1c86f2;
+    color: #fff;
+}
+
+.badge-error {
+    background: #f03c69;
+    color: #fff;
+}
+
+.badge-alternance {
+    background: #991766;
+    color: #fff;
+}

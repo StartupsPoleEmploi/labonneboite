@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon compte{{ super() }}{% endblock %}
+
+{% block content %}
+<div class="lbb-content">
+  <div class="lbb-single-column-content">
+
+    <h2>Mon compte</h2>
+
+    <p>
+      <b>{{ user.first_name | title }} {{ user.last_name }}</b>
+      {% if user.email %}<br>{{ user.email | lower }}{% endif %}
+    </p>
+
+    <hr>
+
+    <p>
+      <a href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
+    </p>
+
+    <hr>
+
+    <p class="text-right">
+      <a href="{{ url_for('user.account_delete') }}"><small>Supprimer mon compte</small></a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,173 @@
+/* Input with icons.
+=========================================================================== */
+
+input.input-icon {
+    background: #fff url(../images/input-icons/suitcase.svg) no-repeat 8px 50%;
+    padding-left: 30px;
+}
+
+input.input-icon-suitcase {
+    background-image: url(../images/input-icons/suitcase.svg);
+}
+
+input.input-icon-location {
+    background-image: url(../images/input-icons/pinmap-location.svg);
+}
+
+/* Form utils.
+=========================================================================== */
+
+.form-help-text {
+    margin-top: 0;
+    color: #5d5d5d;
+    font-size: 14px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 0.875rem;
+}
+
+select.form-error,
+input.form-error,
+textarea.form-error,
+.form-error select,
+.form-error input,
+.form-error textarea {
+    border: 1px solid #f03c69;
+}
+
+.form-errorlist {
+    text-align: left;
+    margin-top: 5px;
+    color: #f03c69;
+    padding: 0 0 0 29px;
+}
+
+/* Vertical form.
+=========================================================================== */
+
+.form-vertical label {
+    display: block;
+    font-weight: bold;
+}
+
+.form-vertical input[type='email'],
+.form-vertical input[type='number'],
+.form-vertical input[type='password'],
+.form-vertical input[type='search'],
+.form-vertical input[type='tel'],
+.form-vertical input[type='text'],
+.form-vertical input[type='url'],
+.form-vertical textarea {
+    width: 100%;
+}
+
+/* Inline form.
+=========================================================================== */
+
+.form-inline {
+    display: inline;
+}
+
+/* Search form (2 inputs one above the other and a search button).
+=========================================================================== */
+
+.form-search {
+    position: relative;
+}
+
+.form-search div {
+    width: calc(100% - 50px - 5px);  /* (full width) - (submit button width) - (margin) */
+}
+
+.form-search div input {
+    width: 100%;
+}
+
+.form-search div input:not(:last-child) {
+    margin-bottom: 5px;
+}
+
+.form-search button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50px;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.form-search button img {
+    width: 100%;
+    display: block;
+    padding: 0 10px;
+}
+
+/* Additional fields under the search form.
+=========================================================================== */
+
+.form-search-additional-fields {
+    margin: 10px 0;
+    font-size: 14px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 0.875rem;
+}
+
+/* Custom checkbox (used on the HP to search for "alternance" results).
+=========================================================================== */
+
+/* Take the native checkbox input out of document flow and hide it. */
+.custom-checkbox {
+    position: absolute;
+    opacity: 0;
+}
+
+.custom-checkbox + label {
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+    color: #5d5d5d;
+}
+
+/* Checkbox. */
+.custom-checkbox + label:before {
+    content: '';
+    margin: 0 10px 0 0;
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    border: 1px solid #cbcbcb;
+    border-radius: 2px;
+    vertical-align: middle;
+}
+
+/* Checkbox hover. */
+.custom-checkbox:hover + label:before {
+    border: 1px solid #991766;
+}
+
+/* Checkbox focus. */
+.custom-checkbox:focus + label:before {
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+    border: 1px solid #991766;
+}
+
+/* Checkbox checked. */
+.custom-checkbox:checked + label:before {
+    background: #991766;
+    border: 1px solid #991766;
+}
+
+/* Checkmark. */
+.custom-checkbox:checked + label:after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 9px;
+    top: 2px;
+    /* Make it a small rectangle so the border will create an L-shape. */
+    width: 8px;
+    height: 16px;
+    /* Add a white border on the bottom and left, creating the L-shape. */
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    /* Rotate the L 45 degrees to turn it into a checkmark. */
+    transform: rotate(45deg);
+}

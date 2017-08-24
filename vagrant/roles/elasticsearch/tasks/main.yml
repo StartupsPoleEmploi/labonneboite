@@ -1,0 +1,18 @@
+---
+
+- include: prequesites.yml
+  tags: [elasticsearch, elasticsearch-prequesites]
+
+- include: install.yml
+  tags: [elasticsearch, elasticsearch-install]
+
+- include: configuration.yml
+  tags: [elasticsearch, elasticsearch-configuration]
+
+- include: plugins.yml
+  when: es_install_plugins
+  tags: [elasticsearch, elasticsearch-plugins]
+
+- include: curator.yml
+  when: es_install_curator
+  tags: [elasticsearch, elasticsearch-curator]

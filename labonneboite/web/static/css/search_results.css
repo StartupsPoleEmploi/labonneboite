@@ -1,0 +1,217 @@
+/* Layout for content with a sidebar.
+=========================================================================== */
+
+/*
+ * Large size displays: the sidebar is floating on the left.
+ */
+@media (min-width: 800px) {  /* For any browser width over 800px. */
+
+    .lbb-content-with-sidebar {
+        padding-left: 255px;  /* 235px (.lbb-sidebar-wrapper width) + 20px (margin between sidebar and content) */
+    }
+
+    .lbb-content-with-sidebar:after {
+        content: '';
+        display: table;
+        clear: both;
+    }
+
+    .lbb-sidebar-wrapper {
+        float: left;
+        margin-left: -255px;
+        width: 235px;
+    }
+
+    .lbb-sidebar-toggle-wrapper {
+        display: none;
+    }
+
+    .lbb-sidebar .lbb-sidebar-toggle-wrapper + h2 {
+        margin-top: 0;
+    }
+
+}
+
+/*
+ * For small size displays: the sidebar can be toggled with a sliding effect.
+ */
+@media (max-width: 800px) {  /* For any browser width under 800px. */
+
+    .lbb-sidebar-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        width: 100%;
+        background: #fff;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        overflow: auto;
+        height: 100%;  /* Fallback in `%` for browsers that don't support `vh`. */
+        height: 100vh;
+    }
+
+    .lbb-sidebar-wrapper.active, /* Set via JS. */
+    /* Slide in with pure CSS via :target and <a href="#lbb-sidebar-wrapper">. */
+    .lbb-sidebar-wrapper:target {
+        transform: translateX(0);
+    }
+
+    .lbb-sidebar-toggle-wrapper {
+        display: block;
+    }
+
+    .lbb-sidebar-toggle:link,
+    .lbb-sidebar-toggle:visited,
+    .lbb-sidebar-toggle:active,
+    .lbb-sidebar-toggle:hover {
+        font-weight: bold;
+        font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
+        font-size: 1.1rem;
+        text-decoration: none;
+    }
+
+}
+
+/* Sidebar (filter form).
+=========================================================================== */
+
+.lbb-sidebar {
+    background: #fff;
+    padding: 20px;
+    font-size: 0.90em;
+    color: #5d5d5d;
+}
+
+.lbb-sidebar h2 {
+    font-style: italic;
+    font-size: 14px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 0.875rem;
+}
+
+.lbb-sidebar-item {
+    margin-top: 12px;  /* Fallback in `px` for browsers that don't support rem. */
+    margin-top: 0.75rem;
+}
+
+.lbb-sidebar-item p,
+.lbb-sidebar-item ul {
+    margin: 0 0 5px 0;
+    list-style: none;
+    padding: 0;
+}
+
+.lbb-sidebar-item p {
+    font-weight: bold;
+}
+
+.lbb-sidebar-item ul li {
+    margin: 2px 0;
+}
+
+/* Results info (offices list's title), e.g.:
+"14 entreprises susceptibles de recruter en Boucherie autour de Metz (57000)"
+=========================================================================== */
+
+.lbb-result-info {
+    color: #fff;
+    font-weight: normal;
+    font-size: 24px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1.5rem;
+}
+
+/* Results (offices list).
+=========================================================================== */
+
+.lbb-result {
+    color: #5d5d5d;
+}
+
+.lbb-result * + * {
+    margin-top: 0;  /* Cancel default spacing across block-level elements inside. */
+}
+
+.lbb-result h2 {
+    font-size: 20px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1.25rem;
+}
+
+.lbb-result h3 {
+    color: #5d5d5d;
+    font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1rem;
+    margin-top: 15px;
+}
+
+.lbb-result ul {
+    list-style: none;
+    padding: 0;
+}
+
+/* Actions (after the header): toggle details, add to MEMO, etc.
+=========================================================================== */
+
+.lbb-result__actions {
+    background: #efefef;
+    margin: 15px -20px -20px -20px;
+    padding: 5px 20px;
+    vertical-align: middle;
+}
+
+.lbb-result__actions .btn,
+.lbb-result__actions .memoImportButton {
+    vertical-align: middle;
+    display: inline-block;
+    margin: 5px 5px 5px 0;
+}
+
+/* Actions (after the content): download PDF etc.
+=========================================================================== */
+
+.lbb-result__content__actions {
+    text-align: center;
+}
+
+.lbb-result__content__actions .btn {
+    margin: 4px;
+}
+
+/* Toggle details.
+=========================================================================== */
+
+.lbb-result__details {
+  display: none;
+  padding-top: 20px;
+}
+
+.active .lbb-result__details {
+  display: block;
+}
+
+.js-result-toggle-details:after {
+    content: '+';
+    display: inline-block;
+    width: 5px;
+    margin-left: 5px;
+}
+
+.active .js-result-toggle-details:after {
+    content: '-';
+}
+
+/* Map.
+=========================================================================== */
+
+.lbb-result .js-map-container {
+    margin: 20px -20px;
+}
+@media (max-width: 800px) {  /* For any browser width under 800px. */
+    .lbb-result .js-map-container {
+        margin: 20px;  /* Let some space around the map so scrolling is easier. */
+    }
+}
+
+.lbb-result .map {
+    width: 100%;
+    height: 250px;
+}

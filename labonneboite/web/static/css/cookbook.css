@@ -1,0 +1,19 @@
+/* Cookbook.
+=========================================================================== */
+
+/* Used to display all the CSS colors used through the project. */
+.cookbook-color {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    vertical-align: middle;
+}
+
+.cookbook-title {
+    text-align: left;
+    background: #5d5d5d;
+    padding: 10px;
+    color: #fff;
+    font-size: 20px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 1.25rem;
+}

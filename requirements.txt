@@ -1,0 +1,111 @@
+Flask==0.12.2
+Flask-Mandrill==0.2
+Flask-Script==2.0.5
+
+# Flask assets.
+Flask-Assets==0.12
+cssmin==0.2.0
+jsmin==2.2.2
+
+# Forms.
+Flask-WTF==0.14.2
+WTForms==2.1
+
+# Flask admin.
+Flask-Admin==1.5.0
+
+# Localization With Flask-Babelex.
+# http://flask-admin.readthedocs.io/en/latest/advanced/#localization-with-flask-babelex
+Flask-BabelEx==0.9.3
+speaklater==1.3
+
+# Monitoring and debug tools.
+Flask-DebugToolbar==0.10.1
+ipdb==0.10.1
+ipython==3.1.0
+opbeat==3.5.2
+pylint==1.6.4
+python-logstash==0.4.5
+
+# Databases and migrations.
+alembic==0.9.3
+elasticsearch==1.6.0
+MySQL-python==1.2.5
+SQLAlchemy-Utils==0.32.13
+SQLAlchemy==1.1.11
+
+# Users and auth management.
+# `pyjwkest` is required by `social-auth-core` which is required by `social-auth-app-flask`.
+Flask-Login==0.4.0
+pyjwkest==1.3.2
+social-auth-app-flask-sqlalchemy==1.0.1
+social-auth-app-flask==1.0.0
+
+# Unit tests.
+nose==1.3.7
+selenium==2.53.0
+PyVirtualDisplay==0.2.1
+
+# Data.
+numpy==1.11.2
+pandas==0.19.1
+scikit-learn==0.16.1
+
+# PDF utils and dependencies.
+html5lib==0.999999
+xhtml2pdf==0.0.6
+
+# Utils.
+gevent==1.0.2
+gnureadline==6.3.3
+python-slugify==1.2.4
+requests==2.18.1
+validators==0.11.2
+
+# Pillow
+# For now, stick to Pillow 2.9 because later releases for Ubuntu 14.04 requires extra packages.
+# https://askubuntu.com/a/687637
+Pillow==2.9.0
+
+# Deployment.
+uWSGI==2.0.13.1
+
+# Secondary dependencies.
+# Explicitly specify secondary dependencies to ensure consistent build behavior.
+argparse==1.2.1
+astroid==1.4.9
+backports.functools-lru-cache==1.4
+blinker==1.4
+certifi==2017.4.17
+chardet==3.0.4
+click==6.7
+configparser==3.5.0
+EasyProcess==0.2.3
+future==0.16.0
+greenlet==0.4.12
+idna==2.5
+isort==4.2.15
+itsdangerous==0.24
+Jinja2==2.9.6
+lazy-object-proxy==1.3.1
+Mako==1.0.7
+MarkupSafe==1.0
+mccabe==0.6.1
+oauthlib==2.0.2
+pycryptodomex==3.4.6
+PyJWT==1.5.2
+PyPDF2==1.26.0
+python-dateutil==2.6.1
+python-editor==1.0.3
+python-openid==2.2.5
+pytz==2017.2
+reportlab==3.4.0
+requests-oauthlib==0.8.0
+six==1.10.0
+social-auth-core==1.4.0
+social-auth-storage-sqlalchemy==1.1.0
+Unidecode==0.04.21
+urllib3==1.21.1
+webassets==0.12.1
+wrapt==1.10.10
+wsgiref==0.1.2

@@ -1,0 +1,11 @@
+---
+
+- name: get installed Elasticsearch plugins list
+  command: "bin/plugin list chdir=/usr/share/elasticsearch"
+  changed_when: false
+  register: es_installed_plugins
+
+- name: install Elasticsearch plugins
+  command: "bin/plugin install {{item.path}} chdir=/usr/share/elasticsearch"
+  with_items: "{{es_install_plugins}}"
+  when: "'- {{item.name}}' not in es_installed_plugins.stdout"

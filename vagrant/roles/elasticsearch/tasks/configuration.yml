@@ -1,0 +1,29 @@
+---
+
+- name: set default start options
+  template: src=default.j2 dest=/etc/default/elasticsearch mode=0644 owner=root group=root
+  notify: restart elasticsearch
+
+- name: update group gid
+  group: name=elasticsearch gid="{{ es_gid }}" state=present
+  when: es_gid
+
+- name: update user uid and gid
+  user: name=elasticsearch uid="{{ es_uid }}" group=elasticsearch state=present
+  when: es_uid
+
+- name: set elasticsearch configuration
+  template: src=elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml mode=0644 owner=root group=root
+  notify: restart elasticsearch
+
+# set limits.conf
+- name: limits.conf tuning
+  lineinfile: dest=/etc/security/limits.conf line="{{ item }}" 
+  with_items:
+    - "elasticsearch soft nofile 32000"
+    - "elasticsearch hard nofile 32000"
+  notify: restart elasticsearch
+
+- name: ensure service is started
+  service: name=elasticsearch state=started
+  when: es_manage_service

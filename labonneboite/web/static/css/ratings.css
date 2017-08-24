@@ -1,0 +1,36 @@
+/* Ratings stars.
+=========================================================================== */
+
+.rating-stars {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-size: 0;
+    width: 78px;
+    height: 15px;
+    background: transparent url(../images/stars/stars_empty.svg) no-repeat 0 0;
+}
+
+.rating-stars b {
+    position: absolute;
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+    background: transparent url(../images/stars/stars.svg) no-repeat 0 0;
+}
+
+/* Ratings value.
+=========================================================================== */
+
+.rating-value {
+    display: inline-block;
+    border-radius: 2px;
+    background: #cbcbcb;
+    padding: 1px 5px;
+    font-size: 12px;  /* Fallback in `px` for browsers that don't support rem. */
+    font-size: 0.75rem;
+    position: relative;
+    top: -1px;
+    font-weight: normal;
+    color: #222;
+}

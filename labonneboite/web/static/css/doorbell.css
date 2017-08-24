@@ -1,0 +1,14 @@
+/* Doorbell.
+=========================================================================== */
+
+#doorbell-button,
+#doorbell-background {
+    margin: 0;  /* Cancel default global spacing for block-level elements. */
+}
+
+#doorbell-button {
+    background: #19c158;
+    position: fixed;
+    right: 20px;
+    bottom: 0;
+}

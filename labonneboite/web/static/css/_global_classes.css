@@ -1,0 +1,125 @@
+/* Global classes.
+=========================================================================== */
+
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-left {
+    text-align: left !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.lbb-green {
+    color: #19c158 !important;
+}
+
+.lbb-grey {
+    color: #5d5d5d !important;
+}
+
+.lbb-purple {
+    color: #7c408b !important;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.easy-copy-paste {
+    -webkit-user-select: all;
+    -moz-user-select: all;
+    -ms-user-select: all;
+    user-select: all;
+}
+
+/* A container with a bright background used to wrap content when a dark color is used for the main background. */
+.lbb-bright-container {
+    background: #fff;
+    padding: 20px;
+    color: #222;
+}
+
+/* Images list.
+=========================================================================== */
+
+.img-list {
+    padding: 0;
+    list-style: none;
+    text-align: center;
+}
+
+.img-list li {
+    display: inline-block;
+    padding: 0;
+}
+
+.img-list li img {
+    vertical-align: middle;
+    margin: 20px;
+}
+
+@media (max-width: 800px) {  /* For any browser width under 800px. */
+    .img-list li img {
+        vertical-align: middle;
+        margin: 20px 10px;
+    }
+}
+
+/* E-mail obfuscation.
+https://blog.jayway.com/2012/11/30/smart-email-obfuscation-using-css/
+========================================================================== */
+
+.js-obfuscated-email {
+    unicode-bidi: bidi-override;
+    direction: rtl;
+}
+
+/* Spinner.
+https://github.com/tobiasahlin/SpinKit
+=========================================================================== */
+
+.spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border-radius: 100%;
+    -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
+    animation: sk-pulseScaleOut 1s infinite ease-in-out;
+}
+
+@-webkit-keyframes sk-pulseScaleOut {
+    0% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+    100% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+@keyframes sk-pulseScaleOut {
+    0% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+    100% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 0;
+    }
+}

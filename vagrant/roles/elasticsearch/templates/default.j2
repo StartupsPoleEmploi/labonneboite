@@ -1,0 +1,5 @@
+{% if es_start_options %}
+{% for key, value in es_start_options|dictsort(by="key") %}
+{{key}}={{value}}
+{% endfor %}
+{% endif %}

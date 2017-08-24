@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer mon compte{{ super() }}{% endblock %}
+
+{% block content %}
+<div class="lbb-content">
+  <div class="lbb-single-column-content">
+
+    <ol class="breadcrumb">
+        <li><a href="{{ url_for('user.account') }}">Mon compte</a></li>
+        <li>Supprimer mon compte</li>
+    </ol>
+
+    <h2>Voulez-vous vraiment supprimer définitivement votre compte utilisateur ?</h2>
+
+    <div class="alert">
+      <p>
+        En cliquant sur le bouton ci-dessous, <b>la suppression de votre compte utilisateur sera définitive</b>.
+      </p>
+      <p>
+        Vous pourrez recréer votre compte plus tard mais toutes les données vous concernant auront été effacées (dont vos favoris).
+      </p>
+    </div>
+
+    <form class="form-vertical" action="{{ url_for('user.account_delete') }}" method="post">
+      {{ form.hidden_tag() }}
+      <div class="lbb-dropdown-wrapper">
+        <a class="btn btn-error" href="#">Supprimer définitivement mon compte ▴</a>
+        <div class="lbb-dropdown lbb-dropdown-top-right" style="display: none;">
+          <p>
+            <a class="btn btn-dark" href="{{ url_for('user.account') }}">Annuler</a>
+            <input class="btn btn-error" type="submit" value="Je confirme">
+          </p>
+        </div>
+      </div>
+    </form>
+
+    <hr>
+
+    <p><a href="{{ url_for('user.account') }}">Annuler</a></p>
+
+  </div>
+</div>
+{% endblock %}

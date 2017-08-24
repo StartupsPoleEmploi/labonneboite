@@ -1,0 +1,7 @@
+<ul>
+  {% for distance, (distance_label, count) in alternative_distances.iteritems() %}
+    <li>
+      <a href="#" class="js-extend-search-distance" data-distance="{{ distance }}">Etendre à {{ distance_label }} ({{ count }})</a>
+    </li>
+  {% endfor %}
+</ul>

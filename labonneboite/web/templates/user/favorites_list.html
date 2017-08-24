@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes favoris{{ super() }}{% endblock %}
+
+{% block extrahead %}
+  {{ super() }}
+  <link href="{{ mapbox_css_url }}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ mapbox_js_url }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="lbb-content-purple-wrapper">
+  <div class="lbb-content">
+    <div class="lbb-single-column-content">
+
+      <div class="lbb-bright-container">
+        <ol class="breadcrumb">
+            <li><a href="{{ url_for('user.account') }}">Mon compte</a></li>
+            <li>Mes favoris</li>
+        </ol>
+        <h2>Mes favoris</h2>
+      </div>
+
+      {% if not favorites.count() %}
+        <div class="lbb-bright-container">
+          <p>Aucun favori pour le moment.</p>
+        </div>
+        <div class="lbb-bright-container">
+          <p>
+            <a class="btn" href="/">Faites une nouvelle recherche</a>
+          </p>
+        </div>
+      {% else %}
+        {% for fav in favorites %}
+          {% with company = fav.office %}
+            <div class="lbb-bright-container lbb-result">
+              {% with show_more_info=1 %}
+                {% include "includes/office_header.html" %}
+                {% include "includes/office_content.html" %}
+              {% endwith %}
+            </div>
+          {% endwith %}
+        {% endfor %}
+      {% endif %}
+
+      {% include "includes/pagination.html" %}
+
+      <div class="alert alert-warning">
+        <p>
+          <small>Le potentiel d'embauche est actualisé chaque mois, des entreprises voyant leur potentiel d'embauche baisser peuvent disparaître de vos favoris. Pour les sauvegarder définitivement, nous vous conseillons de les importer dans MEMO.<br><a href="https://memo.pole-emploi.fr">MEMO</a> est un service de Pôle emploi vous permettant de gérer vos démarches de recherche d'emploi.</small>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

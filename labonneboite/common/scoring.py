@@ -1,0 +1,113 @@
+# coding: utf8
+
+import math
+from backports.functools_lru_cache import lru_cache
+
+from labonneboite.common import mapping as mapping_util
+from labonneboite.conf import settings
+from settings import SCORE_50_HIRINGS, SCORE_60_HIRINGS, SCORE_80_HIRINGS, SCORE_100_HIRINGS
+
+# ############### WARNING about matching scores vs hirings ################
+# Methods scoring_util.get_hirings_from_score
+# and scoring_util.get_score_from_hirings
+# rely on special coefficients SCORE_50_HIRINGS, SCORE_60_HIRINGS etc..
+# which values in github repository are *fake* and used for dev and test only.
+#
+# The real values are confidential, stored outside of github repo,
+# and only used in staging and production.
+#
+# This is designed so that you *CANNOT* guess the hirings based
+# on the score you see in production.
+# #########################################################################
+
+@lru_cache(maxsize=512*1024)
+def get_score_from_hirings(hirings, as_float=False):
+    """
+    Transform a number of hirings (typically, the predicted hirings in the next 6 months)
+    which is a float between 0 and 1000 or even more (it is the output of the regression model)
+    into a score (int between 50 and 100) just like in the previous binary classification model.
+
+    The underlying formula has been designed when switching from a binary classification model
+    to a regression model, in order to roughly keep the same volumes of 1-stars, 2-stars, 
+    3-stars and 4-stars offices.
+
+    0.0 stars ~ 0 hirings
+    2.5 stars ~ SCORE_50_HIRINGS hirings
+    3.0 stars ~ SCORE_60_HIRINGS hirings
+    4.0 stars ~ SCORE_80_HIRINGS hirings
+    5.0 stars ~ SCORE_100_HIRINGS+ hirings
+
+    For confidentiality reasons, we cannot disclose the SCORE_*_HIRINGS values.
+    """
+    if hirings <= SCORE_50_HIRINGS:
+        # this way about 500K offices will be selected to be deployed in production
+        # and all others (score below 50) will be automatically filtered out
+        score = 0 + 50 * (hirings - 0.0) / (SCORE_50_HIRINGS - 0.0)
+    elif hirings >= SCORE_100_HIRINGS:
+        score = 100
+    elif hirings <= SCORE_60_HIRINGS:
+        score = 50 + 10 * (hirings - SCORE_50_HIRINGS) / (SCORE_60_HIRINGS - SCORE_50_HIRINGS)
+    elif hirings <= SCORE_80_HIRINGS:
+        score = 60 + 20 * (hirings - SCORE_60_HIRINGS) / (SCORE_80_HIRINGS - SCORE_60_HIRINGS)
+    elif hirings <= SCORE_100_HIRINGS:
+        score = 80 + 20.0/math.log10(SCORE_100_HIRINGS) * math.log10(1 + hirings - SCORE_80_HIRINGS)
+    else:
+        raise Exception("unexpected value of hirings : %s" % hirings)
+    if as_float:
+        return score
+    return int(round(score))
+
+
+@lru_cache(maxsize=1024)
+def get_hirings_from_score(score):
+    """
+    does exactly the reverse operation of get_score_from_hirings
+    """
+    if score <= 50:
+        hirings = SCORE_50_HIRINGS * score / 50.0
+    elif score <= 60:
+        hirings = SCORE_50_HIRINGS + (score - 50) / 10.0 * (SCORE_60_HIRINGS - SCORE_50_HIRINGS)
+    elif score <= 80:
+        hirings = SCORE_60_HIRINGS + (score - 60) / 20.0 * (SCORE_80_HIRINGS - SCORE_60_HIRINGS)
+    elif score <= 100:
+        hirings = -1 + SCORE_80_HIRINGS + 10.0 ** ((score-80) / 20.0 * math.log10(SCORE_100_HIRINGS))
+    else:
+        raise Exception("unexpected value of score : %s" % score)
+    return hirings
+
+
+@lru_cache(maxsize=256*1024)
+def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
+    """
+    Adjust the score to a rome_code (e.g. the ROME code of the current search)
+    and a naf_code (e.g. NAF code of an office)
+    The resulting score is an integer and might be below 50 (from 0 to 100)
+    """
+
+    # fallback to main score in some cases
+    # - no rome_code in context (favorites page, office page...)
+    # - rome_code is not related to the naf_code
+    if not rome_code or rome_code not in mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code]:
+        return score
+
+    rome_codes = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code].keys()
+    total_office_hirings = get_hirings_from_score(score)
+    total_naf_hirings = sum(mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome] for rome in rome_codes)
+    current_rome_hirings = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome_code]
+
+    if not (current_rome_hirings >= 1 and current_rome_hirings <= total_naf_hirings):
+        raise Exception("error in hiring data for rome_code=%s and naf_code=%s" % (rome_code, naf_code))
+
+    # 1.0 used to force float result, otherwise int/int like 30/100 give... zero
+    office_hirings_for_current_rome = total_office_hirings * (1.0 * current_rome_hirings / total_naf_hirings)
+
+    # result should be integer
+    return get_score_from_hirings(office_hirings_for_current_rome, as_float=False)
+
+
+
+
+
+
+
+

@@ -1,0 +1,15 @@
+/* Home Page.
+=========================================================================== */
+
+@media (min-width: 800px) {  /* For any browser width over 800px. */
+
+    .lbb-home-title,
+    .lbb-home-form-search {
+        margin-top: 60px;
+    }
+
+    .lbb-home-explanation {
+        margin: 40px 0 80px 0;
+    }
+
+}
