@@ -17,9 +17,8 @@ class GeocodingTest(unittest.TestCase):
         self.assertTrue(found)
 
     def test_saint_denis_reunion_have_correct_coordinates(self):
-        city = "saint denis"
         zipcode = "97490"
-        lat_long = geocoding.get_latitude_and_longitude_from_file(city, zipcode)
+        lat_long = geocoding.get_lat_long_from_zipcode(zipcode)
         self.assertEquals(int(float(lat_long[0])), -20)
         self.assertEquals(int(float(lat_long[1])), 55)
 
@@ -31,8 +30,7 @@ class GeocodingTest(unittest.TestCase):
         zipcode = montigny_zipcodes[0]
         self.assertEquals(zipcode, "57158")
 
-        city = "Montigny les Metz"
-        lat_long = geocoding.get_latitude_and_longitude_from_file(city, zipcode)
+        lat_long = geocoding.get_lat_long_from_zipcode(zipcode)
         self.assertEquals(lat_long, ('49.1', '6.15'))
 
     def test_paris4eme_is_correctly_found(self):
@@ -43,6 +41,5 @@ class GeocodingTest(unittest.TestCase):
         zipcode = paris4eme_zipcodes[0]
         self.assertEquals(zipcode, "75004")
 
-        city = "Paris 4eme arrondissement"
-        lat_long = geocoding.get_latitude_and_longitude_from_file(city, zipcode)
+        lat_long = geocoding.get_lat_long_from_zipcode(zipcode)
         self.assertEquals(lat_long, ('48.8553815318', '2.35541102422'))

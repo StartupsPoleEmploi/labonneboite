@@ -97,7 +97,7 @@ class Fetcher(object):
     def get_company_count(self, rome_codes, naf_codes, distance):
         naf_codes = get_api_ready_rome_and_naf_codes(rome_codes, naf_codes)
 
-        # Reasons why we only support single-rome search are detailed in README.md
+        # We only fully support single-rome search.
         if len(rome_codes) > 1:
             raise Exception("multi ROME search not supported")
         rome_code = rome_codes[0]
@@ -116,7 +116,7 @@ class Fetcher(object):
 
     def get_companies(self):
         try:
-            self.latitude, self.longitude = geocoding.get_latitude_and_longitude_from_file(self.city, self.zipcode)
+            self.latitude, self.longitude = geocoding.get_lat_long_from_zipcode(self.zipcode)
             logger.info("location found for %s %s : lat=%s long=%s",
                 self.city, self.zipcode, self.latitude, self.longitude)
         except:
@@ -211,7 +211,7 @@ def _get_companies_from_api(
         headcount_filter = settings.HEADCOUNT_WHATEVER
     naf_codes = get_api_ready_rome_and_naf_codes(rome_codes, naf_codes)
 
-    # Reasons why we only support single-rome search are detailed in README.md
+    # We only fully support single-rome search.
     if len(rome_codes) > 1:
         raise Exception("multi ROME search not supported")
     rome_code = rome_codes[0]
@@ -599,7 +599,6 @@ def build_job_label_suggestions(term):
             },
         },
         "size": 0,
-
     }
 
     res = es.search(index="labonneboite", doc_type="ogr", body=body)

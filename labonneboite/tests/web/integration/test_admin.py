@@ -38,6 +38,7 @@ class AdminTest(DatabaseTest):
             self.url_for('officeadminadd.index_view'),
             self.url_for('officeadminremove.index_view'),
             self.url_for('officeadminupdate.index_view'),
+            self.url_for('officeadminextrageolocation.index_view'),
         ]
 
         with self.test_request_context:

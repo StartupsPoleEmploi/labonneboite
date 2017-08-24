@@ -1,6 +1,7 @@
 # coding: utf8
 import argparse
 import logging
+from itertools import groupby
 
 from elasticsearch import Elasticsearch
 from elasticsearch import TransportError
@@ -13,7 +14,7 @@ from labonneboite.common import pdf as pdf_util
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_codes
 from labonneboite.common.models import Office
-from labonneboite.common.models import OfficeAdminAdd, OfficeAdminUpdate, OfficeAdminRemove
+from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import mapping as mapping_util
@@ -205,6 +206,12 @@ mapping_office = {
         "location": {
             "type": "geo_point",
         },
+        # Denormalize `location_size` to avoid using the script filter https://stackoverflow.com/q/15543308
+        # because dynamic scripting is disabled by default from Elasticsearch v1.4.3.
+        "location_size": {
+            "type": "integer",
+            "index": "not_analyzed",
+        },
     },
 }
 
@@ -228,7 +235,7 @@ def add_scores_to_request_body():
     for rome_code in settings.ROME_DESCRIPTIONS.keys():
         request_body["mappings"]["office"]["properties"]["score_for_rome_%s" % rome_code] = {
             "type": "integer",
-            "index": "not_analyzed"    
+            "index": "not_analyzed"
         }
 
 
@@ -339,13 +346,16 @@ def get_office_as_es_doc(office):
         'flag_junior': int(office.flag_junior),
         'flag_senior': int(office.flag_senior),
         'flag_handicap': int(office.flag_handicap),
+        'location_size': 0,
     }
 
     if office.y and office.x:
-        doc['location'] = {
-            'lat': office.y,
-            'lon': office.x,
-        }
+        # Use an array to allow multiple locations per document, see `add_locations()`
+        # and https://goo.gl/fdTaEM
+        doc['location'] = [
+            {'lat': office.y, 'lon': office.x},
+        ]
+        doc['location_size'] = 1
 
     doc = inject_office_rome_scores_into_es_doc(office, doc)
 
@@ -518,6 +528,65 @@ def update_offices(index=INDEX_NAME):
             pdf_util.delete_file(office)
 
 
+def add_offices_geolocations(index=INDEX_NAME):
+    """
+    Add geolocations to offices.
+
+    New geolocations are entered into the system through the `OfficeAdminExtraGeoLocation` table.
+
+    This function updates ElasticSearch with those new geolocations. The `location_size` field
+    is updated alongside to reflect the total number of geolocations for an office.
+
+    After the update, `location_size` is used to retrieve all offices with more than one geolocation.
+    If an office with more than one geolocation exists and is not part of the just updated offices,
+    it means that it has been completely deleted from the `OfficeAdminExtraGeoLocation` table.
+    Thus we have to reset its geolocation info.
+    """
+    es = Elasticsearch(timeout=ES_TIMEOUT)
+
+    # Add multiple locations.
+    updated_sirets = []
+    extra_geolocations = db_session.query(OfficeAdminExtraGeoLocation).all()
+    for siret, grouped_extra_geolocations in groupby(extra_geolocations, lambda item: item.siret_id):
+        office = Office.query.filter_by(siret=siret).first()
+        if office:
+            location = []
+            if office.y and office.x:
+                location.append({'lat': office.y, 'lon': office.x})  # Keep the initial geolocation of the office.
+            for extra_geolocation in grouped_extra_geolocations:
+                location.append({'lat': extra_geolocation.latitude, 'lon': extra_geolocation.longitude})
+            # Apply changes in ElasticSearch.
+            es.update(
+                index=index,
+                doc_type=OFFICE_TYPE,
+                id=siret,
+                body={'doc': {'location': location, 'location_size': len(location)}},
+                ignore=404,
+            )
+            updated_sirets.append(siret)
+
+    # Reset multiple locations.
+    body = {"query": {"range": {"location_size": {"gt": 1}}}}
+    multilocation_offices = es.search(index="labonneboite", doc_type=OFFICE_TYPE, body=body)
+    multilocation_sirets = [office['_source']['siret'] for office in multilocation_offices['hits']['hits']]
+    # Find sirets in `multilocation_sirets` but not in `updated_sirets`.
+    sirets_to_reset = set(multilocation_sirets) - set(updated_sirets)
+    for siret in sirets_to_reset:
+        office = Office.query.filter_by(siret=siret).first()
+        if office:
+            location = []
+            if office.y and office.x:
+                location.append({'lat': office.y, 'lon': office.x})
+            # Apply changes in ElasticSearch.
+            es.update(
+                index=index,
+                doc_type=OFFICE_TYPE,
+                id=siret,
+                body={'doc': {'location': location, 'location_size': len(location)}},
+                ignore=404,
+            )
+
+
 def display_performance_stats():
     methods = [
                'get_score_from_hirings',
@@ -551,6 +620,7 @@ def run():
     add_offices()
     remove_offices()
     update_offices()
+    add_offices_geolocations()
 
     display_performance_stats()
 

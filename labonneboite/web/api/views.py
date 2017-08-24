@@ -75,7 +75,7 @@ def company_list():
     if 'commune_id' in request.args:
         commune_id = request.args.get('commune_id')
         city, zipcode = geocoding.get_city_name_and_zipcode_from_commune_id(commune_id)
-        latitude, longitude = geocoding.get_latitude_and_longitude_from_file(city, zipcode)
+        latitude, longitude = geocoding.get_lat_long_from_zipcode(zipcode)
         if not latitude or not longitude:
             return u'could not resolve latitude and longitude from given commune_id', 400
     elif 'latitude' in request.args and 'longitude' in request.args:
@@ -94,7 +94,6 @@ def company_list():
             return u'invalid rome code: %s' % rome, 400
 
     if len(rome_code_list) > 1:
-        # Reasons why we only support single-rome search are detailed in README.md
         return u'Multi ROME search is no longer supported, please use single ROME search only.', 400
     rome_code = rome_code_list[0]
 

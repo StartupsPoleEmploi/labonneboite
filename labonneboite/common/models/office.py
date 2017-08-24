@@ -67,6 +67,9 @@ class Office(OfficeMixin, CRUDMixin, Base):
 
     # Fields are provided by the `OfficeMixin`.
 
+    def __unicode__(self):
+        return u"%s - %s" % (self.siret, self.name)
+
     def as_json(self, rome_code=None):
         """
         rome_code : optional parameter, used only in case of being in the context

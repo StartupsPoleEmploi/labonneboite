@@ -79,10 +79,10 @@ class UtilsTest(CreateIndexBaseTest):
             'name': u'SUPERMARCHES MATCH',
             'flag_junior': 0,
             'score': 50,
-            'location': {
-                'lat': 49.1044,
-                'lon': 6.17952,
-            },
+            'location': [
+                {'lat': 49.1044, 'lon': 6.17952},
+            ],
+            'location_size': 1,
             'siret': u'78548035101646',
             'headcount': 12,
             'email': u'supermarche@match.com',
