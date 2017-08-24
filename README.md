@@ -8,25 +8,31 @@
 
 # Présentation du projet
 
-La Bonne Boite (LBB) est un projet lancé par Pôle emploi pour permettre aux chercheurs d'emploi de cibler plus efficacement leurs candidatures spontanées : l'utilisateur accède à la liste des entreprises à "haut potentiel d'embauche". Le "potentiel d'embauche" est un algorithme exclusif inventé par Pôle emploi qui prédit combien de recrutements (CDI et CDD de plus de un mois) une entreprise donnée va réaliser dans les 6 prochains mois.
+La Bonne Boite (LBB) est un service lancé par Pôle emploi pour permettre aux chercheurs d’emploi de cibler plus efficacement leurs candidatures spontanées : l'utilisateur accède à la liste des entreprises à « haut potentiel d'embauche ». Le « potentiel d'embauche » est un indicateur exclusif inventé par Pôle emploi pour prédire le nombre de recrutements (CDI et CDD de plus de un mois) d’une entreprise donnée dans les 6 prochains mois.
 
-En contactant uniquement des entreprises à "haut potentiel d'embauche", le chercheur d'emploi concentre ses efforts uniquement sur les entreprises qui sont le plus susceptibles de l'embaucher. La Bonne Boite lui permet ainsi de réduire drastiquement le nombre d'entreprises à contacter et d'être plus efficace dans sa recherche.
+En contactant des entreprises à « haut potentiel d'embauche », le chercheur d'emploi concentre ses efforts uniquement sur les entreprises qui sont le plus susceptibles de l'embaucher. La Bonne Boite lui permet ainsi de réduire drastiquement le nombre d'entreprises à contacter et d'être plus efficace dans sa recherche.
 
-Le "potentiel d'embauche" est un indicateur basé une technique d'intelligence artificielle (apprentissage automatique ou "machine learning"), en l'occurence un algorithme de régression.
+Le « potentiel d'embauche » est un indicateur basé une technique d'intelligence artificielle (apprentissage automatique ou "machine learning"), en l'occurence un algorithme de régression. Pour calculer un potentiel d’embauche, La Bonne Boite analyse des millions de recrutements de toutes les entreprises de France depuis plusieurs années.
 
 La Bonne Boite a été déployée en France avec des premiers résultats encourageants, et est en cours de développement pour d'autres pays (Luxembourg).
 
-La Bonne Boite, [on en parle dèjà dans la presse](https://labonneboite.pole-emploi.fr/espace-presse)
+La Bonne Boite c’est un [site web](https://labonneboite.pole-emploi.fr) mais aussi une [API](https://www.emploi-store-dev.fr/portail-developpeur/detailapicatalogue/labonneboite)
+
+La Bonne Boite, [on en parle dans la presse](https://labonneboite.pole-emploi.fr/espace-presse)
 
 # Project overview
 
-La Bonne Boite (LBB) is a project launched by Pole Emploi (french national employment agency) to offer a new way for job seekers to look for a new job. Instead of searching for job offers, the job seeker can look directly for companies that have a high "hiring potential". The "hiring potential" is an algorithm exclusivity created by Pole Emploi that estimates how many contracts a given company is likely to hire in the next 6 months.
+La Bonne Boite (LBB) is a service launched by Pole Emploi (french national employment agency) to offer a new way for job seekers to look for a new job. Instead of searching for job offers, the job seeker can look directly for companies that have a high "hiring potential". The "hiring potential" is an algorithm exclusivity created by Pole Emploi that estimates how many contracts a given company is likely to hire in the next 6 months.
 
 By only contacting companies with a high "hiring potential", job seekers can focus their efforts only on companies that are likely to hire them. Instead of targeting every and any company that might potentially be interested by their profile, La Bonne Boite drastically reduces the number of companies a job seeker needs to have in mind when looking for a job.
 
-The "hiring potential" score is based on a machine learning algorithm, in this case a regression.
+The "hiring potential" is an indicator based on a machine learning model, in this case a regression. La Bonne Boite processes millions of recrutements of all french companies over years to compute this "hiring potential".
 
 It has already been deployed in France with early results that are very promising. Early development is being made for new countries (Luxembourg).
+
+La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API](https://www.emploi-store-dev.fr/portail-developpeur/detailapicatalogue/labonneboite).
+
+[Press Coverage on La Bonne Boite](https://labonneboite.pole-emploi.fr/espace-presse)
 
 # Install a new development environment
 
