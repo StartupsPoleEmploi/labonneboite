@@ -43,8 +43,6 @@ def search():
     form = CompanySearchForm(request.args)
     if request.args and form.validate():
         return form.redirect('search.results')
-    if form.errors:
-        current_app.logger.error("validation error: %s", form.errors)
     return render_template('search/results.html', form=form)
 
 
