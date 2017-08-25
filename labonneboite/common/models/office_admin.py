@@ -3,9 +3,10 @@ import datetime
 import json
 import re
 
-from sqlalchemy import Column, ForeignKey
 from sqlalchemy import Boolean, DateTime, Integer, String, Text
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy import desc
+from sqlalchemy.event import listens_for
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
 
@@ -153,10 +154,9 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     id = Column(Integer, primary_key=True)
     siret = Column(String(191), nullable=False, unique=True)
 
-    # Stores a list of french zipcodes or departements as a string separated by `GEOLOCATIONS_TEXT_SEPARATORS`.
+    # Stores a list of french "zipcodes" or "departements" as a string separated by `GEOLOCATIONS_TEXT_SEPARATORS`.
     codes = Column(Text, nullable=False)
     # Stores a JSON object of latitude/longitude coordinates for each entry in `geolocations_text`.
-    # See `codes_as_json_geolocations` for the suitable format.
     geolocations = Column(Text, nullable=False)
 
     reason = Column(Text, default='', nullable=False)
@@ -170,6 +170,17 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
     created_by = relationship('User', foreign_keys=[created_by_id])
     updated_by = relationship('User', foreign_keys=[updated_by_id])
+
+    def clean(self):
+        """
+        Clean some fields before saving or updating the instance.
+        This method should not be called manually since it's automatically triggered
+        on a `before_insert` or `before_update` event via `listens_for`.
+        """
+        # Remove multiple newlines in `codes`.
+        self.codes = '\n'.join(self.codes_as_list(self.codes))
+        # Get and store the content of `geolocations` as JSON.
+        self.geolocations = self.codes_as_json_geolocations(self.codes)
 
     def geolocations_as_lat_lon_properties(self):
         """
@@ -188,7 +199,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         Returns the content of the `geolocations` field as HTML links.
         """
         links = []
-        link = '<a href="https://maps.google.com/maps?q={lat},{lon}" target="_blank">{lat},{lon}</a>'
+        link = '<a href="https://maps.google.com/maps?q={lat},{lon}" target="_blank">{lat}, {lon}</a>'
         for coords in self.geolocations_as_lat_lon_properties():
             links.append(link.format(lat=coords['lat'], lon=coords['lon']))
         return '<br>'.join(links)
@@ -245,3 +256,12 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         '[["48.68", "6.17"], ["49.15", "6.22"]]'
         """
         return json.dumps(OfficeAdminExtraGeoLocation.codes_as_geolocations(codes))
+
+
+@listens_for(OfficeAdminExtraGeoLocation, 'before_insert')
+@listens_for(OfficeAdminExtraGeoLocation, 'before_update')
+def clean(mapper, connect, self):
+    """
+    Trigger the `OfficeAdminExtraGeoLocation.clean()` method before an insert or an update.
+    """
+    self.clean()

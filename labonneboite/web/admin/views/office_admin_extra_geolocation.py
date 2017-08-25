@@ -81,10 +81,6 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
     }
 
     def on_model_change(self, form, model, is_created):
-        # Remove empty lines.
-        model.codes = '\n'.join(OfficeAdminExtraGeoLocation.codes_as_list(model.codes))
-        # Store geolocations as JSON.
-        model.geolocations = OfficeAdminExtraGeoLocation.codes_as_json_geolocations(model.codes)
         if is_created:
             model.created_by = current_user
         else:

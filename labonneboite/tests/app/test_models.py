@@ -1,15 +1,39 @@
 # coding: utf8
-import unittest
-
+from labonneboite.common.database import db_session
 from labonneboite.common.models import OfficeAdminExtraGeoLocation
+from labonneboite.tests.test_base import DatabaseTest
 
 
-class OfficeAdminExtraGeoLocationTest(unittest.TestCase):
+class OfficeAdminExtraGeoLocationTest(DatabaseTest):
     """
     Tests for the OfficeAdminExtraGeoLocation model.
     """
 
+    def test_clean(self):
+        """
+        Test `OfficeAdminExtraGeoLocation.clean()`.
+        """
+        extra_geolocation = OfficeAdminExtraGeoLocation(
+            siret=u"38524664000176",
+            codes=u"75010\n\n\n\n\n\n\n57070",
+            reason=u"Paris + Metz",
+        )
+        db_session.add(extra_geolocation)
+        db_session.commit()
+        # The `clean()` method should have been called automatically.
+        extra_geolocation = db_session.query(OfficeAdminExtraGeoLocation).first()
+        # Multiple newlines should have been removed.
+        self.assertEqual(extra_geolocation.codes, u'57070\n75010')
+        # Corresponding Lat/Lon coords should have been found and stored.
+        self.assertEqual(
+            extra_geolocation.geolocations,
+            '[["49.157869706", "6.2212499254"], ["48.8761941084", "2.36107097577"]]'
+        )
+
     def test_codes_as_list(self):
+        """
+        Test `OfficeAdminExtraGeoLocation.codes_as_list()`.
+        """
         codes = u"   57070\n\n\n\n\n\n     75010  \n  54      "
         codes_as_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
         self.assertItemsEqual(codes_as_list, [u'54', u'57070', u'75010'])
@@ -18,6 +42,9 @@ class OfficeAdminExtraGeoLocationTest(unittest.TestCase):
         self.assertItemsEqual(codes_as_list, [u'13', u'57', u'75'])
 
     def test_codes_as_geolocations(self):
+        """
+        Test `OfficeAdminExtraGeoLocation.codes_as_geolocations()`.
+        """
         codes = u"75\n57070"
         codes_as_geolocations = OfficeAdminExtraGeoLocation.codes_as_geolocations(codes)
         expected = [
@@ -50,6 +77,9 @@ class OfficeAdminExtraGeoLocationTest(unittest.TestCase):
         self.assertItemsEqual(expected, codes_as_geolocations)
 
     def test_codes_as_json_geolocations(self):
+        """
+        Test `OfficeAdminExtraGeoLocation.codes_as_json_geolocations()`.
+        """
         codes = u"75010"
         codes_as_json_geolocations = OfficeAdminExtraGeoLocation.codes_as_json_geolocations(codes)
         expected = '[["48.8761941084", "2.36107097577"]]'

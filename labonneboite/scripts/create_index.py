@@ -349,8 +349,8 @@ def get_office_as_es_doc(office):
     }
 
     if office.y and office.x:
-        # Use an array to allow multiple locations per document, see `add_locations()`
-        # and https://goo.gl/fdTaEM
+        # Use an array to allow multiple locations per document, see https://goo.gl/fdTaEM
+        # Multiple locations may be added later via the admin UI.
         doc['location'] = [
             {'lat': office.y, 'lon': office.x},
         ]
