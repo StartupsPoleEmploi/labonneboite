@@ -3,6 +3,7 @@
 import time
 
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
+from labonneboite.common.models import OfficeAdminExtraGeoLocation
 from labonneboite.scripts import create_index as script
 from labonneboite.tests.test_base import DatabaseTest
 
@@ -53,10 +54,6 @@ class CreateIndexBaseTest(DatabaseTest):
         # Ensure that the office is the one that has been indexed in ES.
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
         self.assertEquals(res['_source']['email'], self.office.email)
-
-    def tearDown(self):
-        script.drop_and_create_index(index=self.ES_TEST_INDEX)
-        return super(CreateIndexBaseTest, self).tearDown()
 
 
 class UtilsTest(CreateIndexBaseTest):
@@ -228,3 +225,45 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEquals(res['_source']['phone'], u'')
         self.assertEquals(res['_source']['website'], u'')
         self.assertEquals(res['_source']['score'], self.office.score)
+
+
+class AddOfficesGeolocationsTest(CreateIndexBaseTest):
+    """
+    Test add_offices_geolocations().
+    """
+
+    def test_add_offices_geolocations(self):
+        """
+        Test `add_offices_geolocations`.
+        """
+        # Add an entry in the OfficeAdminExtraGeoLocation table with extra geolocations.
+        extra_geolocation = OfficeAdminExtraGeoLocation(
+            siret=self.office.siret,
+            codes=u"75010\n13000",  # Paris 10 + Marseille
+        )
+        extra_geolocation.save()
+
+        script.add_offices_geolocations(index=self.ES_TEST_INDEX)
+        time.sleep(1)  # Sleep required by ES to register new documents.
+
+        # The office should now have 3 geolocations in ES (the original one + Paris 10 + Marseille).
+        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
+        expected_location = [
+            {u'lat': 49.1044, u'lon': 6.17952},
+            {u'lat': u'43.2599669004', u'lon': u'5.37074086578'},
+            {u'lat': u'48.8761941084', u'lon': u'2.36107097577'},
+        ]
+        self.assertItemsEqual(res['_source']['location'], expected_location)
+        self.assertEquals(res['_source']['location_size'], len(expected_location))
+
+        # Now remove the entry in the OfficeAdminExtraGeoLocation table.
+        extra_geolocation.delete()
+
+        script.add_offices_geolocations(index=self.ES_TEST_INDEX)
+        time.sleep(1)  # Sleep required by ES to register new documents.
+
+        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
+        expected_location = [
+            {u'lat': 49.1044, u'lon': 6.17952},
+        ]
+        self.assertItemsEqual(res['_source']['location'], expected_location)

@@ -8,11 +8,11 @@ from sqlalchemy import Column, Index, Integer, String, Float, Boolean
 from sqlalchemy import PrimaryKeyConstraint
 
 from labonneboite.common import encoding as encoding_util
+from labonneboite.common import scoring as scoring_util
 from labonneboite.common.database import Base
 from labonneboite.common.load_data import load_city_codes
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
-from labonneboite.common import scoring as scoring_util
 
 
 logger = logging.getLogger('main')
@@ -80,7 +80,7 @@ class Office(OfficeMixin, CRUDMixin, Base):
         and the URL of the company page is also adjusted to keep the same context.
         Main case is results returned by an API search. The scores and URLs embedded
         in the company objects should be adjusted to the ROME code context.
-        
+
         TOFIX: some fields are added by external functions. This limits considerably
         the usefulness of this method.
         """

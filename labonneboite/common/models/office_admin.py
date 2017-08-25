@@ -154,7 +154,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     id = Column(Integer, primary_key=True)
     siret = Column(String(191), nullable=False, unique=True)
 
-    # Stores a list of french "zipcodes" or "departements" as a string separated by `GEOLOCATIONS_TEXT_SEPARATORS`.
+    # Stores a list of french "zipcodes" and/or "departements" as a string separated by `GEOLOCATIONS_TEXT_SEPARATORS`.
     codes = Column(Text, nullable=False)
     # Stores a JSON object of latitude/longitude coordinates for each entry in `geolocations_text`.
     geolocations = Column(Text, nullable=False)
@@ -184,7 +184,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
 
     def geolocations_as_lat_lon_properties(self):
         """
-        Returns the content of the `geolocations` field as a Python `list` of `lat/lon dicts`.
+        Returns the content of the `geolocations` field as a Python list of `lat/lon dicts`.
         This stucture maps to an Elasticsearch's geo_point "Lat Lon as Properties" format.
         E.g.:
         [
@@ -221,7 +221,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     @staticmethod
     def codes_as_list(codes):
         """
-        Converts the given `string` of codes to a Python `list` of codes.
+        Converts the given string of codes to a Python list of codes.
         """
         if not codes:
             return []
@@ -232,7 +232,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     @staticmethod
     def codes_as_geolocations(codes):
         """
-        Converts the given `string` of codes to an `array` of `lat/lon tuples`.
+        Converts the given string of codes to an array of `lat/lon tuples`.
         E.g.:
         [
             ('48.68', '6.17'),

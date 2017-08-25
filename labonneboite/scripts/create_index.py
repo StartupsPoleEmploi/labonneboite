@@ -559,7 +559,7 @@ def add_offices_geolocations(index=INDEX_NAME):
 
     # Reset multiple locations.
     body = {"query": {"range": {"location_size": {"gt": 1}}}}
-    multilocation_offices = es.search(index="labonneboite", doc_type=OFFICE_TYPE, body=body)
+    multilocation_offices = es.search(index=index, doc_type=OFFICE_TYPE, body=body)
     multilocation_sirets = [office['_source']['siret'] for office in multilocation_offices['hits']['hits']]
     # Find sirets in `multilocation_sirets` but not in `updated_sirets`.
     sirets_to_reset = set(multilocation_sirets) - set(updated_sirets)
