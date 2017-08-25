@@ -1,4 +1,5 @@
 # coding: utf8
+import datetime
 
 from flask import abort
 from flask_login import current_user
@@ -30,6 +31,16 @@ class AdminModelViewMixin(object):
 
     def inaccessible_callback(self, name, **kwargs):
         return abort_if_not_admin()
+
+    def on_model_change(self, form, model, is_created):
+        if is_created:
+            if hasattr(model, 'created_by'):
+                model.created_by = current_user
+        else:
+            if hasattr(model, 'updated_by'):
+                model.updated_by = current_user
+            if hasattr(model, 'date_updated'):
+                model.date_updated = datetime.datetime.utcnow()
 
 
 def datetime_format(view, context, model, name):

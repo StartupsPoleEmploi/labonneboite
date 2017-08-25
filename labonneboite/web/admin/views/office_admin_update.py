@@ -1,8 +1,5 @@
 # coding: utf8
-import datetime
-
 from flask_admin.contrib.sqla import ModelView
-from flask_login import current_user
 from wtforms import validators
 
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
@@ -146,10 +143,3 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             'filters': [strip_filter],
         },
     }
-
-    def on_model_change(self, form, model, is_created):
-        if is_created:
-            model.created_by = current_user
-        else:
-            model.updated_by = current_user
-            model.date_updated = datetime.datetime.utcnow()

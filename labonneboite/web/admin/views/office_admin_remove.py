@@ -1,10 +1,7 @@
 # coding: utf8
-import datetime
-
 from flask import flash, url_for
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView
-from flask_login import current_user
 from wtforms import validators
 
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminRemove
@@ -124,13 +121,6 @@ class OfficeAdminRemoveModelView(AdminModelViewMixin, ModelView):
             'validators': [validators.optional(), phone_validator],
         },
     }
-
-    def on_model_change(self, form, model, is_created):
-        if is_created:
-            model.created_by = current_user
-        else:
-            model.updated_by = current_user
-            model.date_updated = datetime.datetime.utcnow()
 
     def validate_form(self, form):
         """
