@@ -5,11 +5,11 @@ import logging
 
 from flask import url_for
 from sqlalchemy import Column, Index, Integer, String, Float, Boolean
-from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy import exists, PrimaryKeyConstraint
 
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import scoring as scoring_util
-from labonneboite.common.database import Base
+from labonneboite.common.database import Base, db_session
 from labonneboite.common.load_data import load_city_codes
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
@@ -253,6 +253,14 @@ class Office(OfficeMixin, CRUDMixin, Base):
             # RuntimeError is raised when we are outside of a Flask's application context.
             # Here, we cannot properly generate an URL via url_for.
             return None
+
+    @property
+    def has_multi_geolocations(self):
+        """
+        Returns true if the current office has multi geolocations.
+        """
+        from labonneboite.common.models import OfficeAdminExtraGeoLocation
+        return db_session.query(exists().where(OfficeAdminExtraGeoLocation.siret == self.siret)).scalar()
 
 
 CONTACT_MODE_STAGES = {
