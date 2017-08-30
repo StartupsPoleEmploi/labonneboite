@@ -1,4 +1,6 @@
 # coding: utf8
+import datetime
+
 from labonneboite.common.database import db_session
 from labonneboite.common.models import OfficeAdminExtraGeoLocation
 from labonneboite.tests.test_base import DatabaseTest
@@ -29,6 +31,21 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
             extra_geolocation.geolocations,
             '[["49.157869706", "6.2212499254"], ["48.8761941084", "2.36107097577"]]'
         )
+
+    def test_is_outdated(self):
+        """
+        Test `OfficeAdminExtraGeoLocation.is_outdated()`.
+        """
+        extra_geolocation = OfficeAdminExtraGeoLocation(
+            siret=u"38524664000176",
+            codes=u"75008",
+        )
+        extra_geolocation.save()
+        self.assertFalse(extra_geolocation.is_outdated())
+        # Make `extra_geolocation` instance out-of-date.
+        extra_geolocation.date_end = datetime.datetime.now() - datetime.timedelta(days=1)
+        extra_geolocation.update()
+        self.assertTrue(extra_geolocation.is_outdated())
 
     def test_codes_as_list(self):
         """

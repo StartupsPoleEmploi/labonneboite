@@ -3,6 +3,7 @@ import datetime
 import json
 import re
 
+from dateutil.relativedelta import relativedelta
 from sqlalchemy import Boolean, DateTime, Integer, String, Text
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import desc
@@ -158,6 +159,8 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     codes = Column(Text, nullable=False)
     # Stores a JSON object of latitude/longitude coordinates for each entry in `geolocations_text`.
     geolocations = Column(Text, nullable=False)
+    # After this date, extra geolocations will be considered obsolete.
+    date_end = Column(DateTime, default=datetime.datetime.utcnow() + relativedelta(months=3), nullable=False)
 
     reason = Column(Text, default='', nullable=False)
 
@@ -181,6 +184,12 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         self.codes = '\n'.join(self.codes_as_list(self.codes))
         # Get and store the content of `geolocations` as JSON.
         self.geolocations = self.codes_as_json_geolocations(self.codes)
+
+    def is_outdated(self):
+        """
+        Returns True if extra geolocations are outdated, False otherwise.
+        """
+        return datetime.datetime.utcnow() > self.date_end
 
     def geolocations_as_lat_lon_properties(self):
         """

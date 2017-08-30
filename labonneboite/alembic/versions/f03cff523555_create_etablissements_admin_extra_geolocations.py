@@ -24,6 +24,7 @@ def upgrade():
         sa.Column('siret', mysql.VARCHAR(collation=u'utf8mb4_unicode_ci', length=191), nullable=False),
         sa.Column('codes', mysql.TEXT(collation=u'utf8mb4_unicode_ci'), nullable=False),
         sa.Column('geolocations', mysql.TEXT(collation=u'utf8mb4_unicode_ci'), nullable=False),
+        sa.Column('date_end', mysql.DATETIME(), nullable=False),
         sa.Column('reason', mysql.TEXT(collation=u'utf8mb4_unicode_ci'), nullable=False),
         sa.Column('date_created', mysql.DATETIME(), nullable=False),
         sa.Column('date_updated', mysql.DATETIME(), nullable=True),

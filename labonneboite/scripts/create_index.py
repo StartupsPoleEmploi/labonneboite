@@ -205,12 +205,6 @@ mapping_office = {
         "location": {
             "type": "geo_point",
         },
-        # Denormalize `location_size` to avoid using the script filter https://stackoverflow.com/q/15543308
-        # because dynamic scripting is disabled by default from Elasticsearch v1.4.3.
-        "location_size": {
-            "type": "integer",
-            "index": "not_analyzed",
-        },
     },
 }
 
@@ -345,7 +339,6 @@ def get_office_as_es_doc(office):
         'flag_junior': int(office.flag_junior),
         'flag_senior': int(office.flag_senior),
         'flag_handicap': int(office.flag_handicap),
-        'location_size': 0,
     }
 
     if office.y and office.x:
@@ -354,7 +347,6 @@ def get_office_as_es_doc(office):
         doc['location'] = [
             {'lat': office.y, 'lon': office.x},
         ]
-        doc['location_size'] = 1
 
     doc = inject_office_rome_scores_into_es_doc(office, doc)
 
@@ -527,51 +519,24 @@ def update_offices(index=INDEX_NAME):
             pdf_util.delete_file(office)
 
 
-def add_offices_geolocations(index=INDEX_NAME):
+def update_offices_geolocations(index=INDEX_NAME):
     """
-    Add geolocations to offices.
-
+    Remove or add extra geolocations to offices.
     New geolocations are entered into the system through the `OfficeAdminExtraGeoLocation` table.
-
-    This function updates ElasticSearch with those new geolocations. The `location_size` field
-    is updated alongside to reflect the total number of geolocations for an office.
-
-    After the update, `location_size` is used to retrieve all offices with more than one geolocation.
-    If an office with more than one geolocation exists and is not part of the just updated offices,
-    it means that it has been completely deleted from the `OfficeAdminExtraGeoLocation` table.
-    Thus we have to reset its geolocation info.
     """
     es = Elasticsearch(timeout=ES_TIMEOUT)
 
-    updated_sirets = []
-
-    # Add multiple locations.
     for extra_geolocation in db_session.query(OfficeAdminExtraGeoLocation).all():
         office = Office.query.filter_by(siret=extra_geolocation.siret).first()
         if office:
-            location = extra_geolocation.geolocations_as_lat_lon_properties()
+            locations = []
             if office.y and office.x:
-                location.insert(0, {'lat': office.y, 'lon': office.x})  # Prepend the initial geolocation.
+                locations.append({'lat': office.y, 'lon': office.x})
+            if not extra_geolocation.is_outdated():
+                locations.extend(extra_geolocation.geolocations_as_lat_lon_properties())
             # Apply changes in ElasticSearch.
-            body = {'doc': {'location': location, 'location_size': len(location)}}
+            body = {'doc': {'location': locations}}
             es.update(index=index, doc_type=OFFICE_TYPE, id=office.siret, body=body, ignore=404)
-            updated_sirets.append(office.siret)
-
-    # Reset multiple locations.
-    body = {"query": {"range": {"location_size": {"gt": 1}}}}
-    multilocation_offices = es.search(index=index, doc_type=OFFICE_TYPE, body=body)
-    multilocation_sirets = [office['_source']['siret'] for office in multilocation_offices['hits']['hits']]
-    # Find sirets in `multilocation_sirets` but not in `updated_sirets`.
-    sirets_to_reset = set(multilocation_sirets) - set(updated_sirets)
-    for siret in sirets_to_reset:
-        office = Office.query.filter_by(siret=siret).first()
-        if office:
-            location = []
-            if office.y and office.x:
-                location.append({'lat': office.y, 'lon': office.x})
-            # Apply changes in ElasticSearch.
-            body = {'doc': {'location': location, 'location_size': len(location)}}
-            es.update(index=index, doc_type=OFFICE_TYPE, id=siret, body=body, ignore=404)
 
 
 def display_performance_stats():
@@ -607,7 +572,7 @@ def run():
     add_offices()
     remove_offices()
     update_offices()
-    add_offices_geolocations()
+    update_offices_geolocations()
 
     display_performance_stats()
 

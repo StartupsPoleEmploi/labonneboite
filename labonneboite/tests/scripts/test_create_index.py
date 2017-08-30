@@ -1,5 +1,5 @@
 # coding: utf8
-
+import datetime
 import time
 
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
@@ -79,7 +79,6 @@ class UtilsTest(CreateIndexBaseTest):
             'location': [
                 {'lat': 49.1044, 'lon': 6.17952},
             ],
-            'location_size': 1,
             'siret': u'78548035101646',
             'headcount': 12,
             'email': u'supermarche@match.com',
@@ -227,14 +226,14 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEquals(res['_source']['score'], self.office.score)
 
 
-class AddOfficesGeolocationsTest(CreateIndexBaseTest):
+class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
     """
-    Test add_offices_geolocations().
+    Test update_offices_geolocations().
     """
 
-    def test_add_offices_geolocations(self):
+    def test_update_offices_geolocations(self):
         """
-        Test `add_offices_geolocations`.
+        Test `update_offices_geolocations`.
         """
         # Add an entry in the OfficeAdminExtraGeoLocation table with extra geolocations.
         extra_geolocation = OfficeAdminExtraGeoLocation(
@@ -243,7 +242,7 @@ class AddOfficesGeolocationsTest(CreateIndexBaseTest):
         )
         extra_geolocation.save()
 
-        script.add_offices_geolocations(index=self.ES_TEST_INDEX)
+        script.update_offices_geolocations(index=self.ES_TEST_INDEX)
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         # The office should now have 3 geolocations in ES (the original one + Paris 10 + Marseille).
@@ -254,14 +253,16 @@ class AddOfficesGeolocationsTest(CreateIndexBaseTest):
             {u'lat': u'48.8761941084', u'lon': u'2.36107097577'},
         ]
         self.assertItemsEqual(res['_source']['location'], expected_location)
-        self.assertEquals(res['_source']['location_size'], len(expected_location))
 
-        # Now remove the entry in the OfficeAdminExtraGeoLocation table.
-        extra_geolocation.delete()
+        # Make `extra_geolocation` instance out-of-date.
+        extra_geolocation.date_end = datetime.datetime.now() - datetime.timedelta(days=1)
+        extra_geolocation.update()
+        self.assertTrue(extra_geolocation.is_outdated())
 
-        script.add_offices_geolocations(index=self.ES_TEST_INDEX)
+        script.update_offices_geolocations(index=self.ES_TEST_INDEX)
         time.sleep(1)  # Sleep required by ES to register new documents.
 
+        # The office extra geolocations should now be reset.
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
         expected_location = [
             {u'lat': 49.1044, u'lon': 6.17952},

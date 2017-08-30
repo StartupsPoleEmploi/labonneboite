@@ -151,7 +151,7 @@ def register_admin(flask_app):
     from labonneboite.common.models import OfficeAdminExtraGeoLocation
     from labonneboite.web.admin.views.office_admin_extra_geolocation import OfficeAdminExtraGeoLocationModelView
     admin.add_view(OfficeAdminExtraGeoLocationModelView(OfficeAdminExtraGeoLocation, db_session,
-        name=u'Ajouter une géolocation'))
+        name=u'Géolocalisations'))
 
 
 def register_before_requests(flask_app):

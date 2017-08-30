@@ -1,4 +1,6 @@
 # coding: utf8
+import datetime
+
 from flask import flash
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView
@@ -25,6 +27,7 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
         'codes',
         'reason',
         'date_created',
+        'date_end',
     ]
 
     column_details_list = [
@@ -36,10 +39,12 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
         'date_created',
         'updated_by',
         'date_updated',
+        'date_end',
     ]
 
     column_formatters = {
         'date_created': datetime_format,
+        'date_end': datetime_format,
         'date_updated': datetime_format,
         'codes': lambda view, context, model, name: model.codes_as_list(model.codes),
         'geolocations': lambda view, context, model, name: Markup(model.geolocations_as_html_links()),
@@ -52,6 +57,7 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
         'geolocations': u"Latitude/longitude",
         'reason': u"Raison",
         'date_created': u"Date de création",
+        'date_end': u"Date de fin",
         'date_updated': u"Date de modification",
         'created_by': u"Créé par",
         'updated_by': u"Modifié par",
@@ -65,6 +71,7 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
     form_columns = [
         'siret',
         'codes',
+        'date_end',
         'reason',
     ]
 
@@ -79,21 +86,33 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
 
     def validate_form(self, form):
         is_valid = super(OfficeAdminExtraGeoLocationModelView, self).validate_form(form)
+
+        if is_valid and form.data.get('date_end'):
+            if datetime.datetime.utcnow() >= form.data['date_end']:
+                msg = (u"La date de fin doit être dans le futur.")
+                flash(msg, 'error')
+                return False
+
         if is_valid and form.data.get('codes'):
             for code in OfficeAdminExtraGeoLocation.codes_as_list(form.data['codes']):
                 if len(code) not in [2, 5]:
-                    msg = (u"`%s` n'est pas un code postal ou un numéro de département valide" % code)
+                    msg = (
+                        u"`%s` n'est pas un code postal ou un numéro de département valide. "
+                        u"Assurez-vous de saisir un élément par ligne."
+                        % code
+                    )
                     flash(msg, 'error')
                     return False
                 if OfficeAdminExtraGeoLocation.is_departement(code):
                     if not geocoding.get_all_lat_long_from_departement(code):
-                        msg = (u"Impossible de trouver des latitude/longitude pour le département %s" % code)
+                        msg = (u"Impossible de trouver des latitude/longitude pour le département %s." % code)
                         flash(msg, 'error')
                         return False
                 elif OfficeAdminExtraGeoLocation.is_zipcode(code):
                     lat_long = geocoding.get_lat_long_from_zipcode(code)
                     if lat_long == (None, None):
-                        msg = (u"Impossible de trouver les latitude/longitude du code postal %s" % code)
+                        msg = (u"Impossible de trouver les latitude/longitude du code postal %s." % code)
                         flash(msg, 'error')
                         return False
+
         return is_valid
