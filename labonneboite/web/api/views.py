@@ -94,6 +94,7 @@ def company_list():
             return u'invalid rome code: %s' % rome, 400
 
     if len(rome_code_list) > 1:
+        # Reasons why we only support single-rome search are detailed in README.md
         return u'Multi ROME search is no longer supported, please use single ROME search only.', 400
     rome_code = rome_code_list[0]
 

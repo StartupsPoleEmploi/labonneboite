@@ -95,7 +95,7 @@ class Fetcher(object):
     def get_company_count(self, rome_codes, naf_codes, distance):
         naf_codes = get_api_ready_rome_and_naf_codes(rome_codes, naf_codes)
 
-        # We only fully support single-rome search.
+        # Reasons why we only support single-rome search are detailed in README.md
         if len(rome_codes) > 1:
             raise Exception("multi ROME search not supported")
         rome_code = rome_codes[0]
@@ -209,7 +209,7 @@ def _get_companies_from_api(
         headcount_filter = settings.HEADCOUNT_WHATEVER
     naf_codes = get_api_ready_rome_and_naf_codes(rome_codes, naf_codes)
 
-    # We only fully support single-rome search.
+    # Reasons why we only support single-rome search are detailed in README.md
     if len(rome_codes) > 1:
         raise Exception("multi ROME search not supported")
     rome_code = rome_codes[0]
