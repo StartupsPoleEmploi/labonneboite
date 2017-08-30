@@ -14,18 +14,18 @@ class ApiBaseTest(DatabaseTest):
 
     positions = {
         'bayonville_sur_mad': {
-            'location': {
+            'coords': [{
                 'lat': 49,
                 'lon': 6,
-            },
+            }],
             'zip_code': u'54890',
             'commune_id': u'54055',
         },
         'caen': {
-            'location': {
+            'coords': [{
                 'lat': 49.1812497463,
                 'lon': -0.372499354315,
-            },
+            }],
             'zip_code': u'14000',
             'commune_id': u'14118',
         },
@@ -62,7 +62,7 @@ class ApiBaseTest(DatabaseTest):
                             "type": "integer",
                             "index": "not_analyzed"
                         },
-                        "location": {
+                        "locations": {
                             "type": "geo_point",
                         }
                     }
@@ -73,7 +73,7 @@ class ApiBaseTest(DatabaseTest):
         for rome_code in settings.ROME_DESCRIPTIONS.keys():
             request_body["mappings"]["office"]["properties"]["score_for_rome_%s" % rome_code] = {
                 "type": "integer",
-                "index": "not_analyzed"    
+                "index": "not_analyzed"
             }
         self.es.indices.create(index=self.ES_TEST_INDEX, body=request_body)
 
@@ -84,7 +84,7 @@ class ApiBaseTest(DatabaseTest):
                 'siret': u'00000000000001',
                 'score': 68,
                 'headcount': 11,
-                'location': self.positions['bayonville_sur_mad']['location'],
+                'locations': self.positions['bayonville_sur_mad']['coords'],
                 'name': u'Office 1',
             },
             {
@@ -92,7 +92,7 @@ class ApiBaseTest(DatabaseTest):
                 'siret': u'00000000000002',
                 'score': 69,
                 'headcount': 31,
-                'location': self.positions['bayonville_sur_mad']['location'],
+                'locations': self.positions['bayonville_sur_mad']['coords'],
                 'name': u'Office 2',
             },
             {
@@ -100,7 +100,7 @@ class ApiBaseTest(DatabaseTest):
                 'siret': u'00000000000003',
                 'score': 70,
                 'headcount': 31,
-                'location': self.positions['bayonville_sur_mad']['location'],
+                'locations': self.positions['bayonville_sur_mad']['coords'],
                 'name': u'Office 3',
             },
             {
@@ -108,7 +108,7 @@ class ApiBaseTest(DatabaseTest):
                 'siret': u'00000000000004',
                 'score': 71,
                 'headcount': 31,
-                'location': self.positions['caen']['location'],
+                'locations': self.positions['caen']['coords'],
                 'name': u'Office 4',
             },
             {
@@ -116,7 +116,7 @@ class ApiBaseTest(DatabaseTest):
                 'siret': u'00000000000005',
                 'score': 71,
                 'headcount': 31,
-                'location': self.positions['caen']['location'],
+                'locations': self.positions['caen']['coords'],
                 'name': u'Office 5',
             },
         ]
@@ -132,10 +132,10 @@ class ApiBaseTest(DatabaseTest):
                     rome_code=rome_code,
                     naf_code=naf
                 )
-                doc['score_for_rome_%s' % rome_code] = office_score_for_current_rome 
+                doc['score_for_rome_%s' % rome_code] = office_score_for_current_rome
 
             self.es.index(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
-        
+
         # need for ES to register our new documents, flaky test here otherwise
         time.sleep(1)
 
@@ -146,7 +146,7 @@ class ApiBaseTest(DatabaseTest):
             commune_id = None
             zip_code = None
             for position in self.positions:
-                if doc['location'] == self.positions[position]['location']:
+                if doc['locations'] == self.positions[position]['coords']:
                     commune_id = self.positions[position]['commune_id']
                     zip_code = self.positions[position]['zip_code']
                     break
@@ -163,8 +163,8 @@ class ApiBaseTest(DatabaseTest):
                 zipcode=zip_code,
                 email=u'foo@bar.com',
                 departement=zip_code[:2],
-                x=doc['location']['lon'],
-                y=doc['location']['lat'],
+                x=doc['locations'][0]['lon'],
+                y=doc['locations'][0]['lat'],
             )
             office.save()
 

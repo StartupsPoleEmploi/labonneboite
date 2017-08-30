@@ -76,7 +76,7 @@ class UtilsTest(CreateIndexBaseTest):
             'name': u'SUPERMARCHES MATCH',
             'flag_junior': 0,
             'score': 50,
-            'location': [
+            'locations': [
                 {'lat': 49.1044, 'lon': 6.17952},
             ],
             'siret': u'78548035101646',
@@ -247,12 +247,12 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
 
         # The office should now have 3 geolocations in ES (the original one + Paris 10 + Marseille).
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
-        expected_location = [
+        expected_locations = [
             {u'lat': 49.1044, u'lon': 6.17952},
             {u'lat': u'43.2599669004', u'lon': u'5.37074086578'},
             {u'lat': u'48.8761941084', u'lon': u'2.36107097577'},
         ]
-        self.assertItemsEqual(res['_source']['location'], expected_location)
+        self.assertItemsEqual(res['_source']['locations'], expected_locations)
 
         # Make `extra_geolocation` instance out-of-date.
         extra_geolocation.date_end = datetime.datetime.now() - datetime.timedelta(days=1)
@@ -264,7 +264,7 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
 
         # The office extra geolocations should now be reset.
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
-        expected_location = [
+        expected_locations = [
             {u'lat': 49.1044, u'lon': 6.17952},
         ]
-        self.assertItemsEqual(res['_source']['location'], expected_location)
+        self.assertItemsEqual(res['_source']['locations'], expected_locations)

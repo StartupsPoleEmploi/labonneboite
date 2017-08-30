@@ -224,8 +224,8 @@ class ApiCompanyListTest(ApiBaseTest):
         params = self.add_security_params({
             'distance': 10,
             'from_number': 1,
-            'latitude': self.positions['bayonville_sur_mad']['location']['lat'],
-            'longitude': self.positions['bayonville_sur_mad']['location']['lon'],
+            'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
+            'longitude': self.positions['bayonville_sur_mad']['coords'][0]['lon'],
             'rome_codes': u'D1405',
             'to_number': 2,
             'user': u'labonneboite',
@@ -239,8 +239,8 @@ class ApiCompanyListTest(ApiBaseTest):
     def test_count_pagination(self):
         params = self.add_security_params({
             'distance': 10,
-            'latitude': self.positions['bayonville_sur_mad']['location']['lat'],
-            'longitude': self.positions['bayonville_sur_mad']['location']['lon'],
+            'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
+            'longitude': self.positions['bayonville_sur_mad']['coords'][0]['lon'],
             'page': 1,
             'page_size': 2,
             'rome_codes': u'D1405',
@@ -333,7 +333,7 @@ class ApiCompanyListTest(ApiBaseTest):
         # let's see how adjusting for this rome decreased hirings
         # from 77.5 (hirings for all rome_codes included)
         # to 0.6 (hirings for only the current rome_code)
-        # 
+        #
         # 0.6 is approx 1% of 77.5
         # which means that on average, companies of this naf_code hire 1% in this rome_code
         # and 99% in all other rome_codes associated to this naf_code
@@ -370,8 +370,8 @@ class ApiCompanyListTest(ApiBaseTest):
         """
         params = self.add_security_params({
             'distance': 20,
-            'latitude': self.positions['bayonville_sur_mad']['location']['lat'],
-            'longitude': self.positions['bayonville_sur_mad']['location']['lon'],
+            'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
+            'longitude': self.positions['bayonville_sur_mad']['coords'][0]['lon'],
             'rome_codes': u'D1405',
             'user': u'labonneboite',
         })
@@ -385,8 +385,8 @@ class ApiCompanyListTest(ApiBaseTest):
     def test_response_headers(self):
         params = self.add_security_params({
             'distance': 20,
-            'latitude': self.positions['bayonville_sur_mad']['location']['lat'],
-            'longitude': self.positions['bayonville_sur_mad']['location']['lon'],
+            'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
+            'longitude': self.positions['bayonville_sur_mad']['coords'][0]['lon'],
             'rome_codes': u'D1405',
             'user': u'labonneboite',
         })

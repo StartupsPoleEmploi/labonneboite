@@ -202,7 +202,7 @@ mapping_office = {
             "type": "integer",
             "index": "not_analyzed",
         },
-        "location": {
+        "locations": {
             "type": "geo_point",
         },
     },
@@ -344,7 +344,7 @@ def get_office_as_es_doc(office):
     if office.y and office.x:
         # Use an array to allow multiple locations per document, see https://goo.gl/fdTaEM
         # Multiple locations may be added later via the admin UI.
-        doc['location'] = [
+        doc['locations'] = [
             {'lat': office.y, 'lon': office.x},
         ]
 
@@ -535,7 +535,7 @@ def update_offices_geolocations(index=INDEX_NAME):
             if not extra_geolocation.is_outdated():
                 locations.extend(extra_geolocation.geolocations_as_lat_lon_properties())
             # Apply changes in ElasticSearch.
-            body = {'doc': {'location': locations}}
+            body = {'doc': {'locations': locations}}
             es.update(index=index, doc_type=OFFICE_TYPE, id=office.siret, body=body, ignore=404)
 
 

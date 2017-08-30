@@ -44,12 +44,10 @@ class Fetcher(object):
         self.headcount = kwargs.get('headcount')
         self.sort = kwargs.get('sort')
         self.flag_alternance = kwargs.get('flag_alternance')
-        
         public = kwargs.get('public')
         self.flag_junior = public == PUBLIC_JUNIOR
         self.flag_senior = public == PUBLIC_SENIOR
         self.flag_handicap = public == PUBLIC_HANDICAP
-        
         self.naf_codes = []
         self.alternative_rome_codes = {}
         self.alternative_distances = collections.OrderedDict()
@@ -101,7 +99,7 @@ class Fetcher(object):
         if len(rome_codes) > 1:
             raise Exception("multi ROME search not supported")
         rome_code = rome_codes[0]
-        
+
         return count_companies_for_naf_codes(
             naf_codes,
             self.latitude,
@@ -341,7 +339,7 @@ def build_json_body_elastic_search(
             "numeric_range": {
                 "headcount": headcount_filter
             }
-        }      
+        }
         filters += [headcount_filter_dic]
 
     if flag_alternance == 1:
@@ -382,7 +380,7 @@ def build_json_body_elastic_search(
 
     distance_sort = {
         "_geo_distance": {
-            "location": {
+            "locations": {
                 "lat": latitude,
                 "lon": longitude
             },
@@ -421,7 +419,7 @@ def build_json_body_elastic_search(
     filters.append({
         "geo_distance": {
             "distance": "%skm" % distance,
-            "location": {
+            "locations": {
                 "lat": latitude,
                 "lon": longitude
             }
@@ -476,7 +474,7 @@ def retrieve_companies_from_elastic_search(json_body, distance_sort=True, index=
         for obj in company_objects:
             obj.distance = distances[obj.siret]
             company_dict[obj.siret] = obj
-            
+
         for siret in siret_list:
             company = company_dict[siret]
             if company.has_city():

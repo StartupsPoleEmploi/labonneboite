@@ -15,18 +15,18 @@ class FavoriteBaseTest(DatabaseTest):
 
     positions = {
         'paris': {
-            'location': {
+            'coords': [{
                 'lat': 48.866667,
                 'lon': 2.333333,
-            },
+            }],
             'zip_code': u'75010',
             'commune_id': u'75110',
         },
         'metz': {
-            'location': {
+            'coords': [{
                 'lat': 49.133333,
                 'lon': 6.166667,
-            },
+            }],
             'zip_code': u'57000',
             'commune_id': u'57463',
         },
@@ -66,7 +66,7 @@ class FavoriteBaseTest(DatabaseTest):
                             "type": "integer",
                             "index": "not_analyzed"
                         },
-                        "location": {
+                        "locations": {
                             "type": "geo_point",
                         }
                     }
@@ -82,7 +82,7 @@ class FavoriteBaseTest(DatabaseTest):
                 'siret': u'00000000000001',
                 'score': 98,
                 'headcount': 32,
-                'location': self.positions['metz']['location'],
+                'locations': self.positions['metz']['coords'],
                 'name': u'Centre Distributeur E.Leclerc',
             },
             {
@@ -90,7 +90,7 @@ class FavoriteBaseTest(DatabaseTest):
                 'siret': u'00000000000002',
                 'score': 98,
                 'headcount': 12,
-                'location': self.positions['metz']['location'],
+                'locations': self.positions['metz']['coords'],
                 'name': u'Maison Nicolas',
             },
             {
@@ -98,7 +98,7 @@ class FavoriteBaseTest(DatabaseTest):
                 'siret': u'00000000000003',
                 'score': 98,
                 'headcount': 32,
-                'location': self.positions['paris']['location'],
+                'locations': self.positions['paris']['coords'],
                 'name': u'Carrefour Paris',
             },
             {
@@ -106,7 +106,7 @@ class FavoriteBaseTest(DatabaseTest):
                 'siret': u'00000000000004',
                 'score': 98,
                 'headcount': 84,
-                'location': self.positions['paris']['location'],
+                'locations': self.positions['paris']['coords'],
                 'name': u'Maistre Mathieu',
             },
         ]
@@ -124,7 +124,7 @@ class FavoriteBaseTest(DatabaseTest):
             zip_code = None
             commune_id = None
             for position in self.positions:
-                if doc['location'] == self.positions[position]['location']:
+                if doc['locations'] == self.positions[position]['coords']:
                     commune_id = self.positions[position]['commune_id']
                     zip_code = self.positions[position]['zip_code']
                     break
@@ -141,8 +141,8 @@ class FavoriteBaseTest(DatabaseTest):
                 zipcode=zip_code,
                 email=u'foo@bar.com',
                 departement=zip_code[:2],
-                x=doc['location']['lon'],
-                y=doc['location']['lat'],
+                x=doc['locations'][0]['lon'],
+                y=doc['locations'][0]['lat'],
             )
             office.save()
 
