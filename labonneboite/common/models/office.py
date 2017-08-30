@@ -254,11 +254,22 @@ class Office(OfficeMixin, CRUDMixin, Base):
             # Here, we cannot properly generate an URL via url_for.
             return None
 
-    @property
-    def has_multi_geolocations(self):
+    def show_recruit_elsewhere_msg(self, distance, zipcode):
         """
-        Returns true if the current office has multi geolocations.
+        Returns True if a message that indicates that the current office recruits beyond the boundaries
+        of its own zipcode should be displayed, False otherwise.
+        This method is used in the context of the search result page.
         """
+        # If the distance scope of the search is too large, the message is unnecessary.
+        from labonneboite.web.search.forms import CompanySearchForm
+        if distance and distance >= CompanySearchForm.DISTANCE_S:
+            return False
+        # If the `zipcode` search parameter is in the same departement as the current office,
+        # the message is unnecessary.
+        if zipcode.startswith(self.zipcode[:2]):
+            return False
+        # Otherwise check if this office has multi geolocations.
+        # This perform 1 SQL query for each call. It might be "denormalized" if it becomes a problem.
         from labonneboite.common.models import OfficeAdminExtraGeoLocation
         return db_session.query(exists().where(OfficeAdminExtraGeoLocation.siret == self.siret)).scalar()
 

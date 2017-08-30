@@ -215,6 +215,7 @@ def results(city, zipcode, occupation):
         'sort': kwargs['sort'],
         'tile_server_url': settings.TILE_SERVER_URL,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
+        'zipcode': zipcode,
     }
     return render_template('search/results.html', **context)
 

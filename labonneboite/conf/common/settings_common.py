@@ -59,5 +59,3 @@ LOGSTASH_HOST = "localhost"
 LOGSTASH_PORT = 5959
 
 TILE_SERVER_URL = "http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}"
-
-

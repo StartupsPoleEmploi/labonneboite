@@ -26,12 +26,18 @@ class CompanySearchForm(FlaskForm):
 
     NAF_CHOICES = [('', u'Tous les secteurs')] + [(k, v) for k, v in settings.NAF_CODES.items()]
 
+    DISTANCE_XS = u'10'
+    DISTANCE_S = u'30'
+    DISTANCE_M = u'50'
+    DISTANCE_L = u'100'
+    DISTANCE_XL = u'3000'
+
     DISTANCE_CHOICES = (
-        (u'10', u'Moins de 10 km'),
-        (u'30', u'Moins de 30 km'),
-        (u'50', u'Moins de 50 km'),
-        (u'100', u'Moins de 100km'),
-        (u'3000', u'France entière')
+        (DISTANCE_XS, u'Moins de 10 km'),
+        (DISTANCE_S, u'Moins de 30 km'),
+        (DISTANCE_M, u'Moins de 50 km'),
+        (DISTANCE_L, u'Moins de 100km'),
+        (DISTANCE_XL, u'France entière')
     )
 
     FLAG_ALTERNANCE_CHOICES = (

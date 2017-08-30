@@ -19,14 +19,6 @@
           {% endfor %}
         </p>
 
-        {# `company.has_multi_geolocations` could perform one SQL query for each result depending #}
-        {# on the distance value. It might be "denormalized" if it becomes a problem. #}
-        {% if distance and distance <= 30 and company.has_multi_geolocations %}
-        <p>
-          <mark>Cette entreprise recrute aussi dans votre région.</mark>
-        </p>
-        {% endif %}
-
       </div>
       <div class="grid-col-4">
 
