@@ -112,7 +112,7 @@ def get_city_name_and_zipcode_from_commune_id(commune):
 
     Examples:
 
-    - 57000 (departement of Metz) is a zipcode and not a commune id.
+    - 57000 (departement of Metz) is a zipcode and not a commune id, the corresponding commune_id is 57463.
     - 14118 (Caen) is a commune id and not a zipcode, but its corresponding zipcode is 14000.
     """
     if not COMMUNES_CACHE:

@@ -9,46 +9,56 @@ import logging
 
 from slugify import slugify
 from locust import HttpLocust, TaskSet, task
-from locust.exception import StopLocust
 
 from labonneboite.importer import util as import_util
 from labonneboite.conf import settings
+from labonneboite.web.api import util
 
 logger = logging.getLogger(__name__)
 logger.info("loading locustfile")
 
 con, cur = import_util.create_cursor()
-cur.execute("select count(1) from %s" % (settings.OFFICE_TABLE))
-con.commit()
-OFFICE_COUNT = cur.fetchone()[0]
+
+
+def generate_siret_choices():
+    cur.execute("select siret from %s limit 100000" % (settings.OFFICE_TABLE))
+    con.commit()
+    rows = cur.fetchall()
+    return [row[0] for row in rows]
+
+SIRET_CHOICES = generate_siret_choices()
 
 
 def generate_city_choices():
-    fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../labonneboite/common/data/consolidated_cities.csv")
-    city_file = open(fullname, "r")
-    reader = csv.reader(city_file)
-    cities = []
-    for city_name, first_zipcode, population, _, _ in reader:
-        cities.append([city_name, first_zipcode, int(population)])
-    cities_by_population = sorted(cities, key=itemgetter(2), reverse=True)
-    city_choices = []
-    for city in cities_by_population[:2000]:
-        name, zipcode, population = city
-        city_choices.append([(name, zipcode), math.log10(population)])
-    return city_choices
+    fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+        "../../labonneboite/common/data/consolidated_cities.csv")
+    with open(fullname, "r") as city_file:
+        reader = csv.reader(city_file)
+        cities = []
+        for city_name, first_zipcode, population, _, _ in reader:
+            cities.append([city_name, first_zipcode, int(population)])
+        cities_by_population = sorted(cities, key=itemgetter(2), reverse=True)
+        city_choices = []
+        for city in cities_by_population[:2000]:
+            name, zipcode, population = city
+            city_choices.append([(name, zipcode), math.log10(population)])
+        return city_choices
 
 CITY_CHOICES = generate_city_choices()
 
 
-# generate companies siret numbers for secretaries in a radius of 50km around Paris
-rome = ['M1607',]
-naf = []
-latitude = 48.8536415100097
-longitude = 2.34842991828918
-distance = 50
-headcount = None
-from_number = 1
-to_number = 100000
+def generate_commune_choices():
+    fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+        "../../labonneboite/common/data/villes_france.csv")
+    with open(fullname, "r") as commune_file:
+        reader = csv.reader(commune_file)
+        commune_choices = []
+        for line in reader:
+            commune_id = line[10]
+            commune_choices.append(commune_id)
+        return commune_choices
+
+COMMUNE_CHOICES = generate_commune_choices()
 
 
 def weighted_choice(choices):
@@ -62,13 +72,21 @@ def weighted_choice(choices):
     assert False, "Shouldn't get here"
 
 
+def pick_commune():
+    return random.choice(COMMUNE_CHOICES)
+
+
 def pick_location():
     city, zipcode = weighted_choice(CITY_CHOICES)
     return city, zipcode
 
 
-def pick_job():
+def pick_job_name():
     return random.choice(settings.ROME_DESCRIPTIONS.values())
+
+
+def pick_job_rome():
+    return random.choice(settings.ROME_DESCRIPTIONS.keys())
 
 
 class UserBehavior(TaskSet):
@@ -76,57 +94,56 @@ class UserBehavior(TaskSet):
     companies = []
 
     def on_start(self):
-        self.home()
+        pass
 
-    @task(5)
-    def stop_session(self):
-        logger.info("*** stop locust ***")
-        raise StopLocust()
-
-    @task(7)
+    @task(0)
     def home(self):
         logger.info("GET /")
         self.client.get("/")
 
-    @task(16)
-    def search(self):
-        logger.info("URL:search")
-        location = pick_location()
-        city = location[0]
-        zipcode = location[1]
-        job = pick_job()
-        # WTF... job is unicode but city is utf8...
-        args = {
-            'job': job.encode('utf-8'),
-            'city': city,
-            'zipcode': zipcode
+    @task(1)
+    def api_search(self):
+        logger.info("URL:API-search")
+
+        commune_id = pick_commune()
+
+        job = pick_job_rome()
+
+        params = {
+            'commune_id': commune_id,
+            'rome_codes': job,
+            'user': u'labonneboite',
         }
-        param_string = urllib.urlencode(args)
-        url = "/recherche?%s" % param_string
+
+        timestamp = util.make_timestamp()
+        signature = util.make_signature(params, timestamp, user=params.get('user'))
+        params['timestamp'] = timestamp
+        params['signature'] = signature
+
+        url = '/api/v1/company/?%s' % urllib.urlencode(params)
         logger.info("GET %s", url)
         self.client.get(url)
 
-    @task(25)
-    def results(self):
+    @task(0)
+    def frontend_search(self):
         logger.info("URL:entreprises")
 
         location = pick_location()
         city = location[0]
         zipcode = location[1]
 
-        job = pick_job()
+        job = pick_job_name()
         slugified_city = slugify(city.lower())
         slugified_job = slugify(job.lower())
         url = "/entreprises/%s-%s/%s?from=1&to=10" % (slugified_city, zipcode, slugified_job)
         logger.info("GET %s", url)
         self.client.get(url)
 
-
-    @task(32)
+    @task(0)
     def suggest_job_labels(self):
         logger.info("URL:suggest_job_labels")
 
-        term = pick_job()
+        term = pick_job_name()
         index = random.choice([3, 4, 5, 6])
         if not len(term) > index:
             index = len(term) - 1
@@ -135,7 +152,7 @@ class UserBehavior(TaskSet):
         logger.info("GET %s", url)
         self.client.get(url)
 
-    @task(16)
+    @task(0)
     def suggest_cities(self):
         logger.info("URL:suggest_cities")
 
@@ -148,10 +165,10 @@ class UserBehavior(TaskSet):
         logger.info("GET %s", url)
         self.client.get(url)
 
-    @task(4)
+    @task(0)
     def download_company(self):
         logger.info("URL:download")
-        siret = random.choice(SIRET_NUMBERS)  # FIXME SIRET_NUMBERS undefined
+        siret = random.choice(SIRET_CHOICES)
         url = "/%s/download" % siret
         logger.info("GET %s", url)
         self.client.get(url)
@@ -160,4 +177,4 @@ class UserBehavior(TaskSet):
 class WebsiteUser(HttpLocust):
     task_set = UserBehavior
     min_wait = 1000
-    max_wait = 10000
+    max_wait = 1000
