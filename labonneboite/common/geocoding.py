@@ -28,19 +28,6 @@ def load_names_and_coordinates_for_zipcodes():
     return names_and_coordinates_by_zipcode
 
 
-def load_coordinates_for_zipcodes():
-    zipcode_coordinates = {}
-    fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)), "zipcode_geocoding.csv")
-    with open(fullname, 'r') as city_file:
-        reader = csv.reader(city_file)
-        for fields in reader:
-            zipcode = fields[1]
-            latitude = fields[2]
-            longitude = fields[3]
-            zipcode_coordinates[zipcode] = (latitude, longitude)
-    return zipcode_coordinates
-
-
 def zipcode_is_arrondissement(zipcode):
     start_zipcodes = ['13', '69', '75']
     for start in start_zipcodes:
@@ -81,23 +68,6 @@ def load_coordinates_for_cities():
                 city_coordinates.append((None, city_name, zipcode, population, latitude, longitude))
     return city_coordinates
 
-
-def get_latitude_and_longitude(city, zipcode):
-    location = "%s %s" % (city, zipcode)
-    BASE = "http://api-adresse.data.gouv.fr/search/?q="
-    geocoding_request = "%s%s" % (BASE, urllib.quote_plus(location.encode('utf8')))
-    result = requests.get(geocoding_request)
-    results = result.json()['features']
-    coordinates = None
-    for result in results:
-        label = result['properties']['label']
-        postcode = result['properties']['postcode']
-        coordinates = result['geometry']['coordinates']
-        location = '%s %s' % (label, postcode)
-        latitude = coordinates[1]
-        longitude = coordinates[0]
-        return location, latitude, longitude
-    return None
 
 # -------- END INTERNAL FUNCTIONS
 
