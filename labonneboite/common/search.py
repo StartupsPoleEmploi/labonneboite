@@ -114,7 +114,9 @@ class Fetcher(object):
 
     def get_companies(self):
         try:
-            self.latitude, self.longitude = geocoding.get_lat_long_from_zipcode(self.zipcode)
+            city = geocoding.get_city_by_zipcode(self.zipcode, self.city)
+            self.latitude = city['coords']['lat']
+            self.longitude = city['coords']['lon']
             logger.info("location found for %s %s : lat=%s long=%s",
                 self.city, self.zipcode, self.latitude, self.longitude)
         except:
@@ -549,7 +551,7 @@ def build_location_suggestions(term):
             city_name = source['city_name'].replace('"', '')
             label = u'%s (%s)' % (city_name, source['zipcode'])
             city = {
-                'city': city_name.lower(),
+                'city': source['slug'],
                 'zipcode': source['zipcode'],
                 'label': label,
                 'latitude': source['location']['lat'],

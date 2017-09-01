@@ -17,6 +17,7 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
     http://flask-admin.readthedocs.io/en/latest/api/mod_model/
     """
 
+    can_delete = False
     can_view_details = True
     column_searchable_list = ['siret']
     column_default_sort = ('date_created', True)
@@ -53,7 +54,7 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
 
     column_labels = {
         'siret': u"Siret",
-        'codes': u"Départements / Code postaux",
+        'codes': u"Départements / Codes communes (INSEE)",
         'geolocations': u"Latitude/longitude",
         'reason': u"Raison",
         'date_created': u"Date de création",
@@ -64,7 +65,7 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
     }
 
     column_descriptions = {
-        'codes': u"Veuillez entrer un département ou un code postal par ligne.",
+        'codes': u"Veuillez entrer un département ou un code commune (INSEE) par ligne.",
     }
 
     # `geolocations` is not included, it will be populated based on the `codes` content.
@@ -97,21 +98,21 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
             for code in OfficeAdminExtraGeoLocation.codes_as_list(form.data['codes']):
                 if len(code) not in [2, 5]:
                     msg = (
-                        u"`%s` n'est pas un code postal ou un numéro de département valide. "
+                        u"`%s` n'est pas un code commune (INSEE) ou un numéro de département valide. "
                         u"Assurez-vous de saisir un élément par ligne."
                         % code
                     )
                     flash(msg, 'error')
                     return False
                 if OfficeAdminExtraGeoLocation.is_departement(code):
-                    if not geocoding.get_all_lat_long_from_departement(code):
+                    if not geocoding.get_all_cities_from_departement(code):
                         msg = (u"Impossible de trouver des latitude/longitude pour le département %s." % code)
                         flash(msg, 'error')
                         return False
-                elif OfficeAdminExtraGeoLocation.is_zipcode(code):
-                    lat_long = geocoding.get_lat_long_from_zipcode(code)
+                elif OfficeAdminExtraGeoLocation.is_commune_id(code):
+                    lat_long = geocoding.get_city_by_commune_id(code)
                     if lat_long == (None, None):
-                        msg = (u"Impossible de trouver les latitude/longitude du code postal %s." % code)
+                        msg = (u"Impossible de trouver les latitude/longitude du code commune INSEE %s." % code)
                         flash(msg, 'error')
                         return False
 

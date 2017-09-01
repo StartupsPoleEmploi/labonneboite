@@ -155,15 +155,19 @@ mapping_location = {
                 },
             },
         },
+        "coordinates": {
+            "type": "geo_point",
+        },
         "population": {
             "type": "integer",
+        },
+        "slug": {
+            "type": "string",
+            "index": "not_analyzed",
         },
         "zipcode": {
             "type": "string",
             "index": "not_analyzed",
-        },
-        "coordinates": {
-            "type": "geo_point",
         },
     },
 }
@@ -276,25 +280,16 @@ def create_locations(index=INDEX_NAME):
     """
     Create the `location` type in ElasticSearch.
     """
-    all_cities = geocoding.load_coordinates_for_cities()
     es = Elasticsearch(timeout=ES_TIMEOUT)
     actions = []
-
-    for _, city_name, zipcode, population, latitude, longitude in all_cities:
-        try:
-            int(city_name)
-            continue
-        except ValueError:
-            # city_name should not be an integer, so we SHOULD go into exception here
-            pass
-
+    for city in geocoding.get_cities():
         doc = {
-            'zipcode': zipcode,
-            'city_name': city_name,
-            'location': {'lat': latitude, 'lon': longitude},
-            'population': population,
+            'city_name': city['name'],
+            'location': {'lat': city['coords']['lat'], 'lon': city['coords']['lon']},
+            'population': city['population'],
+            'slug': city['slug'],
+            'zipcode': city['zipcode'],
         }
-
         action = {
             '_op_type': 'index',
             '_index': index,

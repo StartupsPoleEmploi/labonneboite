@@ -155,7 +155,8 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     id = Column(Integer, primary_key=True)
     siret = Column(String(191), nullable=False, unique=True)
 
-    # Stores a list of french "zipcodes" and/or "departements" as a string separated by `GEOLOCATIONS_TEXT_SEPARATORS`.
+    # Stores a list of french "codes communes (INSEE)" and/or french "departements" as a string
+    # separated by `GEOLOCATIONS_TEXT_SEPARATORS`.
     codes = Column(Text, nullable=False)
     # Stores a JSON object of latitude/longitude coordinates for each entry in `geolocations_text`.
     geolocations = Column(Text, nullable=False)
@@ -221,9 +222,9 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         return len(value) == 2
 
     @staticmethod
-    def is_zipcode(value):
+    def is_commune_id(value):
         """
-        Returns true if the given value is a zipcode, false otherwise.
+        Returns true if the given value is a "code commune (INSEE)", false otherwise.
         """
         return len(value) == 5
 
@@ -244,17 +245,19 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         Converts the given string of codes to an array of `lat/lon tuples`.
         E.g.:
         [
-            ('48.68', '6.17'),
-            ('49.15', '6.22'),
+            (48.68, 6.17),
+            (49.15, 6.22),
         ]
         """
         geolocations = []
         codes_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
         for code in codes_list:
             if OfficeAdminExtraGeoLocation.is_departement(code):
-                geolocations.extend(geocoding.get_all_lat_long_from_departement(code))
-            elif OfficeAdminExtraGeoLocation.is_zipcode(code):
-                geolocations.append(geocoding.get_lat_long_from_zipcode(code))
+                for city in geocoding.get_all_cities_from_departement(code):
+                    geolocations.append((city['coords']['lat'], city['coords']['lon']))
+            elif OfficeAdminExtraGeoLocation.is_commune_id(code):
+                city = geocoding.get_city_by_commune_id(code)
+                geolocations.append((city['coords']['lat'], city['coords']['lon']))
         return geolocations
 
     @staticmethod
@@ -262,7 +265,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         """
         Converts the given string of codes to a JSON object suitable to be stored in the `geolocations` field.
         E.g.:
-        '[["48.68", "6.17"], ["49.15", "6.22"]]'
+        '[[48.68, 6.17], [49.15, 6.22]]'
         """
         return json.dumps(OfficeAdminExtraGeoLocation.codes_as_geolocations(codes))
 

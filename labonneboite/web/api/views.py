@@ -74,10 +74,11 @@ def company_list():
 
     if 'commune_id' in request.args:
         commune_id = request.args.get('commune_id')
-        city, zipcode = geocoding.get_city_name_and_zipcode_from_commune_id(commune_id)
-        latitude, longitude = geocoding.get_lat_long_from_zipcode(zipcode)
-        if not latitude or not longitude:
+        city = geocoding.get_city_by_commune_id(commune_id)
+        if not city:
             return u'could not resolve latitude and longitude from given commune_id', 400
+        latitude = city['coords']['lat']
+        longitude = city['coords']['lon']
     elif 'latitude' in request.args and 'longitude' in request.args:
         latitude = request.args.get('latitude')
         longitude = request.args.get('longitude')

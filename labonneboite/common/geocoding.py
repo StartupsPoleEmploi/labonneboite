@@ -1,144 +1,138 @@
-import csv
-import logging
+# coding: utf8
+import collections
+import json
 import os
-import urllib
 
-import requests
-
-logger = logging.getLogger('main')
+from slugify import slugify
 
 
-COORDINATES_CACHE = {}
-COMMUNES_CACHE = {}
+CACHE = {}
 
 
-# --------- BEGIN INTERNAL FUNCTIONS
+def city_as_dict(item):
+    first_zipcode = item[u'codesPostaux'][0]
 
-def load_names_and_coordinates_for_zipcodes():
-    names_and_coordinates_by_zipcode = {}
-    fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)), "zipcode_geocoding.csv")
-    with open(fullname, 'r') as city_file:
-        reader = csv.reader(city_file)
-        for fields in reader:
-            zipcode = fields[1]
-            latitude = fields[2]
-            longitude = fields[3]
-            name = fields[0]
-            names_and_coordinates_by_zipcode[zipcode] = (name, latitude, longitude)
-    return names_and_coordinates_by_zipcode
+    # Use the "main" zipcode for cities that are subdivided into arrondissements.
+    if item[u'nom'] == 'Lyon':
+        first_zipcode = u"69000"
+    elif item[u'nom'] == 'Marseille':
+        first_zipcode = u"13000"
+    elif item[u'nom'] == 'Paris':
+        first_zipcode = u"75000"
 
-
-def zipcode_is_arrondissement(zipcode):
-    start_zipcodes = ['13', '69', '75']
-    for start in start_zipcodes:
-        if zipcode.startswith(start):
-            if zipcode in [str((int(start) * 1000 + i)) for i in range(0, 21)]:
-                return True
-    return False
-
-
-def load_coordinates_for_cities():
-    city_coordinates = []
-    fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/villes_france.csv")
-    with open(fullname, 'r') as city_file:
-        reader = csv.reader(city_file)
-        names_and_coordinates_by_zipcode = load_names_and_coordinates_for_zipcodes()
-        for fields in reader:
-            zipcode = fields[8]
-            # city_slug = fields[2]
-            city_name = fields[5]
-            latitude = fields[20]
-            longitude = fields[19]
-            population = int(fields[14])
-            if "-" in zipcode:
-                first_zipcode = zipcode.split("-")[0]
-                if zipcode_is_arrondissement(first_zipcode):
-                    zipcodes = zipcode.split("-")
-                    for zipcode in zipcodes:
-                        try:
-                            city_name, latitude, longitude = names_and_coordinates_by_zipcode[zipcode]
-                            city_coordinates.append((None, city_name, zipcode, population, latitude, longitude))
-                        except KeyError:
-                            logger.info(
-                                'warning : zipcode %s present in villes_france.csv but absent '
-                                'in zipcode_geocoding.csv' % zipcode)
-                else:
-                    city_coordinates.append((None, city_name, first_zipcode, population, latitude, longitude))
-            else:
-                city_coordinates.append((None, city_name, zipcode, population, latitude, longitude))
-    return city_coordinates
+    return {
+        'name': item[u'nom'],
+        'slug': slugify(item[u'nom']),
+        'commune_id': item[u'code'],
+        'zipcodes': item[u'codesPostaux'],
+        'zipcode': first_zipcode,
+        'population': item[u'population'],
+        'coords': {
+            'lon': item[u'centre'][u'coordinates'][0],
+            'lat': item[u'centre'][u'coordinates'][1],
+        },
+    }
 
 
-# -------- END INTERNAL FUNCTIONS
-
-
-def get_city_name_and_zipcode_from_commune_id(commune):
+def get_cities():
     """
-    # Zipcodes versus Commune ids
+    Returns a list of all cities in France with their geographical coordinates and more.
 
-    Even if they may look similar, these two code systems are strictly different and not to be mixed up:
+    The data source is a JSON file that comes from api.gouv.fr's GeoAPI: https://docs.geo.api.gouv.fr
+    The JSON file is generated with the following bash command:
+        export URL="https://geo.api.gouv.fr/communes?fields=nom,code,codesPostaux,centre,population&boost=population"
+        wget $URL -O cities-`date +%Y-%m-%d`.json
 
-    - Commune ids (`commune_id` in the code, aka "code INSEE" in French)
-    - Zipcodes (`zipcode` in the code, aka "code postal" or "CP" in French)
-
-    Examples:
-
-    - 57000 (departement of Metz) is a zipcode and not a commune id, the corresponding commune_id is 57463.
-    - 14118 (Caen) is a commune id and not a zipcode, but its corresponding zipcode is 14000.
+    However the data source does not go down to the "arrondissement" level yet.
+    This feature is in the GeoAPI roadmap and planned for autumn 2017.
+    Meanwhile the `cities-arrondissements.json` file is created manually with the same JSON structure.
+    Population data is based on INSEE data:
+    https://www.insee.fr/fr/statistiques/fichier/2525755/dep75.pdf
+    https://www.insee.fr/fr/statistiques/fichier/2525755/dep13.pdf
+    https://www.insee.fr/fr/statistiques/fichier/2525755/dep69.pdf
     """
-    if not COMMUNES_CACHE:
-        fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/villes_france.csv")
-        with open(fullname, 'r') as city_file:
-            reader = csv.reader(city_file)
-            for line in reader:
-                # a city might have several "communes" (ex. Paris ? in our file, there is only one commune ID for a city,
-                # but seems wrong by INSEE standards). For now, go with the one commune id we have here.
-                commune_id = line[10]
-                city_slug = line[2]
-                zipcode = line[8]
-                # if there are several zipcodes for a city, we just take the first one for now... ex. Paris --> 75001
-                if "-" in zipcode:
-                    zipcode = zipcode.split("-")[0]
-                COMMUNES_CACHE[commune_id] = (city_slug, zipcode)
+    if 'cities' in CACHE:
+        return CACHE['cities']
 
-    if commune in COMMUNES_CACHE:
-        return COMMUNES_CACHE[commune]
-    return None, None
+    # GeoAPI known issues, waiting for a fix.
+    COMMUNES_TO_SKIP = [
+        # Communes without `centre` attribute.
+        # ------------------------------------
+        u"17004",  # Île-d'Aix (Fort-Boyard)
+        # Communes without `population` attribute.
+        # ----------------------------------------
+        # Meuse (starting with 55), because there is no more inhabitants.
+        u"55039", u"55050", u"55139", u"55189", u"55239", u"55307",
+        # Mayotte (starting with 976), because there is no accurate population data available yet.
+        u"97601", u"97602", u"97603", u"97604", u"97605", u"97606", u"97607", u"97608", u"97609",
+        u"97610", u"97611", u"97612", u"97613", u"97614", u"97615", u"97616", u"97617",
+    ]
+
+    cities = []
+
+    json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/cities-2017-08-31.json")
+    with open(json_file, 'r') as json_data:
+        for item in json.load(json_data):
+            if item[u'code'] not in COMMUNES_TO_SKIP:
+                cities.append(city_as_dict(item))
+
+    json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/cities-arrondissements.json")
+    with open(json_file, 'r') as json_data:
+        for item in json.load(json_data):
+            cities.append(city_as_dict(item))
+
+    CACHE['cities'] = cities
+
+    # Create a dict where each "code commune (INSEE)" is mapped to its corresponding city.
+    # This works because a code commune is unique for each city.
+    CACHE['cities_by_commune_id'] = {city['commune_id']: city for city in cities}
+
+    # Create a dict where each "zipcode" is mapped to its corresponding cities.
+    # Since the zipcode is not unique, it can be mapped to several cities.
+    CACHE['cities_by_zipcode'] = collections.defaultdict(list)
+    for city in cities:
+        key = city['zipcode']
+        CACHE['cities_by_zipcode'][key].append(city)
+
+    return cities
 
 
-def load_coordinates():
-    if not COORDINATES_CACHE:
-        logger.info("loading coordinates from file consolidated_cities.csv")
-        fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/consolidated_cities.csv")
-        with open(fullname, 'r') as city_file:
-            reader = csv.reader(city_file)
-            for city_name, first_zipcode, population, latitude, longitude in reader:
-                COORDINATES_CACHE[first_zipcode] = (latitude, longitude)
-        logger.info("enriching coordinates from file villes_france.csv")
-        coordinates = load_coordinates_for_cities()
-        for c in coordinates:
-            zipcode = c[2]
-            latitude = c[4]
-            longitude = c[5]
-            if zipcode not in COORDINATES_CACHE:
-                COORDINATES_CACHE[zipcode] = (latitude, longitude)
-
-    return COORDINATES_CACHE
-
-
-def get_lat_long_from_zipcode(zipcode):
+def get_city_by_commune_id(commune_id):
     """
-    Returns a tuple of the (latitude, longitude) for the given zipcode.
+    Returns the city corresponding to the given commune_id.
     """
-    coordinates = load_coordinates()
-    if zipcode in coordinates:
-        return coordinates[zipcode]
-    return None, None
+    if 'cities_by_commune_id' not in CACHE:
+        get_cities()
+    if commune_id in CACHE['cities_by_commune_id']:
+        return CACHE['cities_by_commune_id'][commune_id]
+    return None
 
 
-def get_all_lat_long_from_departement(departement):
+def get_city_by_zipcode(zipcode, city_name_slug):
     """
-    Returns a list of tuple of the (latitude, longitude) of all zipcodes for the given departement.
+    Returns the city corresponding to the given `zipcode` and `city_name_slug`.
+    `city_name_slug` is required to deal with situations where a zipcode is not unique for a city.
     """
-    coordinates = load_coordinates()
-    return [lat_long for zipcode, lat_long in coordinates.items() if zipcode.startswith(departement)]
+    if 'cities_by_zipcode' not in CACHE:
+        get_cities()
+    cities = CACHE['cities_by_zipcode'][zipcode]
+    if not cities:
+        return None
+    if len(cities) > 1:
+        for city in cities:
+            if city['slug'] == city_name_slug:
+                return city
+    return cities[0]
+
+
+def get_all_cities_from_departement(departement):
+    """
+    Returns a list of all cities for the given departement.
+    """
+    if 'cities_by_commune_id' not in CACHE:
+        get_cities()
+    return [
+        city
+        for commune_id, city in CACHE['cities_by_commune_id'].items()
+        if commune_id.startswith(departement)
+    ]

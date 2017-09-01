@@ -2,7 +2,6 @@
 
 from flask import redirect, url_for
 from flask_wtf import FlaskForm
-from slugify import slugify
 from wtforms import StringField, SelectField, HiddenField, RadioField
 from wtforms.validators import DataRequired, Optional
 
@@ -104,11 +103,11 @@ class CompanySearchForm(FlaskForm):
         validators=[Optional()])
 
     def redirect(self, endpoint):
-        city = self.city.data
+        city = self.city.data  # This stores the city name slug.
         zipcode = self.zipcode.data
         occupation = self.occupation.data
         values = {
-            'city': slugify(city),
+            'city': city,
             'zipcode': zipcode,
             'occupation': occupation,
         }

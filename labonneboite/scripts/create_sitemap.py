@@ -1,17 +1,19 @@
 # coding: utf8
-
 from datetime import datetime
 import operator
 import os
+
 from flask import Flask, render_template
 from flask_script import Manager
 from slugify import slugify
-from labonneboite.conf import settings
+
 from labonneboite.common import geocoding
+from labonneboite.conf import settings
+
 
 app = Flask(__name__)
-manager = Manager(app)
 
+manager = Manager(app)
 
 @manager.command
 def sitemap():
@@ -21,12 +23,16 @@ def sitemap():
     Currently you don't need to run it more than once as its content is pretty much static.
     """
     pages = []
-    now = datetime.now()
-    now_str = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    now_str = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    cities = geocoding.load_coordinates_for_cities()
-    cities = [city for city in cities if city[2][-2:] == "00"]
-    top_cities = [(slugify(l[1].lower()), l[2]) for l in sorted(cities, key=operator.itemgetter(3), reverse=True)[:94]]
+    cities = [city for city in geocoding.get_cities() if city['zipcode'].endswith(u'00')]
+    top_cities = [
+        (
+            slugify(city['name'].lower()),
+            city['zipcode']
+        )
+        for city in sorted(cities, key=operator.itemgetter('population'), reverse=True)[:94]
+    ]
 
     rome_descriptions = settings.ROME_DESCRIPTIONS.values()
 
@@ -36,8 +42,8 @@ def sitemap():
             url = "https://labonneboite.pole-emploi.fr/entreprises/%s-%s/%s" % (city, zipcode, occupation)
             pages.append((url, now_str))
 
-    # a sitemap should have at most 50K URLs
-    # see https://en.wikipedia.org/wiki/Sitemaps#Sitemap_limits
+    # A sitemap should have at most 50K URLs.
+    # See https://en.wikipedia.org/wiki/Sitemaps#Sitemap_limits
     if len(pages) >= 50000:
         raise Exception("sitemap should have at most 50K URLs")
 

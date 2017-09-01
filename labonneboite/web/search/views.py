@@ -235,20 +235,14 @@ def results_by_commune_and_rome(commune_id, rome_id):
         slugified_rome_description = slugify(rome_description)
     except KeyError:
         rome_description = None
-    city, zipcode = geocoding.get_city_name_and_zipcode_from_commune_id(commune_id)
+    city = geocoding.get_city_by_commune_id(commune_id)
 
-    if not city or not zipcode or not rome_description:
-        msg = '[404] /entreprises/commune/%s/rome/%s : rome_description=%s city=%s zipcode=%s' % (
-            commune_id,
-            rome_id,
-            rome_description,
-            city,
-            zipcode,
-        )
+    if not city or not rome_description:
+        msg = '[404] /entreprises/commune/%s/rome/%s : rome_description=%s' % (commune_id, rome_id, rome_description)
         current_app.logger.error(msg)
         abort(404)
 
-    url = url_for('search.results', city=city, zipcode=zipcode, occupation=slugified_rome_description)
+    url = url_for('search.results', city=city['slug'], zipcode=city['zipcode'], occupation=slugified_rome_description)
     # Pass all GET params to the redirect URL: this will allow users of the API to build web links
     # roughly equivalent to the result of an API call - see Trello #971.
     return redirect('%s?%s' % (url, urlencode(request.args)))

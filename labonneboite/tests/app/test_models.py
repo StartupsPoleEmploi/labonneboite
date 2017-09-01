@@ -17,19 +17,19 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         """
         extra_geolocation = OfficeAdminExtraGeoLocation(
             siret=u"38524664000176",
-            codes=u"75010\n\n\n\n\n\n\n57070",
-            reason=u"Paris + Metz",
+            codes=u"75110\n\n\n\n\n\n\n57616",
+            reason=u"Paris 10 + Metz Saint Julien",
         )
         db_session.add(extra_geolocation)
         db_session.commit()
         # The `clean()` method should have been called automatically.
         extra_geolocation = db_session.query(OfficeAdminExtraGeoLocation).first()
         # Multiple newlines should have been removed.
-        self.assertEqual(extra_geolocation.codes, u'57070\n75010')
+        self.assertEqual(extra_geolocation.codes, u'57616\n75110')
         # Corresponding Lat/Lon coords should have been found and stored.
         self.assertEqual(
             extra_geolocation.geolocations,
-            '[["49.157869706", "6.2212499254"], ["48.8761941084", "2.36107097577"]]'
+            '[[49.135208952059884, 6.207906756168173], [48.8815994262695, 2.36229991912841]]'
         )
 
     def test_is_outdated(self):
@@ -38,7 +38,7 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         """
         extra_geolocation = OfficeAdminExtraGeoLocation(
             siret=u"38524664000176",
-            codes=u"75008",
+            codes=u"75108",
         )
         extra_geolocation.save()
         self.assertFalse(extra_geolocation.is_outdated())
@@ -51,9 +51,9 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         """
         Test `OfficeAdminExtraGeoLocation.codes_as_list()`.
         """
-        codes = u"   57070\n\n\n\n\n\n     75010  \n  54      "
+        codes = u"   57616\n\n\n\n\n\n     75110  \n  54      "
         codes_as_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
-        self.assertItemsEqual(codes_as_list, [u'54', u'57070', u'75010'])
+        self.assertItemsEqual(codes_as_list, [u'54', u'57616', u'75110'])
         codes = u"75\r57\n13"
         codes_as_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
         self.assertItemsEqual(codes_as_list, [u'13', u'57', u'75'])
@@ -62,34 +62,33 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         """
         Test `OfficeAdminExtraGeoLocation.codes_as_geolocations()`.
         """
-        codes = u"75\n57070"
+        codes = u"75\n57616"
         codes_as_geolocations = OfficeAdminExtraGeoLocation.codes_as_geolocations(codes)
         expected = [
             # Found for the departement 75.
-            ('48.8264581543', '2.32690527897'),
-            ('48.8280603003', '2.3544809727'),
-            ('48.8365381105', '2.42075934432'),
-            ('48.8421891171', '2.29652252417'),
-            ('48.8449537128', '2.37608588424'),
-            ('48.846262612', '2.34839040879'),
-            ('48.8501003498', '2.33402139523'),
-            ('48.8543439464', '2.31294138206'),
-            ('48.8553815318', '2.35541102422'),
-            ('48.8566390262', '2.25972331102'),
-            ('48.8566390262', '2.25972331102'),
-            ('48.8590284068', '2.37705679761'),
-            ('48.8622892805', '2.36158587519'),
-            ('48.8628435865', '2.33807010768'),
-            ('48.8643142257', '2.39961435812'),
-            ('48.8684296759', '2.34149433888'),
-            ('48.8729556556', '2.31369616661'),
-            ('48.8758285242', '2.33869789273'),
-            ('48.8761941084', '2.36107097577'),
-            ('48.8878020912', '2.30862255671'),
-            ('48.8928608126', '2.3479701879'),
-            ('49.157869706', '6.2212499254'),
-            # Found for 57070.
-            ('48.8840228115', '2.38234715656'),
+            (48.8274002075195, 2.36660003662109),
+            (48.8367004394531, 2.39689993858337),
+            (48.8611984252929, 2.3833999633789),
+            (48.8815994262695, 2.36229991912841),
+            (48.8866996765136, 2.30349993705749),
+            (48.8712005615234, 2.28929996490478),
+            (48.8445014953613, 2.29769992828369),
+            (48.8316993713378, 2.32319998741149),
+            (48.8825988769531, 2.39109992980957),
+            (48.8917007446289, 2.35100007057189),
+            (48.8646011352539, 2.40639996528625),
+            (48.84495371275856, 2.3760858842364394),
+            (48.872200012207, 2.31680011749267),
+            (48.8801002502441, 2.34039998054504),
+            (48.8544006347656, 2.36240005493164),
+            (48.8446998596191, 2.35419988632202),
+            (48.8470001220703, 2.33459997177124),
+            (48.8564987182617, 2.31369996070861),
+            (48.8536415100097, 2.34842991828918),
+            (48.8694992065429, 2.34479999542236),
+            (48.8627014160156, 2.3652000427246),
+            # Found for 57616.
+            (49.135208952059884, 6.207906756168173),
         ]
         self.assertItemsEqual(expected, codes_as_geolocations)
 
@@ -97,7 +96,7 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         """
         Test `OfficeAdminExtraGeoLocation.codes_as_json_geolocations()`.
         """
-        codes = u"75010"
+        codes = u"75110"
         codes_as_json_geolocations = OfficeAdminExtraGeoLocation.codes_as_json_geolocations(codes)
-        expected = '[["48.8761941084", "2.36107097577"]]'
+        expected = '[[48.8815994262695, 2.36229991912841]]'
         self.assertEqual(expected, codes_as_json_geolocations)

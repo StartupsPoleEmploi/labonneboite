@@ -238,7 +238,7 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         # Add an entry in the OfficeAdminExtraGeoLocation table with extra geolocations.
         extra_geolocation = OfficeAdminExtraGeoLocation(
             siret=self.office.siret,
-            codes=u"75010\n13000",  # Paris 10 + Marseille
+            codes=u"75110\n13055",  # Paris 10 + Marseille
         )
         extra_geolocation.save()
 
@@ -249,8 +249,8 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
         expected_locations = [
             {u'lat': 49.1044, u'lon': 6.17952},
-            {u'lat': u'43.2599669004', u'lon': u'5.37074086578'},
-            {u'lat': u'48.8761941084', u'lon': u'2.36107097577'},
+            {u'lat': 43.25996690043557, u'lon': 5.370740865779022},
+            {u'lat': 48.8815994262695, u'lon': 2.36229991912841},
         ]
         self.assertItemsEqual(res['_source']['locations'], expected_locations)
 
