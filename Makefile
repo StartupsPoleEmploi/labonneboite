@@ -84,8 +84,23 @@ rebuild_importer_tests_compressed_files:
 # Load testing
 # ------------
 
-start_locust:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite && echo -e && echo -e && echo "Please open locust web interface at http://localhost:8089" && echo -e && echo -e && locust --locustfile=scripts/loadtesting.py --host=http://localhost:8090';
+.PHONY: start_locust_against_localhost
+
+start_locust_against_localhost:
+	cd vagrant && vagrant ssh --command '\
+	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+	&& echo -e && echo -e \
+	&& echo "Please open locust web interface at http://localhost:8089" \
+	&& echo -e && echo -e \
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
+	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
+	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
+	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
+	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --master';
 
 # Tests
 # -----

@@ -72,6 +72,7 @@ uWSGI==2.0.13.1
 
 # Load testing.
 locustio==0.7.5
+pyzmq==16.0.2
 
 # Secondary dependencies.
 # Explicitly specify secondary dependencies to ensure consistent build behavior.

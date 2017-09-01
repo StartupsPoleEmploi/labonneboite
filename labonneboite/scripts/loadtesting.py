@@ -1,4 +1,35 @@
 # coding: utf8
+
+"""
+Load testing API+Frontend using Locust framework.
+
+See README.md to learn how to start locust interface.
+
+The key parameters below you should adjust to your needs are:
+- SECONDS_BETWEEN_TASKS
+- `@task(n)` n value for each task
+
+Here are two example scenarios you could test:
+
+1) API requests only
+
+- set SECONDS_BETWEEN_TASKS to 1
+- set api_search task(1) and all other to task(0)
+
+2) Frontend requests only
+
+- set SECONDS_BETWEEN_TASKS to 10
+- api_search task(0)
+- frontend_search task(50)
+- suggest_job_labels task(60)
+- suggest_cities task(20)
+- download_company task(2)
+
+These ratios (50/60/20/2) directly come from observed ratios in production.
+On average in production, we observe that for 50 frontend searches,
+we get 60 suggest_job_labels requests, 20 suggest_cities requests etc..
+"""
+
 import random
 import os
 import csv
@@ -18,6 +49,10 @@ logger = logging.getLogger(__name__)
 logger.info("loading locustfile")
 
 con, cur = import_util.create_cursor()
+
+# For each locust, number of seconds between its tasks.
+# Default value : 1
+SECONDS_BETWEEN_TASKS = 1
 
 
 def generate_siret_choices():
@@ -176,5 +211,7 @@ class UserBehavior(TaskSet):
 
 class WebsiteUser(HttpLocust):
     task_set = UserBehavior
-    min_wait = 1000
-    max_wait = 1000
+    # Broaden range a little to add some noise in duration between requests
+    # while still respecting SECONDS_BETWEEN_TASKS value on average.
+    min_wait = int(SECONDS_BETWEEN_TASKS * 1000 * 0.80)
+    max_wait = int(SECONDS_BETWEEN_TASKS * 1000 * 1.20)
