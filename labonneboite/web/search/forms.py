@@ -103,11 +103,11 @@ class CompanySearchForm(FlaskForm):
         validators=[Optional()])
 
     def redirect(self, endpoint):
-        city = self.city.data  # This stores the city name slug.
+        city_slug = self.city.data
         zipcode = self.zipcode.data
         occupation = self.occupation.data
         values = {
-            'city': city,
+            'city': city_slug,
             'zipcode': zipcode,
             'occupation': occupation,
         }
