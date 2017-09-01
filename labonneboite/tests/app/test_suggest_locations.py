@@ -10,7 +10,7 @@ class SuggestLocationTest(unittest.TestCase):
         term = u"paris 1"
         suggestions = search.build_location_suggestions(term)
         city_names = [suggestion['city'] for suggestion in suggestions]
-        self.assertTrue(u"paris - 1er" in city_names)
+        self.assertTrue(u"paris-1er" in city_names)
 
     def test_suggest_locations_paris_75000_first(self):
         term = u"paris"
@@ -28,4 +28,4 @@ class SuggestLocationTest(unittest.TestCase):
         term = u"lilas"
         suggestions = search.build_location_suggestions(term)
         city_names = [suggestion['city'] for suggestion in suggestions]
-        self.assertEquals(u"les lilas", city_names[0])
+        self.assertEquals(u"les-lilas", city_names[0])
