@@ -10,11 +10,11 @@
 
 Quel est le canal le plus utilisé par les chercheurs d'emploi pour rechercher un emploi ?
 ...
-Les offres d'emploi
+Les offres d'emploi.
 
 Quel est le canal le plus utilisé par les employeurs pour recruter ?
 ...
-Les candidatures spontanées 
+Les candidatures spontanées.
 
 Selon [une enquête de l’INSEE](https://insee.fr/fr/statistiques/2901587), 7% des recrutements se font via des offres, contre **42%** via des candidatures spontanées. Le « marché caché » (qui n’est pas matérialisé dans des offres) est donc la première source de recrutement en France !
 
