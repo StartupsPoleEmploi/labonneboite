@@ -1,4 +1,5 @@
 # coding: utf8
+from functools import wraps
 import collections
 import json
 import os
@@ -34,9 +35,9 @@ def city_as_dict(item):
     }
 
 
-def get_cities():
+def load_cities_cache():
     """
-    Returns a list of all cities in France with their geographical coordinates and more.
+    Populates the cities cache with all cities in France (with their geographical coordinates and more).
 
     The data source is a JSON file that comes from api.gouv.fr's GeoAPI: https://docs.geo.api.gouv.fr
     The JSON file is generated with the following bash command:
@@ -51,8 +52,6 @@ def get_cities():
     https://www.insee.fr/fr/statistiques/fichier/2525755/dep13.pdf
     https://www.insee.fr/fr/statistiques/fichier/2525755/dep69.pdf
     """
-    if 'cities' in CACHE:
-        return CACHE['cities']
 
     # GeoAPI known issues, waiting for a fix.
     COMMUNES_TO_SKIP = [
@@ -94,28 +93,40 @@ def get_cities():
         key = city['zipcode']
         CACHE['cities_by_zipcode'][key].append(city)
 
-    return cities
+
+def cities_cache_required(function):
+    """
+    A decorator that ensures that cities cache is loaded.
+    """
+    @wraps(function)
+    def decorated(*args, **kwargs):
+        if not CACHE:
+            load_cities_cache()
+        return function(*args, **kwargs)
+
+    return decorated
 
 
+@cities_cache_required
+def get_cities():
+    return CACHE['cities']
+
+
+@cities_cache_required
 def get_city_by_commune_id(commune_id):
     """
-    Returns the city corresponding to the given commune_id.
+    Returns the city corresponding to the given commune_id string or None.
     """
-    if 'cities_by_commune_id' not in CACHE:
-        get_cities()
-    if commune_id in CACHE['cities_by_commune_id']:
-        return CACHE['cities_by_commune_id'][commune_id]
-    return None
+    return CACHE['cities_by_commune_id'].get(commune_id)
 
 
+@cities_cache_required
 def get_city_by_zipcode(zipcode, city_name_slug):
     """
-    Returns the city corresponding to the given `zipcode` and `city_name_slug`.
+    Returns the city corresponding to the given `zipcode` string and `city_name_slug`.
     `city_name_slug` is required to deal with situations where a zipcode is not unique for a city.
     """
-    if 'cities_by_zipcode' not in CACHE:
-        get_cities()
-    cities = CACHE['cities_by_zipcode'][zipcode]
+    cities = CACHE['cities_by_zipcode'].get(zipcode)
     if not cities:
         return None
     if len(cities) > 1:
@@ -125,12 +136,11 @@ def get_city_by_zipcode(zipcode, city_name_slug):
     return cities[0]
 
 
+@cities_cache_required
 def get_all_cities_from_departement(departement):
     """
     Returns a list of all cities for the given departement.
     """
-    if 'cities_by_commune_id' not in CACHE:
-        get_cities()
     return [
         city
         for commune_id, city in CACHE['cities_by_commune_id'].items()
