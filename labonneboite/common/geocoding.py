@@ -146,3 +146,20 @@ def get_all_cities_from_departement(departement):
         for commune_id, city in CACHE['cities_by_commune_id'].items()
         if commune_id.startswith(departement)
     ]
+
+
+@cities_cache_required
+def is_commune_id(value):
+    """
+    Returns true if the given string is a "code commune (INSEE)", false otherwise.
+    """
+    return value in CACHE['cities_by_commune_id']
+
+
+@cities_cache_required
+def is_departement(value):
+    """
+    Returns true if the given string is a departement, false otherwise.
+    """
+    departements = set([item[:2] for item in CACHE['cities_by_zipcode'].keys()])
+    return value in departements

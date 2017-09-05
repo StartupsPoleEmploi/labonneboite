@@ -87,16 +87,14 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
 
     def validate_form(self, form):
         is_valid = super(OfficeAdminExtraGeoLocationModelView, self).validate_form(form)
-
         if is_valid and form.data.get('date_end'):
             if datetime.datetime.utcnow() >= form.data['date_end']:
                 msg = (u"La date de fin doit être dans le futur.")
                 flash(msg, 'error')
                 return False
-
         if is_valid and form.data.get('codes'):
             for code in OfficeAdminExtraGeoLocation.codes_as_list(form.data['codes']):
-                if len(code) not in [2, 5]:
+                if not any([geocoding.is_departement(code), geocoding.is_commune_id(code)]):
                     msg = (
                         u"`%s` n'est pas un code commune (INSEE) ou un numéro de département valide. "
                         u"Assurez-vous de saisir un élément par ligne."
@@ -104,16 +102,5 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
                     )
                     flash(msg, 'error')
                     return False
-                if OfficeAdminExtraGeoLocation.is_departement(code):
-                    if not geocoding.get_all_cities_from_departement(code):
-                        msg = (u"Impossible de trouver des latitude/longitude pour le département %s." % code)
-                        flash(msg, 'error')
-                        return False
-                elif OfficeAdminExtraGeoLocation.is_commune_id(code):
-                    lat_long = geocoding.get_city_by_commune_id(code)
-                    if lat_long == (None, None):
-                        msg = (u"Impossible de trouver les latitude/longitude du code commune INSEE %s." % code)
-                        flash(msg, 'error')
-                        return False
 
         return is_valid

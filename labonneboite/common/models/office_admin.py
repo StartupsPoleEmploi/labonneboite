@@ -215,20 +215,6 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         return '<br>'.join(links)
 
     @staticmethod
-    def is_departement(value):
-        """
-        Returns true if the given value is a departement, false otherwise.
-        """
-        return len(value) == 2
-
-    @staticmethod
-    def is_commune_id(value):
-        """
-        Returns true if the given value is a "code commune (INSEE)", false otherwise.
-        """
-        return len(value) == 5
-
-    @staticmethod
     def codes_as_list(codes):
         """
         Converts the given string of codes to a Python list of codes.
@@ -252,10 +238,10 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         geolocations = []
         codes_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
         for code in codes_list:
-            if OfficeAdminExtraGeoLocation.is_departement(code):
+            if geocoding.is_departement(code):
                 for city in geocoding.get_all_cities_from_departement(code):
                     geolocations.append((city['coords']['lat'], city['coords']['lon']))
-            elif OfficeAdminExtraGeoLocation.is_commune_id(code):
+            elif geocoding.is_commune_id(code):
                 city = geocoding.get_city_by_commune_id(code)
                 geolocations.append((city['coords']['lat'], city['coords']['lon']))
         return geolocations
