@@ -27,10 +27,7 @@ def sitemap():
 
     cities = [city for city in geocoding.get_cities() if city['zipcode'].endswith(u'00')]
     top_cities = [
-        (
-            slugify(city['name'].lower()),
-            city['zipcode']
-        )
+        (city['slug'], city['zipcode'])
         for city in sorted(cities, key=operator.itemgetter('population'), reverse=True)[:94]
     ]
 
