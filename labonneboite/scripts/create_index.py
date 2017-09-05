@@ -445,7 +445,11 @@ def add_offices(index=INDEX_NAME):
             new_office = Office()
             # Use `inspect` because `Office` columns are named distinctly from attributes.
             for field_name in inspect(Office).columns.keys():
-                value = getattr(office_to_add, field_name)
+                try:
+                    value = getattr(office_to_add, field_name)
+                except AttributeError:
+                    # Some fields are not shared between `Office` and `OfficeAdminAdd`.
+                    continue
                 if field_name == 'headcount':
                     value = headcount
                 setattr(new_office, field_name, value)
@@ -529,6 +533,11 @@ def update_offices_geolocations(index=INDEX_NAME):
                 locations.append({'lat': office.y, 'lon': office.x})
             if not extra_geolocation.is_outdated():
                 locations.extend(extra_geolocation.geolocations_as_lat_lon_properties())
+                office.has_multi_geolocations = True
+            else:
+                office.has_multi_geolocations = False
+            # Apply changes in DB.
+            office.save()
             # Apply changes in ElasticSearch.
             body = {'doc': {'locations': locations}}
             es.update(index=index, doc_type=OFFICE_TYPE, id=office.siret, body=body, ignore=404)

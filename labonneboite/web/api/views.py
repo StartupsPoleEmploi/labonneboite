@@ -72,9 +72,9 @@ def company_list():
 
     current_app.logger.debug("API request received: %s", request.full_path)
 
+    city = {}
     if 'commune_id' in request.args:
-        commune_id = request.args.get('commune_id')
-        city = geocoding.get_city_by_commune_id(commune_id)
+        city = geocoding.get_city_by_commune_id(request.args.get('commune_id'))
         if not city:
             return u'could not resolve latitude and longitude from given commune_id', 400
         latitude = city['coords']['lat']
@@ -153,12 +153,14 @@ def company_list():
         rome_code=rome_code,
     )
 
-    company_json = {
-        'companies': [company.as_json(rome_code=rome_code) for company in companies],
+    result = {
+        'companies': [
+            company.as_json(rome_code=rome_code, distance=distance, zipcode=city.get('zipcode'))
+            for company in companies
+        ],
         'companies_count': companies_count
     }
-
-    return jsonify(company_json)
+    return jsonify(result)
 
 
 @apiBlueprint.route('/office/<siret>/details', methods=['GET'])

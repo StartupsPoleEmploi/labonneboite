@@ -39,7 +39,7 @@
       </h3>
     </div>
     <div class="grid-col-4">
-      {% if distance and zipcode and company.show_recruit_elsewhere_msg(distance, zipcode) %}
+      {% if distance and zipcode and company.show_multi_geolocations_msg(distance, zipcode) %}
         <h3>Cette entreprise recrute aussi dans votre région.</h3>
       {% elif company.distance %}
         <h3>{{ company.distance }} Km</h3>

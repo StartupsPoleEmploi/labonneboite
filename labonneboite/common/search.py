@@ -73,7 +73,8 @@ class Fetcher(object):
             self.flag_alternance,
             self.flag_junior,
             self.flag_senior,
-            self.flag_handicap)
+            self.flag_handicap
+        )
         search_companies = {}
         for company in companies:
             search_companies[company["siret"]] = company

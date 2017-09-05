@@ -5,11 +5,11 @@ import logging
 
 from flask import url_for
 from sqlalchemy import Column, Index, Integer, String, Float, Boolean
-from sqlalchemy import exists, PrimaryKeyConstraint
+from sqlalchemy import PrimaryKeyConstraint
 
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import scoring as scoring_util
-from labonneboite.common.database import Base, db_session
+from labonneboite.common.database import Base
 from labonneboite.common.load_data import load_city_codes
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
@@ -65,14 +65,17 @@ class Office(OfficeMixin, CRUDMixin, Base):
         PrimaryKeyConstraint('siret'),
     )
 
-    # Fields are provided by the `OfficeMixin`.
+    # Almost all fields are provided by the `OfficeMixin`.
+
+    # A flag that is True if the office also recruits beyond the boundaries of its primary geolocation.
+    has_multi_geolocations = Column(Boolean, default=False, nullable=False)
 
     def __unicode__(self):
         return u"%s - %s" % (self.siret, self.name)
 
-    def as_json(self, rome_code=None):
+    def as_json(self, rome_code=None, distance=None, zipcode=None):
         """
-        rome_code : optional parameter, used only in case of being in the context
+        `rome_code`: optional parameter, used only in case of being in the context
         of a search by ROME code.
         Without the context of a ROME code, the general purpose score of the office
         is returned.
@@ -80,9 +83,6 @@ class Office(OfficeMixin, CRUDMixin, Base):
         and the URL of the company page is also adjusted to keep the same context.
         Main case is results returned by an API search. The scores and URLs embedded
         in the company objects should be adjusted to the ROME code context.
-
-        TOFIX: some fields are added by external functions. This limits considerably
-        the usefulness of this method.
         """
         json = {
             'address': self.address_as_text,
@@ -100,6 +100,10 @@ class Office(OfficeMixin, CRUDMixin, Base):
             # this is NOT a model field or property!
             'distance': self.distance,
         }
+        # This message should concern only a small number of companies who explicitly requested
+        # to appear in extra geolocations.
+        if any([distance, zipcode]) and json['address'] and self.show_multi_geolocations_msg(distance, zipcode):
+            json['address'] += u", Cette entreprise recrute aussi dans votre région."
         return json
 
     def serialize(self):
@@ -133,10 +137,9 @@ class Office(OfficeMixin, CRUDMixin, Base):
 
     @property
     def address_as_text(self):
-        if len(self.address_fields) >= 1:
+        if self.address_fields:
             return u", ".join([f for f in self.address_fields if f is not None])
-        else:
-            return None
+        return None
 
     @property
     def phone(self):
@@ -254,24 +257,24 @@ class Office(OfficeMixin, CRUDMixin, Base):
             # Here, we cannot properly generate an URL via url_for.
             return None
 
-    def show_recruit_elsewhere_msg(self, distance, zipcode):
+    def show_multi_geolocations_msg(self, distance=None, zipcode=None):
         """
-        Returns True if a message that indicates that the current office recruits beyond the boundaries
-        of its own zipcode should be displayed, False otherwise.
-        This method is used in the context of the search result page.
+        Returns True if a message that indicates that the current office recruits beyond
+        the boundaries of its own departement should be displayed, False otherwise.
+
+        This message should concern only a small number of companies who explicitly requested
+        to appear in extra geolocations.
         """
-        # If the distance scope of the search is too large, the message is unnecessary.
-        from labonneboite.web.search.forms import CompanySearchForm
-        if distance and distance >= CompanySearchForm.DISTANCE_S:
-            return False
-        # If the `zipcode` search parameter is in the same departement as the current office,
-        # the message is unnecessary.
-        if zipcode.startswith(self.zipcode[:2]):
-            return False
-        # Otherwise check if this office has multi geolocations.
-        # This perform 1 SQL query for each call. It might be "denormalized" if it becomes a problem.
-        from labonneboite.common.models import OfficeAdminExtraGeoLocation
-        return db_session.query(exists().where(OfficeAdminExtraGeoLocation.siret == self.siret)).scalar()
+        if self.has_multi_geolocations:
+            # If the given `zipcode` is in the same departement: the message is unnecessary.
+            if zipcode and zipcode.startswith(self.zipcode[:2]):
+                return False
+            # If the given `distance` is too far: the message is unnecessary.
+            from labonneboite.web.search.forms import CompanySearchForm
+            if distance and int(distance) > int(CompanySearchForm.DISTANCE_S):
+                return False
+            return True
+        return False
 
 
 CONTACT_MODE_STAGES = {

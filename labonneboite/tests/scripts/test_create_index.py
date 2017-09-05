@@ -254,6 +254,9 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         ]
         self.assertItemsEqual(res['_source']['locations'], expected_locations)
 
+        office = Office.get(self.office.siret)
+        self.assertTrue(office.has_multi_geolocations)
+
         # Make `extra_geolocation` instance out-of-date.
         extra_geolocation.date_end = datetime.datetime.now() - datetime.timedelta(days=1)
         extra_geolocation.update()
@@ -268,3 +271,6 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
             {u'lat': 49.1044, u'lon': 6.17952},
         ]
         self.assertItemsEqual(res['_source']['locations'], expected_locations)
+
+        office = Office.get(self.office.siret)
+        self.assertFalse(office.has_multi_geolocations)

@@ -84,6 +84,7 @@ class ExportableOffice(CRUDMixin, Base):
     flag_junior = Column(Boolean, default=False, nullable=False)
     flag_senior = Column(Boolean, default=False, nullable=False)
     flag_handicap = Column(Boolean, default=False, nullable=False)
+    has_multi_geolocations = Column(Boolean, default=False, nullable=False)
 
     departement = Column(String(8))
     headcount = Column('trancheeffectif', String(2))

@@ -16,6 +16,7 @@ CREATE TABLE etablissements_backoffice (
   flag_junior tinyint(1) NOT NULL,
   flag_senior tinyint(1) NOT NULL,
   flag_handicap tinyint(1) NOT NULL,
+  has_multi_geolocations tinyint(1) NOT NULL,
   codecommune varchar(191) DEFAULT NULL,
   coordinates_x double DEFAULT NULL,
   coordinates_y double DEFAULT NULL,
