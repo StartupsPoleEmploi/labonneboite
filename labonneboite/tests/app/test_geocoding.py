@@ -17,6 +17,14 @@ class GeocodingTest(unittest.TestCase):
                 break
         self.assertTrue(found)
 
+    def test_is_commune_id(self):
+        self.assertFalse(geocoding.is_commune_id(u"75010"))
+        self.assertTrue(geocoding.is_commune_id(u"75110"))
+
+    def test_is_departement(self):
+        self.assertFalse(geocoding.is_departement(u"AAAAA"))
+        self.assertTrue(geocoding.is_departement(u"57"))
+
     def test_saint_denis_reunion_have_correct_coordinates(self):
         city = geocoding.get_city_by_zipcode(u"97400", u"montigny-les-metz")
         self.assertEquals(int(float(city['coords']['lat'])), -20)
