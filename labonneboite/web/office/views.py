@@ -17,7 +17,7 @@ from labonneboite.common import util
 from labonneboite.common.email_util import MandrillClient
 from labonneboite.common.load_data import load_contact_modes
 from labonneboite.common.models import Office
-from labonneboite.common.models import CONTACT_MODE_STAGES
+from labonneboite.common.models import CONTACT_MODE_STAGES, CONTACT_MODE_DEFAULT
 from labonneboite.conf import settings
 
 from labonneboite.web.office.forms import OfficeRemovalForm
@@ -103,7 +103,10 @@ def detail(siret):
     try:
         contact_mode = contact_mode_dict[company.naf[:2]][rome]
     except KeyError:
-        contact_mode = contact_mode_dict[company.naf[:2]].values()[0]
+        try:
+            contact_mode = contact_mode_dict[company.naf[:2]].values()[0]
+        except IndexError:
+            contact_mode = CONTACT_MODE_DEFAULT
 
     google_search = "%s+%s" % (company.name.replace(' ', '+'), company.city.replace(' ', '+'))
     google_url = "https://www.google.fr/search?q=%s" % google_search
