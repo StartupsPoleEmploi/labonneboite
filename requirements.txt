@@ -56,7 +56,7 @@ html5lib==0.999999
 xhtml2pdf==0.0.6
 
 # Utils.
-gevent==1.0.2
+gevent==1.1.1  # only used by geocode importer job and locust load testing
 gnureadline==6.3.3
 python-slugify==1.2.4
 requests==2.18.1
@@ -69,6 +69,10 @@ Pillow==2.9.0
 
 # Deployment.
 uWSGI==2.0.13.1
+
+# Load testing.
+locustio==0.7.5
+pyzmq==16.0.2
 
 # Secondary dependencies.
 # Explicitly specify secondary dependencies to ensure consistent build behavior.

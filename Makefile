@@ -81,6 +81,27 @@ mysql_local_shell:
 rebuild_importer_tests_compressed_files:
 	cd labonneboite/importer/tests/data && rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.gz && gzip --keep LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv && rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.bz2 && bzip2 --keep LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv
 
+# Load testing
+# ------------
+
+.PHONY: start_locust_against_localhost
+
+start_locust_against_localhost:
+	cd vagrant && vagrant ssh --command '\
+	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+	&& echo -e && echo -e \
+	&& echo "Please open locust web interface at http://localhost:8089" \
+	&& echo -e && echo -e \
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
+	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
+	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
+	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
+	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --master';
+
 # Tests
 # -----
 
