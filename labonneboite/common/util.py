@@ -10,6 +10,8 @@ from flask import request
 from flask_login import current_user
 
 from labonneboite.conf import settings
+from labonneboite.common.load_data import load_contact_modes
+from labonneboite.common.models import CONTACT_MODE_DEFAULT
 
 logger = logging.getLogger('main')
 
@@ -142,5 +144,16 @@ def is_safe_url(url, allowed_hosts=None):
     return ((not url_info.netloc or url_info.netloc in allowed_hosts) and (not scheme or scheme in valid_schemes))
 
 
+def get_contact_mode_for_rome_and_naf(rome, naf):
+    contact_mode_dict = load_contact_modes()
+    naf_prefix = naf[:2]
+    rome_to_contact_mode_dict = contact_mode_dict[naf_prefix]
+    if rome in rome_to_contact_mode_dict:
+        contact_mode = rome_to_contact_mode_dict[rome]
+    elif rome_to_contact_mode_dict:
+        contact_mode = rome_to_contact_mode_dict.values()[0]
+    else:
+        contact_mode = CONTACT_MODE_DEFAULT
+    return contact_mode
 
 
