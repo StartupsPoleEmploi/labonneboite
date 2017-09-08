@@ -15,7 +15,6 @@ from flask import request, session, url_for
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import util
 from labonneboite.common.email_util import MandrillClient
-from labonneboite.common.load_data import load_contact_modes
 from labonneboite.common.models import Office
 from labonneboite.common.models import CONTACT_MODE_STAGES
 from labonneboite.conf import settings
@@ -87,23 +86,19 @@ def change_info():
 
 def detail(siret):
     company = Office.query.filter(Office.siret == siret).one()
-    contact_mode_dict = load_contact_modes()
 
     if 'search_args' in session:
         search_url = util.get_search_url('/resultat', session['search_args'])
     else:
         search_url = None
     rome = request.args.get('r')
-    if rome not in settings.ROME_DESCRIPTIONS.keys():
+    if rome not in settings.ROME_DESCRIPTIONS:
         rome = None
         rome_description = None
     else:
         rome_description = settings.ROME_DESCRIPTIONS[rome]
 
-    try:
-        contact_mode = contact_mode_dict[company.naf[:2]][rome]
-    except KeyError:
-        contact_mode = contact_mode_dict[company.naf[:2]].values()[0]
+    contact_mode = util.get_contact_mode_for_rome_and_naf(rome, company.naf)
 
     google_search = "%s+%s" % (company.name.replace(' ', '+'), company.city.replace(' ', '+'))
     google_url = "https://www.google.fr/search?q=%s" % google_search

@@ -13,9 +13,8 @@ from labonneboite.common import geocoding
 from labonneboite.common import util
 from labonneboite.common import search as search_util
 from labonneboite.common import mapping as mapping_util
-from labonneboite.common.load_data import load_contact_modes
 from labonneboite.common.models import UserFavoriteOffice
-from labonneboite.common.models import CONTACT_MODE_DEFAULT
+
 from labonneboite.conf import settings
 from labonneboite.web.pagination import PaginationManager
 from labonneboite.web.search.forms import CompanySearchForm
@@ -170,18 +169,10 @@ def results(city, zipcode, occupation):
     pagination_manager = PaginationManager(company_count, from_number_param, to_number_param, request.full_path)
     current_page = pagination_manager.get_current_page()
 
-    # Get contact mode.
-    contact_mode_dict = load_contact_modes()
+    # Get contact mode and position.
     for position, company in enumerate(companies, start=1):
-        try:
-            contact_mode = contact_mode_dict[company.naf[:2]][fetcher.rome]
-        except KeyError:
-            try:
-                contact_mode = contact_mode_dict[company.naf[:2]].values()[0]
-            except IndexError:
-                contact_mode = CONTACT_MODE_DEFAULT
-        company.contact_mode = contact_mode
-        # is this even used at all?? FIXME
+        company.contact_mode = util.get_contact_mode_for_rome_and_naf(fetcher.rome, company.naf)
+        # position is later used in labonneboite/web/static/js/results.js
         company.position = position
 
     # Get NAF code and their descriptions.

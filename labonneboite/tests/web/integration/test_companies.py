@@ -36,7 +36,7 @@ class RouteTest(DatabaseTest):
 
     def test_office_details_page(self):
         """
-        Test the company details page.
+        Test the office details page of a regular office.
         """
 
         self.create_example_office()
@@ -44,13 +44,30 @@ class RouteTest(DatabaseTest):
         rv = self.app.get('/%s/details' % self.office.siret)
         self.assertEqual(rv.status_code, 200)
 
-        # The details page of an nonexistent company should raise a 404.
+    def test_office_details_page_of_non_existing_office(self):
+        """
+        Test the office details page of a non existing office.
+        """
+
+        # The details page of an nonexistent office should raise a 404.
         rv = self.app.get('/7x5x8x3x1x1x46/details')
         self.assertEqual(rv.status_code, 404)
 
-    def test_download_missing_siret(self):
+    def test_office_details_page_of_office_having_buggy_naf(self):
         """
-        Test the company PDF download
+        Test the office details page of an office having NAF 9900Z.
+        """
+
+        self.create_example_office()
+        self.office.naf = u'9900Z'
+        self.office.save()
+
+        rv = self.app.get('/%s/details' % self.office.siret)
+        self.assertEqual(rv.status_code, 200)
+
+    def test_download_regular_office(self):
+        """
+        Test the office PDF download
         """
 
         self.create_example_office()
@@ -59,6 +76,22 @@ class RouteTest(DatabaseTest):
         rv = self.app.get("/%s/download" % self.office.siret)
         self.assertEqual(rv.status_code, 200)
 
+    def test_download_missing_siret(self):
+        """
+        Test the office PDF download of a non existing office
+        """
         # siret does not exist
         rv = self.app.get("/1234567890/download")
         self.assertEqual(rv.status_code, 404)
+
+    def test_download_of_office_having_buggy_naf(self):
+        """
+        Test the office PDF download of an office having NAF 9900Z.
+        """
+
+        self.create_example_office()
+        self.office.naf = u'9900Z'
+        self.office.save()
+
+        rv = self.app.get('/%s/download' % self.office.siret)
+        self.assertEqual(rv.status_code, 200)

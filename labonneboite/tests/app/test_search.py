@@ -4,7 +4,7 @@ import unittest
 from labonneboite.common import search
 
 
-class ElasticTest(unittest.TestCase):
+class SearchTest(unittest.TestCase):
 
     def search_in_naf(self, naf, lat, lon):
         distance = 5
