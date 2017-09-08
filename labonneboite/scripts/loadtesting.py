@@ -30,28 +30,27 @@ On average in production, we observe that for 50 frontend searches,
 we get 60 suggest_job_labels requests, 20 suggest_cities requests etc..
 """
 
-import random
-import os
-import csv
-import math
 from operator import itemgetter
-import urllib
 import logging
+import math
+import random
+import urllib
 
-from slugify import slugify
 from locust import HttpLocust, TaskSet, task
+from slugify import slugify
 
-from labonneboite.importer import util as import_util
+from labonneboite.common import geocoding
 from labonneboite.conf import settings
+from labonneboite.importer import util as import_util
 from labonneboite.web.api import util
+
 
 logger = logging.getLogger(__name__)
 logger.info("loading locustfile")
 
 con, cur = import_util.create_cursor()
 
-# For each locust, number of seconds between its tasks.
-# Default value : 1
+# For each locust, number of seconds between its tasks. Default value: 1.
 SECONDS_BETWEEN_TASKS = 1
 
 
@@ -61,39 +60,26 @@ def generate_siret_choices():
     rows = cur.fetchall()
     return [row[0] for row in rows]
 
-SIRET_CHOICES = generate_siret_choices()
-
 
 def generate_city_choices():
-    fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-        "../../labonneboite/common/data/consolidated_cities.csv")
-    with open(fullname, "r") as city_file:
-        reader = csv.reader(city_file)
-        cities = []
-        for city_name, first_zipcode, population, _, _ in reader:
-            cities.append([city_name, first_zipcode, int(population)])
-        cities_by_population = sorted(cities, key=itemgetter(2), reverse=True)
-        city_choices = []
-        for city in cities_by_population[:2000]:
-            name, zipcode, population = city
-            city_choices.append([(name, zipcode), math.log10(population)])
-        return city_choices
+    cities_by_population = sorted(geocoding.get_cities(), key=itemgetter('population'), reverse=True)
+    city_choices = []
+    for city in cities_by_population[:2000]:
+        city_choices.append(
+            [
+                (city['name'], city['zipcode']), math.log10(city['population'])
+            ]
+        )
+    return city_choices
+
 
 CITY_CHOICES = generate_city_choices()
 
 
-def generate_commune_choices():
-    fullname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-        "../../labonneboite/common/data/villes_france.csv")
-    with open(fullname, "r") as commune_file:
-        reader = csv.reader(commune_file)
-        commune_choices = []
-        for line in reader:
-            commune_id = line[10]
-            commune_choices.append(commune_id)
-        return commune_choices
+COMMUNE_CHOICES = [city_['commune_id'] for city_ in geocoding.get_cities()]
 
-COMMUNE_CHOICES = generate_commune_choices()
+
+SIRET_CHOICES = generate_siret_choices()
 
 
 def weighted_choice(choices):
