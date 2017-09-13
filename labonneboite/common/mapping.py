@@ -65,6 +65,8 @@ class Rome2NafMapper(object):
     def map(self, rome_codes, optional_naf_codes=None):
         naf_codes = set()
         for rome in rome_codes:
+            if rome not in ROME_CODES:
+                raise Exception('bad rome code %s' % rome)
             try:
                 naf_codes_with_hirings = self.rome_2_naf_dict[rome]
             except KeyError:

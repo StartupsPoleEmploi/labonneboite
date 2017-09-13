@@ -8,7 +8,7 @@ class SearchTest(unittest.TestCase):
 
     def search_in_naf(self, naf, lat, lon):
         distance = 5
-        companies, _ = search.get_companies_for_naf_codes([naf, ], lat, lon, distance, 1, 1000)
+        companies, _ = search.get_companies([naf, ], lat, lon, distance, 1, 1000)
         return [company.siret for company in companies]
 
     def test_lorraine_tube(self):

@@ -10,12 +10,14 @@ import unidecode
 from elasticsearch import Elasticsearch
 from slugify import slugify
 
-from labonneboite.common.models import Office
-from labonneboite.conf import settings
 from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
+from labonneboite.common.models import Office
+from labonneboite.conf import settings
+
 
 logger = logging.getLogger('main')
+
 
 PUBLIC_ALL = 0
 PUBLIC_JUNIOR = 1
@@ -35,74 +37,55 @@ class JobException(Exception):
 class Fetcher(object):
 
     def __init__(self, **kwargs):
-        self.job = kwargs.get('job')
-        self.city = kwargs.get('city')
-        self.zipcode = kwargs.get('zipcode')
-        self.occupation = kwargs.get('occupation')
+        self.city_slug = kwargs.get('city')
+        self.occupation_slug = kwargs.get('occupation')
         self.distance = kwargs.get('distance')
-        self.naf = kwargs.get('naf')
-        self.headcount = kwargs.get('headcount')
         self.sort = kwargs.get('sort')
-        self.flag_alternance = kwargs.get('flag_alternance')
-        public = kwargs.get('public')
-        self.flag_junior = public == PUBLIC_JUNIOR
-        self.flag_senior = public == PUBLIC_SENIOR
-        self.flag_handicap = public == PUBLIC_HANDICAP
-        self.naf_codes = []
-        self.alternative_rome_codes = {}
-        self.alternative_distances = collections.OrderedDict()
-        self.latitude = None
-        self.longitude = None
-        self.rome = None
+        self.zipcode = kwargs.get('zipcode')
+
+        # Latitude/longitude.
+        city = geocoding.get_city_by_zipcode(self.zipcode, self.city_slug)
+        if not city:
+            logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.city_slug)
+            raise LocationError
+        self.latitude = city['coords']['lat']
+        self.longitude = city['coords']['lon']
+
+        # Pagination.
         self.from_number = int(kwargs.get('from') or 1)
         self.to_number = int(kwargs.get('to') or 10)
 
-    def get_companies_for_rome_and_naf_codes(self, rome_codes, naf_codes, distance=None):
-        if distance is None:
-            distance = self.distance
-        companies = _get_companies_from_api(
-            rome_codes,
-            naf_codes,
-            self.longitude,
-            self.latitude,
-            distance,
-            self.headcount,
-            self.sort,
-            self.from_number,
-            self.to_number,
-            self.flag_alternance,
-            self.flag_junior,
-            self.flag_senior,
-            self.flag_handicap
-        )
-        search_companies = {}
-        for company in companies:
-            search_companies[company["siret"]] = company
-        siret_list = [company["siret"] for company in companies]
-        if siret_list:
-            companies = Office.query.filter(Office.siret.in_(siret_list))
-            company_by_siret = {}
-            for company in companies:
-                search_company = search_companies[company.siret]
-                company.x = search_company["lon"]
-                company.y = search_company["lat"]
-                company.distance = search_company["distance"]
-                company_by_siret[company.siret] = company
-        self.companies = []
-        for siret in siret_list:
-            self.companies.append(company_by_siret[siret])
-        return self.companies
+        # Flags.
+        self.flag_alternance = kwargs.get('flag_alternance')
+        public = kwargs.get('public')
+        self.flag_handicap = public == PUBLIC_HANDICAP
+        self.flag_junior = public == PUBLIC_JUNIOR
+        self.flag_senior = public == PUBLIC_SENIOR
 
-    def get_company_count(self, rome_codes, naf_codes, distance):
-        naf_codes = get_api_ready_rome_and_naf_codes(rome_codes, naf_codes)
+        # Headcount.
+        self.headcount = kwargs.get('headcount')
+        try:
+            self.headcount_filter = int(self.headcount)
+        except (TypeError, ValueError):
+            self.headcount_filter = settings.HEADCOUNT_WHATEVER
 
-        # Reasons why we only support single-rome search are detailed in README.md
-        if len(rome_codes) > 1:
-            raise Exception("multi ROME search not supported")
-        rome_code = rome_codes[0]
+        # NAF, ROME and NAF codes.
+        self.naf = kwargs.get('naf')
+        self.rome = mapping_util.SLUGIFIED_ROME_LABELS[self.occupation_slug]
+        mapper = mapping_util.Rome2NafMapper()
+        if self.naf:
+            self.naf_codes = mapper.map([self.rome], [self.naf])
+        else:
+            self.naf_codes = mapper.map([self.rome])
 
-        return count_companies_for_naf_codes(
-            naf_codes,
+        # Other properties.
+        self.alternative_rome_codes = {}
+        self.alternative_distances = collections.OrderedDict()
+        self.company_count = None
+
+    def _get_company_count(self, rome_code, distance):
+        return count_companies(
+            self.naf_codes,
             self.latitude,
             self.longitude,
             distance,
@@ -110,22 +93,55 @@ class Fetcher(object):
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
-            headcount_filter=self.headcount,
-            rome_code=rome_code)
+            headcount_filter=self.headcount_filter,
+            rome_code=rome_code,
+        )
+
+    def _get_companies_from_es_and_db(self):
+        result = []
+
+        companies_from_es, _ = get_companies(
+            self.naf_codes,
+            self.latitude,
+            self.longitude,
+            self.distance,
+            self.from_number,
+            self.to_number,
+            flag_alternance=self.flag_alternance,
+            flag_junior=self.flag_junior,
+            flag_senior=self.flag_senior,
+            flag_handicap=self.flag_handicap,
+            headcount_filter=self.headcount_filter,
+            sort=self.sort,
+            index=settings.ES_INDEX,
+            rome_code=self.rome,
+        )
+
+        json_companies = [company.as_json() for company in companies_from_es]
+
+        if json_companies:
+
+            siret_list = [item['siret'] for item in json_companies]
+            companies_from_db = Office.query.filter(Office.siret.in_(siret_list))
+
+            company_by_siret = {}
+            for company in companies_from_db:
+                # Get the corresponding dict from the `json_companies` list.
+                json_company = next((item for item in json_companies if item['siret'] == company.siret))
+                company.x = json_company['lon']
+                company.y = json_company['lat']
+                company.distance = json_company['distance']
+                company_by_siret[company.siret] = company
+
+            # Keep the Elasticsearch initial order.
+            for siret in siret_list:
+                result.append(company_by_siret[siret])
+
+        return result
 
     def get_companies(self):
-        try:
-            city = geocoding.get_city_by_zipcode(self.zipcode, self.city)
-            self.latitude = city['coords']['lat']
-            self.longitude = city['coords']['lon']
-            logger.info("location found for %s %s : lat=%s long=%s",
-                self.city, self.zipcode, self.latitude, self.longitude)
-        except:
-            logger.info("location error for %s %s", self.city, self.zipcode)
-            raise LocationError
 
-        self.rome = mapping_util.SLUGIFIED_ROME_LABELS[self.occupation]
-        self.company_count = self.get_company_count([self.rome], [self.naf], self.distance)
+        self.company_count = self._get_company_count(self.rome, self.distance)
         logger.debug("set company_count to %s from get_companies", self.company_count)
 
         if self.from_number < 1:
@@ -144,95 +160,30 @@ class Fetcher(object):
             self.from_number = 1
             self.to_number = 10
 
-        result = []
-        if self.company_count:
-            result = self.get_companies_for_rome_and_naf_codes([self.rome], [self.naf], self.distance)
+        result = self._get_companies_from_es_and_db() if self.company_count else []
+
         if self.company_count < 10:
+
+            # Suggest other jobs.
             alternative_rome_codes = settings.ROME_MOBILITIES[self.rome]
             for rome in alternative_rome_codes:
                 if not rome == self.rome:
-                    self.naf_codes = []
-                    company_count = self.get_company_count([rome], [self.naf], self.distance)
+                    company_count = self._get_company_count(rome, self.distance)
                     self.alternative_rome_codes[rome] = company_count
+
+            # Suggest other distances.
             last_count = 0
-            for distance, distance_label in [(30, '30 km'), (50, '50 km'), (3000, u'France entière')]:
-                self.naf_codes = []
-                company_count = self.get_company_count([self.rome], [self.naf], distance)
+            for distance, distance_label in [(30, u'30 km'), (50, u'50 km'), (3000, u'France entière')]:
+                company_count = self._get_company_count(self.rome, distance)
                 if company_count > last_count:
                     last_count = company_count
                     self.alternative_distances[distance] = (distance_label, last_count)
+
         return result
 
-    def get_first_rome_suggestion(self, job):
-        logger.debug("get suggestions for input %s", job)
-        suggestions = build_job_label_suggestions(job)
-        if not suggestions:
-            raise JobException
-        return [sugg['id'] for sugg in suggestions][0]
 
-
-def get_api_ready_rome_and_naf_codes(rome_codes, naf_codes):
-    mapper = mapping_util.Rome2NafMapper()
-    for rome in rome_codes:
-        if rome not in mapping_util.ROME_CODES:
-            raise Exception('bad rome code %s' % rome)
-
-    if naf_codes and not naf_codes[0]:
-        naf_codes = []
-
-    if naf_codes:
-        naf_codes = mapper.map(rome_codes, naf_codes)
-    else:
-        naf_codes = mapper.map(rome_codes)
-    return naf_codes
-
-
-def _get_companies_from_api(
-        rome_codes,
-        naf_codes,
-        longitude,
-        latitude,
-        distance,
-        headcount,
-        sort,
-        from_number,
-        to_number,
-        flag_alternance,
-        flag_junior,
-        flag_senior,
-        flag_handicap):
-    """Internal function to be used to avoid the http overhead as for now
-    the application server and the API server are on the same server.
-    """
-    try:
-        headcount_filter = int(headcount)
-    except TypeError:
-        headcount_filter = settings.HEADCOUNT_WHATEVER
-    except ValueError:
-        headcount_filter = settings.HEADCOUNT_WHATEVER
-    naf_codes = get_api_ready_rome_and_naf_codes(rome_codes, naf_codes)
-
-    # Reasons why we only support single-rome search are detailed in README.md
-    if len(rome_codes) > 1:
-        raise Exception("multi ROME search not supported")
-    rome_code = rome_codes[0]
-
-    companies, _ = get_companies_for_naf_codes(
-        naf_codes, latitude, longitude, distance, from_number, to_number,
-        flag_alternance=flag_alternance,
-        flag_junior=flag_junior,
-        flag_senior=flag_senior,
-        flag_handicap=flag_handicap,
-        headcount_filter=headcount_filter, sort=sort, index=settings.ES_INDEX,
-        rome_code=rome_code)
-    return [company.as_json() for company in companies]
-
-
-def count_companies_for_naf_codes(*args, **kwargs):
-    if 'index' in kwargs:
-        index = kwargs.pop('index')
-    else:
-        index = 'labonneboite'
+def count_companies(*args, **kwargs):
+    index = kwargs.pop('index', 'labonneboite')
     json_body = build_json_body_elastic_search(*args, **kwargs)
     del json_body["sort"]
     es = Elasticsearch()
@@ -240,11 +191,8 @@ def count_companies_for_naf_codes(*args, **kwargs):
     return res["count"]
 
 
-def get_companies_for_naf_codes(*args, **kwargs):
-    if 'index' in kwargs:
-        index = kwargs.pop('index')
-    else:
-        index = 'labonneboite'
+def get_companies(*args, **kwargs):
+    index = kwargs.pop('index', 'labonneboite')
     json_body = build_json_body_elastic_search(*args, **kwargs)
     try:
         distance_sort = kwargs['sort'] == 'distance'
@@ -254,13 +202,8 @@ def get_companies_for_naf_codes(*args, **kwargs):
         json_body,
         index=index,
         distance_sort=distance_sort
-        )
-
-    try:
-        rome_code = kwargs['rome_code']
-    except KeyError:
-        rome_code = None
-    companies = shuffle_companies(companies, distance_sort, rome_code)
+    )
+    companies = shuffle_companies(companies, distance_sort, kwargs.get('rome_code'))
     return companies, companies_count
 
 
@@ -305,9 +248,18 @@ def shuffle_companies(companies, distance_sort, rome_code):
 
 
 def build_json_body_elastic_search(
-        naf_codes, latitude, longitude, distance,
-        from_number=None, to_number=None, headcount_filter=settings.HEADCOUNT_WHATEVER,
-        sort="distance", flag_alternance=0, flag_junior=0, flag_senior=0, flag_handicap=0,
+        naf_codes,
+        latitude,
+        longitude,
+        distance,
+        from_number=None,
+        to_number=None,
+        headcount_filter=settings.HEADCOUNT_WHATEVER,
+        sort='distance',
+        flag_alternance=0,
+        flag_junior=0,
+        flag_senior=0,
+        flag_handicap=0,
         rome_code=None):
 
     sort_attrs = []

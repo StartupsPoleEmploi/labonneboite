@@ -128,7 +128,7 @@ def company_list():
     mapper = mapping_util.Rome2NafMapper()
     naf_code_list = mapper.map(rome_code_list)
 
-    companies, companies_count = search.get_companies_for_naf_codes(
+    companies, companies_count = search.get_companies(
         naf_code_list,
         latitude,
         longitude,
