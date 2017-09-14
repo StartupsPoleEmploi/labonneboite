@@ -60,3 +60,7 @@ Thumbs.db
 .osync_workdir
 # folder to store backups used on some environments
 srv
+
+# Data
+ROME_NAF/opendata/sir*.csv
+ROME_NAF/*.csv

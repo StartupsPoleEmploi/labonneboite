@@ -1,0 +1,532 @@
+code,code1,code2,code3,label,slug
+A1101,A,11,01,Conduite d'engins agricoles et forestiers,conduite-d-engins-agricoles-et-forestiers
+A1201,A,12,01,Bûcheronnage et élagage,bucheronnage-et-elagage
+A1202,A,12,02,Entretien des espaces naturels,entretien-des-espaces-naturels
+A1203,A,12,03,Entretien des espaces verts,entretien-des-espaces-verts
+A1204,A,12,04,Protection du patrimoine naturel,protection-du-patrimoine-naturel
+A1205,A,12,05,Sylviculture,sylviculture
+A1301,A,13,01,Conseil et assistance technique en agriculture,conseil-et-assistance-technique-en-agriculture
+A1302,A,13,02,Contrôle et diagnostic technique en agriculture,controle-et-diagnostic-technique-en-agriculture
+A1303,A,13,03,Ingénierie en agriculture et environnement naturel,ingenierie-en-agriculture-et-environnement-naturel
+A1401,A,14,01,Aide agricole de production fruitière ou viticole,aide-agricole-de-production-fruitiere-ou-viticole
+A1402,A,14,02,Aide agricole de production légumière ou végétale,aide-agricole-de-production-legumiere-ou-vegetale
+A1403,A,14,03,Aide d'élevage agricole et aquacole,aide-d-elevage-agricole-et-aquacole
+A1404,A,14,04,Aquaculture,aquaculture
+A1405,A,14,05,Arboriculture et viticulture,arboriculture-et-viticulture
+A1406,A,14,06,Encadrement équipage de la pêche,encadrement-equipage-de-la-peche
+A1407,A,14,07,Élevage bovin ou équin,elevage-bovin-ou-equin
+A1408,A,14,08,Élevage d'animaux sauvages ou de compagnie,elevage-d-animaux-sauvages-ou-de-compagnie
+A1409,A,14,09,Élevage de lapins et volailles,elevage-de-lapins-et-volailles
+A1410,A,14,10,Élevage ovin ou caprin,elevage-ovin-ou-caprin
+A1411,A,14,11,Élevage porcin,elevage-porcin
+A1412,A,14,12,Fabrication et affinage de fromages,fabrication-et-affinage-de-fromages
+A1413,A,14,13,Fermentation de boissons alcoolisées,fermentation-de-boissons-alcoolisees
+A1414,A,14,14,Horticulture et maraîchage,horticulture-et-maraichage
+A1415,A,14,15,Equipage de la pêche,equipage-de-la-peche
+A1416,A,14,16,"Polyculture, élevage",polyculture-elevage
+A1417,A,14,17,Saliculture,saliculture
+A1501,A,15,01,Aide aux soins animaux,aide-aux-soins-animaux
+A1502,A,15,02,Podologie animale,podologie-animale
+A1503,A,15,03,Toilettage des animaux,toilettage-des-animaux
+A1504,A,15,04,Santé animale,sante-animale
+B1101,B,11,01,Création en arts plastiques,creation-en-arts-plastiques
+B1201,B,12,01,Réalisation d'objets décoratifs et utilitaires en céramique et matériaux de synthèse,realisation-d-objets-decoratifs-et-utilitaires-en-ceramique-et-materiaux-de-synthese
+B1301,B,13,01,Décoration d'espaces de vente et d'exposition,decoration-d-espaces-de-vente-et-d-exposition
+B1302,B,13,02,Décoration d'objets d'art et artisanaux,decoration-d-objets-d-art-et-artisanaux
+B1303,B,13,03,Gravure - ciselure,gravure-ciselure
+B1401,B,14,01,"Réalisation d'objets en lianes, fibres et brins végétaux",realisation-d-objets-en-lianes-fibres-et-brins-vegetaux
+B1402,B,14,02,Reliure et restauration de livres et archives,reliure-et-restauration-de-livres-et-archives
+B1501,B,15,01,Fabrication et réparation d'instruments de musique,fabrication-et-reparation-d-instruments-de-musique
+B1601,B,16,01,Métallerie d'art,metallerie-d-art
+B1602,B,16,02,Réalisation d'objets artistiques et fonctionnels en verre,realisation-d-objets-artistiques-et-fonctionnels-en-verre
+B1603,B,16,03,"Réalisation d'ouvrages en bijouterie, joaillerie et orfèvrerie",realisation-d-ouvrages-en-bijouterie-joaillerie-et-orfevrerie
+B1604,B,16,04,Réparation - montage en systèmes horlogers,reparation-montage-en-systemes-horlogers
+B1701,B,17,01,Conservation et reconstitution d'espèces animales,conservation-et-reconstitution-d-especes-animales
+B1801,B,18,01,Réalisation d'articles de chapellerie,realisation-d-articles-de-chapellerie
+B1802,B,18,02,Réalisation d'articles en cuir et matériaux souples (hors vêtement),realisation-d-articles-en-cuir-et-materiaux-souples-hors-vetement
+B1803,B,18,03,Réalisation de vêtements sur mesure ou en petite série,realisation-de-vetements-sur-mesure-ou-en-petite-serie
+B1804,B,18,04,Réalisation d'ouvrages d'art en fils,realisation-d-ouvrages-d-art-en-fils
+B1805,B,18,05,Stylisme,stylisme
+B1806,B,18,06,Tapisserie - décoration en ameublement,tapisserie-decoration-en-ameublement
+C1101,C,11,01,Conception - développement produits d'assurances,conception-developpement-produits-d-assurances
+C1102,C,11,02,Conseil clientèle en assurances,conseil-clientele-en-assurances
+C1103,C,11,03,Courtage en assurances,courtage-en-assurances
+C1104,C,11,04,Direction d'exploitation en assurances,direction-d-exploitation-en-assurances
+C1105,C,11,05,Études actuarielles en assurances,etudes-actuarielles-en-assurances
+C1106,C,11,06,Expertise risques en assurances,expertise-risques-en-assurances
+C1107,C,11,07,Indemnisations en assurances,indemnisations-en-assurances
+C1108,C,11,08,Management de groupe et de service en assurances,management-de-groupe-et-de-service-en-assurances
+C1109,C,11,09,Rédaction et gestion en assurances,redaction-et-gestion-en-assurances
+C1110,C,11,10,Souscription d'assurances,souscription-d-assurances
+C1201,C,12,01,Accueil et services bancaires,accueil-et-services-bancaires
+C1202,C,12,02,Analyse de crédits et risques bancaires,analyse-de-credits-et-risques-bancaires
+C1203,C,12,03,Relation clients banque/finance,relation-clients-banque-finance
+C1204,C,12,04,Conception et expertise produits bancaires et financiers,conception-et-expertise-produits-bancaires-et-financiers
+C1205,C,12,05,Conseil en gestion de patrimoine financier,conseil-en-gestion-de-patrimoine-financier
+C1206,C,12,06,Gestion de clientèle bancaire,gestion-de-clientele-bancaire
+C1207,C,12,07,Management en exploitation bancaire,management-en-exploitation-bancaire
+C1301,C,13,01,Front office marchés financiers,front-office-marches-financiers
+C1302,C,13,02,Gestion back et middle-office marchés financiers,gestion-back-et-middle-office-marches-financiers
+C1303,C,13,03,Gestion de portefeuilles sur les marchés financiers,gestion-de-portefeuilles-sur-les-marches-financiers
+C1401,C,14,01,Gestion en banque et assurance,gestion-en-banque-et-assurance
+C1501,C,15,01,Gérance immobilière,gerance-immobiliere
+C1502,C,15,02,Gestion locative immobilière,gestion-locative-immobiliere
+C1503,C,15,03,Management de projet immobilier,management-de-projet-immobilier
+C1504,C,15,04,Transaction immobilière,transaction-immobiliere
+D1101,D,11,01,Boucherie,boucherie
+D1102,D,11,02,Boulangerie - viennoiserie,boulangerie-viennoiserie
+D1103,D,11,03,Charcuterie - traiteur,charcuterie-traiteur
+D1104,D,11,04,"Pâtisserie, confiserie, chocolaterie et glacerie",patisserie-confiserie-chocolaterie-et-glacerie
+D1105,D,11,05,Poissonnerie,poissonnerie
+D1106,D,11,06,Vente en alimentation,vente-en-alimentation
+D1107,D,11,07,Vente en gros de produits frais,vente-en-gros-de-produits-frais
+D1201,D,12,01,"Achat vente d'objets d'art, anciens ou d'occasion",achat-vente-d-objets-d-art-anciens-ou-d-occasion
+D1202,D,12,02,Coiffure,coiffure
+D1203,D,12,03,Hydrothérapie,hydrotherapie
+D1204,D,12,04,Location de véhicules ou de matériel de loisirs,location-de-vehicules-ou-de-materiel-de-loisirs
+D1205,D,12,05,Nettoyage d'articles textiles ou cuirs,nettoyage-d-articles-textiles-ou-cuirs
+D1206,D,12,06,Réparation d'articles en cuir et matériaux souples,reparation-d-articles-en-cuir-et-materiaux-souples
+D1207,D,12,07,Retouches en habillement,retouches-en-habillement
+D1208,D,12,08,Soins esthétiques et corporels,soins-esthetiques-et-corporels
+D1209,D,12,09,Vente de végétaux,vente-de-vegetaux
+D1210,D,12,10,Vente en animalerie,vente-en-animalerie
+D1211,D,12,11,Vente en articles de sport et loisirs,vente-en-articles-de-sport-et-loisirs
+D1212,D,12,12,Vente en décoration et équipement du foyer,vente-en-decoration-et-equipement-du-foyer
+D1213,D,12,13,Vente en gros de matériel et équipement,vente-en-gros-de-materiel-et-equipement
+D1214,D,12,14,Vente en habillement et accessoires de la personne,vente-en-habillement-et-accessoires-de-la-personne
+D1301,D,13,01,Management de magasin de détail,management-de-magasin-de-detail
+D1401,D,14,01,Assistanat commercial,assistanat-commercial
+D1402,D,14,02,Relation commerciale grands comptes et entreprises,relation-commerciale-grands-comptes-et-entreprises
+D1403,D,14,03,Relation commerciale auprès de particuliers,relation-commerciale-aupres-de-particuliers
+D1404,D,14,04,Relation commerciale en vente de véhicules,relation-commerciale-en-vente-de-vehicules
+D1405,D,14,05,Conseil en information médicale,conseil-en-information-medicale
+D1406,D,14,06,Management en force de vente,management-en-force-de-vente
+D1407,D,14,07,Relation technico-commerciale,relation-technico-commerciale
+D1408,D,14,08,Téléconseil et télévente,teleconseil-et-televente
+D1501,D,15,01,Animation de vente,animation-de-vente
+D1502,D,15,02,Management/gestion de rayon produits alimentaires,management-gestion-de-rayon-produits-alimentaires
+D1503,D,15,03,Management/gestion de rayon produits non alimentaires,management-gestion-de-rayon-produits-non-alimentaires
+D1504,D,15,04,Direction de magasin de grande distribution,direction-de-magasin-de-grande-distribution
+D1505,D,15,05,Personnel de caisse,personnel-de-caisse
+D1506,D,15,06,Marchandisage,marchandisage
+D1507,D,15,07,Mise en rayon libre-service,mise-en-rayon-libre-service
+D1508,D,15,08,Encadrement du personnel de caisses,encadrement-du-personnel-de-caisses
+D1509,D,15,09,Management de département en grande distribution,management-de-departement-en-grande-distribution
+E1101,E,11,01,Animation de site multimédia,animation-de-site-multimedia
+E1102,E,11,02,"Ecriture d'ouvrages, de livres",ecriture-d-ouvrages-de-livres
+E1103,E,11,03,Communication,communication
+E1104,E,11,04,Conception de contenus multimédias,conception-de-contenus-multimedias
+E1105,E,11,05,Coordination d'édition,coordination-d-edition
+E1106,E,11,06,Journalisme et information média,journalisme-et-information-media
+E1107,E,11,07,Organisation d'évènementiel,organisation-d-evenementiel
+E1108,E,11,08,"Traduction, interprétariat",traduction-interpretariat
+E1201,E,12,01,Photographie,photographie
+E1202,E,12,02,Production en laboratoire cinématographique,production-en-laboratoire-cinematographique
+E1203,E,12,03,Production en laboratoire photographique,production-en-laboratoire-photographique
+E1204,E,12,04,Projection cinéma,projection-cinema
+E1205,E,12,05,Réalisation de contenus multimédias,realisation-de-contenus-multimedias
+E1301,E,13,01,Conduite de machines d'impression,conduite-de-machines-d-impression
+E1302,E,13,02,Conduite de machines de façonnage routage,conduite-de-machines-de-faconnage-routage
+E1303,E,13,03,Encadrement des industries graphiques,encadrement-des-industries-graphiques
+E1304,E,13,04,Façonnage et routage,faconnage-et-routage
+E1305,E,13,05,Préparation et correction en édition et presse,preparation-et-correction-en-edition-et-presse
+E1306,E,13,06,Prépresse,prepresse
+E1307,E,13,07,Reprographie,reprographie
+E1308,E,13,08,Intervention technique en industrie graphique,intervention-technique-en-industrie-graphique
+E1401,E,14,01,Développement et promotion publicitaire,developpement-et-promotion-publicitaire
+E1402,E,14,02,Élaboration de plan média,elaboration-de-plan-media
+F1101,F,11,01,Architecture du BTP,architecture-du-btp
+F1102,F,11,02,Conception - aménagement d'espaces intérieurs,conception-amenagement-d-espaces-interieurs
+F1103,F,11,03,Contrôle et diagnostic technique du bâtiment,controle-et-diagnostic-technique-du-batiment
+F1104,F,11,04,Dessin BTP,dessin-btp
+F1105,F,11,05,Études géologiques,etudes-geologiques
+F1106,F,11,06,Ingénierie et études du BTP,ingenierie-et-etudes-du-btp
+F1107,F,11,07,Mesures topographiques,mesures-topographiques
+F1108,F,11,08,Métré de la construction,metre-de-la-construction
+F1201,F,12,01,Conduite de travaux du BTP,conduite-de-travaux-du-btp
+F1202,F,12,02,Direction de chantier du BTP,direction-de-chantier-du-btp
+F1203,F,12,03,Direction et ingénierie d'exploitation de gisements et de carrières,direction-et-ingenierie-d-exploitation-de-gisements-et-de-carrieres
+F1204,F,12,04,Sécurité et protection santé du BTP,securite-et-protection-sante-du-btp
+F1301,F,13,01,Conduite de grue,conduite-de-grue
+F1302,F,13,02,Conduite d'engins de terrassement et de carrière,conduite-d-engins-de-terrassement-et-de-carriere
+F1401,F,14,01,Extraction liquide et gazeuse,extraction-liquide-et-gazeuse
+F1402,F,14,02,Extraction solide,extraction-solide
+F1501,F,15,01,Montage de structures et de charpentes bois,montage-de-structures-et-de-charpentes-bois
+F1502,F,15,02,Montage de structures métalliques,montage-de-structures-metalliques
+F1503,F,15,03,Réalisation - installation d'ossatures bois,realisation-installation-d-ossatures-bois
+F1601,F,16,01,"Application et décoration en plâtre, stuc et staff",application-et-decoration-en-platre-stuc-et-staff
+F1602,F,16,02,Électricité bâtiment,electricite-batiment
+F1603,F,16,03,Installation d'équipements sanitaires et thermiques,installation-d-equipements-sanitaires-et-thermiques
+F1604,F,16,04,Montage d'agencements,montage-d-agencements
+F1605,F,16,05,Montage de réseaux électriques et télécoms,montage-de-reseaux-electriques-et-telecoms
+F1606,F,16,06,Peinture en bâtiment,peinture-en-batiment
+F1607,F,16,07,Pose de fermetures menuisées,pose-de-fermetures-menuisees
+F1608,F,16,08,Pose de revêtements rigides,pose-de-revetements-rigides
+F1609,F,16,09,Pose de revêtements souples,pose-de-revetements-souples
+F1610,F,16,10,Pose et restauration de couvertures,pose-et-restauration-de-couvertures
+F1611,F,16,11,Réalisation et restauration de façades,realisation-et-restauration-de-facades
+F1612,F,16,12,Taille et décoration de pierres,taille-et-decoration-de-pierres
+F1613,F,16,13,Travaux d'étanchéité et d'isolation,travaux-d-etancheite-et-d-isolation
+F1701,F,17,01,Construction en béton,construction-en-beton
+F1702,F,17,02,Construction de routes et voies,construction-de-routes-et-voies
+F1703,F,17,03,Maçonnerie,maconnerie
+F1704,F,17,04,Préparation du gros oeuvre et des travaux publics,preparation-du-gros-oeuvre-et-des-travaux-publics
+F1705,F,17,05,Pose de canalisations,pose-de-canalisations
+F1706,F,17,06,Préfabrication en béton industriel,prefabrication-en-beton-industriel
+G1101,G,11,01,Accueil touristique,accueil-touristique
+G1102,G,11,02,Promotion du tourisme local,promotion-du-tourisme-local
+G1201,G,12,01,"Accompagnement de voyages, d'activités culturelles ou sportives",accompagnement-de-voyages-d-activites-culturelles-ou-sportives
+G1202,G,12,02,Animation d'activités culturelles ou ludiques,animation-d-activites-culturelles-ou-ludiques
+G1203,G,12,03,Animation de loisirs auprès d'enfants ou d'adolescents,animation-de-loisirs-aupres-d-enfants-ou-d-adolescents
+G1204,G,12,04,Éducation en activités sportives,education-en-activites-sportives
+G1205,G,12,05,Personnel d'attractions ou de structures de loisirs,personnel-d-attractions-ou-de-structures-de-loisirs
+G1206,G,12,06,Personnel technique des jeux,personnel-technique-des-jeux
+G1301,G,13,01,Conception de produits touristiques,conception-de-produits-touristiques
+G1302,G,13,02,Optimisation de produits touristiques,optimisation-de-produits-touristiques
+G1303,G,13,03,Vente de voyages,vente-de-voyages
+G1401,G,14,01,Assistance de direction d'hôtel-restaurant,assistance-de-direction-d-hotel-restaurant
+G1402,G,14,02,Management d'hôtel-restaurant,management-d-hotel-restaurant
+G1403,G,14,03,Gestion de structure de loisirs ou d'hébergement touristique,gestion-de-structure-de-loisirs-ou-d-hebergement-touristique
+G1404,G,14,04,Management d'établissement de restauration collective,management-d-etablissement-de-restauration-collective
+G1501,G,15,01,Personnel d'étage,personnel-d-etage
+G1502,G,15,02,Personnel polyvalent d'hôtellerie,personnel-polyvalent-d-hotellerie
+G1503,G,15,03,Management du personnel d'étage,management-du-personnel-d-etage
+G1601,G,16,01,Management du personnel de cuisine,management-du-personnel-de-cuisine
+G1602,G,16,02,Personnel de cuisine,personnel-de-cuisine
+G1603,G,16,03,Personnel polyvalent en restauration,personnel-polyvalent-en-restauration
+G1604,G,16,04,Fabrication de crêpes ou pizzas,fabrication-de-crepes-ou-pizzas
+G1605,G,16,05,Plonge en restauration,plonge-en-restauration
+G1701,G,17,01,Conciergerie en hôtellerie,conciergerie-en-hotellerie
+G1702,G,17,02,Personnel du hall,personnel-du-hall
+G1703,G,17,03,Réception en hôtellerie,reception-en-hotellerie
+G1801,G,18,01,"Café, bar brasserie",cafe-bar-brasserie
+G1802,G,18,02,Management du service en restauration,management-du-service-en-restauration
+G1803,G,18,03,Service en restauration,service-en-restauration
+G1804,G,18,04,Sommellerie,sommellerie
+H1101,H,11,01,Assistance et support technique client,assistance-et-support-technique-client
+H1102,H,11,02,Management et ingénierie d'affaires,management-et-ingenierie-d-affaires
+H1201,H,12,01,Expertise technique couleur en industrie,expertise-technique-couleur-en-industrie
+H1202,H,12,02,Conception et dessin de produits électriques et électroniques,conception-et-dessin-de-produits-electriques-et-electroniques
+H1203,H,12,03,Conception et dessin produits mécaniques,conception-et-dessin-produits-mecaniques
+H1204,H,12,04,Design industriel,design-industriel
+H1205,H,12,05,Études - modèles en industrie des matériaux souples,etudes-modeles-en-industrie-des-materiaux-souples
+H1206,H,12,06,"Management et ingénierie études, recherche et développement industriel",management-et-ingenierie-etudes-recherche-et-developpement-industriel
+H1207,H,12,07,Rédaction technique,redaction-technique
+H1208,H,12,08,Intervention technique en études et conception en automatisme,intervention-technique-en-etudes-et-conception-en-automatisme
+H1209,H,12,09,Intervention technique en études et développement électronique,intervention-technique-en-etudes-et-developpement-electronique
+H1210,H,12,10,"Intervention technique en études, recherche et développement",intervention-technique-en-etudes-recherche-et-developpement
+H1301,H,13,01,Inspection de conformité,inspection-de-conformite
+H1302,H,13,02,Management et ingénierie Hygiène Sécurité Environnement -HSE- industriels,management-et-ingenierie-hygiene-securite-environnement-hse-industriels
+H1303,H,13,03,Intervention technique en Hygiène Sécurité Environnement -HSE- industriel,intervention-technique-en-hygiene-securite-environnement-hse-industriel
+H1401,H,14,01,Management et ingénierie gestion industrielle et logistique,management-et-ingenierie-gestion-industrielle-et-logistique
+H1402,H,14,02,Management et ingénierie méthodes et industrialisation,management-et-ingenierie-methodes-et-industrialisation
+H1403,H,14,03,Intervention technique en gestion industrielle et logistique,intervention-technique-en-gestion-industrielle-et-logistique
+H1404,H,14,04,Intervention technique en méthodes et industrialisation,intervention-technique-en-methodes-et-industrialisation
+H1501,H,15,01,Direction de laboratoire d'analyse industrielle,direction-de-laboratoire-d-analyse-industrielle
+H1502,H,15,02,Management et ingénierie qualité industrielle,management-et-ingenierie-qualite-industrielle
+H1503,H,15,03,Intervention technique en laboratoire d'analyse industrielle,intervention-technique-en-laboratoire-d-analyse-industrielle
+H1504,H,15,04,Intervention technique en contrôle essai qualité en électricité et électronique,intervention-technique-en-controle-essai-qualite-en-electricite-et-electronique
+H1505,H,15,05,Intervention technique en formulation et analyse sensorielle,intervention-technique-en-formulation-et-analyse-sensorielle
+H1506,H,15,06,Intervention technique qualité en mécanique et travail des métaux,intervention-technique-qualite-en-mecanique-et-travail-des-metaux
+H2101,H,21,01,Abattage et découpe des viandes,abattage-et-decoupe-des-viandes
+H2102,H,21,02,Conduite d'équipement de production alimentaire,conduite-d-equipement-de-production-alimentaire
+H2201,H,22,01,Assemblage d'ouvrages en bois,assemblage-d-ouvrages-en-bois
+H2202,H,22,02,Conduite d'équipement de fabrication de l'ameublement et du bois,conduite-d-equipement-de-fabrication-de-l-ameublement-et-du-bois
+H2203,H,22,03,Conduite d'installation de production de panneaux bois,conduite-d-installation-de-production-de-panneaux-bois
+H2204,H,22,04,Encadrement des industries de l'ameublement et du bois,encadrement-des-industries-de-l-ameublement-et-du-bois
+H2205,H,22,05,Première transformation de bois d'oeuvre,premiere-transformation-de-bois-d-oeuvre
+H2206,H,22,06,Réalisation de menuiserie bois et tonnellerie,realisation-de-menuiserie-bois-et-tonnellerie
+H2207,H,22,07,Réalisation de meubles en bois,realisation-de-meubles-en-bois
+H2208,H,22,08,Réalisation d'ouvrages décoratifs en bois,realisation-d-ouvrages-decoratifs-en-bois
+H2209,H,22,09,Intervention technique en ameublement et bois,intervention-technique-en-ameublement-et-bois
+H2301,H,23,01,Conduite d'équipement de production chimique ou pharmaceutique,conduite-d-equipement-de-production-chimique-ou-pharmaceutique
+H2401,H,24,01,"Assemblage - montage d'articles en cuirs, peaux",assemblage-montage-d-articles-en-cuirs-peaux
+H2402,H,24,02,Assemblage - montage de vêtements et produits textiles,assemblage-montage-de-vetements-et-produits-textiles
+H2403,H,24,03,Conduite de machine de fabrication de produits textiles,conduite-de-machine-de-fabrication-de-produits-textiles
+H2404,H,24,04,Conduite de machine de production et transformation des fils,conduite-de-machine-de-production-et-transformation-des-fils
+H2405,H,24,05,Conduite de machine de textiles nontissés,conduite-de-machine-de-textiles-nontisses
+H2406,H,24,06,Conduite de machine de traitement textile,conduite-de-machine-de-traitement-textile
+H2407,H,24,07,Conduite de machine de transformation et de finition des cuirs et peaux,conduite-de-machine-de-transformation-et-de-finition-des-cuirs-et-peaux
+H2408,H,24,08,Conduite de machine d'impression textile,conduite-de-machine-d-impression-textile
+H2409,H,24,09,"Coupe cuir, textile et matériaux souples",coupe-cuir-textile-et-materiaux-souples
+H2410,H,24,10,"Mise en forme, repassage et finitions en industrie textile",mise-en-forme-repassage-et-finitions-en-industrie-textile
+H2411,H,24,11,Montage de prototype cuir et matériaux souples,montage-de-prototype-cuir-et-materiaux-souples
+H2412,H,24,12,Patronnage - gradation,patronnage-gradation
+H2413,H,24,13,"Préparation de fils, montage de métiers textiles",preparation-de-fils-montage-de-metiers-textiles
+H2414,H,24,14,Préparation et finition d'articles en cuir et matériaux souples,preparation-et-finition-d-articles-en-cuir-et-materiaux-souples
+H2415,H,24,15,Contrôle en industrie du cuir et du textile,controle-en-industrie-du-cuir-et-du-textile
+H2501,H,25,01,Encadrement de production de matériel électrique et électronique,encadrement-de-production-de-materiel-electrique-et-electronique
+H2502,H,25,02,Management et ingénierie de production,management-et-ingenierie-de-production
+H2503,H,25,03,Pilotage d'unité élémentaire de production mécanique ou de travail des métaux,pilotage-d-unite-elementaire-de-production-mecanique-ou-de-travail-des-metaux
+H2504,H,25,04,Encadrement d'équipe en industrie de transformation,encadrement-d-equipe-en-industrie-de-transformation
+H2505,H,25,05,Encadrement d'équipe ou d'atelier en matériaux souples,encadrement-d-equipe-ou-d-atelier-en-materiaux-souples
+H2601,H,26,01,Bobinage électrique,bobinage-electrique
+H2602,H,26,02,Câblage électrique et électromécanique,cablage-electrique-et-electromecanique
+H2603,H,26,03,"Conduite d'installation automatisée de production électrique, électronique et microélectronique",conduite-d-installation-automatisee-de-production-electrique-electronique-et-microelectronique
+H2604,H,26,04,Montage de produits électriques et électroniques,montage-de-produits-electriques-et-electroniques
+H2605,H,26,05,Montage et câblage électronique,montage-et-cablage-electronique
+H2701,H,27,01,Pilotage d'installation énergétique et pétrochimique,pilotage-d-installation-energetique-et-petrochimique
+H2801,H,28,01,Conduite d'équipement de transformation du verre,conduite-d-equipement-de-transformation-du-verre
+H2802,H,28,02,Conduite d'installation de production de matériaux de construction,conduite-d-installation-de-production-de-materiaux-de-construction
+H2803,H,28,03,Façonnage et émaillage en industrie céramique,faconnage-et-emaillage-en-industrie-ceramique
+H2804,H,28,04,"Pilotage de centrale à béton prêt à l'emploi, ciment, enrobés et granulats",pilotage-de-centrale-a-beton-pret-a-l-emploi-ciment-enrobes-et-granulats
+H2805,H,28,05,Pilotage d'installation de production verrière,pilotage-d-installation-de-production-verriere
+H2901,H,29,01,Ajustement et montage de fabrication,ajustement-et-montage-de-fabrication
+H2902,H,29,02,Chaudronnerie - tôlerie,chaudronnerie-tolerie
+H2903,H,29,03,Conduite d'équipement d'usinage,conduite-d-equipement-d-usinage
+H2904,H,29,04,Conduite d'équipement de déformation des métaux,conduite-d-equipement-de-deformation-des-metaux
+H2905,H,29,05,Conduite d'équipement de formage et découpage des matériaux,conduite-d-equipement-de-formage-et-decoupage-des-materiaux
+H2906,H,29,06,Conduite d'installation automatisée ou robotisée de fabrication mécanique,conduite-d-installation-automatisee-ou-robotisee-de-fabrication-mecanique
+H2907,H,29,07,Conduite d'installation de production des métaux,conduite-d-installation-de-production-des-metaux
+H2908,H,29,08,Modelage de matériaux non métalliques,modelage-de-materiaux-non-metalliques
+H2909,H,29,09,Montage-assemblage mécanique,montage-assemblage-mecanique
+H2910,H,29,10,Moulage sable,moulage-sable
+H2911,H,29,11,Réalisation de structures métalliques,realisation-de-structures-metalliques
+H2912,H,29,12,Réglage d'équipement de production industrielle,reglage-d-equipement-de-production-industrielle
+H2913,H,29,13,Soudage manuel,soudage-manuel
+H2914,H,29,14,Réalisation et montage en tuyauterie,realisation-et-montage-en-tuyauterie
+H3101,H,31,01,Conduite d'équipement de fabrication de papier ou de carton,conduite-d-equipement-de-fabrication-de-papier-ou-de-carton
+H3102,H,31,02,Conduite d'installation de pâte à papier,conduite-d-installation-de-pate-a-papier
+H3201,H,32,01,Conduite d'équipement de formage des plastiques et caoutchoucs,conduite-d-equipement-de-formage-des-plastiques-et-caoutchoucs
+H3202,H,32,02,Réglage d'équipement de formage des plastiques et caoutchoucs,reglage-d-equipement-de-formage-des-plastiques-et-caoutchoucs
+H3203,H,32,03,Fabrication de pièces en matériaux composites,fabrication-de-pieces-en-materiaux-composites
+H3301,H,33,01,Conduite d'équipement de conditionnement,conduite-d-equipement-de-conditionnement
+H3302,H,33,02,"Opérations manuelles d'assemblage, tri ou emballage",operations-manuelles-d-assemblage-tri-ou-emballage
+H3303,H,33,03,"Préparation de matières et produits industriels (broyage, mélange, ...)",preparation-de-matieres-et-produits-industriels-broyage-melange
+H3401,H,34,01,Conduite de traitement d'abrasion de surface,conduite-de-traitement-d-abrasion-de-surface
+H3402,H,34,02,Conduite de traitement par dépôt de surface,conduite-de-traitement-par-depot-de-surface
+H3403,H,34,03,Conduite de traitement thermique,conduite-de-traitement-thermique
+H3404,H,34,04,Peinture industrielle,peinture-industrielle
+I1101,I,11,01,Direction et ingénierie en entretien infrastructure et bâti,direction-et-ingenierie-en-entretien-infrastructure-et-bati
+I1102,I,11,02,Management et ingénierie de maintenance industrielle,management-et-ingenierie-de-maintenance-industrielle
+I1103,I,11,03,Supervision d'entretien et gestion de véhicules,supervision-d-entretien-et-gestion-de-vehicules
+I1201,I,12,01,Entretien d'affichage et mobilier urbain,entretien-d-affichage-et-mobilier-urbain
+I1202,I,12,02,Entretien et surveillance du tracé routier,entretien-et-surveillance-du-trace-routier
+I1203,I,12,03,Maintenance des bâtiments et des locaux,maintenance-des-batiments-et-des-locaux
+I1301,I,13,01,Installation et maintenance d'ascenseurs,installation-et-maintenance-d-ascenseurs
+I1302,I,13,02,Installation et maintenance d'automatismes,installation-et-maintenance-d-automatismes
+I1303,I,13,03,Installation et maintenance de distributeurs automatiques,installation-et-maintenance-de-distributeurs-automatiques
+I1304,I,13,04,Installation et maintenance d'équipements industriels et d'exploitation,installation-et-maintenance-d-equipements-industriels-et-d-exploitation
+I1305,I,13,05,Installation et maintenance électronique,installation-et-maintenance-electronique
+I1306,I,13,06,"Installation et maintenance en froid, conditionnement d'air",installation-et-maintenance-en-froid-conditionnement-d-air
+I1307,I,13,07,Installation et maintenance télécoms et courants faibles,installation-et-maintenance-telecoms-et-courants-faibles
+I1308,I,13,08,Maintenance d'installation de chauffage,maintenance-d-installation-de-chauffage
+I1309,I,13,09,Maintenance électrique,maintenance-electrique
+I1310,I,13,10,Maintenance mécanique industrielle,maintenance-mecanique-industrielle
+I1401,I,14,01,Maintenance informatique et bureautique,maintenance-informatique-et-bureautique
+I1402,I,14,02,Réparation de biens électrodomestiques,reparation-de-biens-electrodomestiques
+I1501,I,15,01,Intervention en grande hauteur,intervention-en-grande-hauteur
+I1502,I,15,02,Intervention en milieu subaquatique,intervention-en-milieu-subaquatique
+I1503,I,15,03,Intervention en milieux et produits nocifs,intervention-en-milieux-et-produits-nocifs
+I1601,I,16,01,Installation et maintenance en nautisme,installation-et-maintenance-en-nautisme
+I1602,I,16,02,Maintenance d'aéronefs,maintenance-d-aeronefs
+I1603,I,16,03,"Maintenance d'engins de chantier, levage, manutention et de machines agricoles",maintenance-d-engins-de-chantier-levage-manutention-et-de-machines-agricoles
+I1604,I,16,04,Mécanique automobile et entretien de véhicules,mecanique-automobile-et-entretien-de-vehicules
+I1605,I,16,05,Mécanique de marine,mecanique-de-marine
+I1606,I,16,06,Réparation de carrosserie,reparation-de-carrosserie
+I1607,I,16,07,"Réparation de cycles, motocycles et motoculteurs de loisirs",reparation-de-cycles-motocycles-et-motoculteurs-de-loisirs
+J1101,J,11,01,Médecine de prévention,medecine-de-prevention
+J1102,J,11,02,Médecine généraliste et spécialisée,medecine-generaliste-et-specialisee
+J1103,J,11,03,Médecine dentaire,medecine-dentaire
+J1104,J,11,04,Suivi de la grossesse et de l'accouchement,suivi-de-la-grossesse-et-de-l-accouchement
+J1201,J,12,01,Biologie médicale,biologie-medicale
+J1202,J,12,02,Pharmacie,pharmacie
+J1301,J,13,01,Personnel polyvalent des services hospitaliers,personnel-polyvalent-des-services-hospitaliers
+J1302,J,13,02,Analyses médicales,analyses-medicales
+J1303,J,13,03,Assistance médico-technique,assistance-medico-technique
+J1304,J,13,04,Aide en puériculture,aide-en-puericulture
+J1305,J,13,05,Conduite de véhicules sanitaires,conduite-de-vehicules-sanitaires
+J1306,J,13,06,Imagerie médicale,imagerie-medicale
+J1307,J,13,07,Préparation en pharmacie,preparation-en-pharmacie
+J1401,J,14,01,Audioprothèses,audioprotheses
+J1402,J,14,02,Diététique,dietetique
+J1403,J,14,03,Ergothérapie,ergotherapie
+J1404,J,14,04,Kinésithérapie,kinesitherapie
+J1405,J,14,05,Optique - lunetterie,optique-lunetterie
+J1406,J,14,06,Orthophonie,orthophonie
+J1407,J,14,07,Orthoptique,orthoptique
+J1408,J,14,08,Ostéopathie et chiropraxie,osteopathie-et-chiropraxie
+J1409,J,14,09,Pédicurie et podologie,pedicurie-et-podologie
+J1410,J,14,10,Prothèses dentaires,protheses-dentaires
+J1411,J,14,11,Prothèses et orthèses,protheses-et-ortheses
+J1412,J,14,12,Rééducation en psychomotricité,reeducation-en-psychomotricite
+J1501,J,15,01,"Soins d'hygiène, de confort du patient",soins-d-hygiene-de-confort-du-patient
+J1502,J,15,02,Coordination de services médicaux ou paramédicaux,coordination-de-services-medicaux-ou-paramedicaux
+J1503,J,15,03,Soins infirmiers spécialisés en anesthésie,soins-infirmiers-specialises-en-anesthesie
+J1504,J,15,04,Soins infirmiers spécialisés en bloc opératoire,soins-infirmiers-specialises-en-bloc-operatoire
+J1505,J,15,05,Soins infirmiers spécialisés en prévention,soins-infirmiers-specialises-en-prevention
+J1506,J,15,06,Soins infirmiers généralistes,soins-infirmiers-generalistes
+J1507,J,15,07,Soins infirmiers spécialisés en puériculture,soins-infirmiers-specialises-en-puericulture
+K1101,K,11,01,Accompagnement et médiation familiale,accompagnement-et-mediation-familiale
+K1102,K,11,02,Aide aux bénéficiaires d'une mesure de protection juridique,aide-aux-beneficiaires-d-une-mesure-de-protection-juridique
+K1103,K,11,03,Développement personnel et bien-être de la personne,developpement-personnel-et-bien-etre-de-la-personne
+K1104,K,11,04,Psychologie,psychologie
+K1201,K,12,01,Action sociale,action-sociale
+K1202,K,12,02,Éducation de jeunes enfants,education-de-jeunes-enfants
+K1203,K,12,03,Encadrement technique en insertion professionnelle,encadrement-technique-en-insertion-professionnelle
+K1204,K,12,04,Médiation sociale et facilitation de la vie en société,mediation-sociale-et-facilitation-de-la-vie-en-societe
+K1205,K,12,05,Information sociale,information-sociale
+K1206,K,12,06,Intervention socioculturelle,intervention-socioculturelle
+K1207,K,12,07,Intervention socioéducative,intervention-socioeducative
+K1301,K,13,01,Accompagnement médicosocial,accompagnement-medicosocial
+K1302,K,13,02,Assistance auprès d'adultes,assistance-aupres-d-adultes
+K1303,K,13,03,Assistance auprès d'enfants,assistance-aupres-d-enfants
+K1304,K,13,04,Services domestiques,services-domestiques
+K1305,K,13,05,Intervention sociale et familiale,intervention-sociale-et-familiale
+K1401,K,14,01,Conception et pilotage de la politique des pouvoirs publics,conception-et-pilotage-de-la-politique-des-pouvoirs-publics
+K1402,K,14,02,Conseil en Santé Publique,conseil-en-sante-publique
+K1403,K,14,03,"Management de structure de santé, sociale ou pénitentiaire",management-de-structure-de-sante-sociale-ou-penitentiaire
+K1404,K,14,04,Mise en oeuvre et pilotage de la politique des pouvoirs publics,mise-en-oeuvre-et-pilotage-de-la-politique-des-pouvoirs-publics
+K1405,K,14,05,Représentation de l'Etat sur le territoire national ou international,representation-de-l-etat-sur-le-territoire-national-ou-international
+K1501,K,15,01,Application des règles financières publiques,application-des-regles-financieres-publiques
+K1502,K,15,02,Contrôle et inspection des Affaires Sociales,controle-et-inspection-des-affaires-sociales
+K1503,K,15,03,Contrôle et inspection des impôts,controle-et-inspection-des-impots
+K1504,K,15,04,Contrôle et inspection du Trésor Public,controle-et-inspection-du-tresor-public
+K1505,K,15,05,Protection des consommateurs et contrôle des échanges commerciaux,protection-des-consommateurs-et-controle-des-echanges-commerciaux
+K1601,K,16,01,Gestion de l'information et de la documentation,gestion-de-l-information-et-de-la-documentation
+K1602,K,16,02,Gestion de patrimoine culturel,gestion-de-patrimoine-culturel
+K1701,K,17,01,Personnel de la Défense,personnel-de-la-defense
+K1702,K,17,02,Direction de la sécurité civile et des secours,direction-de-la-securite-civile-et-des-secours
+K1703,K,17,03,Direction opérationnelle de la défense,direction-operationnelle-de-la-defense
+K1704,K,17,04,Management de la sécurité publique,management-de-la-securite-publique
+K1705,K,17,05,Sécurité civile et secours,securite-civile-et-secours
+K1706,K,17,06,Sécurité publique,securite-publique
+K1707,K,17,07,Surveillance municipale,surveillance-municipale
+K1801,K,18,01,Conseil en emploi et insertion socioprofessionnelle,conseil-en-emploi-et-insertion-socioprofessionnelle
+K1802,K,18,02,Développement local,developpement-local
+K1901,K,19,01,Aide et médiation judiciaire,aide-et-mediation-judiciaire
+K1902,K,19,02,Collaboration juridique,collaboration-juridique
+K1903,K,19,03,Défense et conseil juridique,defense-et-conseil-juridique
+K1904,K,19,04,Magistrature,magistrature
+K2101,K,21,01,Conseil en formation,conseil-en-formation
+K2102,K,21,02,Coordination pédagogique,coordination-pedagogique
+K2103,K,21,03,Direction d'établissement et d'enseignement,direction-d-etablissement-et-d-enseignement
+K2104,K,21,04,Éducation et surveillance au sein d'établissements d'enseignement,education-et-surveillance-au-sein-d-etablissements-d-enseignement
+K2105,K,21,05,Enseignement artistique,enseignement-artistique
+K2106,K,21,06,Enseignement des écoles,enseignement-des-ecoles
+K2107,K,21,07,Enseignement général du second degré,enseignement-general-du-second-degre
+K2108,K,21,08,Enseignement supérieur,enseignement-superieur
+K2109,K,21,09,Enseignement technique et professionnel,enseignement-technique-et-professionnel
+K2110,K,21,10,Formation en conduite de véhicules,formation-en-conduite-de-vehicules
+K2111,K,21,11,Formation professionnelle,formation-professionnelle
+K2112,K,21,12,Orientation scolaire et professionnelle,orientation-scolaire-et-professionnelle
+K2201,K,22,01,Blanchisserie industrielle,blanchisserie-industrielle
+K2202,K,22,02,Lavage de vitres,lavage-de-vitres
+K2203,K,22,03,Management et inspection en propreté de locaux,management-et-inspection-en-proprete-de-locaux
+K2204,K,22,04,Nettoyage de locaux,nettoyage-de-locaux
+K2301,K,23,01,Distribution et assainissement d'eau,distribution-et-assainissement-d-eau
+K2302,K,23,02,Management et inspection en environnement urbain,management-et-inspection-en-environnement-urbain
+K2303,K,23,03,Nettoyage des espaces urbains,nettoyage-des-espaces-urbains
+K2304,K,23,04,Revalorisation de produits industriels,revalorisation-de-produits-industriels
+K2305,K,23,05,Salubrité et traitement de nuisibles,salubrite-et-traitement-de-nuisibles
+K2306,K,23,06,Supervision d'exploitation éco-industrielle,supervision-d-exploitation-eco-industrielle
+K2401,K,24,01,Recherche en sciences de l'homme et de la société,recherche-en-sciences-de-l-homme-et-de-la-societe
+K2402,K,24,02,"Recherche en sciences de l'univers, de la matière et du vivant",recherche-en-sciences-de-l-univers-de-la-matiere-et-du-vivant
+K2501,K,25,01,Gardiennage de locaux,gardiennage-de-locaux
+K2502,K,25,02,Management de sécurité privée,management-de-securite-privee
+K2503,K,25,03,Sécurité et surveillance privées,securite-et-surveillance-privees
+K2601,K,26,01,Conduite d'opérations funéraires,conduite-d-operations-funeraires
+K2602,K,26,02,Conseil en services funéraires,conseil-en-services-funeraires
+K2603,K,26,03,Thanatopraxie,thanatopraxie
+L1101,L,11,01,Animation musicale et scénique,animation-musicale-et-scenique
+L1102,L,11,02,Mannequinat et pose artistique,mannequinat-et-pose-artistique
+L1103,L,11,03,Présentation de spectacles ou d'émissions,presentation-de-spectacles-ou-d-emissions
+L1201,L,12,01,Danse,danse
+L1202,L,12,02,Musique et chant,musique-et-chant
+L1203,L,12,03,Art dramatique,art-dramatique
+L1204,L,12,04,Arts du cirque et arts visuels,arts-du-cirque-et-arts-visuels
+L1301,L,13,01,Mise en scène de spectacles vivants,mise-en-scene-de-spectacles-vivants
+L1302,L,13,02,"Production et administration spectacle, cinéma et audiovisuel",production-et-administration-spectacle-cinema-et-audiovisuel
+L1303,L,13,03,Promotion d'artistes et de spectacles,promotion-d-artistes-et-de-spectacles
+L1304,L,13,04,Réalisation cinématographique et audiovisuelle,realisation-cinematographique-et-audiovisuelle
+L1401,L,14,01,Sportif professionnel,sportif-professionnel
+L1501,L,15,01,Coiffure et maquillage spectacle,coiffure-et-maquillage-spectacle
+L1502,L,15,02,Costume et habillage spectacle,costume-et-habillage-spectacle
+L1503,L,15,03,Décor et accessoires spectacle,decor-et-accessoires-spectacle
+L1504,L,15,04,Éclairage spectacle,eclairage-spectacle
+L1505,L,15,05,Image cinématographique et télévisuelle,image-cinematographique-et-televisuelle
+L1506,L,15,06,Machinerie spectacle,machinerie-spectacle
+L1507,L,15,07,Montage audiovisuel et post-production,montage-audiovisuel-et-post-production
+L1508,L,15,08,Prise de son et sonorisation,prise-de-son-et-sonorisation
+L1509,L,15,09,Régie générale,regie-generale
+M1101,M,11,01,Achats,achats
+M1102,M,11,02,Direction des achats,direction-des-achats
+M1201,M,12,01,Analyse et ingénierie financière,analyse-et-ingenierie-financiere
+M1202,M,12,02,Audit et contrôle comptables et financiers,audit-et-controle-comptables-et-financiers
+M1203,M,12,03,Comptabilité,comptabilite
+M1204,M,12,04,Contrôle de gestion,controle-de-gestion
+M1205,M,12,05,Direction administrative et financière,direction-administrative-et-financiere
+M1206,M,12,06,Management de groupe ou de service comptable,management-de-groupe-ou-de-service-comptable
+M1207,M,12,07,Trésorerie et financement,tresorerie-et-financement
+M1301,M,13,01,Direction de grande entreprise ou d'établissement public,direction-de-grande-entreprise-ou-d-etablissement-public
+M1302,M,13,02,Direction de petite ou moyenne entreprise,direction-de-petite-ou-moyenne-entreprise
+M1401,M,14,01,Conduite d'enquêtes,conduite-d-enquetes
+M1402,M,14,02,Conseil en organisation et management d'entreprise,conseil-en-organisation-et-management-d-entreprise
+M1403,M,14,03,Études et prospectives socio-économiques,etudes-et-prospectives-socio-economiques
+M1404,M,14,04,Management et gestion d'enquêtes,management-et-gestion-d-enquetes
+M1501,M,15,01,Assistanat en ressources humaines,assistanat-en-ressources-humaines
+M1502,M,15,02,Développement des ressources humaines,developpement-des-ressources-humaines
+M1503,M,15,03,Management des ressources humaines,management-des-ressources-humaines
+M1601,M,16,01,Accueil et renseignements,accueil-et-renseignements
+M1602,M,16,02,Opérations administratives,operations-administratives
+M1603,M,16,03,Distribution de documents,distribution-de-documents
+M1604,M,16,04,Assistanat de direction,assistanat-de-direction
+M1605,M,16,05,Assistanat technique et administratif,assistanat-technique-et-administratif
+M1606,M,16,06,Saisie de données,saisie-de-donnees
+M1607,M,16,07,Secrétariat,secretariat
+M1608,M,16,08,Secrétariat comptable,secretariat-comptable
+M1609,M,16,09,Secrétariat et assistanat médical ou médico-social,secretariat-et-assistanat-medical-ou-medico-social
+M1701,M,17,01,Administration des ventes,administration-des-ventes
+M1702,M,17,02,Analyse de tendance,analyse-de-tendance
+M1703,M,17,03,Management et gestion de produit,management-et-gestion-de-produit
+M1704,M,17,04,Management relation clientèle,management-relation-clientele
+M1705,M,17,05,Marketing,marketing
+M1706,M,17,06,Promotion des ventes,promotion-des-ventes
+M1707,M,17,07,Stratégie commerciale,strategie-commerciale
+M1801,M,18,01,Administration de systèmes d'information,administration-de-systemes-d-information
+M1802,M,18,02,Expertise et support en systèmes d'information,expertise-et-support-en-systemes-d-information
+M1803,M,18,03,Direction des systèmes d'information,direction-des-systemes-d-information
+M1804,M,18,04,Études et développement de réseaux de télécoms,etudes-et-developpement-de-reseaux-de-telecoms
+M1805,M,18,05,Études et développement informatique,etudes-et-developpement-informatique
+M1806,M,18,06,Conseil et maîtrise d'ouvrage en systèmes d'information,conseil-et-maitrise-d-ouvrage-en-systemes-d-information
+M1807,M,18,07,Exploitation de systèmes de communication et de commandement,exploitation-de-systemes-de-communication-et-de-commandement
+M1808,M,18,08,Information géographique,information-geographique
+M1809,M,18,09,Information météorologique,information-meteorologique
+M1810,M,18,10,Production et exploitation de systèmes d'information,production-et-exploitation-de-systemes-d-information
+N1101,N,11,01,Conduite d'engins de déplacement des charges,conduite-d-engins-de-deplacement-des-charges
+N1102,N,11,02,Déménagement,demenagement
+N1103,N,11,03,Magasinage et préparation de commandes,magasinage-et-preparation-de-commandes
+N1104,N,11,04,Manoeuvre et conduite d'engins lourds de manutention,manoeuvre-et-conduite-d-engins-lourds-de-manutention
+N1105,N,11,05,Manutention manuelle de charges,manutention-manuelle-de-charges
+N1201,N,12,01,Affrètement transport,affretement-transport
+N1202,N,12,02,Gestion des opérations de circulation internationale des marchandises,gestion-des-operations-de-circulation-internationale-des-marchandises
+N1301,N,13,01,Conception et organisation de la chaîne logistique,conception-et-organisation-de-la-chaine-logistique
+N1302,N,13,02,Direction de site logistique,direction-de-site-logistique
+N1303,N,13,03,Intervention technique d'exploitation logistique,intervention-technique-d-exploitation-logistique
+N2101,N,21,01,Navigation commerciale aérienne,navigation-commerciale-aerienne
+N2102,N,21,02,Pilotage et navigation technique aérienne,pilotage-et-navigation-technique-aerienne
+N2201,N,22,01,Personnel d'escale aéroportuaire,personnel-d-escale-aeroportuaire
+N2202,N,22,02,Contrôle de la navigation aérienne,controle-de-la-navigation-aerienne
+N2203,N,22,03,Exploitation des pistes aéroportuaires,exploitation-des-pistes-aeroportuaires
+N2204,N,22,04,Préparation des vols,preparation-des-vols
+N2205,N,22,05,Direction d'escale et exploitation aéroportuaire,direction-d-escale-et-exploitation-aeroportuaire
+N3101,N,31,01,Encadrement de la navigation maritime,encadrement-de-la-navigation-maritime
+N3102,N,31,02,Equipage de la navigation maritime,equipage-de-la-navigation-maritime
+N3103,N,31,03,Navigation fluviale,navigation-fluviale
+N3201,N,32,01,Exploitation des opérations portuaires et du transport maritime,exploitation-des-operations-portuaires-et-du-transport-maritime
+N3202,N,32,02,Exploitation du transport fluvial,exploitation-du-transport-fluvial
+N3203,N,32,03,Manutention portuaire,manutention-portuaire
+N4101,N,41,01,Conduite de transport de marchandises sur longue distance,conduite-de-transport-de-marchandises-sur-longue-distance
+N4102,N,41,02,Conduite de transport de particuliers,conduite-de-transport-de-particuliers
+N4103,N,41,03,Conduite de transport en commun sur route,conduite-de-transport-en-commun-sur-route
+N4104,N,41,04,Courses et livraisons express,courses-et-livraisons-express
+N4105,N,41,05,Conduite et livraison par tournées sur courte distance,conduite-et-livraison-par-tournees-sur-courte-distance
+N4201,N,42,01,Direction d'exploitation des transports routiers de marchandises,direction-d-exploitation-des-transports-routiers-de-marchandises
+N4202,N,42,02,Direction d'exploitation des transports routiers de personnes,direction-d-exploitation-des-transports-routiers-de-personnes
+N4203,N,42,03,Intervention technique d'exploitation des transports routiers de marchandises,intervention-technique-d-exploitation-des-transports-routiers-de-marchandises
+N4204,N,42,04,Intervention technique d'exploitation des transports routiers de personnes,intervention-technique-d-exploitation-des-transports-routiers-de-personnes
+N4301,N,43,01,Conduite sur rails,conduite-sur-rails
+N4302,N,43,02,Contrôle des transports en commun,controle-des-transports-en-commun
+N4401,N,44,01,Circulation du réseau ferré,circulation-du-reseau-ferre
+N4402,N,44,02,Exploitation et manoeuvre des remontées mécaniques,exploitation-et-manoeuvre-des-remontees-mecaniques
+N4403,N,44,03,Manoeuvre du réseau ferré,manoeuvre-du-reseau-ferre
