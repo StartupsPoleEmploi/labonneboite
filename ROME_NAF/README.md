@@ -1,3 +1,15 @@
+# Rejouer les traitements
+
+Les codes sources de ce répertoires sont écrit en python 3.
+
+Les traitements de ce répertoires font un large usage de notebooks jupyter écrits en python. Un [notebook jupyter](http://jupyter.org/) est un environnement de développement intégré dans un navigateur web, permettant d'exécuter du code par étapes et d'en partager facilement les résultats.
+
+Pour installer un serveur jupyter : `pip install jupyter`
+
+Le serveur se lance avec la commande `jupyter notebook`. Le serveur est accessible par défaut à l'adresse `localhost:8888` et il est possible de naviger dans l'arborescence pour atteindre un notebook.
+
+Il est souvent préférable de procéder à l'installation au sein d'un environnement virtuel. Voir par exemple [pew](https://github.com/berdario/pew).
+
 
 # Sources de données
 
