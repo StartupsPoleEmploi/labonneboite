@@ -17,7 +17,7 @@ Les fichiers de données sont nettoyés et seules les informations utilisées ul
 
 ## `clean.sh`
 
-Le script `clean.sh` décompresse, supprime les guillements, remplace le séparateur de colonne par pipe (`|`) et crée un échantillon constitué d'une ligne sur 1000 à des fins d'exploration.
+Le script `clean.sh` décompresse, supprime les guillemets, remplace le séparateur de colonne par pipe (`|`) et crée un échantillon constitué d'une ligne sur 1000 à des fins d'exploration.
 
 ## Notebooks
 
@@ -59,6 +59,6 @@ Le notebook `tableau_LBB.ipynb` produit un fichier CSV `tableau_LBB.csv` utilisa
 
 ## Partition des codes OGR d'un code ROME
 
-Un code ROME peut se révélé trop imprécis, voir par exemple `ROME_D1106` qui détaille les statistiques d'embauches sur le code ROME D1106 (Vente en alimentation). Ce code ROME regroupe des métiers très différents (Vendeur / Vendeuse en boulangerie-pâtisserie, Vendeur / Vendeuse en poissonnerie...).
+Un code ROME peut se révéler trop imprécis, voir par exemple `ROME_D1106` qui détaille les statistiques d'embauches sur le code ROME D1106 (Vente en alimentation). Ce code ROME regroupe des métiers très différents (Vendeur / Vendeuse en boulangerie-pâtisserie, Vendeur / Vendeuse en poissonnerie...).
 
 Le notebook `meta_OGR.ipynb` propose une méthode de regroupement des différents codes OGR d'un code ROME donné faisant sens pour le demandeur d'emploi.
