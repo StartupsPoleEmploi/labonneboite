@@ -63,3 +63,4 @@ srv
 
 # Data
 ROME_NAF/opendata/sir*.csv
+ROME_NAF/*.csv
