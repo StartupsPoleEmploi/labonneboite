@@ -9,27 +9,7 @@
     <h2>Demande de modification des informations de mon entreprise</h2>
 
     <form class="form-vertical" action="" method="post">
-
-      {% for field in form if field.widget.input_type != 'hidden' %}
-      <div{% if field.errors %} class="form-error"{% endif %}>
-        {{ field.label }}
-        {{ field() }}
-        {% if field.errors %}
-        <ul class="form-errorlist">
-          {% for error in field.errors %}
-            <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
-      {% endfor %}
-
-      {{ form.hidden_tag() }}
-
-      <p>
-        <input class="btn" type="submit" value="Envoyer">
-      </p>
-
+      {% include "includes/form_content.html" %}
     </form>
 
   </div>

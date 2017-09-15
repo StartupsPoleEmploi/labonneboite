@@ -108,6 +108,7 @@ def register_blueprints(flask_app):
     """
     from labonneboite.web.api.views import apiBlueprint
     from labonneboite.web.auth.views import authBlueprint
+    from labonneboite.web.data.views import dataBlueprint
     from labonneboite.web.health.views import healthBlueprint
     from labonneboite.web.office.views import officeBlueprint
     from labonneboite.web.root.views import rootBlueprint
@@ -116,6 +117,7 @@ def register_blueprints(flask_app):
     from social_flask.routes import social_auth
     flask_app.register_blueprint(apiBlueprint, url_prefix='/api/v1')
     flask_app.register_blueprint(authBlueprint, url_prefix='/authentication')
+    flask_app.register_blueprint(dataBlueprint, url_prefix='/data')
     flask_app.register_blueprint(healthBlueprint, url_prefix='/health')
     flask_app.register_blueprint(officeBlueprint)
     flask_app.register_blueprint(rootBlueprint)

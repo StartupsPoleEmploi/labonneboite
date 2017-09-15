@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="lbb-content">
+  <div class="lbb-single-column-content">
+
+    <ol class="breadcrumb">
+        <li>
+          {% if current_tab == 'nafs_for_rome' %}ROME/NAF
+          {% else %}<a href="{{ url_for('data.nafs_for_rome') }}">ROME/NAF</a>{% endif %}
+        </li>
+        <li>
+          {% if current_tab == 'romes_for_naf' %}NAF/ROME
+          {% else %}<a href="{{ url_for('data.romes_for_naf') }}">NAF/ROME</a>{% endif %}
+        </li>
+        <li>
+          {% if current_tab == 'romes_for_siret' %}SIRET/ROME
+          {% else %}<a href="{{ url_for('data.romes_for_siret') }}">SIRET/ROME</a>{% endif %}
+        </li>
+    </ol>
+
+    {% block data_content %}{% endblock %}
+
+  </div>
+</div>
+{% endblock %}

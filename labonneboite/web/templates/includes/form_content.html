@@ -1,0 +1,39 @@
+{#
+
+Generic form content rendering.
+
+If you have multiple forms, you can use the `with` statement, e.g.:
+
+  {% with form=form1 %}
+    <form class="form-vertical" action="" method="post">
+      {% include "includes/form_content.html" %}
+    </form>
+  {% endwith %}
+
+  {% with form=form2 %}
+    <form class="form-vertical" action="" method="post">
+      {% include "includes/form_content.html" %}
+    </form>
+  {% endwith %}
+
+#}
+{% for field in form if field.widget.input_type != 'hidden' %}
+  <div{% if field.errors %} class="form-error"{% endif %}>
+    {{ field.label }}
+    {{ field() }}
+    {% if field.description %}<p class="form-help-text">{{ field.description }}</p>{% endif %}
+    {% if field.errors %}
+    <ul class="form-errorlist">
+      {% for error in field.errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+{% endfor %}
+
+{{ form.hidden_tag() }}
+
+<p>
+  <input class="btn" type="submit" value="Envoyer">
+</p>

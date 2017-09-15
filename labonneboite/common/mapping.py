@@ -1,12 +1,17 @@
 # coding: utf8
 
+from collections import namedtuple
 import logging
+
+from slugify import slugify
 
 from labonneboite.common.load_data import load_ogr_rome_codes, load_manual_rome_naf_file
 from labonneboite.conf import settings
-from slugify import slugify
+from labonneboite.conf.common.naf_codes import NAF_CODES
+
 
 logger = logging.getLogger('main')
+
 
 OGR_ROME_CODES = load_ogr_rome_codes()
 ROME_CODES = OGR_ROME_CODES.values()
@@ -16,6 +21,7 @@ SLUGIFIED_ROME_LABELS = {slugify(v): k for k, v in settings.ROME_DESCRIPTIONS.it
 NAF_CODES_FROM_ROME_NAF_MAPPING = set()
 MANUAL_ROME_NAF_MAPPING = {}
 MANUAL_NAF_ROME_MAPPING = {}
+
 
 def load_manual_rome_naf_mapping():
     reader = load_manual_rome_naf_file()
@@ -79,3 +85,35 @@ class Rome2NafMapper(object):
                 else:
                     naf_codes.add(naf)
         return list(naf_codes)
+
+    def romes_for_naf(self, naf):
+        """
+        Returns ROME codes matching the given NAF code as a list of named tuples ordered by the number of hires.
+        E.g. for NAF 4212Z:
+        [
+            Rome(code='F1702', name=u'Construction de routes et voies', nafs={'4212Z': 395, '8130Z': 112}),
+            Rome(code='F1201', name=u'Conduite de travaux du BTP', nafs={'4212Z': 86, '7810Z': 17}),
+            Rome(code='N4403', name=u'Manoeuvre du réseau ferré', nafs={'4910Z': 12, '4920Z': 8}),
+            ...
+        ]
+        """
+        romes_for_naf = {k: v for (k, v) in self.rome_2_naf_dict.items() if naf in v}
+        romes_for_naf = sorted(romes_for_naf.items(), key=lambda (k, v): v[naf], reverse=True)
+        Rome = namedtuple('Rome', ['code', 'name', 'nafs'])
+        return [Rome(rome[0], settings.ROME_DESCRIPTIONS[rome[0]], rome[1]) for rome in romes_for_naf]
+
+    def nafs_for_rome(self, rome):
+        """
+        Returns NAF codes matching the given ROME code as a list of named tuples ordered by the number of hires.
+        E.g. for ROME M1607:
+        [
+            Naf(code='8810A', name=u'Aide à domicile', hirings=2830),
+            Naf(code='6831Z', name=u'Agences immobilières', hirings=897),
+            Naf(code='8422Z', name=u'Défense', hirings=6),
+            ...
+        ]
+        """
+        nafs = self.rome_2_naf_dict.get(rome, {})
+        nafs = sorted(nafs.items(), key=lambda (k, v): v, reverse=True)
+        Naf = namedtuple('Naf', ['code', 'name', 'hirings'])
+        return [Naf(naf[0], NAF_CODES[naf[0]], naf[1]) for naf in nafs]

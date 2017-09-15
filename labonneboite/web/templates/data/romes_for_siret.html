@@ -1,0 +1,28 @@
+{% extends 'data/base.html' %}
+
+{% block title %}Codes ROME associés à un SIRET{{ super() }}{% endblock %}
+
+{% block data_content %}
+
+  <h2>Codes ROME associés à un SIRET</h2>
+
+  <form class="form-vertical" action="" method="get">
+    {% include "includes/form_content.html" %}
+  </form>
+
+  {% if romes %}
+    <p>Codes ROME associés au SIRET <b>{{ siret }}</b> dont le code NAF est <b>{{ naf }}</b> ({{ naf_name }}) :</p>
+    <ul>
+    {% for rome in romes %}
+      <li>
+        <b>{{ rome.code }}</b>
+        -
+        {{ rome.name }}
+        <span class="badge badge-info">{{ rome.nafs[naf] }}</span>
+        <small>[<a href="{{ url_for('data.nafs_for_rome', rome=rome.code) }}">Voir les NAF associés</a>]</small>
+      </li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+
+{% endblock %}
