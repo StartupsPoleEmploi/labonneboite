@@ -106,15 +106,21 @@ class OfficeAdminUpdate(CRUDMixin, Base):
 
     __tablename__ = 'etablissements_admin_update'
 
+    ROMES_SEPARATORS = [u'\n', u'\r']
+
     id = Column(Integer, primary_key=True)
     siret = Column(String(191), nullable=False, unique=True)
     name = Column(String(191), default='', nullable=False)
 
     # Info to update.
-    new_score = Column(Integer, nullable=True)  # Set it to 100 to promote the offfice.
     new_email = Column(String(191), default='', nullable=False)
     new_phone = Column(String(191), default='', nullable=False)
     new_website = Column(String(191), default='', nullable=False)
+    # Set `new_score` to 100 to promote the offfice.
+    new_score = Column(Integer, nullable=True)
+    # Stores a list of ROME codes as a string separated by `ROMES_SEPARATORS`.
+    # If `romes_to_boost` is populated, the `new_score` will be set only for specified ROME codes.
+    romes_to_boost = Column(Text, default='', nullable=False)
 
     # Info to remove.
     remove_email = Column(Boolean, default=False, nullable=False)
@@ -141,6 +147,27 @@ class OfficeAdminUpdate(CRUDMixin, Base):
         'order_by': desc(date_created),  # Default order_by for all queries.
     }
 
+    def clean(self):
+        """
+        Clean some fields before saving or updating the instance.
+        This method should not be called manually since it's automatically triggered
+        on a `before_insert` or `before_update` event via `listens_for`.
+        """
+        # Remove multiple newlines in `romes_to_boost`.
+        separator = self.ROMES_SEPARATORS[0]
+        self.romes_to_boost = separator.join(self.romes_as_list(self.romes_to_boost))
+
+    @staticmethod
+    def romes_as_list(codes):
+        """
+        Converts the given string of ROME codes to a Python list of unique ROME codes.
+        """
+        if not codes:
+            return []
+        separators = OfficeAdminUpdate.ROMES_SEPARATORS
+        codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
+        return sorted(set(codes))
+
 
 class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     """
@@ -158,7 +185,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     # Stores a list of french "codes communes (INSEE)" and/or french "departements" as a string
     # separated by `GEOLOCATIONS_TEXT_SEPARATORS`.
     codes = Column(Text, nullable=False)
-    # Stores a JSON object of latitude/longitude coordinates for each entry in `geolocations_text`.
+    # Stores a JSON object of latitude/longitude coordinates found in each entry of `self.codes`.
     geolocations = Column(Text, nullable=False)
     # After this date, extra geolocations will be considered obsolete.
     date_end = Column(DateTime, default=datetime.datetime.utcnow() + relativedelta(months=3), nullable=False)
@@ -175,6 +202,10 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     created_by = relationship('User', foreign_keys=[created_by_id])
     updated_by = relationship('User', foreign_keys=[updated_by_id])
 
+    __mapper_args__ = {
+        'order_by': desc(date_created),  # Default order_by for all queries.
+    }
+
     def clean(self):
         """
         Clean some fields before saving or updating the instance.
@@ -182,7 +213,8 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         on a `before_insert` or `before_update` event via `listens_for`.
         """
         # Remove multiple newlines in `codes`.
-        self.codes = '\n'.join(self.codes_as_list(self.codes))
+        separator = self.GEOLOCATIONS_TEXT_SEPARATORS[0]
+        self.codes = separator.join(self.codes_as_list(self.codes))
         # Get and store the content of `geolocations` as JSON.
         self.geolocations = self.codes_as_json_geolocations(self.codes)
 
@@ -217,7 +249,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     @staticmethod
     def codes_as_list(codes):
         """
-        Converts the given string of codes to a Python list of codes.
+        Converts the given string of codes to a Python list of unique codes.
         """
         if not codes:
             return []
@@ -256,10 +288,12 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         return json.dumps(OfficeAdminExtraGeoLocation.codes_as_geolocations(codes))
 
 
+@listens_for(OfficeAdminUpdate, 'before_insert')
+@listens_for(OfficeAdminUpdate, 'before_update')
 @listens_for(OfficeAdminExtraGeoLocation, 'before_insert')
 @listens_for(OfficeAdminExtraGeoLocation, 'before_update')
 def clean(mapper, connect, self):
     """
-    Trigger the `OfficeAdminExtraGeoLocation.clean()` method before an insert or an update.
+    Trigger the `clean()` method before an insert or an update.
     """
     self.clean()

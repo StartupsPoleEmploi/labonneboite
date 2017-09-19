@@ -9,14 +9,14 @@ from sqlalchemy import inspect
 
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import geocoding
+from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
+from labonneboite.common import scoring as scoring_util
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_codes
 from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
-from labonneboite.common import scoring as scoring_util
-from labonneboite.common import mapping as mapping_util
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -348,7 +348,10 @@ def get_office_as_es_doc(office):
     return doc
 
 
-def inject_office_rome_scores_into_es_doc(office, doc):
+def inject_office_rome_scores_into_es_doc(office, doc, romes_to_boost=None):
+    if not romes_to_boost:
+        romes_to_boost = []
+
     # fetch all rome_codes mapped to the naf of this office
     # as we will compute a score adjusted for each of them
     try:
@@ -358,14 +361,34 @@ def inject_office_rome_scores_into_es_doc(office, doc):
         rome_codes = []
 
     for rome_code in rome_codes:
-        office_score_for_current_rome = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-            score=office.score,
-            rome_code=rome_code,
-            naf_code=office.naf
-        )
-        if office_score_for_current_rome >= SCORE_FOR_ROME_MINIMUM:
+
+        score = 0
+
+        # Boost the score for all ROME codes.
+        # @vermeer guaranteed that a "real" score will never be equal to 100.
+        if office.score == 100 and not romes_to_boost:
+            score = 100
+
+        # Boost the score for some ROME codes only.
+        elif office.score == 100 and romes_to_boost:
+            if rome_code in romes_to_boost:
+                score = 100
+            else:
+                score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                    score=office.score,
+                    rome_code=rome_code,
+                    naf_code=office.naf)
+
+        # Get the non-boosted score.
+        else:
+            score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                score=office.score,
+                rome_code=rome_code,
+                naf_code=office.naf)
+
+        if score >= SCORE_FOR_ROME_MINIMUM:
             st.increment_office_score_for_rome_count()
-            doc['score_for_rome_%s' % rome_code] = office_score_for_current_rome
+            doc['score_for_rome_%s' % rome_code] = score
 
     return doc
 
@@ -510,8 +533,9 @@ def update_offices(index=INDEX_NAME):
             # Apply changes in ElasticSearch.
             body = {'doc': {'email': office.email, 'phone': office.tel, 'website': office.website}}
             if office_to_update.new_score:
+                romes_to_boost = office_to_update.romes_as_list(office_to_update.romes_to_boost)
                 body['doc']['score'] = office_to_update.new_score
-                body['doc'] = inject_office_rome_scores_into_es_doc(office, body['doc'])
+                body['doc'] = inject_office_rome_scores_into_es_doc(office, body['doc'], romes_to_boost)
             es.update(index=index, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body, ignore=404)
 
             # Delete the current PDF, it will be regenerated at next download attempt.

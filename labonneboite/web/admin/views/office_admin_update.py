@@ -1,9 +1,13 @@
 # coding: utf8
+from flask import flash
+from flask import Markup
 from flask_admin.contrib.sqla import ModelView
 from wtforms import validators
 
-from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
+from labonneboite.common import mapping as mapping_util
+from labonneboite.common.models import Office, OfficeAdminUpdate
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter, siret_validator
+from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 
 
 class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
@@ -29,6 +33,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'siret',
         'name',
         'new_score',
+        'romes_to_boost',
         'new_email',
         'new_phone',
         'new_website',
@@ -47,6 +52,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     ]
 
     column_formatters = {
+        'romes_to_boost': lambda view, context, model, name: model.romes_as_list(model.romes_to_boost),
         'date_created': datetime_format,
         'date_updated': datetime_format,
     }
@@ -56,6 +62,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'name': u"Nom de l'entreprise",
         'reason': u"Raison",
         'new_score': u"Nouveau score",
+        'romes_to_boost': u"Booster le score par ROME",
         'new_email': u"Nouvel email",
         'new_phone': u"Nouveau téléphone",
         'new_website': u"Nouveau site web",
@@ -78,6 +85,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'requested_by_last_name': u"Nom de la personne qui demande la suppression.",
         'requested_by_phone': u"Téléphone de la personne qui demande la suppression.",
         'new_score': u"100 pour forcer le positionnement en tête des résultats (boost), sinon laisser vide",
+        'romes_to_boost': u"Veuillez entrer un ROME par ligne. Si ce champ est renseigné, "
+            + u"le score sera forcé uniquement pour les ROME spécifiés.",
         'new_email': u"Laisser vide s'il n'y a pas de modification à apporter",
         'new_phone': u"Laisser vide s'il n'y a pas de modification à apporter",
         'new_website': u"Laisser vide s'il n'y a pas de modification à apporter",
@@ -91,6 +100,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'siret',
         'name',
         'new_score',
+        'romes_to_boost',
         'new_email',
         'new_phone',
         'new_website',
@@ -114,6 +124,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         },
         'new_score': {
             'validators': [validators.optional(), validators.NumberRange(min=0, max=100)],
+        },
+        'romes_to_boost': {
+            'filters': [strip_filter],
         },
         'new_email': {
             'validators': [validators.optional(), validators.Email()],
@@ -143,3 +156,41 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             'filters': [strip_filter],
         },
     }
+
+
+    def validate_form(self, form):
+        is_valid = super(OfficeAdminUpdateModelView, self).validate_form(form)
+
+        if is_valid and form.data.get('romes_to_boost'):
+
+            romes_to_boost = form.data.get('romes_to_boost')
+
+            if not form.data.get('new_score'):
+                msg = u"Veuillez spécifier le nouveau score."
+                flash(msg, 'error')
+                return False
+
+            office_to_update = Office.query.filter_by(siret=form.data['siret']).first()
+            if not office_to_update:
+                msg = u"Le siret `%s` n'est pas présent sur LBB." % form.data['siret']
+                flash(msg, 'error')
+                return False
+
+            mapper = mapping_util.Rome2NafMapper()
+            office_romes = [item.code for item in mapper.romes_for_naf(office_to_update.naf)]
+            for rome in OfficeAdminUpdate.romes_as_list(romes_to_boost):
+                if not mapper.romes_is_valid(rome):
+                    msg = (
+                        u"`%s` n'est pas un code ROME valide."
+                        u"<br>"
+                        u"Assurez-vous de ne saisir qu'un élément par ligne."
+                        % rome
+                    )
+                    flash(Markup(msg), 'error')
+                    return False
+                if rome not in office_romes:
+                    msg = u"`%s` n'est pas un code ROME lié au NAF de cette entreprise." % rome
+                    flash(msg, 'error')
+                    return False
+
+        return is_valid

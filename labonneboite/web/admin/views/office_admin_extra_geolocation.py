@@ -96,11 +96,12 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
             for code in OfficeAdminExtraGeoLocation.codes_as_list(form.data['codes']):
                 if not any([geocoding.is_departement(code), geocoding.is_commune_id(code)]):
                     msg = (
-                        u"`%s` n'est pas un code commune (INSEE) ou un numéro de département valide. "
-                        u"Assurez-vous de saisir un élément par ligne."
+                        u"`%s` n'est pas un code commune (INSEE) ou un numéro de département valide."
+                        u"<br>"
+                        u"Assurez-vous de ne saisir qu'un élément par ligne."
                         % code
                     )
-                    flash(msg, 'error')
+                    flash(Markup(msg), 'error')
                     return False
 
         return is_valid

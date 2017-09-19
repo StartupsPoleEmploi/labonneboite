@@ -4,9 +4,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError
 from wtforms.validators import DataRequired
 
+from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office
-from labonneboite.conf import settings
-from labonneboite.conf.common.naf_codes import NAF_CODES
 from labonneboite.web.admin.forms import siret_validator
 
 
@@ -26,7 +25,7 @@ class NafForm(FlaskForm):
         csrf = False
 
     def validate_naf(self, field):
-        if field.data and field.data not in NAF_CODES:
+        if field.data and not mapping_util.Rome2NafMapper.naf_is_valid(field.data):
             raise ValidationError(u"Ce code NAF n'est pas valide.")
 
 
@@ -46,7 +45,7 @@ class RomeForm(FlaskForm):
         csrf = False
 
     def validate_rome(self, field):
-        if field.data and field.data not in settings.ROME_DESCRIPTIONS:
+        if field.data and not mapping_util.Rome2NafMapper.romes_is_valid(field.data):
             raise ValidationError(u"Ce code ROME n'est pas valide.")
 
 

@@ -117,3 +117,17 @@ class Rome2NafMapper(object):
         nafs = sorted(nafs.items(), key=lambda (k, v): v, reverse=True)
         Naf = namedtuple('Naf', ['code', 'name', 'hirings'])
         return [Naf(naf[0], NAF_CODES[naf[0]], naf[1]) for naf in nafs]
+
+    @staticmethod
+    def romes_is_valid(rome):
+        """
+        Returns True if the given ROME code is valid, False otherwise.
+        """
+        return rome in settings.ROME_DESCRIPTIONS
+
+    @staticmethod
+    def naf_is_valid(naf):
+        """
+        Returns True if the given NAF code is valid, False otherwise.
+        """
+        return naf in NAF_CODES
