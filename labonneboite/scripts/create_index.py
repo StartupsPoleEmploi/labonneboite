@@ -204,10 +204,7 @@ mapping_office = {
         },
         "scores_by_rome": {
             "type": "object",
-            "properties" : {
-                "rome": {"type" : "string", "index": "not_analyzed"},
-                "score": {"type" : "integer", "index": "not_analyzed"},
-            },
+            "index": "not_analyzed",
         },
         "headcount": {
             "type": "integer",
