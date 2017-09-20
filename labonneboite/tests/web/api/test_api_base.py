@@ -4,7 +4,6 @@ import time
 
 from labonneboite.common.models import Office
 from labonneboite.tests.test_base import DatabaseTest
-from labonneboite.conf import settings
 from labonneboite.web.api import util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import scoring as scoring_util
@@ -70,11 +69,6 @@ class ApiBaseTest(DatabaseTest):
             }
         }
 
-        for rome_code in settings.ROME_DESCRIPTIONS.keys():
-            request_body["mappings"]["office"]["properties"]["score_for_rome_%s" % rome_code] = {
-                "type": "integer",
-                "index": "not_analyzed"
-            }
         self.es.indices.create(index=self.ES_TEST_INDEX, body=request_body)
 
         # Insert test data into Elasticsearch.
@@ -121,18 +115,20 @@ class ApiBaseTest(DatabaseTest):
             },
         ]
         for i, doc in enumerate(docs, start=1):
-            # build scores for relevant ROME codes
+            # Build scores for relevant ROME codes.
             naf = doc['naf']
             score = doc['score']
             rome_codes = mapping_util.MANUAL_NAF_ROME_MAPPING[naf].keys()
 
+            scores_by_rome = {}
             for rome_code in rome_codes:
-                office_score_for_current_rome = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                scores_by_rome[rome_code] = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
                     score=score,
                     rome_code=rome_code,
                     naf_code=naf
                 )
-                doc['score_for_rome_%s' % rome_code] = office_score_for_current_rome
+            if scores_by_rome:
+                doc['scores_by_rome'] = scores_by_rome
 
             self.es.index(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
 

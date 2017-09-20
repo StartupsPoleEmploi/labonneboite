@@ -351,10 +351,11 @@ def build_json_body_elastic_search(
             }
         }
     else:
-        field_name = "score_for_rome_%s" % rome_code
+        field_name = "scores_by_rome.%s" % rome_code
         score_sort = {
             field_name: {
-                "order": "desc"
+                "order": "desc",
+                "ignore_unmapped": True,
             }
         }
         score_for_rome_filter = {

@@ -202,6 +202,13 @@ mapping_office = {
             "type": "integer",
             "index": "not_analyzed",
         },
+        "scores_by_rome": {
+            "type": "object",
+            "properties" : {
+                "rome": {"type" : "string", "index": "not_analyzed"},
+                "score": {"type" : "integer", "index": "not_analyzed"},
+            },
+        },
         "headcount": {
             "type": "integer",
             "index": "not_analyzed",
@@ -227,16 +234,6 @@ request_body = {
         "office": mapping_office,
     },
 }
-
-def add_scores_to_request_body():
-    for rome_code in settings.ROME_DESCRIPTIONS.keys():
-        request_body["mappings"]["office"]["properties"]["score_for_rome_%s" % rome_code] = {
-            "type": "integer",
-            "index": "not_analyzed"
-        }
-
-
-add_scores_to_request_body()
 
 
 def drop_and_create_index(index=INDEX_NAME):
@@ -343,12 +340,15 @@ def get_office_as_es_doc(office):
             {'lat': office.y, 'lon': office.x},
         ]
 
-    doc = inject_office_rome_scores_into_es_doc(office, doc)
+    scores_by_rome = get_scores_by_rome(office)
+    if scores_by_rome:
+        doc['scores_by_rome'] = scores_by_rome
 
     return doc
 
 
-def inject_office_rome_scores_into_es_doc(office, doc, office_to_update=None):
+def get_scores_by_rome(office, office_to_update=None):
+    scores_by_rome = {}
 
     # fetch all rome_codes mapped to the naf of this office
     # as we will compute a score adjusted for each of them
@@ -365,6 +365,7 @@ def inject_office_rome_scores_into_es_doc(office, doc, office_to_update=None):
     for rome_code in rome_codes:
         score = 0
 
+        # With boosting.
         if office_to_update and office_to_update.boost:
             if not office_to_update.romes_to_boost:
                 # Boost the score for all ROME codes.
@@ -379,6 +380,8 @@ def inject_office_rome_scores_into_es_doc(office, doc, office_to_update=None):
                         score=office.score,
                         rome_code=rome_code,
                         naf_code=office.naf)
+
+        # Without boosting.
         else:
             score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
                 score=office.score,
@@ -386,10 +389,10 @@ def inject_office_rome_scores_into_es_doc(office, doc, office_to_update=None):
                 naf_code=office.naf)
 
         if score >= SCORE_FOR_ROME_MINIMUM:
+            scores_by_rome[rome_code] = score
             st.increment_office_score_for_rome_count()
-            doc['score_for_rome_%s' % rome_code] = score
 
-    return doc
+    return scores_by_rome
 
 
 def chunks(l, n):
@@ -417,11 +420,11 @@ def create_offices(index=INDEX_NAME, ignore_unreachable_offices=False):
             logging.info("already processed %s offices, %s were actually indexed...",
                 st.office_count,
                 st.indexed_office_count,
-                )
+            )
 
         es_doc = get_office_as_es_doc(office)
 
-        office_is_reachable = any(key.startswith('score_for_rome_') for key in es_doc)
+        office_is_reachable = 'scores_by_rome' in es_doc
 
         if office_is_reachable or not ignore_unreachable_offices:
             st.increment_indexed_office_count()
@@ -529,9 +532,25 @@ def update_offices(index=INDEX_NAME):
 
             # Apply changes in ElasticSearch.
             body = {'doc': {'email': office.email, 'phone': office.tel, 'website': office.website}}
+
             if office_to_update.boost and not office_to_update.romes_to_boost:
                 body['doc']['score'] = 100
-            body['doc'] = inject_office_rome_scores_into_es_doc(office, body['doc'], office_to_update)
+            else:
+                body['doc']['score'] = office.score
+
+            scores_by_rome = get_scores_by_rome(office, office_to_update)
+            if scores_by_rome:
+                body['doc']['scores_by_rome'] = scores_by_rome
+
+            # The update API makes partial updates: existing `scalar` fields are overwritten,
+            # but `objects` fields are merged together.
+            # https://www.elastic.co/guide/en/elasticsearch/guide/1.x/partial-updates.html
+            # However `scores_by_rome` needs to be overwritten because it may change over time.
+            # To do this, we perform 2 requests: the first one reset `scores_by_rome`, the
+            # second one populate it.
+            delete_body = {'doc': {'scores_by_rome': None}}
+            es.update(index=index, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=delete_body, ignore=404)
+
             es.update(index=index, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body, ignore=404)
 
             # Delete the current PDF, it will be regenerated at next download attempt.
@@ -576,7 +595,7 @@ def display_performance_stats():
         st.indexed_office_count,
         st.office_count,
         st.office_score_for_rome_count
-        )
+    )
 
 
 def run():

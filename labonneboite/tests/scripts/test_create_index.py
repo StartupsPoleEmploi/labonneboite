@@ -37,7 +37,7 @@ class CreateIndexBaseTest(DatabaseTest):
             flag_handicap=0,
             departement=u"57",
             headcount=u"12",
-            score=50,
+            score=90,
             x=6.17952,
             y=49.1044,
         )
@@ -77,7 +77,15 @@ class UtilsTest(CreateIndexBaseTest):
             'naf': u'4711D',
             'name': u'SUPERMARCHES MATCH',
             'flag_junior': 0,
-            'score': 50,
+            'score': 90,
+            'scores_by_rome': {
+                'D1101': 43,
+                'D1106': 47,
+                'D1214': 51,
+                'D1505': 52,
+                'D1507': 54,
+                'N1103': 24,
+            },
             'locations': [
                 {'lat': 49.1044, 'lon': 6.17952},
             ],
@@ -200,10 +208,10 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         # Check scores.
         self.assertEquals(res['_source']['score'], 100)
         mapper = mapping_util.Rome2NafMapper()
-        # Since `romes_to_boost` is empty, all `score_for_rome_*` should be set to 100.
+        # Since `romes_to_boost` is empty, all `scores_by_rome` should be set to 100.
         self.assertEquals(office_to_update.romes_to_boost, u"")
         for rome in mapper.romes_for_naf(office.naf):
-            self.assertEquals(res['_source']['score_for_rome_%s' % rome.code], 100)
+            self.assertEquals(res['_source']['scores_by_rome'][rome.code], 100)
 
     def test_update_office_by_removing_contact(self):
         """
@@ -259,14 +267,14 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
-        self.assertEquals(res['_source']['score_for_rome_D1507'], 100)
-        self.assertEquals(res['_source']['score_for_rome_D1103'], 100)
+        self.assertEquals(res['_source']['scores_by_rome']['D1507'], 100)
+        self.assertEquals(res['_source']['scores_by_rome']['D1103'], 100)
 
         # Other scores should not be boosted.
         for rome in romes_for_office:
             if rome not in [u"D1507", u"D1103"]:
                 try:
-                    self.assertNotEqual(res['_source']['score_for_rome_%s' % rome], 100)
+                    self.assertNotEqual(res['_source']['scores_by_rome'][rome], 100)
                 except KeyError:
                     # Score for ROME has not been indexed because it was too low.
                     score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
