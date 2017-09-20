@@ -7,7 +7,7 @@ from labonneboite.common import search
 class SuggestLocationTest(unittest.TestCase):
 
     def test_suggest_locations_paris_1_findable(self):
-        term = u"paris 1"
+        term = u"paris 1er"
         suggestions = search.build_location_suggestions(term)
         city_names = [suggestion['city'] for suggestion in suggestions]
         self.assertTrue(u"paris-1er" in city_names)

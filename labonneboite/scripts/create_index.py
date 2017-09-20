@@ -348,9 +348,7 @@ def get_office_as_es_doc(office):
     return doc
 
 
-def inject_office_rome_scores_into_es_doc(office, doc, romes_to_boost=None):
-    if not romes_to_boost:
-        romes_to_boost = []
+def inject_office_rome_scores_into_es_doc(office, doc, office_to_update=None):
 
     # fetch all rome_codes mapped to the naf of this office
     # as we will compute a score adjusted for each of them
@@ -360,26 +358,27 @@ def inject_office_rome_scores_into_es_doc(office, doc, romes_to_boost=None):
         # unfortunately some NAF codes have no matching ROME at all
         rome_codes = []
 
-    for rome_code in rome_codes:
+    romes_to_boost = []
+    if office_to_update:
+        romes_to_boost = office_to_update.romes_as_list(office_to_update.romes_to_boost)
 
+    for rome_code in rome_codes:
         score = 0
 
-        # Boost the score for all ROME codes.
-        # @vermeer guaranteed that a "real" score will never be equal to 100.
-        if office.score == 100 and not romes_to_boost:
-            score = 100
-
-        # Boost the score for some ROME codes only.
-        elif office.score == 100 and romes_to_boost:
-            if rome_code in romes_to_boost:
+        if office_to_update and office_to_update.boost:
+            if not office_to_update.romes_to_boost:
+                # Boost the score for all ROME codes.
+                # @vermeer guaranteed that a "real" score will never be equal to 100.
                 score = 100
             else:
-                score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                    score=office.score,
-                    rome_code=rome_code,
-                    naf_code=office.naf)
-
-        # Get the non-boosted score.
+                # Boost the score for some ROME codes only.
+                if rome_code in romes_to_boost:
+                    score = 100
+                else:
+                    score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                        score=office.score,
+                        rome_code=rome_code,
+                        naf_code=office.naf)
         else:
             score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
                 score=office.score,
@@ -526,16 +525,13 @@ def update_offices(index=INDEX_NAME):
             office.tel = u'' if office_to_update.remove_phone else (office_to_update.new_phone or office.tel)
             office.website = u'' if office_to_update.remove_website else (
                 office_to_update.new_website or office.website)
-            if office_to_update.new_score:
-                office.score = office_to_update.new_score
             office.save()
 
             # Apply changes in ElasticSearch.
             body = {'doc': {'email': office.email, 'phone': office.tel, 'website': office.website}}
-            if office_to_update.new_score:
-                romes_to_boost = office_to_update.romes_as_list(office_to_update.romes_to_boost)
-                body['doc']['score'] = office_to_update.new_score
-                body['doc'] = inject_office_rome_scores_into_es_doc(office, body['doc'], romes_to_boost)
+            if office_to_update.boost and not office_to_update.romes_to_boost:
+                body['doc']['score'] = 100
+            body['doc'] = inject_office_rome_scores_into_es_doc(office, body['doc'], office_to_update)
             es.update(index=index, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body, ignore=404)
 
             # Delete the current PDF, it will be regenerated at next download attempt.

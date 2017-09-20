@@ -2,6 +2,8 @@
 import datetime
 import time
 
+from labonneboite.common import mapping as mapping_util
+from labonneboite.common import scoring as scoring_util
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.common.models import OfficeAdminExtraGeoLocation
 from labonneboite.scripts import create_index as script
@@ -109,7 +111,7 @@ class AddOfficesTest(CreateIndexBaseTest):
             flag_senior=0,
             departement=u"57",
             headcount=u'31',
-            score=100,
+            score=80,
             x=6.17528,
             y=49.1187,
             reason=u"Demande de mise en avant",
@@ -171,7 +173,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office_to_update = OfficeAdminUpdate(
             siret=self.office.siret,
             name=self.office.company_name,
-            new_score=100,
+            boost=True,
             new_email=u"foo@pole-emploi.fr",
             new_phone=u"",  # Leave empty on purpose: it should not be modified.
             new_website=u"https://foo.pole-emploi.fr",
@@ -186,15 +188,22 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         office = Office.get(self.office.siret)
         self.assertEquals(office.email, office_to_update.new_email)
-        self.assertEquals(office.score, office_to_update.new_score)
+        self.assertEquals(office.score, office.score)  # This value should not be modified.
         self.assertEquals(office.tel, self.office.tel)  # This value should not be modified.
         self.assertEquals(office.website, office_to_update.new_website)
 
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
         self.assertEquals(res['_source']['email'], office.email)
         self.assertEquals(res['_source']['phone'], office.tel)
-        self.assertEquals(res['_source']['score'], office.score)
         self.assertEquals(res['_source']['website'], office.website)
+
+        # Check scores.
+        self.assertEquals(res['_source']['score'], 100)
+        mapper = mapping_util.Rome2NafMapper()
+        # Since `romes_to_boost` is empty, all `score_for_rome_*` should be set to 100.
+        self.assertEquals(office_to_update.romes_to_boost, u"")
+        for rome in mapper.romes_for_naf(office.naf):
+            self.assertEquals(res['_source']['score_for_rome_%s' % rome.code], 100)
 
     def test_update_office_by_removing_contact(self):
         """
@@ -223,7 +232,46 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEquals(res['_source']['email'], u'')
         self.assertEquals(res['_source']['phone'], u'')
         self.assertEquals(res['_source']['website'], u'')
-        self.assertEquals(res['_source']['score'], self.office.score)
+
+    def test_update_office_boost_specific_romes(self):
+        """
+        Test `update_offices` to update an office: boost score for specific ROME codes.
+        """
+        mapper = mapping_util.Rome2NafMapper()
+        romes_for_office = [rome.code for rome in mapper.romes_for_naf(self.office.naf)]
+
+        # Ensure the following ROME codes are related to the office.
+        self.assertIn(u"D1507", romes_for_office)
+        self.assertIn(u"D1103", romes_for_office)
+
+        office_to_update = OfficeAdminUpdate(
+            siret=self.office.siret,
+            name=self.office.company_name,
+            boost=True,
+            romes_to_boost=u"D1507\nD1103",  # Boost score only for those ROME.
+        )
+        office_to_update.save()
+
+        script.update_offices(index=self.ES_TEST_INDEX)
+        time.sleep(1)  # Sleep required by ES to register new documents.
+
+        office = Office.get(self.office.siret)
+        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
+
+        # Check boosted scores.
+        self.assertEquals(res['_source']['score_for_rome_D1507'], 100)
+        self.assertEquals(res['_source']['score_for_rome_D1103'], 100)
+
+        # Other scores should not be boosted.
+        for rome in romes_for_office:
+            if rome not in [u"D1507", u"D1103"]:
+                try:
+                    self.assertNotEqual(res['_source']['score_for_rome_%s' % rome], 100)
+                except KeyError:
+                    # Score for ROME has not been indexed because it was too low.
+                    score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                        score=office.score, rome_code=rome, naf_code=office.naf)
+                    self.assertTrue(score < script.SCORE_FOR_ROME_MINIMUM)
 
 
 class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):

@@ -116,10 +116,11 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     new_email = Column(String(191), default='', nullable=False)
     new_phone = Column(String(191), default='', nullable=False)
     new_website = Column(String(191), default='', nullable=False)
-    # Set `new_score` to 100 to promote the offfice.
-    new_score = Column(Integer, nullable=True)
+
+    # Set `boost` to True to promote the offfice.
+    boost = Column(Boolean, default=False, nullable=False)
     # Stores a list of ROME codes as a string separated by `ROMES_SEPARATORS`.
-    # If `romes_to_boost` is populated, the `new_score` will be set only for specified ROME codes.
+    # If `romes_to_boost` is populated, boosting will be set only for specified ROME codes.
     romes_to_boost = Column(Text, default='', nullable=False)
 
     # Info to remove.
@@ -167,6 +168,16 @@ class OfficeAdminUpdate(CRUDMixin, Base):
         separators = OfficeAdminUpdate.ROMES_SEPARATORS
         codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
         return sorted(set(codes))
+
+    def romes_to_boost_as_html(self):
+        """
+        Returns the content of the `romes_to_boost` field as HTML.
+        Used in the admin UI.
+        """
+        html = []
+        for rome in self.romes_as_list(self.romes_to_boost):
+            html.append(u"{0} - {1}".format(rome, settings.ROME_DESCRIPTIONS[rome]))
+        return '<br>'.join(html)
 
 
 class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
@@ -239,12 +250,13 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     def geolocations_as_html_links(self):
         """
         Returns the content of the `geolocations` field as HTML links.
+        Used in the admin UI.
         """
-        links = []
-        link = '<a href="https://maps.google.com/maps?q={lat},{lon}" target="_blank">{lat}, {lon}</a>'
+        html = []
+        link = u'<a href="https://maps.google.com/maps?q={lat},{lon}" target="_blank">{lat}, {lon}</a>'
         for coords in self.geolocations_as_lat_lon_properties():
-            links.append(link.format(lat=coords['lat'], lon=coords['lon']))
-        return '<br>'.join(links)
+            html.append(link.format(lat=coords['lat'], lon=coords['lon']))
+        return u'<br>'.join(html)
 
     @staticmethod
     def codes_as_list(codes):

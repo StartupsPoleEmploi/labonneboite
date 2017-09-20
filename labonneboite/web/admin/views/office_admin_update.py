@@ -32,7 +32,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     column_details_list = [
         'siret',
         'name',
-        'new_score',
+        'boost',
         'romes_to_boost',
         'new_email',
         'new_phone',
@@ -52,17 +52,17 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     ]
 
     column_formatters = {
-        'romes_to_boost': lambda view, context, model, name: model.romes_as_list(model.romes_to_boost),
         'date_created': datetime_format,
         'date_updated': datetime_format,
+        'romes_to_boost': lambda view, context, model, name: Markup(model.romes_to_boost_as_html()),
     }
 
     column_labels = {
         'siret': u"Siret",
         'name': u"Nom de l'entreprise",
         'reason': u"Raison",
-        'new_score': u"Nouveau score",
-        'romes_to_boost': u"Booster le score par ROME",
+        'boost': u"Booster le score",
+        'romes_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement",
         'new_email': u"Nouvel email",
         'new_phone': u"Nouveau téléphone",
         'new_website': u"Nouveau site web",
@@ -84,9 +84,14 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'requested_by_first_name': u"Prénom de la personne qui demande la suppression.",
         'requested_by_last_name': u"Nom de la personne qui demande la suppression.",
         'requested_by_phone': u"Téléphone de la personne qui demande la suppression.",
-        'new_score': u"100 pour forcer le positionnement en tête des résultats (boost), sinon laisser vide",
-        'romes_to_boost': u"Veuillez entrer un ROME par ligne. Si ce champ est renseigné, "
-            + u"le score sera forcé uniquement pour les ROME spécifiés.",
+        'boost': u"Cocher cette case pour forcer le positionnement en tête des résultats",
+        'romes_to_boost': Markup(
+            u"Veuillez entrer un ROME par ligne."
+            u"<br>"
+            u"Si ce champ est renseigné, le score sera forcé uniquement pour le(s) ROME spécifié(s)."
+            u"<br>"
+            u"<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
+        ),
         'new_email': u"Laisser vide s'il n'y a pas de modification à apporter",
         'new_phone': u"Laisser vide s'il n'y a pas de modification à apporter",
         'new_website': u"Laisser vide s'il n'y a pas de modification à apporter",
@@ -99,7 +104,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     form_columns = [
         'siret',
         'name',
-        'new_score',
+        'boost',
         'romes_to_boost',
         'new_email',
         'new_phone',
@@ -121,9 +126,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         },
         'name': {
             'filters': [strip_filter],
-        },
-        'new_score': {
-            'validators': [validators.optional(), validators.NumberRange(min=0, max=100)],
         },
         'romes_to_boost': {
             'filters': [strip_filter],
@@ -157,7 +159,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         },
     }
 
-
     def validate_form(self, form):
         is_valid = super(OfficeAdminUpdateModelView, self).validate_form(form)
 
@@ -165,8 +166,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
             romes_to_boost = form.data.get('romes_to_boost')
 
-            if not form.data.get('new_score'):
-                msg = u"Veuillez spécifier le nouveau score."
+            if not form.data.get('boost'):
+                msg = u"Vous devez cocher la case `Booster le score`."
                 flash(msg, 'error')
                 return False
 
