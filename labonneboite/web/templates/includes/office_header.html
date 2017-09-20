@@ -30,12 +30,21 @@
     <div class="grid-col-4">
       <h3 class="lbb-green">
         Potentiel d'embauche<br>
-        <span class="rating-stars">
-          <b style="width: {{ company.get_stars_for_rome_code_as_percentage(rome_code) }}%;">
-            {{ company.get_stars_for_rome_code(rome_code) }}
-          </b>
-        </span>
-        <span class="rating-value">{{ '%0.1f' % company.get_stars_for_rome_code(rome_code) }}</span>
+        {% if company.scores_by_rome and company.scores_by_rome.get(rome_code) == 100 %}
+          {# Score boost. #}
+          <span class="rating-stars">
+            <b style="width: 100%;">5</b>
+          </span>
+          <span class="rating-value">5</span>
+        {% else %}
+          {# Normal score. #}
+          <span class="rating-stars">
+            <b style="width: {{ company.get_stars_for_rome_code_as_percentage(rome_code) }}%;">
+              {{ company.get_stars_for_rome_code(rome_code) }}
+            </b>
+          </span>
+          <span class="rating-value">{{ '%0.1f' % company.get_stars_for_rome_code(rome_code) }}</span>
+        {% endif %}
       </h3>
     </div>
     <div class="grid-col-4">

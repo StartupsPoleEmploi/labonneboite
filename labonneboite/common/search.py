@@ -97,48 +97,6 @@ class Fetcher(object):
             rome_code=rome_code,
         )
 
-    def _get_companies_from_es_and_db(self):
-        result = []
-
-        companies_from_es, _ = get_companies(
-            self.naf_codes,
-            self.latitude,
-            self.longitude,
-            self.distance,
-            self.from_number,
-            self.to_number,
-            flag_alternance=self.flag_alternance,
-            flag_junior=self.flag_junior,
-            flag_senior=self.flag_senior,
-            flag_handicap=self.flag_handicap,
-            headcount_filter=self.headcount_filter,
-            sort=self.sort,
-            index=settings.ES_INDEX,
-            rome_code=self.rome,
-        )
-
-        json_companies = [company.as_json() for company in companies_from_es]
-
-        if json_companies:
-
-            siret_list = [item['siret'] for item in json_companies]
-            companies_from_db = Office.query.filter(Office.siret.in_(siret_list))
-
-            company_by_siret = {}
-            for company in companies_from_db:
-                # Get the corresponding dict from the `json_companies` list.
-                json_company = next((item for item in json_companies if item['siret'] == company.siret))
-                company.x = json_company['lon']
-                company.y = json_company['lat']
-                company.distance = json_company['distance']
-                company_by_siret[company.siret] = company
-
-            # Keep the Elasticsearch initial order.
-            for siret in siret_list:
-                result.append(company_by_siret[siret])
-
-        return result
-
     def get_companies(self):
 
         self.company_count = self._get_company_count(self.rome, self.distance)
@@ -160,7 +118,24 @@ class Fetcher(object):
             self.from_number = 1
             self.to_number = 10
 
-        result = self._get_companies_from_es_and_db() if self.company_count else []
+        result = []
+        if self.company_count:
+            result, _ = get_companies(
+                self.naf_codes,
+                self.latitude,
+                self.longitude,
+                self.distance,
+                self.from_number,
+                self.to_number,
+                flag_alternance=self.flag_alternance,
+                flag_junior=self.flag_junior,
+                flag_senior=self.flag_senior,
+                flag_handicap=self.flag_handicap,
+                headcount_filter=self.headcount_filter,
+                sort=self.sort,
+                index=settings.ES_INDEX,
+                rome_code=self.rome,
+            )
 
         if self.company_count < 10:
 
@@ -410,25 +385,29 @@ def retrieve_companies_from_elastic_search(json_body, distance_sort=True, index=
     es = Elasticsearch()
     res = es.search(index=index, doc_type="office", body=json_body)
     logger.info("Elastic Search request : %s", json_body)
+
     companies = []
-    siret_list = []
-    distances = {}
+    siret_list = [office["_source"]["siret"] for office in res['hits']['hits']]
+
     if distance_sort:
         distance_sort_index = 0
     else:
         distance_sort_index = 1
-
-    for office in res['hits']['hits']:
-        siret = office["_source"]["siret"]
-        siret_list.append(siret)
-        distances[siret] = int(round(office["sort"][distance_sort_index]))
 
     if siret_list:
         company_objects = Office.query.filter(Office.siret.in_(siret_list))
         company_dict = {}
 
         for obj in company_objects:
-            obj.distance = distances[obj.siret]
+            # Get the corresponding item from the Elasticsearch results.
+            es_company = next((item for item in res['hits']['hits'] if item["_source"]["siret"] == obj.siret))
+            obj.distance = int(round(es_company["sort"][distance_sort_index]))
+            # Add an extra `scores_by_rome` attribute: this will allow us to identify boosted offices
+            # in the search result HTML template.
+            try:
+                obj.scores_by_rome = es_company["_source"]["scores_by_rome"]
+            except KeyError:
+                obj.scores_by_rome = {}
             company_dict[obj.siret] = obj
 
         for siret in siret_list:
