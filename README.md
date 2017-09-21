@@ -60,9 +60,9 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
       $ pip install ansible==2.3.0.0
       ```
 
-- Install VirtualBox
+- Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 
-- Install Vagrant
+- Install [Vagrant](https://www.vagrantup.com/downloads.html)
 
 - Fetch labonneboite repository `git clone https://github.com/StartupPoleEmploi/labonneboite.git`
 
