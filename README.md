@@ -62,7 +62,7 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 
 - Install [Vagrant](https://www.vagrantup.com/downloads.html)
 
-- Fetch labonneboite repository `git clone https://github.com/StartupPoleEmploi/labonneboite.git`
+- Fetch labonneboite repository `git clone https://github.com/StartupsPoleEmploi/labonneboite.git`
 
     - ensure your ssh public key has been properly setup
 
