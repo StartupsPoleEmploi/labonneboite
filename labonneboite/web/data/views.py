@@ -29,7 +29,7 @@ def romes_for_naf():
     """
     naf = request.args.get('naf')
     naf_name = None
-    romes = None
+    romes = []
     form = NafForm(naf=naf)
 
     if naf and form.validate():
@@ -37,13 +37,13 @@ def romes_for_naf():
         naf_name = NAF_CODES.get(naf)
         mapper = mapping_util.Rome2NafMapper()
         romes = mapper.romes_for_naf(naf)
-
     context = {
         'current_tab': 'romes_for_naf',
         'form': form,
         'naf': naf,
         'naf_name': naf_name,
         'romes': romes,
+        'total_hirings_for_naf': sum(rome.nafs[naf] for rome in romes),
     }
     return render_template('data/romes_for_naf.html', **context)
 
@@ -82,7 +82,7 @@ def romes_for_siret():
     siret = request.args.get('siret')
     naf = None
     naf_name = None
-    romes = None
+    romes = []
     form = SiretForm(siret=siret)
 
     if siret and form.validate():
@@ -99,5 +99,6 @@ def romes_for_siret():
         'naf_name': naf_name,
         'romes': romes,
         'siret': siret,
+        'total_hirings_for_naf': sum(rome.nafs[naf] for rome in romes),
     }
     return render_template('data/romes_for_siret.html', **context)
