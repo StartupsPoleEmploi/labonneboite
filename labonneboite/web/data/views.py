@@ -55,7 +55,7 @@ def nafs_for_rome():
     """
     rome = request.args.get('rome')
     rome_name = None
-    nafs = None
+    nafs = []
     form = RomeForm(rome=rome)
 
     if rome and form.validate():
@@ -70,6 +70,7 @@ def nafs_for_rome():
         'nafs': nafs,
         'rome': rome,
         'rome_name': rome_name,
+        'total_hirings_for_rome': sum(naf.hirings for naf in nafs),
     }
     return render_template('data/nafs_for_rome.html', **context)
 

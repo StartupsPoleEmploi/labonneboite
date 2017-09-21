@@ -11,18 +11,40 @@
   </form>
 
   {% if nafs %}
-    <p>Codes NAF associés au code ROME <b>{{ rome }}</b> ({{ rome_name }}) :</p>
-    <ul>
-    {% for naf in nafs %}
-      <li>
-        <b>{{ naf.code }}</b>
-        -
-        {{ naf.name }}
-        <span class="badge badge-info">{{ naf.hirings }}</span>
-        <small>[<a href="{{ url_for('data.romes_for_naf', naf=naf.code) }}">Voir les ROME associés</a>]</small>
-      </li>
-    {% endfor %}
-    </ul>
+    <p>
+      Codes NAF associés au code ROME <b>{{ rome }} - {{ rome_name }}</b>
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>NAF</th>
+          <th>Nom</th>
+          <th colspan="2">
+            Nombre de recrutements
+            <br>
+            <span class="badge badge-info">{{ total_hirings_for_rome }}</span>
+          </th>
+          <th> </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for naf in nafs %}
+          <tr>
+            <td><b>{{ naf.code }}</b></td>
+            <td>{{ naf.name }}</td>
+            <td>
+              <span class="badge badge-info">{{ naf.hirings }}</span>
+            </td>
+            <td>
+              <span class="badge badge-info">{{ (naf.hirings / total_hirings_for_rome * 100) | round(2) }}%</span>
+            </td>
+            <td>
+              <small><a href="{{ url_for('data.romes_for_naf', naf=naf.code) }}">ROME associés</a></small>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   {% endif %}
 
 {% endblock %}

@@ -10,22 +10,6 @@
     {% include "includes/form_content.html" %}
   </form>
 
-  {% if romes %}
-    <p>Codes ROME associés au SIRET <b>{{ siret }}</b> dont le code NAF est <b>{{ naf }}</b> - {{ naf_name }} <span class="badge badge-info">{{ total_hirings_for_naf }}</span> :</p>
-    <ul>
-    {% for rome in romes %}
-      <li>
-        <b>{{ rome.code }}</b>
-        -
-        {{ rome.name }}
-        {% with hirings_for_naf = rome.nafs[naf] %}
-          <span class="badge badge-info">{{ hirings_for_naf }}</span>
-          <span class="badge badge-info">{{ (hirings_for_naf / total_hirings_for_naf * 100) | round(2) }}%</span>
-        {% endwith %}
-        <small>[<a href="{{ url_for('data.nafs_for_rome', rome=rome.code) }}">Voir les NAF associés</a>]</small>
-      </li>
-    {% endfor %}
-    </ul>
-  {% endif %}
+  {% include "data/_romes_list.html" %}
 
 {% endblock %}

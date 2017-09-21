@@ -1,0 +1,38 @@
+{% if romes %}
+  <p>
+    Codes ROME associés au code NAF <b>{{ naf }} - {{ naf_name }}</b>
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>ROME</th>
+        <th>Nom</th>
+        <th colspan="2">
+          Nombre de recrutements
+          <br>
+          <span class="badge badge-info">{{ total_hirings_for_naf }}</span>
+        </th>
+        <th> </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rome in romes %}
+      <tr>
+        <td><b>{{ rome.code }}</b></td>
+        <td>{{ rome.name }}</td>
+        {% with hirings_for_naf = rome.nafs[naf] %}
+        <td>
+          <span class="badge badge-info">{{ hirings_for_naf }}</span>
+        </td>
+        <td>
+          <span class="badge badge-info">{{ (hirings_for_naf / total_hirings_for_naf * 100) | round(2) }}%</span>
+        </td>
+        {% endwith %}
+        <td>
+          <small><a href="{{ url_for('data.nafs_for_rome', rome=rome.code) }}">NAF associés</a></small>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
