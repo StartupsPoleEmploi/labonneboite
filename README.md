@@ -50,14 +50,12 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 
 - Install Ansible:
 
-    - either in your global `site-packages`, e.g. on macOS: `brew install ansible`
-
-    - or create an [isolated Python environments](https://virtualenv.pypa.io/) using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
+    - create an [isolated Python environment](https://virtualenv.pypa.io/) using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
 
       ```
       $ mkvirtualenv --python=`which python2.7` lbb
       $ workon lbb
-      $ pip install ansible==2.3.0.0
+      $ pip install ansible
       ```
 
 - Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
