@@ -1,6 +1,9 @@
-import os
+# coding: utf8
 import errno
 import logging
+import os
+
+from slugify import slugify
 
 from labonneboite.conf import settings
 
@@ -8,7 +11,7 @@ logger = logging.getLogger('main')
 
 
 def get_file_path(office):
-    file_path = "pdf/%s/%s/%s/%s.pdf" % (office.departement, office.naf, office.name.strip()[0], office.siret)
+    file_path = "pdf/%s/%s/%s/%s.pdf" % (office.departement, office.naf, slugify(office.name.strip()[0]), office.siret)
     full_path = os.path.join(settings.GLOBAL_STATIC_PATH, file_path)
     return full_path
 

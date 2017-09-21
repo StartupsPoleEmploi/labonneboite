@@ -4,19 +4,20 @@ from datetime import date
 import os
 import StringIO
 
+from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
 from xhtml2pdf import pisa
 
-from flask import Blueprint, current_app
 from flask import abort, redirect, render_template, flash
+from flask import Blueprint, current_app
 from flask import make_response, send_file
 from flask import request, session, url_for
 
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import util
 from labonneboite.common.email_util import MandrillClient
-from labonneboite.common.models import Office
 from labonneboite.common.models import CONTACT_MODE_STAGES
+from labonneboite.common.models import Office
 from labonneboite.conf import settings
 
 from labonneboite.web.office.forms import OfficeRemovalForm
@@ -128,7 +129,7 @@ def download(siret=None):
         office = Office.query.filter(Office.siret == siret).one()
     except NoResultFound:
         abort(404)
-    attachment_name = 'fiche_entreprise_%s.pdf' % office.name.replace(' ', '_')
+    attachment_name = 'fiche_entreprise_%s.pdf' % slugify(office.name, separator='_')
     full_path = pdf_util.get_file_path(office)
     if os.path.exists(full_path):
         return send_file(full_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)
