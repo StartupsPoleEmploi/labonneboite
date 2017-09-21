@@ -1,8 +1,8 @@
 {% if romes %}
-  <p>
-    Codes ROME associés au code NAF <b>{{ naf }} - {{ naf_name }}</b>
-  </p>
   <table>
+    <caption>
+      Codes ROME associés au code NAF <b>{{ naf }} - {{ naf_name }}</b>
+    </caption>
     <thead>
       <tr>
         <th>ROME</th>
@@ -25,7 +25,7 @@
           <span class="badge badge-info">{{ hirings_for_naf }}</span>
         </td>
         <td>
-          <span class="badge badge-info">{{ (hirings_for_naf / total_hirings_for_naf * 100) | round(2) }}%</span>
+          {{ (hirings_for_naf / total_hirings_for_naf * 100) | round(2) }} %
         </td>
         {% endwith %}
         <td>

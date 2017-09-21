@@ -11,10 +11,10 @@
   </form>
 
   {% if nafs %}
-    <p>
-      Codes NAF associés au code ROME <b>{{ rome }} - {{ rome_name }}</b>
-    </p>
     <table>
+      <caption>
+        Codes NAF associés au code ROME <b>{{ rome }} - {{ rome_name }}</b>
+      </caption>
       <thead>
         <tr>
           <th>NAF</th>
@@ -36,7 +36,7 @@
               <span class="badge badge-info">{{ naf.hirings }}</span>
             </td>
             <td>
-              <span class="badge badge-info">{{ (naf.hirings / total_hirings_for_rome * 100) | round(2) }}%</span>
+              {{ (naf.hirings / total_hirings_for_rome * 100) | round(2) }} %
             </td>
             <td>
               <small><a href="{{ url_for('data.romes_for_naf', naf=naf.code) }}">ROME associés</a></small>
