@@ -9,12 +9,21 @@ from labonneboite.common.models import Office
 from labonneboite.web.admin.forms import siret_validator
 
 
+def upper_filter(value):
+    """
+    Uppercase user input.
+    """
+    if value is not None and hasattr(value, 'upper'):
+        return value.upper()
+    return value
+
+
 class NafForm(FlaskForm):
     """
     Enter a NAF code to find associated ROME codes.
     """
     naf = StringField(u"NAF", validators=[DataRequired()],
-        description=u"Saisissez un code NAF pour trouver les codes ROME associés.")
+        description=u"Saisissez un code NAF pour trouver les codes ROME associés.", filters=[upper_filter])
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -34,7 +43,7 @@ class RomeForm(FlaskForm):
     Enter a ROME code to find associated NAF codes.
     """
     rome = StringField(u"ROME", validators=[DataRequired()],
-        description=u"Saisissez un code ROME pour trouver les codes NAF associés.")
+        description=u"Saisissez un code ROME pour trouver les codes NAF associés.", filters=[upper_filter])
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
