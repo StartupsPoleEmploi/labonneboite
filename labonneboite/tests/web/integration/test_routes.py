@@ -66,27 +66,3 @@ class GenericUrlSearchRedirectionTest(AppTest):
         self.assertEqual(redirection_path, expected_path)
         self.assertEqual(redirection_query, expected_query)
 
-    def test_deprecated_bob_url(self):
-        """
-        Test the deprecated URL initially used by Bob.
-        Query string params should follow the redirection chain.
-        """
-        rv = self.app.get("/bob/75056/D1104")
-        self.assertEqual(rv.status_code, 302)
-
-        expected_path = '/entreprises/commune/75056/rome/D1104'
-        expected_query = {'utm_medium': 'web', 'utm_source': 'bob', 'utm_campaign': 'bob-deprecated'}
-        redirection_path = urlparse(rv.location).path
-        redirection_query = dict(parse_qsl(urlparse(rv.location).query))
-        self.assertEqual(redirection_path, expected_path)
-        self.assertEqual(redirection_query, expected_query)
-
-        rv = self.app.get('%s?%s' % (redirection_path, urlencode(redirection_query)))
-        self.assertEqual(rv.status_code, 302)
-
-        expected_path = '/entreprises/paris-75000/patisserie-confiserie-chocolaterie-et-glacerie'
-        expected_query = {'utm_medium': 'web', 'utm_source': 'bob', 'utm_campaign': 'bob-deprecated'}
-        redirection_path = urlparse(rv.location).path
-        redirection_query = dict(parse_qsl(urlparse(rv.location).query))
-        self.assertEqual(redirection_path, expected_path)
-        self.assertEqual(redirection_query, expected_query)
