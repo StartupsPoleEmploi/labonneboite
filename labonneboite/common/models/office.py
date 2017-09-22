@@ -96,7 +96,7 @@ class Office(OfficeMixin, CRUDMixin, Base):
             'siret': self.siret,
             'stars': self.get_stars_for_rome_code(rome_code),
             'url': self.get_url_for_rome_code(rome_code),
-            # Warning: the `distance` field is added by `retrieve_companies_from_elastic_search`,
+            # Warning: the `distance` field is added by `get_companies_from_es_and_db`,
             # this is NOT a model field or property!
             'distance': self.distance,
         }

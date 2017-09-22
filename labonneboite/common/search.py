@@ -173,11 +173,7 @@ def get_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
         distance_sort = kwargs['sort'] == 'distance'
     except KeyError:
         distance_sort = True
-    companies, companies_count = retrieve_companies_from_elastic_search(
-        json_body,
-        index=index,
-        distance_sort=distance_sort
-    )
+    companies, companies_count = get_companies_from_es_and_db(json_body, index=index, distance_sort=distance_sort)
     companies = shuffle_companies(companies, distance_sort, rome_code)
     return companies, companies_count
 
@@ -255,8 +251,8 @@ def build_json_body_elastic_search(
     except ValueError:
         headcount_filter = settings.HEADCOUNT_WHATEVER
 
-    min_office_size = None
     max_office_size = None
+    min_office_size = None
     if headcount_filter == settings.HEADCOUNT_SMALL_ONLY:
         max_office_size = settings.HEADCOUNT_SMALL_ONLY_MAXIMUM
     elif headcount_filter == settings.HEADCOUNT_BIG_ONLY:
@@ -372,7 +368,14 @@ def build_json_body_elastic_search(
     return json_body
 
 
-def retrieve_companies_from_elastic_search(json_body, distance_sort=True, index="labonneboite"):
+def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonneboite"):
+    """
+    Fetch companies first from Elasticsearch, then from the database.
+
+    Returns a tuple of (companies, companies_count), where `companies` is a
+    list of results as Office instances (with some extra attributes only available
+    in Elasticsearch) and `companies_count` an integer of the results number.
+    """
     es = Elasticsearch()
     res = es.search(index=index, doc_type="office", body=json_body)
     logger.info("Elastic Search request : %s", json_body)
@@ -380,18 +383,20 @@ def retrieve_companies_from_elastic_search(json_body, distance_sort=True, index=
     companies = []
     siret_list = [office["_source"]["siret"] for office in res['hits']['hits']]
 
-    if distance_sort:
-        distance_sort_index = 0
-    else:
-        distance_sort_index = 1
-
     if siret_list:
+
+        if distance_sort:
+            distance_sort_index = 0
+        else:
+            distance_sort_index = 1
+
         company_objects = Office.query.filter(Office.siret.in_(siret_list))
         company_dict = {}
 
         for obj in company_objects:
             # Get the corresponding item from the Elasticsearch results.
             es_company = next((item for item in res['hits']['hits'] if item["_source"]["siret"] == obj.siret))
+            # Add an extra `distance` attribute.
             obj.distance = int(round(es_company["sort"][distance_sort_index]))
             # Add an extra `scores_by_rome` attribute: this will allow us to identify boosted offices
             # in the search result HTML template.
