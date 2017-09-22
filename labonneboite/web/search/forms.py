@@ -45,10 +45,10 @@ class CompanySearchForm(FlaskForm):
     )
 
     PUBLIC_CHOICES = (
-        (str(search.PUBLIC_ALL).decode('utf-8'), u'Tout'),
-        (str(search.PUBLIC_JUNIOR).decode('utf-8'), u'Junior uniquement <small class="badge badge-info" data-toggle="tooltip" title="moins de 26 ans">?</small>'),
-        (str(search.PUBLIC_SENIOR).decode('utf-8'), u'Senior uniquement <small class="badge badge-info" data-toggle="tooltip" title="plus de 50 ans">?</small>'),
-        (str(search.PUBLIC_HANDICAP).decode('utf-8'), u'BOE uniquement <small class="badge badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">?</small>'),
+        (unicode(search.PUBLIC_ALL), u'Tout'),
+        (unicode(search.PUBLIC_JUNIOR), u'Junior uniquement <small class="badge badge-info" data-toggle="tooltip" title="moins de 26 ans">?</small>'),
+        (unicode(search.PUBLIC_SENIOR), u'Senior uniquement <small class="badge badge-info" data-toggle="tooltip" title="plus de 50 ans">?</small>'),
+        (unicode(search.PUBLIC_HANDICAP), u'BOE uniquement <small class="badge badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">?</small>'),
     )
 
     class Meta:
