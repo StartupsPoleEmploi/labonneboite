@@ -107,9 +107,15 @@ def pro_version_enabled():
             )
 >>>>>>> Add the pro mode (session based)
 
+<<<<<<< HEAD
 def pro_version_enabled():
     return session.get('pro_version', False)
 >>>>>>> Test that the Pro Version is correctly enabled/desabled
+=======
+        return result
+
+    return False
+>>>>>>> quick bugfix - feel free to improve it @Alexandre
 
 def pro_mode_activated():
     return session.get("pro_mode", False)
