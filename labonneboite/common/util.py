@@ -6,7 +6,7 @@ import unicodedata
 import urllib
 import re
 
-from flask import request
+from flask import request, session
 from flask_login import current_user
 
 from labonneboite.conf import settings
@@ -66,29 +66,24 @@ def user_is_pro():
     - Office data : statistics about recruitments...
     """
 
+    # Check user IP (not need to be authenticated)
     user_ip = get_user_ip()
+    if user_ip in settings.VERSION_PRO_ALLOWED_IPS:
+        return True
 
-    # =============================================================
-    # beginning of temporary block of version pro (FIXME remove me)
-    if current_user.is_authenticated:
-        current_user_email = current_user.email.lower()
-        result = (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS)
-        return result
-    else:
-        return False
-    # end of temporary block of version pro (FIXME remove me)
-    # =============================================================
-
+    # Check user e-mail by plain_value, suffix or regex (@see local_settings.py)
     if current_user.is_authenticated:
         current_user_email = current_user.email.lower()
 
-        result = (user_ip in settings.VERSION_PRO_ALLOWED_IPS
-            or current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
+        result = (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
             or any(current_user_email.endswith(suffix) for suffix in settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
             or any(re.match(regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS)
             )
 
     return result
+
+def pro_mode_activated():
+    return session.get("pro_mode", False)
 
 
 def get_doorbell_tags(tag):

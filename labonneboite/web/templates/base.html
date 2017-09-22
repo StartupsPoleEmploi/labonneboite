@@ -28,14 +28,37 @@
         </a>
       </li>
       <li class="text-left">
-        {% if user_is_pro %}
+        {% if pro_mode_activated %}
           <small class="badge badge-info" data-toggle="tooltip" data-placement="bottom" title="La version PRO de LBB affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visible aux conseillers Pôle emploi et à une sélection d'acteurs.">Version PRO</small>
         {% endif %}
         {% if is_alternance %}
           <small class="badge badge-alternance" data-toggle="tooltip" data-placement="bottom" title="La recherche est limitée aux entreprises recrutant notamment des contrats en alternance">Alternance</small>
         {% endif %}
       </li>
+
       <li>
+        {# PRO ZONE #}
+        {% if user_is_pro %}
+          <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
+            <a href="#" class="lbb-header-btn">
+              {% if pro_mode_activated %}
+                <img src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="">
+              {% else %}
+                <img src="{{ url_for('static', filename='images/pro/pro.svg') }}" alt="" />
+              {% endif %}
+              <span>Version PRO</span>
+            </a>
+            <div class="lbb-dropdown lbb-dropdown-right text-right">
+              {% if pro_mode_activated %}
+              <a id="pro-mode" href="#" class="btn no-wrap" data-action="disabled">Désactiver le mode PRO</a>  
+              {% else %} 
+                <p>Le mode PRO vous donne accès à des fonctionnalités supplémentaires : plus de filtres etc.</p>
+                <a id="pro-mode" href="#" class="btn" data-action="enabled">Activer le mode PRO</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
         {# START LOGIN ZONE #}
         {% if not user.is_authenticated %}
           <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">

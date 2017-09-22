@@ -6,7 +6,7 @@
     {% if company.flag_alternance %}
       - <span class="badge badge-alternance" data-toggle="tooltip" title="Cette entreprise recrute notamment des contrats en alternance">Alternance</span>
     {% endif %}
-    {% if user_is_pro %}
+    {% if pro_mode_activated %}
       {% if company.flag_junior %}
         - <small class="badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute une proportion élevée de juniors (moins de 26 ans) - indicateur exclusif version PRO">
         Junior</small>
