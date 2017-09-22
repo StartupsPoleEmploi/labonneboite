@@ -223,11 +223,11 @@ class ApiCompanyListTest(ApiBaseTest):
     def test_count_and_old_pagination(self):
         params = self.add_security_params({
             'distance': 10,
-            'from_number': 1,
             'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
             'longitude': self.positions['bayonville_sur_mad']['coords'][0]['lon'],
+            'page': 1,
+            'page_size': 2,
             'rome_codes': u'D1405',
-            'to_number': 2,
             'user': u'labonneboite',
         })
         rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
