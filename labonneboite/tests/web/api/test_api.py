@@ -220,22 +220,6 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(rv.status_code, 400)
         self.assertEqual(rv.data, u'invalid rome code: INVALID')
 
-    def test_count_and_old_pagination(self):
-        params = self.add_security_params({
-            'distance': 10,
-            'from_number': 1,
-            'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
-            'longitude': self.positions['bayonville_sur_mad']['coords'][0]['lon'],
-            'rome_codes': u'D1405',
-            'to_number': 2,
-            'user': u'labonneboite',
-        })
-        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
-        self.assertEqual(rv.status_code, 200)
-        data = json.loads(rv.data)
-        self.assertEqual(data['companies_count'], 3)
-        self.assertEqual(len(data['companies']), 2)
-
     def test_count_pagination(self):
         params = self.add_security_params({
             'distance': 10,
