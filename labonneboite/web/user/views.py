@@ -158,18 +158,22 @@ def favorites_delete(siret):
 
     return redirect(url_for('user.favorites_list'))
 
-@userBlueprint.route('/pro-mode')
-def pro_mode():
+@userBlueprint.route('/pro-version')
+def pro_version():
     if not util.user_is_pro:
         abort(401)
     
-    action = request.args.get('action','')
+    action = request.args.get('action', '')
     if not action:
         abort(400)
 
-    if action == "enabled" and not util.pro_mode_activated():
-        session['pro_mode'] = True
-    elif action == "disabled" and util.pro_mode_activated():
-        session.pop('pro_mode')
+    if action == "enabled" and not util.pro_version_enabled():
+        session['pro_version'] = True
+    elif action == "disabled" and util.pro_version_enabled():
+        session.pop('pro_version')
 
-    return make_response(json.dumps('{ "success": true }'));    
+    redirect_url = request.args.get('redirect', '/')
+    if not util.is_safe_url(redirect_url):
+        redirect_url = '/'
+    
+    return redirect(redirect_url)   

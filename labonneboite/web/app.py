@@ -187,7 +187,7 @@ def register_context_processors(flask_app):
             'mapbox_css_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css',
             'mapbox_js_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js',
             'user_is_pro': util.user_is_pro(),
-            'pro_mode_activated': util.pro_mode_activated()
+            'pro_version_enabled': util.pro_version_enabled()
         }
 
     def inject_user():
@@ -272,7 +272,6 @@ def create_app():
         'js/results.js',
         'js/tooltip.js',  # Depends on 'js/vendor/bootstrap-tooltip.js'.
         'js/unobfuscate.js',
-        'js/pro-mode-toggle.js',
         filters='jsmin',
         output='gen/packed.%(version)s.js',
     )

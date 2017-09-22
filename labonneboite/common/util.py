@@ -66,7 +66,7 @@ def user_is_pro():
     - Office data : statistics about recruitments...
     """
 
-    # Check user IP (not need to be authenticated)
+    # Check user IP (no need to be authenticated)
     user_ip = get_user_ip()
     if user_ip in settings.VERSION_PRO_ALLOWED_IPS:
         return True
@@ -75,17 +75,23 @@ def user_is_pro():
     if current_user.is_authenticated:
         current_user_email = current_user.email.lower()
 
-        result = (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
+        return (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
             or any(current_user_email.endswith(suffix) for suffix in settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
-            or any(re.match(regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS)
-            )
+            or any(re.match(regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS))
+        
+    return False
 
+<<<<<<< HEAD
         return result
 
     return False
 
 def pro_mode_activated():
     return session.get("pro_mode", False)
+=======
+def pro_version_enabled():
+    return session.get("pro_version", False)
+>>>>>>> Change wording, texte (pro_mode => pro_version), redirect by url in request and more !
 
 
 def get_doorbell_tags(tag):
