@@ -205,8 +205,9 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEquals(res['_source']['phone'], office.tel)
         self.assertEquals(res['_source']['website'], office.website)
 
-        # Check scores.
-        self.assertEquals(res['_source']['score'], 100)
+        # Global score should always be the same.
+        self.assertEquals(res['_source']['score'], office.score)
+        # Check scores for ROME.
         mapper = mapping_util.Rome2NafMapper()
         # Since `romes_to_boost` is empty, all `scores_by_rome` should be set to 100.
         self.assertEquals(office_to_update.romes_to_boost, u"")

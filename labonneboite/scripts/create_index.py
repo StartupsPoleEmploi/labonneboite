@@ -530,11 +530,6 @@ def update_offices(index=INDEX_NAME):
             # Apply changes in ElasticSearch.
             body = {'doc': {'email': office.email, 'phone': office.tel, 'website': office.website}}
 
-            if office_to_update.boost and not office_to_update.romes_to_boost:
-                body['doc']['score'] = 100
-            else:
-                body['doc']['score'] = office.score
-
             scores_by_rome = get_scores_by_rome(office, office_to_update)
             if scores_by_rome:
                 body['doc']['scores_by_rome'] = scores_by_rome

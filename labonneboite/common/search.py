@@ -86,6 +86,7 @@ class Fetcher(object):
     def _get_company_count(self, rome_code, distance):
         return count_companies(
             self.naf_codes,
+            rome_code,
             self.latitude,
             self.longitude,
             distance,
@@ -94,7 +95,6 @@ class Fetcher(object):
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount_filter=self.headcount_filter,
-            rome_code=rome_code,
         )
 
     def get_companies(self):
@@ -122,11 +122,12 @@ class Fetcher(object):
         if self.company_count:
             result, _ = get_companies(
                 self.naf_codes,
+                self.rome,
                 self.latitude,
                 self.longitude,
                 self.distance,
-                self.from_number,
-                self.to_number,
+                from_number=self.from_number,
+                to_number=self.to_number,
                 flag_alternance=self.flag_alternance,
                 flag_junior=self.flag_junior,
                 flag_senior=self.flag_senior,
@@ -134,7 +135,6 @@ class Fetcher(object):
                 headcount_filter=self.headcount_filter,
                 sort=self.sort,
                 index=settings.ES_INDEX,
-                rome_code=self.rome,
             )
 
         if self.company_count < 10:
@@ -157,18 +157,18 @@ class Fetcher(object):
         return result
 
 
-def count_companies(*args, **kwargs):
+def count_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
     index = kwargs.pop('index', 'labonneboite')
-    json_body = build_json_body_elastic_search(*args, **kwargs)
+    json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
     del json_body["sort"]
     es = Elasticsearch()
     res = es.count(index=index, doc_type="office", body=json_body)
     return res["count"]
 
 
-def get_companies(*args, **kwargs):
+def get_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
     index = kwargs.pop('index', 'labonneboite')
-    json_body = build_json_body_elastic_search(*args, **kwargs)
+    json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
     try:
         distance_sort = kwargs['sort'] == 'distance'
     except KeyError:
@@ -178,7 +178,7 @@ def get_companies(*args, **kwargs):
         index=index,
         distance_sort=distance_sort
     )
-    companies = shuffle_companies(companies, distance_sort, kwargs.get('rome_code'))
+    companies = shuffle_companies(companies, distance_sort, rome_code)
     return companies, companies_count
 
 
@@ -197,8 +197,8 @@ def shuffle_companies(companies, distance_sort, rome_code):
         if distance_sort:
             key = company.distance
         else:
-            if company.score == 100:
-                # make an exception for offices which were manually boosted (score 100)
+            if hasattr(company, 'scores_by_rome') and company.scores_by_rome.get(rome_code) == 100:
+                # make an exception for offices which were manually boosted (score for rome = 100)
                 # to ensure they consistently appear on top of results
                 # and are not shuffled with other offices having 5.0 stars,
                 # but only score 99 and not 100
@@ -224,6 +224,7 @@ def shuffle_companies(companies, distance_sort, rome_code):
 
 def build_json_body_elastic_search(
         naf_codes,
+        rome_code,
         latitude,
         longitude,
         distance,
@@ -234,18 +235,19 @@ def build_json_body_elastic_search(
         flag_alternance=0,
         flag_junior=0,
         flag_senior=0,
-        flag_handicap=0,
-        rome_code=None):
+        flag_handicap=0):
+
+    score_for_rome_field_name = "scores_by_rome.%s" % rome_code
 
     sort_attrs = []
 
-    naf_filter = {
+    # Build filters.
+
+    filters = [{
         "terms": {
             "naf": naf_codes
         }
-    }
-
-    filters = [naf_filter]
+    }]
 
     # in some cases, a string is given as input, let's ensure it is an int from now on
     try:
@@ -265,44 +267,57 @@ def build_json_body_elastic_search(
             headcount_filter = {"gte": min_office_size}
         if max_office_size:
             headcount_filter = {"lte": max_office_size}
-        headcount_filter_dic = {
+        filters.append({
             "numeric_range": {
                 "headcount": headcount_filter
             }
-        }
-        filters += [headcount_filter_dic]
+        })
 
     if flag_alternance == 1:
-        flag_alternance_filter = {
+        filters.append({
             "term": {
                 "flag_alternance": 1
             }
-        }
-        filters += [flag_alternance_filter]
+        })
 
     if flag_junior == 1:
-        flag_junior_filter = {
+        filters.append({
             "term": {
                 "flag_junior": 1
             }
-        }
-        filters += [flag_junior_filter]
+        })
 
     if flag_senior == 1:
-        flag_senior_filter = {
+        filters.append({
             "term": {
                 "flag_senior": 1
             }
-        }
-        filters += [flag_senior_filter]
+        })
 
     if flag_handicap == 1:
-        flag_handicap_filter = {
+        filters.append({
             "term": {
                 "flag_handicap": 1
             }
+        })
+
+    filters.append({
+        "exists": {
+            "field": score_for_rome_field_name
         }
-        filters += [flag_handicap_filter]
+    })
+
+    filters.append({
+        "geo_distance": {
+            "distance": "%skm" % distance,
+            "locations": {
+                "lat": latitude,
+                "lon": longitude
+            }
+        }
+    })
+
+    # Build sort.
 
     if sort not in ['distance', 'score']:
         logger.info('sort should be distance or score: %s', sort)
@@ -319,26 +334,12 @@ def build_json_body_elastic_search(
         }
     }
 
-    if rome_code is None:
-        score_sort = {
-            "score": {
-                "order": "desc"
-            }
+    score_sort = {
+        score_for_rome_field_name: {
+            "order": "desc",
+            "ignore_unmapped": True,
         }
-    else:
-        field_name = "scores_by_rome.%s" % rome_code
-        score_sort = {
-            field_name: {
-                "order": "desc",
-                "ignore_unmapped": True,
-            }
-        }
-        score_for_rome_filter = {
-            "exists": {
-                "field": field_name
-            }
-        }
-        filters.append(score_for_rome_filter)
+    }
 
     if sort == "distance":
         sort_attrs.append(distance_sort)
@@ -346,16 +347,6 @@ def build_json_body_elastic_search(
     elif sort == "score":
         sort_attrs.append(score_sort)
         sort_attrs.append(distance_sort)
-
-    filters.append({
-        "geo_distance": {
-            "distance": "%skm" % distance,
-            "locations": {
-                "lat": latitude,
-                "lon": longitude
-            }
-        }
-    })
 
     json_body = {
         "sort": sort_attrs,

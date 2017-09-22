@@ -22,11 +22,11 @@ class ApiGenericTest(ApiBaseTest):
         distance = 100
         companies, _ = get_companies(
             naf_codes,
+            rome_code,
             latitude,
             longitude,
             distance,
             index=self.ES_TEST_INDEX,
-            rome_code=rome_code,
         )
         sirets = [company.siret for company in companies]
         self.assertIn(u'00000000000001', sirets)
@@ -42,11 +42,11 @@ class ApiGenericTest(ApiBaseTest):
         headcount_filter = settings.HEADCOUNT_SMALL_ONLY
         companies, _ = get_companies(
             naf_codes,
+            rome_code,
             latitude,
             longitude,
             distance,
             index=self.ES_TEST_INDEX,
-            rome_code=rome_code,
             headcount_filter=headcount_filter,
         )
         sirets = [company.siret for company in companies]

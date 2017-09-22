@@ -130,6 +130,7 @@ def company_list():
 
     companies, companies_count = search.get_companies(
         naf_code_list,
+        rome_code,
         latitude,
         longitude,
         distance,
@@ -138,7 +139,6 @@ def company_list():
         to_number=to_number,
         sort=settings.SORT_FILTER_DEFAULT,
         index=settings.ES_INDEX,
-        rome_code=rome_code,
     )
 
     result = {
