@@ -9,16 +9,9 @@ import urllib
 from flask import request, session
 from flask_login import current_user
 
-<<<<<<< HEAD
 from labonneboite.conf import settings
 from labonneboite.conf.common.contact_mode import CONTACT_MODE_DEFAULT
 from labonneboite.common.load_data import load_contact_modes
-=======
-from labonneboite.common.load_data import load_contact_modes
-from labonneboite.common.models import CONTACT_MODE_DEFAULT
-from labonneboite.conf import settings
-
->>>>>>> Test that the Pro Version is correctly enabled/desabled
 
 logger = logging.getLogger('main')
 
@@ -81,6 +74,7 @@ def user_is_pro():
     # Check user e-mail by plain_value, suffix or regex (@see local_settings.py)
     if current_user.is_authenticated:
         current_user_email = current_user.email.lower()
+<<<<<<< HEAD
 
         return (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
             or any(current_user_email.endswith(suffix) for suffix in settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
@@ -105,10 +99,20 @@ def pro_version_enabled():
     return session.get("pro_version", False)
 >>>>>>> Change wording, texte (pro_mode => pro_version), redirect by url in request and more !
 =======
+=======
+
+        result = (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
+            or any(current_user_email.endswith(suffix) for suffix in settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
+            or any(re.match(regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS)
+            )
+>>>>>>> Add the pro mode (session based)
 
 def pro_version_enabled():
     return session.get('pro_version', False)
 >>>>>>> Test that the Pro Version is correctly enabled/desabled
+
+def pro_mode_activated():
+    return session.get("pro_mode", False)
 
 
 def get_doorbell_tags(tag):

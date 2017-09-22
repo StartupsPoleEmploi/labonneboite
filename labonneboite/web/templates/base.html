@@ -33,13 +33,29 @@
         {% endif %}
       </li>
 
-      
-      <li class="float-right lbb-header-logo-pole-emploi">
-        {# The hardcoded width attribute is required by IE 11. #}
-        <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi" width="74">
-      </li>
-      
-      <li class="float-right">
+      <li>
+        {# PRO ZONE #}
+        {% if user_is_pro %}
+          <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
+            <a href="#" class="lbb-header-btn">
+              {% if pro_mode_activated %}
+                <img src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="">
+              {% else %}
+                <img src="{{ url_for('static', filename='images/pro/pro.svg') }}" alt="" />
+              {% endif %}
+              <span>Version PRO</span>
+            </a>
+            <div class="lbb-dropdown lbb-dropdown-right text-right">
+              {% if pro_mode_activated %}
+              <a id="pro-mode" href="#" class="btn no-wrap" data-action="disabled">Désactiver le mode PRO</a>  
+              {% else %} 
+                <p>Le mode PRO vous donne accès à des fonctionnalités supplémentaires : plus de filtres etc.</p>
+                <a id="pro-mode" href="#" class="btn" data-action="enabled">Activer le mode PRO</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
         {# START LOGIN ZONE #}
         {% if not user.is_authenticated %}
           <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">

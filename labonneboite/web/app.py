@@ -272,6 +272,7 @@ def create_app():
         'js/results.js',
         'js/tooltip.js',  # Depends on 'js/vendor/bootstrap-tooltip.js'.
         'js/unobfuscate.js',
+        'js/pro-mode-toggle.js',
         filters='jsmin',
         output='gen/packed.%(version)s.js',
     )
