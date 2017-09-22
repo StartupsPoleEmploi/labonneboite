@@ -80,7 +80,9 @@ def user_is_pro():
             or any(re.match(regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS)
             )
 
-    return result
+        return result
+
+    return False
 
 def pro_mode_activated():
     return session.get("pro_mode", False)
