@@ -247,18 +247,3 @@ def results_by_commune_and_rome(commune_id, rome_id):
     # roughly equivalent to the result of an API call - see Trello #971.
     return redirect('%s?%s' % (url, urlencode(request.args)))
 
-
-@searchBlueprint.route('/bob/<commune_id>/<rome_id>', methods=['GET'])
-def bob(commune_id, rome_id):
-    """
-    FIXME DEPRECATED URL initially used for Bob
-    replaced by generic URL /entreprises/commune/<commune_id>/rome/<rome_id>
-    """
-    return redirect(url_for(
-        'search.results_by_commune_and_rome',
-        commune_id=commune_id,
-        rome_id=rome_id,
-        utm_medium='web',
-        utm_source='bob',
-        utm_campaign='bob-deprecated'
-    ))
