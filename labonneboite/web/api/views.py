@@ -115,18 +115,6 @@ def company_list():
     to_number = page * page_size
     from_number = to_number - page_size + 1
 
-    # FIXME ---- remove this block when nobody uses from/to_number anymore
-    try:
-        from_number = int(request.args.get('from_number'))
-    except TypeError:
-        pass
-
-    try:
-        to_number = int(request.args.get('to_number'))
-    except TypeError:
-        pass
-    # -------
-
     try:
         distance = int(request.args.get('distance'))
     except (TypeError, ValueError):
