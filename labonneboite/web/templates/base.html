@@ -47,10 +47,10 @@
             </a>
             <div class="lbb-dropdown lbb-dropdown-right text-right">
               {% if pro_version_enabled %}
-                <a class="btn" href="{{ url_for('user.pro_version') }}?action=disabled&amp;redirect={{ request.url | urlencode }}">Désactiver le mode PRO</a>  
+                <a class="btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">Désactiver le mode PRO</a>  
               {% else %} 
                 <p>La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visible aux conseillers Pôle emploi et à une sélection d'acteurs.</p>
-                <a class="btn" href="{{ url_for('user.pro_version') }}?action=enabled&amp;redirect={{ request.url | urlencode }}">Activer le mode PRO</a>
+                <a class="btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">Activer le mode PRO</a>
               {% endif %}
             </div>
           </div>

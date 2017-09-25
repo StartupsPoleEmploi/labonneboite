@@ -162,18 +162,14 @@ def favorites_delete(siret):
 def pro_version():
     if not util.user_is_pro:
         abort(401)
-    
-    action = request.args.get('action', '')
-    if not action:
-        abort(400)
 
-    if action == "enabled" and not util.pro_version_enabled():
-        session['pro_version'] = True
-    elif action == "disabled" and util.pro_version_enabled():
+    if util.pro_version_enabled():
         session.pop('pro_version')
+    else:
+        session['pro_version'] = True
 
-    redirect_url = request.args.get('redirect', '/')
+    redirect_url = request.args.get('next', '/')
     if not util.is_safe_url(redirect_url):
         redirect_url = '/'
     
-    return redirect(redirect_url)   
+    return redirect(redirect_url)

@@ -82,6 +82,7 @@ def user_is_pro():
     return False
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         return result
 
     return False
@@ -89,6 +90,8 @@ def user_is_pro():
 def pro_mode_activated():
     return session.get("pro_mode", False)
 =======
+=======
+>>>>>>> Remove switch, no more action= in the URL et pro_version everywhere
 def pro_version_enabled():
     return session.get("pro_version", False)
 >>>>>>> Change wording, texte (pro_mode => pro_version), redirect by url in request and more !
