@@ -39,19 +39,24 @@
           <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
             <a href="#" class="lbb-header-btn">
               {% if pro_version_enabled %}
-                <img src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="" />
+                <img src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="">
               {% else %}
-                <img src="{{ url_for('static', filename='images/pro/pro.svg') }}" alt="" />
+                <img src="{{ url_for('static', filename='images/pro/pro.svg') }}" alt="">
               {% endif %}
               <span>Version PRO</span>
             </a>
             <div class="lbb-dropdown lbb-dropdown-right text-right">
-              {% if pro_version_enabled %}
-                <a class="btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">Désactiver le mode PRO</a>  
-              {% else %} 
-                <p>La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visible aux conseillers Pôle emploi et à une sélection d'acteurs.</p>
-                <a class="btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">Activer le mode PRO</a>
-              {% endif %}
+              <p>
+                <a class="btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">
+                  {% if pro_version_enabled %}
+                    Désactiver le mode PRO
+                  {% else %}
+                    Activer le mode PRO
+                  {% endif %}</a>
+              </p>
+              <p>
+                <i>La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visible aux conseillers Pôle emploi et à une sélection d'acteurs.</i>
+              </p>
             </div>
           </div>
         {% endif %}

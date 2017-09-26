@@ -40,4 +40,3 @@ class ContactModeTest(unittest.TestCase):
         self.assertNotIn(naf_prefix, contact_mode_dict)
         contact_mode = util.get_contact_mode_for_rome_and_naf(rome, naf)
         self.assertEqual(contact_mode, u'Envoyer un CV et une lettre de motivation')
-

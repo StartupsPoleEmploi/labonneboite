@@ -3,7 +3,7 @@
 import urllib
 
 from flask import Blueprint, Markup
-from flask import abort, current_app, flash, json, make_response, redirect, render_template, request, session, url_for
+from flask import abort, current_app, flash, redirect, render_template, request, session, url_for
 
 import flask_login
 from flask_login import current_user
@@ -160,6 +160,9 @@ def favorites_delete(siret):
 
 @userBlueprint.route('/pro-version')
 def pro_version():
+    """
+    Enable or disable "Version PRO" which is only visible to "PRO users".
+    """
     if not util.user_is_pro:
         abort(401)
 
@@ -169,7 +172,8 @@ def pro_version():
         session['pro_version'] = True
 
     redirect_url = request.args.get('next', '/')
+
     if not util.is_safe_url(redirect_url):
         redirect_url = '/'
-    
+
     return redirect(redirect_url)
