@@ -127,3 +127,20 @@
     background-color: #d5385f;
     border-color: #d5385f;
 }
+
+/* Colors: info.
+=========================================================================== */
+
+.btn.btn-info,
+.btn.btn-info:link,
+.btn.btn-info:visited {
+    background-color: #1c86f2;
+    border-color: #1c86f2;
+    color: #fff;
+}
+
+.btn.btn-info:focus,
+.btn.btn-info:hover {
+    background-color: #1263b5;
+    border-color: #1263b5;
+}

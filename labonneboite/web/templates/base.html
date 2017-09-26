@@ -34,6 +34,7 @@
       </li>
 
       <li>
+
         {# PRO ZONE #}
         {% if user_is_pro %}
           <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
@@ -47,7 +48,7 @@
             </a>
             <div class="lbb-dropdown lbb-dropdown-right text-right">
               <p>
-                <a class="btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">
+                <a class="btn btn-info btn-small" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">
                   {% if pro_version_enabled %}
                     Désactiver le mode PRO
                   {% else %}
@@ -114,6 +115,7 @@
           </div>
         {% endif %}
         {# END LOGIN ZONE #}
+
       </li>
       <li class="lbb-header-logo-pole-emploi">
         {# The hardcoded width attribute is required by IE 11. #}
