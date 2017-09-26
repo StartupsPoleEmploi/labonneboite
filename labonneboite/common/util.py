@@ -77,8 +77,9 @@ def user_is_pro():
 
         return (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
             or any(current_user_email.endswith(suffix) for suffix in settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
-            or any(re.match(regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS))
-        
+            or any(re.match(
+                regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS))
+
     return False
 
 <<<<<<< HEAD
@@ -121,7 +122,7 @@ def sanitize_string(s):
 
 def is_safe_url(url, allowed_hosts=None):
     """
-    Shamelessly ripped from Django:
+    Ripped and adapted from Django:
     https://github.com/django/django/blob/13cd5b/django/utils/http.py#L347-L370
     """
     if not allowed_hosts:
@@ -142,12 +143,16 @@ def is_safe_url(url, allowed_hosts=None):
     # URL and might consider the URL as scheme relative.
     if unicodedata.category(url[0])[0] == 'C':
         return False
+    if not url_info.netloc:
+        return False
+    if allowed_hosts and not url_info.netloc in allowed_hosts:
+        return False
     scheme = url_info.scheme
     # Consider URLs without a scheme (e.g. //example.com/p) to be http.
     if not url_info.scheme and url_info.netloc:
         scheme = 'http'
     valid_schemes = ['http', 'https']
-    return ((not url_info.netloc or url_info.netloc in allowed_hosts) and (not scheme or scheme in valid_schemes))
+    return (not scheme or scheme in valid_schemes)
 
 
 def get_contact_mode_for_rome_and_naf(rome, naf):
