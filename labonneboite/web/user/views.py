@@ -172,7 +172,8 @@ def pro_version():
         session['pro_version'] = True
 
     redirect_url = request.args.get('next', '/')
+
     if not util.is_safe_url(redirect_url):
         redirect_url = '/'
-    
+
     return redirect(redirect_url)
