@@ -2,16 +2,23 @@
 
 from urlparse import urlparse
 import logging
+import re
 import unicodedata
 import urllib
-import re
 
 from flask import request, session
 from flask_login import current_user
 
+<<<<<<< HEAD
 from labonneboite.conf import settings
 from labonneboite.conf.common.contact_mode import CONTACT_MODE_DEFAULT
 from labonneboite.common.load_data import load_contact_modes
+=======
+from labonneboite.common.load_data import load_contact_modes
+from labonneboite.common.models import CONTACT_MODE_DEFAULT
+from labonneboite.conf import settings
+
+>>>>>>> Test that the Pro Version is correctly enabled/desabled
 
 logger = logging.getLogger('main')
 
@@ -84,6 +91,7 @@ def user_is_pro():
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         return result
 
     return False
@@ -96,6 +104,11 @@ def pro_mode_activated():
 def pro_version_enabled():
     return session.get("pro_version", False)
 >>>>>>> Change wording, texte (pro_mode => pro_version), redirect by url in request and more !
+=======
+
+def pro_version_enabled():
+    return session.get('pro_version', False)
+>>>>>>> Test that the Pro Version is correctly enabled/desabled
 
 
 def get_doorbell_tags(tag):
