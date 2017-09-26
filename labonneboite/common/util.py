@@ -86,6 +86,7 @@ def user_is_pro():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         return result
 
     return False
@@ -127,9 +128,12 @@ def pro_version_enabled():
 >>>>>>> Ensure that the `allowed_hosts` parameter is optional.
     return False
 >>>>>>> quick bugfix - feel free to improve it @Alexandre
+=======
+>>>>>>> Test that the Pro Version is correctly enabled/desabled
 
 def pro_version_enabled():
-    return session.get("pro_version", False)
+    return session.get('pro_version', False)
+
 
 
 def get_doorbell_tags(tag):
