@@ -104,6 +104,7 @@ def pro_version_enabled():
         return (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
             or any(current_user_email.endswith(suffix) for suffix in settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
 <<<<<<< HEAD
+<<<<<<< HEAD
             or any(re.match(regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS)
             )
 >>>>>>> Add the pro mode (session based)
@@ -119,6 +120,11 @@ def pro_version_enabled():
             or any(re.match(regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS))
         
 >>>>>>> Change wording, texte (pro_mode => pro_version), redirect by url in request and more !
+=======
+            or any(re.match(
+                regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS))
+
+>>>>>>> Ensure that the `allowed_hosts` parameter is optional.
     return False
 >>>>>>> quick bugfix - feel free to improve it @Alexandre
 
