@@ -60,16 +60,10 @@
               <p>
                 <a href="{{ url_for('user.account') }}"><b>{{ user.first_name | title }} {{ user.last_name }}</b></a>
               </p>
-              <hr>
               <ul>
                 <li>
                   <a href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
                 </li>
-                {% if user_is_pro or user.is_admin %}
-                  <li>
-                    <a href="{{ url_for('data.home') }}">Mapping ROME/NAF</a>
-                  </li>
-                {% endif %}
                 {% if user.is_admin %}
                   <li>
                     <a href="{{ url_for('admin.index') }}">Admin</a>
@@ -77,6 +71,17 @@
                 {% endif %}
               </ul>
               <hr>
+              {% if user_is_pro or user.is_admin %}
+              <p>
+                <small class="badge badge-info">Version PRO</small>
+              </p>
+              <ul>
+                <li>
+                  <a href="{{ url_for('data.home') }}">Mapping ROME/NAF</a>
+                </li>
+              </ul>
+              <hr>
+              {% endif %}
               <p>
                 <a href="{{ url_for('auth.logout') }}" class="logout">Se déconnecter</a>
               </p>
