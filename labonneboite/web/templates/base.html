@@ -54,15 +54,28 @@
           <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
             <a href="#" class="lbb-header-btn">
               <img src="{{ url_for('static', filename='images/user-color.svg') }}" alt="">
-              <span>Mon compte &#x25BE;</span>
+              <span>Mon compte</span>
             </a>
             <div class="lbb-dropdown lbb-dropdown-right text-right">
               <p>
                 <a href="{{ url_for('user.account') }}"><b>{{ user.first_name | title }} {{ user.last_name }}</b></a>
               </p>
-              <p>
-                <a href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
-              </p>
+              <hr>
+              <ul>
+                <li>
+                  <a href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
+                </li>
+                {% if user_is_pro or user.is_admin %}
+                  <li>
+                    <a href="{{ url_for('data.home') }}">Mapping ROME/NAF</a>
+                  </li>
+                {% endif %}
+                {% if user.is_admin %}
+                  <li>
+                    <a href="{{ url_for('admin.index') }}">Admin</a>
+                  </li>
+                {% endif %}
+              </ul>
               <hr>
               <p>
                 <a href="{{ url_for('auth.logout') }}" class="logout">Se déconnecter</a>
