@@ -33,8 +33,39 @@
         <small class="badge badge-alternance" data-toggle="tooltip" data-placement="bottom" title="Tooltip.">Alternance</small>
       </li>
 
-      <li>
+      <li class="lbb-header-entry">
+        <a class="lbb-header-btn" href="#">
+          <span class="lbb-header-btn no-padding">
+            <img src="/static/images/pro/pro-color.svg" alt="">
+          </span>
+          
+          <p class="lbb-switch">
+            <span>
+              <span class="off">Off</span>
+              <span class="square"></span>
+              <span class="on">On</span>
+            </span>
+          </p>
+        </a>
+      </li>
 
+      <li class="lbb-header-entry">
+        <a class="lbb-header-btn" href="#">
+          <span class="lbb-header-btn no-padding">
+            <img src="/static/images/pro/pro.svg" alt="">
+          </span>
+          
+          <p class="lbb-switch on">
+            <span>
+              <span class="off">Off</span>
+              <span class="square"></span>
+              <span class="on">On</span>
+            </span>
+          </p>
+        </a>
+      </li>
+
+      <li class="lbb-header-entry">
         <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
           <a href="#" class="lbb-header-btn">
             <img src="{{ url_for('static', filename='images/user.svg') }}" alt="">
@@ -47,7 +78,8 @@
             </p>
           </div>
         </div>
-
+      </li>
+      <li class="lbb-header-entry">
         <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
           <a href="#" class="lbb-header-btn">
             <img src="{{ url_for('static', filename='images/user-color.svg') }}" alt="">
@@ -890,11 +922,32 @@
           <div class="cookbook-title">Meter</div>
           <div><meter value="2" min="0" max="10">2 out of 10</meter></div>
 
+          <div class="cookbook-title">Switch (not a checkbox)</div>
+          <div>
+              <p class="lbb-switch">
+                <span>
+                  <span class="off">Off</span>
+                  <span class="square"></span>
+                  <span class="on">On</span>
+                </span>
+              </p>
+
+              <p class="lbb-switch on">
+                <span>
+                  <span class="off">Off</span>
+                  <span class="square"></span>
+                  <span class="on">On</span>
+                </span>
+              </p>
+          </div>
+
           <div class="cookbook-title">Progress</div>
           <div><progress>progress</progress></div>
 
           <div class="cookbook-title">Inline SVG</div>
           <div><svg width="100px" height="100px"><circle cx="100" cy="100" r="100" fill="#1fa3ec"></circle></svg></div>
+
+
 
         </div>
 

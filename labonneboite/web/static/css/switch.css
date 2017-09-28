@@ -1,0 +1,67 @@
+/* Switch button
+=========================================================================== */
+.lbb-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    overflow: hidden;
+}
+
+.lbb-switch > span {
+    position: absolute;
+    height: 30px;
+    width: 122px;
+    top: 0;
+    margin: 0;
+    padding: 0 2px;
+
+    transition: left 0.3s linear, background-color 0.3s linear;
+}
+
+.lbb-switch > span {
+    background-color: transparent;
+    left: 0;
+    color: #5d5d5d;
+}
+
+
+.lbb-switch > span > span {
+    float: left;
+    line-height: 30px;
+}
+
+.lbb-switch span.on {
+    width: 30px;
+    padding-left: 10px;
+    color: #fff;
+    margin: 0;
+}
+
+.lbb-switch span.off {
+    width: 30px;
+    margin: 0;
+    padding-left: 5px;
+    text-align: left;
+}
+
+.lbb-switch span.square {
+    border: solid 1px #5d5d5d;
+    width: 10px;
+    height: 10px;
+    margin: 10px 5px;
+    background-color: white;
+}
+
+/* Switch active */
+.lbb-switch.on > span {
+    background-color: #1c86f2;
+    left: -31px;
+}
+
+.lbb-switch.on span.square:after {
+    content: '✔';
+    color: black;
+    top: -12px;
+    font-size: 8px;
+    position: relative;
+}

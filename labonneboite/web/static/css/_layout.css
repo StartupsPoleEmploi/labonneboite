@@ -86,6 +86,10 @@ ul.lbb-header {
     vertical-align: middle;
 }
 
+.lbb-header-entry {
+    width: 74px; /* Fix the width for <li> */
+}
+
 .lbb-header-logo-lbb,
 .lbb-header-logo-pole-emploi {
     width: 74px;  /* This width will give a height of ~ 70px for each logos since they have the same proportions. */

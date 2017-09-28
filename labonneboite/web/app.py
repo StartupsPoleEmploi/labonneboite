@@ -295,6 +295,7 @@ def create_app():
         'css/pagination.css',
         'css/ratings.css',
         'css/search_results.css',
+        'css/switch.css',
         # Vendor.
         'css/vendor/bootstrap-tooltip.css',
         'css/vendor/jquery-ui.css',
