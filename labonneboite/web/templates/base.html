@@ -94,9 +94,9 @@
         {# END LOGIN ZONE #}
       </li>
 
-      <li class="float-right lbb-header-entry">
-        {# PRO ZONE #}
-        {% if user_is_pro %}
+      {# PRO ZONE #}
+      {% if user_is_pro %}
+        <li class="float-right lbb-header-entry">
           <a class="lbb-header-btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">
             <span class="lbb-header-btn no-padding">
               {% if pro_version_enabled %}
@@ -117,9 +117,9 @@
               </span>
             </p>
           </a>
-        {% endif %}
-        {# END PRO ZONE #}
-      </li>
+        </li>
+      {% endif %}
+      {# END PRO ZONE #}
 
     </ul>
   </header>
