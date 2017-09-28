@@ -33,34 +33,13 @@
         {% endif %}
       </li>
 
-      <li class="lbb-header-entry">
-        {# PRO ZONE #}
-        {% if user_is_pro %}
-          <a class="lbb-header-btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">
-            <span class="lbb-header-btn no-padding">
-              {% if pro_version_enabled %}
-                <img src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="" data-toggle="tooltip" data-placement="bottom" data-original-title="La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visible aux conseillers Pôle emploi et à une sélection d'acteurs.">
-              {% else %}
-                <img src="{{ url_for('static', filename='images/pro/pro.svg') }}" alt="" data-toggle="tooltip" data-placement="bottom" data-original-title="La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visible aux conseillers Pôle emploi et à une sélection d'acteurs.">
-              {% endif %}
-            </span>
-            {% if pro_version_enabled %}
-              <p class="lbb-switch on">
-            {% else %}
-              <p class="lbb-switch">
-            {% endif %}
-              <span>
-                <span class="off">Off</span>
-                <span class="square"></span>
-                <span class="on">On</span>
-              </span>
-            </p>
-          </a>
-        {% endif %}
-        {# END PRO ZONE #}
+      
+      <li class="float-right lbb-header-logo-pole-emploi">
+        {# The hardcoded width attribute is required by IE 11. #}
+        <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi" width="74">
       </li>
       
-      <li class="lbb-header-entry">
+      <li class="float-right">
         {# START LOGIN ZONE #}
         {% if not user.is_authenticated %}
           <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
@@ -113,18 +92,17 @@
             </div>
         {% endif %}
         {# END LOGIN ZONE #}
-
       </li>
 
-      {# PRO ZONE #}
-      {% if user_is_pro %}
-        <li class="float-right lbb-header-entry">
+      <li class="float-right lbb-header-entry">
+        {# PRO ZONE #}
+        {% if user_is_pro %}
           <a class="lbb-header-btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">
             <span class="lbb-header-btn no-padding">
               {% if pro_version_enabled %}
-                <img class="no-margin" src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="Version PRO active" data-toggle="tooltip" data-placement="bottom" data-original-title="La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visibles aux conseillers Pôle emploi et à une sélection d'acteurs.">
+                <img class="no-margin" src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="Version PRO active" data-toggle="tooltip" data-placement="bottom" data-original-title="La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visible aux conseillers Pôle emploi et à une sélection d'acteurs.">
               {% else %}
-                <img class="no-margin" src="{{ url_for('static', filename='images/pro/pro.svg') }}" alt="Version PRO inactive" data-toggle="tooltip" data-placement="bottom" data-original-title="La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visibles aux conseillers Pôle emploi et à une sélection d'acteurs.">
+                <img class="no-margin" src="{{ url_for('static', filename='images/pro/pro.svg') }}" alt="Version PRO inactive" data-toggle="tooltip" data-placement="bottom" data-original-title="La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visible aux conseillers Pôle emploi et à une sélection d'acteurs.">
               {% endif %}
             </span>
             {% if pro_version_enabled %}
@@ -132,13 +110,16 @@
             {% else %}
               <p class="lbb-switch">
             {% endif %}
-              <span class="on">On</span>
-              <span class="off">Off</span>
+              <span>
+                <span class="off">On</span> <!-- Go to "On" -->
+                <span class="square"></span>
+                <span class="on">Off</span> <!-- Go to "Off" -->
+              </span>
             </p>
           </a>
-        </li>
-      {% endif %}
-      {# END PRO ZONE #}
+        {% endif %}
+        {# END PRO ZONE #}
+      </li>
 
     </ul>
   </header>
