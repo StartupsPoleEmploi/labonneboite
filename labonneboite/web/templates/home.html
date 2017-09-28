@@ -13,7 +13,12 @@
   <div class="lbb-single-column-content text-center">
 
     <h1 class="lbb-home-title">
-      Trouvez les entreprises qui embauchent sans déposer d'offres d'emploi !*
+      {% if pro_version_enabled %}
+        La version PRO affiche des indicateurs exclusifs (Junior, Senior et Bénéficiaire de l'Obligation d'Emploi).
+      {% else %}
+        N'envoyez plus vos CV au hasard
+        <small class="sub-heading">Découvrez notre sélection d'entreprises à fort potentiel d'embauche*</small>
+      {% endif %}
     </h1>
 
     <form action="{{ url_for('search.search') }}" class="lbb-home-form-search js-search-form" method="get">
