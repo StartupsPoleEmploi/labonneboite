@@ -48,6 +48,10 @@
     user-select: all;
 }
 
+.no-padding {
+    padding: 0 !important;
+}
+
 /* A container with a bright background used to wrap content when a dark color is used for the main background. */
 .lbb-bright-container {
     background: #fff;
