@@ -3,13 +3,13 @@
 .lbb-switch {
     position: relative;
     width: 60px;
-    height: 30px;
+    height: 17px;
     overflow: hidden;
 }
 
 .lbb-switch > span {
     position: absolute;
-    height: 30px;
+    height: 17px;
     width: 122px;
     top: 0;
     margin: 0;
@@ -27,20 +27,21 @@
 
 .lbb-switch > span > span {
     float: left;
-    line-height: 30px;
+    line-height: 17px;
 }
 
 .lbb-switch span.on {
     width: 30px;
-    padding-left: 10px;
+    padding-left: 0;
     color: #fff;
     margin: 0;
+    text-align: left;
 }
 
 .lbb-switch span.off {
     width: 30px;
     margin: 0;
-    padding-left: 5px;
+    padding-left: 10px;
     text-align: left;
 }
 
@@ -48,7 +49,7 @@
     border: solid 1px #5d5d5d;
     width: 10px;
     height: 10px;
-    margin: 10px 5px;
+    margin: 4px 10px;
     background-color: white;
 }
 
@@ -61,7 +62,7 @@
 .lbb-switch.on span.square:after {
     content: '✔';
     color: black;
-    top: -12px;
+    top: -6px;
     font-size: 8px;
     position: relative;
 }
