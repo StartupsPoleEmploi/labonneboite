@@ -33,10 +33,11 @@
       {{ form.hidden_tag() }}
 
     </form>
-
-    <p class="lbb-home-explanation lbb-grey">
-      <small>*Grâce à un algorithme exclusif de Pôle emploi détectant les entreprises qui vont probablement embaucher ces 6 prochains mois.</small>
-    </p>
+    {% if not pro_version_enabled %}
+      <p class="lbb-home-explanation lbb-grey">
+        <small>*Potentiel d'embauche : algorithme exclusif de Pôle emploi détectant les entreprises qui vont probablement embaucher ces 6 prochains mois.</small>
+      </p>
+    {% endif %}
   </div>
 </div>
 
