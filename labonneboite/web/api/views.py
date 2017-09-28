@@ -174,7 +174,6 @@ def company_list():
         to_number=to_number,
         flag_alternance=flag_alternance,
         sort=sort,
-        index=settings.ES_INDEX
     )
 
     # Define additional query string to add to office urls

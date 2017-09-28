@@ -4,6 +4,8 @@ import operator
 import os
 
 from flask import Flask, render_template
+# FIXME drop deprecated flask-script
+# see https://flask-script.readthedocs.io/en/latest/
 from flask_script import Manager
 from slugify import slugify
 

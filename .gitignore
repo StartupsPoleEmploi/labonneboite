@@ -86,3 +86,7 @@ labonneboite/importer/jenkins/*.jenkins
 labonneboite/importer/output/*.bz2
 labonneboite/importer/output/*.gz
 labonneboite/importer/output/*.sql
+
+# Mailing data #
+################
+labonneboite/scripts/mailing_data/users_sample_*.csv

@@ -74,6 +74,7 @@ def init_db():
 
     # Create LBB tables.
     # Import all models so that metadata can be filled in and SQLAlchemy knows what tables to deal with.
+    # FIXME import importer models as well !?
     # pylint:disable=unused-variable
     from labonneboite.common import models
     # pylint:enable=unused-variable
@@ -111,6 +112,7 @@ def delete_db():
     PSABase.metadata.drop_all(engine)
 
     # Drop LBB tables.
+    # FIXME drop importer tables as well !?
     # Import all models so that metadata can be filled in and SQLAlchemy knows what tables to deal with.
     # pylint:disable=unused-variable
     from labonneboite.common import models

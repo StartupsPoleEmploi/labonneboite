@@ -15,6 +15,8 @@ SEARCHING_TIME = 10000
 
 HOST = 'labonneboite.pole-emploi.fr'
 
+DISTANCE_FILTER_DEFAULT = 10
+
 # Headcount
 HEADCOUNT_INSEE = {
     u'00': u'0 salarié',
@@ -53,12 +55,16 @@ HEADCOUNT_VALUES = {
 # Contract Value
 CONTRACT_VALUES = {'all': 0, 'alternance': 1}
 
-# Sort
+# Sorting
 SORTING_CHOICES = (
     (u'distance', u'Distance'),
     (u'score', u'Potentiel d\'embauche'),
 )
-SORT_FILTER_DEFAULT = "score"
+
+SORT_FILTER_SCORE = "score"
+SORT_FILTER_DISTANCE = "distance"
+SORT_FILTERS = [SORT_FILTER_SCORE, SORT_FILTER_DISTANCE]
+SORT_FILTER_DEFAULT = SORT_FILTER_SCORE
 
 # Paginaton
 PAGINATION_MAX_PAGES = 10
@@ -75,5 +81,3 @@ COMPANY_RESULTS_MAX = 100
 AUTOCOMPLETE_MAX = 5
 
 ROME_NAF_PROBABILITY_CUTOFF = 0.05
-
-DISTANCE_FILTER_DEFAULT = 10

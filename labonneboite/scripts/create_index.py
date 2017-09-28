@@ -28,7 +28,10 @@ from labonneboite.conf import settings
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 
+# FIXME shouldn't create_index script also be used to populate test ES index as well?
+# we should use settings.ES_INDEX here instead
 INDEX_NAME = 'labonneboite'
+
 OFFICE_TYPE = 'office'
 OGR_TYPE = 'ogr'
 LOCATION_TYPE = 'location'
