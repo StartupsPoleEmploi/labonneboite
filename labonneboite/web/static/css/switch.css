@@ -1,68 +1,28 @@
 /* Switch button
 =========================================================================== */
 .lbb-switch {
-    position: relative;
-    width: 60px;
-    height: 17px;
-    overflow: hidden;
+    width: 62px;
+    height: 19px;
+    border: solid 1px #5d5d5d;
 }
 
 .lbb-switch > span {
-    position: absolute;
-    height: 17px;
-    width: 122px;
-    top: 0;
-    margin: 0;
-    padding: 0 2px;
-
-    transition: left 0.3s linear, background-color 0.3s linear;
-}
-
-.lbb-switch > span {
-    background-color: transparent;
-    left: 0;
+    float: left;
+    width: 30px;
+    line-height: 17px;
+    
+    text-align: center;
+    
+    background-color: white;
     color: #5d5d5d;
 }
 
-
-.lbb-switch > span > span {
-    float: left;
-    line-height: 17px;
-}
-
-.lbb-switch span.on {
-    width: 30px;
-    padding-left: 0;
-    color: #fff;
-    margin: 0;
-    text-align: left;
-}
-
-.lbb-switch span.off {
-    width: 30px;
-    margin: 0;
-    padding-left: 10px;
-    text-align: left;
-}
-
-.lbb-switch span.square {
-    border: solid 1px #5d5d5d;
-    width: 10px;
-    height: 10px;
-    margin: 4px 10px;
-    background-color: white;
-}
-
-/* Switch active */
-.lbb-switch.on > span {
+/* Switch state */
+.lbb-switch > span.off, .lbb-switch.on > span.on {
     background-color: #1c86f2;
-    left: -31px;
+    color: white;
 }
-
-.lbb-switch.on span.square:after {
-    content: '✔';
-    color: black;
-    top: -6px;
-    font-size: 8px;
-    position: relative;
+.lbb-switch.on > span.off {
+    background-color: white;
+    color: #5d5d5d;
 }
