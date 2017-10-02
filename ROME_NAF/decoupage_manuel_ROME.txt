@@ -1,0 +1,40 @@
+
+*** D1106 : Vente en alimentation ***
+
+Vendeur / Vendeuse en boulangerie-pâtisserie
+20560 Vendeur / Vendeuse en boulangerie-pâtisserie (45782.0)
+20567 Vendeur / Vendeuse en chocolaterie (2981.0)
+20568 Vendeur / Vendeuse en confiserie (811.0)
+
+Vendeur / Vendeuse en épicerie
+20576 Vendeur / Vendeuse en épicerie (1467.0)
+20577 Vendeur / Vendeuse en épicerie fine (2868.0)
+20540 Vendeur / Vendeuse en alimentation générale (3395.0)
+14863 Epicier / Epicière (353.0)
+
+Vendeur / Vendeuse de fruits et légumes
+20525 Vendeur / Vendeuse de fruits et légumes (3062.0)
+16388 Marchand / Marchande de fruits et légumes (51.0)
+20530 Vendeur / Vendeuse de primeurs (249.0)
+
+Vendeur / Vendeuse en crèmerie-fromagerie
+20570 Vendeur / Vendeuse en crèmerie (434.0)
+20623 Vendeur / Vendeuse en produits frais (1928.0)
+20645 Vendeur / Vendeuse rayon fromages (1194.0)
+
+Vendeur / Vendeuse en produits biologiques-diététiques
+38776 Vendeur / Vendeuse en produits biologiques (2067.0)
+20622 Vendeur / Vendeuse en produits diététiques (1062.0)
+
+Vendeur / Vendeuse en boucherie-charcuterie
+20646 Vendeur / Vendeuse rayon traiteur (926.0)
+20558 Vendeur / Vendeuse en boucherie (1443.0)
+20564 Vendeur / Vendeuse en charcuterie (4729.0)
+20559 Vendeur / Vendeuse en boucherie-charcuterie (2069.0)
+20627 Vendeur / Vendeuse en rôtisserie (236.0)
+
+Vendeur / Vendeuse en poissonnerie
+20612 Vendeur / Vendeuse en poissonnerie (3842.0)
+
+Vendeur / Vendeuse en vins et spiritueux
+20635 Vendeur / Vendeuse en vins et spiritueux (1913.0)
