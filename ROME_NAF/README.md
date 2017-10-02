@@ -1,6 +1,6 @@
 # Rejouer les traitements
 
-Les codes sources de ce répertoires sont écrit en python 3.
+Les codes sources de ce répertoires sont écrit en python 3.5.2.
 
 Les traitements de ce répertoires font un large usage de notebooks jupyter écrits en python. Un [notebook jupyter](http://jupyter.org/) est un environnement de développement intégré dans un navigateur web, permettant d'exécuter du code par étapes et d'en partager facilement les résultats.
 
@@ -35,7 +35,7 @@ Le script `clean.sh` décompresse, supprime les guillemets, remplace le séparat
 
 Les notebooks `DPAE.ipynb`, `ETT.ipynb`, `offres.ipynb` permettent d'examiner les échantillons des fichiers préparés.
 
-Les notebooks `clean_DPAE.ipynb`, `clean_ETT.ipynb` et `clean_offres.ipynb` ne conservent que les informations utilisées par la suite.  Les fichiers créés `*_clean.csv` contiennent des informations réidentifiantes mais moins sensibles que les fichiers originaux.
+Les notebooks `clean_DPAE.ipynb`, `clean_ETT.ipynb` et `clean_offres.ipynb` ne conservent que les informations utilisées par la suite.  Les fichiers créés `*_clean.csv` contiennent des informations réidentifiantes mais moins sensibles que les fichiers originaux. Une copie de ces fichiers est conservées sur lbbdev:/home/michel/data.
 
 # Agrégation par code ROME, OGR, NAF
 
@@ -69,8 +69,28 @@ Un tableau XLSX est produit par code ROME ainsi qu'un fichier `suggestions.pickl
 
 Le notebook `tableau_LBB.ipynb` produit un fichier CSV `tableau_LBB.csv` utilisation par le backend de La Bonne Boîte.
 
-## Partition des codes OGR d'un code ROME
+## Partition des codes OGR d'un code ROME (*"ROMEbis"*)
 
-Un code ROME peut se révéler trop imprécis, voir par exemple `ROME_D1106` qui détaille les statistiques d'embauches sur le code ROME D1106 (Vente en alimentation). Ce code ROME regroupe des métiers très différents (Vendeur / Vendeuse en boulangerie-pâtisserie, Vendeur / Vendeuse en poissonnerie...).
+Un code ROME peut se révéler trop imprécis, voir par exemple `ROME_D1106.ipynb` qui détaille les statistiques d'embauches sur le code ROME D1106 (Vente en alimentation). Ce code ROME regroupe des métiers très différents (Vendeur / Vendeuse en boulangerie-pâtisserie, Vendeur / Vendeuse en poissonnerie...).
 
-Le notebook `meta_OGR.ipynb` propose une méthode de regroupement des différents codes OGR d'un code ROME donné faisant sens pour le demandeur d'emploi.
+Le notebook `decoupage_ROME.ipynb` propose une méthode de regroupement automatique des différents codes OGR d'un code ROME donné faisant sens pour le demandeur d'emploi. Le découpage produit est affiché dans le fichier `decoupage_ROME.txt`. Ce regroupement automatique ne donne pas des résultats satisfaisants, c'est donc une approche manuelle qui est actuellement utilisée. Un petit nombre de codes ROME sont découpés manuellement : les extraits correspondants du fichier `decoupage_ROME.txt` sont copiés puis modifiés pour respecter le format suivant :
+
+```
+*** X0123 : un code ROME ***
+
+Le label du groupe OGR 1
+01234 titre de l'OGR
+01235 titre de l'OGR
+
+Le label du groupe OGR 2
+01236 titre de l'OGR
+01237 titre de l'OGR
+
+*** Y1234 : un autre code ROME ***
+
+...
+```
+
+Ce nouveau fichier est parsé par `parsing_decoupage_ROME.ipynb` et le résultat est sauvegardé dans `decoupage_ROME.pickle`.
+
+Les fichiers requis pour faire évoluer LBB sont créés dans le notebook `output_to_production.ipynb` puis `tableau_LBB.ipynb`.
