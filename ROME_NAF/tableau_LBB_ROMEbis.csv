@@ -20,6 +20,15 @@ A1101,"Conduite d'engins agricoles et forestiers",7731Z,"Location et location-ba
 A1101,"Conduite d'engins agricoles et forestiers",7830Z,"Autre mise à disposition de ressources humaines",248
 A1101,"Conduite d'engins agricoles et forestiers",8130Z,"Services d'aménagement paysager",86
 A1101,"Conduite d'engins agricoles et forestiers",9412Z,"Activités des organisations professionnelles",3
+A1201,"Bûcheronnage et élagage",0161Z,"Activités de soutien aux cultures",21
+A1201,"Bûcheronnage et élagage",0210Z,"Sylviculture et autres activités forestières",9
+A1201,"Bûcheronnage et élagage",0220Z,"Exploitation forestière",165
+A1201,"Bûcheronnage et élagage",0240Z,"Services de soutien à l'exploitation forestière",410
+A1201,"Bûcheronnage et élagage",1610A,"Sciage et rabotage du bois, hors imprégnation",57
+A1201,"Bûcheronnage et élagage",4778B,"Commerces de détail de charbons et combustibles",17
+A1201,"Bûcheronnage et élagage",8130Z,"Services d'aménagement paysager",488
+A1201,"Bûcheronnage et élagage",8411Z,"Administration publique générale",185
+A1201,"Bûcheronnage et élagage",8899B,"Action sociale sans hébergement n.c.a.",85
 A1202,"Entretien des espaces naturels",0240Z,"Services de soutien à l'exploitation forestière",20
 A1202,"Entretien des espaces naturels",4299Z,"Construction d'autres ouvrages de génie civil n.c.a.",12
 A1202,"Entretien des espaces naturels",5510Z,"Hôtels et hébergement similaire",69
@@ -11137,263 +11146,365 @@ N4403,"Manoeuvre du réseau ferré",4212Z,"Construction de voies ferrées de sur
 N4403,"Manoeuvre du réseau ferré",4910Z,"Transport ferroviaire interurbain de voyageurs",12
 N4403,"Manoeuvre du réseau ferré",4920Z,"Transports ferroviaires de fret",8
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1013B,"Charcuterie",6
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1052Z,"Fabrication de glaces et sorbets",39
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1071A,"Fabrication industrielle de pain et de pâtisserie fraîche",235
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1039B,"Transformation et conservation de fruits",2
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1052Z,"Fabrication de glaces et sorbets",45
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1071A,"Fabrication industrielle de pain et de pâtisserie fraîche",236
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1071B,"Cuisson de produits de boulangerie",583
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1071C,"Boulangerie et boulangerie-pâtisserie",7543
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1071D,"Pâtisserie",427
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1072Z,"Fabrication de biscuits, biscottes et pâtisseries de conservation",8
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1082Z,"Fabrication de cacao, chocolat et de produits de confiserie",10
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1071C,"Boulangerie et boulangerie-pâtisserie",7552
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1071D,"Pâtisserie",530
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1072Z,"Fabrication de biscuits, biscottes et pâtisseries de conservation",78
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1082Z,"Fabrication de cacao, chocolat et de produits de confiserie",307
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1083Z,"Transformation du thé et du café",1
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1085Z,"Fabrication de plats préparés",14
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1089Z,"Fabrication d'autres produits alimentaires n.c.a.",18
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",1089Z,"Fabrication d'autres produits alimentaires n.c.a.",22
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4617A,"Centrales d'achat alimentaires",2
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4619B,"Autres intermédiaires du commerce en produits divers",7
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4619B,"Autres intermédiaires du commerce en produits divers",22
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4634Z,"Commerce de gros (commerce interentreprises) de boissons",1
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4636Z,"Commerce de gros (commerce interentreprises) de sucre, chocolat et confiserie",6
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4638B,"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers",5
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",2
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4636Z,"Commerce de gros (commerce interentreprises) de sucre, chocolat et confiserie",20
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4638B,"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers",13
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",3
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4711A,"Commerce de détail de produits surgelés",4
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4711B,"Commerce d'alimentation générale",49
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4711B,"Commerce d'alimentation générale",73
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4711C,"Supérettes",57
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4711D,"Supermarchés",443
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4711E,"Magasins multi-commerces",10
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4711F,"Hypermarchés",192
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4711F,"Hypermarchés",199
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4719A,"Grands magasins",6
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4719B,"Autres commerces de détail en magasin non spécialisé",3
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4719B,"Autres commerces de détail en magasin non spécialisé",12
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4721Z,"Commerce de détail de fruits et légumes en magasin spécialisé",1
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4722Z,"Commerce de détail de viandes et de produits à base de viande en magasin spécialisé",2
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4724Z,"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",524
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4725Z,"Commerce de détail de boissons en magasin spécialisé",7
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",27
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4724Z,"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",840
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4725Z,"Commerce de détail de boissons en magasin spécialisé",10
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",47
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4730Z,"Commerce de détail de carburants en magasin spécialisé",70
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4771Z,"Commerce de détail d'habillement en magasin spécialisé",34
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4778C,"Autres commerces de détail spécialisés divers",13
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",69
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4789Z,"Autres commerces de détail sur éventaires et marchés",6
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4771Z,"Commerce de détail d'habillement en magasin spécialisé",83
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4778C,"Autres commerces de détail spécialisés divers",60
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",78
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4789Z,"Autres commerces de détail sur éventaires et marchés",8
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",13
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5510Z,"Hôtels et hébergement similaire",545
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5610A,"Restauration traditionnelle",1353
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5510Z,"Hôtels et hébergement similaire",581
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5610A,"Restauration traditionnelle",1421
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5610B,"Cafétérias et autres libres-services",98
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5610C,"Restauration de type rapide",2124
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5621Z,"Services des traiteurs",33
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5630Z,"Débits de boissons",155
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",6420Z,"Activités des sociétés holding",65
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",6820B,"Location de terrains et d'autres biens immobiliers",69
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",7010Z,"Activités des sièges sociaux",692
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",7810Z,"Activités des agences de placement de main-d'œuvre",164
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5610C,"Restauration de type rapide",2286
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5621Z,"Services des traiteurs",36
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",5630Z,"Débits de boissons",183
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",6420Z,"Activités des sociétés holding",67
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",6820B,"Location de terrains et d'autres biens immobiliers",71
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",7010Z,"Activités des sièges sociaux",734
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",7810Z,"Activités des agences de placement de main-d'œuvre",173
 D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",7830Z,"Autre mise à disposition de ressources humaines",639
-D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",8559A,"Formation continue d'adultes",63
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",1039B,"Transformation et conservation de fruits",2
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",1052Z,"Fabrication de glaces et sorbets",6
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",1071A,"Fabrication industrielle de pain et de pâtisserie fraîche",1
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",1071C,"Boulangerie et boulangerie-pâtisserie",10
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",1071D,"Pâtisserie",103
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",1072Z,"Fabrication de biscuits, biscottes et pâtisseries de conservation",71
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",1082Z,"Fabrication de cacao, chocolat et de produits de confiserie",298
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",1083Z,"Transformation du thé et du café",1
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",1089Z,"Fabrication d'autres produits alimentaires n.c.a.",4
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4619B,"Autres intermédiaires du commerce en produits divers",16
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4636Z,"Commerce de gros (commerce interentreprises) de sucre, chocolat et confiserie",14
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4638B,"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers",9
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",1
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4711B,"Commerce d'alimentation générale",24
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4711F,"Hypermarchés",7
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4719B,"Autres commerces de détail en magasin non spécialisé",9
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4724Z,"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",317
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4725Z,"Commerce de détail de boissons en magasin spécialisé",3
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",21
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4771Z,"Commerce de détail d'habillement en magasin spécialisé",50
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4778C,"Autres commerces de détail spécialisés divers",47
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",9
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",4789Z,"Autres commerces de détail sur éventaires et marchés",2
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",5510Z,"Hôtels et hébergement similaire",37
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",5610A,"Restauration traditionnelle",68
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",5610C,"Restauration de type rapide",162
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",5621Z,"Services des traiteurs",4
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",5630Z,"Débits de boissons",29
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",6420Z,"Activités des sociétés holding",2
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",6820B,"Location de terrains et d'autres biens immobiliers",3
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",7010Z,"Activités des sièges sociaux",43
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",7810Z,"Activités des agences de placement de main-d'œuvre",9
-D1106b,"Vendeur / Vendeuse en chocolaterie-confiserie",8559A,"Formation continue d'adultes",2
-D1106c,"Vendeur / Vendeuse en épicerie",0113Z,"Culture de légumes, de melons, de racines et de tubercules",3
-D1106c,"Vendeur / Vendeuse en épicerie",0145Z,"Élevage d'ovins et de caprins",1
-D1106c,"Vendeur / Vendeuse en épicerie",0147Z,"Élevage de volailles",12
-D1106c,"Vendeur / Vendeuse en épicerie",0149Z,"Élevage d'autres animaux",3
-D1106c,"Vendeur / Vendeuse en épicerie",0150Z,"Culture et élevage associés",1
-D1106c,"Vendeur / Vendeuse en épicerie",0322Z,"Aquaculture en eau douce",1
-D1106c,"Vendeur / Vendeuse en épicerie",0893Z,"Production de sel",4
-D1106c,"Vendeur / Vendeuse en épicerie",1013A,"Préparation industrielle de produits à base de viande",42
-D1106c,"Vendeur / Vendeuse en épicerie",1013B,"Charcuterie",4
-D1106c,"Vendeur / Vendeuse en épicerie",1020Z,"Transformation et conservation de poisson, de crustacés et de mollusques",28
-D1106c,"Vendeur / Vendeuse en épicerie",1039B,"Transformation et conservation de fruits",18
-D1106c,"Vendeur / Vendeuse en épicerie",1051A,"Fabrication de lait liquide et de produits frais",14
-D1106c,"Vendeur / Vendeuse en épicerie",1051C,"Fabrication de fromage",14
-D1106c,"Vendeur / Vendeuse en épicerie",1052Z,"Fabrication de glaces et sorbets",6
-D1106c,"Vendeur / Vendeuse en épicerie",1071A,"Fabrication industrielle de pain et de pâtisserie fraîche",3
-D1106c,"Vendeur / Vendeuse en épicerie",1071C,"Boulangerie et boulangerie-pâtisserie",3
-D1106c,"Vendeur / Vendeuse en épicerie",1071D,"Pâtisserie",7
-D1106c,"Vendeur / Vendeuse en épicerie",1072Z,"Fabrication de biscuits, biscottes et pâtisseries de conservation",23
-D1106c,"Vendeur / Vendeuse en épicerie",1082Z,"Fabrication de cacao, chocolat et de produits de confiserie",3
-D1106c,"Vendeur / Vendeuse en épicerie",1083Z,"Transformation du thé et du café",20
-D1106c,"Vendeur / Vendeuse en épicerie",1085Z,"Fabrication de plats préparés",52
-D1106c,"Vendeur / Vendeuse en épicerie",1089Z,"Fabrication d'autres produits alimentaires n.c.a.",15
-D1106c,"Vendeur / Vendeuse en épicerie",1101Z,"Production de boissons alcooliques distillées",15
-D1106c,"Vendeur / Vendeuse en épicerie",1102B,"Vinification",1
-D1106c,"Vendeur / Vendeuse en épicerie",4617A,"Centrales d'achat alimentaires",19
-D1106c,"Vendeur / Vendeuse en épicerie",4617B,"Autres intermédiaires du commerce en denrées, boissons et tabac",1
-D1106c,"Vendeur / Vendeuse en épicerie",4619B,"Autres intermédiaires du commerce en produits divers",24
-D1106c,"Vendeur / Vendeuse en épicerie",4621Z,"Commerce de gros (commerce interentreprises) de céréales, de tabac non manufacturé, de semences et d'aliments pour le bétail",25
-D1106c,"Vendeur / Vendeuse en épicerie",4631Z,"Commerce de gros (commerce interentreprises) de fruits et légumes",4
-D1106c,"Vendeur / Vendeuse en épicerie",4633Z,"Commerce de gros (commerce interentreprises) de produits laitiers, œufs, huiles et matières grasses comestibles",9
-D1106c,"Vendeur / Vendeuse en épicerie",4634Z,"Commerce de gros (commerce interentreprises) de boissons",2
-D1106c,"Vendeur / Vendeuse en épicerie",4636Z,"Commerce de gros (commerce interentreprises) de sucre, chocolat et confiserie",1
-D1106c,"Vendeur / Vendeuse en épicerie",4637Z,"Commerce de gros (commerce interentreprises) de café, thé, cacao et épices",8
-D1106c,"Vendeur / Vendeuse en épicerie",4638B,"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers",51
-D1106c,"Vendeur / Vendeuse en épicerie",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",22
-D1106c,"Vendeur / Vendeuse en épicerie",4711B,"Commerce d'alimentation générale",294
-D1106c,"Vendeur / Vendeuse en épicerie",4711C,"Supérettes",83
-D1106c,"Vendeur / Vendeuse en épicerie",4711D,"Supermarchés",51
-D1106c,"Vendeur / Vendeuse en épicerie",4711E,"Magasins multi-commerces",10
-D1106c,"Vendeur / Vendeuse en épicerie",4711F,"Hypermarchés",47
-D1106c,"Vendeur / Vendeuse en épicerie",4719B,"Autres commerces de détail en magasin non spécialisé",151
-D1106c,"Vendeur / Vendeuse en épicerie",4721Z,"Commerce de détail de fruits et légumes en magasin spécialisé",40
-D1106c,"Vendeur / Vendeuse en épicerie",4722Z,"Commerce de détail de viandes et de produits à base de viande en magasin spécialisé",17
-D1106c,"Vendeur / Vendeuse en épicerie",4723Z,"Commerce de détail de poissons, crustacés et mollusques en magasin spécialisé",12
-D1106c,"Vendeur / Vendeuse en épicerie",4724Z,"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",28
-D1106c,"Vendeur / Vendeuse en épicerie",4725Z,"Commerce de détail de boissons en magasin spécialisé",16
-D1106c,"Vendeur / Vendeuse en épicerie",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",774
-D1106c,"Vendeur / Vendeuse en épicerie",4730Z,"Commerce de détail de carburants en magasin spécialisé",11
-D1106c,"Vendeur / Vendeuse en épicerie",4771Z,"Commerce de détail d'habillement en magasin spécialisé",332
-D1106c,"Vendeur / Vendeuse en épicerie",4778C,"Autres commerces de détail spécialisés divers",203
-D1106c,"Vendeur / Vendeuse en épicerie",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",57
-D1106c,"Vendeur / Vendeuse en épicerie",4789Z,"Autres commerces de détail sur éventaires et marchés",15
-D1106c,"Vendeur / Vendeuse en épicerie",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",8
-D1106c,"Vendeur / Vendeuse en épicerie",5510Z,"Hôtels et hébergement similaire",109
-D1106c,"Vendeur / Vendeuse en épicerie",5610A,"Restauration traditionnelle",740
-D1106c,"Vendeur / Vendeuse en épicerie",5610C,"Restauration de type rapide",82
-D1106c,"Vendeur / Vendeuse en épicerie",5621Z,"Services des traiteurs",38
-D1106c,"Vendeur / Vendeuse en épicerie",5630Z,"Débits de boissons",183
-D1106c,"Vendeur / Vendeuse en épicerie",6420Z,"Activités des sociétés holding",12
-D1106c,"Vendeur / Vendeuse en épicerie",6820B,"Location de terrains et d'autres biens immobiliers",10
-D1106c,"Vendeur / Vendeuse en épicerie",7010Z,"Activités des sièges sociaux",66
-D1106c,"Vendeur / Vendeuse en épicerie",7810Z,"Activités des agences de placement de main-d'œuvre",9
-D1106c,"Vendeur / Vendeuse en épicerie",7830Z,"Autre mise à disposition de ressources humaines",51
-D1106c,"Vendeur / Vendeuse en épicerie",8559A,"Formation continue d'adultes",11
-D1106d,"Vendeur / Vendeuse en alimentation générale",0113Z,"Culture de légumes, de melons, de racines et de tubercules",76
-D1106d,"Vendeur / Vendeuse en alimentation générale",0145Z,"Élevage d'ovins et de caprins",17
-D1106d,"Vendeur / Vendeuse en alimentation générale",0147Z,"Élevage de volailles",26
-D1106d,"Vendeur / Vendeuse en alimentation générale",0149Z,"Élevage d'autres animaux",8
-D1106d,"Vendeur / Vendeuse en alimentation générale",0150Z,"Culture et élevage associés",17
-D1106d,"Vendeur / Vendeuse en alimentation générale",0321Z,"Aquaculture en mer",38
-D1106d,"Vendeur / Vendeuse en alimentation générale",0322Z,"Aquaculture en eau douce",3
-D1106d,"Vendeur / Vendeuse en alimentation générale",1011Z,"Transformation et conservation de la viande de boucherie",201
-D1106d,"Vendeur / Vendeuse en alimentation générale",1013A,"Préparation industrielle de produits à base de viande",124
-D1106d,"Vendeur / Vendeuse en alimentation générale",1013B,"Charcuterie",314
-D1106d,"Vendeur / Vendeuse en alimentation générale",1020Z,"Transformation et conservation de poisson, de crustacés et de mollusques",84
-D1106d,"Vendeur / Vendeuse en alimentation générale",1039B,"Transformation et conservation de fruits",22
-D1106d,"Vendeur / Vendeuse en alimentation générale",1051A,"Fabrication de lait liquide et de produits frais",8
-D1106d,"Vendeur / Vendeuse en alimentation générale",1051C,"Fabrication de fromage",96
-D1106d,"Vendeur / Vendeuse en alimentation générale",1071A,"Fabrication industrielle de pain et de pâtisserie fraîche",9
-D1106d,"Vendeur / Vendeuse en alimentation générale",1071B,"Cuisson de produits de boulangerie",8
-D1106d,"Vendeur / Vendeuse en alimentation générale",1071C,"Boulangerie et boulangerie-pâtisserie",40
-D1106d,"Vendeur / Vendeuse en alimentation générale",1071D,"Pâtisserie",9
-D1106d,"Vendeur / Vendeuse en alimentation générale",1072Z,"Fabrication de biscuits, biscottes et pâtisseries de conservation",8
-D1106d,"Vendeur / Vendeuse en alimentation générale",1082Z,"Fabrication de cacao, chocolat et de produits de confiserie",5
-D1106d,"Vendeur / Vendeuse en alimentation générale",1085Z,"Fabrication de plats préparés",60
-D1106d,"Vendeur / Vendeuse en alimentation générale",1089Z,"Fabrication d'autres produits alimentaires n.c.a.",11
-D1106d,"Vendeur / Vendeuse en alimentation générale",1101Z,"Production de boissons alcooliques distillées",1
-D1106d,"Vendeur / Vendeuse en alimentation générale",4617A,"Centrales d'achat alimentaires",7
-D1106d,"Vendeur / Vendeuse en alimentation générale",4617B,"Autres intermédiaires du commerce en denrées, boissons et tabac",1
-D1106d,"Vendeur / Vendeuse en alimentation générale",4619B,"Autres intermédiaires du commerce en produits divers",14
-D1106d,"Vendeur / Vendeuse en alimentation générale",4621Z,"Commerce de gros (commerce interentreprises) de céréales, de tabac non manufacturé, de semences et d'aliments pour le bétail",29
-D1106d,"Vendeur / Vendeuse en alimentation générale",4631Z,"Commerce de gros (commerce interentreprises) de fruits et légumes",190
-D1106d,"Vendeur / Vendeuse en alimentation générale",4632A,"Commerce de gros (commerce interentreprises) de viandes de boucherie",16
-D1106d,"Vendeur / Vendeuse en alimentation générale",4633Z,"Commerce de gros (commerce interentreprises) de produits laitiers, œufs, huiles et matières grasses comestibles",28
-D1106d,"Vendeur / Vendeuse en alimentation générale",4634Z,"Commerce de gros (commerce interentreprises) de boissons",24
-D1106d,"Vendeur / Vendeuse en alimentation générale",4636Z,"Commerce de gros (commerce interentreprises) de sucre, chocolat et confiserie",1
-D1106d,"Vendeur / Vendeuse en alimentation générale",4638A,"Commerce de gros (commerce interentreprises) de poissons, crustacés et mollusques",55
-D1106d,"Vendeur / Vendeuse en alimentation générale",4638B,"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers",23
-D1106d,"Vendeur / Vendeuse en alimentation générale",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",76
-D1106d,"Vendeur / Vendeuse en alimentation générale",4711A,"Commerce de détail de produits surgelés",164
-D1106d,"Vendeur / Vendeuse en alimentation générale",4711B,"Commerce d'alimentation générale",526
-D1106d,"Vendeur / Vendeuse en alimentation générale",4711C,"Supérettes",240
-D1106d,"Vendeur / Vendeuse en alimentation générale",4711D,"Supermarchés",3147
-D1106d,"Vendeur / Vendeuse en alimentation générale",4711E,"Magasins multi-commerces",31
-D1106d,"Vendeur / Vendeuse en alimentation générale",4711F,"Hypermarchés",2637
-D1106d,"Vendeur / Vendeuse en alimentation générale",4719A,"Grands magasins",29
-D1106d,"Vendeur / Vendeuse en alimentation générale",4719B,"Autres commerces de détail en magasin non spécialisé",154
-D1106d,"Vendeur / Vendeuse en alimentation générale",4721Z,"Commerce de détail de fruits et légumes en magasin spécialisé",422
-D1106d,"Vendeur / Vendeuse en alimentation générale",4722Z,"Commerce de détail de viandes et de produits à base de viande en magasin spécialisé",632
-D1106d,"Vendeur / Vendeuse en alimentation générale",4723Z,"Commerce de détail de poissons, crustacés et mollusques en magasin spécialisé",234
-D1106d,"Vendeur / Vendeuse en alimentation générale",4724Z,"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",9
-D1106d,"Vendeur / Vendeuse en alimentation générale",4725Z,"Commerce de détail de boissons en magasin spécialisé",10
-D1106d,"Vendeur / Vendeuse en alimentation générale",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",188
-D1106d,"Vendeur / Vendeuse en alimentation générale",4730Z,"Commerce de détail de carburants en magasin spécialisé",155
-D1106d,"Vendeur / Vendeuse en alimentation générale",4771Z,"Commerce de détail d'habillement en magasin spécialisé",447
-D1106d,"Vendeur / Vendeuse en alimentation générale",4778C,"Autres commerces de détail spécialisés divers",156
-D1106d,"Vendeur / Vendeuse en alimentation générale",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",579
-D1106d,"Vendeur / Vendeuse en alimentation générale",4789Z,"Autres commerces de détail sur éventaires et marchés",33
-D1106d,"Vendeur / Vendeuse en alimentation générale",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",16
-D1106d,"Vendeur / Vendeuse en alimentation générale",5510Z,"Hôtels et hébergement similaire",472
-D1106d,"Vendeur / Vendeuse en alimentation générale",5610A,"Restauration traditionnelle",1001
-D1106d,"Vendeur / Vendeuse en alimentation générale",5610B,"Cafétérias et autres libres-services",45
-D1106d,"Vendeur / Vendeuse en alimentation générale",5610C,"Restauration de type rapide",359
-D1106d,"Vendeur / Vendeuse en alimentation générale",5621Z,"Services des traiteurs",94
-D1106d,"Vendeur / Vendeuse en alimentation générale",5630Z,"Débits de boissons",225
-D1106d,"Vendeur / Vendeuse en alimentation générale",6420Z,"Activités des sociétés holding",22
-D1106d,"Vendeur / Vendeuse en alimentation générale",6820B,"Location de terrains et d'autres biens immobiliers",66
-D1106d,"Vendeur / Vendeuse en alimentation générale",7010Z,"Activités des sièges sociaux",198
-D1106d,"Vendeur / Vendeuse en alimentation générale",7810Z,"Activités des agences de placement de main-d'œuvre",106
-D1106d,"Vendeur / Vendeuse en alimentation générale",7830Z,"Autre mise à disposition de ressources humaines",802
-D1106d,"Vendeur / Vendeuse en alimentation générale",8559A,"Formation continue d'adultes",25
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",0113Z,"Culture de légumes, de melons, de racines et de tubercules",1
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",1071C,"Boulangerie et boulangerie-pâtisserie",1
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",1101Z,"Production de boissons alcooliques distillées",10
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",1102B,"Vinification",44
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4617A,"Centrales d'achat alimentaires",7
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4617B,"Autres intermédiaires du commerce en denrées, boissons et tabac",15
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4619B,"Autres intermédiaires du commerce en produits divers",3
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4621Z,"Commerce de gros (commerce interentreprises) de céréales, de tabac non manufacturé, de semences et d'aliments pour le bétail",5
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4634Z,"Commerce de gros (commerce interentreprises) de boissons",136
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",9
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4711B,"Commerce d'alimentation générale",9
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4711C,"Supérettes",1
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4711D,"Supermarchés",11
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4711F,"Hypermarchés",28
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4722Z,"Commerce de détail de viandes et de produits à base de viande en magasin spécialisé",2
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4724Z,"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",1
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4725Z,"Commerce de détail de boissons en magasin spécialisé",239
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",9
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4771Z,"Commerce de détail d'habillement en magasin spécialisé",34
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4778C,"Autres commerces de détail spécialisés divers",4
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",1
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",1
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",5510Z,"Hôtels et hébergement similaire",254
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",5610A,"Restauration traditionnelle",152
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",5610C,"Restauration de type rapide",5
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",5630Z,"Débits de boissons",85
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",6420Z,"Activités des sociétés holding",1
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",6820B,"Location de terrains et d'autres biens immobiliers",5
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",7010Z,"Activités des sièges sociaux",6
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",7810Z,"Activités des agences de placement de main-d'œuvre",3
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",7830Z,"Autre mise à disposition de ressources humaines",101
-D1106e,"Vendeur / Vendeuse en vins et spiritueux",8559A,"Formation continue d'adultes",4
-A1201a,"Bûcheron / Bûcheronne",0161Z,"Activités de soutien aux cultures",12
-A1201a,"Bûcheron / Bûcheronne",0210Z,"Sylviculture et autres activités forestières",7
-A1201a,"Bûcheron / Bûcheronne",0220Z,"Exploitation forestière",139
-A1201a,"Bûcheron / Bûcheronne",0240Z,"Services de soutien à l'exploitation forestière",340
-A1201a,"Bûcheron / Bûcheronne",1610A,"Sciage et rabotage du bois, hors imprégnation",57
-A1201a,"Bûcheron / Bûcheronne",4778B,"Commerces de détail de charbons et combustibles",16
-A1201a,"Bûcheron / Bûcheronne",8130Z,"Services d'aménagement paysager",99
-A1201a,"Bûcheron / Bûcheronne",8411Z,"Administration publique générale",56
-A1201a,"Bûcheron / Bûcheronne",8899B,"Action sociale sans hébergement n.c.a.",60
-A1201b,"Elagueur / Elagueuse",0161Z,"Activités de soutien aux cultures",10
-A1201b,"Elagueur / Elagueuse",0210Z,"Sylviculture et autres activités forestières",3
-A1201b,"Elagueur / Elagueuse",0220Z,"Exploitation forestière",27
-A1201b,"Elagueur / Elagueuse",0240Z,"Services de soutien à l'exploitation forestière",71
-A1201b,"Elagueur / Elagueuse",1610A,"Sciage et rabotage du bois, hors imprégnation",1
-A1201b,"Elagueur / Elagueuse",4778B,"Commerces de détail de charbons et combustibles",2
-A1201b,"Elagueur / Elagueuse",8130Z,"Services d'aménagement paysager",390
-A1201b,"Elagueur / Elagueuse",8411Z,"Administration publique générale",130
-A1201b,"Elagueur / Elagueuse",8899B,"Action sociale sans hébergement n.c.a.",26
+D1106a,"Vendeur / Vendeuse en boulangerie-pâtisserie",8559A,"Formation continue d'adultes",64
+D1106b,"Vendeur / Vendeuse en épicerie",0113Z,"Culture de légumes, de melons, de racines et de tubercules",1
+D1106b,"Vendeur / Vendeuse en épicerie",0145Z,"Élevage d'ovins et de caprins",2
+D1106b,"Vendeur / Vendeuse en épicerie",0147Z,"Élevage de volailles",14
+D1106b,"Vendeur / Vendeuse en épicerie",0149Z,"Élevage d'autres animaux",7
+D1106b,"Vendeur / Vendeuse en épicerie",0150Z,"Culture et élevage associés",3
+D1106b,"Vendeur / Vendeuse en épicerie",0321Z,"Aquaculture en mer",3
+D1106b,"Vendeur / Vendeuse en épicerie",0322Z,"Aquaculture en eau douce",3
+D1106b,"Vendeur / Vendeuse en épicerie",0893Z,"Production de sel",4
+D1106b,"Vendeur / Vendeuse en épicerie",1011Z,"Transformation et conservation de la viande de boucherie",25
+D1106b,"Vendeur / Vendeuse en épicerie",1013A,"Préparation industrielle de produits à base de viande",58
+D1106b,"Vendeur / Vendeuse en épicerie",1013B,"Charcuterie",11
+D1106b,"Vendeur / Vendeuse en épicerie",1020Z,"Transformation et conservation de poisson, de crustacés et de mollusques",28
+D1106b,"Vendeur / Vendeuse en épicerie",1039B,"Transformation et conservation de fruits",15
+D1106b,"Vendeur / Vendeuse en épicerie",1051A,"Fabrication de lait liquide et de produits frais",3
+D1106b,"Vendeur / Vendeuse en épicerie",1051C,"Fabrication de fromage",7
+D1106b,"Vendeur / Vendeuse en épicerie",1052Z,"Fabrication de glaces et sorbets",6
+D1106b,"Vendeur / Vendeuse en épicerie",1071A,"Fabrication industrielle de pain et de pâtisserie fraîche",9
+D1106b,"Vendeur / Vendeuse en épicerie",1071B,"Cuisson de produits de boulangerie",5
+D1106b,"Vendeur / Vendeuse en épicerie",1071C,"Boulangerie et boulangerie-pâtisserie",34
+D1106b,"Vendeur / Vendeuse en épicerie",1071D,"Pâtisserie",11
+D1106b,"Vendeur / Vendeuse en épicerie",1072Z,"Fabrication de biscuits, biscottes et pâtisseries de conservation",29
+D1106b,"Vendeur / Vendeuse en épicerie",1082Z,"Fabrication de cacao, chocolat et de produits de confiserie",5
+D1106b,"Vendeur / Vendeuse en épicerie",1083Z,"Transformation du thé et du café",20
+D1106b,"Vendeur / Vendeuse en épicerie",1085Z,"Fabrication de plats préparés",66
+D1106b,"Vendeur / Vendeuse en épicerie",1089Z,"Fabrication d'autres produits alimentaires n.c.a.",15
+D1106b,"Vendeur / Vendeuse en épicerie",1101Z,"Production de boissons alcooliques distillées",16
+D1106b,"Vendeur / Vendeuse en épicerie",1102B,"Vinification",1
+D1106b,"Vendeur / Vendeuse en épicerie",4617A,"Centrales d'achat alimentaires",17
+D1106b,"Vendeur / Vendeuse en épicerie",4617B,"Autres intermédiaires du commerce en denrées, boissons et tabac",1
+D1106b,"Vendeur / Vendeuse en épicerie",4619B,"Autres intermédiaires du commerce en produits divers",11
+D1106b,"Vendeur / Vendeuse en épicerie",4621Z,"Commerce de gros (commerce interentreprises) de céréales, de tabac non manufacturé, de semences et d'aliments pour le bétail",44
+D1106b,"Vendeur / Vendeuse en épicerie",4631Z,"Commerce de gros (commerce interentreprises) de fruits et légumes",5
+D1106b,"Vendeur / Vendeuse en épicerie",4632A,"Commerce de gros (commerce interentreprises) de viandes de boucherie",1
+D1106b,"Vendeur / Vendeuse en épicerie",4633Z,"Commerce de gros (commerce interentreprises) de produits laitiers, œufs, huiles et matières grasses comestibles",4
+D1106b,"Vendeur / Vendeuse en épicerie",4634Z,"Commerce de gros (commerce interentreprises) de boissons",24
+D1106b,"Vendeur / Vendeuse en épicerie",4636Z,"Commerce de gros (commerce interentreprises) de sucre, chocolat et confiserie",1
+D1106b,"Vendeur / Vendeuse en épicerie",4637Z,"Commerce de gros (commerce interentreprises) de café, thé, cacao et épices",8
+D1106b,"Vendeur / Vendeuse en épicerie",4638A,"Commerce de gros (commerce interentreprises) de poissons, crustacés et mollusques",3
+D1106b,"Vendeur / Vendeuse en épicerie",4638B,"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers",42
+D1106b,"Vendeur / Vendeuse en épicerie",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",35
+D1106b,"Vendeur / Vendeuse en épicerie",4711A,"Commerce de détail de produits surgelés",86
+D1106b,"Vendeur / Vendeuse en épicerie",4711B,"Commerce d'alimentation générale",437
+D1106b,"Vendeur / Vendeuse en épicerie",4711C,"Supérettes",131
+D1106b,"Vendeur / Vendeuse en épicerie",4711D,"Supermarchés",185
+D1106b,"Vendeur / Vendeuse en épicerie",4711E,"Magasins multi-commerces",13
+D1106b,"Vendeur / Vendeuse en épicerie",4711F,"Hypermarchés",148
+D1106b,"Vendeur / Vendeuse en épicerie",4719A,"Grands magasins",26
+D1106b,"Vendeur / Vendeuse en épicerie",4719B,"Autres commerces de détail en magasin non spécialisé",149
+D1106b,"Vendeur / Vendeuse en épicerie",4721Z,"Commerce de détail de fruits et légumes en magasin spécialisé",37
+D1106b,"Vendeur / Vendeuse en épicerie",4722Z,"Commerce de détail de viandes et de produits à base de viande en magasin spécialisé",31
+D1106b,"Vendeur / Vendeuse en épicerie",4723Z,"Commerce de détail de poissons, crustacés et mollusques en magasin spécialisé",14
+D1106b,"Vendeur / Vendeuse en épicerie",4724Z,"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",33
+D1106b,"Vendeur / Vendeuse en épicerie",4725Z,"Commerce de détail de boissons en magasin spécialisé",21
+D1106b,"Vendeur / Vendeuse en épicerie",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",383
+D1106b,"Vendeur / Vendeuse en épicerie",4730Z,"Commerce de détail de carburants en magasin spécialisé",48
+D1106b,"Vendeur / Vendeuse en épicerie",4771Z,"Commerce de détail d'habillement en magasin spécialisé",712
+D1106b,"Vendeur / Vendeuse en épicerie",4778C,"Autres commerces de détail spécialisés divers",205
+D1106b,"Vendeur / Vendeuse en épicerie",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",71
+D1106b,"Vendeur / Vendeuse en épicerie",4789Z,"Autres commerces de détail sur éventaires et marchés",17
+D1106b,"Vendeur / Vendeuse en épicerie",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",12
+D1106b,"Vendeur / Vendeuse en épicerie",5510Z,"Hôtels et hébergement similaire",436
+D1106b,"Vendeur / Vendeuse en épicerie",5610A,"Restauration traditionnelle",1017
+D1106b,"Vendeur / Vendeuse en épicerie",5610B,"Cafétérias et autres libres-services",38
+D1106b,"Vendeur / Vendeuse en épicerie",5610C,"Restauration de type rapide",199
+D1106b,"Vendeur / Vendeuse en épicerie",5621Z,"Services des traiteurs",42
+D1106b,"Vendeur / Vendeuse en épicerie",5630Z,"Débits de boissons",295
+D1106b,"Vendeur / Vendeuse en épicerie",6420Z,"Activités des sociétés holding",6
+D1106b,"Vendeur / Vendeuse en épicerie",6820B,"Location de terrains et d'autres biens immobiliers",12
+D1106b,"Vendeur / Vendeuse en épicerie",7010Z,"Activités des sièges sociaux",84
+D1106b,"Vendeur / Vendeuse en épicerie",7810Z,"Activités des agences de placement de main-d'œuvre",12
+D1106b,"Vendeur / Vendeuse en épicerie",7830Z,"Autre mise à disposition de ressources humaines",251
+D1106b,"Vendeur / Vendeuse en épicerie",8559A,"Formation continue d'adultes",16
+D1106c,"Vendeur / Vendeuse de fruits et légumes",0113Z,"Culture de légumes, de melons, de racines et de tubercules",74
+D1106c,"Vendeur / Vendeuse de fruits et légumes",0147Z,"Élevage de volailles",4
+D1106c,"Vendeur / Vendeuse de fruits et légumes",0149Z,"Élevage d'autres animaux",4
+D1106c,"Vendeur / Vendeuse de fruits et légumes",0150Z,"Culture et élevage associés",6
+D1106c,"Vendeur / Vendeuse de fruits et légumes",0321Z,"Aquaculture en mer",1
+D1106c,"Vendeur / Vendeuse de fruits et légumes",1011Z,"Transformation et conservation de la viande de boucherie",11
+D1106c,"Vendeur / Vendeuse de fruits et légumes",1013B,"Charcuterie",1
+D1106c,"Vendeur / Vendeuse de fruits et légumes",1039B,"Transformation et conservation de fruits",18
+D1106c,"Vendeur / Vendeuse de fruits et légumes",1071B,"Cuisson de produits de boulangerie",1
+D1106c,"Vendeur / Vendeuse de fruits et légumes",1071C,"Boulangerie et boulangerie-pâtisserie",1
+D1106c,"Vendeur / Vendeuse de fruits et légumes",1089Z,"Fabrication d'autres produits alimentaires n.c.a.",8
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4617A,"Centrales d'achat alimentaires",2
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4617B,"Autres intermédiaires du commerce en denrées, boissons et tabac",1
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4631Z,"Commerce de gros (commerce interentreprises) de fruits et légumes",184
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4638A,"Commerce de gros (commerce interentreprises) de poissons, crustacés et mollusques",2
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4638B,"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers",8
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",12
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4711B,"Commerce d'alimentation générale",111
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4711C,"Supérettes",24
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4711D,"Supermarchés",215
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4711E,"Magasins multi-commerces",7
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4711F,"Hypermarchés",150
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4719A,"Grands magasins",2
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4719B,"Autres commerces de détail en magasin non spécialisé",43
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4721Z,"Commerce de détail de fruits et légumes en magasin spécialisé",330
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4722Z,"Commerce de détail de viandes et de produits à base de viande en magasin spécialisé",3
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4725Z,"Commerce de détail de boissons en magasin spécialisé",4
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",26
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4778C,"Autres commerces de détail spécialisés divers",44
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",209
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4789Z,"Autres commerces de détail sur éventaires et marchés",19
+D1106c,"Vendeur / Vendeuse de fruits et légumes",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",3
+D1106c,"Vendeur / Vendeuse de fruits et légumes",5610A,"Restauration traditionnelle",17
+D1106c,"Vendeur / Vendeuse de fruits et légumes",5610C,"Restauration de type rapide",20
+D1106c,"Vendeur / Vendeuse de fruits et légumes",5630Z,"Débits de boissons",15
+D1106c,"Vendeur / Vendeuse de fruits et légumes",6420Z,"Activités des sociétés holding",1
+D1106c,"Vendeur / Vendeuse de fruits et légumes",6820B,"Location de terrains et d'autres biens immobiliers",14
+D1106c,"Vendeur / Vendeuse de fruits et légumes",7010Z,"Activités des sièges sociaux",24
+D1106c,"Vendeur / Vendeuse de fruits et légumes",7810Z,"Activités des agences de placement de main-d'œuvre",6
+D1106c,"Vendeur / Vendeuse de fruits et légumes",7830Z,"Autre mise à disposition de ressources humaines",126
+D1106c,"Vendeur / Vendeuse de fruits et légumes",8559A,"Formation continue d'adultes",4
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",0113Z,"Culture de légumes, de melons, de racines et de tubercules",2
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",0145Z,"Élevage d'ovins et de caprins",15
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",0147Z,"Élevage de volailles",4
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",0150Z,"Culture et élevage associés",3
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",0321Z,"Aquaculture en mer",15
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1011Z,"Transformation et conservation de la viande de boucherie",8
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1013A,"Préparation industrielle de produits à base de viande",15
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1013B,"Charcuterie",6
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1020Z,"Transformation et conservation de poisson, de crustacés et de mollusques",50
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1039B,"Transformation et conservation de fruits",5
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1051A,"Fabrication de lait liquide et de produits frais",19
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1051C,"Fabrication de fromage",103
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1071A,"Fabrication industrielle de pain et de pâtisserie fraîche",3
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1071B,"Cuisson de produits de boulangerie",1
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1071C,"Boulangerie et boulangerie-pâtisserie",2
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1071D,"Pâtisserie",2
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1072Z,"Fabrication de biscuits, biscottes et pâtisseries de conservation",2
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1082Z,"Fabrication de cacao, chocolat et de produits de confiserie",2
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1085Z,"Fabrication de plats préparés",7
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",1089Z,"Fabrication d'autres produits alimentaires n.c.a.",3
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4617A,"Centrales d'achat alimentaires",5
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4617B,"Autres intermédiaires du commerce en denrées, boissons et tabac",1
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4619B,"Autres intermédiaires du commerce en produits divers",3
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4631Z,"Commerce de gros (commerce interentreprises) de fruits et légumes",5
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4632A,"Commerce de gros (commerce interentreprises) de viandes de boucherie",8
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4633Z,"Commerce de gros (commerce interentreprises) de produits laitiers, œufs, huiles et matières grasses comestibles",31
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4634Z,"Commerce de gros (commerce interentreprises) de boissons",2
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4638A,"Commerce de gros (commerce interentreprises) de poissons, crustacés et mollusques",6
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4638B,"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers",3
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",11
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4711A,"Commerce de détail de produits surgelés",78
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4711B,"Commerce d'alimentation générale",89
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4711C,"Supérettes",47
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4711D,"Supermarchés",435
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4711E,"Magasins multi-commerces",6
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4711F,"Hypermarchés",425
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4719B,"Autres commerces de détail en magasin non spécialisé",9
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4721Z,"Commerce de détail de fruits et légumes en magasin spécialisé",30
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4722Z,"Commerce de détail de viandes et de produits à base de viande en magasin spécialisé",28
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4723Z,"Commerce de détail de poissons, crustacés et mollusques en magasin spécialisé",8
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4724Z,"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",1
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4725Z,"Commerce de détail de boissons en magasin spécialisé",2
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",99
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4730Z,"Commerce de détail de carburants en magasin spécialisé",6
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4771Z,"Commerce de détail d'habillement en magasin spécialisé",34
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4778C,"Autres commerces de détail spécialisés divers",20
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",124
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4789Z,"Autres commerces de détail sur éventaires et marchés",6
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",2
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",5510Z,"Hôtels et hébergement similaire",37
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",5610A,"Restauration traditionnelle",227
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",5610B,"Cafétérias et autres libres-services",8
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",5610C,"Restauration de type rapide",81
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",5621Z,"Services des traiteurs",11
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",5630Z,"Débits de boissons",57
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",6420Z,"Activités des sociétés holding",4
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",6820B,"Location de terrains et d'autres biens immobiliers",11
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",7010Z,"Activités des sièges sociaux",45
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",7810Z,"Activités des agences de placement de main-d'œuvre",18
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",7830Z,"Autre mise à disposition de ressources humaines",101
+D1106d,"Vendeur / Vendeuse en crèmerie-fromagerie",8559A,"Formation continue d'adultes",3
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",0113Z,"Culture de légumes, de melons, de racines et de tubercules",2
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",1013A,"Préparation industrielle de produits à base de viande",5
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",1039B,"Transformation et conservation de fruits",3
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",1071C,"Boulangerie et boulangerie-pâtisserie",2
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",1082Z,"Fabrication de cacao, chocolat et de produits de confiserie",1
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4617A,"Centrales d'achat alimentaires",2
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4617B,"Autres intermédiaires du commerce en denrées, boissons et tabac",1
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4619B,"Autres intermédiaires du commerce en produits divers",18
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4621Z,"Commerce de gros (commerce interentreprises) de céréales, de tabac non manufacturé, de semences et d'aliments pour le bétail",10
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4638B,"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers",18
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",11
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4711B,"Commerce d'alimentation générale",53
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4711C,"Supérettes",49
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4711D,"Supermarchés",16
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4711F,"Hypermarchés",2
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4719B,"Autres commerces de détail en magasin non spécialisé",83
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4721Z,"Commerce de détail de fruits et légumes en magasin spécialisé",22
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",426
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4730Z,"Commerce de détail de carburants en magasin spécialisé",6
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4778C,"Autres commerces de détail spécialisés divers",58
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",5
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",2
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",5610A,"Restauration traditionnelle",34
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",5610C,"Restauration de type rapide",4
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",6420Z,"Activités des sociétés holding",8
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",6820B,"Location de terrains et d'autres biens immobiliers",3
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",7010Z,"Activités des sièges sociaux",21
+D1106e,"Vendeur / Vendeuse en produits biologiques-diététiques",8559A,"Formation continue d'adultes",4
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",0113Z,"Culture de légumes, de melons, de racines et de tubercules",1
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",0145Z,"Élevage d'ovins et de caprins",1
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",0147Z,"Élevage de volailles",18
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",0150Z,"Culture et élevage associés",6
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",1011Z,"Transformation et conservation de la viande de boucherie",159
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",1013A,"Préparation industrielle de produits à base de viande",89
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",1013B,"Charcuterie",301
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",1071B,"Cuisson de produits de boulangerie",2
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",1071C,"Boulangerie et boulangerie-pâtisserie",6
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",1071D,"Pâtisserie",3
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",1072Z,"Fabrication de biscuits, biscottes et pâtisseries de conservation",1
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",1085Z,"Fabrication de plats préparés",40
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4617B,"Autres intermédiaires du commerce en denrées, boissons et tabac",1
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4619B,"Autres intermédiaires du commerce en produits divers",7
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4632A,"Commerce de gros (commerce interentreprises) de viandes de boucherie",9
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4633Z,"Commerce de gros (commerce interentreprises) de produits laitiers, œufs, huiles et matières grasses comestibles",2
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4638A,"Commerce de gros (commerce interentreprises) de poissons, crustacés et mollusques",2
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4638B,"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers",4
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",21
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4711B,"Commerce d'alimentation générale",120
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4711C,"Supérettes",68
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4711D,"Supermarchés",1546
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4711E,"Magasins multi-commerces",5
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4711F,"Hypermarchés",1096
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4719A,"Grands magasins",3
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4719B,"Autres commerces de détail en magasin non spécialisé",15
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4721Z,"Commerce de détail de fruits et légumes en magasin spécialisé",42
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4722Z,"Commerce de détail de viandes et de produits à base de viande en magasin spécialisé",590
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4723Z,"Commerce de détail de poissons, crustacés et mollusques en magasin spécialisé",8
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4724Z,"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",4
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",28
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4730Z,"Commerce de détail de carburants en magasin spécialisé",75
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4771Z,"Commerce de détail d'habillement en magasin spécialisé",17
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4778C,"Autres commerces de détail spécialisés divers",31
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",112
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4789Z,"Autres commerces de détail sur éventaires et marchés",4
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",4
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",5510Z,"Hôtels et hébergement similaire",37
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",5610A,"Restauration traditionnelle",320
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",5610C,"Restauration de type rapide",134
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",5621Z,"Services des traiteurs",75
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",5630Z,"Débits de boissons",43
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",6420Z,"Activités des sociétés holding",14
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",6820B,"Location de terrains et d'autres biens immobiliers",23
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",7010Z,"Activités des sièges sociaux",71
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",7810Z,"Activités des agences de placement de main-d'œuvre",53
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",7830Z,"Autre mise à disposition de ressources humaines",339
+D1106f,"Vendeur / Vendeuse en boucherie-charcuterie",8559A,"Formation continue d'adultes",7
+D1106g,"Vendeur / Vendeuse en poissonnerie",0150Z,"Culture et élevage associés",1
+D1106g,"Vendeur / Vendeuse en poissonnerie",0321Z,"Aquaculture en mer",21
+D1106g,"Vendeur / Vendeuse en poissonnerie",0322Z,"Aquaculture en eau douce",1
+D1106g,"Vendeur / Vendeuse en poissonnerie",1020Z,"Transformation et conservation de poisson, de crustacés et de mollusques",34
+D1106g,"Vendeur / Vendeuse en poissonnerie",4617A,"Centrales d'achat alimentaires",1
+D1106g,"Vendeur / Vendeuse en poissonnerie",4638A,"Commerce de gros (commerce interentreprises) de poissons, crustacés et mollusques",46
+D1106g,"Vendeur / Vendeuse en poissonnerie",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",11
+D1106g,"Vendeur / Vendeuse en poissonnerie",4711B,"Commerce d'alimentation générale",13
+D1106g,"Vendeur / Vendeuse en poissonnerie",4711C,"Supérettes",6
+D1106g,"Vendeur / Vendeuse en poissonnerie",4711D,"Supermarchés",803
+D1106g,"Vendeur / Vendeuse en poissonnerie",4711E,"Magasins multi-commerces",10
+D1106g,"Vendeur / Vendeuse en poissonnerie",4711F,"Hypermarchés",866
+D1106g,"Vendeur / Vendeuse en poissonnerie",4719B,"Autres commerces de détail en magasin non spécialisé",9
+D1106g,"Vendeur / Vendeuse en poissonnerie",4721Z,"Commerce de détail de fruits et légumes en magasin spécialisé",3
+D1106g,"Vendeur / Vendeuse en poissonnerie",4723Z,"Commerce de détail de poissons, crustacés et mollusques en magasin spécialisé",217
+D1106g,"Vendeur / Vendeuse en poissonnerie",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",2
+D1106g,"Vendeur / Vendeuse en poissonnerie",4730Z,"Commerce de détail de carburants en magasin spécialisé",32
+D1106g,"Vendeur / Vendeuse en poissonnerie",4771Z,"Commerce de détail d'habillement en magasin spécialisé",17
+D1106g,"Vendeur / Vendeuse en poissonnerie",4778C,"Autres commerces de détail spécialisés divers",2
+D1106g,"Vendeur / Vendeuse en poissonnerie",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",116
+D1106g,"Vendeur / Vendeuse en poissonnerie",4789Z,"Autres commerces de détail sur éventaires et marchés",4
+D1106g,"Vendeur / Vendeuse en poissonnerie",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",3
+D1106g,"Vendeur / Vendeuse en poissonnerie",5510Z,"Hôtels et hébergement similaire",73
+D1106g,"Vendeur / Vendeuse en poissonnerie",5610A,"Restauration traditionnelle",127
+D1106g,"Vendeur / Vendeuse en poissonnerie",5610C,"Restauration de type rapide",5
+D1106g,"Vendeur / Vendeuse en poissonnerie",5621Z,"Services des traiteurs",4
+D1106g,"Vendeur / Vendeuse en poissonnerie",6420Z,"Activités des sociétés holding",2
+D1106g,"Vendeur / Vendeuse en poissonnerie",6820B,"Location de terrains et d'autres biens immobiliers",15
+D1106g,"Vendeur / Vendeuse en poissonnerie",7010Z,"Activités des sièges sociaux",22
+D1106g,"Vendeur / Vendeuse en poissonnerie",7810Z,"Activités des agences de placement de main-d'œuvre",27
+D1106g,"Vendeur / Vendeuse en poissonnerie",7830Z,"Autre mise à disposition de ressources humaines",38
+D1106g,"Vendeur / Vendeuse en poissonnerie",8559A,"Formation continue d'adultes",3
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",0113Z,"Culture de légumes, de melons, de racines et de tubercules",1
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",1071C,"Boulangerie et boulangerie-pâtisserie",1
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",1101Z,"Production de boissons alcooliques distillées",10
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",1102B,"Vinification",44
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4617A,"Centrales d'achat alimentaires",7
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4617B,"Autres intermédiaires du commerce en denrées, boissons et tabac",15
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4619B,"Autres intermédiaires du commerce en produits divers",3
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4621Z,"Commerce de gros (commerce interentreprises) de céréales, de tabac non manufacturé, de semences et d'aliments pour le bétail",5
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4634Z,"Commerce de gros (commerce interentreprises) de boissons",136
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4639B,"Commerce de gros (commerce interentreprises) alimentaire non spécialisé",9
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4711B,"Commerce d'alimentation générale",9
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4711C,"Supérettes",1
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4711D,"Supermarchés",11
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4711F,"Hypermarchés",28
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4722Z,"Commerce de détail de viandes et de produits à base de viande en magasin spécialisé",2
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4724Z,"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",1
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4725Z,"Commerce de détail de boissons en magasin spécialisé",239
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4729Z,"Autres commerces de détail alimentaires en magasin spécialisé",9
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4771Z,"Commerce de détail d'habillement en magasin spécialisé",34
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4778C,"Autres commerces de détail spécialisés divers",4
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4781Z,"Commerce de détail alimentaire sur éventaires et marchés",1
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",1
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",5510Z,"Hôtels et hébergement similaire",254
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",5610A,"Restauration traditionnelle",152
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",5610C,"Restauration de type rapide",5
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",5630Z,"Débits de boissons",85
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",6420Z,"Activités des sociétés holding",1
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",6820B,"Location de terrains et d'autres biens immobiliers",5
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",7010Z,"Activités des sièges sociaux",6
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",7810Z,"Activités des agences de placement de main-d'œuvre",3
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",7830Z,"Autre mise à disposition de ressources humaines",101
+D1106h,"Vendeur / Vendeuse en vins et spiritueux",8559A,"Formation continue d'adultes",4
