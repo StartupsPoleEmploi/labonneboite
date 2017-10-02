@@ -1,4 +1,5 @@
 A1101,Conduite d'engins agricoles et forestiers
+A1201,Bûcheronnage et élagage
 A1202,Entretien des espaces naturels
 A1203,Entretien des espaces verts
 A1204,Protection du patrimoine naturel
@@ -528,9 +529,10 @@ N4401,Circulation du réseau ferré
 N4402,Exploitation et manoeuvre des remontées mécaniques
 N4403,Manoeuvre du réseau ferré
 D1106a,Vendeur / Vendeuse en boulangerie-pâtisserie
-D1106b,Vendeur / Vendeuse en chocolaterie-confiserie
-D1106c,Vendeur / Vendeuse en épicerie
-D1106d,Vendeur / Vendeuse en alimentation générale
-D1106e,Vendeur / Vendeuse en vins et spiritueux
-A1201a,Bûcheron / Bûcheronne
-A1201b,Elagueur / Elagueuse
+D1106b,Vendeur / Vendeuse en épicerie
+D1106c,Vendeur / Vendeuse de fruits et légumes
+D1106d,Vendeur / Vendeuse en crèmerie-fromagerie
+D1106e,Vendeur / Vendeuse en produits biologiques-diététiques
+D1106f,Vendeur / Vendeuse en boucherie-charcuterie
+D1106g,Vendeur / Vendeuse en poissonnerie
+D1106h,Vendeur / Vendeuse en vins et spiritueux
