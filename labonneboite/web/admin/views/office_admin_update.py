@@ -178,7 +178,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 return False
 
             mapper = mapping_util.Rome2NafMapper()
-            office_romes = [item.code for item in mapper.romes_for_naf(office_to_update.naf)]
             for rome in OfficeAdminUpdate.romes_as_list(romes_to_boost):
                 if not mapper.romes_is_valid(rome):
                     msg = (
@@ -188,10 +187,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                         % rome
                     )
                     flash(Markup(msg), 'error')
-                    return False
-                if rome not in office_romes:
-                    msg = u"`%s` n'est pas un code ROME lié au NAF de cette entreprise." % rome
-                    flash(msg, 'error')
                     return False
 
         return is_valid

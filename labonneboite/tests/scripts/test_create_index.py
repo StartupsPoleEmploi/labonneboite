@@ -282,6 +282,46 @@ class UpdateOfficesTest(CreateIndexBaseTest):
                         score=office.score, rome_code=rome, naf_code=office.naf)
                     self.assertTrue(score < script.SCORE_FOR_ROME_MINIMUM)
 
+    def test_update_office_boost_unrelated_romes(self):
+        """
+        Test `update_offices` to update an office: boost score for specific ROME codes
+        but with romes not associated to the office.
+        """
+        mapper = mapping_util.Rome2NafMapper()
+        romes_for_office = [rome.code for rome in mapper.romes_for_naf(self.office.naf)]
+
+        self.assertNotIn(u"D1506", romes_for_office) # Rome not related to the office
+        self.assertIn(u"D1507", romes_for_office) # Rome related to the office
+
+        office_to_update = OfficeAdminUpdate(
+            siret=self.office.siret,
+            name=self.office.company_name,
+            boost=True,
+            romes_to_boost=u"D1506\nD1507",  # Boost score only for those ROME.
+        )
+        office_to_update.save()
+
+        script.update_offices(index=self.ES_TEST_INDEX)
+        time.sleep(1)  # Sleep required by ES to register new documents.
+
+        office = Office.get(self.office.siret)
+        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
+
+        # Check boosted scores.
+        print res['_source']['scores_by_rome'].keys()
+        self.assertEquals(res['_source']['scores_by_rome']['D1506'], 100)
+        self.assertEquals(res['_source']['scores_by_rome']['D1507'], 100)
+
+        # Other scores should not be boosted.
+        for rome in romes_for_office:
+            if rome not in [u"D1507"]:
+                try:
+                    self.assertNotEqual(res['_source']['scores_by_rome'][rome], 100)
+                except KeyError:
+                    # Score for ROME has not been indexed because it was too low.
+                    score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                        score=office.score, rome_code=rome, naf_code=office.naf)
+                    self.assertTrue(score < script.SCORE_FOR_ROME_MINIMUM)
 
 class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
     """
