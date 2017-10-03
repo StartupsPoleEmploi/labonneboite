@@ -94,3 +94,7 @@ Le label du groupe OGR 2
 Ce nouveau fichier est parsé par `parsing_decoupage_ROME.ipynb` et le résultat est sauvegardé dans `decoupage_ROME.pickle`.
 
 Les fichiers requis pour faire évoluer LBB sont créés dans le notebook `output_to_production.ipynb` puis `tableau_LBB.ipynb`.
+
+## Copie
+
+Le script `copy_mapping.sh` copie les fichiers précédemment créés dans le dossier `labonneboite/common/data`.
