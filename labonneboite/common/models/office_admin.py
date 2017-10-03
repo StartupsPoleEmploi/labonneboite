@@ -119,9 +119,14 @@ class OfficeAdminUpdate(CRUDMixin, Base):
 
     # Set `boost` to True to promote the offfice.
     boost = Column(Boolean, default=False, nullable=False)
+    
     # Stores a list of ROME codes as a string separated by `ROMES_SEPARATORS`.
     # If `romes_to_boost` is populated, boosting will be set only for specified ROME codes.
     romes_to_boost = Column(Text, default='', nullable=False)
+
+    # Stores a list of ROME codes as a string separated by `ROMES_SEPARATORS`.
+    # If `romes_to_remove` is populated, these ROME codes will not be indexed
+    romes_to_remove = Column(Text, default='', nullable=False)
 
     # Info to remove.
     remove_email = Column(Boolean, default=False, nullable=False)
@@ -169,13 +174,13 @@ class OfficeAdminUpdate(CRUDMixin, Base):
         codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
         return sorted(set(codes))
 
-    def romes_to_boost_as_html(self):
+    def romes_as_html(self, romes):
         """
         Returns the content of the `romes_to_boost` field as HTML.
         Used in the admin UI.
         """
         html = []
-        for rome in self.romes_as_list(self.romes_to_boost):
+        for rome in self.romes_as_list(romes):
             html.append(u"{0} - {1}".format(rome, settings.ROME_DESCRIPTIONS[rome]))
         return '<br>'.join(html)
 
