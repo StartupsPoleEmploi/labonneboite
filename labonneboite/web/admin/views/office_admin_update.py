@@ -98,7 +98,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_to_remove': Markup(
             u"Veuillez entrer un ROME par ligne."
             u"<br>"
-            u"Si ce champ est renseigné, le(s) ROME spécifié(s) seront retirés pour cette entreprise."
+            u"Si ce champ est renseigné, le(s) ROME spécifié(s) ne seront plus associés à cette entreprise."
             u"<br>"
             u"<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
         ),
@@ -176,7 +176,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     def validate_form(self, form):
         is_valid = super(OfficeAdminUpdateModelView, self).validate_form(form)
 
-        # Code ROMES to boost or to add
+        # Codes ROMES to boost or to add
         if is_valid and form.data.get('romes_to_boost'):
 
             romes_to_boost = form.data.get('romes_to_boost')
