@@ -360,10 +360,7 @@ def get_scores_by_rome(office, office_to_update=None):
         romes_to_boost = office_to_update.romes_as_list(office_to_update.romes_to_boost)
 
         # Add unrelated rome for indexing (with boost)
-        for rome_to_boost in romes_to_boost:
-            if rome_to_boost not in rome_codes:
-                rome_codes.append(rome_to_boost)
-
+        rome_codes = rome_codes + [romes for romes in romes_to_boost if romes not in rome_codes]
 
     for rome_code in rome_codes:
         score = 0
