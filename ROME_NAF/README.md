@@ -73,7 +73,15 @@ Le notebook `tableau_LBB.ipynb` produit un fichier CSV `tableau_LBB.csv` utilisa
 
 Un code ROME peut se révéler trop imprécis, voir par exemple `ROME_D1106.ipynb` qui détaille les statistiques d'embauches sur le code ROME D1106 (Vente en alimentation). Ce code ROME regroupe des métiers très différents (Vendeur / Vendeuse en boulangerie-pâtisserie, Vendeur / Vendeuse en poissonnerie...).
 
-Le notebook `decoupage_ROME.ipynb` propose une méthode de regroupement automatique des différents codes OGR d'un code ROME donné faisant sens pour le demandeur d'emploi. Le découpage produit est affiché dans le fichier `decoupage_ROME.txt`. Ce regroupement automatique ne donne pas des résultats satisfaisants, c'est donc une approche manuelle qui est actuellement utilisée. Un petit nombre de codes ROME sont découpés manuellement : les extraits correspondants du fichier `decoupage_ROME.txt` sont copiés puis modifiés pour respecter le format suivant :
+### Partition automatique
+
+Le notebook `decoupage_ROME.ipynb` propose une méthode de regroupement automatique des différents codes OGR d'un code ROME donné faisant sens pour le demandeur d'emploi. Le découpage produit est affiché dans le fichier `decoupage_ROME.txt`.
+
+Ce regroupement automatique ne donne pas des résultats satisfaisants. Par exemple, les codes OGR de poissonnier et de boucher sont groupés ensemble.
+
+### Partition manuelle
+
+Un petit nombre de codes ROME sont découpés manuellement : les extraits correspondants du fichier `decoupage_ROME.txt` sont copiés puis modifiés pour respecter le format suivant :
 
 ```
 *** X0123 : un code ROME ***
@@ -93,8 +101,14 @@ Le label du groupe OGR 2
 
 Ce nouveau fichier est parsé par `parsing_decoupage_ROME.ipynb` et le résultat est sauvegardé dans `decoupage_ROME.pickle`.
 
-Les fichiers requis pour faire évoluer LBB sont créés dans le notebook `output_to_production.ipynb` puis `tableau_LBB.ipynb`.
+### Partition par seuillage
 
-## Copie
+Les codes ROME comptant plus d'embauches qu'un seuil fixé, sont découpés en OGR, les autres pas.
+
+Voir `seuillage.ipynb`. Le résultat est aussi sauvegardé dans `decoupage_ROME.pickle`.
+
+## Utilisation du nouveau mapping
+
+Les fichiers requis pour faire évoluer LBB sont créés dans le notebook `output_to_production.ipynb` puis `tableau_LBB.ipynb`.
 
 Le script `copy_mapping.sh` copie les fichiers précédemment créés dans le dossier `labonneboite/common/data`.
