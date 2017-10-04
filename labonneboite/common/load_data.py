@@ -43,6 +43,7 @@ def load_ogr_labels():
 
 
 def load_ogr_rome_codes():
+    # FIXME
     return load_pickle_file("ogr_rome_codes.pickle")
 
 

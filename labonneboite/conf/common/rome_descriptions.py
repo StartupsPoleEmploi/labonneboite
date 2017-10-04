@@ -1,5 +1,6 @@
 # coding: utf8
 
+# FIXME
 ROME_DESCRIPTIONS = {'A1101': u"Conduite d'engins d'exploitation agricole et foresti\xe8re",
  'A1201': u'B\xfbcheronnage et \xe9lagage',
  'A1202': u'Entretien des espaces naturels',
