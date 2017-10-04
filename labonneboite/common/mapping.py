@@ -30,7 +30,7 @@ def load_manual_rome_naf_mapping():
     NAF_COLUMN = 2
     HIRINGS_COLUMN = 4
 
-    for columns in reader:
+    for columns in reader:  # FIXME pandas
 
         rome = columns[ROME_COLUMN].strip().upper()
         naf = columns[NAF_COLUMN].strip().upper()
