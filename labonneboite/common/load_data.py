@@ -2,7 +2,6 @@ import os
 import pickle
 import csv
 
-from labonneboite.conf import settings
 from backports.functools_lru_cache import lru_cache
 
 
@@ -52,6 +51,20 @@ def load_ogr_rome_codes():
         ogr_to_rome[column[OGR_COLUMN]] = column[ROME_COLUMN]
 
     return ogr_to_rome
+
+
+@lru_cache(maxsize=None)
+def load_rome_labels():
+    reader = load_csv_file("rome_labels.csv")
+
+    ROME_COLUMN = 0
+    LABEL_COLUMN = 1
+    rome_to_label = {}
+
+    for column in reader:
+        rome_to_label[column[ROME_COLUMN]] = column[LABEL_COLUMN].decode('utf8')
+
+    return rome_to_label
 
 
 @lru_cache(maxsize=None)
