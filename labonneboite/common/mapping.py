@@ -23,7 +23,7 @@ MANUAL_ROME_NAF_MAPPING = {}
 MANUAL_NAF_ROME_MAPPING = {}
 
 
-def load_manual_rome_naf_mapping():
+def load_manual_rome_naf_mapping():  # FIXME caching
     reader = load_manual_rome_naf_file()
 
     ROME_COLUMN = 0
@@ -54,11 +54,11 @@ def load_manual_rome_naf_mapping():
 load_manual_rome_naf_mapping()  # populates once all variables above
 
 
-def load_rome_codes_from_rome_naf_mapping():
+def load_rome_codes_from_rome_naf_mapping():  # FIXME caching
     return MANUAL_ROME_NAF_MAPPING.keys()
 
 
-def load_naf_codes_from_rome_naf_mapping():
+def load_naf_codes_from_rome_naf_mapping():  # FIXME caching
     #  the '[]' is the second parameter to 'sum' and allows for one line concatenating of a list of lists
     return set(sum((MANUAL_ROME_NAF_MAPPING[rome].keys() for rome in MANUAL_ROME_NAF_MAPPING.keys()), []))
 
