@@ -51,8 +51,6 @@ SORT_FILTER_DEFAULT = "score"
 PAGINATION_MAX_PAGES = 10
 PAGINATION_COMPANIES_PER_PAGE = 10
 
-MANUAL_ROME_NAF_FILENAME = "rome_naf_filter.csv"
-
 ES_INDEX = 'labonneboite'
 
 LOGSTASH_HOST = "localhost"
