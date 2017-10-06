@@ -7,7 +7,7 @@ from flask import abort, Blueprint, current_app, jsonify, request
 from labonneboite.common import geocoding
 from labonneboite.common import search
 from labonneboite.common import mapping as mapping_util
-from labonneboite.common.load_data import load_ogr_rome_codes
+from labonneboite.common.load_data import load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
@@ -15,7 +15,7 @@ from labonneboite.web.api import util as api_util
 
 apiBlueprint = Blueprint('api', __name__)
 
-OGR_ROME_CODES = load_ogr_rome_codes()
+OGR_ROME_CODES = load_ogr_rome_mapping()
 ROME_CODES = OGR_ROME_CODES.values()
 
 # Some internal services of Pôle emploi can sometimes have access to sensitive information.

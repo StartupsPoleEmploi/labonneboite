@@ -164,18 +164,6 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(rv.status_code, 400)
         self.assertEqual(rv.data, u'missing argument: rome_codes')
 
-    def test_all_rome_codes_in_rome_naf_mapping_have_a_description(self):
-        rome_codes_from_rome_naf_mapping = mapping_util.load_rome_codes_from_rome_naf_mapping()
-        rome_codes_from_rome_referential = settings.ROME_DESCRIPTIONS.keys()
-        for rome_code in rome_codes_from_rome_naf_mapping:
-            self.assertIn(rome_code, rome_codes_from_rome_referential)
-
-    def test_all_naf_codes_in_rome_naf_mapping_have_a_description(self):
-        naf_codes_from_rome_naf_mapping = mapping_util.load_naf_codes_from_rome_naf_mapping()
-        naf_codes_from_naf_referential = settings.NAF_CODES
-        for naf_code in naf_codes_from_rome_naf_mapping:
-            self.assertIn(naf_code, naf_codes_from_naf_referential)
-
     def test_page_size_too_large(self):
         params = self.add_security_params({
             'commune_id': self.positions['caen']['commune_id'],
