@@ -253,21 +253,22 @@ def create_job_codes(index=INDEX_NAME):
     es = Elasticsearch(timeout=ES_TIMEOUT)
 
     for ogr, description in ogr_labels.iteritems():
-        rome_code = ogr_rome_codes[ogr]
-        try:
-            rome_description = settings.ROME_DESCRIPTIONS[rome_code]
-        except KeyError:
-            rome_description = ""
-            logging.info("can't find description for rome %s", rome_code)
-            continue
-        doc = {
-            'ogr_code': ogr,
-            'ogr_description': description,
-            'rome_code': rome_code,
-            'rome_description': rome_description
-        }
-        es.index(index=index, doc_type='ogr', id=key, body=doc)
-        key += 1
+        if ogr in ogr_rome_codes:
+            rome_code = ogr_rome_codes[ogr]
+            try:
+                rome_description = settings.ROME_DESCRIPTIONS[rome_code]
+            except KeyError:
+                rome_description = ""
+                logging.info("can't find description for rome %s", rome_code)
+                continue
+            doc = {
+                'ogr_code': ogr,
+                'ogr_description': description,
+                'rome_code': rome_code,
+                'rome_description': rome_description
+            }
+            es.index(index=index, doc_type='ogr', id=key, body=doc)
+            key += 1
 
 
 def create_locations(index=INDEX_NAME):
