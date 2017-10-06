@@ -61,6 +61,10 @@ Thumbs.db
 # folder to store backups used on some environments
 srv
 
-# Data
+# Data #
+########
 ROME_NAF/opendata/sir*.csv
 ROME_NAF/*.csv
+ROME_NAF/**/*.pickle
+ROME_NAF/tableaux
+ROME_NAF/*.txt
