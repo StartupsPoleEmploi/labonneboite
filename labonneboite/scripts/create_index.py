@@ -13,7 +13,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common.database import db_session
-from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_codes
+from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
@@ -249,7 +249,7 @@ def create_job_codes(index=INDEX_NAME):
     # libelles des appelations pour les codes ROME
     ogr_labels = load_ogr_labels()
     # correspondance appellation vers rome
-    ogr_rome_codes = load_ogr_rome_codes()
+    ogr_rome_codes = load_ogr_rome_mapping()
     es = Elasticsearch(timeout=ES_TIMEOUT)
 
     for ogr, description in ogr_labels.iteritems():

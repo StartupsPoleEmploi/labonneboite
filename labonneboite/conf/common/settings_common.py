@@ -1,10 +1,12 @@
 # coding: utf8
 
 # pylint: disable=unused-import
-from labonneboite.conf.common.rome_descriptions import ROME_DESCRIPTIONS
 from labonneboite.conf.common.rome_mobilities import ROME_MOBILITIES
 from labonneboite.conf.common.naf_codes import NAF_CODES
 # pylint: enable=unused-import
+from labonneboite.common.load_data import load_rome_labels
+
+ROME_DESCRIPTIONS = load_rome_labels()
 
 LOCALE = 'fr_FR.utf8'
 
