@@ -13,10 +13,9 @@ import traceback
 from collections import deque
 
 import multiprocessing as mp
-import logging
-
+from multiprocessing.dummy import Pool as ThreadPool
 from functools import partial
-from mp.dummy import Pool as ThreadPool
+import logging
 
 from labonneboite.importer import settings
 from labonneboite.importer import compute_score
