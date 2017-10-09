@@ -2,6 +2,8 @@
 import argparse
 import logging
 
+import multiprocessing as mp
+from functools import partial
 from elasticsearch import Elasticsearch
 from elasticsearch import TransportError
 from elasticsearch.helpers import bulk
@@ -17,6 +19,7 @@ from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
+from labonneboite.importer import settings as importer_settings
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -245,30 +248,31 @@ def create_job_codes(index=INDEX_NAME):
     Create the `ogr` type in ElasticSearch.
     """
     logging.info("create job codes...")
-    key = 1
     # libelles des appelations pour les codes ROME
     ogr_labels = load_ogr_labels()
     # correspondance appellation vers rome
     ogr_rome_codes = load_ogr_rome_mapping()
     es = Elasticsearch(timeout=ES_TIMEOUT)
+    actions = []
 
     for ogr, description in ogr_labels.iteritems():
         if ogr in ogr_rome_codes:
             rome_code = ogr_rome_codes[ogr]
-            try:
-                rome_description = settings.ROME_DESCRIPTIONS[rome_code]
-            except KeyError:
-                rome_description = ""
-                logging.info("can't find description for rome %s", rome_code)
-                continue
+            rome_description = settings.ROME_DESCRIPTIONS[rome_code]
             doc = {
                 'ogr_code': ogr,
                 'ogr_description': description,
                 'rome_code': rome_code,
                 'rome_description': rome_description
             }
-            es.index(index=index, doc_type='ogr', id=key, body=doc)
-            key += 1
+            action = {
+                '_op_type': 'index',
+                '_index': index,
+                '_type': 'ogr',
+                '_source': doc
+            }
+            actions.append(action)
+    bulk(es, actions)
 
 
 def create_locations(index=INDEX_NAME):
@@ -409,22 +413,35 @@ def chunks(l, n):
 
 def create_offices(index=INDEX_NAME, ignore_unreachable_offices=False):
     """
-    Create the `office` type in ElasticSearch.
+    Populate the `office` type in ElasticSearch.
+    Run it as a parallel computation based on departements.
+    """
+    pool = mp.Pool(processes=mp.cpu_count(), maxtasksperchild=1)
+
+    func = partial(
+        create_offices_for_departement,
+        index=index,
+        ignore_unreachable_offices=ignore_unreachable_offices
+    )
+
+    pool.map(func, importer_settings.DEPARTEMENTS)
+    pool.close()
+    pool.join()
+
+
+def create_offices_for_departement(departement, index=INDEX_NAME, ignore_unreachable_offices=False):
+    """
+    Populate the `office` type in ElasticSearch with offices having given departement.
     """
     es = Elasticsearch(timeout=300)
 
     actions = []
 
-    logging.info("creating offices...")
+    logging.info("STARTED creating offices for departement=%s ...", departement)
 
-    for _, office in enumerate(db_session.query(Office).all()):
+    for _, office in enumerate(db_session.query(Office).filter_by(departement=departement).all()):
 
         st.increment_office_count()
-        if st.office_count % 10000 == 0:
-            logging.info("already processed %s offices, %s were actually indexed...",
-                st.office_count,
-                st.indexed_office_count,
-            )
 
         es_doc = get_office_as_es_doc(office)
 
@@ -440,14 +457,11 @@ def create_offices(index=INDEX_NAME, ignore_unreachable_offices=False):
                 '_source': es_doc,
             })
 
-    logging.info("chunking index actions")
     batch_actions = chunks(actions, 10000)
-    logging.info("chunking done...")
-    chunk = 0
     for batch_action in batch_actions:
-        logging.info("chunk %s", chunk)
-        chunk += 1
         bulk(es, batch_action)
+
+    logging.info("COMPLETED creating offices for departement=%s ...", departement)
 
 
 def add_offices(index=INDEX_NAME):

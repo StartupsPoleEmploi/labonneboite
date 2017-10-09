@@ -12,18 +12,18 @@ import sys
 import traceback
 from collections import deque
 
-import multiprocessing
+import multiprocessing as mp
+import logging
 
-from multiprocessing.dummy import Pool as ThreadPool
 from functools import partial
+from mp.dummy import Pool as ThreadPool
 
 from labonneboite.importer import settings
 from labonneboite.importer import compute_score
 from labonneboite.importer import util as import_util
 from labonneboite.importer.models.computing import DpaeStatistics
-from base import Job
+from labonneboite.importer.jobs.base import Job
 
-import logging
 
 logger = logging.getLogger('main')
 formatter = logging.Formatter("%(levelname)s - IMPORTER - %(message)s")
@@ -50,7 +50,7 @@ def abortable_worker(func, etab_table, dpae_table, departement, dpae_date, **kwa
         out = res.get(timeout)  # Wait timeout seconds for func to complete.
         logger.info("got result before timeout(%s)", departement)
         return out
-    except multiprocessing.TimeoutError:
+    except mp.TimeoutError:
         logger.warning("timeout error for departement (%s)", departement)
         p.terminate()
         return None
@@ -79,7 +79,10 @@ class ScoreComputingJob(Job):
         If a job was not finished before the timeout, it will be added to a list to be processed sequentially.
         """
         results = []
-        pool = multiprocessing.Pool(processes=8, maxtasksperchild=1)
+        # Use parallel computing on all available CPU cores.
+        # maxtasksperchild default is infinite, which means memory is never freed up, and grows up to 200G :-/
+        # maxtasksperchild=1 ensures memory is freed up after every departement computation.
+        pool = mp.Pool(processes=mp.cpu_count(), maxtasksperchild=1)
         async_results = {}
         most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
 
