@@ -26,6 +26,8 @@ ipython==3.1.0
 opbeat==3.5.2
 pylint==1.6.4
 python-logstash==0.4.5
+# profiler used in create_index.py
+pycallgraph==1.0.1
 
 # Databases and migrations.
 alembic==0.9.3

@@ -636,4 +636,13 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    # run()
+
+    import profile
+    profile.run('run()')
+
+    # from pycallgraph import PyCallGraph
+    # from pycallgraph.output import GraphvizOutput
+    # 
+    # with PyCallGraph(output=GraphvizOutput()):
+    #     run()
