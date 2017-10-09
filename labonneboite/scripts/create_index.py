@@ -296,6 +296,8 @@ def create_locations(index=INDEX_NAME):
             '_source': doc
         }
         actions.append(action)
+    # unfortunately parallel_bulk is not available in the current elasticsearch version
+    # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
     bulk(es, actions)
 
 
@@ -437,7 +439,7 @@ def create_offices_for_departement(departement, index=INDEX_NAME, ignore_unreach
 
     actions = []
 
-    logging.info("STARTED creating offices for departement=%s ...", departement)
+    logging.info("STARTED indexing offices for departement=%s ...", departement)
 
     for _, office in enumerate(db_session.query(Office).filter_by(departement=departement).all()):
 
@@ -461,7 +463,7 @@ def create_offices_for_departement(departement, index=INDEX_NAME, ignore_unreach
     for batch_action in batch_actions:
         bulk(es, batch_action)
 
-    logging.info("COMPLETED creating offices for departement=%s ...", departement)
+    logging.info("COMPLETED indexing offices for departement=%s ...", departement)
 
 
 def add_offices(index=INDEX_NAME):
