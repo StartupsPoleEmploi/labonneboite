@@ -125,8 +125,8 @@ def company_list():
     except (TypeError, ValueError):
         headcount_filter = settings.HEADCOUNT_WHATEVER
 
-    mapper = mapping_util.Rome2NafMapper()
-    naf_code_list = mapper.map(rome_code_list)
+    # No naf filter
+    naf_code_list = {}
 
     companies, companies_count = search.get_companies(
         naf_code_list,
