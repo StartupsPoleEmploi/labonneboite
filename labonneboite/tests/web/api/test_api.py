@@ -402,7 +402,105 @@ class ApiCompanyListTest(ApiBaseTest):
         params = self.add_security_params({
             'commune_id': self.positions['caen']['commune_id'],
             'rome_codes': u'D1405,M1801',
-            'user': u'labonneboite',
+            'user': u'labonneboite'
         })
         rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
         self.assertEqual(rv.status_code, 400)
+
+    def test_naf_no_exists(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'INVALID,INVALID_TOO',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(rv.data, u'invalid NAF code(s): INVALID INVALID_TOO')
+
+    def test_same_rome_with_no_naf_filters(self):
+        # 1) No NAF Code => 2 result expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+        self.assertNotEqual(data['companies'][0]['naf'], data['companies'][1]['naf'])
+
+    def test_same_rome_with_one_naf_filters(self):
+        # 1) NAF Code : 4711C => 1 result expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'4711C',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000006')
+        
+        # 2) NAF Code : 5610C => 1 result expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'5610C',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000007')
+
+    def test_same_rome_with_two_naf_filters(self):
+        # 1) NAF codes : 5610C,4711C => 2 results expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'5610C,4711C',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+
+        # 2) NAF codes : 9499Z,5610C => 1 result expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'9499Z,5610C',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000007')
+
+    def test_same_rome_with_unrelated_naf_filters(self):
+        # NAF Code : 9499Z => 0 result expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'9499Z',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 0)
+        self.assertEqual(len(data['companies']), 0)
+
+
