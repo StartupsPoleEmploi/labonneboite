@@ -11,6 +11,7 @@ from labonneboite.common.load_data import load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
+from labonneboite.conf.common.naf_codes import NAF_CODES
 
 
 apiBlueprint = Blueprint('api', __name__)
@@ -67,7 +68,8 @@ def company_list():
     Optional parameters:
     - `distance`: perimeter of the search radius (in Km) in which to search.
     - `page`: number of the requested page.
-    - `page_size`: number of results per page.
+    - `page_size`: number of results per page (maximum : 100).
+    - `naf_codes`: one or more naf_codes, comma separated. If empty or missing, no filter will be used
     """
 
     current_app.logger.debug("API request received: %s", request.full_path)
@@ -125,9 +127,15 @@ def company_list():
     except (TypeError, ValueError):
         headcount_filter = settings.HEADCOUNT_WHATEVER
 
-    # No NAF filter
-    # Empty list is needed to handle companies with ROME not related to their NAF
-    naf_codes = {}
+    naf_code_list = {}
+    naf_codes = request.args.get('naf_codes')
+    if naf_codes:
+        naf_code_list = [naf.upper() for naf in naf_codes.split(',')]
+        naf_invalid = [naf for naf in naf_code_list if naf not in NAF_CODES]
+        if naf_invalid:
+            return u'invalid NAF code(s): %s' % ' '.join(naf_invalid), 400
+
+
 
     companies, companies_count = search.get_companies(
         naf_codes,

@@ -28,6 +28,14 @@ class ApiBaseTest(DatabaseTest):
             'zip_code': u'14000',
             'commune_id': u'14118',
         },
+        'metz': {
+            'coords': [{
+                'lat': 49.133333,
+                'lon': 6.166667,
+            }],
+            'zip_code': u'57050',
+            'commune_id': u'57463',
+        }
     }
 
     def setUp(self, *args, **kwargs):
@@ -113,6 +121,23 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['caen']['coords'],
                 'name': u'Office 5',
             },
+            # For NAF filter
+            {
+                'naf': u'4711C',  # Map to ROME D1508.
+                'siret': u'00000000000006',
+                'score': 75,
+                'headcount': 31,
+                'locations': self.positions['metz']['coords'],
+                'name': u'Office 6',
+            },
+            {
+                'naf': u'5610C',  # Map to ROME D1508.
+                'siret': u'00000000000007',
+                'score': 70,
+                'headcount': 50,
+                'locations': self.positions['metz']['coords'],
+                'name': u'Office 7',
+            }
         ]
         for i, doc in enumerate(docs, start=1):
             # Build scores for relevant ROME codes.
