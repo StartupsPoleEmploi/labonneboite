@@ -515,4 +515,47 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(data['companies_count'], 0)
         self.assertEqual(len(data['companies']), 0)
 
+    def test_wrong_value_in_sort(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['nantes']['commune_id'],
+            'rome_codes': u'D1211',
+            'sort': u'INVALID',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(rv.data, u'invalid sort value. Possible values : distance, score')
 
+    def test_sort_by_distance(self):
+        # Nantes in first place, then Reze
+        params = self.add_security_params({
+            'commune_id': self.positions['nantes']['commune_id'],
+            'rome_codes': u'D1211',
+            'sort': u'distance',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+        self.assertEqual(data["companies"][0]['siret'], u'00000000000008')
+        self.assertEqual(data["companies"][1]['siret'], u'00000000000009')
+        self.assertLess(data["companies"][0]['distance'], data["companies"][1]['distance'])
+
+    def test_sort_by_score(self):
+        # Reze in first place, then Nantes
+        params = self.add_security_params({
+            'commune_id': self.positions['nantes']['commune_id'],
+            'rome_codes': u'D1211',
+            'sort': u'score',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+        self.assertEqual(data["companies"][0]['siret'], u'00000000000009')
+        self.assertEqual(data["companies"][1]['siret'], u'00000000000008')
+        self.assertGreater(data["companies"][0]['stars'], data["companies"][1]['stars'])

@@ -46,6 +46,12 @@ ROME_NAF_PROBABILITY_CUTOFF = 0.05
 
 DISTANCE_FILTER_DEFAULT = 10
 HEADCOUNT_FILTER_DEFAULT = 1
+
+# Sort
+SORTING_CHOICES = (
+    (u'distance', u'Distance'),
+    (u'score', u'Potentiel d\'embauche'),
+)
 SORT_FILTER_DEFAULT = "score"
 
 PAGINATION_MAX_PAGES = 10
