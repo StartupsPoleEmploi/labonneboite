@@ -35,6 +35,23 @@ class ApiBaseTest(DatabaseTest):
             }],
             'zip_code': u'57050',
             'commune_id': u'57463',
+        },
+        'nantes': {
+            'coords': [{
+                'lat': 47.217222,
+                'lon': -1.553889,
+            }],
+            'zip_code': u'44000',
+            'commune_id': u'44109',
+        },
+        # City close to Nantes
+        'reze': {
+            'coords': [{
+                'lat': 47.2,
+                'lon': -1.566667,
+            }],
+            'zip_code': u'44400',
+            'commune_id': u'44143',
         }
     }
 
@@ -137,6 +154,23 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 50,
                 'locations': self.positions['metz']['coords'],
                 'name': u'Office 7',
+            },
+            # For result sort
+            {
+                'naf': u'9103Z', # Map to ROME D1211
+                'siret': u'00000000000008',
+                'score': 75,
+                'headcount': 50,
+                'locations': self.positions['nantes']['coords'],
+                'name': u'Office 8',
+            },
+            {
+                'naf': u'5630Z', # Map to ROME D1211
+                'siret': u'00000000000009',
+                'score': 99,
+                'headcount': 50,
+                'locations': self.positions['reze']['coords'], # City close to Nantes
+                'name': u'Office 9',
             }
         ]
         for i, doc in enumerate(docs, start=1):
