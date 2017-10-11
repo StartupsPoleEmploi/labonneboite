@@ -12,12 +12,14 @@ from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.naf_codes import NAF_CODES
+from labonneboite.conf.common.settings_common import SORTING_CHOICES
 
 
 apiBlueprint = Blueprint('api', __name__)
 
 OGR_ROME_CODES = load_ogr_rome_mapping()
 ROME_CODES = OGR_ROME_CODES.values()
+SORTING_VALUES = [key for key, _ in SORTING_CHOICES]
 
 # Some internal services of Pôle emploi can sometimes have access to sensitive information.
 API_INTERNAL_CONSUMERS = ['labonneboite', 'memo']
@@ -140,8 +142,16 @@ def company_list():
         if naf_invalid:
             return u'invalid NAF code(s): %s' % ' '.join(naf_invalid), 400
 
+<<<<<<< HEAD
 
 >>>>>>> Add naf_codes filter in API
+=======
+    sort = settings.SORT_FILTER_DEFAULT
+    if 'sort' in request.args:
+        sort = request.args.get('sort')
+        if sort not in SORTING_VALUES:
+            return u'invalid sort value. Possible values : %s' % ', '.join(SORTING_VALUES), 400
+>>>>>>> Add sort filter in API
 
     companies, companies_count = search.get_companies(
         naf_codes,
@@ -152,7 +162,7 @@ def company_list():
         headcount_filter=headcount_filter,
         from_number=from_number,
         to_number=to_number,
-        sort=settings.SORT_FILTER_DEFAULT,
+        sort=sort,
         index=settings.ES_INDEX,
     )
 
