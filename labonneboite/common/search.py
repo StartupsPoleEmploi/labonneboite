@@ -43,13 +43,6 @@ class Fetcher(object):
         self.sort = kwargs.get('sort')
         self.zipcode = kwargs.get('zipcode')
 
-        # Latitude/longitude.
-        city = geocoding.get_city_by_zipcode(self.zipcode, self.city_slug)
-        if not city:
-            logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.city_slug)
-            raise LocationError
-        self.latitude = city['coords']['lat']
-        self.longitude = city['coords']['lon']
 
         # Pagination.
         self.from_number = int(kwargs.get('from') or 1)
@@ -71,17 +64,26 @@ class Fetcher(object):
 
         # NAF, ROME and NAF codes.
         self.naf = kwargs.get('naf')
+
         self.rome = mapping_util.SLUGIFIED_ROME_LABELS[self.occupation_slug]
         mapper = mapping_util.Rome2NafMapper()
         if self.naf:
             self.naf_codes = mapper.map([self.rome], [self.naf])
         else:
-            self.naf_codes = mapper.map([self.rome])
-
+            self.naf_codes = {}
         # Other properties.
         self.alternative_rome_codes = {}
         self.alternative_distances = collections.OrderedDict()
         self.company_count = None
+
+    def findLocation(self):
+        # Latitude/longitude.
+        city = geocoding.get_city_by_zipcode(self.zipcode, self.city_slug)
+        if not city:
+            logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.city_slug)
+            raise LocationError
+        self.latitude = city['coords']['lat']
+        self.longitude = city['coords']['lon']
 
     def _get_company_count(self, rome_code, distance):
         return count_companies(
@@ -238,12 +240,13 @@ def build_json_body_elastic_search(
     sort_attrs = []
 
     # Build filters.
-
-    filters = [{
-        "terms": {
-            "naf": naf_codes
-        }
-    }]
+    filters = []
+    if naf_codes:
+        filters = [{
+            "terms": {
+                "naf": naf_codes
+            }
+        }]
 
     # in some cases, a string is given as input, let's ensure it is an int from now on
     try:

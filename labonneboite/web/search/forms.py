@@ -8,6 +8,7 @@ from wtforms.validators import DataRequired, Optional
 from labonneboite.conf import settings
 from labonneboite.common import util
 from labonneboite.common import search
+from labonneboite.conf.common.settings_common import SORTING_CHOICES
 
 
 class CompanySearchForm(FlaskForm):
@@ -16,11 +17,6 @@ class CompanySearchForm(FlaskForm):
         (u'1', u'Toutes tailles'),
         (u'2', u'Moins de 50 salariés'),
         (u'3', u'Plus de 50 salariés'),
-    )
-
-    SORTING_CHOICES = (
-        (u'distance', u'Distance'),
-        (u'score', u'Potentiel d\'embauche'),
     )
 
     NAF_CHOICES = [('', u'Tous les secteurs')] + [(k, v) for k, v in settings.NAF_CODES.items()]

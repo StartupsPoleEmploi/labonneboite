@@ -11,12 +11,15 @@ from labonneboite.common.load_data import load_ogr_rome_codes
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
+from labonneboite.conf.common.naf_codes import NAF_CODES
+from labonneboite.conf.common.settings_common import CONTRACT_VALUES, HEADCOUNT_VALUES, SORTING_CHOICES
 
 
 apiBlueprint = Blueprint('api', __name__)
 
 OGR_ROME_CODES = load_ogr_rome_codes()
 ROME_CODES = OGR_ROME_CODES.values()
+SORTING_VALUES = [key for key, _ in SORTING_CHOICES]
 
 # Some internal services of Pôle emploi can sometimes have access to sensitive information.
 API_INTERNAL_CONSUMERS = ['labonneboite', 'memo']
@@ -67,7 +70,11 @@ def company_list():
     Optional parameters:
     - `distance`: perimeter of the search radius (in Km) in which to search.
     - `page`: number of the requested page.
-    - `page_size`: number of results per page.
+    - `page_size`: number of results per page (maximum : 100).
+    - `naf_codes`: one or more naf_codes, comma separated. If empty or missing, no filter will be used
+    - `contract`: one value, only between 'all' (default) or 'alternance'
+    - `sort`: one value, only between 'score' (default) and 'distance'
+    - `headcount`: one value, only between 'all' (default), 'small' or 'big'
     """
 
     current_app.logger.debug("API request received: %s", request.full_path)
@@ -120,13 +127,35 @@ def company_list():
     except (TypeError, ValueError):
         distance = settings.DISTANCE_FILTER_DEFAULT
 
-    try:
-        headcount_filter = int(request.args.get('headcount'))
-    except (TypeError, ValueError):
-        headcount_filter = settings.HEADCOUNT_WHATEVER
+    naf_code_list = {}
+    naf_codes = request.args.get('naf_codes')
+    if naf_codes:
+        naf_code_list = [naf.upper() for naf in naf_codes.split(',')]
+        naf_invalid = [naf for naf in naf_code_list if naf not in NAF_CODES]
+        if naf_invalid:
+            return u'invalid NAF code(s): %s' % ' '.join(naf_invalid), 400
 
-    mapper = mapping_util.Rome2NafMapper()
-    naf_code_list = mapper.map(rome_code_list)
+    sort = settings.SORT_FILTER_DEFAULT
+    if 'sort' in request.args:
+        sort = request.args.get('sort')
+        if sort not in SORTING_VALUES:
+            return u'invalid sort value. Possible values : %s' % ', '.join(SORTING_VALUES), 400
+
+    flag_alternance = 0
+    if 'contract' in request.args:
+        contract = request.args.get('contract')
+        if contract not in CONTRACT_VALUES:
+            return u'invalid contract value. Possible values : %s' % ', '.join(CONTRACT_VALUES), 400
+        else:
+            flag_alternance = 1 if contract == 'alternance' else 0
+
+    headcount_filter = settings.HEADCOUNT_WHATEVER
+    if 'headcount' in request.args:
+        headcount = request.args.get('headcount')
+        if headcount not in HEADCOUNT_VALUES.keys():
+            return u'invalid headcount value. Possible values : %s' % ', '.join(HEADCOUNT_VALUES.keys()), 400
+        else:
+            headcount_filter = HEADCOUNT_VALUES[headcount]
 
     companies, companies_count = search.get_companies(
         naf_code_list,
@@ -137,7 +166,8 @@ def company_list():
         headcount_filter=headcount_filter,
         from_number=from_number,
         to_number=to_number,
-        sort=settings.SORT_FILTER_DEFAULT,
+        flag_alternance=flag_alternance,
+        sort=sort,
         index=settings.ES_INDEX,
     )
 

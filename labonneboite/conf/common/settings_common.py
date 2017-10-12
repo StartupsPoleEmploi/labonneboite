@@ -12,6 +12,7 @@ SEARCHING_TIME = 10000
 
 HOST = 'labonneboite.pole-emploi.fr'
 
+# Headcount
 HEADCOUNT_INSEE = {
     u'00': u'0 salarié',
     u'01': u'1 ou 2 salariés',
@@ -38,16 +39,25 @@ HEADCOUNT_BIG_ONLY = 3
 
 HEADCOUNT_SMALL_ONLY_MAXIMUM = 12
 HEADCOUNT_BIG_ONLY_MINIMUM = 21
-
-COMPANY_RESULTS_MAX = 100
-AUTOCOMPLETE_MAX = 5
-
-ROME_NAF_PROBABILITY_CUTOFF = 0.05
-
-DISTANCE_FILTER_DEFAULT = 10
 HEADCOUNT_FILTER_DEFAULT = 1
+
+HEADCOUNT_VALUES = {
+    'all': HEADCOUNT_WHATEVER,
+    'big': HEADCOUNT_BIG_ONLY,
+    'small': HEADCOUNT_SMALL_ONLY
+}
+
+# Contract Value
+CONTRACT_VALUES = ['all', 'alternance']
+
+# Sort
+SORTING_CHOICES = (
+    (u'distance', u'Distance'),
+    (u'score', u'Potentiel d\'embauche'),
+)
 SORT_FILTER_DEFAULT = "score"
 
+# Paginaton
 PAGINATION_MAX_PAGES = 10
 PAGINATION_COMPANIES_PER_PAGE = 10
 
@@ -59,3 +69,10 @@ LOGSTASH_HOST = "localhost"
 LOGSTASH_PORT = 5959
 
 TILE_SERVER_URL = "http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}"
+
+COMPANY_RESULTS_MAX = 100
+AUTOCOMPLETE_MAX = 5
+
+ROME_NAF_PROBABILITY_CUTOFF = 0.05
+
+DISTANCE_FILTER_DEFAULT = 10
