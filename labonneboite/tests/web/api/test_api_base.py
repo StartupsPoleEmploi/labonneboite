@@ -60,6 +60,14 @@ class ApiBaseTest(DatabaseTest):
             }],
             'zip_code': u'59800',
             'commune_id': u'59350',
+        },
+        'toulouse': {
+            'coords': [{
+                'lat': 43.600000,
+                'lon': 1.433333,
+            }],
+            'zip_code': u'31500',
+            'commune_id': u'31555',
         }
     }
 
@@ -211,6 +219,25 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['lille']['coords'],
                 'name': u'Office 11',
                 'flag_alternance': 1
+            },
+            # For headcount filter
+            {
+                'naf': u'7022Z', # Map to Rome M1202
+                'siret': u'00000000000012', 
+                'score': 82,
+                'headcount': 10,
+                'locations': self.positions['toulouse']['coords'],
+                'name': u'Office 12',
+                'flag_alternance': 0
+            },
+            {
+                'naf': u'7010Z',  # Map to Rome M1202
+                'siret': u'00000000000013',
+                'score': 82,
+                'headcount': 60,
+                'locations': self.positions['toulouse']['coords'],
+                'name': u'Office 13',
+                'flag_alternance': 0
             }
         ]
         for i, doc in enumerate(docs, start=1):

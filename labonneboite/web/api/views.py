@@ -12,7 +12,7 @@ from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.naf_codes import NAF_CODES
-from labonneboite.conf.common.settings_common import CONTRACT_VALUES, SORTING_CHOICES
+from labonneboite.conf.common.settings_common import CONTRACT_VALUES, HEADCOUNT_VALUES, SORTING_CHOICES
 
 
 apiBlueprint = Blueprint('api', __name__)
@@ -73,6 +73,7 @@ def company_list():
     - `page_size`: number of results per page (maximum : 100).
     - `naf_codes`: one or more naf_codes, comma separated. If empty or missing, no filter will be used
     - `contract`: one value only between 'all' (default) or 'alternance'
+    - `headcount`: one value only between 'all', 'small' or 'big'
     """
 
     current_app.logger.debug("API request received: %s", request.full_path)
@@ -125,11 +126,6 @@ def company_list():
     except (TypeError, ValueError):
         distance = settings.DISTANCE_FILTER_DEFAULT
 
-    try:
-        headcount_filter = int(request.args.get('headcount'))
-    except (TypeError, ValueError):
-        headcount_filter = settings.HEADCOUNT_WHATEVER
-
     naf_code_list = {}
     naf_codes = request.args.get('naf_codes')
     if naf_codes:
@@ -151,6 +147,14 @@ def company_list():
             return u'invalid contract value. Possible values : %s' % ', '.join(CONTRACT_VALUES), 400
         else:
             flag_alternance = 1 if contract == 'alternance' else 0
+
+    headcount_filter = settings.HEADCOUNT_WHATEVER
+    if 'headcount' in request.args:
+        headcount = request.args.get('headcount')
+        if headcount not in HEADCOUNT_VALUES.keys():
+            return u'invalid headcount value. Possible values : %s' % ', '.join(HEADCOUNT_VALUES.keys()), 400
+        else:
+            headcount_filter = HEADCOUNT_VALUES[headcount]
 
     companies, companies_count = search.get_companies(
         naf_codes,
