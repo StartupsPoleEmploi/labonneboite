@@ -12,7 +12,7 @@ from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.naf_codes import NAF_CODES
-from labonneboite.conf.common.settings_common import SORTING_CHOICES
+from labonneboite.conf.common.settings_common import CONTRACT_VALUES, SORTING_CHOICES
 
 
 apiBlueprint = Blueprint('api', __name__)
@@ -72,6 +72,7 @@ def company_list():
     - `page`: number of the requested page.
     - `page_size`: number of results per page (maximum : 100).
     - `naf_codes`: one or more naf_codes, comma separated. If empty or missing, no filter will be used
+    - `contract`: one value only between 'all' (default) or 'alternance'
     """
 
     current_app.logger.debug("API request received: %s", request.full_path)
@@ -153,6 +154,14 @@ def company_list():
             return u'invalid sort value. Possible values : %s' % ', '.join(SORTING_VALUES), 400
 >>>>>>> Add sort filter in API
 
+    flag_alternance = 0
+    if 'contract' in request.args:
+        contract = request.args.get('contract')
+        if contract not in CONTRACT_VALUES:
+            return u'invalid contract value. Possible values : %s' % ', '.join(CONTRACT_VALUES), 400
+        else:
+            flag_alternance = 1 if contract == 'alternance' else 0
+
     companies, companies_count = search.get_companies(
         naf_codes,
         rome_code,
@@ -162,6 +171,7 @@ def company_list():
         headcount_filter=headcount_filter,
         from_number=from_number,
         to_number=to_number,
+        flag_alternance=flag_alternance,
         sort=sort,
         index=settings.ES_INDEX,
     )
