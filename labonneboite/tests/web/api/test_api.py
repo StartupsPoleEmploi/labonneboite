@@ -419,7 +419,7 @@ class ApiCompanyListTest(ApiBaseTest):
         rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
         self.assertEqual(rv.status_code, 400)
 
-    def test_naf_no_exists(self):
+    def test_wrong_naf_value(self):
         params = self.add_security_params({
             'commune_id': self.positions['metz']['commune_id'],
             'rome_codes': u'D1508',
@@ -458,7 +458,7 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(data['companies_count'], 1)
         self.assertEqual(len(data['companies']), 1)
         self.assertEqual(data['companies'][0]['siret'], u'00000000000006')
-        
+
         # 2) NAF Code : 5610C => 1 result expected
         params = self.add_security_params({
             'commune_id': self.positions['metz']['commune_id'],
@@ -559,3 +559,41 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(data["companies"][0]['siret'], u'00000000000009')
         self.assertEqual(data["companies"][1]['siret'], u'00000000000008')
         self.assertGreater(data["companies"][0]['stars'], data["companies"][1]['stars'])
+
+    def test_wrong_contract_value(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['lille']['commune_id'],
+            'rome_codes': u'D1213',
+            'user': u'labonneboite',
+            'contract': u'Invalid'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(rv.data, u'invalid contract value. Possible values : all, alternance')
+
+    def test_contract_all(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['lille']['commune_id'],
+            'rome_codes': u'D1213',
+            'user': u'labonneboite',
+            'contract': u'all'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+
+    def test_contract_alternance_only(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['lille']['commune_id'],
+            'rome_codes': u'D1213',
+            'user': u'labonneboite',
+            'contract': u'alternance'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000011')
