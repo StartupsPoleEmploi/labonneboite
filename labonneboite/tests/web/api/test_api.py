@@ -597,3 +597,55 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(data['companies_count'], 1)
         self.assertEqual(len(data['companies']), 1)
         self.assertEqual(data['companies'][0]['siret'], u'00000000000011')
+
+    def test_wrong_headcount_value(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['toulouse']['commune_id'],
+            'rome_codes': u'M1202',
+            'user': u'labonneboite',
+            'headcount': u'INVALID'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(rv.data, u'invalid headcount value. Possible values : small, big, all')
+
+    def test_headcount_all(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['toulouse']['commune_id'],
+            'rome_codes': u'M1202',
+            'user': u'labonneboite',
+            'headcount': u'all'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+
+    def test_headcount_small(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['toulouse']['commune_id'],
+            'rome_codes': u'M1202',
+            'user': u'labonneboite',
+            'headcount': u'small'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000012')
+
+    def test_headcount_big(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['toulouse']['commune_id'],
+            'rome_codes': u'M1202',
+            'user': u'labonneboite',
+            'headcount': u'big'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000013')
