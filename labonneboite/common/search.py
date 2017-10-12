@@ -43,13 +43,6 @@ class Fetcher(object):
         self.sort = kwargs.get('sort')
         self.zipcode = kwargs.get('zipcode')
 
-        # Latitude/longitude.
-        city = geocoding.get_city_by_zipcode(self.zipcode, self.city_slug)
-        if not city:
-            logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.city_slug)
-            raise LocationError
-        self.latitude = city['coords']['lat']
-        self.longitude = city['coords']['lon']
 
         # Pagination.
         self.from_number = int(kwargs.get('from') or 1)
@@ -82,6 +75,15 @@ class Fetcher(object):
         self.alternative_rome_codes = {}
         self.alternative_distances = collections.OrderedDict()
         self.company_count = None
+
+    def findLocation(self):
+        # Latitude/longitude.
+        city = geocoding.get_city_by_zipcode(self.zipcode, self.city_slug)
+        if not city:
+            logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.city_slug)
+            raise LocationError
+        self.latitude = city['coords']['lat']
+        self.longitude = city['coords']['lon']
 
     def _get_company_count(self, rome_code, distance):
         return count_companies(

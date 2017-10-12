@@ -145,23 +145,28 @@ def results(city, zipcode, occupation):
     alternative_rome_descriptions = []
     alternative_distances = {}
     location_error = False
+
     try:
-        current_app.logger.debug("fetching companies and company_count")
-        companies = fetcher.get_companies()
-        for alternative, count in fetcher.alternative_rome_codes.iteritems():
-            if settings.ROME_DESCRIPTIONS.get(alternative) and count:
-                desc = settings.ROME_DESCRIPTIONS.get(alternative)
-                slug = slugify(desc)
-                alternative_rome_descriptions.append([alternative, desc, slug, count])
-        company_count = fetcher.company_count
-        alternative_distances = fetcher.alternative_distances
-    except search_util.JobException:
-        companies = []
-        company_count = 0
+        fetcher.findLocation()
     except search_util.LocationError:
         companies = []
         company_count = 0
         location_error = True
+
+    if not location_error:
+        try:
+            current_app.logger.debug("fetching companies and company_count")
+            companies = fetcher.get_companies()
+            for alternative, count in fetcher.alternative_rome_codes.iteritems():
+                if settings.ROME_DESCRIPTIONS.get(alternative) and count:
+                    desc = settings.ROME_DESCRIPTIONS.get(alternative)
+                    slug = slugify(desc)
+                    alternative_rome_descriptions.append([alternative, desc, slug, count])
+            company_count = fetcher.company_count
+            alternative_distances = fetcher.alternative_distances
+        except search_util.JobException:
+            companies = []
+            company_count = 0
 
     # Pagination.
     from_number_param = int(kwargs.get('from') or 1)
