@@ -50,6 +50,9 @@ ROME_NAF_PROBABILITY_CUTOFF = 0.05
 DISTANCE_FILTER_DEFAULT = 10
 HEADCOUNT_FILTER_DEFAULT = 1
 
+# Contract Value
+CONTRACT_VALUES = ['all', 'alternance']
+
 # Sort
 SORTING_CHOICES = (
     (u'distance', u'Distance'),
