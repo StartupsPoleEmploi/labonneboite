@@ -72,8 +72,17 @@ def company_list():
     - `page`: number of the requested page.
     - `page_size`: number of results per page (maximum : 100).
     - `naf_codes`: one or more naf_codes, comma separated. If empty or missing, no filter will be used
+<<<<<<< HEAD
     - `contract`: one value only between 'all' (default) or 'alternance'
+<<<<<<< HEAD
     - `headcount`: one value only between 'all', 'small' or 'big'
+=======
+=======
+    - `contract`: one value, only between 'all' (default) or 'alternance'
+    - `sort`: one value, only between 'score' (default) and 'distance'
+    - `headcount`: one value, only between 'all' (default), 'small' or 'big'
+>>>>>>> bd2b1ee... Add explanation for the sort parameter in API
+>>>>>>> 07c8296... Add explanation for the sort parameter in API
     """
 
     current_app.logger.debug("API request received: %s", request.full_path)
