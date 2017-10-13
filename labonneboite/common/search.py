@@ -74,10 +74,11 @@ class Fetcher(object):
 
         self.rome = mapping_util.SLUGIFIED_ROME_LABELS[self.occupation_slug]
         mapper = mapping_util.Rome2NafMapper()
+        
+        # Empty list is needed to handle companies with ROME not related to their NAF
+        self.naf_codes = {}
         if self.naf:
             self.naf_codes = mapper.map([self.rome], [self.naf])
-        else:
-            self.naf_codes = {}
         # Other properties.
         self.alternative_rome_codes = {}
         self.alternative_distances = collections.OrderedDict()

@@ -125,11 +125,12 @@ def company_list():
     except (TypeError, ValueError):
         headcount_filter = settings.HEADCOUNT_WHATEVER
 
-    # No naf filter
-    naf_code_list = {}
+    # No NAF filter
+    # Empty list is needed to handle companies with ROME not related to their NAF
+    naf_codes = {}
 
     companies, companies_count = search.get_companies(
-        naf_code_list,
+        naf_codes,
         rome_code,
         latitude,
         longitude,
