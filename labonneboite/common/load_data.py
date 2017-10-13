@@ -29,7 +29,7 @@ def load_csv_file(filename, delimiter=','):
     for row in reader:
         if len_previous_row:
             if len(row) != len_previous_row:
-                raise Exception("found rows with different number of fields")
+                raise Exception("found rows with different number of fields : %s" % row)
         rows.append(row)
         len_previous_row = len(row)
 
@@ -94,6 +94,21 @@ def load_rome_labels():
         rome_to_label[row[ROME_COLUMN]] = row[LABEL_COLUMN].decode('utf8')
 
     return rome_to_label
+
+
+@lru_cache(maxsize=None)
+def load_naf_labels():
+    # use pipe delimiter because ';' appear in label data
+    rows = load_csv_file("naf_labels.csv", delimiter='|')
+
+    NAF_COLUMN = 0
+    LABEL_COLUMN = 1
+    naf_to_label = {}
+
+    for row in rows:
+        naf_to_label[row[NAF_COLUMN]] = row[LABEL_COLUMN].decode('utf8')
+
+    return naf_to_label
 
 
 @lru_cache(maxsize=None)

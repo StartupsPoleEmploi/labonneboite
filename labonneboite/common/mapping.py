@@ -7,7 +7,6 @@ from slugify import slugify
 
 from labonneboite.common.load_data import load_rome_naf_mapping
 from labonneboite.conf import settings
-from labonneboite.conf.common.naf_codes import NAF_CODES
 
 
 logger = logging.getLogger('main')
@@ -42,15 +41,15 @@ def populate_rome_naf_mapping():
         if rome not in settings.ROME_DESCRIPTIONS:
             raise Exception("missing label for ROME %s" % rome)
 
-        if naf not in NAF_CODES:
+        if naf not in settings.NAF_CODES:
             raise Exception("missing label for NAF %s" % naf)
 
         if ENSURE_LABELS_IN_MAPPING_MATCH:
 
-            if naf_label != NAF_CODES[naf].encode('utf8'):
+            if naf_label != settings.NAF_CODES[naf].encode('utf8'):
                 raise Exception("labels '%s' and '%s' do not match for NAF %s" % (
                     naf_label,
-                    NAF_CODES[naf].encode('utf8'),
+                    settings.NAF_CODES[naf].encode('utf8'),
                     naf,
                     )
                 )
@@ -132,7 +131,7 @@ class Rome2NafMapper(object):
         nafs = self.rome_2_naf_dict.get(rome, {})
         nafs = sorted(nafs.items(), key=lambda (k, v): v, reverse=True)
         Naf = namedtuple('Naf', ['code', 'name', 'hirings'])
-        return [Naf(naf[0], NAF_CODES[naf[0]], naf[1]) for naf in nafs]
+        return [Naf(naf[0], settings.NAF_CODES[naf[0]], naf[1]) for naf in nafs]
 
     @staticmethod
     def romes_is_valid(rome):
@@ -146,4 +145,4 @@ class Rome2NafMapper(object):
         """
         Returns True if the given NAF code is valid, False otherwise.
         """
-        return naf in NAF_CODES
+        return naf in settings.NAF_CODES
