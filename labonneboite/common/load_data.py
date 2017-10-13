@@ -62,7 +62,7 @@ def load_ogr_labels():
 
 @lru_cache(maxsize=None)
 def load_ogr_rome_mapping():
-    rows = load_csv_file("ogr_rome_mapping.csv.new")
+    rows = load_csv_file("ogr_rome_mapping.csv")
 
     OGR_COLUMN = 0
     ROME_COLUMN = 1
@@ -84,7 +84,7 @@ def load_ogr_rome_mapping():
 
 @lru_cache(maxsize=None)
 def load_rome_labels():
-    rows = load_csv_file("rome_labels.csv.new", delimiter=';')
+    rows = load_csv_file("rome_labels.csv", delimiter=';')
 
     ROME_COLUMN = 0
     LABEL_COLUMN = 1
@@ -98,7 +98,7 @@ def load_rome_labels():
 
 @lru_cache(maxsize=None)
 def load_rome_naf_mapping():
-    return load_csv_file("rome_naf_mapping.csv.new")
+    return load_csv_file("rome_naf_mapping.csv")
 
 
 
