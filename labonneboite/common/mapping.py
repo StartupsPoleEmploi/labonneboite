@@ -18,7 +18,7 @@ SLUGIFIED_ROME_LABELS = {slugify(v): k for k, v in settings.ROME_DESCRIPTIONS.it
 MANUAL_ROME_NAF_MAPPING = {}
 MANUAL_NAF_ROME_MAPPING = {}
 
-ENSURE_LABELS_IN_MAPPING_MATCH = False  # FIXME
+ENSURE_LABELS_IN_MAPPING_MATCH = False  # FIXME resolve pending issue of non matching label data
 
 
 def populate_rome_naf_mapping():
