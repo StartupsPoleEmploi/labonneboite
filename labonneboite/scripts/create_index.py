@@ -636,13 +636,12 @@ def run():
 
 
 if __name__ == '__main__':
-    # run()
-
-    import profile
-    profile.run('run()')
-
-    # from pycallgraph import PyCallGraph
-    # from pycallgraph.output import GraphvizOutput
-    # 
-    # with PyCallGraph(output=GraphvizOutput()):
-    #     run()
+    if ENABLE_CODE_PERFORMANCE_PROFILING:
+        from cProfile import Profile
+        profiler = Profile()
+        profiler.runctx("run()", locals(), globals())
+        from pyprof2calltree import convert
+        # FIXME file not found on staging, go absolute path
+        convert(profiler.getstats(), 'profiling_results.kgrind')
+    else:
+        run()
