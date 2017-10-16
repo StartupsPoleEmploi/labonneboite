@@ -29,11 +29,6 @@ PUBLIC_CHOICES = [PUBLIC_ALL, PUBLIC_JUNIOR, PUBLIC_SENIOR, PUBLIC_HANDICAP]
 class LocationError(Exception):
     pass
 
-
-class JobException(Exception):
-    pass
-
-
 class Fetcher(object):
 
     def __init__(self, **kwargs):
@@ -76,7 +71,7 @@ class Fetcher(object):
         self.alternative_distances = collections.OrderedDict()
         self.company_count = None
 
-    def findLocation(self):
+    def init_location(self):
         # Latitude/longitude.
         city = geocoding.get_city_by_zipcode(self.zipcode, self.city_slug)
         if not city:
