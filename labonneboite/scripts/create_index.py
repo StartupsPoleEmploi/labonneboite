@@ -641,5 +641,8 @@ if __name__ == '__main__':
         import os
         filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'profiling_results.kgrind')
         convert(profiler.getstats(), filename)
+        logging.info("COMPLETED run with profiling: exported profiling result as %s", filename)
     else:
         run()
+        logging.info("COMPLETED run without profiling")
+
