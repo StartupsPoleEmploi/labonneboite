@@ -641,7 +641,8 @@ if __name__ == '__main__':
         profiler = Profile()
         profiler.runctx("run()", locals(), globals())
         from pyprof2calltree import convert
-        # FIXME file not found on staging, go absolute path
-        convert(profiler.getstats(), 'profiling_results.kgrind')
+        import os
+        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'profiling_results.kgrind')
+        convert(profiler.getstats(), filename)
     else:
         run()
