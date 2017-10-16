@@ -410,7 +410,7 @@ def get_scores_by_rome(office, office_to_update=None):
     return scores_by_rome
 
 
-def create_offices():
+def create_offices(enable_profiling=False):
     """
     Populate the `office` type in ElasticSearch.
     Run it as a parallel computation based on departements.
@@ -422,7 +422,7 @@ def create_offices():
     # maxtasksperchild=1 ensures memory is freed up after every departement computation.
     pool = mp.Pool(processes=int(1.25*mp.cpu_count()), maxtasksperchild=1)
 
-    if ENABLE_CODE_PERFORMANCE_PROFILING:
+    if enable_profiling:
         func = profile_create_offices_for_departement
     else:
         func = create_offices_for_departement
@@ -624,15 +624,11 @@ def display_performance_stats(departement):
     )
 
 
-def run():
-    parser = argparse.ArgumentParser(description="Update etablissement data with geographic coordinates")
-    parser.add_argument('-d', '--drop-indexes', dest='drop_indexes', help="Drop indexs before updating documents")
-    args = parser.parse_args()
-
-    if args.drop_indexes:
+def update_data(drop_indexes, enable_profiling):
+    if drop_indexes:
         logging.info("drop index")
         drop_and_create_index()
-        create_offices()
+        create_offices(enable_profiling)
         create_job_codes()
         create_locations()
 
@@ -644,17 +640,29 @@ def run():
     update_offices_geolocations()
 
 
-if __name__ == '__main__':
-    if ENABLE_CODE_PERFORMANCE_PROFILING:
+def run():
+    parser = argparse.ArgumentParser(description="Update elasticsearch data: offices, ogr_codes and locations.")
+    parser.add_argument('-d', '--drop-indexes', dest='drop_indexes', help="Drop and recreate from scratch the index.")
+    parser.add_argument('-p', '--profile', dest='profile', help="Enable code performance profiling.")
+    args = parser.parse_args()
+
+    drop_indexes = (args.drop_indexes is not None)
+    enable_profiling = (args.profile is not None)
+
+    if enable_profiling:
         logging.info("STARTED run with profiling")
         profiler = Profile()
-        profiler.runctx("run()", locals(), globals())
+        profiler.runctx("update_data(drop_indexes, enable_profiling=True)", locals(), globals())
         relative_filename = 'profiling_results/create_index_run.kgrind'
         filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), relative_filename)
         convert(profiler.getstats(), filename)
         logging.info("COMPLETED run with profiling: exported profiling result as %s", filename)
     else:
         logging.info("STARTED run without profiling")
-        run()
+        update_data(drop_indexes, enable_profiling=False)
         logging.info("COMPLETED run without profiling")
+
+
+if __name__ == '__main__':
+    run()
 
