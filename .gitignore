@@ -61,6 +61,10 @@ Thumbs.db
 # folder to store backups used on some environments
 srv
 
+# Importer outputs #
+####################
+labonneboite/importer/pickle_exports/*.pickle
+
 # Data #
 ########
 ROME_NAF/opendata/sir*.csv
@@ -70,6 +74,7 @@ ROME_NAF/tableaux
 ROME_NAF/*.txt
 
 # Profiling files #
-####################
+###################
 labonneboite/scripts/**/*.kgrind
 labonneboite/*.lprof
+
