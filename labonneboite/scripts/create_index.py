@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 INDEX_NAME = 'labonneboite'
 OFFICE_TYPE = 'office'
-ES_TIMEOUT = 30
+ES_TIMEOUT = 90
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
 
@@ -406,14 +406,6 @@ def get_scores_by_rome(office, office_to_update=None):
     return scores_by_rome
 
 
-def chunks(l, n):  # FIXME drop?
-    """
-    Yield successive n-sized chunks from l.
-    """
-    for i in xrange(0, len(l), n):
-        yield l[i:i+n]
-
-
 def create_offices(index=INDEX_NAME, ignore_unreachable_offices=False):
     """
     Populate the `office` type in ElasticSearch.
@@ -468,6 +460,8 @@ def create_offices_for_departement(departement, index=INDEX_NAME, ignore_unreach
     bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
 
     logging.info("COMPLETED indexing offices for departement=%s ...", departement)
+
+    display_performance_stats(departement)
 
 
 def add_offices(index=INDEX_NAME):
@@ -601,16 +595,17 @@ def update_offices_geolocations(index=INDEX_NAME):
             es.update(index=index, doc_type=OFFICE_TYPE, id=office.siret, body=body, ignore=404)
 
 
-def display_performance_stats():
+def display_performance_stats(departement):
     methods = [
                'get_score_from_hirings',
                'get_hirings_from_score',
                'get_score_adjusted_to_rome_code_and_naf_code',
               ]
     for method in methods:
-        logging.info("%s : %s", method, getattr(scoring_util, method).cache_info())
+        logging.info("[DPT%s] %s : %s", departement, method, getattr(scoring_util, method).cache_info())
 
-    logging.info("indexed %s of %s offices and %s score_for_rome",
+    logging.info("[DPT%s] indexed %s of %s offices and %s score_for_rome",
+        departement,
         st.indexed_office_count,
         st.office_count,
         st.office_score_for_rome_count
@@ -635,8 +630,6 @@ def run():
     remove_offices()
     update_offices()
     update_offices_geolocations()
-
-    display_performance_stats()
 
 
 if __name__ == '__main__':
