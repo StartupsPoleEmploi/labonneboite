@@ -1,9 +1,13 @@
 # coding: utf8
 import argparse
 import logging
+import os
 
 import multiprocessing as mp
-from functools import partial
+# profiling libraries
+from cProfile import Profile
+from pyprof2calltree import convert
+# other libraries
 from elasticsearch import Elasticsearch
 from elasticsearch import TransportError
 from elasticsearch.helpers import bulk
@@ -237,14 +241,14 @@ request_body = {
 }
 
 
-def drop_and_create_index(index=INDEX_NAME):
+def drop_and_create_index():
     logging.info("drop and create index...")
     es = Elasticsearch(timeout=ES_TIMEOUT)
-    es.indices.delete(index=index, ignore=[400, 404])
-    es.indices.create(index=index, body=request_body)
+    es.indices.delete(index=INDEX_NAME, ignore=[400, 404])
+    es.indices.create(index=INDEX_NAME, body=request_body)
 
 
-def create_job_codes(index=INDEX_NAME):
+def create_job_codes():
     """
     Create the `ogr` type in ElasticSearch.
     """
@@ -276,7 +280,7 @@ def create_job_codes(index=INDEX_NAME):
     bulk(es, actions)
 
 
-def create_locations(index=INDEX_NAME):
+def create_locations():
     """
     Create the `location` type in ElasticSearch.
     """
@@ -292,7 +296,7 @@ def create_locations(index=INDEX_NAME):
         }
         action = {
             '_op_type': 'index',
-            '_index': index,
+            '_index': INDEX_NAME,
             '_type': 'location',
             '_source': doc
         }
@@ -406,7 +410,7 @@ def get_scores_by_rome(office, office_to_update=None):
     return scores_by_rome
 
 
-def create_offices(index=INDEX_NAME, ignore_unreachable_offices=False):
+def create_offices():
     """
     Populate the `office` type in ElasticSearch.
     Run it as a parallel computation based on departements.
@@ -418,18 +422,17 @@ def create_offices(index=INDEX_NAME, ignore_unreachable_offices=False):
     # maxtasksperchild=1 ensures memory is freed up after every departement computation.
     pool = mp.Pool(processes=int(1.25*mp.cpu_count()), maxtasksperchild=1)
 
-    func = partial(
-        create_offices_for_departement,
-        index=index,
-        ignore_unreachable_offices=ignore_unreachable_offices
-    )
+    if ENABLE_CODE_PERFORMANCE_PROFILING:
+        func = profile_create_offices_for_departement
+    else:
+        func = create_offices_for_departement
 
     pool.map(func, importer_settings.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
     pool.close()
     pool.join()
 
 
-def create_offices_for_departement(departement, index=INDEX_NAME, ignore_unreachable_offices=False):
+def create_offices_for_departement(departement):
     """
     Populate the `office` type in ElasticSearch with offices having given departement.
     """
@@ -447,11 +450,11 @@ def create_offices_for_departement(departement, index=INDEX_NAME, ignore_unreach
 
         office_is_reachable = 'scores_by_rome' in es_doc
 
-        if office_is_reachable or not ignore_unreachable_offices:
+        if office_is_reachable:
             st.increment_indexed_office_count()
             actions.append({
                 '_op_type': 'index',
-                '_index': index,
+                '_index': INDEX_NAME,
                 '_type': OFFICE_TYPE,
                 '_id': office.siret,
                 '_source': es_doc,
@@ -464,7 +467,16 @@ def create_offices_for_departement(departement, index=INDEX_NAME, ignore_unreach
     display_performance_stats(departement)
 
 
-def add_offices(index=INDEX_NAME):
+def profile_create_offices_for_departement(departement):
+    profiler = Profile()
+    command = "create_offices_for_departement('%s')" % departement
+    profiler.runctx(command, locals(), globals())
+    relative_filename = 'profiling_results/create_index_dpt%s.kgrind' % departement
+    filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), relative_filename)
+    convert(profiler.getstats(), filename)
+
+
+def add_offices():
     """
     Add offices (complete the data provided by the importer).
     """
@@ -501,10 +513,10 @@ def add_offices(index=INDEX_NAME):
 
             # Create the new office in ES.
             doc = get_office_as_es_doc(office_to_add)
-            es.create(index=index, doc_type=OFFICE_TYPE, id=office_to_add.siret, body=doc)
+            es.create(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_add.siret, body=doc)
 
 
-def remove_offices(index=INDEX_NAME):
+def remove_offices():
     """
     Remove offices (overload the data provided by the importer).
     """
@@ -517,7 +529,7 @@ def remove_offices(index=INDEX_NAME):
     for siret in offices_to_remove:
         # Apply changes in ElasticSearch.
         try:
-            es.delete(index=index, doc_type=OFFICE_TYPE, id=siret)
+            es.delete(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret)
         except TransportError as e:
             if e.status_code != 404:
                 raise
@@ -529,7 +541,7 @@ def remove_offices(index=INDEX_NAME):
             pdf_util.delete_file(office)
 
 
-def update_offices(index=INDEX_NAME):
+def update_offices():
     """
     Update offices (overload the data provided by the importer).
     """
@@ -562,15 +574,15 @@ def update_offices(index=INDEX_NAME):
             # To do this, we perform 2 requests: the first one reset `scores_by_rome`, the
             # second one populate it.
             delete_body = {'doc': {'scores_by_rome': None}}
-            es.update(index=index, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=delete_body, ignore=404)
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=delete_body, ignore=404)
 
-            es.update(index=index, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body, ignore=404)
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body, ignore=404)
 
             # Delete the current PDF, it will be regenerated at next download attempt.
             pdf_util.delete_file(office)
 
 
-def update_offices_geolocations(index=INDEX_NAME):
+def update_offices_geolocations():
     """
     Remove or add extra geolocations to offices.
     New geolocations are entered into the system through the `OfficeAdminExtraGeoLocation` table.
@@ -592,7 +604,7 @@ def update_offices_geolocations(index=INDEX_NAME):
             office.save()
             # Apply changes in ElasticSearch.
             body = {'doc': {'locations': locations}}
-            es.update(index=index, doc_type=OFFICE_TYPE, id=office.siret, body=body, ignore=404)
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office.siret, body=body, ignore=404)
 
 
 def display_performance_stats(departement):
@@ -620,7 +632,7 @@ def run():
     if args.drop_indexes:
         logging.info("drop index")
         drop_and_create_index()
-        create_offices(ignore_unreachable_offices=True)
+        create_offices()
         create_job_codes()
         create_locations()
 
@@ -635,12 +647,10 @@ def run():
 if __name__ == '__main__':
     if ENABLE_CODE_PERFORMANCE_PROFILING:
         logging.info("STARTED run with profiling")
-        from cProfile import Profile
         profiler = Profile()
         profiler.runctx("run()", locals(), globals())
-        from pyprof2calltree import convert
-        import os
-        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'profiling_results.kgrind')
+        relative_filename = 'profiling_results/create_index_run.kgrind'
+        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), relative_filename)
         convert(profiler.getstats(), filename)
         logging.info("COMPLETED run with profiling: exported profiling result as %s", filename)
     else:
