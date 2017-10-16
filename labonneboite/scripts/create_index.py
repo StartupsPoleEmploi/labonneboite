@@ -419,7 +419,12 @@ def create_offices(index=INDEX_NAME, ignore_unreachable_offices=False):
     Populate the `office` type in ElasticSearch.
     Run it as a parallel computation based on departements.
     """
-    pool = mp.Pool(processes=mp.cpu_count(), maxtasksperchild=1)
+    # Use parallel computing on all available CPU cores.
+    # Use even slightly more than avaible CPUs because in practise a job does not always
+    # use 100% of a cpu.
+    # maxtasksperchild default is infinite, which means memory is never freed up, and grows indefinitely :-/
+    # maxtasksperchild=1 ensures memory is freed up after every departement computation.
+    pool = mp.Pool(processes=int(1.25*mp.cpu_count()), maxtasksperchild=1)
 
     func = partial(
         create_offices_for_departement,
