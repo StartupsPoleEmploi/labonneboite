@@ -36,6 +36,27 @@ ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
 
 
+class Counter(object):
+    """
+    Counter class without the race-condition bug.
+    Needed to be able to have a variable (counter) shared between all parallel jobs.
+    Inspired from https://stackoverflow.com/questions/2080660/python-multiprocessing-and-a-shared-counter
+    """
+    def __init__(self):
+        self.val = mp.Value('i', 0)
+
+    def increment(self, n=1):
+        with self.val.get_lock():
+            self.val.value += n
+
+    @property
+    def value(self):
+        return self.val.value
+
+
+completed_jobs_counter = Counter()
+
+
 class StatTracker:
     def __init__(self):
         self.office_count = 0
@@ -462,7 +483,14 @@ def create_offices_for_departement(departement):
 
     bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
 
-    logging.info("COMPLETED indexing offices for departement=%s ...", departement)
+    completed_jobs_counter.increment()
+
+    logging.info(
+        "COMPLETED indexing offices for departement=%s (%s of %s jobs completed)",
+        departement,
+        completed_jobs_counter.value,
+        len(importer_settings.DEPARTEMENTS),
+    )
 
     display_performance_stats(departement)
 
