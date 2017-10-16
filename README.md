@@ -217,9 +217,7 @@ Tests which can run in development:
     $ make test_api
     $ make test_integration
     $ make test_selenium
-
-Tests which for some reason do not run in dev yet, only jenkins:
-
+    $ make test_scripts
     $ make test_integration
 
 You can run all tests with:
