@@ -69,6 +69,7 @@ ROME_NAF/**/*.pickle
 ROME_NAF/tableaux
 ROME_NAF/*.txt
 
-
-*.kgrind
-*.lprof
+# Profiling files #
+####################
+labonneboite/scripts/**/*.kgrind
+labonneboite/*.lprof
