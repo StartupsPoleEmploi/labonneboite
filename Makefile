@@ -58,7 +58,7 @@ vagrant_reload:
 # Local dev
 # ---------
 
-.PHONY: serve_web_app create_sitemap create_index create_index_from_scratch mysql_local_shell rebuild_importer_tests_compressed_files
+.PHONY: serve_web_app create_sitemap create_index create_index_from_scratch create_index_from_scratch_with_profiling mysql_local_shell rebuild_importer_tests_compressed_files
 
 serve_web_app:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && python /srv/lbb/labonneboite/web/app.py';
@@ -71,6 +71,9 @@ create_index:
 
 create_index_from_scratch:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1';
+
+create_index_from_scratch_with_profiling:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1 -p 1';
 
 sass_watch:
 	sass --watch labonneboite/web/static/stylesheets:labonneboite/web/static/stylesheets;
