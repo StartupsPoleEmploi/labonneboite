@@ -356,13 +356,13 @@ def get_office_as_es_doc(office):
     return doc
 
 
-def get_scores_by_rome(office, office_to_update=None):
+def get_scores_by_rome(office, office_to_update=None):  # FIXME perf
     scores_by_rome = {}
 
     # fetch all rome_codes mapped to the naf of this office
     # as we will compute a score adjusted for each of them
     try:
-        rome_codes = mapping_util.MANUAL_NAF_ROME_MAPPING[office.naf].keys()
+        rome_codes = mapping_util.get_romes_for_naf(office.naf)
     except KeyError:
         # unfortunately some NAF codes have no matching ROME at all
         rome_codes = []
