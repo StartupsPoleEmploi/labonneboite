@@ -301,8 +301,10 @@ The load testing is designed to run directly from your vagrant VM using 4 cores 
 - Start your swarm with for example 1 user then increase slowly and observe what happens.
 - As long as your observed RPS stays coherent with your number of users, it means the app behaves correctly. As soon as the RPS is less than it shoud be and/or you get many 500 errors (check your logs) it means the load is too high.
 
+# Profiling
 
-
+- For Mac OS: `brew update && brew install qcachegrind`
+- `qcachegrind labonneboite/scripts/profiling_results.kgrind`
 
 
 

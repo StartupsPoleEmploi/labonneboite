@@ -28,6 +28,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 INDEX_NAME = 'labonneboite'
 OFFICE_TYPE = 'office'
 ES_TIMEOUT = 30
+ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
 
 
@@ -298,7 +299,7 @@ def create_locations(index=INDEX_NAME):
         actions.append(action)
     # unfortunately parallel_bulk is not available in the current elasticsearch version
     # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
-    bulk(es, actions)
+    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
 
 
 def get_office_as_es_doc(office):
@@ -405,7 +406,7 @@ def get_scores_by_rome(office, office_to_update=None):
     return scores_by_rome
 
 
-def chunks(l, n):
+def chunks(l, n):  # FIXME drop?
     """
     Yield successive n-sized chunks from l.
     """
@@ -426,7 +427,7 @@ def create_offices(index=INDEX_NAME, ignore_unreachable_offices=False):
         ignore_unreachable_offices=ignore_unreachable_offices
     )
 
-    pool.map(func, importer_settings.DEPARTEMENTS)
+    pool.map(func, importer_settings.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
     pool.close()
     pool.join()
 
@@ -459,9 +460,7 @@ def create_offices_for_departement(departement, index=INDEX_NAME, ignore_unreach
                 '_source': es_doc,
             })
 
-    batch_actions = chunks(actions, 10000)
-    for batch_action in batch_actions:
-        bulk(es, batch_action)
+    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
 
     logging.info("COMPLETED indexing offices for departement=%s ...", departement)
 

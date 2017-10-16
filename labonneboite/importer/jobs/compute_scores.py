@@ -10,7 +10,6 @@ Each compute_score job is launched on a given departement.
 
 import sys
 import traceback
-from collections import deque
 
 import multiprocessing as mp
 from multiprocessing.dummy import Pool as ThreadPool
@@ -85,12 +84,7 @@ class ScoreComputingJob(Job):
         async_results = {}
         most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
 
-        if '75' in settings.DEPARTEMENTS:
-            departements = deque(settings.DEPARTEMENTS)
-            departements.remove('75')
-            departements.appendleft('75')
-        else:
-            departements = list(settings.DEPARTEMENTS)
+        departements = settings.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST
 
         if COMPUTE_SCORES_DEBUG_MODE:
             if len(COMPUTE_SCORES_DEBUG_DEPARTEMENTS) >= 1:
@@ -111,13 +105,10 @@ class ScoreComputingJob(Job):
         logger.info("all compute_score done, analyzing results...")
 
         for departement, async_result in async_results.iteritems():
-            try:
-                result = async_result.get()
-                if not bool(result):
-                    logger.info("departement with error : %s", departement)
-                results.append([departement, bool(result)])
-            except:
-                logger.error("traceback for unprocessed_departement: %s", traceback.format_exc())
+            result = async_result.get()
+            if not bool(result):
+                logger.info("departement with error : %s", departement)
+            results.append([departement, bool(result)])
 
         logger.info("compute_scores FINISHED")
         return results
