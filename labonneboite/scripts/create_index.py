@@ -634,6 +634,7 @@ def run():
 
 if __name__ == '__main__':
     if ENABLE_CODE_PERFORMANCE_PROFILING:
+        logging.info("STARTED run with profiling")
         from cProfile import Profile
         profiler = Profile()
         profiler.runctx("run()", locals(), globals())
@@ -643,6 +644,7 @@ if __name__ == '__main__':
         convert(profiler.getstats(), filename)
         logging.info("COMPLETED run with profiling: exported profiling result as %s", filename)
     else:
+        logging.info("STARTED run without profiling")
         run()
         logging.info("COMPLETED run without profiling")
 
