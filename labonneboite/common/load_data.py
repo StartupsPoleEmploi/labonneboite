@@ -5,9 +5,9 @@ import csv
 from backports.functools_lru_cache import lru_cache
 
 
-def load_file(fun, filename):
+def load_file(func, filename):
     full_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/%s" % filename)
-    return fun(full_filename)
+    return func(full_filename)
 
 
 def load_pickle_file(filename):
