@@ -71,3 +71,4 @@ ROME_NAF/*.txt
 
 
 *.kgrind
+*.lprof
