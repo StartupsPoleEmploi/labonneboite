@@ -16,7 +16,7 @@ def load_pickle_file(filename):
     return load_file(f, filename)
 
 
-def load_csv_file(filename, delimiter=','):
+def load_csv_file(filename, delimiter='|'):
     def f(full_filename):
         csv_file = open(full_filename, 'rb')
         reader = csv.reader(csv_file, delimiter=delimiter)
@@ -48,7 +48,7 @@ def load_contact_modes():
 
 @lru_cache(maxsize=None)
 def load_ogr_labels():
-    rows = load_csv_file("ogr_labels.csv", delimiter=';')
+    rows = load_csv_file("ogr_labels.csv")
 
     OGR_COLUMN = 0
     LABEL_COLUMN = 1
@@ -84,7 +84,7 @@ def load_ogr_rome_mapping():
 
 @lru_cache(maxsize=None)
 def load_rome_labels():
-    rows = load_csv_file("rome_labels.csv", delimiter=';')
+    rows = load_csv_file("rome_labels.csv")
 
     ROME_COLUMN = 0
     LABEL_COLUMN = 1
@@ -99,7 +99,7 @@ def load_rome_labels():
 @lru_cache(maxsize=None)
 def load_naf_labels():
     # use pipe delimiter because ';' appear in label data
-    rows = load_csv_file("naf_labels.csv", delimiter='|')
+    rows = load_csv_file("naf_labels.csv")
 
     NAF_COLUMN = 0
     LABEL_COLUMN = 1
@@ -113,7 +113,7 @@ def load_naf_labels():
 
 @lru_cache(maxsize=None)
 def load_rome_naf_mapping():
-    return load_csv_file("rome_naf_mapping.csv")
+    return load_csv_file("rome_naf_mapping.csv", delimiter=',')
 
 
 
