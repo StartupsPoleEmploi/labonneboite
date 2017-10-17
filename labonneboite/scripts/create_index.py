@@ -35,6 +35,12 @@ ES_TIMEOUT = 90
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
 
+# Special debug mode to investigate performance of a single job (departement 57):
+# - skip all other tasks than reindexing offices
+# - reindex offices of departement 57 only
+# - disable parallel computation for easier profiling
+# - FIXME line by line profiling of key methods
+DEBUG_MODE = True
 
 class Counter(object):
     """
@@ -327,6 +333,7 @@ def create_locations():
     bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
 
 
+#@profile  # only used while running line by line profiling (kernprof)
 def get_office_as_es_doc(office):
     """
     Return the office as a JSON document suitable for indexation in ElasticSearch.
@@ -377,6 +384,7 @@ def get_office_as_es_doc(office):
     return doc
 
 
+#@profile  # only used while running line by line profiling (kernprof)
 def get_scores_by_rome(office, office_to_update=None):  # FIXME perf
     scores_by_rome = {}
 
@@ -453,6 +461,7 @@ def create_offices(enable_profiling=False):
     pool.join()
 
 
+#@profile  # only used while running line by line profiling (kernprof)
 def create_offices_for_departement(departement):
     """
     Populate the `office` type in ElasticSearch with offices having given departement.
@@ -496,6 +505,9 @@ def create_offices_for_departement(departement):
 
 
 def profile_create_offices_for_departement(departement):
+    """
+    FIXME why? inner job profiling
+    """
     profiler = Profile()
     command = "create_offices_for_departement('%s')" % departement
     profiler.runctx(command, locals(), globals())
@@ -637,7 +649,7 @@ def update_offices_geolocations():
 
 def display_performance_stats(departement):
     methods = [
-               'get_score_from_hirings',
+               '_get_score_from_hirings',
                'get_hirings_from_score',
                'get_score_adjusted_to_rome_code_and_naf_code',
               ]
@@ -653,8 +665,12 @@ def display_performance_stats(departement):
 
 
 def update_data(drop_indexes, enable_profiling):
+    if DEBUG_MODE:
+        drop_and_create_index()
+        create_offices_for_departement('57')
+        return
+
     if drop_indexes:
-        logging.info("drop index")
         drop_and_create_index()
         create_offices(enable_profiling)
         create_job_codes()
