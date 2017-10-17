@@ -501,20 +501,6 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(data['companies_count'], 2)
         self.assertEqual(len(data['companies']), 2)
 
-        # 2) NAF codes : 9499Z,5610C => 1 result expected
-        params = self.add_security_params({
-            'commune_id': self.positions['metz']['commune_id'],
-            'rome_codes': u'D1508',
-            'naf_codes': u'9499Z,5610C',
-            'user': u'labonneboite'
-        })
-        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
-        self.assertEqual(rv.status_code, 200)
-        data = json.loads(rv.data)
-        self.assertEqual(data['companies_count'], 1)
-        self.assertEqual(len(data['companies']), 1)
-        self.assertEqual(data['companies'][0]['siret'], u'00000000000007')
-
     def test_same_rome_with_unrelated_naf_filters(self):
         # NAF Code : 9499Z => 0 result expected
         params = self.add_security_params({
@@ -524,10 +510,10 @@ class ApiCompanyListTest(ApiBaseTest):
             'user': u'labonneboite'
         })
         rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
-        self.assertEqual(rv.status_code, 200)
-        data = json.loads(rv.data)
-        self.assertEqual(data['companies_count'], 0)
-        self.assertEqual(len(data['companies']), 0)
+        self.assertEqual(rv.status_code, 400)
+        print "rv.data"
+        print rv.data
+        self.assertIn(u'invalid NAF code(s): 9499Z. Possible values : ', rv.data)
 
     def test_wrong_value_in_sort(self):
         params = self.add_security_params({
