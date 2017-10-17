@@ -39,8 +39,8 @@ SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
 # - skip all other tasks than reindexing offices
 # - reindex offices of departement 57 only
 # - disable parallel computation for easier profiling
-# - FIXME line by line profiling of key methods
-DEBUG_MODE = True
+# - line by line profiling of key methods is enabled in another way FIXME
+DEBUG_MODE = False
 
 class Counter(object):
     """
