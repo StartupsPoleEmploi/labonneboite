@@ -84,6 +84,12 @@ def get_romes_for_naf(naf):
     return MANUAL_NAF_ROME_MAPPING[naf].keys()
 
 
+@lru_cache(maxsize=1024)
+def get_total_naf_hirings(naf):
+    romes = get_romes_for_naf(naf)
+    return sum(MANUAL_NAF_ROME_MAPPING[naf][rome] for rome in romes)
+
+
 def load_rome_codes_from_rome_naf_mapping():
     return MANUAL_ROME_NAF_MAPPING.keys()
 
