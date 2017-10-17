@@ -282,7 +282,7 @@ def bulk_actions(actions):
     es = Elasticsearch(timeout=ES_TIMEOUT)
     # unfortunately parallel_bulk is not available in the current elasticsearch version
     # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
-    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE, ignore=404)
+    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
 
 
 def create_job_codes():
@@ -594,7 +594,7 @@ def update_offices():
     """
     Update offices (overload the data provided by the importer).
     """
-    actions = []
+    es = Elasticsearch(timeout=ES_TIMEOUT)
 
     for office_to_update in db_session.query(OfficeAdminUpdate).all():
 
@@ -624,31 +624,14 @@ def update_offices():
             # second one populate it.
             delete_body = {'doc': {'scores_by_rome': None}}
 
-            delete_action = {
-                '_op_type': 'update',
-                '_index': INDEX_NAME,
-                '_type': OFFICE_TYPE,
-                '_id': office_to_update.siret,
-                '_source': delete_body,
-                'ignore': 404,
-                '_ignore': 404,
-            }
-            actions.append(delete_action)
-            action = {
-                '_op_type': 'update',
-                '_index': INDEX_NAME,
-                '_type': OFFICE_TYPE,
-                '_id': office_to_update.siret,
-                '_source': body,
-                'ignore': 404,
-                '_ignore': 404,
-            }
-            actions.append(action)
+            # Unfortunately these cannot easily be bulked :-(
+            # The reason is there is no way to tell bulk to ignore missing documents (404)
+            # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=delete_body, ignore=404)
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body, ignore=404)
 
             # Delete the current PDF, it will be regenerated at next download attempt.
             pdf_util.delete_file(office)
-
-    bulk_actions(actions)
 
 def update_offices_geolocations():
     """
