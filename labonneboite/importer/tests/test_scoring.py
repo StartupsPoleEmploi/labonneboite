@@ -11,7 +11,6 @@ from labonneboite.importer.tests.test_base import DatabaseTest
 
 from labonneboite.common import scoring as scoring_util
 from labonneboite.conf import settings
-from settings import SCORE_50_HIRINGS, SCORE_60_HIRINGS, SCORE_80_HIRINGS, SCORE_100_HIRINGS
 
 FIFTEEN_MONTHS = 15 * 30
 
@@ -43,7 +42,10 @@ class ScoringTest(DatabaseTest):
 
     def test_converting_hirings_into_scores_back_and_forth(self):
         for score in range(101):  # [0, 1, 2, 3.. 100]
-            self.assertEqual(score, scoring_util.get_score_from_hirings(scoring_util.get_hirings_from_score(score)))
+            self.assertEqual(
+                score,
+                scoring_util.get_score_from_hirings(scoring_util.get_hirings_from_score(score), skip_bucketing=True)
+            )
 
     # ############### WARNING about matching scores vs hirings ################
     # Methods scoring_util.get_hirings_from_score
@@ -60,8 +62,7 @@ class ScoringTest(DatabaseTest):
 
     def test_key_values_of_conversion_between_score_and_hirings(self):
         self.assertEqual(0, scoring_util.get_score_from_hirings(0))
-        self.assertEqual(50, scoring_util.get_score_from_hirings(SCORE_50_HIRINGS))
-        self.assertEqual(60, scoring_util.get_score_from_hirings(SCORE_60_HIRINGS))
-        self.assertEqual(80, scoring_util.get_score_from_hirings(SCORE_80_HIRINGS))
-        self.assertEqual(100, scoring_util.get_score_from_hirings(SCORE_100_HIRINGS))
-
+        self.assertEqual(50, scoring_util.get_score_from_hirings(settings.SCORE_50_HIRINGS))
+        self.assertEqual(60, scoring_util.get_score_from_hirings(settings.SCORE_60_HIRINGS))
+        self.assertEqual(80, scoring_util.get_score_from_hirings(settings.SCORE_80_HIRINGS))
+        self.assertEqual(100, scoring_util.get_score_from_hirings(settings.SCORE_100_HIRINGS))

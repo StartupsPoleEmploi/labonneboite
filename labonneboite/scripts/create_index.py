@@ -446,23 +446,27 @@ def get_scores_by_rome(office, office_to_update=None):  # FIXME perf
     return scores_by_rome
 
 
-def create_offices(enable_profiling=False):
+def create_offices(enable_profiling=False, disable_parallel_computing=False):
     """
     Populate the `office` type in ElasticSearch.
     Run it as a parallel computation based on departements.
     """
+    if enable_profiling:
+        func = profile_create_offices_for_departement
+    else:
+        func = create_offices_for_departement
+
+    if disable_parallel_computing:
+        for departement in importer_settings.DEPARTEMENTS:
+            func(departement)
+        return
+
     # Use parallel computing on all available CPU cores.
     # Use even slightly more than avaible CPUs because in practise a job does not always
     # use 100% of a cpu.
     # maxtasksperchild default is infinite, which means memory is never freed up, and grows indefinitely :-/
     # maxtasksperchild=1 ensures memory is freed up after every departement computation.
     pool = mp.Pool(processes=int(1.25*mp.cpu_count()), maxtasksperchild=1)
-
-    if enable_profiling:
-        func = profile_create_offices_for_departement
-    else:
-        func = create_offices_for_departement
-
     pool.map(func, importer_settings.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
     pool.close()
     pool.join()
