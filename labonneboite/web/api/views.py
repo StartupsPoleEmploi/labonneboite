@@ -127,24 +127,11 @@ def company_list():
     except (TypeError, ValueError):
         distance = settings.DISTANCE_FILTER_DEFAULT
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     try:
         headcount_filter = int(request.args.get('headcount'))
     except (TypeError, ValueError):
         headcount_filter = settings.HEADCOUNT_WHATEVER
 
-<<<<<<< HEAD
-    # No NAF filter
-    # Empty list is needed to handle companies with ROME not related to their NAF
-    naf_codes = {}
-=======
-=======
->>>>>>> Add heacount filter in API
-    naf_code_list = {}
-=======
-    naf_code_list = []
->>>>>>> 400 if naf_codes are not related to the rome given
     naf_codes = request.args.get('naf_codes')
     if naf_codes:
         naf_code_list = [naf.upper() for naf in naf_codes.split(',')]
@@ -158,16 +145,11 @@ def company_list():
         if invalid_nafs:
             return u'invalid NAF code(s): %s. Possible values : %s ' % (' '.join(invalid_nafs), ', '.join(naf_codes_expected)), 400
 
-<<<<<<< HEAD
-
->>>>>>> Add naf_codes filter in API
-=======
     sort = settings.SORT_FILTER_DEFAULT
     if 'sort' in request.args:
         sort = request.args.get('sort')
         if sort not in SORTING_VALUES:
             return u'invalid sort value. Possible values : %s' % ', '.join(SORTING_VALUES), 400
->>>>>>> Add sort filter in API
 
     flag_alternance = CONTRACT_VALUES['all']
     if 'contract' in request.args:
