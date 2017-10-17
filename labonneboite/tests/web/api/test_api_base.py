@@ -68,6 +68,17 @@ class ApiBaseTest(DatabaseTest):
             }],
             'zip_code': u'31500',
             'commune_id': u'31555',
+<<<<<<< HEAD
+=======
+        },
+        'pau': {
+            'coords': [{
+                'lat': 43.300000,
+                'lon': -0.366667,
+            }],
+            'zip_code': u'64000',
+            'commune_id': u'64445',
+>>>>>>> 7daa8ad... Refacto python + more tests + fix heacount_text problem (in tests only)
         }
     }
 
@@ -223,9 +234,9 @@ class ApiBaseTest(DatabaseTest):
             # For headcount filter
             {
                 'naf': u'7022Z', # Map to Rome M1202
-                'siret': u'00000000000012', 
+                'siret': u'00000000000012',
                 'score': 82,
-                'headcount': 10,
+                'headcount': 11,
                 'locations': self.positions['toulouse']['coords'],
                 'name': u'Office 12',
                 'flag_alternance': 0
@@ -234,9 +245,19 @@ class ApiBaseTest(DatabaseTest):
                 'naf': u'7010Z',  # Map to Rome M1202
                 'siret': u'00000000000013',
                 'score': 82,
-                'headcount': 60,
+                'headcount': 22,
                 'locations': self.positions['toulouse']['coords'],
                 'name': u'Office 13',
+                'flag_alternance': 0
+            },
+            # For headcount_text
+            {
+                'naf': u'4648Z',  # Map to Rome B1603
+                'siret': u'00000000000014',
+                'score': 80,
+                'headcount': 53, # headcount_text : '10 000 salariés et plus'
+                'locations': self.positions['pau']['coords'],
+                'name': u'Office 14',
                 'flag_alternance': 0
             }
         ]
@@ -285,6 +306,7 @@ class ApiBaseTest(DatabaseTest):
                 zipcode=zip_code,
                 email=u'foo@bar.com',
                 departement=zip_code[:2],
+                headcount=doc['headcount'],
                 x=doc['locations'][0]['lon'],
                 y=doc['locations'][0]['lat'],
             )

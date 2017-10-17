@@ -19,7 +19,8 @@ class ApiOfficeDetailsTest(ApiBaseTest):
             u'name': u'OFFICE 1',
             u'naf_text': u'\xc9tudes de march\xe9 et sondages',
             u'url': u'%s/00000000000001/details' % self.HOME_URL,
-            u'lon': 6.0, u'headcount_text': u'',
+            u'lon': 6.0,
+            u'headcount_text': u'10 \xe0 19 salari\xe9s',
             u'phone': u'',
             u'stars': 3.4,
             u'address': {
