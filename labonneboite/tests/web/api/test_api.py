@@ -649,4 +649,3 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(len(data['companies']), 1)
         self.assertEqual(data['companies'][0]['siret'], u'00000000000013')
         self.assertEqual(data['companies'][0]['headcount_text'], u'100 à 199 salariés')
-
