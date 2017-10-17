@@ -73,6 +73,7 @@ def company_list():
     - `page_size`: number of results per page (maximum : 100).
     - `naf_codes`: one or more naf_codes, comma separated. If empty or missing, no filter will be used
 <<<<<<< HEAD
+<<<<<<< HEAD
     - `contract`: one value only between 'all' (default) or 'alternance'
 <<<<<<< HEAD
     - `headcount`: one value only between 'all', 'small' or 'big'
@@ -83,6 +84,11 @@ def company_list():
     - `headcount`: one value, only between 'all' (default), 'small' or 'big'
 >>>>>>> bd2b1ee... Add explanation for the sort parameter in API
 >>>>>>> 07c8296... Add explanation for the sort parameter in API
+=======
+    - `contract`: one value, only between 'all' (default) or 'alternance'
+    - `sort`: one value, only between 'score' (default) and 'distance'
+    - `headcount`: one value, only between 'all' (default), 'small' or 'big'
+>>>>>>> 07a8388... 400 if naf_codes are not related to the rome given
     """
 
     current_app.logger.debug("API request received: %s", request.full_path)
@@ -135,13 +141,22 @@ def company_list():
     except (TypeError, ValueError):
         distance = settings.DISTANCE_FILTER_DEFAULT
 
+<<<<<<< HEAD
     naf_code_list = {}
+=======
+>>>>>>> 07a8388... 400 if naf_codes are not related to the rome given
     naf_codes = request.args.get('naf_codes')
     if naf_codes:
         naf_code_list = [naf.upper() for naf in naf_codes.split(',')]
-        naf_invalid = [naf for naf in naf_code_list if naf not in NAF_CODES]
-        if naf_invalid:
-            return u'invalid NAF code(s): %s' % ' '.join(naf_invalid), 400
+        invalid_nafs = [naf for naf in naf_code_list if naf not in NAF_CODES]
+        if invalid_nafs:
+            return u'invalid NAF code(s): %s' % ' '.join(invalid_nafs), 400
+
+        rome_2_naf_mapper = mapping_util.Rome2NafMapper()
+        naf_codes_expected = rome_2_naf_mapper.map([rome_code, ])
+        invalid_nafs = [naf for naf in naf_code_list if naf not in naf_codes_expected]
+        if invalid_nafs:
+            return u'invalid NAF code(s): %s. Possible values : %s ' % (' '.join(invalid_nafs), ', '.join(naf_codes_expected)), 400
 
     sort = settings.SORT_FILTER_DEFAULT
     if 'sort' in request.args:
@@ -149,7 +164,7 @@ def company_list():
         if sort not in SORTING_VALUES:
             return u'invalid sort value. Possible values : %s' % ', '.join(SORTING_VALUES), 400
 
-    flag_alternance = 0
+    flag_alternance = CONTRACT_VALUES['all']
     if 'contract' in request.args:
         contract = request.args.get('contract')
         if contract not in CONTRACT_VALUES:
