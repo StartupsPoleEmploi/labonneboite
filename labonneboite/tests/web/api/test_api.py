@@ -155,6 +155,20 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(rv.status_code, 400)
         self.assertEqual(rv.data, u'could not resolve latitude and longitude from given commune_id')
 
+    def test_correct_headcount_text(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['pau']['commune_id'],
+            'distance': 10,
+            'rome_codes': u'B1603',
+            'user': u'labonneboite',
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['headcount_text'], u'10 000 salariés et plus')
+
     def test_missing_rome_codes(self):
         params = self.add_security_params({
             'commune_id': self.positions['caen']['commune_id'],
@@ -635,6 +649,7 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(data['companies_count'], 1)
         self.assertEqual(len(data['companies']), 1)
         self.assertEqual(data['companies'][0]['siret'], u'00000000000012')
+        self.assertEqual(data['companies'][0]['headcount_text'], u'10 à 19 salariés')
 
     def test_headcount_big(self):
         params = self.add_security_params({
@@ -649,3 +664,5 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(data['companies_count'], 1)
         self.assertEqual(len(data['companies']), 1)
         self.assertEqual(data['companies'][0]['siret'], u'00000000000013')
+        self.assertEqual(data['companies'][0]['headcount_text'], u'100 à 199 salariés')
+
