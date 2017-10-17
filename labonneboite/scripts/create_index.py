@@ -282,7 +282,7 @@ def bulk_actions(actions):
     es = Elasticsearch(timeout=ES_TIMEOUT)
     # unfortunately parallel_bulk is not available in the current elasticsearch version
     # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
-    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
+    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE, ignore=404)
 
 
 def create_job_codes():
@@ -629,7 +629,9 @@ def update_offices():
                 '_index': INDEX_NAME,
                 '_type': OFFICE_TYPE,
                 '_id': office_to_update.siret,
-                '_source': delete_body
+                '_source': delete_body,
+                'ignore': 404,
+                '_ignore': 404,
             }
             actions.append(delete_action)
             action = {
@@ -637,7 +639,9 @@ def update_offices():
                 '_index': INDEX_NAME,
                 '_type': OFFICE_TYPE,
                 '_id': office_to_update.siret,
-                '_source': body
+                '_source': body,
+                'ignore': 404,
+                '_ignore': 404,
             }
             actions.append(action)
 
