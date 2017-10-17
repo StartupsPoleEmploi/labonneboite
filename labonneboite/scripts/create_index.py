@@ -42,7 +42,8 @@ SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
 # - line by line profiling of key methods is enabled in another way FIXME
 DEBUG_MODE = False
 
-WARMUP_CACHE_BEFORE_PARALLEL_COMPUTING = True
+WARMUP_CACHE_BEFORE_PARALLEL_COMPUTING = False  # FIXME breaks on staging but not local o_O
+# sqlalchemy.exc.OperationalError: (_mysql_exceptions.OperationalError) (2013, 'Lost connection to MySQL server during query')
 
 class Counter(object):
     """
