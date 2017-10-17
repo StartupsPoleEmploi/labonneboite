@@ -31,7 +31,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 INDEX_NAME = 'labonneboite'
 OFFICE_TYPE = 'office'
-ES_TIMEOUT = 90
+OGR_TYPE = 'ogr'
+LOCATION_TYPE = 'location'
+ES_TIMEOUT = 300
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
 
@@ -42,8 +44,6 @@ SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
 # - line by line profiling of key methods is enabled in another way FIXME
 DEBUG_MODE = False
 
-WARMUP_CACHE_BEFORE_PARALLEL_COMPUTING = False  # FIXME breaks on staging but not local o_O
-# sqlalchemy.exc.OperationalError: (_mysql_exceptions.OperationalError) (2013, 'Lost connection to MySQL server during query')
 
 class Counter(object):
     """
@@ -278,6 +278,13 @@ def drop_and_create_index():
     es.indices.create(index=INDEX_NAME, body=request_body)
 
 
+def bulk_actions(actions):
+    es = Elasticsearch(timeout=ES_TIMEOUT)
+    # unfortunately parallel_bulk is not available in the current elasticsearch version
+    # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
+    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
+
+
 def create_job_codes():
     """
     Create the `ogr` type in ElasticSearch.
@@ -287,7 +294,6 @@ def create_job_codes():
     ogr_labels = load_ogr_labels()
     # correspondance appellation vers rome
     ogr_rome_codes = load_ogr_rome_mapping()
-    es = Elasticsearch(timeout=ES_TIMEOUT)
     actions = []
 
     for ogr, description in ogr_labels.iteritems():
@@ -302,19 +308,18 @@ def create_job_codes():
             }
             action = {
                 '_op_type': 'index',
-                '_index': index,
-                '_type': 'ogr',
+                '_index': INDEX_NAME,
+                '_type': OGR_TYPE,
                 '_source': doc
             }
             actions.append(action)
-    bulk(es, actions)
+    bulk_actions(actions)
 
 
 def create_locations():
     """
     Create the `location` type in ElasticSearch.
     """
-    es = Elasticsearch(timeout=ES_TIMEOUT)
     actions = []
     for city in geocoding.get_cities():
         doc = {
@@ -327,13 +332,12 @@ def create_locations():
         action = {
             '_op_type': 'index',
             '_index': INDEX_NAME,
-            '_type': 'location',
+            '_type': LOCATION_TYPE,
             '_source': doc
         }
         actions.append(action)
-    # unfortunately parallel_bulk is not available in the current elasticsearch version
-    # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
-    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
+
+    bulk_actions(actions)
 
 
 #@profile  # only used while running line by line profiling (kernprof)
@@ -469,8 +473,6 @@ def create_offices_for_departement(departement):
     """
     Populate the `office` type in ElasticSearch with offices having given departement.
     """
-    es = Elasticsearch(timeout=300)
-
     actions = []
 
     logging.info("STARTED indexing offices for departement=%s ...", departement)
@@ -493,7 +495,7 @@ def create_offices_for_departement(departement):
                 '_source': es_doc,
             })
 
-    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
+    bulk_actions(actions)
 
     completed_jobs_counter.increment()
 
@@ -588,7 +590,7 @@ def update_offices():
     """
     Update offices (overload the data provided by the importer).
     """
-    es = Elasticsearch(timeout=ES_TIMEOUT)
+    actions = []
 
     for office_to_update in db_session.query(OfficeAdminUpdate).all():
 
@@ -617,13 +619,28 @@ def update_offices():
             # To do this, we perform 2 requests: the first one reset `scores_by_rome`, the
             # second one populate it.
             delete_body = {'doc': {'scores_by_rome': None}}
-            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=delete_body, ignore=404)
 
-            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body, ignore=404)
+            delete_action = {
+                '_op_type': 'update',
+                '_index': INDEX_NAME,
+                '_type': OFFICE_TYPE,
+                '_id': office_to_update.siret,
+                '_source': delete_body
+            }
+            actions.append(delete_action)
+            action = {
+                '_op_type': 'update',
+                '_index': INDEX_NAME,
+                '_type': OFFICE_TYPE,
+                '_id': office_to_update.siret,
+                '_source': body
+            }
+            actions.append(action)
 
             # Delete the current PDF, it will be regenerated at next download attempt.
             pdf_util.delete_file(office)
 
+    bulk_actions(actions)
 
 def update_offices_geolocations():
     """
@@ -675,9 +692,6 @@ def update_data(drop_indexes, enable_profiling):
 
     if drop_indexes:
         drop_and_create_index()
-        if WARMUP_CACHE_BEFORE_PARALLEL_COMPUTING:
-            create_offices_for_departement('57')
-            drop_and_create_index()
         create_offices(enable_profiling)
         create_job_codes()
         create_locations()
