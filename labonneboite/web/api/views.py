@@ -128,6 +128,7 @@ def company_list():
         distance = settings.DISTANCE_FILTER_DEFAULT
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     try:
         headcount_filter = int(request.args.get('headcount'))
     except (TypeError, ValueError):
@@ -141,12 +142,21 @@ def company_list():
 =======
 >>>>>>> Add heacount filter in API
     naf_code_list = {}
+=======
+    naf_code_list = []
+>>>>>>> 400 if naf_codes are not related to the rome given
     naf_codes = request.args.get('naf_codes')
     if naf_codes:
         naf_code_list = [naf.upper() for naf in naf_codes.split(',')]
-        naf_invalid = [naf for naf in naf_code_list if naf not in NAF_CODES]
-        if naf_invalid:
-            return u'invalid NAF code(s): %s' % ' '.join(naf_invalid), 400
+        invalid_nafs = [naf for naf in naf_code_list if naf not in NAF_CODES]
+        if invalid_nafs:
+            return u'invalid NAF code(s): %s' % ' '.join(invalid_nafs), 400
+
+        rome_2_naf_mapper = mapping_util.Rome2NafMapper()
+        naf_codes_expected = rome_2_naf_mapper.map([rome_code, ])
+        invalid_nafs = [naf for naf in naf_code_list if naf not in naf_codes_expected]
+        if invalid_nafs:
+            return u'invalid NAF code(s): %s. Possible values : %s ' % (' '.join(invalid_nafs), ', '.join(naf_codes_expected)), 400
 
 <<<<<<< HEAD
 
@@ -159,7 +169,7 @@ def company_list():
             return u'invalid sort value. Possible values : %s' % ', '.join(SORTING_VALUES), 400
 >>>>>>> Add sort filter in API
 
-    flag_alternance = 0
+    flag_alternance = CONTRACT_VALUES['all']
     if 'contract' in request.args:
         contract = request.args.get('contract')
         if contract not in CONTRACT_VALUES:
