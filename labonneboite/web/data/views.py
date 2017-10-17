@@ -7,7 +7,6 @@ from flask import redirect, render_template, request, url_for
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.conf import settings
-from labonneboite.conf.common.naf_codes import NAF_CODES
 from labonneboite.web.data.forms import NafForm, RomeForm, SiretForm
 
 
@@ -34,7 +33,7 @@ def romes_for_naf():
 
     if naf and form.validate():
         naf = form.naf.data
-        naf_name = NAF_CODES.get(naf)
+        naf_name = settings.NAF_CODES.get(naf)
         mapper = mapping_util.Rome2NafMapper()
         romes = mapper.romes_for_naf(naf)
     context = {
@@ -88,7 +87,7 @@ def romes_for_siret():
 
     if siret and form.validate():
         naf = form.office.naf
-        naf_name = NAF_CODES.get(naf)
+        naf_name = settings.NAF_CODES.get(naf)
         siret = form.siret.data
         mapper = mapping_util.Rome2NafMapper()
         romes = mapper.romes_for_naf(naf)

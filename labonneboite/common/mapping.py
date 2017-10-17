@@ -5,36 +5,62 @@ import logging
 
 from slugify import slugify
 
-from labonneboite.common.load_data import load_ogr_rome_codes, load_manual_rome_naf_file
+from labonneboite.common.load_data import load_rome_naf_mapping
 from labonneboite.conf import settings
-from labonneboite.conf.common.naf_codes import NAF_CODES
 
 
 logger = logging.getLogger('main')
 
 
-OGR_ROME_CODES = load_ogr_rome_codes()
-ROME_CODES = OGR_ROME_CODES.values()
 SLUGIFIED_ROME_LABELS = {slugify(v): k for k, v in settings.ROME_DESCRIPTIONS.items()}
 
 # these variables will be populated once by load_manual_rome_naf_mapping()
-NAF_CODES_FROM_ROME_NAF_MAPPING = set()
 MANUAL_ROME_NAF_MAPPING = {}
 MANUAL_NAF_ROME_MAPPING = {}
 
+ENSURE_LABELS_IN_MAPPING_MATCH = False  # FIXME resolve pending issue of non matching label data
 
-def load_manual_rome_naf_mapping():
-    reader = load_manual_rome_naf_file()
+
+def populate_rome_naf_mapping():
+    rows = load_rome_naf_mapping()
 
     ROME_COLUMN = 0
+    ROME_LABEL_COLUMN = 1
     NAF_COLUMN = 2
+    NAF_LABEL_COLUMN = 3
     HIRINGS_COLUMN = 4
 
-    for columns in reader:
+    for row in rows:
 
-        rome = columns[ROME_COLUMN].strip().upper()
-        naf = columns[NAF_COLUMN].strip().upper()
-        hirings = int(columns[HIRINGS_COLUMN].strip())
+        rome = row[ROME_COLUMN].strip().upper()
+        rome_label = row[ROME_LABEL_COLUMN]
+        naf = row[NAF_COLUMN].strip().upper()
+        naf_label = row[NAF_LABEL_COLUMN]
+        hirings = int(row[HIRINGS_COLUMN].strip())
+
+        if rome not in settings.ROME_DESCRIPTIONS:
+            raise Exception("missing label for ROME %s" % rome)
+
+        if naf not in settings.NAF_CODES:
+            raise Exception("missing label for NAF %s" % naf)
+
+        if ENSURE_LABELS_IN_MAPPING_MATCH:
+
+            if naf_label != settings.NAF_CODES[naf].encode('utf8'):
+                raise Exception("labels '%s' and '%s' do not match for NAF %s" % (
+                    naf_label,
+                    settings.NAF_CODES[naf].encode('utf8'),
+                    naf,
+                    )
+                )
+
+            if rome_label != settings.ROME_DESCRIPTIONS[rome].encode('utf8'):
+                raise Exception("labels '%s' and '%s' do not match for ROME %s" % (
+                    rome_label,
+                    settings.ROME_DESCRIPTIONS[rome].encode('utf8'),
+                    rome,
+                    )
+                )
 
         MANUAL_ROME_NAF_MAPPING.setdefault(rome, {})
         if naf not in MANUAL_ROME_NAF_MAPPING[rome]:
@@ -48,19 +74,8 @@ def load_manual_rome_naf_mapping():
         else:
             raise Exception("duplicate mapping")
 
-        NAF_CODES_FROM_ROME_NAF_MAPPING.add(naf)
 
-
-load_manual_rome_naf_mapping()  # populates once all variables above
-
-
-def load_rome_codes_from_rome_naf_mapping():
-    return MANUAL_ROME_NAF_MAPPING.keys()
-
-
-def load_naf_codes_from_rome_naf_mapping():
-    #  the '[]' is the second parameter to 'sum' and allows for one line concatenating of a list of lists
-    return set(sum((MANUAL_ROME_NAF_MAPPING[rome].keys() for rome in MANUAL_ROME_NAF_MAPPING.keys()), []))
+populate_rome_naf_mapping()  # populates once all variables above
 
 
 class Rome2NafMapper(object):
@@ -71,7 +86,7 @@ class Rome2NafMapper(object):
     def map(self, rome_codes, optional_naf_codes=None):
         naf_codes = set()
         for rome in rome_codes:
-            if rome not in ROME_CODES:
+            if rome not in settings.ROME_DESCRIPTIONS.keys():
                 raise Exception('bad rome code %s' % rome)
             try:
                 naf_codes_with_hirings = self.rome_2_naf_dict[rome]
@@ -116,7 +131,7 @@ class Rome2NafMapper(object):
         nafs = self.rome_2_naf_dict.get(rome, {})
         nafs = sorted(nafs.items(), key=lambda (k, v): v, reverse=True)
         Naf = namedtuple('Naf', ['code', 'name', 'hirings'])
-        return [Naf(naf[0], NAF_CODES[naf[0]], naf[1]) for naf in nafs]
+        return [Naf(naf[0], settings.NAF_CODES[naf[0]], naf[1]) for naf in nafs]
 
     @staticmethod
     def romes_is_valid(rome):
@@ -130,4 +145,4 @@ class Rome2NafMapper(object):
         """
         Returns True if the given NAF code is valid, False otherwise.
         """
-        return naf in NAF_CODES
+        return naf in settings.NAF_CODES

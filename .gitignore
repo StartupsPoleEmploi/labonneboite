@@ -68,3 +68,7 @@ ROME_NAF/*.csv
 ROME_NAF/**/*.pickle
 ROME_NAF/tableaux
 ROME_NAF/*.txt
+
+
+*.kgrind
+*.lprof

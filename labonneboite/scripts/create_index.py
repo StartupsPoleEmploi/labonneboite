@@ -13,7 +13,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common.database import db_session
-from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_codes
+from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
@@ -249,25 +249,26 @@ def create_job_codes(index=INDEX_NAME):
     # libelles des appelations pour les codes ROME
     ogr_labels = load_ogr_labels()
     # correspondance appellation vers rome
-    ogr_rome_codes = load_ogr_rome_codes()
+    ogr_rome_codes = load_ogr_rome_mapping()
     es = Elasticsearch(timeout=ES_TIMEOUT)
 
     for ogr, description in ogr_labels.iteritems():
-        rome_code = ogr_rome_codes[ogr]
-        try:
-            rome_description = settings.ROME_DESCRIPTIONS[rome_code]
-        except KeyError:
-            rome_description = ""
-            logging.info("can't find description for rome %s", rome_code)
-            continue
-        doc = {
-            'ogr_code': ogr,
-            'ogr_description': description,
-            'rome_code': rome_code,
-            'rome_description': rome_description
-        }
-        es.index(index=index, doc_type='ogr', id=key, body=doc)
-        key += 1
+        if ogr in ogr_rome_codes:
+            rome_code = ogr_rome_codes[ogr]
+            try:
+                rome_description = settings.ROME_DESCRIPTIONS[rome_code]
+            except KeyError:
+                rome_description = ""
+                logging.info("can't find description for rome %s", rome_code)
+                continue
+            doc = {
+                'ogr_code': ogr,
+                'ogr_description': description,
+                'rome_code': rome_code,
+                'rome_description': rome_description
+            }
+            es.index(index=index, doc_type='ogr', id=key, body=doc)
+            key += 1
 
 
 def create_locations(index=INDEX_NAME):

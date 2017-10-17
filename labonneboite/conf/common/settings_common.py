@@ -1,10 +1,13 @@
 # coding: utf8
 
 # pylint: disable=unused-import
-from labonneboite.conf.common.rome_descriptions import ROME_DESCRIPTIONS
 from labonneboite.conf.common.rome_mobilities import ROME_MOBILITIES
-from labonneboite.conf.common.naf_codes import NAF_CODES
 # pylint: enable=unused-import
+from labonneboite.common.load_data import load_rome_labels, load_naf_labels
+
+ROME_DESCRIPTIONS = load_rome_labels()
+
+NAF_CODES = load_naf_labels()
 
 LOCALE = 'fr_FR.utf8'
 
@@ -50,8 +53,6 @@ SORT_FILTER_DEFAULT = "score"
 
 PAGINATION_MAX_PAGES = 10
 PAGINATION_COMPANIES_PER_PAGE = 10
-
-MANUAL_ROME_NAF_FILENAME = "rome_naf_filter.csv"
 
 ES_INDEX = 'labonneboite'
 
