@@ -62,12 +62,14 @@ def _get_score_from_hirings(hirings, as_float=False):
     return int(round(score))
 
 
-def get_score_from_hirings(hirings, as_float=False):
+def get_score_from_hirings(hirings, as_float=False, skip_bucketing=False):
     """
     Bucket values of float hirings in order to improve hit/miss ratio of underlying
     private method _get_score_from_hirings.
     """
-    if hirings <= 3:
+    if skip_bucketing:
+        pass
+    elif hirings <= 3:
         hirings = round(hirings, 1)
     else:
         hirings = round(hirings)

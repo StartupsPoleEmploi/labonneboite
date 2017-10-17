@@ -18,6 +18,9 @@ class CreateIndexBaseTest(DatabaseTest):
     def setUp(self, *args, **kwargs):
         super(CreateIndexBaseTest, self).setUp(*args, **kwargs)
 
+        # use custom ES index for tests
+        script.INDEX_NAME = self.ES_TEST_INDEX
+
         # Create 1 office.
         self.office = Office(
             siret=u"78548035101646",
@@ -47,7 +50,8 @@ class CreateIndexBaseTest(DatabaseTest):
         self.assertEquals(Office.query.count(), 1)
 
         # Put the office into ES.
-        script.create_offices(index=self.ES_TEST_INDEX)
+        # Disable parallel computing because it does not play well with test environment (it hangs).
+        script.create_offices(disable_parallel_computing=True)
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         # We should have 1 office in the ES.
@@ -79,12 +83,16 @@ class UtilsTest(CreateIndexBaseTest):
             'flag_junior': 0,
             'score': 90,
             'scores_by_rome': {
-                'D1101': 43,
-                'D1106': 47,
+                'N1103': 25,
                 'D1214': 51,
-                'D1505': 52,
+                'D1101': 45,
                 'D1507': 54,
-                'N1103': 24,
+                'D1506': 90,
+                'D1505': 52,
+                'D1502': 20,
+                'M1607': 20,
+                'K1303': 20,
+                'D1106': 45
             },
             'locations': [
                 {'lat': 49.1044, 'lon': 6.17952},
@@ -126,7 +134,7 @@ class AddOfficesTest(CreateIndexBaseTest):
         )
         office_to_add.save()
 
-        script.add_offices(index=self.ES_TEST_INDEX)
+        script.add_offices()
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(office_to_add.siret)
@@ -158,7 +166,7 @@ class RemoveOfficesTest(CreateIndexBaseTest):
         )
         office_to_remove.save()
 
-        script.remove_offices(index=self.ES_TEST_INDEX)
+        script.remove_offices()
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         # The office should have been removed from the DB.
@@ -191,7 +199,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices(index=self.ES_TEST_INDEX)
+        script.update_offices()
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
@@ -229,7 +237,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices(index=self.ES_TEST_INDEX)
+        script.update_offices()
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
@@ -261,7 +269,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices(index=self.ES_TEST_INDEX)
+        script.update_offices()
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
@@ -301,7 +309,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices(index=self.ES_TEST_INDEX)
+        script.update_offices()
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
@@ -341,7 +349,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices(index=self.ES_TEST_INDEX)
+        script.update_offices()
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
@@ -379,7 +387,7 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         )
         extra_geolocation.save()
 
-        script.update_offices_geolocations(index=self.ES_TEST_INDEX)
+        script.update_offices_geolocations()
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         # The office should now have 3 geolocations in ES (the original one + Paris 10 + Marseille).
@@ -399,7 +407,7 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         extra_geolocation.update()
         self.assertTrue(extra_geolocation.is_outdated())
 
-        script.update_offices_geolocations(index=self.ES_TEST_INDEX)
+        script.update_offices_geolocations()
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         # The office extra geolocations should now be reset.
