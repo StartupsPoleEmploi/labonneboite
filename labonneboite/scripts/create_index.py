@@ -42,6 +42,8 @@ SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
 # - line by line profiling of key methods is enabled in another way FIXME
 DEBUG_MODE = False
 
+WARMUP_CACHE_BEFORE_PARALLEL_COMPUTING = True
+
 class Counter(object):
     """
     Counter class without the race-condition bug.
@@ -672,6 +674,9 @@ def update_data(drop_indexes, enable_profiling):
 
     if drop_indexes:
         drop_and_create_index()
+        if WARMUP_CACHE_BEFORE_PARALLEL_COMPUTING:
+            create_offices_for_departement('57')
+            drop_and_create_index()
         create_offices(enable_profiling)
         create_job_codes()
         create_locations()
