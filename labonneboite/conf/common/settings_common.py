@@ -51,7 +51,7 @@ HEADCOUNT_VALUES = {
 }
 
 # Contract Value
-CONTRACT_VALUES = ['all', 'alternance']
+CONTRACT_VALUES = {'all': 0, 'alternance': 1}
 
 # Sort
 SORTING_CHOICES = (

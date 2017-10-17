@@ -165,7 +165,7 @@ def company_list():
         if contract not in CONTRACT_VALUES:
             return u'invalid contract value. Possible values : %s' % ', '.join(CONTRACT_VALUES), 400
         else:
-            flag_alternance = 1 if contract == 'alternance' else 0
+            flag_alternance = CONTRACT_VALUES[contract]
 
     headcount_filter = settings.HEADCOUNT_WHATEVER
     if 'headcount' in request.args:
