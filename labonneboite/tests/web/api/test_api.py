@@ -499,8 +499,6 @@ class ApiCompanyListTest(ApiBaseTest):
         })
         rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
         self.assertEqual(rv.status_code, 400)
-        print "rv.data"
-        print rv.data
         self.assertIn(u'invalid NAF code(s): 9499Z. Possible values : ', rv.data)
 
     def test_wrong_value_in_sort(self):
