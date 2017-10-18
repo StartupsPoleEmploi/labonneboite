@@ -37,13 +37,6 @@ ES_TIMEOUT = 300
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
 
-# Special debug mode to investigate performance of a single job (departement 57):
-# - skip all other tasks than reindexing offices
-# - reindex offices of departement 57 only
-# - disable parallel computation for easier profiling
-# - line by line profiling of key methods is enabled in another way FIXME
-DEBUG_MODE = False
-
 
 class Counter(object):
     """
@@ -340,7 +333,6 @@ def create_locations():
     bulk_actions(actions)
 
 
-#@profile  # only used while running line by line profiling (kernprof)
 def get_office_as_es_doc(office):
     """
     Return the office as a JSON document suitable for indexation in ElasticSearch.
@@ -391,8 +383,7 @@ def get_office_as_es_doc(office):
     return doc
 
 
-#@profile  # only used while running line by line profiling (kernprof)
-def get_scores_by_rome(office, office_to_update=None):  # FIXME perf
+def get_scores_by_rome(office, office_to_update=None):
     scores_by_rome = {}
 
     # fetch all rome_codes mapped to the naf of this office
@@ -472,7 +463,6 @@ def create_offices(enable_profiling=False, disable_parallel_computing=False):
     pool.join()
 
 
-#@profile  # only used while running line by line profiling (kernprof)
 def create_offices_for_departement(departement):
     """
     Populate the `office` type in ElasticSearch with offices having given departement.
@@ -675,8 +665,11 @@ def display_performance_stats(departement):
     )
 
 
-def update_data(drop_indexes, enable_profiling):
-    if DEBUG_MODE:
+def update_data(drop_indexes, enable_profiling, single_job):
+    if single_job and not drop_indexes:
+        raise Exception("This combination does not make sense.")
+
+    if single_job:
         drop_and_create_index()
         create_offices_for_departement('57')
         return
@@ -696,25 +689,31 @@ def update_data(drop_indexes, enable_profiling):
 
 
 def run():
-    parser = argparse.ArgumentParser(description="Update elasticsearch data: offices, ogr_codes and locations.")
-    parser.add_argument('-d', '--drop-indexes', dest='drop_indexes', help="Drop and recreate from scratch the index.")
-    parser.add_argument('-p', '--profile', dest='profile', help="Enable code performance profiling.")
+    parser = argparse.ArgumentParser(
+        description="Update elasticsearch data: offices, ogr_codes and locations.")
+    parser.add_argument('-d', '--drop-indexes', dest='drop_indexes',
+        help="Drop and recreate index from scratch.")
+    parser.add_argument('-p', '--profile', dest='profile',
+        help="Enable code performance profiling for later visualization with Q/KCacheGrind.")
+    parser.add_argument('-s', '--single-job', dest='single_job',
+        help="Disable parallel computing and run a single office indexing job (departement 57) and nothing else.")
     args = parser.parse_args()
 
     drop_indexes = (args.drop_indexes is not None)
     enable_profiling = (args.profile is not None)
+    single_job = (args.single_job is not None)
 
     if enable_profiling:
         logging.info("STARTED run with profiling")
         profiler = Profile()
-        profiler.runctx("update_data(drop_indexes, enable_profiling=True)", locals(), globals())
+        profiler.runctx("update_data(drop_indexes, enable_profiling, single_job)", locals(), globals())
         relative_filename = 'profiling_results/create_index_run.kgrind'
         filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), relative_filename)
         convert(profiler.getstats(), filename)
         logging.info("COMPLETED run with profiling: exported profiling result as %s", filename)
     else:
         logging.info("STARTED run without profiling")
-        update_data(drop_indexes, enable_profiling=False)
+        update_data(drop_indexes, enable_profiling, single_job)
         logging.info("COMPLETED run without profiling")
 
 
