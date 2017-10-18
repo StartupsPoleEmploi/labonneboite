@@ -75,6 +75,7 @@ ROME_NAF/*.txt
 
 # Profiling files #
 ###################
-labonneboite/scripts/profiling_results/**/*.kgrind
+labonneboite/scripts/profiling_results/*.kgrind
+labonneboite/scripts/profiling_results/staging/*.kgrind
 labonneboite/*.lprof
 
