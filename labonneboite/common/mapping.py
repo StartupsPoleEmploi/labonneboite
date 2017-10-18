@@ -90,10 +90,6 @@ def get_total_naf_hirings(naf):
     return sum(MANUAL_NAF_ROME_MAPPING[naf][rome] for rome in romes)
 
 
-def load_rome_codes_from_rome_naf_mapping():
-    return MANUAL_ROME_NAF_MAPPING.keys()
-
-
 class Rome2NafMapper(object):
 
     def __init__(self):
