@@ -67,7 +67,8 @@ vagrant_reload:
 # ---------
 
 .PHONY: serve_web_app create_sitemap create_index create_index_from_scratch
-.PHONY: create_index_from_scratch_with_profiling create_index_from_scratch_with_debug_mode
+.PHONY: create_index_from_scratch_with_profiling create_index_from_scratch_with_profiling_on_staging
+.PHONY: create_index_from_scratch_with_profiling_line_by_line
 .PHONY: mysql_local_shell rebuild_importer_tests_compressed_files
 
 serve_web_app:
