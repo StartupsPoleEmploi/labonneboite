@@ -665,7 +665,7 @@ def display_performance_stats(departement):
     )
 
 
-def update_data(drop_indexes, enable_profiling, single_job):
+def update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing):
     if single_job and not drop_indexes:
         raise Exception("This combination does not make sense.")
 
@@ -676,7 +676,7 @@ def update_data(drop_indexes, enable_profiling, single_job):
 
     if drop_indexes:
         drop_and_create_index()
-        create_offices(enable_profiling)
+        create_offices(enable_profiling, disable_parallel_computing)
         create_job_codes()
         create_locations()
 
@@ -687,6 +687,23 @@ def update_data(drop_indexes, enable_profiling, single_job):
     update_offices()
     update_offices_geolocations()
 
+def update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job, disable_parallel_computing=False):
+    if enable_profiling:
+        logging.info("STARTED run with profiling")
+        profiler = Profile()
+        profiler.runctx(
+            "update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)",
+            locals(),
+            globals()
+        )
+        relative_filename = 'profiling_results/create_index_run.kgrind'
+        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), relative_filename)
+        convert(profiler.getstats(), filename)
+        logging.info("COMPLETED run with profiling: exported profiling result as %s", filename)
+    else:
+        logging.info("STARTED run without profiling")
+        update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)
+        logging.info("COMPLETED run without profiling")
 
 def run():
     parser = argparse.ArgumentParser(
@@ -703,18 +720,7 @@ def run():
     enable_profiling = (args.profile is not None)
     single_job = (args.single_job is not None)
 
-    if enable_profiling:
-        logging.info("STARTED run with profiling")
-        profiler = Profile()
-        profiler.runctx("update_data(drop_indexes, enable_profiling, single_job)", locals(), globals())
-        relative_filename = 'profiling_results/create_index_run.kgrind'
-        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), relative_filename)
-        convert(profiler.getstats(), filename)
-        logging.info("COMPLETED run with profiling: exported profiling result as %s", filename)
-    else:
-        logging.info("STARTED run without profiling")
-        update_data(drop_indexes, enable_profiling, single_job)
-        logging.info("COMPLETED run without profiling")
+    update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job)
 
 
 if __name__ == '__main__':
