@@ -505,7 +505,7 @@ def create_offices_for_departement(departement):
 
 def profile_create_offices_for_departement(departement):
     """
-    FIXME why? inner job profiling
+    Run create_offices_for_departement with profiling.
     """
     profiler = Profile()
     command = "create_offices_for_departement('%s')" % departement
