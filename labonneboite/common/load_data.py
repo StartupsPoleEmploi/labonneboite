@@ -4,7 +4,7 @@ import csv
 
 from backports.functools_lru_cache import lru_cache
 
-USE_ROME_SLICING_DATASET = True  # Rome slicing dataset is not ready yet
+USE_ROME_SLICING_DATASET = False  # Rome slicing dataset is not ready yet
 
 if USE_ROME_SLICING_DATASET:
     OGR_ROME_FILE = "rome_slicing_dataset/ogr_rome_mapping.csv"
