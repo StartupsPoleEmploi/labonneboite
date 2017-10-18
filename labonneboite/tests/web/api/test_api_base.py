@@ -68,8 +68,6 @@ class ApiBaseTest(DatabaseTest):
             }],
             'zip_code': u'31500',
             'commune_id': u'31555',
-<<<<<<< HEAD
-=======
         },
         'pau': {
             'coords': [{
@@ -78,7 +76,6 @@ class ApiBaseTest(DatabaseTest):
             }],
             'zip_code': u'64000',
             'commune_id': u'64445',
->>>>>>> 7daa8ad... Refacto python + more tests + fix heacount_text problem (in tests only)
         }
     }
 
@@ -204,7 +201,7 @@ class ApiBaseTest(DatabaseTest):
                 'flag_alternance': 0
             },
             {
-                'naf': u'5630Z', # Map to ROME D1211
+                'naf': u'7010Z', # Map to ROME D1211
                 'siret': u'00000000000009',
                 'score': 99,
                 'headcount': 50,
