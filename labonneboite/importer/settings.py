@@ -12,9 +12,9 @@ LAST_DAY_DPAE = datetime(2015, 6, 30)
 
 NOW = datetime.now()
 
-
+# FIXME rename all those
 BACKOFFICE_ETABLISSEMENT_TABLE = 'etablissements_backoffice'
-EXPORT_ETABLISSEMENT_TABLE = 'etablissements'
+EXPORT_ETABLISSEMENT_TABLE = 'etablissements'  # FIXME DNRY
 OFFICE_TABLE = 'etablissements_prod'
 DPAE_TABLE = 'dpae'
 

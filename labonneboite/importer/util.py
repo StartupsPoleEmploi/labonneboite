@@ -92,7 +92,7 @@ def is_processed(filename):
     in order to track whether its contents were imported or not.
     This function lets us know whether contents were imported or not.
     """
-    import_tasks = ImportTask.query.filter(  # FIXME
+    import_tasks = ImportTask.query.filter(
         ImportTask.filename == os.path.basename(filename),
         ImportTask.state >= ImportTask.FILE_READ).all()
     return bool(import_tasks)
