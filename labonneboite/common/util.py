@@ -145,16 +145,14 @@ def is_safe_url(url, allowed_hosts=None):
 
 
 def get_contact_mode_for_rome_and_naf(rome, naf):
-    contact_mode_dict = load_contact_modes()
     naf_prefix = naf[:2]
+    naf_prefix_to_rome_to_contact_mode = load_contact_modes()
     try:
-        rome_to_contact_mode_dict = contact_mode_dict[naf_prefix]
-    except:
-        import ipdb; ipdb.set_trace()
-    if rome in rome_to_contact_mode_dict:
-        contact_mode = rome_to_contact_mode_dict[rome]
-    elif rome_to_contact_mode_dict:
-        contact_mode = rome_to_contact_mode_dict.values()[0]
-    else:
-        contact_mode = CONTACT_MODE_DEFAULT
-    return contact_mode
+        return naf_prefix_to_rome_to_contact_mode[naf_prefix][rome]
+    except KeyError:
+        pass
+    try:
+        return naf_prefix_to_rome_to_contact_mode[naf_prefix].values()[0]
+    except (KeyError, IndexError):
+        return CONTACT_MODE_DEFAULT
+
