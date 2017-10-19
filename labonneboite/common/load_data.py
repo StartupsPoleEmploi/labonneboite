@@ -49,7 +49,7 @@ def load_csv_file(filename, delimiter='|'):
 
 @lru_cache(maxsize=None)
 def load_city_codes():
-    return load_pickle_file("city_codes_v2.pickle")
+    return load_pickle_file("city_codes.pickle")
 
 
 @lru_cache(maxsize=None)
