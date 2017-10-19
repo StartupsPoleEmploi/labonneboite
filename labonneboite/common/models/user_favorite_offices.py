@@ -37,7 +37,7 @@ class UserFavoriteOffice(CRUDMixin, Base):
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
 
     user = relationship('User')
-    office = relationship('labonneboite.common.models.office.Office', lazy='joined')
+    office = relationship('Office', lazy='joined')
 
     __mapper_args__ = {
         'order_by': desc(date_created),  # Default order_by for all queries.

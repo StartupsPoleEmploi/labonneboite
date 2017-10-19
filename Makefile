@@ -111,6 +111,15 @@ create_index_from_scratch_with_profiling_line_by_line:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 	cd /srv/lbb/labonneboite && kernprof -v -l scripts/create_index.py -d 1 -p 1 -s 1';
 
+run_importer_first_job:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && \
+		export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && \
+		cd importer && \
+		mkdir -p /srv/lbb/data && \
+		touch /srv/lbb/data/LBB_EGCEMP_ENTREPRISE_20160910_20171010_20171010_175431.csv.bz2 && \
+		python jobs/check_etablissements.py';
+
 mysql_local_shell:
 	cd vagrant && vagrant ssh --command 'mysql -u root -D labonneboite --host 127.0.0.1';
 

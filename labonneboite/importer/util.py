@@ -94,6 +94,15 @@ def is_processed(filename):
     """
     # from labonneboite.common.models import Office, User, UserFavoriteOffice
     # from labonneboite.common.models import *
+    # sqlalchemy.orm.instrumentation.unregister_class(Office)
+    # sqlalchemy.orm.instrumentation.unregister_class(UserFavoriteOffice)
+    # from labonneboite.importer.models.computing import ImportTask
+    # from labonneboite.importer.models.computing import *
+    #
+    # import sqlalchemy
+    # from labonneboite.common.models import Office
+    # 
+    #
     # import ipdb; ipdb.set_trace()
     import_tasks = ImportTask.query.filter(
         ImportTask.filename == os.path.basename(filename),
