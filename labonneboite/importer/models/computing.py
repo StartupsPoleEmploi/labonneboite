@@ -26,7 +26,7 @@ class Dpae(CRUDMixin, Base):
         return '%s %s' % (self.siret, self.hiring_date)
 
 
-class Office(CRUDMixin, Base):
+class RawOffice(CRUDMixin, Base):
     """
     raw importer table including all 10M offices
     """
