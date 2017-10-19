@@ -91,7 +91,9 @@ def load_city_codes():
 
 @lru_cache(maxsize=None)
 def load_contact_modes():
-    rows = load_csv_file("contact_modes.csv")
+    # use comma delimiter instead of pipe so that it is recognized by github
+    # and can easily be edited online by the intrapreneurs
+    rows = load_csv_file("contact_modes.csv", delimiter=',')
     naf_prefix_to_rome_to_contact_mode = load_rows_as_dict_of_dict(rows)
     return naf_prefix_to_rome_to_contact_mode
 
