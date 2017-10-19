@@ -39,35 +39,67 @@ def load_csv_file(filename, delimiter='|'):
 
     for row in reader:
         if len_previous_row:
+            # at least second line of CSV file
             if len(row) != len_previous_row:
                 raise Exception("found rows with different number of fields : %s" % row)
-        rows.append(row)
+            rows.append(row)
+        else:
+            # first line of CSV file: headers should be ignored
+            pass
+        
         len_previous_row = len(row)
 
     return rows
 
 
+def load_rows_as_dict(rows):
+    d = {}
+    for row in rows:
+        if len(row) != 2:
+            raise Exception("wrong number of fields")
+        if row[0] in d:
+            raise Exception("duplicate key")
+        d[row[0]] = row[1].decode('utf8')
+    return d
+
+
+def load_rows_as_dict_of_dict(rows):
+    d = {}
+    for row in rows:
+        if len(row) != 3:
+            raise Exception("wrong number of fields")
+        # values of 3 fields
+        f1 = row[0]
+        f2 = row[1]
+        f3 = row[2].decode('utf8')
+        if f1 in d:
+            if f2 in d[f1]:
+                raise Exception("duplicate key")
+            else:
+                d[f1][f2] = f3
+        else:
+            d[f1] = {f2: f3}
+    return d
+
+
 @lru_cache(maxsize=None)
 def load_city_codes():
-    return load_pickle_file("city_codes.pickle")
+    rows = load_csv_file("city_codes.csv")
+    commune_id_to_commune_name = load_rows_as_dict(rows)
+    return commune_id_to_commune_name
 
 
 @lru_cache(maxsize=None)
 def load_contact_modes():
-    return load_pickle_file("contact_modes.pickle")
+    rows = load_csv_file("contact_modes.csv")
+    naf_prefix_to_rome_to_contact_mode = load_rows_as_dict_of_dict(rows)
+    return naf_prefix_to_rome_to_contact_mode
 
 
 @lru_cache(maxsize=None)
 def load_ogr_labels():
     rows = load_csv_file("ogr_labels.csv")
-
-    OGR_COLUMN = 0
-    LABEL_COLUMN = 1
-    ogr_to_label = {}
-
-    for row in rows:
-        ogr_to_label[row[OGR_COLUMN]] = row[LABEL_COLUMN].decode('utf8')
-
+    ogr_to_label = load_rows_as_dict(rows)
     return ogr_to_label
 
 
@@ -96,29 +128,14 @@ def load_ogr_rome_mapping():
 @lru_cache(maxsize=None)
 def load_rome_labels():
     rows = load_csv_file(ROME_FILE)
-
-    ROME_COLUMN = 0
-    LABEL_COLUMN = 1
-    rome_to_label = {}
-
-    for row in rows:
-        rome_to_label[row[ROME_COLUMN]] = row[LABEL_COLUMN].decode('utf8')
-
+    rome_to_label = load_rows_as_dict(rows)
     return rome_to_label
 
 
 @lru_cache(maxsize=None)
 def load_naf_labels():
-    # use pipe delimiter because ';' appear in label data
     rows = load_csv_file("naf_labels.csv")
-
-    NAF_COLUMN = 0
-    LABEL_COLUMN = 1
-    naf_to_label = {}
-
-    for row in rows:
-        naf_to_label[row[NAF_COLUMN]] = row[LABEL_COLUMN].decode('utf8')
-
+    naf_to_label = load_rows_as_dict(rows)
     return naf_to_label
 
 

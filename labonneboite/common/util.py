@@ -147,7 +147,10 @@ def is_safe_url(url, allowed_hosts=None):
 def get_contact_mode_for_rome_and_naf(rome, naf):
     contact_mode_dict = load_contact_modes()
     naf_prefix = naf[:2]
-    rome_to_contact_mode_dict = contact_mode_dict[naf_prefix]
+    try:
+        rome_to_contact_mode_dict = contact_mode_dict[naf_prefix]
+    except:
+        import ipdb; ipdb.set_trace()
     if rome in rome_to_contact_mode_dict:
         contact_mode = rome_to_contact_mode_dict[rome]
     elif rome_to_contact_mode_dict:
