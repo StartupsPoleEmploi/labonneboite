@@ -66,7 +66,7 @@ class ExportableOffice(CRUDMixin, Base):
     -
     note that this is actually a duplicate of the Office model
     in common/models/office.py
-    TOFIX somehow eliminate this confusing code duplication
+    FIXME fix duplication of office model between app and importer
     """
     __tablename__ = settings.EXPORT_ETABLISSEMENT_TABLE
     siret = Column(String(14), primary_key=True)
@@ -112,8 +112,8 @@ class ImportTask(CRUDMixin, Base):
     created_date = Column(DateTime, default=datetime.datetime.utcnow)
 
     @classmethod
-    def is_last_import_dpae(clazz):
-        return clazz.query.order_by(clazz.created_date.desc()).first().import_type == ImportTask.DPAE
+    def is_last_import_dpae(cls):
+        return cls.query.order_by(cls.created_date.desc()).first().import_type == ImportTask.DPAE
 
 
 class DpaeStatistics(CRUDMixin, Base):
@@ -124,9 +124,9 @@ class DpaeStatistics(CRUDMixin, Base):
     most_recent_data_date = Column(DateTime, default=datetime.datetime.utcnow)
 
     @classmethod
-    def get_most_recent_data_date(clazz):
+    def get_most_recent_data_date(cls):
         try:
-            return clazz.query.order_by(clazz.most_recent_data_date.desc()).first().most_recent_data_date
+            return cls.query.order_by(cls.most_recent_data_date.desc()).first().most_recent_data_date
         except AttributeError:
             # if there was no import of dpae thus far, return the date for which
             # we don't want to import dpae before that date

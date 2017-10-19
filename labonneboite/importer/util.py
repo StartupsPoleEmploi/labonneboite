@@ -5,6 +5,7 @@ import re
 import subprocess
 from datetime import datetime
 
+import logging
 import MySQLdb as mdb
 
 from labonneboite.importer import settings as importer_settings
@@ -13,7 +14,6 @@ from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common.database import DATABASE
 from labonneboite.common import encoding as encoding_util
 
-import logging
 logger = logging.getLogger('main')
 
 TRANCHE_AGE_SENIOR = "51-99"
@@ -62,7 +62,8 @@ def back_up(backup_folder, table, name, timestamp, copy_to_remote_server=True, r
     else:
         table_new = table
 
-    # sed command from https://stackoverflow.com/questions/8042723/mysqldump-can-you-change-the-name-of-the-table-youre-inserting-into
+    # sed command from
+    # https://stackoverflow.com/questions/8042723/mysqldump-can-you-change-the-name-of-the-table-youre-inserting-into
     # to rename table name on the fly,
     # useful in the case of deploy_data to allow zero downtime atomic table swap of table etablissements
     subprocess.check_call(
@@ -91,13 +92,10 @@ def is_processed(filename):
     in order to track whether its contents were imported or not.
     This function lets us know whether contents were imported or not.
     """
-    import_tasks = ImportTask.query.filter(
+    import_tasks = ImportTask.query.filter(  # FIXME
         ImportTask.filename == os.path.basename(filename),
         ImportTask.state >= ImportTask.FILE_READ).all()
-    if import_tasks:
-        return True
-    else:
-        return False
+    return bool(import_tasks)
 
 
 def check_runnable(filename, file_type):
@@ -120,7 +118,14 @@ def detect_runnable_file(file_type):
     return None
 
 
-def reduce_scores_into_table(description, create_table_filename, departements, target_table, select_fields, drop_low_scores):
+def reduce_scores_into_table(
+        description,
+        create_table_filename,
+        departements,
+        target_table,
+        select_fields,
+        drop_low_scores
+    ):
     """
     Analog to a Map/Reduce operation.
     We have "etablissements" in MySQL tables for each departement.
@@ -146,12 +151,21 @@ def reduce_scores_into_table(description, create_table_filename, departements, t
         if drop_low_scores:
             query += " where score >= 50"
         try:
-            subprocess.check_call("""mysql -u %s %s %s -e'%s'""" % (DATABASE['USER'], password_statement, DATABASE['NAME'], query), shell=True)
+            subprocess.check_call(
+                """mysql -u %s %s %s -e'%s'""" % (
+                    DATABASE['USER'],
+                    password_statement,
+                    DATABASE['NAME'],
+                    query
+                ), 
+                shell=True
+            )
         except:
             logger.error("an error happened in reducing %s %s", departement, description)
             raise
     logger.info("score reduction %s finished, all data available in table %s",
                 description, target_table)
+
 
 
 def get_select_fields_for_main_db():
@@ -287,7 +301,7 @@ def parse_dpae_line(line):
     iiann = fields[21]
 
     def remove_exotic_characters(text):
-        return ''.join(i for i in text if ord(i)<128)
+        return ''.join(i for i in text if ord(i) < 128)
 
     choices = {
         "- de 26 ans": TRANCHE_AGE_JUNIOR,
@@ -302,7 +316,8 @@ def parse_dpae_line(line):
 
     handicap_label = fields[23]
 
-    return siret, hiring_date, zipcode, contract_type, departement, contract_duration, iiann, tranche_age, handicap_label
+    return (siret, hiring_date, zipcode, contract_type, departement,
+        contract_duration, iiann, tranche_age, handicap_label)
 
 
 def get_file_extension(filename):
