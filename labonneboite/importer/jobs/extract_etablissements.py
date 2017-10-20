@@ -11,10 +11,6 @@ from labonneboite.conf import get_current_env, ENV_LBBDEV
 from .base import Job
 from .common import logger
 
-class DepartementException(Exception):
-    pass
-
-
 @lru_cache(maxsize=128*1024)
 def extract_departement_from_zipcode(zipcode):
     zipcode = zipcode.strip()
@@ -31,14 +27,6 @@ def extract_departement_from_zipcode(zipcode):
     if departement == "2A" or departement == "2B":
         departement = "20"
     return departement
-
-
-def extract_departement_from_zipcode_and_siret(zipcode, siret):
-    departement = extract_departement_from_zipcode(zipcode)
-    if departement is None:
-        raise DepartementException("departement not recognized for siret='%s' and zipcode='%s'" % (siret, zipcode))
-    else:
-        return departement
 
 
 @timeit
@@ -205,7 +193,6 @@ class EtablissementExtractJob(Job):
         departements = settings.DEPARTEMENTS
         count = 0
         no_zipcode_count = 0
-        departement_errors = 0
         unprocessable_departement_errors = 0
         format_errors = 0
         departement_counter_dic = {}
@@ -241,43 +228,38 @@ class EtablissementExtractJob(Job):
                 email = encoding_util.strip_french_accents(email)
 
                 if codecommune.strip():
-                    try:
-                        departement = extract_departement_from_zipcode_and_siret(codepostal, siret)
-                        process_this_departement = departement in departements
-                        if process_this_departement:
+                    departement = get_departement_from_zipcode(codepostal)
+                    process_this_departement = departement in departements
+                    if process_this_departement:
 
-                            if len(codepostal) == 4:
-                                codepostal = "0%s" % codepostal
-                            etab_create_fields = siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
-                                codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-                                website1, website2
-                            etab_update_fields = raisonsociale, enseigne, codenaf, numerorue, libellerue, \
-                                codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-                                website1, website2, siret
-                            if codepostal.startswith(departement):
-                                departement_counter_dic.setdefault(departement, 0)
-                                departement_counter_dic[departement] += 1
-                                offices[siret] = {
-                                    "create_fields": etab_create_fields,
-                                    "update_fields": etab_update_fields,
-                                }
-                            else:
-                                logger.info(
-                                    "zipcode %s and departement %s don't match commune_id %s",
-                                    codepostal,
-                                    departement,
-                                    codecommune,
-                                )
+                        if len(codepostal) == 4:
+                            codepostal = "0%s" % codepostal
+                        etab_create_fields = siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
+                            codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
+                            website1, website2
+                        etab_update_fields = raisonsociale, enseigne, codenaf, numerorue, libellerue, \
+                            codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
+                            website1, website2, siret
+                        if codepostal.startswith(departement):
+                            departement_counter_dic.setdefault(departement, 0)
+                            departement_counter_dic[departement] += 1
+                            offices[siret] = {
+                                "create_fields": etab_create_fields,
+                                "update_fields": etab_update_fields,
+                            }
                         else:
-                            unprocessable_departement_errors += 1
-                    except DepartementException:
-                        logger.exception("departement exception")
-                        departement_errors += 1
+                            logger.info(
+                                "zipcode %s and departement %s don't match commune_id %s",
+                                codepostal,
+                                departement,
+                                codecommune,
+                            )
+                    else:
+                        unprocessable_departement_errors += 1
                 else:
                     no_zipcode_count += 1
 
         logger.info("%i offices total", count)
-        logger.info("%i offices with incorrect departement", departement_errors)
         logger.info("%i offices with unprocessable departement", unprocessable_departement_errors)
         logger.info("%i offices with no zipcodes", no_zipcode_count)
         logger.info("%i offices not read because of format error", format_errors)
@@ -286,8 +268,6 @@ class EtablissementExtractJob(Job):
         logger.info("per departement read %s", departement_count)
         logger.info("finished reading offices...")
 
-        if departement_errors > 500:
-            raise Exception("too many departement_errors")
         if unprocessable_departement_errors > 2000:
             raise Exception("too many unprocessable_departement_errors")
         if no_zipcode_count > 50000:
