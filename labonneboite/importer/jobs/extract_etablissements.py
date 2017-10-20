@@ -189,6 +189,10 @@ class EtablissementExtractJob(Job):
 
     @timeit
     def get_offices_from_file(self):
+        # FIXME elegantly parallelize this stuff
+        # see
+        # https://stackoverflow.com/questions/8717179/chunking-data-from-a-large-file-for-multiprocessing
+        # https://docs.python.org/2/library/itertools.html#itertools.islice
         logger.info("extracting %s...", self.input_filename)
         departements = settings.DEPARTEMENTS
         count = 0
