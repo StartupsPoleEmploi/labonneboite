@@ -314,7 +314,10 @@ class Fetcher(object):
         if self.company_count <= current_page_size and add_suggestions:
 
             # Suggest other jobs.
-            alternative_rome_codes = ROME_MOBILITIES[self.rome]
+            try:
+                alternative_rome_codes = ROME_MOBILITIES[self.rome]
+            except KeyError:  # FIXME regenerate rome_mobilities dataset after rome slicing
+                alternative_rome_codes = []
             for rome in alternative_rome_codes:
                 if not rome == self.rome:
                     company_count = self._get_company_count(rome, self.distance)
