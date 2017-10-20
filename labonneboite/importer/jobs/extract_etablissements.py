@@ -12,7 +12,7 @@ from .base import Job
 from .common import logger
 
 @lru_cache(maxsize=128*1024)
-def extract_departement_from_zipcode(zipcode):
+def get_departement_from_zipcode(zipcode):
     zipcode = zipcode.strip()
     departement = None
     if len(zipcode) in range(1, 6):
