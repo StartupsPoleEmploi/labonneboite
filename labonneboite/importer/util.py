@@ -3,6 +3,8 @@ import gzip
 import bz2
 import re
 import subprocess
+from functools import wraps
+from time import time
 from datetime import datetime
 
 import logging
@@ -64,6 +66,7 @@ def check_for_updates(input_folder):
     return new_files
 
 
+@timeit
 def back_up(backup_folder, table, name, timestamp, copy_to_remote_server=True, rename_table=False):
     timestamp_filename = '%s_backup_%s.sql.gz' % (name, timestamp)
     backup_filename = os.path.join(backup_folder, timestamp_filename)
@@ -142,6 +145,7 @@ def detect_runnable_file(file_type):
     return None
 
 
+@timeit
 def reduce_scores_into_table(
         description,
         create_table_filename,
@@ -219,6 +223,7 @@ def get_select_fields_for_backoffice():
     return fields
 
 
+@timeit
 def reduce_scores_for_main_db(departements):
     reduce_scores_into_table(
         description="[main_db]",
@@ -230,6 +235,7 @@ def reduce_scores_for_main_db(departements):
     )
 
 
+@timeit
 def reduce_scores_for_backoffice(departements):
     reduce_scores_into_table(
         description="[backoffice]",
@@ -241,6 +247,7 @@ def reduce_scores_for_backoffice(departements):
     )
 
 
+@timeit
 def clean_tables():
     if importer_settings.MYSQL_NO_PASSWORD:
         password_statement = ''
@@ -254,25 +261,6 @@ def clean_tables():
         drop_table_query = "drop table if exists %s" % departement_table
         subprocess.check_call("""mysql -u %s %s %s -e'%s'""" % (
             DATABASE['USER'], password_statement, DATABASE['NAME'], drop_table_query), shell=True)
-
-
-def extract_departement_from_zipcode(zipcode, siret):
-    zipcode = zipcode.strip()
-    departement = None
-    if len(zipcode) in range(1, 6):
-        if len(zipcode) == 1:
-            departement = "0%s" % zipcode[0]
-        elif len(zipcode) == 2:
-            departement = zipcode
-        elif len(zipcode) == 4:
-            departement = "0%s" % zipcode[0]
-        elif len(zipcode) == 5:
-            departement = zipcode[:2]
-        else:
-            raise DepartementException("length ok but departement not recognized for siret %s %s" % (siret, zipcode))
-    else:
-        raise DepartementException("departement not recognized for siret %s %s" % (siret, zipcode))
-    return departement
 
 
 def get_fields_from_csv_line(line):
@@ -367,5 +355,14 @@ def get_reader(filename):
     return open_file(filename, "r")
 
 
-
+def timeit(func):
+    @wraps(func)
+    def wrap(*args, **kw):
+        ts = time()
+        result = func(*args, **kw)
+        te = time()
+        print 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
+          (func.__name__, te-ts, args, kw)
+        return result
+    return wrap
 

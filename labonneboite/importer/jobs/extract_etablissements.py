@@ -1,10 +1,9 @@
 import sys
-from functools import wraps
-from time import time
 from backports.functools_lru_cache import lru_cache
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
+from labonneboite.importer.util import timeit
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common import encoding as encoding_util
 from labonneboite.conf import get_current_env, ENV_LBBDEV
@@ -13,18 +12,6 @@ from .common import logger
 
 class DepartementException(Exception):
     pass
-
-
-def timeit(func):
-    @wraps(func)
-    def wrap(*args, **kw):
-        ts = time()
-        result = func(*args, **kw)
-        te = time()
-        print 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
-          (func.__name__, te-ts, args, kw)
-        return result
-    return wrap
 
 
 @lru_cache(maxsize=128*1024)

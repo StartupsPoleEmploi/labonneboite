@@ -9,6 +9,7 @@ import os
 import logging
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
+from labonneboite.importer.util import timeit
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.conf import get_current_env, ENV_LBBDEV
 
@@ -28,6 +29,7 @@ class Job(object):
     import_type = None
     input_filename = None
 
+    @timeit
     def run(self):
         if self.file_type:
             logger.info("file type:%s, checking the task is runnable with that file", self.file_type)
@@ -64,6 +66,7 @@ class Job(object):
         )
         task.save()
 
+    @timeit
     def back_up_input_table(self):
         timestamp = settings.NOW.strftime('%Y_%m_%d_%H%M')
         import_util.back_up(settings.BACKUP_INPUT_FOLDER, self.table_name, self.file_type, timestamp)
