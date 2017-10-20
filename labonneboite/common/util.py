@@ -104,6 +104,3 @@ def get_contact_mode_for_rome_and_naf(rome, naf):
     except (KeyError, IndexError):
         return CONTACT_MODE_DEFAULT
 
-
-def enable_lbbdev_compatibility_mode():
-    return get_current_env() == ENV_LBBDEV

@@ -1,5 +1,6 @@
 from datetime import datetime
 from backports.functools_lru_cache import lru_cache
+from labonneboite.conf import get_current_env, ENV_LBBDEV
 
 SCORE_COMPUTING_MAX_DIFF_MEAN = 30
 HIGH_SCORE_COMPANIES_DIFF_MAX = 30
@@ -18,7 +19,10 @@ EXPORT_ETABLISSEMENT_TABLE = 'etablissements'  # FIXME DNRY
 OFFICE_TABLE = 'etablissements_prod'
 DPAE_TABLE = 'dpae'
 
-INPUT_SOURCE_FOLDER = '/srv/lbb/data'
+if get_current_env() == ENV_LBBDEV:
+    INPUT_SOURCE_FOLDER = '/srv/lbb/data'
+else:  # local dev
+    INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
 BACKUP_FOLDER = '/srv/lbb/backups'
 BACKUP_INPUT_FOLDER = '/srv/lbb/backups/inputs'
 BACKUP_OUTPUT_FOLDER = '/srv/lbb/backups/outputs'

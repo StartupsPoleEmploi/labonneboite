@@ -11,6 +11,7 @@ from labonneboite.common.database import Base
 from labonneboite.common.database import db_session
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.common import util
+from labonneboite.conf import get_current_env, ENV_LBBDEV
 
 
 class UserFavoriteOffice(CRUDMixin, Base):
@@ -38,7 +39,10 @@ class UserFavoriteOffice(CRUDMixin, Base):
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
 
     user = relationship('User')
-    if not util.enable_lbbdev_compatibility_mode():
+    if get_current_env() == ENV_LBBDEV:
+        # disable relationship which mysteriously breaks on lbbdev only, not needed there anyway.
+        pass
+    else:
         office = relationship('Office', lazy='joined')
 
     __mapper_args__ = {

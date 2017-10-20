@@ -79,3 +79,7 @@ labonneboite/scripts/profiling_results/*.kgrind
 labonneboite/scripts/profiling_results/staging/*.kgrind
 labonneboite/*.lprof
 
+# Importer #
+############
+labonneboite/importer/data/*.bz2
+labonneboite/importer/jenkins/*.jenkins
