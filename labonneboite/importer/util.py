@@ -13,6 +13,8 @@ from labonneboite.conf import settings
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common.database import DATABASE
 from labonneboite.common import encoding as encoding_util
+from labonneboite.conf import get_current_env, ENV_LBBDEV
+
 
 logger = logging.getLogger('main')
 
@@ -353,3 +355,15 @@ def get_open_file(filename):
 def get_reader(filename):
     open_file = get_open_file(filename)
     return open_file(filename, "r")
+
+
+def get_jenkins_properties_filename():
+    if get_current_env() == ENV_LBBDEV:
+        filename = os.path.join(os.environ["WORKSPACE"], "properties.jenkins")
+    else:  # local dev
+        filename = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            "jenkins/properties.jenkins",
+        )
+    return filename
+

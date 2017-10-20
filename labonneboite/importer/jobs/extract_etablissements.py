@@ -1,17 +1,12 @@
-"""
-Extracts offices("etablissements").
-
-To be done.
-"""
 import sys
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common import encoding as encoding_util
+from labonneboite.conf import get_current_env, ENV_LBBDEV
 from .base import Job
 from .common import logger
-
 
 class DepartementException(Exception):
     pass
@@ -30,7 +25,9 @@ def extract_departement_from_zipcode(zipcode, siret):
         elif len(zipcode) == 5:
             departement = zipcode[:2]
         else:
-            raise DepartementException("length ok but departement not recognized for siret='%s' and zipcode='%s'" % (siret, zipcode))
+            raise DepartementException(
+                "length ok but departement not recognized for siret='%s' and zipcode='%s'" % (siret, zipcode)
+            )
     else:
         raise DepartementException("departement not recognized for siret='%s' and zipcode='%s'" % (siret, zipcode))
     if departement == "2A" or departement == "2B":
@@ -178,7 +175,6 @@ class EtablissementExtractJob(Job):
         departement_errors = 0
         unprocessable_departement_errors = 0
         format_errors = 0
-        _, _ = import_util.create_cursor()
         departement_counter_dic = {}
         etablissements = {}
 
@@ -233,7 +229,12 @@ class EtablissementExtractJob(Job):
                                     "update_fields": etab_update_fields,
                                 }
                             else:
-                                logger.info("zipcode and departement dont match code commune: %s, code postal: %s, departement: %s", codecommune, codepostal, departement)
+                                logger.info(
+                                    "zipcode %s and departement %s don't match commune_id %s",
+                                    codepostal,
+                                    departement,
+                                    codecommune,
+                                )
                         else:
                             unprocessable_departement_errors += 1
                     except DepartementException:
@@ -273,6 +274,9 @@ class EtablissementExtractJob(Job):
 
 
 if __name__ == "__main__":
-    etablissement_filename = sys.argv[1]
+    if get_current_env() == ENV_LBBDEV:
+        etablissement_filename = sys.argv[1]
+    else:
+        pass
     task = EtablissementExtractJob(etablissement_filename)
     task.run()
