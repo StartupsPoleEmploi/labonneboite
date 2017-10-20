@@ -1,4 +1,5 @@
 import sys
+import pandas as pd
 from backports.functools_lru_cache import lru_cache
 
 from labonneboite.importer import settings
@@ -75,6 +76,7 @@ class EtablissementExtractJob(Job):
 
     @timeit
     def run_task(self):
+        self.benchmark_loading_using_pandas()  # FIXME
         self.csv_offices = self.get_offices_from_file()
         self.csv_sirets = self.csv_offices.keys()
         self.existing_sirets = self.get_sirets_from_database()
@@ -181,6 +183,20 @@ class EtablissementExtractJob(Job):
                 logger.warning("deletable_sirets=%s", self.deletable_sirets)
                 raise
         logger.info("%i old offices deleted.", len(self.deletable_sirets))
+
+    @timeit
+    def benchmark_loading_using_pandas(self):
+        return
+        # ValueError: Falling back to the 'python' engine because the separator encoded in UTF-8 is > 1 char long,
+        # and the 'c' engine does not support such separators, but this causes 'error_bad_lines' to be ignored as
+        # it is not supported by the 'python' engine.
+        df = pd.read_csv(
+            self.input_filename,
+            sep='\xa5',
+            error_bad_lines=False,  # no longer raise Exception when a row is incorrect (wrong number of fields...)
+            warn_bad_lines=True,  # still display warning about those ignored incorrect rows
+        )
+
 
     @timeit
     def get_offices_from_file(self):

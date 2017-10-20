@@ -20,7 +20,7 @@ class Job(object):
     # enable/disable backup here to affect all processes (extract_dpae + extract_etablissements + populate_flags) (DNRY)
     # comes handy as backup VM is often down and up again... (dec 2016)
     if get_current_env() == ENV_LBBDEV:
-        backup_first = True
+        backup_first = False  # FIXME rollback me to True
     else:
         backup_first = False
 

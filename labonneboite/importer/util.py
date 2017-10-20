@@ -52,6 +52,18 @@ def create_cursor():
     return con, cur
 
 
+def timeit(func):
+    @wraps(func)
+    def wrap(*args, **kw):
+        ts = time()
+        result = func(*args, **kw)
+        te = time()
+        print 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
+          (func.__name__, te-ts, args, kw)
+        return result
+    return wrap
+
+
 def check_for_updates(input_folder):
     """
     do we have a new file we haven't processed yet in the input folder?
@@ -355,14 +367,4 @@ def get_reader(filename):
     return open_file(filename, "r")
 
 
-def timeit(func):
-    @wraps(func)
-    def wrap(*args, **kw):
-        ts = time()
-        result = func(*args, **kw)
-        te = time()
-        print 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
-          (func.__name__, te-ts, args, kw)
-        return result
-    return wrap
 
