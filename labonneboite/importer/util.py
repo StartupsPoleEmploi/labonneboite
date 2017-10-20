@@ -24,6 +24,16 @@ TRANCHE_AGE_MIDDLE = "26-50"
 
 OFFICE_FLAGS = ['flag_alternance', 'flag_junior', 'flag_senior', 'flag_handicap']
 
+if get_current_env() == ENV_LBBDEV:
+    JENKINS_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties.jenkins")
+    MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 1000
+else:
+    JENKINS_PROPERTIES_FILENAME = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "jenkins/properties.jenkins",
+    )
+    MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 0
+
 
 class DepartementException(Exception):
     pass
@@ -357,13 +367,5 @@ def get_reader(filename):
     return open_file(filename, "r")
 
 
-def get_jenkins_properties_filename():
-    if get_current_env() == ENV_LBBDEV:
-        filename = os.path.join(os.environ["WORKSPACE"], "properties.jenkins")
-    else:  # local dev
-        filename = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            "jenkins/properties.jenkins",
-        )
-    return filename
+
 

@@ -81,5 +81,5 @@ labonneboite/*.lprof
 
 # Importer #
 ############
-labonneboite/importer/data/*.bz2
+labonneboite/importer/data/*.csv
 labonneboite/importer/jenkins/*.jenkins

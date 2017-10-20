@@ -13,7 +13,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS `import_tasks`;
 DROP TABLE IF EXISTS `geolocations`;
-DROP TABLE IF EXISTS `etablissements_prod`;
+DROP TABLE IF EXISTS `etablissements_importer`;
 DROP TABLE IF EXISTS `dpae_statistics`;
 DROP TABLE IF EXISTS `dpae`;
 
@@ -40,7 +40,7 @@ CREATE TABLE `dpae_statistics` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-CREATE TABLE `etablissements_prod` (
+CREATE TABLE `etablissements_importer` (
   `siret` varchar(191) NOT NULL,
   `raisonsociale` varchar(191) DEFAULT NULL,
   `enseigne` varchar(191) DEFAULT NULL,
@@ -90,9 +90,9 @@ ALTER TABLE `dpae_statistics` ENABLE KEYS;
 UNLOCK TABLES;
 
 
-LOCK TABLES `etablissements_prod` WRITE;
-ALTER TABLE `etablissements_prod` DISABLE KEYS;
-ALTER TABLE `etablissements_prod` ENABLE KEYS;
+LOCK TABLES `etablissements_importer` WRITE;
+ALTER TABLE `etablissements_importer` DISABLE KEYS;
+ALTER TABLE `etablissements_importer` ENABLE KEYS;
 UNLOCK TABLES;
 
 

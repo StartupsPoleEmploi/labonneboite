@@ -190,11 +190,28 @@ test_selenium:
 # Importer jobs
 # -------------
 
+run_importer_jobs:
+	make run_importer_job_00_reset_all && \
+	make run_importer_job_01_check_etablissements && \
+	make run_importer_job_02_extract_etablissements && \
+	echo done
+
+run_importer_job_00_reset_all:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		rm data/*.csv ; rm jenkins/*.jenkins ; \
+		echo delete from import_tasks | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		echo delete from etablissements_importer | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		echo done';
+
 run_importer_job_01_check_etablissements:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && \
-		export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite && \
-		cd importer && \
-		touch /srv/lbb/labonneboite/importer/data/LBB_EGCEMP_ENTREPRISE_20160910_20171010_20171010_175431.csv.bz2 && \
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		cp tests/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
 		python jobs/check_etablissements.py';
+
+run_importer_job_02_extract_etablissements:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/extract_etablissements.py';
 

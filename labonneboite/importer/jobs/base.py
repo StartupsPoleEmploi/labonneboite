@@ -6,18 +6,22 @@ Every child class of this Job class is launchable via a jenkins job on the compu
 
 
 import os
+import logging
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.models.computing import ImportTask
+from labonneboite.conf import get_current_env, ENV_LBBDEV
 
-import logging
 logger = logging.getLogger('main')
 
 
 class Job(object):
     # enable/disable backup here to affect all processes (extract_dpae + extract_etablissements + populate_flags) (DNRY)
     # comes handy as backup VM is often down and up again... (dec 2016)
-    backup_first = True
+    if get_current_env() == ENV_LBBDEV:
+        backup_first = True
+    else:
+        backup_first = False
 
     file_type = None
     table_name = None
@@ -40,7 +44,10 @@ class Job(object):
         logger.info("task is done.")
 
     def check_runnable(self):
-        files = [os.path.join(os.path.normpath(settings.INPUT_SOURCE_FOLDER), name) for name in os.listdir(settings.INPUT_SOURCE_FOLDER)]
+        files = [
+            os.path.join(os.path.normpath(settings.INPUT_SOURCE_FOLDER), name)
+                for name in os.listdir(settings.INPUT_SOURCE_FOLDER)
+        ]
         if not self.input_filename in files:
             raise "file does not exist"
         if import_util.is_processed(self.input_filename):
@@ -50,7 +57,11 @@ class Job(object):
         pass
 
     def record_task(self):
-        task = ImportTask(filename=os.path.basename(self.input_filename), state=ImportTask.FILE_READ, import_type=self.import_type)
+        task = ImportTask(
+            filename=os.path.basename(self.input_filename),
+            state=ImportTask.FILE_READ,
+            import_type=self.import_type,
+        )
         task.save()
 
     def back_up_input_table(self):

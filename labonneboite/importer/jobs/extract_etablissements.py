@@ -1,4 +1,7 @@
 import sys
+from functools import wraps
+from time import time
+from backports.functools_lru_cache import lru_cache
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
@@ -12,7 +15,20 @@ class DepartementException(Exception):
     pass
 
 
-def extract_departement_from_zipcode(zipcode, siret):
+def timeit(func):
+    @wraps(func)
+    def wrap(*args, **kw):
+        ts = time()
+        result = func(*args, **kw)
+        te = time()
+        print 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
+          (func.__name__, te-ts, args, kw)
+        return result
+    return wrap
+
+
+@lru_cache(maxsize=128*1024)
+def extract_departement_from_zipcode(zipcode):
     zipcode = zipcode.strip()
     departement = None
     if len(zipcode) in range(1, 6):
@@ -24,17 +40,20 @@ def extract_departement_from_zipcode(zipcode, siret):
             departement = "0%s" % zipcode[0]
         elif len(zipcode) == 5:
             departement = zipcode[:2]
-        else:
-            raise DepartementException(
-                "length ok but departement not recognized for siret='%s' and zipcode='%s'" % (siret, zipcode)
-            )
-    else:
-        raise DepartementException("departement not recognized for siret='%s' and zipcode='%s'" % (siret, zipcode))
     if departement == "2A" or departement == "2B":
         departement = "20"
     return departement
 
 
+def extract_departement_from_zipcode_and_siret(zipcode, siret):
+    departement = extract_departement_from_zipcode(zipcode)
+    if departement is None:
+        raise DepartementException("departement not recognized for siret='%s' and zipcode='%s'" % (siret, zipcode))
+    else:
+        return departement
+
+
+@timeit
 def check_departements(departements):
     for dep in departements:
         con, cur = import_util.create_cursor()
@@ -53,6 +72,7 @@ class EtablissementExtractJob(Job):
     def __init__(self, etablissement_filename):
         self.input_filename = etablissement_filename
 
+    @timeit
     def after_check(self):
         _, cur = import_util.create_cursor()
         for departement in settings.DEPARTEMENTS:
@@ -63,9 +83,10 @@ class EtablissementExtractJob(Job):
             result = cur.fetchone()
             count = result[0]
             logger.info("number of companies in departement %s : %i", departement, count)
-            if count <= 1000:
-                raise "too few companies"
+            if count < import_util.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
+                raise Exception("too few companies in departement")
 
+    @timeit
     def run_task(self):
         self.csv_offices = self.get_offices_from_file()
         self.csv_sirets = self.csv_offices.keys()
@@ -76,21 +97,26 @@ class EtablissementExtractJob(Job):
         self.creatable_sirets = csv_set - existing_set
         num_created = self.create_creatable_offices()
         # 2 - delete offices which no longer exist
-        self.deletable_sirets = existing_set - csv_set
+        if get_current_env() == ENV_LBBDEV:
+            self.deletable_sirets = existing_set - csv_set
+        else:
+            self.deletable_sirets = set()
         self.delete_deletable_offices()
         # 3 - update existing offices
         self.updatable_sirets = existing_set - self.deletable_sirets
         self.update_updatable_offices()
         return num_created
 
+    @timeit
     def get_sirets_from_database(self):
         query = "select siret from %s where siret != ''" % settings.OFFICE_TABLE
-        logger.info("get etablissements from database")
+        logger.info("get offices from database")
         _, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
         return [row[0] for row in rows]
 
+    @timeit
     def update_updatable_offices(self):
         con, cur = import_util.create_cursor()
         query = """UPDATE %s SET
@@ -109,8 +135,8 @@ class EtablissementExtractJob(Job):
             website2=%%s
         where siret=%%s""" % settings.OFFICE_TABLE
 
-        count = 1
-        logger.info("update updatable etablissements in table %s", settings.OFFICE_TABLE)
+        count = 0
+        logger.info("update updatable offices in table %s", settings.OFFICE_TABLE)
         statements = []
         MAX_COUNT_EXECUTE = 500
         for siret in self.updatable_sirets:
@@ -124,11 +150,12 @@ class EtablissementExtractJob(Job):
         if statements:
             cur.executemany(query, statements)
             con.commit()
-        logger.info("%i etablissements updated.", count)
+        logger.info("%i offices updated.", count)
 
+    @timeit
     def create_creatable_offices(self):
         """
-        create new etablissements (that are not yet in our etablissement table)
+        create new offices (that are not yet in our etablissement table)
         """
         con, cur = import_util.create_cursor()
         query = """INSERT into %s(siret, raisonsociale, enseigne, codenaf, numerorue,
@@ -137,7 +164,7 @@ class EtablissementExtractJob(Job):
         values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.OFFICE_TABLE
 
         count = 1
-        logger.info("create new etablissements in table %s", settings.OFFICE_TABLE)
+        logger.info("create new offices in table %s", settings.OFFICE_TABLE)
         statements = []
         MAX_COUNT_EXECUTE = 500
         for siret in self.creatable_sirets:
@@ -151,8 +178,9 @@ class EtablissementExtractJob(Job):
         if statements:
             cur.executemany(query, statements)
             con.commit()
-        logger.info("%i new etablissements created.", count)
+        logger.info("%i new offices created.", count)
 
+    @timeit
     def delete_deletable_offices(self):
         con, cur = import_util.create_cursor()
         if self.deletable_sirets:
@@ -165,8 +193,9 @@ class EtablissementExtractJob(Job):
             except:
                 logger.warning("deletable_sirets=%s", self.deletable_sirets)
                 raise
-            logger.info("%i old offices deleted.", len(self.deletable_sirets))
+        logger.info("%i old offices deleted.", len(self.deletable_sirets))
 
+    @timeit
     def get_offices_from_file(self):
         logger.info("extracting %s...", self.input_filename)
         departements = settings.DEPARTEMENTS
@@ -176,7 +205,7 @@ class EtablissementExtractJob(Job):
         unprocessable_departement_errors = 0
         format_errors = 0
         departement_counter_dic = {}
-        etablissements = {}
+        offices = {}
 
         with import_util.get_reader(self.input_filename) as myfile:
             header_line = myfile.readline().strip()
@@ -209,7 +238,7 @@ class EtablissementExtractJob(Job):
 
                 if codecommune.strip():
                     try:
-                        departement = extract_departement_from_zipcode(codepostal, siret)
+                        departement = extract_departement_from_zipcode_and_siret(codepostal, siret)
                         process_this_departement = departement in departements
                         if process_this_departement:
 
@@ -224,7 +253,7 @@ class EtablissementExtractJob(Job):
                             if codepostal.startswith(departement):
                                 departement_counter_dic.setdefault(departement, 0)
                                 departement_counter_dic[departement] += 1
-                                etablissements[siret] = {
+                                offices[siret] = {
                                     "create_fields": etab_create_fields,
                                     "update_fields": etab_update_fields,
                                 }
@@ -243,40 +272,43 @@ class EtablissementExtractJob(Job):
                 else:
                     no_zipcode_count += 1
 
-        logger.info("%i etablissements total", count)
-        logger.info("%i etablissements with incorrect departement", departement_errors)
-        logger.info("%i etablissements with unprocessable departement", unprocessable_departement_errors)
-        logger.info("%i etablissements with no zipcodes", no_zipcode_count)
-        logger.info("%i etablissements not read because of format error", format_errors)
-        logger.info("%i number of departements from file", len(departement_counter_dic))
+        logger.info("%i offices total", count)
+        logger.info("%i offices with incorrect departement", departement_errors)
+        logger.info("%i offices with unprocessable departement", unprocessable_departement_errors)
+        logger.info("%i offices with no zipcodes", no_zipcode_count)
+        logger.info("%i offices not read because of format error", format_errors)
+        logger.info("%i distinct departements from file", len(departement_counter_dic))
         departement_count = sorted(departement_counter_dic.items())
         logger.info("per departement read %s", departement_count)
-        logger.info("finished reading etablissements...")
+        logger.info("finished reading offices...")
 
         if departement_errors > 500:
-            raise "too many departement_errors"
+            raise Exception("too many departement_errors")
         if unprocessable_departement_errors > 2000:
-            raise "too many unprocessable_departement_errors"
-        if no_zipcode_count > 40000:
-            raise "too many no_zipcode_count"
+            raise Exception("too many unprocessable_departement_errors")
+        if no_zipcode_count > 50000:
+            raise Exception("too many no_zipcode_count")
         if format_errors > 5:
-            raise "too many format_errors"
-        if len(departement_counter_dic) not in [96, 15]:  # 96 in production, 15 in test
+            raise Exception("too many format_errors")
+        if len(departement_counter_dic) not in [96, 15]:  # 96 in production, 15 in test  # FIXME
             logger.exception("incorrect total number of departements : %s", len(departement_counter_dic))
-            raise "incorrect total number of departements"
-        if len(departement_counter_dic) == 96:
+            raise Exception("incorrect total number of departements")
+        if len(departement_counter_dic) == 96:  # FIXME
             for departement, count in departement_count:
                 if count < 10000:
-                    logger.exception("only %s etablissements in departement %s", count, departement)
-                    raise "not enough etablissements in at least one departement"
+                    logger.exception("only %s offices in departement %s", count, departement)
+                    raise Exception("not enough offices in at least one departement")
 
-        return etablissements
+        return offices
 
 
 if __name__ == "__main__":
     if get_current_env() == ENV_LBBDEV:
         etablissement_filename = sys.argv[1]
     else:
-        pass
+        with open(import_util.JENKINS_PROPERTIES_FILENAME, "r") as f:
+            # file content looks like this:
+            # LBB_ETABLISSEMENT_INPUT_FILE=/srv/lbb/labonneboite/importer/data/LBB_EGCEMP_ENTREPRISE_123.csv.bz2\n
+            etablissement_filename = f.read().strip().split('=')[1]
     task = EtablissementExtractJob(etablissement_filename)
     task.run()

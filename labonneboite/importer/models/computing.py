@@ -30,7 +30,7 @@ class RawOffice(CRUDMixin, Base):
     """
     raw importer table including all 10M offices
     """
-    __tablename__ = 'etablissements_prod'
+    __tablename__ = settings.OFFICE_TABLE
     siret = Column(String(14), primary_key=True)
     company_name = Column('raisonsociale', String(191))
     office_name = Column('enseigne', String(191))

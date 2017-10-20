@@ -16,7 +16,7 @@ NOW = datetime.now()
 # FIXME rename all those
 BACKOFFICE_ETABLISSEMENT_TABLE = 'etablissements_backoffice'
 EXPORT_ETABLISSEMENT_TABLE = 'etablissements'  # FIXME DNRY
-OFFICE_TABLE = 'etablissements_prod'
+OFFICE_TABLE = 'etablissements_importer'
 DPAE_TABLE = 'dpae'
 
 if get_current_env() == ENV_LBBDEV:
