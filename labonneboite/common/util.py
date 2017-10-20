@@ -9,7 +9,7 @@ from flask import request
 
 from labonneboite.conf.common.contact_mode import CONTACT_MODE_DEFAULT
 from labonneboite.common.load_data import load_contact_modes
-
+from labonneboite.conf import get_current_env, ENV_LBBDEV
 
 logger = logging.getLogger('main')
 
@@ -103,3 +103,7 @@ def get_contact_mode_for_rome_and_naf(rome, naf):
         return naf_prefix_to_rome_to_contact_mode[naf_prefix].values()[0]
     except (KeyError, IndexError):
         return CONTACT_MODE_DEFAULT
+
+
+def enable_lbbdev_compatibility_mode():
+    return get_current_env() == ENV_LBBDEV

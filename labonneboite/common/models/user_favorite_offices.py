@@ -10,6 +10,7 @@ from sqlalchemy.orm import relationship
 from labonneboite.common.database import Base
 from labonneboite.common.database import db_session
 from labonneboite.common.models.base import CRUDMixin
+from labonneboite.common import util
 
 
 class UserFavoriteOffice(CRUDMixin, Base):
@@ -37,7 +38,8 @@ class UserFavoriteOffice(CRUDMixin, Base):
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
 
     user = relationship('User')
-    office = relationship('Office', lazy='joined')
+    if not util.enable_lbbdev_compatibility_mode():
+        office = relationship('Office', lazy='joined')
 
     __mapper_args__ = {
         'order_by': desc(date_created),  # Default order_by for all queries.
