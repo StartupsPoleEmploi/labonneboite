@@ -1,5 +1,7 @@
 #! /bin/sh
 
+# FIXME !!?
+
 apt-get update
 apt-get --assume-yes install git
 apt-get --assume-yes install python

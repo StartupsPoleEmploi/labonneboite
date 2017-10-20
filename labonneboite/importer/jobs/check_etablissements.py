@@ -12,6 +12,10 @@ if __name__ == "__main__":
             f.close()
         except KeyError:
             logger.warn("WORKSPACE environment variable does not exist. If I was called outside of Jenkins, this is normal !")
+            f = open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "properties.jenkins"), "w")
+            f.write("LBB_ETABLISSEMENT_INPUT_FILE=%s\n" % filename)
+            f.close()
+            raise Exception("local process still not ready")
 
         sys.exit(0)
     else:
