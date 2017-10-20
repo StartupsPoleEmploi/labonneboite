@@ -186,7 +186,8 @@ class EtablissementExtractJob(Job):
 
     @timeit
     def benchmark_loading_using_pandas(self):
-        return
+        return  # not working yet, see below
+        
         # ValueError: Falling back to the 'python' engine because the separator encoded in UTF-8 is > 1 char long,
         # and the 'c' engine does not support such separators, but this causes 'error_bad_lines' to be ignored as
         # it is not supported by the 'python' engine.
