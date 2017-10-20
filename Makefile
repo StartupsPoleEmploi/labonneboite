@@ -111,7 +111,7 @@ create_index_from_scratch_with_profiling_line_by_line:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 	cd /srv/lbb/labonneboite && kernprof -v -l scripts/create_index.py -d 1 -p 1 -s 1';
 
-run_importer_first_job:
+run_importer_job_01_check_etablissements:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && \
 		export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && \
