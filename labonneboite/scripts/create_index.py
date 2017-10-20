@@ -14,6 +14,7 @@ from elasticsearch.helpers import bulk
 from sqlalchemy import inspect
 
 from labonneboite.common import encoding as encoding_util
+from labonneboite.importer.util import timeit
 from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
@@ -264,6 +265,7 @@ request_body = {
 }
 
 
+@timeit
 def drop_and_create_index():
     logging.info("drop and create index...")
     es = Elasticsearch(timeout=ES_TIMEOUT)
@@ -278,6 +280,7 @@ def bulk_actions(actions):
     bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
 
 
+@timeit
 def create_job_codes():
     """
     Create the `ogr` type in ElasticSearch.
@@ -309,6 +312,7 @@ def create_job_codes():
     bulk_actions(actions)
 
 
+@timeit
 def create_locations():
     """
     Create the `location` type in ElasticSearch.
@@ -463,6 +467,7 @@ def create_offices(enable_profiling=False, disable_parallel_computing=False):
     pool.join()
 
 
+@timeit
 def create_offices_for_departement(departement):
     """
     Populate the `office` type in ElasticSearch with offices having given departement.
@@ -515,6 +520,7 @@ def profile_create_offices_for_departement(departement):
     convert(profiler.getstats(), filename)
 
 
+@timeit
 def add_offices():
     """
     Add offices (complete the data provided by the importer).
@@ -555,6 +561,7 @@ def add_offices():
             es.create(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_add.siret, body=doc)
 
 
+@timeit
 def remove_offices():
     """
     Remove offices (overload the data provided by the importer).
@@ -580,6 +587,7 @@ def remove_offices():
             pdf_util.delete_file(office)
 
 
+@timeit
 def update_offices():
     """
     Update offices (overload the data provided by the importer).
@@ -625,6 +633,7 @@ def update_offices():
             # Delete the current PDF, it will be regenerated at next download attempt.
             pdf_util.delete_file(office)
 
+@timeit
 def update_offices_geolocations():
     """
     Remove or add extra geolocations to offices.
