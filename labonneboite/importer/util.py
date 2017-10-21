@@ -58,8 +58,12 @@ def timeit(func):
         ts = time()
         result = func(*args, **kw)
         te = time()
-        print 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
+        msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
           (func.__name__, te-ts, args, kw)
+        # logger messages are displayed immediately in jenkins console output
+        logger.info(msg)
+        # print messages are displayed all at once when the job ends in jenkins console output
+        print(msg)
         return result
     return wrap
 
