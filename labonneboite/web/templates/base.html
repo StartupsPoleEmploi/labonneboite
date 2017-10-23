@@ -132,6 +132,11 @@
         <li>
           <span class="js-obfuscated-email">rf.iolpme-elop@etiobennobal</span>
         </li>
+        {% if user_is_pro %}
+        <li>
+          <a href="{{ url_for('root.kit') }}" title="Télécharger le kit de présentation de La Bonne Boite">Boîte à outils (fichier <abbr title="Portable Document Format">PDF</abbr>, 400 <abbr title="Kilo octets">ko</abbr>)</a>
+        </li>
+        {% endif %}
       </ul>
     </div>
   </footer>
