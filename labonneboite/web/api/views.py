@@ -136,10 +136,10 @@ def company_list():
             return u'invalid NAF code(s): %s' % ' '.join(invalid_nafs), 400
 
         rome_2_naf_mapper = mapping_util.Rome2NafMapper()
-        naf_codes_expected = rome_2_naf_mapper.map([rome_code, ])
-        invalid_nafs = [naf for naf in naf_codes_list if naf not in naf_codes_expected]
+        expected_naf_codes = rome_2_naf_mapper.map([rome_code, ])
+        invalid_nafs = [naf for naf in naf_codes_list if naf not in expected_naf_codes]
         if invalid_nafs:
-            return u'invalid NAF code(s): %s. Possible values : %s ' % (' '.join(invalid_nafs), ', '.join(naf_codes_expected)), 400
+            return u'invalid NAF code(s): %s. Possible values : %s ' % (' '.join(invalid_nafs), ', '.join(expected_naf_codes)), 400
 
     sort = settings.SORT_FILTER_DEFAULT
     if 'sort' in request.args:
