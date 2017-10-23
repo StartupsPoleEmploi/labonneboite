@@ -37,7 +37,7 @@ class CompanySearchForm(FlaskForm):
 
     FLAG_ALTERNANCE_CHOICES = (
         (u'0', u'Tous types'),
-        (u'1', u'Alternance'),
+        (u'1', u'<span class="badge badge-large badge-alternance">Alternance</span>'),
     )
 
     PUBLIC_CHOICES = (

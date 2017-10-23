@@ -16,6 +16,10 @@
     margin: 0 !important;
 }
 
+.badge-large {
+    font-size: 100%;
+}
+
 .badge-warning {
     background: #f7ba45;
     color: #222;
