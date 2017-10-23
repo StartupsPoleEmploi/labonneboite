@@ -68,6 +68,8 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 
     - note that you'll be using the user `git`, unlike other services which use nominative usernames
 
+- Create a settings file (see below)
+
 - `cd labonneboite/vagrant`
 
 - `vagrant up`
