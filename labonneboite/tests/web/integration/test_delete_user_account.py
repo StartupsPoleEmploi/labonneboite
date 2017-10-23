@@ -1,4 +1,5 @@
 # coding: utf8
+import mock
 from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common.database import db_session
@@ -66,6 +67,7 @@ class DeleteUserAccountTest(DatabaseTest):
         self.assertEquals(db_session.query(UserFavoriteOffice).count(), 2)
         self.assertEquals(db_session.query(UserSocialAuth).count(), 1)
 
+    @mock.patch('settings.PEAM_AUTH_BASE_URL', 'http://peamauthbaseurl.com')
     def test_delete_user_account(self):
         """
         Test the deletion of a user account.
