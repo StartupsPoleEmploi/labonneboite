@@ -155,6 +155,20 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(rv.status_code, 400)
         self.assertEqual(rv.data, u'could not resolve latitude and longitude from given commune_id')
 
+    def test_correct_headcount_text(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['pau']['commune_id'],
+            'distance': 10,
+            'rome_codes': u'B1603',
+            'user': u'labonneboite',
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['headcount_text'], u'10 000 salariés et plus')
+
     def test_missing_rome_codes(self):
         params = self.add_security_params({
             'commune_id': self.positions['caen']['commune_id'],
@@ -402,7 +416,224 @@ class ApiCompanyListTest(ApiBaseTest):
         params = self.add_security_params({
             'commune_id': self.positions['caen']['commune_id'],
             'rome_codes': u'D1405,M1801',
-            'user': u'labonneboite',
+            'user': u'labonneboite'
         })
         rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
         self.assertEqual(rv.status_code, 400)
+
+    def test_wrong_naf_value(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'INVALID,INVALID_TOO',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(rv.data, u'invalid NAF code(s): INVALID INVALID_TOO')
+
+    def test_same_rome_with_no_naf_filters(self):
+        # 1) No NAF Code => 2 result expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+        self.assertNotEqual(data['companies'][0]['naf'], data['companies'][1]['naf'])
+
+    def test_same_rome_with_one_naf_filters(self):
+        # 1) NAF Code : 4711C => 1 result expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'4711C',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000006')
+
+        # 2) NAF Code : 5610C => 1 result expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'5610C',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000007')
+
+    def test_same_rome_with_two_naf_filters(self):
+        # 1) NAF codes : 5610C,4711C => 2 results expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'5610C,4711C',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+
+    def test_same_rome_with_unrelated_naf_filters(self):
+        # NAF Code : 9499Z => 0 result expected
+        params = self.add_security_params({
+            'commune_id': self.positions['metz']['commune_id'],
+            'rome_codes': u'D1508',
+            'naf_codes': u'9499Z',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 400)
+        self.assertIn(u'invalid NAF code(s): 9499Z. Possible values : ', rv.data)
+
+    def test_wrong_value_in_sort(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['nantes']['commune_id'],
+            'rome_codes': u'D1211',
+            'sort': u'INVALID',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(rv.data, u'invalid sort value. Possible values : distance, score')
+
+    def test_sort_by_distance(self):
+        # Nantes in first place, then Reze
+        params = self.add_security_params({
+            'commune_id': self.positions['nantes']['commune_id'],
+            'rome_codes': u'D1211',
+            'sort': u'distance',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+        self.assertEqual(data["companies"][0]['siret'], u'00000000000008')
+        self.assertEqual(data["companies"][1]['siret'], u'00000000000009')
+        self.assertLess(data["companies"][0]['distance'], data["companies"][1]['distance'])
+
+    def test_sort_by_score(self):
+        # Reze in first place, then Nantes
+        params = self.add_security_params({
+            'commune_id': self.positions['nantes']['commune_id'],
+            'rome_codes': u'D1211',
+            'sort': u'score',
+            'user': u'labonneboite'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+        self.assertEqual(data["companies"][0]['siret'], u'00000000000009')
+        self.assertEqual(data["companies"][1]['siret'], u'00000000000008')
+        self.assertGreater(data["companies"][0]['stars'], data["companies"][1]['stars'])
+
+    def test_wrong_contract_value(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['lille']['commune_id'],
+            'rome_codes': u'D1213',
+            'user': u'labonneboite',
+            'contract': u'Invalid'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(rv.data, u'invalid contract value. Possible values : all, alternance')
+
+    def test_contract_all(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['lille']['commune_id'],
+            'rome_codes': u'D1213',
+            'user': u'labonneboite',
+            'contract': u'all'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+
+    def test_contract_alternance_only(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['lille']['commune_id'],
+            'rome_codes': u'D1213',
+            'user': u'labonneboite',
+            'contract': u'alternance'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000011')
+
+    def test_wrong_headcount_value(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['toulouse']['commune_id'],
+            'rome_codes': u'M1202',
+            'user': u'labonneboite',
+            'headcount': u'INVALID'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 400)
+        self.assertEqual(rv.data, u'invalid headcount value. Possible values : small, big, all')
+
+    def test_headcount_all(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['toulouse']['commune_id'],
+            'rome_codes': u'M1202',
+            'user': u'labonneboite',
+            'headcount': u'all'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 2)
+        self.assertEqual(len(data['companies']), 2)
+
+    def test_headcount_small(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['toulouse']['commune_id'],
+            'rome_codes': u'M1202',
+            'user': u'labonneboite',
+            'headcount': u'small'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000012')
+        self.assertEqual(data['companies'][0]['headcount_text'], u'10 à 19 salariés')
+
+    def test_headcount_big(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['toulouse']['commune_id'],
+            'rome_codes': u'M1202',
+            'user': u'labonneboite',
+            'headcount': u'big'
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000013')
+        self.assertEqual(data['companies'][0]['headcount_text'], u'100 à 199 salariés')
