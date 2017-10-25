@@ -11,7 +11,6 @@ from flask_login import current_user
 
 from labonneboite.conf import settings
 from labonneboite.common.load_data import load_contact_modes
-from labonneboite.common.models import CONTACT_MODE_DEFAULT
 
 logger = logging.getLogger('main')
 
@@ -153,7 +152,5 @@ def get_contact_mode_for_rome_and_naf(rome, naf):
     elif rome_to_contact_mode_dict:
         contact_mode = rome_to_contact_mode_dict.values()[0]
     else:
-        contact_mode = CONTACT_MODE_DEFAULT
+        contact_mode = settings.CONTACT_MODE_DEFAULT
     return contact_mode
-
-
