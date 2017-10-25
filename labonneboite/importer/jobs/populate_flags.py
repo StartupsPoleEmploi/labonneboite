@@ -8,14 +8,8 @@ from datetime import datetime
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings
 from labonneboite.importer.models.computing import ImportTask
-from base import Job
-
-logger = logging.getLogger('main')
-formatter = logging.Formatter("%(levelname)s - IMPORTER - %(message)s")
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+from .base import Job
+from .common import logger
 
 
 def populate_flags():

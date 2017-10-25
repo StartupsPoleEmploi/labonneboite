@@ -1,17 +1,10 @@
-import logging
-logger = logging.getLogger('main')
-formatter = logging.Formatter("%(levelname)s - IMPORTER - %(message)s")
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 import sys
 import os
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import parse_dpae_line
+from .common import logger
 
 def get_n_lines(path, n=5, ignore_header=True):
     results = []

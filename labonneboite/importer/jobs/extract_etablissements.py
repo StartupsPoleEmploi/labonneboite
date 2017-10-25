@@ -9,16 +9,8 @@ from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common import encoding as encoding_util
-from base import Job
-
-import logging
-
-logger = logging.getLogger('main')
-formatter = logging.Formatter("%(levelname)s - IMPORTER - %(message)s")
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+from .base import Job
+from .common import logger
 
 
 class DepartementException(Exception):
