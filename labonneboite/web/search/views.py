@@ -184,9 +184,6 @@ def results(city, zipcode, occupation):
     for naf_code in naf_codes:
         naf_description = settings.NAF_CODES.get(naf_code)
         naf_codes_with_descriptions.append((naf_code, naf_description))
-    if kwargs.get('naf') in [item[0] for item in naf_codes_with_descriptions]:
-        naf_text = settings.NAF_CODES.get(kwargs['naf'])
-        naf_codes_with_descriptions.append((kwargs['naf'], naf_text))
 
     form_kwargs['job'] = settings.ROME_DESCRIPTIONS[rome]
     form = CompanySearchForm(**form_kwargs)
@@ -248,4 +245,3 @@ def results_by_commune_and_rome(commune_id, rome_id):
     # Pass all GET params to the redirect URL: this will allow users of the API to build web links
     # roughly equivalent to the result of an API call - see Trello #971.
     return redirect('%s?%s' % (url, urlencode(request.args)))
-
