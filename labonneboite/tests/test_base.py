@@ -107,6 +107,7 @@ class DatabaseTest(AppTest):
     def setUp(self):
 
         # Create MySQL tables.
+        delete_db()
         init_db()
 
         # Create ES index.
