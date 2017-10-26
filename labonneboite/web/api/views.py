@@ -11,7 +11,6 @@ from labonneboite.common.load_data import load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
-from labonneboite.conf.common.naf_codes import NAF_CODES
 from labonneboite.conf.common.settings_common import CONTRACT_VALUES, HEADCOUNT_VALUES, SORTING_CHOICES
 
 
