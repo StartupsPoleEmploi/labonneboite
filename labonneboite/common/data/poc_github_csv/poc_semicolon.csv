@@ -1,6 +1,6 @@
 rome_id;rome_label;naf_id;naf_label;hirings
-A1101;"Conduite d'engins agricoles et forestiers";0111Z;"Culture de céréales (à l'exception du riz); de légumineuses et de graines oléagineuses";161
-A1101;"Conduite d'engins agricoles et forestiers";0113Z;"Culture de légumes; de melons; de racines et de tubercules";47
+A1101;"Conduite d'engins agricoles et forestiers";0111Z;"Culture de céréales (à l'exception du riz), de légumineuses et de graines oléagineuses";161
+A1101;"Conduite d'engins agricoles et forestiers";0113Z;"Culture de légumes, de melons, de racines et de tubercules";47
 A1101;"Conduite d'engins agricoles et forestiers";0114Z;"Culture de la canne à sucre";63
 A1101;"Conduite d'engins agricoles et forestiers";0121Z;"Culture de la vigne";175
 A1101;"Conduite d'engins agricoles et forestiers";0124Z;"Culture de fruits à pépins et à noyau";22
@@ -8,7 +8,7 @@ A1101;"Conduite d'engins agricoles et forestiers";0141Z;"Élevage de vaches lait
 A1101;"Conduite d'engins agricoles et forestiers";0142Z;"Élevage d'autres bovins et de buffles";36
 A1101;"Conduite d'engins agricoles et forestiers";0146Z;"Élevage de porcins";17
 A1101;"Conduite d'engins agricoles et forestiers";0147Z;"Élevage de volailles";19
-A1203;"Entretien des espaces verts";0113Z;"Culture de légumes; de melons; de racines et de tubercules";240
+A1203;"Entretien des espaces verts";0113Z;"Culture de légumes, de melons, de racines et de tubercules";240
 A1203;"Entretien des espaces verts";0119Z;"Autres cultures non permanentes";86
 A1203;"Entretien des espaces verts";0122Z;"Culture de fruits tropicaux et subtropicaux";81
 A1203;"Entretien des espaces verts";0124Z;"Culture de fruits à pépins et à noyau";102
