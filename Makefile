@@ -10,12 +10,15 @@ VAGRANT_PACKAGE_SRC_DIR = $(VAGRANT_PACKAGE_SRC_PATH)$(PACKAGE)
 # Cleanup
 # -------
 
-.PHONY: clean
+.PHONY: clean clean_pyc
 
 clean:
 	find $(PACKAGE_SRC_DIR) "(" -name "*.pyc" -or -name "*.pyo" -or -name "*.mo" -or -name "*.so" ")" -delete
 	find $(PACKAGE_SRC_DIR) -type d -empty -delete
 	find $(PACKAGE_SRC_DIR) -name __pycache__ -delete
+
+clean_pyc:
+	find $(PACKAGE_SRC_DIR) "(" -name "*.pyc" ")" -delete
 
 # Code quality
 # ------------
@@ -107,7 +110,7 @@ start_locust_against_localhost:
 
 .PHONY: test_all test_app test_importer test_api test_integration test_scripts test_selenium
 
-test_all: clean test_app test_importer test_api test_integration test_scripts test_selenium
+test_all: clean_pyc test_app test_importer test_api test_integration test_scripts test_selenium
 
 test_app:
 	cd vagrant; \
