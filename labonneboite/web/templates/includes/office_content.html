@@ -27,7 +27,7 @@
         <ul>
           {% if company.email %}
           <li>
-            <a href="mailto:{{ company.email }}">E-mail</a>
+            <a href="mailto:{{ company.email }}" class="break-word">{{ company.email }}</a>
           </li>
           {% endif %}
           {% if company.phone %}
