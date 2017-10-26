@@ -359,7 +359,7 @@ This variant disables parallel computation, skips all tasks but office reindexin
 
 ![](https://www.evernote.com/l/ABJT1VAV0_xI26HSnAHBP5a7JRSar7CnMjcB/image.png)
 
-## Chirurgical profiling line by line
+## Surgical profiling line by line
 
 Profiling techniques above can give you a good idea of the performance big picture, but sometimes you really want to dig deeper into very specific and critical methods. For example above we really want to investigate what happens within the `get_scores_by_rome` method which seems critical for performance.
 

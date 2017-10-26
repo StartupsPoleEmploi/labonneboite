@@ -1,5 +1,4 @@
 from datetime import datetime
-from collections import deque
 from backports.functools_lru_cache import lru_cache
 
 SCORE_COMPUTING_MAX_DIFF_MEAN = 30
@@ -33,19 +32,10 @@ MYSQL_NO_PASSWORD = False
 
 @lru_cache(maxsize=None)
 def get_departements(largest_ones_first=False):
-    departements = []
-    raw_departements = range(1, 96) + [97]  # 97 is DOM-TOM
-    for d in raw_departements:
-        if d < 10:
-            dep = "0%s" % d
-        else:
-            dep = str(d)
-        departements.append(dep)
+    departements = ["{:02d}".format(d) for d in range(1, 96)] + ['97']
     if largest_ones_first:
-        departements = deque(departements)
         departements.remove('75')
-        departements.appendleft('75')        
-        departements = list(departements)
+        departements[:0] = ['75']
     return departements
 
 DEPARTEMENTS = get_departements()
