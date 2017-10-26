@@ -41,7 +41,7 @@ def load_csv_file(filename, delimiter='|'):
         if len_previous_row:
             # at least second line of CSV file
             if len(row) != len_previous_row:
-                raise Exception("found rows with different number of fields : %s" % row)
+                raise IndexError("found row with abnormal number of fields : %s" % row)
             rows.append(row)
         else:
             # first line of CSV file: headers should be ignored
@@ -56,9 +56,9 @@ def load_rows_as_dict(rows):
     d = {}
     for row in rows:
         if len(row) != 2:
-            raise Exception("wrong number of fields")
+            raise IndexError("wrong number of fields")
         if row[0] in d:
-            raise Exception("duplicate key")
+            raise ValueError("duplicate key")
         d[row[0]] = row[1].decode('utf8')
     return d
 
@@ -67,14 +67,14 @@ def load_rows_as_dict_of_dict(rows):
     d = {}
     for row in rows:
         if len(row) != 3:
-            raise Exception("wrong number of fields")
+            raise IndexError("wrong number of fields")
         # values of 3 fields
         f1 = row[0]
         f2 = row[1]
         f3 = row[2].decode('utf8')
         if f1 in d:
             if f2 in d[f1]:
-                raise Exception("duplicate key")
+                raise ValueError("duplicate key")
             else:
                 d[f1][f2] = f3
         else:
@@ -116,11 +116,11 @@ def load_ogr_rome_mapping():
     for row in rows:
         ogr = row[OGR_COLUMN]
         if ogr not in load_ogr_labels():
-            raise Exception("missing label for OGR %s" % ogr)
+            raise ValueError("missing label for OGR %s" % ogr)
 
         rome = row[ROME_COLUMN]
         if rome not in load_rome_labels():
-            raise Exception("missing label for ROME %s" % rome)
+            raise ValueError("missing label for ROME %s" % rome)
 
         ogr_to_rome[ogr] = rome
 
