@@ -115,23 +115,28 @@
     <div class="lbb-footer">
       <ul>
         <li>
-          <a href="{{ url_for('root.lbb_help') }}">Conseils</a>
+          <a href="{{ url_for('root.lbb_help') }}" title="Conseils pour faire une candidature spontanée">Conseils</a>
         </li>
         <li>
-          <a href="{{ url_for('root.faq') }}">F.A.Q</a>
+          <a href="{{ url_for('root.faq') }}" title="Questions fréquentes">F.A.Q</a>
         </li>
         <li>
-          <a href="https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api-la-bonne-boite-v1.html">API</a>
+          <a href="https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api-la-bonne-boite-v1.html" title="Documentation de notre API pour développeurs">API</a>
         </li>
         <li>
-          <a href="{{ url_for('root.cgu') }}">C.G.U</a>
+          <a href="{{ url_for('root.cgu') }}" title="Conditions générales d'utilisation">C.G.U</a>
         </li>
         <li>
-          <a href="{{ url_for('root.press') }}">Espace Presse</a>
+          <a href="{{ url_for('root.press') }}" title="Contenu à destination de la presse">Espace Presse</a>
         </li>
         <li>
           <span class="js-obfuscated-email">rf.iolpme-elop@etiobennobal</span>
         </li>
+        {% if user_is_pro %}
+        <li>
+          <a href="{{ url_for('root.kit') }}" title="Télécharger le kit de présentation de La Bonne Boite">Boîte à outils (fichier <abbr title="Portable Document Format">PDF</abbr>, 400 <abbr title="Kilo octets">ko</abbr>)</a>
+        </li>
+        {% endif %}
       </ul>
     </div>
   </footer>
