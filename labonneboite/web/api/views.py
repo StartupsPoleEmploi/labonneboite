@@ -138,7 +138,9 @@ def company_list():
         expected_naf_codes = rome_2_naf_mapper.map([rome_code, ])
         invalid_nafs = [naf for naf in naf_codes_list if naf not in expected_naf_codes]
         if invalid_nafs:
-            return u'invalid NAF code(s): %s. Possible values : %s ' % (' '.join(invalid_nafs), ', '.join(expected_naf_codes)), 400
+            return u'invalid NAF code(s): %s. Possible values : %s ' % (
+                ' '.join(invalid_nafs), ', '.join(expected_naf_codes)
+            ), 400
 
     sort = settings.SORT_FILTER_DEFAULT
     if 'sort' in request.args:
@@ -176,9 +178,22 @@ def company_list():
         index=settings.ES_INDEX
     )
 
+    # Define additional query string to add to office urls
+    office_query_string = {
+        "utm_medium": "web"
+    }
+    if 'user' in request.args:
+        office_query_string['utm_source'] = u'api__{}'.format(request.args['user'])
+        office_query_string['utm_campaign'] = u'api__{}'.format(request.args['user'])
+        if 'origin_user' in request.args:
+            office_query_string['utm_campaign'] += u'__{}'.format(request.args['origin_user'])
+
     result = {
         'companies': [
-            company.as_json(rome_code=rome_code, distance=distance, zipcode=city.get('zipcode'))
+            company.as_json(
+                rome_code=rome_code, distance=distance, zipcode=city.get('zipcode'),
+                extra_query_string=office_query_string
+            )
             for company in companies
         ],
         'companies_count': companies_count

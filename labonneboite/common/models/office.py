@@ -74,7 +74,7 @@ class Office(OfficeMixin, CRUDMixin, Base):
     def __unicode__(self):
         return u"%s - %s" % (self.siret, self.name)
 
-    def as_json(self, rome_code=None, distance=None, zipcode=None):
+    def as_json(self, rome_code=None, distance=None, zipcode=None, extra_query_string=None):
         """
         `rome_code`: optional parameter, used only in case of being in the context
         of a search by ROME code.
@@ -84,7 +84,11 @@ class Office(OfficeMixin, CRUDMixin, Base):
         and the URL of the company page is also adjusted to keep the same context.
         Main case is results returned by an API search. The scores and URLs embedded
         in the company objects should be adjusted to the ROME code context.
+
+        `extra_query_string` (dict): extra query string to be added to the API
+        urls for each office.
         """
+        extra_query_string = extra_query_string or {}
         json = {
             'address': self.address_as_text,
             'city': self.city,
@@ -96,7 +100,7 @@ class Office(OfficeMixin, CRUDMixin, Base):
             'name': self.name,
             'siret': self.siret,
             'stars': self.get_stars_for_rome_code(rome_code),
-            'url': self.get_url_for_rome_code(rome_code),
+            'url': self.get_url_for_rome_code(rome_code, **extra_query_string),
             'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
             # Warning: the `distance` field is added by `get_companies_from_es_and_db`,
             # this is NOT a model field or property!
@@ -248,12 +252,12 @@ class Office(OfficeMixin, CRUDMixin, Base):
         """
         return self.get_url_for_rome_code(None)
 
-    def get_url_for_rome_code(self, rome_code):
+    def get_url_for_rome_code(self, rome_code, **query_string):
         try:
             if rome_code:
-                return url_for('office.details', siret=self.siret, rome_code=rome_code, _external=True)
+                return url_for('office.details', siret=self.siret, rome_code=rome_code, _external=True, **query_string)
             else:
-                return url_for('office.details', siret=self.siret, _external=True)
+                return url_for('office.details', siret=self.siret, _external=True, **query_string)
         except RuntimeError:
             # RuntimeError is raised when we are outside of a Flask's application context.
             # Here, we cannot properly generate an URL via url_for.
