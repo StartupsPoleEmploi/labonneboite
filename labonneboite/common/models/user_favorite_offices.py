@@ -10,7 +10,6 @@ from sqlalchemy.orm import relationship
 from labonneboite.common.database import Base
 from labonneboite.common.database import db_session
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.common import util
 from labonneboite.conf import get_current_env, ENV_LBBDEV
 
 
