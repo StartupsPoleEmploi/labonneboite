@@ -20,9 +20,13 @@ from settings import SCORE_50_HIRINGS, SCORE_60_HIRINGS, SCORE_80_HIRINGS, SCORE
 # on the score you see in production.
 # #########################################################################
 
+# very good hit/miss ratio observed while running create_index.py
+# thanks to bucketing float values of hirings, see get_score_from_hirings
 @lru_cache(maxsize=512*1024)
-def get_score_from_hirings(hirings, as_float=False):
+def _get_score_from_hirings(hirings, as_float=False):
     """
+    Note: leading underscore in method name means "private method" (python naming convention).
+
     Transform a number of hirings (typically, the predicted hirings in the next 6 months)
     which is a float between 0 and 1000 or even more (it is the output of the regression model)
     into a score (int between 50 and 100) just like in the previous binary classification model.
@@ -58,6 +62,21 @@ def get_score_from_hirings(hirings, as_float=False):
     return int(round(score))
 
 
+def get_score_from_hirings(hirings, as_float=False, skip_bucketing=False):
+    """
+    Bucket values of float hirings in order to improve hit/miss ratio of underlying
+    private method _get_score_from_hirings.
+    """
+    if skip_bucketing:
+        pass
+    elif hirings <= 3:
+        hirings = round(hirings, 1)
+    else:
+        hirings = round(hirings)
+    return _get_score_from_hirings(hirings, as_float=False)
+
+
+# very good hit/miss ratio observed while running create_index.py
 @lru_cache(maxsize=1024)
 def get_hirings_from_score(score):
     """
@@ -76,6 +95,7 @@ def get_hirings_from_score(score):
     return hirings
 
 
+# very good hit/miss ratio observed while running create_index.py
 @lru_cache(maxsize=256*1024)
 def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
     """
@@ -90,9 +110,8 @@ def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
     if not rome_code or rome_code not in mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code]:
         return score
 
-    rome_codes = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code].keys()
     total_office_hirings = get_hirings_from_score(score)
-    total_naf_hirings = sum(mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome] for rome in rome_codes)
+    total_naf_hirings = mapping_util.get_total_naf_hirings(naf_code)
     current_rome_hirings = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome_code]
 
     if not (current_rome_hirings >= 1 and current_rome_hirings <= total_naf_hirings):

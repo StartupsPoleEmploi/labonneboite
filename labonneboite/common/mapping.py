@@ -2,6 +2,7 @@
 
 from collections import namedtuple
 import logging
+from backports.functools_lru_cache import lru_cache
 
 from slugify import slugify
 
@@ -76,6 +77,17 @@ def populate_rome_naf_mapping():
 
 
 populate_rome_naf_mapping()  # populates once all variables above
+
+
+@lru_cache(maxsize=1024)
+def get_romes_for_naf(naf):
+    return MANUAL_NAF_ROME_MAPPING[naf].keys()
+
+
+@lru_cache(maxsize=1024)
+def get_total_naf_hirings(naf):
+    romes = get_romes_for_naf(naf)
+    return sum(MANUAL_NAF_ROME_MAPPING[naf][rome] for rome in romes)
 
 
 class Rome2NafMapper(object):

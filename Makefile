@@ -28,13 +28,19 @@ clean_pyc:
 # Run pylint on the whole project.
 pylint_all:
 	cd vagrant; \
-	vagrant ssh -c '$(VAGRANT_ACTIVATE_VENV) && pylint --rcfile=$(VAGRANT_PYLINT_RC) --reports=no --output-format=colorized $(VAGRANT_PACKAGE_SRC_DIR) || true';
+	vagrant ssh -c '$(VAGRANT_ACTIVATE_VENV) && \
+	pylint --rcfile=$(VAGRANT_PYLINT_RC) --reports=no \
+		--output-format=colorized $(VAGRANT_PACKAGE_SRC_DIR) || \
+	true';
 
 # Run pylint on a specific file, e.g.:
-# make pylint ARGS=labonneboite/web/app.py
+# make pylint FILE=labonneboite/web/app.py
 pylint:
 	cd vagrant; \
-	vagrant ssh -c '$(VAGRANT_ACTIVATE_VENV) && pylint --rcfile=$(VAGRANT_PYLINT_RC) --reports=no --output-format=colorized $(VAGRANT_PACKAGE_SRC_PATH)$(ARGS) || true';
+	vagrant ssh -c '$(VAGRANT_ACTIVATE_VENV) && \
+	pylint --rcfile=$(VAGRANT_PYLINT_RC) --reports=no \
+		--output-format=colorized $(VAGRANT_PACKAGE_SRC_PATH)$(FILE) || \
+	true';
 
 
 # Vagrant
@@ -49,10 +55,12 @@ vagrant_stop:
 	cd vagrant && vagrant halt;
 
 vagrant_ssh_dev:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb && bash';
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb && bash';
 
 vagrant_ssh_test:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=test && cd /srv/lbb && bash';
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=test && \
+	cd /srv/lbb && bash';
 
 # Reload Vagrant and Vagrantfile quickly.
 vagrant_reload:
@@ -61,28 +69,57 @@ vagrant_reload:
 # Local dev
 # ---------
 
-.PHONY: serve_web_app create_sitemap create_index create_index_from_scratch mysql_local_shell rebuild_importer_tests_compressed_files
+.PHONY: serve_web_app create_sitemap create_index create_index_from_scratch
+.PHONY: create_index_from_scratch_with_profiling create_index_from_scratch_with_profiling_on_staging
+.PHONY: create_index_from_scratch_with_profiling_line_by_line
+.PHONY: mysql_local_shell rebuild_importer_tests_compressed_files
 
 serve_web_app:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && python /srv/lbb/labonneboite/web/app.py';
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	python /srv/lbb/labonneboite/web/app.py';
 
 create_sitemap:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite && python scripts/create_sitemap.py sitemap';
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb/labonneboite && python scripts/create_sitemap.py sitemap';
 
 create_index:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite && python scripts/create_index.py';
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb/labonneboite && python scripts/create_index.py';
 
 create_index_from_scratch:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1';
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1';
 
-sass_watch:
-	sass --watch labonneboite/web/static/stylesheets:labonneboite/web/static/stylesheets;
+create_index_from_scratch_with_profiling:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1 -p 1';
+
+create_index_from_scratch_with_profiling_on_staging:
+	ssh deploy@lbbstaging -t 'bash -c "\
+        cd && source /home/deploy/config/labonneboite/bin/activate && \
+        export LBB_ENV=staging && export LBB_SETTINGS=/home/deploy/config/lbb_staging_settings.py && \
+        cd /home/deploy/code/current/labonneboite/labonneboite && \
+        time python scripts/create_index.py -d 1 -p 1"' && \
+    scp deploy@lbbstaging:/home/deploy/code/current/labonneboite/labonneboite/scripts/profiling_results/*.kgrind \
+    	labonneboite/scripts/profiling_results/staging/;
+
+create_index_from_scratch_with_profiling_single_job:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1 -p 1 -s 1';
+
+create_index_from_scratch_with_profiling_line_by_line:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb/labonneboite && kernprof -v -l scripts/create_index.py -d 1 -p 1 -s 1';
 
 mysql_local_shell:
 	cd vagrant && vagrant ssh --command 'mysql -u root -D labonneboite --host 127.0.0.1';
 
 rebuild_importer_tests_compressed_files:
-	cd labonneboite/importer/tests/data && rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.gz && gzip --keep LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv && rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.bz2 && bzip2 --keep LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv
+	cd labonneboite/importer/tests/data && \
+	rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.gz && \
+	gzip --keep LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv && \
+	rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.bz2 && \
+	bzip2 --keep LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv
 
 # Load testing
 # ------------
@@ -96,13 +133,13 @@ start_locust_against_localhost:
 	&& echo "Please open locust web interface at http://localhost:8089" \
 	&& echo -e && echo -e \
 	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
-	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
 	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
-	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
 	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
-	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
 	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
-	$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
+		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
 	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --master';
 
 # Tests
@@ -142,7 +179,8 @@ test_scripts:
 	&& export LBB_ENV=test \
 	&& nosetests -s /srv/lbb/labonneboite/tests/scripts';
 
-# Selenium tests are run against the full database (not the test one) as of now: we use LBB_ENV=development.
+# Selenium tests are run against the full database (not the test one)
+# as of now: we use LBB_ENV=development.
 test_selenium:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \

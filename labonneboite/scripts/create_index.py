@@ -1,7 +1,13 @@
 # coding: utf8
 import argparse
 import logging
+import os
 
+import multiprocessing as mp
+# profiling libraries
+from cProfile import Profile
+from pyprof2calltree import convert
+# other libraries
 from elasticsearch import Elasticsearch
 from elasticsearch import TransportError
 from elasticsearch.helpers import bulk
@@ -17,6 +23,7 @@ from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
+from labonneboite.importer import settings as importer_settings
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -24,8 +31,32 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 INDEX_NAME = 'labonneboite'
 OFFICE_TYPE = 'office'
-ES_TIMEOUT = 30
+OGR_TYPE = 'ogr'
+LOCATION_TYPE = 'location'
+ES_TIMEOUT = 300
+ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
+
+
+class Counter(object):
+    """
+    Counter class without the race-condition bug.
+    Needed to be able to have a variable (counter) shared between all parallel jobs.
+    Inspired from https://stackoverflow.com/questions/2080660/python-multiprocessing-and-a-shared-counter
+    """
+    def __init__(self):
+        self.val = mp.Value('i', 0)
+
+    def increment(self, n=1):
+        with self.val.get_lock():
+            self.val.value += n
+
+    @property
+    def value(self):
+        return self.val.value
+
+
+completed_jobs_counter = Counter()
 
 
 class StatTracker:
@@ -233,49 +264,55 @@ request_body = {
 }
 
 
-def drop_and_create_index(index=INDEX_NAME):
+def drop_and_create_index():
     logging.info("drop and create index...")
     es = Elasticsearch(timeout=ES_TIMEOUT)
-    es.indices.delete(index=index, ignore=[400, 404])
-    es.indices.create(index=index, body=request_body)
+    es.indices.delete(index=INDEX_NAME, ignore=[400, 404])
+    es.indices.create(index=INDEX_NAME, body=request_body)
 
 
-def create_job_codes(index=INDEX_NAME):
+def bulk_actions(actions):
+    es = Elasticsearch(timeout=ES_TIMEOUT)
+    # unfortunately parallel_bulk is not available in the current elasticsearch version
+    # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
+    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
+
+
+def create_job_codes():
     """
     Create the `ogr` type in ElasticSearch.
     """
     logging.info("create job codes...")
-    key = 1
     # libelles des appelations pour les codes ROME
     ogr_labels = load_ogr_labels()
     # correspondance appellation vers rome
     ogr_rome_codes = load_ogr_rome_mapping()
-    es = Elasticsearch(timeout=ES_TIMEOUT)
+    actions = []
 
     for ogr, description in ogr_labels.iteritems():
         if ogr in ogr_rome_codes:
             rome_code = ogr_rome_codes[ogr]
-            try:
-                rome_description = settings.ROME_DESCRIPTIONS[rome_code]
-            except KeyError:
-                rome_description = ""
-                logging.info("can't find description for rome %s", rome_code)
-                continue
+            rome_description = settings.ROME_DESCRIPTIONS[rome_code]
             doc = {
                 'ogr_code': ogr,
                 'ogr_description': description,
                 'rome_code': rome_code,
                 'rome_description': rome_description
             }
-            es.index(index=index, doc_type='ogr', id=key, body=doc)
-            key += 1
+            action = {
+                '_op_type': 'index',
+                '_index': INDEX_NAME,
+                '_type': OGR_TYPE,
+                '_source': doc
+            }
+            actions.append(action)
+    bulk_actions(actions)
 
 
-def create_locations(index=INDEX_NAME):
+def create_locations():
     """
     Create the `location` type in ElasticSearch.
     """
-    es = Elasticsearch(timeout=ES_TIMEOUT)
     actions = []
     for city in geocoding.get_cities():
         doc = {
@@ -287,12 +324,13 @@ def create_locations(index=INDEX_NAME):
         }
         action = {
             '_op_type': 'index',
-            '_index': index,
-            '_type': 'location',
+            '_index': INDEX_NAME,
+            '_type': LOCATION_TYPE,
             '_source': doc
         }
         actions.append(action)
-    bulk(es, actions)
+
+    bulk_actions(actions)
 
 
 def get_office_as_es_doc(office):
@@ -351,7 +389,7 @@ def get_scores_by_rome(office, office_to_update=None):
     # fetch all rome_codes mapped to the naf of this office
     # as we will compute a score adjusted for each of them
     try:
-        rome_codes = mapping_util.MANUAL_NAF_ROME_MAPPING[office.naf].keys()
+        rome_codes = mapping_util.get_romes_for_naf(office.naf)
     except KeyError:
         # unfortunately some NAF codes have no matching ROME at all
         rome_codes = []
@@ -399,58 +437,85 @@ def get_scores_by_rome(office, office_to_update=None):
     return scores_by_rome
 
 
-def chunks(l, n):
+def create_offices(enable_profiling=False, disable_parallel_computing=False):
     """
-    Yield successive n-sized chunks from l.
+    Populate the `office` type in ElasticSearch.
+    Run it as a parallel computation based on departements.
     """
-    for i in xrange(0, len(l), n):
-        yield l[i:i+n]
+    if enable_profiling:
+        func = profile_create_offices_for_departement
+    else:
+        func = create_offices_for_departement
+
+    if disable_parallel_computing:
+        for departement in importer_settings.DEPARTEMENTS:
+            func(departement)
+        return
+
+    # Use parallel computing on all available CPU cores.
+    # Use even slightly more than avaible CPUs because in practise a job does not always
+    # use 100% of a cpu.
+    # maxtasksperchild default is infinite, which means memory is never freed up, and grows indefinitely :-/
+    # maxtasksperchild=1 ensures memory is freed up after every departement computation.
+    pool = mp.Pool(processes=int(1.25*mp.cpu_count()), maxtasksperchild=1)
+    pool.map(func, importer_settings.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
+    pool.close()
+    pool.join()
 
 
-def create_offices(index=INDEX_NAME, ignore_unreachable_offices=False):
+def create_offices_for_departement(departement):
     """
-    Create the `office` type in ElasticSearch.
+    Populate the `office` type in ElasticSearch with offices having given departement.
     """
-    es = Elasticsearch(timeout=300)
-
     actions = []
 
-    logging.info("creating offices...")
+    logging.info("STARTED indexing offices for departement=%s ...", departement)
 
-    for _, office in enumerate(db_session.query(Office).all()):
+    for _, office in enumerate(db_session.query(Office).filter_by(departement=departement).all()):
 
         st.increment_office_count()
-        if st.office_count % 10000 == 0:
-            logging.info("already processed %s offices, %s were actually indexed...",
-                st.office_count,
-                st.indexed_office_count,
-            )
 
         es_doc = get_office_as_es_doc(office)
 
         office_is_reachable = 'scores_by_rome' in es_doc
 
-        if office_is_reachable or not ignore_unreachable_offices:
+        if office_is_reachable:
             st.increment_indexed_office_count()
             actions.append({
                 '_op_type': 'index',
-                '_index': index,
+                '_index': INDEX_NAME,
                 '_type': OFFICE_TYPE,
                 '_id': office.siret,
                 '_source': es_doc,
             })
 
-    logging.info("chunking index actions")
-    batch_actions = chunks(actions, 10000)
-    logging.info("chunking done...")
-    chunk = 0
-    for batch_action in batch_actions:
-        logging.info("chunk %s", chunk)
-        chunk += 1
-        bulk(es, batch_action)
+    bulk_actions(actions)
+
+    completed_jobs_counter.increment()
+
+    logging.info(
+        "COMPLETED indexing offices for departement=%s (%s of %s jobs completed)",
+        departement,
+        completed_jobs_counter.value,
+        len(importer_settings.DEPARTEMENTS),
+    )
+
+    display_performance_stats(departement)
 
 
-def add_offices(index=INDEX_NAME):
+def profile_create_offices_for_departement(departement):
+    """
+    Run create_offices_for_departement with profiling.
+    """
+    profiler = Profile()
+    command = "create_offices_for_departement('%s')" % departement
+    profiler.runctx(command, locals(), globals())
+    relative_filename = 'profiling_results/create_index_dpt%s.kgrind' % departement
+    filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), relative_filename)
+    convert(profiler.getstats(), filename)
+
+
+def add_offices():
     """
     Add offices (complete the data provided by the importer).
     """
@@ -487,10 +552,10 @@ def add_offices(index=INDEX_NAME):
 
             # Create the new office in ES.
             doc = get_office_as_es_doc(office_to_add)
-            es.create(index=index, doc_type=OFFICE_TYPE, id=office_to_add.siret, body=doc)
+            es.create(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_add.siret, body=doc)
 
 
-def remove_offices(index=INDEX_NAME):
+def remove_offices():
     """
     Remove offices (overload the data provided by the importer).
     """
@@ -503,7 +568,7 @@ def remove_offices(index=INDEX_NAME):
     for siret in offices_to_remove:
         # Apply changes in ElasticSearch.
         try:
-            es.delete(index=index, doc_type=OFFICE_TYPE, id=siret)
+            es.delete(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret)
         except TransportError as e:
             if e.status_code != 404:
                 raise
@@ -515,7 +580,7 @@ def remove_offices(index=INDEX_NAME):
             pdf_util.delete_file(office)
 
 
-def update_offices(index=INDEX_NAME):
+def update_offices():
     """
     Update offices (overload the data provided by the importer).
     """
@@ -548,15 +613,17 @@ def update_offices(index=INDEX_NAME):
             # To do this, we perform 2 requests: the first one reset `scores_by_rome`, the
             # second one populate it.
             delete_body = {'doc': {'scores_by_rome': None}}
-            es.update(index=index, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=delete_body, ignore=404)
 
-            es.update(index=index, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body, ignore=404)
+            # Unfortunately these cannot easily be bulked :-(
+            # The reason is there is no way to tell bulk to ignore missing documents (404)
+            # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=delete_body, ignore=404)
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body, ignore=404)
 
             # Delete the current PDF, it will be regenerated at next download attempt.
             pdf_util.delete_file(office)
 
-
-def update_offices_geolocations(index=INDEX_NAME):
+def update_offices_geolocations():
     """
     Remove or add extra geolocations to offices.
     New geolocations are entered into the system through the `OfficeAdminExtraGeoLocation` table.
@@ -578,34 +645,38 @@ def update_offices_geolocations(index=INDEX_NAME):
             office.save()
             # Apply changes in ElasticSearch.
             body = {'doc': {'locations': locations}}
-            es.update(index=index, doc_type=OFFICE_TYPE, id=office.siret, body=body, ignore=404)
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office.siret, body=body, ignore=404)
 
 
-def display_performance_stats():
+def display_performance_stats(departement):
     methods = [
-               'get_score_from_hirings',
+               '_get_score_from_hirings',
                'get_hirings_from_score',
                'get_score_adjusted_to_rome_code_and_naf_code',
               ]
     for method in methods:
-        logging.info("%s : %s", method, getattr(scoring_util, method).cache_info())
+        logging.info("[DPT%s] %s : %s", departement, method, getattr(scoring_util, method).cache_info())
 
-    logging.info("indexed %s of %s offices and %s score_for_rome",
+    logging.info("[DPT%s] indexed %s of %s offices and %s score_for_rome",
+        departement,
         st.indexed_office_count,
         st.office_count,
         st.office_score_for_rome_count
     )
 
 
-def run():
-    parser = argparse.ArgumentParser(description="Update etablissement data with geographic coordinates")
-    parser.add_argument('-d', '--drop-indexes', dest='drop_indexes', help="Drop indexs before updating documents")
-    args = parser.parse_args()
+def update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing):
+    if single_job and not drop_indexes:
+        raise Exception("This combination does not make sense.")
 
-    if args.drop_indexes:
-        logging.info("drop index")
+    if single_job:
         drop_and_create_index()
-        create_offices(ignore_unreachable_offices=True)
+        create_offices_for_departement('57')
+        return
+
+    if drop_indexes:
+        drop_and_create_index()
+        create_offices(enable_profiling, disable_parallel_computing)
         create_job_codes()
         create_locations()
 
@@ -616,8 +687,42 @@ def run():
     update_offices()
     update_offices_geolocations()
 
-    display_performance_stats()
+def update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job, disable_parallel_computing=False):
+    if enable_profiling:
+        logging.info("STARTED run with profiling")
+        profiler = Profile()
+        profiler.runctx(
+            "update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)",
+            locals(),
+            globals()
+        )
+        relative_filename = 'profiling_results/create_index_run.kgrind'
+        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), relative_filename)
+        convert(profiler.getstats(), filename)
+        logging.info("COMPLETED run with profiling: exported profiling result as %s", filename)
+    else:
+        logging.info("STARTED run without profiling")
+        update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)
+        logging.info("COMPLETED run without profiling")
+
+def run():
+    parser = argparse.ArgumentParser(
+        description="Update elasticsearch data: offices, ogr_codes and locations.")
+    parser.add_argument('-d', '--drop-indexes', dest='drop_indexes',
+        help="Drop and recreate index from scratch.")
+    parser.add_argument('-p', '--profile', dest='profile',
+        help="Enable code performance profiling for later visualization with Q/KCacheGrind.")
+    parser.add_argument('-s', '--single-job', dest='single_job',
+        help="Disable parallel computing and run a single office indexing job (departement 57) and nothing else.")
+    args = parser.parse_args()
+
+    drop_indexes = (args.drop_indexes is not None)
+    enable_profiling = (args.profile is not None)
+    single_job = (args.single_job is not None)
+
+    update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job)
 
 
 if __name__ == '__main__':
     run()
+

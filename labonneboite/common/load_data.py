@@ -4,6 +4,17 @@ import csv
 
 from backports.functools_lru_cache import lru_cache
 
+USE_ROME_SLICING_DATASET = False  # Rome slicing dataset is not ready yet
+
+if USE_ROME_SLICING_DATASET:
+    OGR_ROME_FILE = "rome_slicing_dataset/ogr_rome_mapping.csv"
+    ROME_FILE = "rome_slicing_dataset/rome_labels.csv"
+    ROME_NAF_FILE = "rome_slicing_dataset/rome_naf_mapping.csv"
+else:
+    OGR_ROME_FILE = "ogr_rome_mapping.csv"
+    ROME_FILE = "rome_labels.csv"
+    ROME_NAF_FILE = "rome_naf_mapping.csv"
+
 
 def load_file(func, filename):
     full_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/%s" % filename)
@@ -62,7 +73,7 @@ def load_ogr_labels():
 
 @lru_cache(maxsize=None)
 def load_ogr_rome_mapping():
-    rows = load_csv_file("ogr_rome_mapping.csv")
+    rows = load_csv_file(OGR_ROME_FILE)
 
     OGR_COLUMN = 0
     ROME_COLUMN = 1
@@ -84,7 +95,7 @@ def load_ogr_rome_mapping():
 
 @lru_cache(maxsize=None)
 def load_rome_labels():
-    rows = load_csv_file("rome_labels.csv")
+    rows = load_csv_file(ROME_FILE)
 
     ROME_COLUMN = 0
     LABEL_COLUMN = 1
@@ -113,7 +124,7 @@ def load_naf_labels():
 
 @lru_cache(maxsize=None)
 def load_rome_naf_mapping():
-    return load_csv_file("rome_naf_mapping.csv", delimiter=',')
+    return load_csv_file(ROME_NAF_FILE, delimiter=',')
 
 
 

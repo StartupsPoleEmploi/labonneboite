@@ -30,6 +30,8 @@
         - python-mysqldb
         - chromium-chromedriver
         - xvfb
+        - graphviz
+        - htop
       become: true
 
     - name: Install french locale.
