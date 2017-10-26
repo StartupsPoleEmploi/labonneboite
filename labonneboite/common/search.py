@@ -95,6 +95,25 @@ class Fetcher(object):
             headcount_filter=self.headcount_filter,
         )
 
+    def get_all_companies_naf(self):
+        es_companies, _ = self.get_all_companies()
+        return list(set([es_company.naf for es_company in es_companies]))
+
+    def get_all_companies(self):
+        return get_companies(
+            {}, # No naf filter
+            self.rome,
+            self.latitude,
+            self.longitude,
+            self.distance,
+            flag_alternance=self.flag_alternance,
+            flag_junior=self.flag_junior,
+            flag_senior=self.flag_senior,
+            flag_handicap=self.flag_handicap,
+            headcount_filter=self.headcount_filter,
+            size=200
+        )
+
     def get_companies(self):
 
         self.company_count = self._get_company_count(self.rome, self.distance)
@@ -163,15 +182,21 @@ def count_companies(naf_codes, rome_code, latitude, longitude, distance, **kwarg
     res = es.count(index=index, doc_type="office", body=json_body)
     return res["count"]
 
-
 def get_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
     index = kwargs.pop('index', 'labonneboite')
     json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
+
     try:
         distance_sort = kwargs['sort'] == 'distance'
     except KeyError:
         distance_sort = True
-    companies, companies_count = get_companies_from_es_and_db(json_body, index=index, distance_sort=distance_sort)
+
+    try:
+        size = kwargs['size']
+    except KeyError:
+        size = 10
+
+    companies, companies_count = get_companies_from_es_and_db(json_body, index=index, distance_sort=distance_sort, size=size)
     companies = shuffle_companies(companies, distance_sort, rome_code)
     return companies, companies_count
 
@@ -367,7 +392,7 @@ def build_json_body_elastic_search(
     return json_body
 
 
-def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonneboite"):
+def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonneboite", size=10):
     """
     Fetch companies first from Elasticsearch, then from the database.
 
@@ -376,7 +401,7 @@ def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonnebo
     in Elasticsearch) and `companies_count` an integer of the results number.
     """
     es = Elasticsearch()
-    res = es.search(index=index, doc_type="office", body=json_body)
+    res = es.search(index=index, doc_type="office", body=json_body, size=size)
     logger.info("Elastic Search request : %s", json_body)
 
     companies = []
