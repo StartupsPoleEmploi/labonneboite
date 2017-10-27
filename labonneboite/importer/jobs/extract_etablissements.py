@@ -1,6 +1,5 @@
 import sys
 import pandas as pd
-from backports.functools_lru_cache import lru_cache
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
@@ -10,24 +9,6 @@ from labonneboite.common import encoding as encoding_util
 from labonneboite.conf import get_current_env, ENV_LBBDEV
 from .base import Job
 from .common import logger
-
-@lru_cache(maxsize=128*1024)
-def get_departement_from_zipcode(zipcode):
-    zipcode = zipcode.strip()
-    departement = None
-    if len(zipcode) in range(1, 6):
-        if len(zipcode) == 1:
-            departement = "0%s" % zipcode[0]
-        elif len(zipcode) == 2:
-            departement = zipcode
-        elif len(zipcode) == 4:
-            departement = "0%s" % zipcode[0]
-        elif len(zipcode) == 5:
-            departement = zipcode[:2]
-    if departement == "2A" or departement == "2B":
-        departement = "20"
-    return departement
-
 
 @timeit
 def check_departements(departements):
@@ -232,7 +213,7 @@ class EtablissementExtractJob(Job):
                 email = encoding_util.strip_french_accents(email)
 
                 if codecommune.strip():
-                    departement = get_departement_from_zipcode(codepostal)
+                    departement = import_util.get_departement_from_zipcode(codepostal)
                     process_this_departement = departement in departements
                     if process_this_departement:
 
@@ -294,7 +275,7 @@ if __name__ == "__main__":
     if get_current_env() == ENV_LBBDEV:
         etablissement_filename = sys.argv[1]
     else:
-        with open(import_util.JENKINS_PROPERTIES_FILENAME, "r") as f:
+        with open(import_util.JENKINS_ETAB_PROPERTIES_FILENAME, "r") as f:
             # file content looks like this:
             # LBB_ETABLISSEMENT_INPUT_FILE=/srv/lbb/labonneboite/importer/data/LBB_EGCEMP_ENTREPRISE_123.csv.bz2\n
             etablissement_filename = f.read().strip().split('=')[1]

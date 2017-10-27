@@ -6,6 +6,7 @@ import subprocess
 from functools import wraps
 from time import time
 from datetime import datetime
+from backports.functools_lru_cache import lru_cache
 
 import logging
 import MySQLdb as mdb
@@ -27,21 +28,22 @@ TRANCHE_AGE_MIDDLE = "26-50"
 OFFICE_FLAGS = ['flag_alternance', 'flag_junior', 'flag_senior', 'flag_handicap']
 
 if get_current_env() == ENV_LBBDEV:
-    JENKINS_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties.jenkins")
+    JENKINS_ETAB_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties.jenkins")
+    JENKINS_DPAE_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties_dpae.jenkins")
     MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 1000
 else:
-    JENKINS_PROPERTIES_FILENAME = os.path.join(
+    JENKINS_ETAB_PROPERTIES_FILENAME = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "jenkins/properties.jenkins",
+    )
+    JENKINS_DPAE_PROPERTIES_FILENAME = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "jenkins/properties_dpae.jenkins",
     )
     MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 0
 
 
 class DepartementException(Exception):
-    pass
-
-
-class TooFewFieldsException(Exception):
     pass
 
 
@@ -300,10 +302,7 @@ def parse_dpae_line(line):
             len(fields), required_fields, line
         ))
         logger.error(msg)
-        if len(fields) < required_fields:
-            raise TooFewFieldsException
-        else:
-            raise Exception("found a row with wrong number of columns [%s]" % msg)
+        raise IndexError(msg)
 
     siret = fields[0]
     hiring_date_raw = fields[7]
@@ -314,7 +313,7 @@ def parse_dpae_line(line):
     except ValueError:
         zipcode = None
 
-    departement = extract_departement_from_zipcode(str(zipcode), siret)
+    departement = get_departement_from_zipcode(zipcode)
 
     try:
         contract_type = int(fields[8])
@@ -340,7 +339,7 @@ def parse_dpae_line(line):
     try:
         tranche_age = choices[remove_exotic_characters(fields[22])]
     except KeyError:
-        raise Exception("unknown tranche_age %s" % fields[22])
+        raise ValueError("unknown tranche_age %s" % fields[22])
 
     handicap_label = fields[23]
 
@@ -371,4 +370,20 @@ def get_reader(filename):
     return open_file(filename, "r")
 
 
+@lru_cache(maxsize=128*1024)
+def get_departement_from_zipcode(zipcode):
+    zipcode = str(zipcode).strip()
+    departement = None
+    if len(zipcode) in range(1, 6):
+        if len(zipcode) == 1:
+            departement = "0%s" % zipcode[0]
+        elif len(zipcode) == 2:
+            departement = zipcode
+        elif len(zipcode) == 4:
+            departement = "0%s" % zipcode[0]
+        elif len(zipcode) == 5:
+            departement = zipcode[:2]
+    if departement == "2A" or departement == "2B":
+        departement = "20"
+    return departement
 

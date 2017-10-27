@@ -194,6 +194,7 @@ run_importer_jobs:
 	make run_importer_job_00_reset_all && \
 	make run_importer_job_01_check_etablissements && \
 	make run_importer_job_02_extract_etablissements && \
+	make run_importer_job_03_check_dpae && \
 	echo done
 
 run_importer_job_00_reset_all:
@@ -214,4 +215,10 @@ run_importer_job_02_extract_etablissements:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
 		python jobs/extract_etablissements.py';
+
+run_importer_job_03_check_dpae:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		cp tests/data/LBB_XDPDPA_DPAE_20151110_20161210_20161210_094110.csv data/ && \
+		python jobs/check_dpae.py';
 

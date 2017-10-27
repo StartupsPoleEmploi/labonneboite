@@ -2,7 +2,7 @@ from labonneboite.importer.jobs import check_dpae
 from labonneboite.importer.jobs import extract_dpae
 from labonneboite.importer.models.computing import Dpae
 from labonneboite.importer.tests.test_base import DatabaseTest
-from labonneboite.importer.util import extract_departement_from_zipcode
+from labonneboite.importer.util import get_departement_from_zipcode
 
 
 class TestDpae(DatabaseTest):
@@ -32,7 +32,7 @@ class TestDpae(DatabaseTest):
         self.assertEquals(Dpae.query.count(), 6+2)
 
     def test_extract_departement(self):
-        departement = extract_departement_from_zipcode("6600", None)
+        departement = get_departement_from_zipcode("6600")
         self.assertEqual(departement, "06")
 
     def test_extract_gz_format(self):
