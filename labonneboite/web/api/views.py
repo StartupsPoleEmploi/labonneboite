@@ -174,6 +174,7 @@ def company_list():
         flag_alternance=flag_alternance,
         sort=sort,
         index=settings.ES_INDEX,
+        size=page_size
     )
 
     result = {

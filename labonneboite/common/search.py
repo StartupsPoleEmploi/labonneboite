@@ -254,7 +254,8 @@ def build_json_body_elastic_search(
         flag_alternance=0,
         flag_junior=0,
         flag_senior=0,
-        flag_handicap=0):
+        flag_handicap=0,
+        size=10):
 
     score_for_rome_field_name = "scores_by_rome.%s" % rome_code
 
