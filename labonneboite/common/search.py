@@ -96,11 +96,7 @@ class Fetcher(object):
         )
 
     def get_all_companies_naf(self):
-        es_companies, _ = self.get_all_companies()
-        return list(set([es_company.naf for es_company in es_companies]))
-
-    def get_all_companies(self):
-        return get_companies(
+        _, _, aggregations = get_companies(
             {}, # No naf filter
             self.rome,
             self.latitude,
@@ -111,8 +107,9 @@ class Fetcher(object):
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount_filter=self.headcount_filter,
-            size=200
+            aggregate_by="naf"
         )
+        return [naf_aggregate['key'] for naf_aggregate in aggregations]
 
     def get_companies(self):
 
@@ -137,7 +134,7 @@ class Fetcher(object):
 
         result = []
         if self.company_count:
-            result, _ = get_companies(
+            result, _, _ = get_companies(
                 self.naf_codes,
                 self.rome,
                 self.latitude,
@@ -191,14 +188,14 @@ def get_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
     except KeyError:
         distance_sort = True
 
-    try:
-        size = kwargs['size']
-    except KeyError:
-        size = 10
-
-    companies, companies_count = get_companies_from_es_and_db(json_body, index=index, distance_sort=distance_sort, size=size)
+    companies, companies_count, aggregations = get_companies_from_es_and_db(json_body, index=index, distance_sort=distance_sort)
     companies = shuffle_companies(companies, distance_sort, rome_code)
-    return companies, companies_count
+
+    # Extract aggregation
+    if aggregations:
+        aggregations = aggregations[kwargs["aggregate_by"]]["buckets"]
+
+    return companies, companies_count, aggregations
 
 
 def shuffle_companies(companies, distance_sort, rome_code):
@@ -255,7 +252,7 @@ def build_json_body_elastic_search(
         flag_junior=0,
         flag_senior=0,
         flag_handicap=0,
-        size=10):
+        aggregate_by=None):
 
     score_for_rome_field_name = "scores_by_rome.%s" % rome_code
 
@@ -382,6 +379,15 @@ def build_json_body_elastic_search(
         }
     }
 
+    # Add aggregate
+    if aggregate_by:
+        json_body['aggs'] = {}
+        json_body['aggs'][aggregate_by] = {
+            "terms" : {
+                "field": aggregate_by
+            }
+        }
+
     if from_number:
         json_body["from"] = from_number - 1
         if to_number:
@@ -393,7 +399,7 @@ def build_json_body_elastic_search(
     return json_body
 
 
-def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonneboite", size=10):
+def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonneboite"):
     """
     Fetch companies first from Elasticsearch, then from the database.
 
@@ -402,7 +408,7 @@ def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonnebo
     in Elasticsearch) and `companies_count` an integer of the results number.
     """
     es = Elasticsearch()
-    res = es.search(index=index, doc_type="office", body=json_body, size=size)
+    res = es.search(index=index, doc_type="office", body=json_body)
     logger.info("Elastic Search request : %s", json_body)
 
     companies = []
@@ -439,7 +445,13 @@ def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonnebo
                 logging.info("company siret %s does not have city, ignoring...", siret)
 
     companies_count = res['hits']['total']
-    return companies, companies_count
+
+    try:
+        aggregations = res['aggregations']
+    except KeyError:
+        aggregations = []
+
+    return companies, companies_count, aggregations
 
 
 def build_location_suggestions(term):

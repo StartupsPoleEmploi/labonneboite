@@ -20,7 +20,7 @@ class ApiGenericTest(ApiBaseTest):
         latitude = 49.305658  # 15 Avenue François Mitterrand, 57290 Fameck, France.
         longitude = 6.116853
         distance = 100
-        companies, _ = get_companies(
+        companies, _, _ = get_companies(
             naf_codes,
             rome_code,
             latitude,
@@ -40,7 +40,7 @@ class ApiGenericTest(ApiBaseTest):
         longitude = 6.116853
         distance = 100
         headcount_filter = settings.HEADCOUNT_SMALL_ONLY
-        companies, _ = get_companies(
+        companies, _, _ = get_companies(
             naf_codes,
             rome_code,
             latitude,
