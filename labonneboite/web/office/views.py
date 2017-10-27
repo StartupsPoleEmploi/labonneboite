@@ -18,6 +18,7 @@ from labonneboite.common import util
 from labonneboite.common.email_util import MandrillClient
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
+from labonneboite.conf.common.contact_mode import CONTACT_MODE_STAGES
 
 from labonneboite.web.office.forms import OfficeRemovalForm
 
@@ -136,7 +137,7 @@ def download(siret=None):
         dic = detail(siret)
         office = dic['company']
         pdf_target = StringIO.StringIO()
-        dic['stages'] = settings.CONTACT_MODE_STAGES[dic['contact_mode']]
+        dic['stages'] = CONTACT_MODE_STAGES[dic['contact_mode']]
         dic['date'] = date.today()
         pdf_data = render_template('office/pdf_detail.html', **dic)
         pisa.CreatePDF(StringIO.StringIO(pdf_data), pdf_target, link_callback=fetch_resources)
