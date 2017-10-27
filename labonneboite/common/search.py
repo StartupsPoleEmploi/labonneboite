@@ -109,9 +109,9 @@ class Fetcher(object):
             headcount_filter=self.headcount_filter,
             aggregate_by="naf"
         )
-        return [naf_aggregate['key'] for naf_aggregate in aggregations]
+        return aggregations
 
-    def get_companies(self):
+    def get_companies(self, aggregate_by=None):
 
         self.company_count = self._get_company_count(self.rome, self.distance)
         logger.debug("set company_count to %s from get_companies", self.company_count)
@@ -132,9 +132,9 @@ class Fetcher(object):
             self.from_number = 1
             self.to_number = 10
 
-        result = []
+        result = aggregations = []
         if self.company_count:
-            result, _, _ = get_companies(
+            result, _, aggregations = get_companies(
                 self.naf_codes,
                 self.rome,
                 self.latitude,
@@ -149,6 +149,7 @@ class Fetcher(object):
                 headcount_filter=self.headcount_filter,
                 sort=self.sort,
                 index=settings.ES_INDEX,
+                aggregate_by="naf"
             )
 
         if self.company_count < 10:
@@ -168,7 +169,7 @@ class Fetcher(object):
                     last_count = company_count
                     self.alternative_distances[distance] = (distance_label, last_count)
 
-        return result
+        return result, aggregations
 
 
 def count_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
@@ -194,6 +195,7 @@ def get_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
     # Extract aggregation
     if aggregations:
         aggregations = aggregations[kwargs["aggregate_by"]]["buckets"]
+        aggregations = [{ "naf": naf_aggregate['key'], "count" : naf_aggregate['doc_count']} for naf_aggregate in aggregations]
 
     return companies, companies_count, aggregations
 

@@ -155,7 +155,7 @@ def results(city, zipcode, occupation):
 
     if not location_error:
         current_app.logger.debug("fetching companies and company_count")
-        companies = fetcher.get_companies()
+        companies, naf_aggregations = fetcher.get_companies()
         for alternative, count in fetcher.alternative_rome_codes.iteritems():
             if settings.ROME_DESCRIPTIONS.get(alternative) and count:
                 desc = settings.ROME_DESCRIPTIONS.get(alternative)
@@ -178,11 +178,13 @@ def results(city, zipcode, occupation):
         company.position = position
 
     # Get NAF code and their descriptions.
-    naf_codes = fetcher.get_all_companies_naf()
+    if kwargs["naf"]:
+        naf_aggregations = fetcher.get_all_companies_naf()
+
     naf_codes_with_descriptions = []
-    for naf_code in naf_codes:
-        naf_description = settings.NAF_CODES.get(naf_code)
-        naf_codes_with_descriptions.append((naf_code, naf_description))
+    for naf_aggregate in naf_aggregations:
+        naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["naf"]), naf_aggregate["count"])
+        naf_codes_with_descriptions.append((naf_aggregate["naf"], naf_description))
 
     form_kwargs['job'] = settings.ROME_DESCRIPTIONS[rome]
     form = CompanySearchForm(**form_kwargs)
