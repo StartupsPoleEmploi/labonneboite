@@ -6,9 +6,9 @@ import subprocess
 from functools import wraps
 from time import time
 from datetime import datetime
+import logging
 from backports.functools_lru_cache import lru_cache
 
-import logging
 import MySQLdb as mdb
 
 from labonneboite.importer import settings as importer_settings
@@ -44,6 +44,10 @@ else:
 
 
 class DepartementException(Exception):
+    pass
+
+
+class InvalidRowException(Exception):
     pass
 
 
@@ -302,7 +306,7 @@ def parse_dpae_line(line):
             len(fields), required_fields, line
         ))
         logger.error(msg)
-        raise IndexError(msg)
+        raise InvalidRowException(msg)
 
     siret = fields[0]
     hiring_date_raw = fields[7]

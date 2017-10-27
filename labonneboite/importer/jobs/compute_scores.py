@@ -107,7 +107,7 @@ class ScoreComputingJob(Job):
         return results
 
 
-if __name__ == "__main__":
+def run_main():
     import_util.clean_tables()
     task = ScoreComputingJob()
     results = task.run()
@@ -131,3 +131,8 @@ if __name__ == "__main__":
     import_util.reduce_scores_for_main_db(departements)
     import_util.clean_tables()
     logger.info("compute_scores task: FINISHED")
+
+
+if __name__ == "__main__":
+    run_main()
+    

@@ -4,15 +4,22 @@ Etablissements are imported for Pole Emploi databases without geo coordinates.
 This module assists in finding and assigning geo coordinates to etablissements.
 
 """
-
-from labonneboite.common.database import db_session
-
-import gevent.monkey
-gevent.monkey.patch_socket()
-
 import requests
 import gevent
 from gevent.pool import Pool
+import gevent.monkey
+
+from labonneboite.common.database import db_session
+from labonneboite.common.load_data import load_city_codes
+from labonneboite.importer import settings
+from labonneboite.importer import util as import_util
+from labonneboite.importer.models.computing import Geolocation
+from sqlalchemy.exc import IntegrityError
+from .base import Job
+from .common import logger
+
+gevent.monkey.patch_socket()
+
 connection_limit = 10
 adapter = requests.adapters.HTTPAdapter(pool_connections=connection_limit,
                                         pool_maxsize=connection_limit,
@@ -23,16 +30,8 @@ jobs = []
 pool_size = 10
 pool = Pool(pool_size)
 
-from labonneboite.common.load_data import load_city_codes
 CITY_NAMES = load_city_codes()
-
-from labonneboite.importer import settings
-from labonneboite.importer import util as import_util
-from labonneboite.importer.models.computing import Geolocation
-from .base import Job
-from .common import logger
-
-from sqlalchemy.exc import IntegrityError
+GEOCODING_STATS = {}
 
 
 class IncorrectAdressDataException(Exception):
@@ -41,9 +40,6 @@ class IncorrectAdressDataException(Exception):
 
 class AbnormallyLowGeocodingRatioException(Exception):
     pass
-
-
-GEOCODING_STATS = {}
 
 
 class GeocodeJob(Job):
@@ -62,7 +58,17 @@ class GeocodeJob(Job):
         return full_address.strip()
 
     def create_geocoding_jobs(self):
-        query = """select siret, numerorue, libellerue, codepostal, codecommune, coordinates_x, coordinates_y from %s""" % (settings.EXPORT_ETABLISSEMENT_TABLE)
+        query = """
+            select
+                siret,
+                numerorue,
+                libellerue,
+                codepostal,
+                codecommune,
+                coordinates_x,
+                coordinates_y
+            from %s
+        """ % (settings.EXPORT_ETABLISSEMENT_TABLE)
         _, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
@@ -93,11 +99,17 @@ class GeocodeJob(Job):
         con, cur = import_util.create_cursor()
         count = 0
         statements = []
-        update_query = "update %s set coordinates_x=%%s, coordinates_y=%%s where siret=%%s" % settings.EXPORT_ETABLISSEMENT_TABLE
+        update_query = "update %s set coordinates_x=%%s, coordinates_y=%%s where siret=%%s" % \
+            settings.EXPORT_ETABLISSEMENT_TABLE
         for siret, coordinates in coordinates_updates:
             statements.append([coordinates[0], coordinates[1], siret])
             if not count % 1000:
-                logger.info("geocoding with ban... %i done (example: coordinates_x=%s, coordinates_y=%s", count, statements[0][0], statements[0][1])
+                logger.info(
+                    "geocoding with ban... %i done (example: coordinates_x=%s, coordinates_y=%s",
+                    count,
+                    statements[0][0],
+                    statements[0][1]
+                )
                 cur.executemany(update_query, statements)
                 con.commit()
                 statements = []

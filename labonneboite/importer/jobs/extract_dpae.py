@@ -14,11 +14,10 @@ from sqlalchemy.exc import OperationalError
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import parse_dpae_line, DepartementException, TooFewFieldsException
+from labonneboite.importer.util import parse_dpae_line, DepartementException, InvalidRowException
 from labonneboite.importer.models.computing import DpaeStatistics, ImportTask
 from .base import Job
 from .common import logger
-
 
 class DpaeExtractJob(Job):
     file_type = "dpae"
@@ -52,7 +51,20 @@ class DpaeExtractJob(Job):
         count = 0
         statements = []
         something_new = False
-        query = "INSERT into %s(siret, hiring_date, zipcode, contract_type, departement, contract_duration, iiann, tranche_age, handicap_label) values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)" % settings.DPAE_TABLE
+        query = """
+            INSERT into %s(
+                siret,
+                hiring_date,
+                zipcode,
+                contract_type,
+                departement,
+                contract_duration,
+                iiann,
+                tranche_age,
+                handicap_label
+                )
+            values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
+        """ % settings.DPAE_TABLE
         imported_dpae = 0
         imported_dpae_distribution = {}
         not_imported_dpae = 0
@@ -85,22 +97,31 @@ class DpaeExtractJob(Job):
                         statements = []
                         raise
                 try:
-                    siret, hiring_date, zipcode, contract_type, departement, contract_duration, iiann, tranche_age, handicap_label = parse_dpae_line(line)
+                    siret, hiring_date, zipcode, contract_type, departement, contract_duration, \
+                    iiann, tranche_age, handicap_label = parse_dpae_line(line)
                 except ValueError:
                     self.zipcode_errors += 1
                     continue
                 except DepartementException:
                     self.zipcode_errors += 1
                     continue
-                except TooFewFieldsException:
+                except InvalidRowException:
                     logger.info("invalid_row met at row: %i", count)
                     self.invalid_row_errors += 1
                     continue
 
                 if hiring_date > initial_most_recent_data_date and hiring_date <= self.most_recent_data_date:
-                    statement = (siret, hiring_date, zipcode, contract_type,
-                                 departement, contract_duration, iiann,
-                                 tranche_age, handicap_label)
+                    statement = (
+                        siret,
+                        hiring_date,
+                        zipcode,
+                        contract_type,
+                        departement,
+                        contract_duration,
+                        iiann,
+                        tranche_age,
+                        handicap_label
+                    )
                     statements.append(statement)
                     imported_dpae += 1
 

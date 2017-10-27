@@ -2,7 +2,6 @@
 """
 Validates scoring data produced by compute_scores.
 """
-
 from labonneboite.importer import sanity
 from .common import logger
 
