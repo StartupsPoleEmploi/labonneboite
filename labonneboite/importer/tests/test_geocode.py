@@ -1,12 +1,11 @@
 from labonneboite.common.models import Office
 from labonneboite.importer.jobs.geocode import GeocodeJob
 from labonneboite.importer.jobs.geocode import GeocodeUnit
-from labonneboite.importer.models.computing import ExportableOffice as ComputingOffice
 from labonneboite.importer.tests.test_base import DatabaseTest
 
 
 def make_geocoded_office():
-    office = ComputingOffice(
+    office = Office(
         siret=1234,
         street_number="30",
         street_name="rue Edouard Poisson",

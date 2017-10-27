@@ -1,10 +1,10 @@
 from labonneboite.importer import sanity
-from labonneboite.importer.models.computing import ExportableOffice
+from labonneboite.common.models import Office
 from labonneboite.importer.tests.test_base import DatabaseTest
 
 
 def make_office(departement="04", siret="1234", score=60):
-    office = ExportableOffice(departement=departement, siret=siret, score=score)
+    office = Office(departement=departement, siret=siret, score=score)
     return office
 
 

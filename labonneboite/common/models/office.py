@@ -48,8 +48,8 @@ class OfficeMixin(object):
     departement = Column('departement', String(8), nullable=False)
     headcount = Column('trancheeffectif', String(2))
     score = Column('score', Integer, default=0, nullable=False)
-    x = Column('coordinates_x', Float, nullable=False)  # Longitude.
-    y = Column('coordinates_y', Float, nullable=False)  # Latitude.
+    x = Column('coordinates_x', Float)  # Longitude.
+    y = Column('coordinates_y', Float)  # Latitude.
 
 
 class Office(OfficeMixin, CRUDMixin, Base):

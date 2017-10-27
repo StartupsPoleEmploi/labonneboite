@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import and_
 
-from labonneboite.importer.models.computing import Dpae, ExportableOffice
+from labonneboite.importer.models.computing import Dpae
+from labonneboite.common.models import Office
 
 from labonneboite.importer.tests.test_base import DatabaseTest
 
@@ -23,8 +24,8 @@ class ScoringTest(DatabaseTest):
         departements = ["10", "20", "30", "40", "50", "57", "60", "70", "75", "80", "90", "92"]
 
         for departement in departements:
-            offices = ExportableOffice.query.filter(
-                and_(ExportableOffice.departement == departement, ExportableOffice.score > 50)).limit(1000)
+            offices = Office.query.filter(
+                and_(Office.departement == departement, Office.score > 50)).limit(1000)
 
             last_year = datetime.now() - timedelta(days=FIFTEEN_MONTHS)
 
