@@ -26,8 +26,8 @@ class DpaeExtractJob(Job):
     import_type = ImportTask.DPAE
     table_name = settings.DPAE_TABLE
 
-    def __init__(self, dpae_gz_filename):
-        self.input_filename = dpae_gz_filename
+    def __init__(self, filename):
+        self.input_filename = filename
         self.most_recent_data_date = None
         self.zipcode_errors = 0
         self.invalid_row_errors = 0
