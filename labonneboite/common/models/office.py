@@ -11,6 +11,7 @@ from labonneboite.common import encoding as encoding_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common.database import Base
 from labonneboite.common.load_data import load_city_codes
+from labonneboite.common import util
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
 
@@ -96,6 +97,7 @@ class Office(OfficeMixin, CRUDMixin, Base):
             'siret': self.siret,
             'stars': self.get_stars_for_rome_code(rome_code),
             'url': self.get_url_for_rome_code(rome_code),
+            'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
             # Warning: the `distance` field is added by `get_companies_from_es_and_db`,
             # this is NOT a model field or property!
             'distance': self.distance,
@@ -275,25 +277,3 @@ class Office(OfficeMixin, CRUDMixin, Base):
                 return False
             return True
         return False
-
-
-CONTACT_MODE_STAGES = {
-    u"Se présenter spontanément": [
-        u"Se présenter à l'adresse indiquée avec CV et photo",
-        u"Demander le nom d'un contact pour relancer",
-        u"Relancer votre interlocuteur par téléphone",
-        u"Déclarer votre reprise d'emploi à Pôle emploi :-)",
-    ],
-    u"Envoyer un CV et une lettre de motivation": [
-        (u"Rechercher le nom d'un contact dans l'entreprise (google, kompass, linkedin, viadeo, votre réseau) "
-            u"pour lui adresser votre courrier/email"),
-        (u"Rechercher des informations économiques (projet, évolution) sur l'entreprise afin de personnaliser "
-            u"votre lettre de motivation"),
-        u"Envoyer votre CV et votre lettre de motivation",
-        u"Relancer votre interlocuteur par téléphone",
-        u"Préparer votre entretien",
-        u"Déclarer votre reprise d'emploi à Pôle emploi :-)",
-    ]
-}
-
-CONTACT_MODE_DEFAULT = u"Envoyer un CV et une lettre de motivation"

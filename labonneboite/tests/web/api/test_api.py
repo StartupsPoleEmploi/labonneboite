@@ -637,3 +637,17 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(len(data['companies']), 1)
         self.assertEqual(data['companies'][0]['siret'], u'00000000000013')
         self.assertEqual(data['companies'][0]['headcount_text'], u'100 à 199 salariés')
+
+    def test_contact_mode(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['caen']['commune_id'],
+            'rome_codes': u'D1405',
+            'user': u'labonneboite',
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        self.assertEqual(data['companies_count'], 1)
+        self.assertEqual(len(data['companies']), 1)
+        self.assertEqual(data['companies'][0]['siret'], u'00000000000004')
+        self.assertEqual(data['companies'][0]['contact_mode'], u'Envoyer un CV et une lettre de motivation')
