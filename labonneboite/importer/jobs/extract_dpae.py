@@ -16,8 +16,10 @@ from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import parse_dpae_line, DepartementException, InvalidRowException
 from labonneboite.importer.models.computing import DpaeStatistics, ImportTask
+from labonneboite.conf import get_current_env, ENV_LBBDEV
 from .base import Job
 from .common import logger
+
 
 class DpaeExtractJob(Job):
     file_type = "dpae"
@@ -163,6 +165,10 @@ if __name__ == "__main__":
     import logging
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger('main')
-    filename = sys.argv[1]
-    task = DpaeExtractJob(filename)
+    if get_current_env() == ENV_LBBDEV:
+        dpae_filename = sys.argv[1]
+    else:
+        with open(import_util.JENKINS_DPAE_PROPERTIES_FILENAME, "r") as f:
+            dpae_filename = f.read().strip().split('=')[1]
+    task = DpaeExtractJob(dpae_filename)
     task.run()

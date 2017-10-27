@@ -195,14 +195,17 @@ run_importer_jobs:
 	make run_importer_job_01_check_etablissements && \
 	make run_importer_job_02_extract_etablissements && \
 	make run_importer_job_03_check_dpae && \
+	make run_importer_job_04_extract_dpae && \
 	echo done
 
 run_importer_job_00_reset_all:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		rm data/*.csv ; rm jenkins/*.jenkins ; \
+		rm data/*.csv ; \
+		rm jenkins/*.jenkins ; \
 		echo delete from import_tasks | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		echo delete from etablissements_importer | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		echo delete from dpae_statistics | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		echo done';
 
 run_importer_job_01_check_etablissements:
@@ -221,4 +224,9 @@ run_importer_job_03_check_dpae:
 		cd /srv/lbb/labonneboite && cd importer && \
 		cp tests/data/LBB_XDPDPA_DPAE_20151110_20161210_20161210_094110.csv data/ && \
 		python jobs/check_dpae.py';
+
+run_importer_job_04_extract_dpae:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/extract_dpae.py';
 
