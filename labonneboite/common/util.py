@@ -84,6 +84,8 @@ def user_is_pro():
     return False
 
 def pro_version_enabled():
+    if not user_is_pro() and 'pro_version' in session:
+        session.pop('pro_version')
     return session.get('pro_version', False)
 
 def get_doorbell_tags(tag):
