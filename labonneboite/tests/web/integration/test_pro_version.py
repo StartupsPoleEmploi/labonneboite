@@ -11,7 +11,10 @@ class ProVersionTest(DatabaseTest):
 
     def test_user_is_pro(self):
         """
-        Test that the Pro Version is correctly detected in various cases.
+        Test that the Pro user is correctly detected in various cases.
+
+        Note : A pro user can be defined by his IP address too but it's not possible to test.
+        So, only tests by email are provided
         """
         self.assertIn('@pole-emploi.fr', settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
 
@@ -19,17 +22,16 @@ class ProVersionTest(DatabaseTest):
         user_public = User.create(email=u'john.doe@gmail.com', gender=u'male', first_name=u'John', last_name=u'Doe')
 
         with self.test_request_context:
-
-            # Pro Version should be disabled for non logged users.
+            # User which is not logged in should not be considered a pro user.
             self.assertFalse(util.user_is_pro())
 
-            # Pro Version should be enabled for a user with a PRO email.
+            # User with a pro email should be considered as a pro user.
             self.login(user_pro)
             self.assertTrue(util.user_is_pro())
             self.logout()
             self.assertFalse(util.user_is_pro())
 
-            # # Pro Version should be disabled for a user with a non PRO email.
+            # User with a non pro email should not be considered a pro user.
             self.login(user_public)
             self.assertFalse(util.user_is_pro())
             self.logout()
@@ -37,7 +39,7 @@ class ProVersionTest(DatabaseTest):
 
     def test_enable_disable_pro_version_view(self):
         """
-        Test that the Pro Version is correctly enabled/desabled.
+        Test that the Pro Version is correctly enabled/disabled.
         """
         self.assertIn('@pole-emploi.fr', settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
 
@@ -52,6 +54,7 @@ class ProVersionTest(DatabaseTest):
             # Log the user in.
             self.login(user_pro)
             self.assertTrue(util.user_is_pro())
+            self.assertFalse(util.pro_version_enabled(), False)
 
             with self.app.session_transaction() as sess:
                 self.assertNotIn('pro_version', sess)
@@ -64,11 +67,13 @@ class ProVersionTest(DatabaseTest):
             with self.app.session_transaction() as sess:
                 self.assertIn('pro_version', sess)
                 self.assertTrue(sess['pro_version'])
+                self.assertFalse(util.pro_version_enabled(), True)
 
             # Disable pro version.
             rv = self.app.get(url)
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, next_url)
-
+            self.assertFalse(util.pro_version_enabled(), False)
+            
             with self.app.session_transaction() as sess:
                 self.assertNotIn('pro_version', sess)
