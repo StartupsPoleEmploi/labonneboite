@@ -23,7 +23,7 @@ def static_from_root():
 
 @rootBlueprint.route('/kit.pdf')
 def kit():
-    if util.user_is_pro() and util.pro_version_enabled():
+    if util.pro_version_enabled():
         return send_from_directory(current_app.static_folder, 'kit.pdf')
     abort(404)
 
@@ -65,6 +65,6 @@ def cookbook():
 
 @rootBlueprint.route('/stats')
 def stats():
-    if util.user_is_pro() and util.pro_version_enabled():
+    if util.pro_version_enabled():
         return redirect('https://datastudio.google.com/open/0B0PPPCjOppNIdVNXVVM0QnJHNEE')
     abort(404)
