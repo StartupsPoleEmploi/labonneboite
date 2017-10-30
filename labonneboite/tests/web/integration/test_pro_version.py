@@ -63,11 +63,11 @@ class ProVersionTest(DatabaseTest):
             rv = self.app.get(url)
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, next_url)
+            self.assertTrue(util.pro_version_enabled())
 
             with self.app.session_transaction() as sess:
                 self.assertIn('pro_version', sess)
                 self.assertTrue(sess['pro_version'])
-                self.assertTrue(util.pro_version_enabled())
 
             # Disable pro version.
             rv = self.app.get(url)

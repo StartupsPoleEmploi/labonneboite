@@ -164,11 +164,10 @@
             <a href="{{ url_for('root.kit') }}" title="Télécharger le kit de présentation de La Bonne Boite">Boîte à outils (fichier <abbr title="Portable Document Format">PDF</abbr>, 400 <abbr title="Kilo octets">ko</abbr>)</a>
             <small class="badge badge-info">PRO</small>
           </li>
-          <li>
-            <a href="{{ url_for('root.stats') }}" title="Consulter nos statistiques sur google analytics">Statistiques</a>
-            <small class="badge badge-info">PRO</small>
-          </li>
         {% endif %}
+        <li>
+          <a href="{{ url_for('root.stats') }}" title="Consulter nos statistiques sur Google Analytics">Statistiques</a>
+        </li>
       </ul>
     </div>
   </footer>
