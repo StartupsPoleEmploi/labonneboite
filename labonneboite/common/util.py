@@ -9,9 +9,9 @@ import urllib
 from flask import request, session
 from flask_login import current_user
 
-from labonneboite.common.load_data import load_contact_modes
-from labonneboite.common.models import CONTACT_MODE_DEFAULT
 from labonneboite.conf import settings
+from labonneboite.conf.common.contact_mode import CONTACT_MODE_DEFAULT
+from labonneboite.common.load_data import load_contact_modes
 
 
 logger = logging.getLogger('main')
