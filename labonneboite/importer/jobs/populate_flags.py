@@ -146,8 +146,9 @@ def make_link_file_to_new_archive(archive_path):
 
 
 if __name__ == "__main__":
-    prepare_flags_junior_and_senior()
-    prepare_flag_handicap()
-    populate_flags()
+    # FIXME restore those
+    # prepare_flags_junior_and_senior()
+    # prepare_flag_handicap()
+    # populate_flags()
     filename = dump()
     make_link_file_to_new_archive(filename)
