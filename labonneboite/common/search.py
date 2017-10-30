@@ -96,7 +96,7 @@ class Fetcher(object):
         )
 
     def get_naf_aggregations(self):
-        _, _, aggregations = get_companies(
+        _, _, aggregations = fetch_companies(
             {}, # No naf filter
             self.rome,
             self.latitude,
@@ -111,10 +111,10 @@ class Fetcher(object):
         )
         return aggregations
 
-    def get_companies(self, aggregate_by=None):
+    def get_companies(self):
 
         self.company_count = self._get_company_count(self.rome, self.distance)
-        logger.debug("set company_count to %s from get_companies", self.company_count)
+        logger.debug("set company_count to %s from fetch_companies", self.company_count)
 
         if self.from_number < 1:
             self.from_number = 1
@@ -134,7 +134,7 @@ class Fetcher(object):
 
         result = aggregations = []
         if self.company_count:
-            result, _, aggregations = get_companies(
+            result, _, aggregations = fetch_companies(
                 self.naf_codes,
                 self.rome,
                 self.latitude,
@@ -149,7 +149,7 @@ class Fetcher(object):
                 headcount_filter=self.headcount_filter,
                 sort=self.sort,
                 index=settings.ES_INDEX,
-                aggregate_by=aggregate_by
+                aggregate_by="naf"
             )
 
         if self.company_count < 10:
@@ -180,7 +180,7 @@ def count_companies(naf_codes, rome_code, latitude, longitude, distance, **kwarg
     res = es.count(index=index, doc_type="office", body=json_body)
     return res["count"]
 
-def get_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
+def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
     index = kwargs.pop('index', 'labonneboite')
     json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
 
@@ -195,7 +195,7 @@ def get_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
     # Extract aggregation
     if aggregations:
         aggregations = aggregations[kwargs["aggregate_by"]]["buckets"]
-        aggregations = [{ "naf": naf_aggregate['key'], "count" : naf_aggregate['doc_count']} for naf_aggregate in aggregations]
+        aggregations = [{"naf": naf_aggregate['key'], "count": naf_aggregate['doc_count']} for naf_aggregate in aggregations]
 
     return companies, companies_count, aggregations
 
