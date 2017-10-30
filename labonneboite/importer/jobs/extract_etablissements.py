@@ -6,9 +6,12 @@ from labonneboite.importer import util as import_util
 from labonneboite.importer.util import timeit
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common import encoding as encoding_util
+from labonneboite.common.models import Office
+from labonneboite.common.database import db_session
 from labonneboite.conf import get_current_env, ENV_LBBDEV
 from .base import Job
 from .common import logger
+
 
 @timeit
 def check_departements(departements):
@@ -31,17 +34,25 @@ class EtablissementExtractJob(Job):
 
     @timeit
     def after_check(self):
-        _, cur = import_util.create_cursor()
-        for departement in settings.DEPARTEMENTS:
-            query = "select count(1) from %s where departement='%s'" % (
-                settings.OFFICE_TABLE,
-                departement)
-            cur.execute(query)
-            result = cur.fetchone()
-            count = result[0]
+        query = db_session.query(Office.departement.distinct().label("departement"))
+        departements = [row.departement for row in query.all()]
+
+        if len(departements) != import_util.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
+            msg = "wrong number of departements : %s instead of expected %s" % (
+                len(departements),
+                import_util.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
+            )
+            raise Exception(msg)
+
+        for departement in departements:
+            count = Office.query.filter_by(departement=departement).count()
             logger.info("number of companies in departement %s : %i", departement, count)
-            if count < import_util.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
-                raise Exception("too few companies in departement")
+            if not count >= import_util.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
+                msg = "too few companies in departement : %s instead of expected %s" % (
+                    count,
+                    import_util.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT
+                )
+                raise Exception(msg)
 
     @timeit
     def run_task(self):
@@ -259,14 +270,16 @@ class EtablissementExtractJob(Job):
             raise Exception("too many no_zipcode_count")
         if format_errors > 5:
             raise Exception("too many format_errors")
-        if len(departement_counter_dic) not in [96, 15]:  # 96 in production, 15 in test  # FIXME
-            logger.exception("incorrect total number of departements : %s", len(departement_counter_dic))
-            raise Exception("incorrect total number of departements")
-        if len(departement_counter_dic) == 96:  # FIXME
-            for departement, count in departement_count:
-                if count < 10000:
-                    logger.exception("only %s offices in departement %s", count, departement)
-                    raise Exception("not enough offices in at least one departement")
+        if len(departement_counter_dic) != import_util.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE:
+            msg = "incorrect total number of departements : %s instead of expected %s" % (
+                len(departement_counter_dic),
+                import_util.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE
+            )
+            raise Exception(msg)
+        for departement, count in departement_count:
+            if not count >= import_util.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
+                logger.exception("only %s offices in departement %s", count, departement)
+                raise Exception("not enough offices in at least one departement")
 
         return offices
 
