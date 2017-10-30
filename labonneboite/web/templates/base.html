@@ -75,16 +75,16 @@
                 {% endif %}
               </ul>
               <hr>
-              {% if user_is_pro or user.is_admin %}
-              <p>
-                <small class="badge badge-info">Version PRO</small>
-              </p>
-              <ul>
-                <li>
-                  <a href="{{ url_for('data.home') }}">Mapping ROME/NAF</a>
-                </li>
-              </ul>
-              <hr>
+              {% if (user_is_pro and pro_version_enabled) or user.is_admin %}
+                <p>
+                  <small class="badge badge-info">Version PRO</small>
+                </p>
+                <ul>
+                  <li>
+                    <a href="{{ url_for('data.home') }}">Mapping ROME/NAF</a>
+                  </li>
+                </ul>
+                <hr>
               {% endif %}
               <p>
                 <a href="{{ url_for('auth.logout') }}" class="logout">Se déconnecter</a>
@@ -159,15 +159,15 @@
         <li>
           <span class="js-obfuscated-email">rf.iolpme-elop@etiobennobal</span>
         </li>
-        {% if user_is_pro %}
-        <li>
-          <a href="{{ url_for('root.kit') }}" title="Télécharger le kit de présentation de La Bonne Boite">Boîte à outils (fichier <abbr title="Portable Document Format">PDF</abbr>, 400 <abbr title="Kilo octets">ko</abbr>)</a>
-          <small class="badge badge-info">PRO</small>
-        </li>
-        <li>
-          <a href="{{ url_for('root.stats') }}" title="Consulter nos statistiques sur google analytics">Statistiques</a>
-          <small class="badge badge-info">PRO</small>
-        </li>
+        {% if user_is_pro and pro_version_enabled %}
+          <li>
+            <a href="{{ url_for('root.kit') }}" title="Télécharger le kit de présentation de La Bonne Boite">Boîte à outils (fichier <abbr title="Portable Document Format">PDF</abbr>, 400 <abbr title="Kilo octets">ko</abbr>)</a>
+            <small class="badge badge-info">PRO</small>
+          </li>
+          <li>
+            <a href="{{ url_for('root.stats') }}" title="Consulter nos statistiques sur google analytics">Statistiques</a>
+            <small class="badge badge-info">PRO</small>
+          </li>
         {% endif %}
       </ul>
     </div>
