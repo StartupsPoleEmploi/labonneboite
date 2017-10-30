@@ -54,7 +54,7 @@ class ProVersionTest(DatabaseTest):
             # Log the user in.
             self.login(user_pro)
             self.assertTrue(util.user_is_pro())
-            self.assertFalse(util.pro_version_enabled(), False)
+            self.assertFalse(util.pro_version_enabled())
 
             with self.app.session_transaction() as sess:
                 self.assertNotIn('pro_version', sess)
@@ -67,13 +67,13 @@ class ProVersionTest(DatabaseTest):
             with self.app.session_transaction() as sess:
                 self.assertIn('pro_version', sess)
                 self.assertTrue(sess['pro_version'])
-                self.assertFalse(util.pro_version_enabled(), True)
+                self.assertTrue(util.pro_version_enabled())
 
             # Disable pro version.
             rv = self.app.get(url)
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, next_url)
-            self.assertFalse(util.pro_version_enabled(), False)
-            
+            self.assertFalse(util.pro_version_enabled())
+
             with self.app.session_transaction() as sess:
                 self.assertNotIn('pro_version', sess)
