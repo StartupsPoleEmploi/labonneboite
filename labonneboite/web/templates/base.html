@@ -75,7 +75,7 @@
                 {% endif %}
               </ul>
               <hr>
-              {% if (user_is_pro and pro_version_enabled) or user.is_admin %}
+              {% if user_is_pro or user.is_admin %}
                 <p>
                   <small class="badge badge-info">Version PRO</small>
                 </p>
