@@ -155,7 +155,7 @@ def results(city, zipcode, occupation):
 
     if not location_error:
         current_app.logger.debug("fetching companies and company_count")
-        companies, naf_aggregations = fetcher.get_companies()
+        companies, naf_aggregations = fetcher.get_companies("naf")
         for alternative, count in fetcher.alternative_rome_codes.iteritems():
             if settings.ROME_DESCRIPTIONS.get(alternative) and count:
                 desc = settings.ROME_DESCRIPTIONS.get(alternative)
@@ -179,7 +179,7 @@ def results(city, zipcode, occupation):
 
     # Get NAF code and their descriptions.
     if kwargs["naf"]:
-        naf_aggregations = fetcher.get_all_companies_naf()
+        naf_aggregations = fetcher.get_naf_aggregations()
 
     naf_codes_with_descriptions = []
     for naf_aggregate in naf_aggregations:

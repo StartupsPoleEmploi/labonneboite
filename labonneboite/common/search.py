@@ -95,7 +95,7 @@ class Fetcher(object):
             headcount_filter=self.headcount_filter,
         )
 
-    def get_all_companies_naf(self):
+    def get_naf_aggregations(self):
         _, _, aggregations = get_companies(
             {}, # No naf filter
             self.rome,
@@ -149,7 +149,7 @@ class Fetcher(object):
                 headcount_filter=self.headcount_filter,
                 sort=self.sort,
                 index=settings.ES_INDEX,
-                aggregate_by="naf"
+                aggregate_by=aggregate_by
             )
 
         if self.company_count < 10:
