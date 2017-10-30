@@ -32,4 +32,4 @@ class OfficeRemovalForm(FlaskForm):
     last_name = StringField(u'Nom *', validators=[DataRequired()])
     email = EmailField(u'Email *', validators=[DataRequired(), Email()], description="Exemple : example@domaine.com")
     phone = TelField(u'Téléphone', description="Exemples: 01 77 86 39 49, +33 1 77 86 39 49")
-    comment = TextAreaField(u'Commentaires', [validators.optional(), validators.length(max=1000)], description=u"1000 caractères maximum")
+    comment = TextAreaField(u'Commentaires', [validators.optional(), validators.length(max=15000)], description=u"15000 caractères maximum")
