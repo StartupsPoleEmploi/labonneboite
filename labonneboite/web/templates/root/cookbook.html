@@ -76,7 +76,7 @@
       <li class="float-right lbb-header-entry">
         <a class="lbb-header-btn" href="#">
           <span class="lbb-header-btn no-padding">
-            <img src="/static/images/pro/pro.svg" alt="">
+            <img src="{{ url_for('static', filename='images/pro/pro.svg') }}" alt="">
           </span>
           
           <p class="lbb-switch on">
@@ -89,7 +89,7 @@
       <li class="float-right lbb-header-entry">
         <a class="lbb-header-btn" href="#">
           <span class="lbb-header-btn no-padding">
-            <img src="/static/images/pro/pro-color.svg" alt="">
+            <img src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="">
           </span>
           
           <p class="lbb-switch">
@@ -921,21 +921,15 @@
 
           <div class="cookbook-title">Switch (not a checkbox)</div>
           <div>
-              <p class="lbb-switch">
-                <span>
-                  <span class="off">Off</span>
-                  <span class="square"></span>
-                  <span class="on">On</span>
-                </span>
-              </p>
+            <p class="lbb-switch">
+              <span class="off">On</span>
+              <span class="on">Off</span>
+            </p>
 
-              <p class="lbb-switch on">
-                <span>
-                  <span class="off">Off</span>
-                  <span class="square"></span>
-                  <span class="on">On</span>
-                </span>
-              </p>
+            <p class="lbb-switch on">
+              <span class="off">On</span>
+              <span class="on">Off</span>
+            </p>
           </div>
 
           <div class="cookbook-title">Progress</div>
