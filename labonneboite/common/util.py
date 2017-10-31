@@ -9,7 +9,6 @@ from flask import request
 
 from labonneboite.conf.common.contact_mode import CONTACT_MODE_DEFAULT
 from labonneboite.common.load_data import load_contact_modes
-from labonneboite.conf import get_current_env, ENV_LBBDEV
 
 logger = logging.getLogger('main')
 
