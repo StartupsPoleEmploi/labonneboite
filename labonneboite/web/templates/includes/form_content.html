@@ -17,10 +17,15 @@ If you have multiple forms, you can use the `with` statement, e.g.:
   {% endwith %}
 
 #}
+{% set aria_required = {'aria-required':'true'} %}
+
 {% for field in form if field.widget.input_type != 'hidden' %}
   <div{% if field.errors %} class="form-error"{% endif %}>
+    {% set is_required = field.validators[0].__class__.__name__ == "DataRequired"%}
+
     {{ field.label }}
-    {{ field() }}
+    {{ field(**aria_required) if is_required else field() }}
+    
     {% if field.description %}<p class="form-help-text">{{ field.description }}</p>{% endif %}
     {% if field.errors %}
     <ul class="form-errorlist">
@@ -35,5 +40,5 @@ If you have multiple forms, you can use the `with` statement, e.g.:
 {{ form.hidden_tag() }}
 
 <p>
-  <input class="btn" type="submit" value="Envoyer">
+  <input class="btn" type="submit" value="Envoyer votre demande">
 </p>
