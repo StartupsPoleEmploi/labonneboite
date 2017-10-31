@@ -22,7 +22,7 @@ class TestResetNaf(LbbSeleniumTestCase):
 
         # Filter by NAF `Activités comptables` (`6920Z`).
         select = Select(self.driver.find_element_by_id('naf'))
-        select.select_by_visible_text(u'Activités comptables')
+        select.select_by_value(u'6920Z')
 
         # The form should be auto-submitted after an option has been selected.
         self.assertIn('/entreprises/metz-57000/comptabilite', self.driver.current_url)
