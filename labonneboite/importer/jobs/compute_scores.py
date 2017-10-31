@@ -118,10 +118,14 @@ def run_main():
         if not result:
             no_results.append(departement)
     if len(no_results) > 0:
+        results = set(departements) - set(no_results)
         logger.warning(
-            "compute_scores did not return results for following departement (%i failures), aborting...\n%s",
+            "compute_scores by departement : %i failures (%s) vs %i successes (%s), aborting...",
             len(no_results),
-            ",".join(no_results))
+            ",".join(no_results),
+            len(results),
+            ",".join(results),
+        )
         sys.exit(-1)
 
     import_util.reduce_scores_for_backoffice(departements)

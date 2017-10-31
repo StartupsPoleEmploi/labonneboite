@@ -196,6 +196,7 @@ run_importer_jobs:
 	make run_importer_job_02_extract_etablissements && \
 	make run_importer_job_03_check_dpae && \
 	make run_importer_job_04_extract_dpae && \
+	make run_importer_job_05_compute_scores && \
 	echo done
 
 run_importer_job_00_reset_all:
@@ -230,3 +231,7 @@ run_importer_job_04_extract_dpae:
 		cd /srv/lbb/labonneboite && cd importer && \
 		python jobs/extract_dpae.py';
 
+run_importer_job_05_compute_scores:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/compute_scores.py';
