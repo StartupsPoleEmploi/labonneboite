@@ -65,6 +65,4 @@ def cookbook():
 
 @rootBlueprint.route('/stats')
 def stats():
-    if util.pro_version_enabled():
-        return redirect('https://datastudio.google.com/open/0B0PPPCjOppNIdVNXVVM0QnJHNEE')
-    abort(404)
+    return redirect('https://datastudio.google.com/open/0B0PPPCjOppNIdVNXVVM0QnJHNEE')
