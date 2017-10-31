@@ -162,7 +162,7 @@ def company_list():
         else:
             headcount_filter = HEADCOUNT_VALUES[headcount]
 
-    companies, companies_count = search.get_companies(
+    companies, companies_count, _ = search.fetch_companies(
         naf_codes_list,
         rome_code,
         latitude,
@@ -173,7 +173,7 @@ def company_list():
         to_number=to_number,
         flag_alternance=flag_alternance,
         sort=sort,
-        index=settings.ES_INDEX,
+        index=settings.ES_INDEX
     )
 
     result = {

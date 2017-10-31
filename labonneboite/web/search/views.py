@@ -155,7 +155,7 @@ def results(city, zipcode, occupation):
 
     if not location_error:
         current_app.logger.debug("fetching companies and company_count")
-        companies = fetcher.get_companies()
+        companies, naf_aggregations = fetcher.get_companies()
         for alternative, count in fetcher.alternative_rome_codes.iteritems():
             if settings.ROME_DESCRIPTIONS.get(alternative) and count:
                 desc = settings.ROME_DESCRIPTIONS.get(alternative)
@@ -178,15 +178,13 @@ def results(city, zipcode, occupation):
         company.position = position
 
     # Get NAF code and their descriptions.
-    rome_2_naf_mapper = mapping_util.Rome2NafMapper()
-    naf_codes = rome_2_naf_mapper.map([rome, ])
+    if kwargs["naf"]:
+        naf_aggregations = fetcher.get_naf_aggregations()
+
     naf_codes_with_descriptions = []
-    for naf_code in naf_codes:
-        naf_description = settings.NAF_CODES.get(naf_code)
-        naf_codes_with_descriptions.append((naf_code, naf_description))
-    if kwargs.get('naf') in [item[0] for item in naf_codes_with_descriptions]:
-        naf_text = settings.NAF_CODES.get(kwargs['naf'])
-        naf_codes_with_descriptions.append((kwargs['naf'], naf_text))
+    for naf_aggregate in naf_aggregations:
+        naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["naf"]), naf_aggregate["count"])
+        naf_codes_with_descriptions.append((naf_aggregate["naf"], naf_description))
 
     form_kwargs['job'] = settings.ROME_DESCRIPTIONS[rome]
     form = CompanySearchForm(**form_kwargs)
@@ -248,4 +246,3 @@ def results_by_commune_and_rome(commune_id, rome_id):
     # Pass all GET params to the redirect URL: this will allow users of the API to build web links
     # roughly equivalent to the result of an API call - see Trello #971.
     return redirect('%s?%s' % (url, urlencode(request.args)))
-

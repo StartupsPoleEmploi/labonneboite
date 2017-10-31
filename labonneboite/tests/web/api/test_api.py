@@ -7,7 +7,7 @@ import json
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office
-from labonneboite.common.search import get_companies
+from labonneboite.common.search import fetch_companies
 from labonneboite.conf import settings
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest
 
@@ -20,7 +20,7 @@ class ApiGenericTest(ApiBaseTest):
         latitude = 49.305658  # 15 Avenue François Mitterrand, 57290 Fameck, France.
         longitude = 6.116853
         distance = 100
-        companies, _ = get_companies(
+        companies, _, _ = fetch_companies(
             naf_codes,
             rome_code,
             latitude,
@@ -40,7 +40,7 @@ class ApiGenericTest(ApiBaseTest):
         longitude = 6.116853
         distance = 100
         headcount_filter = settings.HEADCOUNT_SMALL_ONLY
-        companies, _ = get_companies(
+        companies, _, _ = fetch_companies(
             naf_codes,
             rome_code,
             latitude,
