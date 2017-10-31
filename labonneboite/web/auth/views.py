@@ -42,7 +42,7 @@ def logout(user_social_auth=None):
         session.pop('social_auth_last_login_backend')
 
     # Log the user out from PEAM and destroy the PEAM session.
-    if logged_with_peam:
+    if logged_with_peam and user_social_auth:
         params = {
             'id_token_hint': user_social_auth.extra_data['id_token'],
             'redirect_uri': url_for('auth.logout_from_peam_callback', _external=True),

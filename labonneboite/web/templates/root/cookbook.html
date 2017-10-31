@@ -17,37 +17,27 @@
       <a href="#" class="cookies-accept"><b>J'ai compris</b></a>
     </p>
   </div>
-
+  
   <!-- ********************************** Header ********************************** -->
   <header class="lbb-header-wrapper">
     <ul class="lbb-header">
-
+      
       <li class="lbb-header-logo-lbb">
         <a href="#">
-          <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boîte">
+          <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite">
         </a>
       </li>
-
+      
       <li class="text-left">
         <small class="badge badge-info" data-toggle="tooltip" data-placement="bottom" title="Tooltip.">Version PRO</small>
         <small class="badge badge-alternance" data-toggle="tooltip" data-placement="bottom" title="Tooltip.">Alternance</small>
       </li>
+      
+      <li class="float-right lbb-header-logo-pole-emploi">
+        <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
+      </li>
 
-      <li>
-
-        <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
-          <a href="#" class="lbb-header-btn">
-            <img src="{{ url_for('static', filename='images/user.svg') }}" alt="">
-            <span>Connexion &#x25BE;</span>
-          </a>
-          <div class="lbb-dropdown lbb-dropdown-right text-right">
-            <p>
-              <a class="logo-pe-connect" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ request.url | urlencode }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Pôle emploi Connect"></a><br>
-              <i>Connectez-vous à La Bonne Boîte en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
-            </p>
-          </div>
-        </div>
-
+      <li class="float-right">
         <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
           <a href="#" class="lbb-header-btn">
             <img src="{{ url_for('static', filename='images/user-color.svg') }}" alt="">
@@ -66,12 +56,51 @@
             </p>
           </div>
         </div>
-
       </li>
 
-      <li class="lbb-header-logo-pole-emploi">
-        <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
+      <li class="float-right">
+        <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
+          <a href="#" class="lbb-header-btn">
+            <img src="{{ url_for('static', filename='images/user.svg') }}" alt="">
+            <span>Connexion &#x25BE;</span>
+          </a>
+          <div class="lbb-dropdown lbb-dropdown-right text-right">
+            <p>
+              <a class="logo-pe-connect" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ request.url | urlencode }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Pôle emploi Connect"></a><br>
+              <i>Connectez-vous à La Bonne Boîte en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
+            </p>
+          </div>
+        </div>
       </li>
+      
+      <li class="float-right lbb-header-entry">
+        <a class="lbb-header-btn" href="#">
+          <span class="lbb-header-btn no-padding">
+            <img src="{{ url_for('static', filename='images/pro/pro.svg') }}" alt="">
+          </span>
+          
+          <p class="lbb-switch on">
+            <span class="off">On</span>
+            <span class="on">Off</span>
+          </p>
+        </a>
+      </li>
+
+      <li class="float-right lbb-header-entry">
+        <a class="lbb-header-btn" href="#">
+          <span class="lbb-header-btn no-padding">
+            <img src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="">
+          </span>
+          
+          <p class="lbb-switch">
+            <span class="off">On</span>
+            <span class="on">Off</span>
+          </p>
+        </a>
+      </li>
+
+
+
 
     </ul>
   </header>
@@ -236,6 +265,11 @@
         <a class="btn btn-error" href="#">Error &lt;a&gt;</a>
         <a class="btn btn-error btn-small" href="#">Error &lt;a&gt; small</a>
       </p>
+      <p>
+        <a class="btn btn-info btn-large" href="#">Info &lt;a&gt; large</a>
+        <a class="btn btn-info" href="#">Info &lt;a&gt;</a>
+        <a class="btn btn-info btn-small" href="#">Info &lt;a&gt; small</a>
+      </p>
       <hr>
       <!-- Buttons -->
       <div>
@@ -273,6 +307,13 @@
           <button class="btn btn-error btn-small" type="submit">Error &lt;button&gt; small</button>
         </form>
       </div>
+      <div>
+        <form>
+          <button class="btn btn-info btn-large" type="submit">Info &lt;button&gt; large</button>
+          <button class="btn btn-info" type="submit">Info &lt;button&gt;</button>
+          <button class="btn btn-info btn-small" type="submit">Info &lt;button&gt; small</button>
+        </form>
+      </div>
       <hr>
       <!-- Input -->
       <div>
@@ -308,6 +349,13 @@
           <input class="btn btn-error btn-large" type="submit" value="Error &lt;input&gt; large">
           <input class="btn btn-error" type="submit" value="Error &lt;input&gt;">
           <input class="btn btn-error btn-small" type="submit" value="Error &lt;input&gt; small">
+        </form>
+      </div>
+      <div>
+        <form>
+          <input class="btn btn-info btn-large" type="submit" value="Info &lt;input&gt; large">
+          <input class="btn btn-info" type="submit" value="Info &lt;input&gt;">
+          <input class="btn btn-info btn-small" type="submit" value="Info &lt;input&gt; small">
         </form>
       </div>
     </div>
@@ -871,11 +919,26 @@
           <div class="cookbook-title">Meter</div>
           <div><meter value="2" min="0" max="10">2 out of 10</meter></div>
 
+          <div class="cookbook-title">Switch (not a checkbox)</div>
+          <div>
+            <p class="lbb-switch">
+              <span class="off">On</span>
+              <span class="on">Off</span>
+            </p>
+
+            <p class="lbb-switch on">
+              <span class="off">On</span>
+              <span class="on">Off</span>
+            </p>
+          </div>
+
           <div class="cookbook-title">Progress</div>
           <div><progress>progress</progress></div>
 
           <div class="cookbook-title">Inline SVG</div>
           <div><svg width="100px" height="100px"><circle cx="100" cy="100" r="100" fill="#1fa3ec"></circle></svg></div>
+
+
 
         </div>
 
@@ -1025,7 +1088,6 @@
                 <a class="btn" href="#">&lt;a class=btn&gt;</a>
               </p>
             </fieldset>
-
           </form>
         </div>
 

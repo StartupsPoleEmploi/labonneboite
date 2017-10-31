@@ -1,0 +1,28 @@
+/* Switch button
+=========================================================================== */
+.lbb-switch {
+    width: 62px;
+    height: 19px;
+    border: solid 1px #5d5d5d;
+}
+
+.lbb-switch > span {
+    float: left;
+    width: 30px;
+    line-height: 17px;
+    
+    text-align: center;
+    
+    background-color: white;
+    color: #5d5d5d;
+}
+
+/* Switch state */
+.lbb-switch > span.off, .lbb-switch.on > span.on {
+    background-color: #1c86f2;
+    color: white;
+}
+.lbb-switch.on > span.off {
+    background-color: white;
+    color: #5d5d5d;
+}

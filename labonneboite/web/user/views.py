@@ -3,7 +3,7 @@
 import urllib
 
 from flask import Blueprint, Markup
-from flask import abort, current_app, flash, redirect, render_template, request, url_for
+from flask import abort, current_app, flash, redirect, render_template, request, session, url_for
 
 import flask_login
 from flask_login import current_user
@@ -15,7 +15,7 @@ from labonneboite.common.models import get_user_social_auth
 from labonneboite.common.models import Office
 from labonneboite.common.models import User
 from labonneboite.common.models import UserFavoriteOffice
-from labonneboite.common.util import is_safe_url
+from labonneboite.common import util
 from labonneboite.web.auth.views import logout
 from labonneboite.web.pagination import Pagination
 from labonneboite.web.user.forms import UserAccountDeleteForm
@@ -123,7 +123,7 @@ def favorites_add(siret):
     flash(Markup(message), 'success')
 
     next_url = request.form.get('next')
-    if next_url and is_safe_url(next_url):
+    if next_url and util.is_safe_url(next_url):
         return redirect(urllib.unquote(next_url))
 
     return redirect(url_for('user.favorites_list'))
@@ -153,7 +153,27 @@ def favorites_delete(siret):
     flash(message, 'success')
 
     next_url = request.form.get('next')
-    if next_url and is_safe_url(next_url):
+    if next_url and util.is_safe_url(next_url):
         return redirect(urllib.unquote(next_url))
 
     return redirect(url_for('user.favorites_list'))
+
+@userBlueprint.route('/pro-version')
+def pro_version():
+    """
+    Enable or disable "Version PRO" which is only visible to "PRO users".
+    """
+    if not util.user_is_pro:
+        abort(401)
+
+    if util.pro_version_enabled():
+        session.pop('pro_version')
+    else:
+        session['pro_version'] = True
+
+    redirect_url = request.args.get('next', '/')
+
+    if not util.is_safe_url(redirect_url):
+        redirect_url = '/'
+
+    return redirect(redirect_url)

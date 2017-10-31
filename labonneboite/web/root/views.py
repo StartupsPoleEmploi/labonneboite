@@ -1,7 +1,7 @@
 # coding: utf8
 
 from flask import Blueprint, current_app
-from flask import send_from_directory, redirect, render_template, request
+from flask import abort, send_from_directory, redirect, render_template, request
 
 from labonneboite.common import util
 from labonneboite.conf import settings
@@ -23,7 +23,9 @@ def static_from_root():
 
 @rootBlueprint.route('/kit.pdf')
 def kit():
-    return send_from_directory(current_app.static_folder, 'kit.pdf')
+    if util.pro_version_enabled():
+        return send_from_directory(current_app.static_folder, 'kit.pdf')
+    abort(404)
 
 
 @rootBlueprint.route('/espace-presse')

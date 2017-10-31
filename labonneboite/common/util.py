@@ -2,16 +2,17 @@
 
 from urlparse import urlparse
 import logging
+import re
 import unicodedata
 import urllib
-import re
 
-from flask import request
+from flask import request, session
 from flask_login import current_user
 
 from labonneboite.conf import settings
 from labonneboite.conf.common.contact_mode import CONTACT_MODE_DEFAULT
 from labonneboite.common.load_data import load_contact_modes
+
 
 logger = logging.getLogger('main')
 
@@ -66,30 +67,26 @@ def user_is_pro():
     - Office data : statistics about recruitments...
     """
 
+    # Check user IP (no need to be authenticated)
     user_ip = get_user_ip()
+    if user_ip in settings.VERSION_PRO_ALLOWED_IPS:
+        return True
 
-    # =============================================================
-    # beginning of temporary block of version pro (FIXME remove me)
-    if current_user.is_authenticated:
-        current_user_email = current_user.email.lower()
-        result = (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS)
-        return result
-    else:
-        return False
-    # end of temporary block of version pro (FIXME remove me)
-    # =============================================================
-
+    # Check user e-mail by plain_value, suffix or regex (@see local_settings.py)
     if current_user.is_authenticated:
         current_user_email = current_user.email.lower()
 
-        result = (user_ip in settings.VERSION_PRO_ALLOWED_IPS
-            or current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
+        return (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
             or any(current_user_email.endswith(suffix) for suffix in settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
-            or any(re.match(regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS)
-            )
+            or any(re.match(
+                regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS))
 
-    return result
+    return False
 
+def pro_version_enabled():
+    if not user_is_pro() and 'pro_version' in session:
+        session.pop('pro_version')
+    return session.get('pro_version', False)
 
 def get_doorbell_tags(tag):
     if tag not in ['faq', 'help', 'press', 'results']:
@@ -115,7 +112,7 @@ def sanitize_string(s):
 
 def is_safe_url(url, allowed_hosts=None):
     """
-    Shamelessly ripped from Django:
+    Ripped and adapted from Django:
     https://github.com/django/django/blob/13cd5b/django/utils/http.py#L347-L370
     """
     if not allowed_hosts:
@@ -136,12 +133,16 @@ def is_safe_url(url, allowed_hosts=None):
     # URL and might consider the URL as scheme relative.
     if unicodedata.category(url[0])[0] == 'C':
         return False
+    if not url_info.netloc:
+        return False
+    if allowed_hosts and not url_info.netloc in allowed_hosts:
+        return False
     scheme = url_info.scheme
     # Consider URLs without a scheme (e.g. //example.com/p) to be http.
     if not url_info.scheme and url_info.netloc:
         scheme = 'http'
     valid_schemes = ['http', 'https']
-    return ((not url_info.netloc or url_info.netloc in allowed_hosts) and (not scheme or scheme in valid_schemes))
+    return (not scheme or scheme in valid_schemes)
 
 
 def get_contact_mode_for_rome_and_naf(rome, naf):

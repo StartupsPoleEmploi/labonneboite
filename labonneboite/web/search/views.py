@@ -105,7 +105,7 @@ def get_parameters(args):
         kwargs['public'] = search_util.PUBLIC_ALL
 
     # ensure PRO filters are never used in the public version
-    if not util.user_is_pro():
+    if not util.pro_version_enabled():
         del kwargs['public']
 
     return kwargs

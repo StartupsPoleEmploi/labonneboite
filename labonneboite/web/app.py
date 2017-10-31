@@ -187,6 +187,7 @@ def register_context_processors(flask_app):
             'mapbox_css_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css',
             'mapbox_js_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js',
             'user_is_pro': util.user_is_pro(),
+            'pro_version_enabled': util.pro_version_enabled()
         }
 
     def inject_user():
@@ -294,6 +295,7 @@ def create_app():
         'css/pagination.css',
         'css/ratings.css',
         'css/search_results.css',
+        'css/switch.css',
         # Vendor.
         'css/vendor/bootstrap-tooltip.css',
         'css/vendor/jquery-ui.css',
