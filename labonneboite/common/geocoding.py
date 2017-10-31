@@ -69,13 +69,13 @@ def load_cities_cache():
 
     cities = []
 
-    json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/cities-2017-08-31.json")
+    json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/cities.json")
     with open(json_file, 'r') as json_data:
         for item in json.load(json_data):
             if item[u'code'] not in COMMUNES_TO_SKIP:
                 cities.append(city_as_dict(item))
 
-    json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/cities-arrondissements.json")
+    json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/arrondissements_as_cities.json")
     with open(json_file, 'r') as json_data:
         for item in json.load(json_data):
             cities.append(city_as_dict(item))
