@@ -113,7 +113,7 @@ class GeocodeJob(Job):
         """ % settings.EXPORT_ETABLISSEMENT_TABLE
         cur.execute(query)
         geocoding_ratio = cur.fetchall()[0][0]
-        logger.info("geocoding_ratio = %s" % geocoding_ratio)
+        logger.info("geocoding_ratio = %s", geocoding_ratio)
         if geocoding_ratio < 0.75:
             raise AbnormallyLowGeocodingRatioException
 
@@ -147,7 +147,7 @@ class GeocodeJob(Job):
         logger.info("updating coordinates...")
         self.update_coordinates(coordinates_updates)
         logger.info("updated %i coordinates !", len(coordinates_updates))
-        logger.info("GEOCODING_STATS = %s" % GEOCODING_STATS)
+        logger.info("GEOCODING_STATS = %s", GEOCODING_STATS)
         logger.info("validating coordinates...")
         self.validate_coordinates()
         logger.info("validated coordinates !")

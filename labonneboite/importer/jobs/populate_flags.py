@@ -16,7 +16,7 @@ def populate_flags():
 
 
 def populate_flag(flag):
-    logger.info("populating %s ... " % flag)
+    logger.info("populating %s ... ", flag)
     con, cur = import_util.create_cursor()
     query = """
         UPDATE
@@ -27,7 +27,7 @@ def populate_flag(flag):
     """ % (settings.EXPORT_ETABLISSEMENT_TABLE, flag, flag)
     cur.execute(query)
     con.commit()
-    logger.info("completed populating %s ... " % flag)
+    logger.info("completed populating %s ... ", flag)
 
 
 def run_sql_script(sql_script):
@@ -130,7 +130,7 @@ def dump():
 
     tar_filename = os.path.join(settings.BACKUP_FOLDER, "%s.tar.bz2" % timestamp)
     with tarfile.open(tar_filename, "w:bz2") as tar:
-        logger.info("creating tar file %s..." % tar_filename)
+        logger.info("creating tar file %s...", tar_filename)
         tar.add(etab_result, arcname=os.path.basename(etab_result))
         tar.close()
     return tar_filename

@@ -45,7 +45,7 @@ class DpaeExtractJob(Job):
         if date_match:
             date_part = date_match.groups()[-1]
             self.most_recent_data_date = datetime.strptime(date_part, "%Y%m%d")
-            logger.debug("identified most_recent_data_date=%s" % self.most_recent_data_date)
+            logger.debug("identified most_recent_data_date=%s", self.most_recent_data_date)
         else:
             raise Exception("couldn't find a date pattern in filename. filename should be dpae_XYZ_20xxxxxx.tar.gz")
 
@@ -58,9 +58,8 @@ class DpaeExtractJob(Job):
         not_imported_dpae = 0
         initial_most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
 
-        logger.info("will now extract all dpae with hiring_date between %s and %s" % (
-            initial_most_recent_data_date, self.most_recent_data_date
-        ))
+        logger.info("will now extract all dpae with hiring_date between %s and %s",
+                    initial_most_recent_data_date, self.most_recent_data_date)
 
         with import_util.get_reader(self.input_filename) as myfile:
             con, cur = import_util.create_cursor()

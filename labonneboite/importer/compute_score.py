@@ -50,29 +50,22 @@ class NotEnoughDataException(Exception):
 
 
 def raise_with_message(msg):
-    logger.info("WARNING exception: %s" % msg)
+    logger.info("WARNING exception: %s", msg)
     raise Exception(msg)
 
 
 def debug_df(df, description="no description"):
     if len(DEBUG_SIRETS) >= 1:
-        logger.debug("dataframe debug info [%s] about sirets %s" % (
-            description,
-            DEBUG_SIRETS
-        ))
+        logger.debug("dataframe debug info [%s] about sirets %s", 
+                     description, DEBUG_SIRETS)
         columns = list(df.columns)
-        logger.debug("dataframe has %s rows and columns = %s" % (
-            len(df),
-            columns
-        ))
+        logger.debug("dataframe has %s rows and columns = %s", len(df), columns)
         if "siret" in columns:
             tmp_df = df[df.siret.isin(DEBUG_SIRETS)]
-            logger.debug("dataframe content :\n %s" % (
-                tmp_df
-            ))
+            logger.debug("dataframe content :\n %s", tmp_df)
         else:
             logger.debug("dataframe does not have a siret colum")
-            logger.debug("columns : %s" % columns)
+            logger.debug("columns : %s", columns)
 
 
 def discarded_check(departement):
@@ -155,7 +148,7 @@ def merge_and_normalize_websites(websites):
 
 
 def load_df(engine, etablissement_table, dpae_table, departement, most_recent_data_date):
-    logger.debug("reading data with most recent data date %s..." % most_recent_data_date)
+    logger.debug("reading data with most recent data date %s...", most_recent_data_date)
     if departement:
         logger.debug("filtering by departement (%s)...", departement)
         # keep only contract_type = 2 (CDI) and contract_type = 1 (CDD which last at least one month)
@@ -165,7 +158,7 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
             """ % (dpae_table, departement), engine)
         debug_df(df, "after loading from dpae table")
         if df.empty:
-            logger.warning("no dpae data for departement %s" % departement)
+            logger.warning("no dpae data for departement %s", departement)
             return None
         logger.debug("reading data from etablissements (%s)", departement)
         df_etab = pd.read_sql_query("""
@@ -186,7 +179,7 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
             raise Exception("missing website column")
 
         if df_etab.empty:
-            logger.warning("dataframe empty for departement %s" % departement)
+            logger.warning("dataframe empty for departement %s", departement)
             return None
     else:
         # FIXME cleanup - or reuse soon as we will compute all departements with a single model!?
@@ -278,7 +271,7 @@ def compute_reference_date(most_recent_data_date):
         year_reference = most_recent_data_date.year
     reference_date = date(year_reference, month_reference, 1)
 
-    logger.info("reference date %s" % reference_date)
+    logger.info("reference date %s", reference_date)
     return reference_date
 
 
@@ -352,7 +345,7 @@ def add_features(df_final, departement, reference_date, feature_semester_count, 
                                                get_feature_names=True)
 
     semester = 'semester-%i' % (semester_lag + 1)
-    logger.debug("outcome: has hired in %s" % semester)
+    logger.debug("outcome: has hired in %s", semester)
     y = df_final.apply(has_hired_semester(semester), axis=1)
     y_regr = df_final.apply(total_hired_semester(semester), axis=1)
     if get_feature_names:
@@ -385,7 +378,7 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
         semester_lag,
         get_feature_names=True)
     debug_df(df_final, "df_final after add_features")
-    logger.debug("X_train_feature_names: %s" % X_train_feature_names)
+    logger.debug("X_train_feature_names: %s", X_train_feature_names)
 
     logger.debug("%s offices (%s)", len(df_final), departement)
 
@@ -396,21 +389,21 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
     logger.debug("fitting the model on X_train (%s)...", departement)
     clf.fit(X_train, y_train_bin)
     regr.fit(X_train, y_train_regr)
-    logger.debug("regression_coefficients (fitting done on X_train) : %s" % regr.coef_)
+    logger.debug("regression_coefficients (fitting done on X_train) : %s", regr.coef_)
     logger.debug("fitting done (%s)!", departement)
 
     y_train_bin_pred = clf.predict(X_train)
     y_train_regr_pred = regr.predict(X_train)
 
     X_test, X_test_feature_names = create_feature_vector(df_final, 0, debug_msg="X_test", get_feature_names=True)
-    logger.debug("X_test_feature_names: %s" % X_test_feature_names)
+    logger.debug("X_test_feature_names: %s", X_test_feature_names)
     y_test_bin = df_final.apply(has_hired_semester('semester-1'), axis=1)
     y_test_bin_pred = clf.predict(X_test)
     y_test_regr = df_final.apply(total_hired_semester('semester-1'), axis=1)
     y_test_regr_pred = regr.predict(X_test)
 
     X_live, X_live_feature_names = create_feature_vector(df_final, -2 + semester_lag, debug_msg="X_live", get_feature_names=True)
-    logger.debug("X_live_feature_names: %s" % X_live_feature_names)
+    logger.debug("X_live_feature_names: %s", X_live_feature_names)
 
     # 1) --- binary classification metrics
     precision_train, recall_train, _, _ = precision_recall_fscore_support(y_train_bin, y_train_bin_pred)
@@ -508,7 +501,7 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
         )
         debug_df(df_existing_score, "df_existing_score")
         if df_existing_score.empty:
-            logger.debug("no scores for now for departement %s, bypassing score regression..." % departement)
+            logger.debug("no scores for now for departement %s, bypassing score regression...", departement)
         else:
             logger.debug("merging existing scores for %s", departement)
             # merge doc : http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.merge.html
