@@ -63,7 +63,7 @@ class GeocodeJob(Job):
 
     def create_geocoding_jobs(self):
         query = """select siret, numerorue, libellerue, codepostal, codecommune, coordinates_x, coordinates_y from %s""" % (settings.EXPORT_ETABLISSEMENT_TABLE)
-        con, cur = import_util.create_cursor()
+        _, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
         geocoding_jobs = []
@@ -105,7 +105,7 @@ class GeocodeJob(Job):
 
 
     def validate_coordinates(self):
-        con, cur = import_util.create_cursor()
+        _, cur = import_util.create_cursor()
         query = """
         select
         sum(coordinates_x > 0 and coordinates_y > 0)/count(*)

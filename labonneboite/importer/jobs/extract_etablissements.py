@@ -57,7 +57,7 @@ class EtablissementExtractJob(Job):
         self.input_filename = etablissement_filename
 
     def after_check(self):
-        con, cur = import_util.create_cursor()
+        _, cur = import_util.create_cursor()
         for departement in settings.DEPARTEMENTS:
             query = "select count(1) from %s where departement='%s'" % (
                 settings.OFFICE_TABLE,
@@ -89,7 +89,7 @@ class EtablissementExtractJob(Job):
     def get_sirets_from_database(self):
         query = "select siret from %s where siret != ''" % settings.OFFICE_TABLE
         logger.info("get etablissements from database")
-        con, cur = import_util.create_cursor()
+        _, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
         return [row[0] for row in rows]
@@ -178,7 +178,7 @@ class EtablissementExtractJob(Job):
         departement_errors = 0
         unprocessable_departement_errors = 0
         format_errors = 0
-        con, cur = import_util.create_cursor()
+        _, _ = import_util.create_cursor()
         departement_counter_dic = {}
         etablissements = {}
 
@@ -200,8 +200,7 @@ class EtablissementExtractJob(Job):
 
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
                         libellerue, codecommune, codepostal, email, tel, \
-                        trancheeffectif_etablissement, effectif_etablissement, \
-                        trancheeffectif_entreprise, date_creation_entreprise, \
+                        trancheeffectif_etablissement, _, _, _, \
                         website1, website2 = fields
                 except ValueError:
                     logger.exception("exception in line %s", line)

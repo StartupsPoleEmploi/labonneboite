@@ -489,7 +489,7 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
     if result:
         logger.debug("result obtained for departement %s", departement)
         reference_date = compute_reference_date(dpae_date)
-        df, df_dpae = result
+        df, _ = result
         train(df, departement, reference_date, semester_lag)
 
         logger.debug("fetching existing scores for %s", departement)

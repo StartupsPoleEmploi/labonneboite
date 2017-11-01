@@ -33,8 +33,8 @@ class DpaeExtractJob(Job):
 
     # actually never used
     def print_dpae_distribution(self, imported_dpae_distribution):
-        for year, year_dic in sorted(imported_dpae_distribution.items()):
-            for month, month_dic in sorted(imported_dpae_distribution[year].items()):
+        for year, _ in sorted(imported_dpae_distribution.items()):
+            for month, _ in sorted(imported_dpae_distribution[year].items()):
                 for day, count in sorted(imported_dpae_distribution[year][month].items()):
                     logger.info("year: %s, month: %s, day: %s, dpae count %s", year, month, day, count)
 
