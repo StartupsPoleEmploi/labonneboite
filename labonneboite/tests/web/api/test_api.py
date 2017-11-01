@@ -1,8 +1,9 @@
 # coding: utf8
 
-from urllib import urlencode
 import datetime
 import json
+from urllib import urlencode
+import urlparse
 
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import mapping as mapping_util
@@ -651,3 +652,46 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertEqual(len(data['companies']), 1)
         self.assertEqual(data['companies'][0]['siret'], u'00000000000004')
         self.assertEqual(data['companies'][0]['contact_mode'], u'Envoyer un CV et une lettre de motivation')
+
+
+class ApiCompanyListTrackingCodesTest(ApiBaseTest):
+
+    def assertTrackingCodesEqual(self, company_url, utm_medium, utm_source, utm_campaign):
+        url_query = urlparse.urlparse(company_url)[4]
+        url_params = urlparse.parse_qs(url_query)
+
+        self.assertIn('utm_medium', url_params)
+        self.assertEqual([utm_medium], url_params.get('utm_medium'))
+        self.assertIn('utm_source', url_params)
+        self.assertEqual([utm_source], url_params.get('utm_source'))
+        self.assertIn('utm_campaign', url_params)
+        self.assertEqual([utm_campaign], url_params.get('utm_campaign'))
+
+    def test_api_urls_include_google_analytics_tracking(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['pau']['commune_id'],
+            'distance': 10,
+            'rome_codes': u'B1603',
+            'user': u'labonneboite',
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+        company_url = data['companies'][0]['url']
+
+        self.assertTrackingCodesEqual(company_url, 'web', 'api__labonneboite', 'api__labonneboite')
+
+    def test_api_urls_include_google_analytics_tracking_with_origin_user(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['pau']['commune_id'],
+            'distance': 10,
+            'rome_codes': u'B1603',
+            'user': u'labonneboite',
+            'origin_user': 'someuser',
+        })
+        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data)
+
+        company_url = data['companies'][0]['url']
+        self.assertTrackingCodesEqual(company_url, 'web', 'api__labonneboite', 'api__labonneboite__someuser')
