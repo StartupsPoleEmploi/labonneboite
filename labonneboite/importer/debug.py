@@ -1,6 +1,3 @@
-try: import readline  # For readline input support
-except: pass
-
 import sys, os, traceback, signal, codeop, cStringIO, cPickle, tempfile
 
 def pipename(pid):

@@ -1,5 +1,4 @@
 # coding: utf8
-from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
 from labonneboite.tests.test_base import AppTest

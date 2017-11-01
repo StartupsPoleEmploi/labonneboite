@@ -21,7 +21,6 @@ import sqlalchemy
 from sqlalchemy.pool import NullPool
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import DpaeStatistics
-from labonneboite.importer import util as import_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common.database import get_db_string
 import pickle

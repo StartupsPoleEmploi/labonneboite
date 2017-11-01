@@ -2,12 +2,8 @@ import logging
 import os
 import tarfile
 
-import math
-from datetime import datetime
-
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings
-from labonneboite.importer.models.computing import ImportTask
 from .base import Job
 from .common import logger
 

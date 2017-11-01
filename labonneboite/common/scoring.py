@@ -5,7 +5,6 @@ from backports.functools_lru_cache import lru_cache
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.conf import settings
-from settings import SCORE_50_HIRINGS, SCORE_60_HIRINGS, SCORE_80_HIRINGS, SCORE_100_HIRINGS
 
 # ############### WARNING about matching scores vs hirings ################
 # Methods scoring_util.get_hirings_from_score
@@ -43,18 +42,18 @@ def _get_score_from_hirings(hirings, as_float=False):
 
     For confidentiality reasons, we cannot disclose the SCORE_*_HIRINGS values.
     """
-    if hirings <= SCORE_50_HIRINGS:
+    if hirings <= settings.SCORE_50_HIRINGS:
         # this way about 500K offices will be selected to be deployed in production
         # and all others (score below 50) will be automatically filtered out
-        score = 0 + 50 * (hirings - 0.0) / (SCORE_50_HIRINGS - 0.0)
-    elif hirings >= SCORE_100_HIRINGS:
+        score = 0 + 50 * (hirings - 0.0) / (settings.SCORE_50_HIRINGS - 0.0)
+    elif hirings >= settings.SCORE_100_HIRINGS:
         score = 100
-    elif hirings <= SCORE_60_HIRINGS:
-        score = 50 + 10 * (hirings - SCORE_50_HIRINGS) / (SCORE_60_HIRINGS - SCORE_50_HIRINGS)
-    elif hirings <= SCORE_80_HIRINGS:
-        score = 60 + 20 * (hirings - SCORE_60_HIRINGS) / (SCORE_80_HIRINGS - SCORE_60_HIRINGS)
-    elif hirings <= SCORE_100_HIRINGS:
-        score = 80 + 20.0/math.log10(SCORE_100_HIRINGS) * math.log10(1 + hirings - SCORE_80_HIRINGS)
+    elif hirings <= settings.SCORE_60_HIRINGS:
+        score = 50 + 10 * (hirings - settings.SCORE_50_HIRINGS) / (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS)
+    elif hirings <= settings.SCORE_80_HIRINGS:
+        score = 60 + 20 * (hirings - settings.SCORE_60_HIRINGS) / (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS)
+    elif hirings <= settings.SCORE_100_HIRINGS:
+        score = 80 + 20.0/math.log10(settings.SCORE_100_HIRINGS) * math.log10(1 + hirings - settings.SCORE_80_HIRINGS)
     else:
         raise Exception("unexpected value of hirings : %s" % hirings)
     if as_float:
@@ -83,13 +82,13 @@ def get_hirings_from_score(score):
     does exactly the reverse operation of get_score_from_hirings
     """
     if score <= 50:
-        hirings = SCORE_50_HIRINGS * score / 50.0
+        hirings = settings.SCORE_50_HIRINGS * score / 50.0
     elif score <= 60:
-        hirings = SCORE_50_HIRINGS + (score - 50) / 10.0 * (SCORE_60_HIRINGS - SCORE_50_HIRINGS)
+        hirings = settings.SCORE_50_HIRINGS + (score - 50) / 10.0 * (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS)
     elif score <= 80:
-        hirings = SCORE_60_HIRINGS + (score - 60) / 20.0 * (SCORE_80_HIRINGS - SCORE_60_HIRINGS)
+        hirings = settings.SCORE_60_HIRINGS + (score - 60) / 20.0 * (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS)
     elif score <= 100:
-        hirings = -1 + SCORE_80_HIRINGS + 10.0 ** ((score-80) / 20.0 * math.log10(SCORE_100_HIRINGS))
+        hirings = -1 + settings.SCORE_80_HIRINGS + 10.0 ** ((score-80) / 20.0 * math.log10(settings.SCORE_100_HIRINGS))
     else:
         raise Exception("unexpected value of score : %s" % score)
     return hirings
