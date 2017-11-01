@@ -267,7 +267,7 @@ request_body = {
 def drop_and_create_index():
     logging.info("drop and create index...")
     es = Elasticsearch(timeout=ES_TIMEOUT)
-    es.indices.delete(index=INDEX_NAME, ignore=[400, 404])
+    es.indices.delete(index=INDEX_NAME, params={'ignore': [400, 404]})
     es.indices.create(index=INDEX_NAME, body=request_body)
 
 
@@ -617,8 +617,10 @@ def update_offices():
             # Unfortunately these cannot easily be bulked :-(
             # The reason is there is no way to tell bulk to ignore missing documents (404)
             # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
-            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=delete_body, ignore=404)
-            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body, ignore=404)
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=delete_body,
+                      params={'ignore': 404})
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body,
+                      params={'ignore': 404})
 
             # Delete the current PDF, it will be regenerated at next download attempt.
             pdf_util.delete_file(office)
@@ -645,7 +647,7 @@ def update_offices_geolocations():
             office.save()
             # Apply changes in ElasticSearch.
             body = {'doc': {'locations': locations}}
-            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office.siret, body=body, ignore=404)
+            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
 
 
 def display_performance_stats(departement):
