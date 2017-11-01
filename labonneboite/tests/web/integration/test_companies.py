@@ -74,7 +74,10 @@ class RouteTest(DatabaseTest):
 
         # normal behavior
         rv = self.app.get("/%s/download" % self.office.siret)
+
         self.assertEqual(rv.status_code, 200)
+        self.assertEqual('application/pdf', rv.mimetype)
+        self.assertLess(1000, rv.content_length)
 
     def test_download_missing_siret(self):
         """
