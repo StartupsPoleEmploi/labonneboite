@@ -75,7 +75,7 @@ def back_up(backup_folder, table, name, timestamp, copy_to_remote_server=True, r
             table_new,
             backup_filename),
         shell=True)
-    
+
     if copy_to_remote_server:
         logger.info("copying the file to remote server")
         subprocess.check_call("scp %s %s@%s:%s " % (
@@ -294,7 +294,7 @@ def parse_dpae_line(line):
         "de 26 ans  50 ans": TRANCHE_AGE_MIDDLE,
         "+ de 50 ans": TRANCHE_AGE_SENIOR
     }
-    
+
     try:
         tranche_age = choices[remove_exotic_characters(fields[22])]
     except KeyError:

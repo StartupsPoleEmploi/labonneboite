@@ -46,7 +46,7 @@ def load_csv_file(filename, delimiter='|'):
         else:
             # first line of CSV file: headers should be ignored
             pass
-        
+
         len_previous_row = len(row)
 
     return rows

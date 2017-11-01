@@ -31,7 +31,7 @@ def _get_score_from_hirings(hirings, as_float=False):
     into a score (int between 50 and 100) just like in the previous binary classification model.
 
     The underlying formula has been designed when switching from a binary classification model
-    to a regression model, in order to roughly keep the same volumes of 1-stars, 2-stars, 
+    to a regression model, in order to roughly keep the same volumes of 1-stars, 2-stars,
     3-stars and 4-stars offices.
 
     0.0 stars ~ 0 hirings

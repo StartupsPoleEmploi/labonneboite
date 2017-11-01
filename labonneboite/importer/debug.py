@@ -14,7 +14,7 @@ class NamedPipe(object):
         except OSError: pass
         try: os.mkfifo(self.out_name,mode)
         except OSError: pass
-        
+
         # NOTE: The order the ends are opened in is important - both ends
         # of pipe 1 must be opened before the second pipe can be opened.
         if end:
@@ -27,7 +27,7 @@ class NamedPipe(object):
 
     def is_open(self):
         return not (self.inp.closed or self.out.closed)
-        
+
     def put(self,msg):
         if self.is_open():
             data = cPickle.dumps(msg,1)
@@ -36,17 +36,17 @@ class NamedPipe(object):
             self.out.flush()
         else:
             raise Exception("Pipe closed")
-        
+
     def get(self):
         txt=self.inp.readline()
-        if not txt: 
+        if not txt:
             self.inp.close()
         else:
             l = int(txt)
             data=self.inp.read(l)
             if len(data) < l: self.inp.close()
             return cPickle.loads(data)  # Convert back to python object.
-            
+
     def close(self):
         self.inp.close()
         self.out.close()
@@ -57,28 +57,28 @@ class NamedPipe(object):
 
     def __del__(self):
         self.close()
-        
+
 def remote_debug(sig,frame):
     """Handler to allow process to be remotely debugged."""
     def _raiseEx(ex):
         """Raise specified exception in the remote process"""
         _raiseEx.ex = ex
     _raiseEx.ex = None
-    
+
     try:
         # Provide some useful functions.
         locs = {'_raiseEx' : _raiseEx}
         locs.update(frame.f_locals)  # Unless shadowed.
         globs = frame.f_globals
-        
+
         pid = os.getpid()  # Use pipe name based on pid
         pipe = NamedPipe(pipename(pid))
-    
+
         old_stdout, old_stderr = sys.stdout, sys.stderr
         txt = ''
-        pipe.put("Interrupting process at following point:\n" + 
+        pipe.put("Interrupting process at following point:\n" +
                ''.join(traceback.format_stack(frame)) + ">>> ")
-        
+
         try:
             while pipe.is_open() and _raiseEx.ex is None:
                 line = pipe.get()
@@ -107,9 +107,9 @@ def remote_debug(sig,frame):
 
     except Exception:  # Don't allow debug exceptions to propogate to real program.
         traceback.print_exc()
-        
+
     if _raiseEx.ex is not None: raise _raiseEx.ex
-    
+
 def debug_process(pid):
     """Interrupt a running process and debug it."""
     os.kill(pid, signal.SIGUSR1)  # Signal process.

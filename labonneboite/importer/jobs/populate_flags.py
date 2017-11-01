@@ -28,7 +28,7 @@ def populate_flag(flag):
     cur.execute(query)
     con.commit()
     logger.info("completed populating %s ... " % flag)
-    
+
 
 def run_sql_script(sql_script):
     con, cur = import_util.create_cursor()
@@ -42,7 +42,7 @@ def run_sql_script(sql_script):
 
 def prepare_flags_junior_and_senior():
     logger.info("preparing flags_junior_and_senior...")
-    
+
     sql_script = """
         drop table if exists flag_tmp1;
         create table flag_tmp1 as
@@ -114,7 +114,7 @@ def prepare_flag_handicap():
             ( handicap_label = 'RQTH-MDT' )
         );
     """
-    
+
     run_sql_script(sql_script)
     logger.info("completed preparing flag_handicap.")
 

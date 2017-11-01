@@ -84,7 +84,7 @@ class GeocodeJob(Job):
             count += 1
             GEOCODING_STATS['jobs'] = GEOCODING_STATS.get('jobs', 0) + 1
             if not count % 10000:
-                logger.info("loading geocoding jobs from db... loaded %s rows", count) 
+                logger.info("loading geocoding jobs from db... loaded %s rows", count)
         logger.info("%i geocoding jobs created...", len(geocoding_jobs))
         return geocoding_jobs
 
@@ -164,7 +164,7 @@ class GeocodeUnit(object):
 
     def find_coordinates_for_address(self):
         """
-        finding coordinates for an address based on the BAN (base d'adresses nationale), 
+        finding coordinates for an address based on the BAN (base d'adresses nationale),
         an online governmental service.
         """
         coordinates = None
@@ -212,7 +212,7 @@ class GeocodeUnit(object):
                             GEOCODING_STATS['rollbacks'] = GEOCODING_STATS.get('rollbacks', 0) + 1
                 except ValueError:
                     logger.warn('ValueError in json-ing features result %s', response.text)
-                
+
         if coordinates:
             if coordinates == self.initial_coordinates:
                 GEOCODING_STATS['unchanged_coordinates'] = GEOCODING_STATS.get('unchanged_coordinates', 0) + 1
