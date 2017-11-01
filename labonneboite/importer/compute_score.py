@@ -9,11 +9,16 @@ We train a machine learning algorithm on companies and employment data to create
 
 We use the scikit-learn library : more info http://scikit-learn.org/stable/documentation.html
 """
-import sys
-
 from datetime import date, datetime
-from dateutil.relativedelta import relativedelta
+import logging
 from operator import getitem
+import os
+import pickle
+import sys
+from urlparse import urlparse
+import validators
+
+from dateutil.relativedelta import relativedelta
 
 import pandas as pd
 import numpy as np
@@ -23,13 +28,8 @@ from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import DpaeStatistics
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common.database import get_db_string
-import pickle
-import os
-from urlparse import urlparse
-import validators
+from .debug import listen
 
-import logging
-from debug import listen
 
 logger = logging.getLogger('main')
 listen()
@@ -56,7 +56,7 @@ def raise_with_message(msg):
 
 def debug_df(df, description="no description"):
     if len(DEBUG_SIRETS) >= 1:
-        logger.debug("dataframe debug info [%s] about sirets %s", 
+        logger.debug("dataframe debug info [%s] about sirets %s",
                      description, DEBUG_SIRETS)
         columns = list(df.columns)
         logger.debug("dataframe has %s rows and columns = %s", len(df), columns)
@@ -184,10 +184,10 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
     else:
         # FIXME cleanup - or reuse soon as we will compute all departements with a single model!?
         raise Exception("this code is never supposed to run")
-        logger.debug("selecting data from france, gonna be slow...")
-        df = pd.read_sql(dpae_table, engine)
-        logger.debug("reading data from etablissements")
-        df_etab = pd.read_sql(etablissement_table, engine)
+        # logger.debug("selecting data from france, gonna be slow...")
+        # df = pd.read_sql(dpae_table, engine)
+        # logger.debug("reading data from etablissements")
+        # df_etab = pd.read_sql(etablissement_table, engine)
     logger.debug("loading data (%s) OK (%i etablissements)!", departement, len(df_etab))
 
     debug_df(df, "before various filterings")
@@ -450,7 +450,7 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
         logger.info("support for %s: non-embauche %s, embauche %s", departement, support[0], support[1])
         logger.info("regression_train RMSE for %s: %s", departement, rmse_train)
         logger.info("regression_test RMSE for %s: %s", departement, rmse_test)
-        if not(rmse_test < importer_settings.RMSE_MAX):
+        if rmse_test >= importer_settings.RMSE_MAX:
             raise_with_message("rmse_test too high : %s > %s" % (rmse_test, importer_settings.RMSE_MAX))
     except IndexError:
         logger.warning("not enough data to compute RMSE for %s", departement)
@@ -536,10 +536,13 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
         logger.warn("no result for departement %s", departement)
     return result
 
-
-if __name__ == "__main__":
+def main():
     logging.basicConfig(
         level=logging.DEBUG
     )
     most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
-    run(importer_settings.OFFICE_TABLE, importer_settings.DPAE_TABLE, sys.argv[1], most_recent_data_date, semester_lag=1)
+    run(importer_settings.OFFICE_TABLE, importer_settings.DPAE_TABLE,
+        sys.argv[1], most_recent_data_date, semester_lag=1)
+
+if __name__ == "__main__":
+    main()
