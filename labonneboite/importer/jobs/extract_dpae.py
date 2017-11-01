@@ -40,7 +40,7 @@ class DpaeExtractJob(Job):
 
     def run_task(self):
         logger.info("extracting %s ", self.input_filename)
-        date_pattern = ".*_(\d\d\d\d\d\d\d\d)"
+        date_pattern = r'.*_(\d\d\d\d\d\d\d\d)'
         date_match = re.match(date_pattern, self.input_filename)
         if date_match:
             date_part = date_match.groups()[-1]
@@ -98,7 +98,9 @@ class DpaeExtractJob(Job):
                     continue
 
                 if hiring_date > initial_most_recent_data_date and hiring_date <= self.most_recent_data_date:
-                    statement = (siret, hiring_date, zipcode, contract_type, departement, contract_duration, iiann, tranche_age, handicap_label)
+                    statement = (siret, hiring_date, zipcode, contract_type,
+                                 departement, contract_duration, iiann,
+                                 tranche_age, handicap_label)
                     statements.append(statement)
                     imported_dpae += 1
 
@@ -137,6 +139,7 @@ class DpaeExtractJob(Job):
 
 
 if __name__ == "__main__":
+    import logging
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger('main')
     filename = sys.argv[1]
