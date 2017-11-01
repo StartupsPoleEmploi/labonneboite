@@ -40,5 +40,3 @@ def get_departements(largest_ones_first=False):
 
 DEPARTEMENTS = get_departements()
 DEPARTEMENTS_WITH_LARGEST_ONES_FIRST = get_departements(largest_ones_first=True)
-
-

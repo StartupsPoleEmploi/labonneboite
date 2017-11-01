@@ -121,11 +121,3 @@ def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
 
     # result should be integer
     return get_score_from_hirings(office_hirings_for_current_rome, as_float=False)
-
-
-
-
-
-
-
-

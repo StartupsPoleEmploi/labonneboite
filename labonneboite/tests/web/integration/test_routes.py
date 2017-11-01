@@ -64,4 +64,3 @@ class GenericUrlSearchRedirectionTest(AppTest):
         redirection_query = dict(parse_qsl(urlparse(rv.location).query))
         self.assertEqual(redirection_path, expected_path)
         self.assertEqual(redirection_query, expected_query)
-
