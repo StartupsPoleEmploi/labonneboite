@@ -15,6 +15,7 @@ from labonneboite.common.models import get_user_social_auth
 from labonneboite.common.models import Office
 from labonneboite.common.models import User
 from labonneboite.common.models import UserFavoriteOffice
+from labonneboite.common import pro
 from labonneboite.common import util
 from labonneboite.web.auth.views import logout
 from labonneboite.web.pagination import Pagination
@@ -163,10 +164,10 @@ def pro_version():
     """
     Enable or disable "Version PRO" which is only visible to "PRO users".
     """
-    if not util.user_is_pro:
+    if not pro.user_is_pro:
         abort(401)
 
-    if util.pro_version_enabled():
+    if pro.pro_version_enabled():
         session.pop('pro_version')
     else:
         session['pro_version'] = True

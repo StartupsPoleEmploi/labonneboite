@@ -6,7 +6,7 @@ from wtforms import StringField, SelectField, HiddenField, RadioField
 from wtforms.validators import DataRequired, Optional
 
 from labonneboite.conf import settings
-from labonneboite.common import util
+from labonneboite.common import pro
 from labonneboite.common import search
 from labonneboite.conf.common.settings_common import SORTING_CHOICES
 
@@ -117,7 +117,7 @@ class CompanySearchForm(FlaskForm):
             values['h'] = self.headcount.data
         if self.flag_alternance.data:
             values['f_a'] = self.flag_alternance.data
-        if util.pro_version_enabled():
+        if pro.pro_version_enabled():
             if self.public.data:
                 values['p'] = self.public.data
         return redirect(url_for(endpoint, **values))

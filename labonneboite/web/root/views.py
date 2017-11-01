@@ -3,7 +3,8 @@
 from flask import Blueprint, current_app
 from flask import abort, send_from_directory, redirect, render_template, request
 
-from labonneboite.common import util
+from labonneboite.common import doorbell
+from labonneboite.common import pro
 from labonneboite.conf import settings
 from labonneboite.web.search.forms import CompanySearchForm
 
@@ -23,7 +24,7 @@ def static_from_root():
 
 @rootBlueprint.route('/kit.pdf')
 def kit():
-    if util.pro_version_enabled():
+    if pro.pro_version_enabled():
         return send_from_directory(current_app.static_folder, 'kit.pdf')
     abort(404)
 
@@ -31,7 +32,7 @@ def kit():
 @rootBlueprint.route('/espace-presse')
 def press():
     context = {
-        'doorbell_tags': util.get_doorbell_tags('press'),
+        'doorbell_tags': doorbell.get_tags('press'),
     }
     return render_template('root/press.html', **context)
 
@@ -39,7 +40,7 @@ def press():
 @rootBlueprint.route('/comment-faire-une-candidature-spontanee')
 def lbb_help():
     context = {
-        'doorbell_tags': util.get_doorbell_tags('help'),
+        'doorbell_tags': doorbell.get_tags('help'),
     }
     return render_template('root/help.html', **context)
 
@@ -47,7 +48,7 @@ def lbb_help():
 @rootBlueprint.route('/faq')
 def faq():
     context = {
-        'doorbell_tags': util.get_doorbell_tags('faq'),
+        'doorbell_tags': doorbell.get_tags('faq'),
     }
     return render_template('root/faq.html', **context)
 

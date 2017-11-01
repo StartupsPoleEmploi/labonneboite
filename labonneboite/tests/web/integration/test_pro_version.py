@@ -2,7 +2,7 @@
 from urllib import urlencode
 import mock
 
-from labonneboite.common import util
+from labonneboite.common import pro
 from labonneboite.common.models import User
 from labonneboite.tests.test_base import DatabaseTest
 
@@ -22,19 +22,19 @@ class ProVersionTest(DatabaseTest):
 
         with self.test_request_context:
             # User which is not logged in should not be considered a pro user.
-            self.assertFalse(util.user_is_pro())
+            self.assertFalse(pro.user_is_pro())
 
             # User with a pro email should be considered as a pro user.
             self.login(user_pro)
-            self.assertTrue(util.user_is_pro())
+            self.assertTrue(pro.user_is_pro())
             self.logout()
-            self.assertFalse(util.user_is_pro())
+            self.assertFalse(pro.user_is_pro())
 
             # User with a non pro email should not be considered a pro user.
             self.login(user_public)
-            self.assertFalse(util.user_is_pro())
+            self.assertFalse(pro.user_is_pro())
             self.logout()
-            self.assertFalse(util.user_is_pro())
+            self.assertFalse(pro.user_is_pro())
 
     @mock.patch('labonneboite.conf.settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES', ['@pole-emploi.fr'])
     def test_enable_disable_pro_version_view(self):
@@ -51,8 +51,8 @@ class ProVersionTest(DatabaseTest):
 
             # Log the user in.
             self.login(user_pro)
-            self.assertTrue(util.user_is_pro())
-            self.assertFalse(util.pro_version_enabled())
+            self.assertTrue(pro.user_is_pro())
+            self.assertFalse(pro.pro_version_enabled())
 
             with self.app.session_transaction() as sess:
                 self.assertNotIn('pro_version', sess)
@@ -66,7 +66,7 @@ class ProVersionTest(DatabaseTest):
             # pro_version_enabled function is different from the session
             # provided by the self.app.session_transaction context manager, but
             # I don't know why.
-            # self.assertTrue(util.pro_version_enabled())
+            # self.assertTrue(pro.pro_version_enabled())
 
             with self.app.session_transaction() as sess:
                 self.assertIn('pro_version', sess)
@@ -76,7 +76,7 @@ class ProVersionTest(DatabaseTest):
             rv = self.app.get(url)
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, next_url)
-            self.assertFalse(util.pro_version_enabled())
+            self.assertFalse(pro.pro_version_enabled())
 
             with self.app.session_transaction() as sess:
                 self.assertNotIn('pro_version', sess)
