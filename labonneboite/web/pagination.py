@@ -131,6 +131,13 @@ class PaginationManager(object):
 class Page(object):
 
     def __init__(self, ranking, company_count, current_from_number, original_url):
+        """
+        Args:
+            ranking (int)
+            company_count (int)
+            current_from_number (int)
+            original_url (unicode)
+        """
         self.ranking = ranking
         self.company_count = company_count
         self._from_number = None
@@ -152,9 +159,13 @@ class Page(object):
         return self.get_from_number() == self.current_from_number
 
     def get_url(self):
+        """
+        Returns:
+            page_url (unicode)
+        """
         params = {'from': self.get_from_number(), 'to': self.get_to_number()}
         url_query = dict(urlparse.parse_qsl(self.url_parts[4]))
         url_query.update(params)
         self.url_parts[4] = urlencode(url_query)
         page_url = urlparse.urlunparse(self.url_parts)
-        return page_url
+        return page_url.decode('utf8')

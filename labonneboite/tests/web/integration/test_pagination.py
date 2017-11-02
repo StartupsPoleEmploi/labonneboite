@@ -21,7 +21,12 @@ class PaginationTest(unittest.TestCase):
 
 class PageTest(unittest.TestCase):
 
-    def test_unicode_url(self):
+    def test_unicode_query_parameter(self):
         original_url = u'/pouac?h=1l%C3%A0' # h=1là (observed in production)
         page = Page(1, 1, 1, original_url)
         self.assertEqual('/pouac?h=1l%C3%A0&from=11&to=1', page.get_url())
+
+    def test_page_url_is_unicode(self):
+        original_url = u'/nîmes' # (observed in production)
+        page = Page(1, 1, 1, original_url)
+        self.assertEqual('/nîmes?to=1&from=11', page.get_url().encode('utf8'))
