@@ -63,7 +63,7 @@ class GeocodeJob(Job):
 
     def create_geocoding_jobs(self):
         query = """select siret, numerorue, libellerue, codepostal, codecommune, coordinates_x, coordinates_y from %s""" % (settings.EXPORT_ETABLISSEMENT_TABLE)
-        con, cur = import_util.create_cursor()
+        _, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
         geocoding_jobs = []
@@ -84,7 +84,7 @@ class GeocodeJob(Job):
             count += 1
             GEOCODING_STATS['jobs'] = GEOCODING_STATS.get('jobs', 0) + 1
             if not count % 10000:
-                logger.info("loading geocoding jobs from db... loaded %s rows", count) 
+                logger.info("loading geocoding jobs from db... loaded %s rows", count)
         logger.info("%i geocoding jobs created...", len(geocoding_jobs))
         return geocoding_jobs
 
@@ -105,7 +105,7 @@ class GeocodeJob(Job):
 
 
     def validate_coordinates(self):
-        con, cur = import_util.create_cursor()
+        _, cur = import_util.create_cursor()
         query = """
         select
         sum(coordinates_x > 0 and coordinates_y > 0)/count(*)
@@ -113,7 +113,7 @@ class GeocodeJob(Job):
         """ % settings.EXPORT_ETABLISSEMENT_TABLE
         cur.execute(query)
         geocoding_ratio = cur.fetchall()[0][0]
-        logger.info("geocoding_ratio = %s" % geocoding_ratio)
+        logger.info("geocoding_ratio = %s", geocoding_ratio)
         if geocoding_ratio < 0.75:
             raise AbnormallyLowGeocodingRatioException
 
@@ -147,7 +147,7 @@ class GeocodeJob(Job):
         logger.info("updating coordinates...")
         self.update_coordinates(coordinates_updates)
         logger.info("updated %i coordinates !", len(coordinates_updates))
-        logger.info("GEOCODING_STATS = %s" % GEOCODING_STATS)
+        logger.info("GEOCODING_STATS = %s", GEOCODING_STATS)
         logger.info("validating coordinates...")
         self.validate_coordinates()
         logger.info("validated coordinates !")
@@ -164,7 +164,7 @@ class GeocodeUnit(object):
 
     def find_coordinates_for_address(self):
         """
-        finding coordinates for an address based on the BAN (base d'adresses nationale), 
+        finding coordinates for an address based on the BAN (base d'adresses nationale),
         an online governmental service.
         """
         coordinates = None
@@ -212,7 +212,7 @@ class GeocodeUnit(object):
                             GEOCODING_STATS['rollbacks'] = GEOCODING_STATS.get('rollbacks', 0) + 1
                 except ValueError:
                     logger.warn('ValueError in json-ing features result %s', response.text)
-                
+
         if coordinates:
             if coordinates == self.initial_coordinates:
                 GEOCODING_STATS['unchanged_coordinates'] = GEOCODING_STATS.get('unchanged_coordinates', 0) + 1

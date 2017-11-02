@@ -33,19 +33,19 @@ class DpaeExtractJob(Job):
 
     # actually never used
     def print_dpae_distribution(self, imported_dpae_distribution):
-        for year, year_dic in sorted(imported_dpae_distribution.items()):
-            for month, month_dic in sorted(imported_dpae_distribution[year].items()):
+        for year, _ in sorted(imported_dpae_distribution.items()):
+            for month, _ in sorted(imported_dpae_distribution[year].items()):
                 for day, count in sorted(imported_dpae_distribution[year][month].items()):
                     logger.info("year: %s, month: %s, day: %s, dpae count %s", year, month, day, count)
 
     def run_task(self):
         logger.info("extracting %s ", self.input_filename)
-        date_pattern = ".*_(\d\d\d\d\d\d\d\d)"
+        date_pattern = r'.*_(\d\d\d\d\d\d\d\d)'
         date_match = re.match(date_pattern, self.input_filename)
         if date_match:
             date_part = date_match.groups()[-1]
             self.most_recent_data_date = datetime.strptime(date_part, "%Y%m%d")
-            logger.debug("identified most_recent_data_date=%s" % self.most_recent_data_date)
+            logger.debug("identified most_recent_data_date=%s", self.most_recent_data_date)
         else:
             raise Exception("couldn't find a date pattern in filename. filename should be dpae_XYZ_20xxxxxx.tar.gz")
 
@@ -58,9 +58,8 @@ class DpaeExtractJob(Job):
         not_imported_dpae = 0
         initial_most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
 
-        logger.info("will now extract all dpae with hiring_date between %s and %s" % (
-            initial_most_recent_data_date, self.most_recent_data_date
-        ))
+        logger.info("will now extract all dpae with hiring_date between %s and %s",
+                    initial_most_recent_data_date, self.most_recent_data_date)
 
         with import_util.get_reader(self.input_filename) as myfile:
             con, cur = import_util.create_cursor()
@@ -99,7 +98,9 @@ class DpaeExtractJob(Job):
                     continue
 
                 if hiring_date > initial_most_recent_data_date and hiring_date <= self.most_recent_data_date:
-                    statement = (siret, hiring_date, zipcode, contract_type, departement, contract_duration, iiann, tranche_age, handicap_label)
+                    statement = (siret, hiring_date, zipcode, contract_type,
+                                 departement, contract_duration, iiann,
+                                 tranche_age, handicap_label)
                     statements.append(statement)
                     imported_dpae += 1
 
@@ -138,6 +139,7 @@ class DpaeExtractJob(Job):
 
 
 if __name__ == "__main__":
+    import logging
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger('main')
     filename = sys.argv[1]

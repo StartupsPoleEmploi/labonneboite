@@ -57,7 +57,7 @@ class EtablissementExtractJob(Job):
         self.input_filename = etablissement_filename
 
     def after_check(self):
-        con, cur = import_util.create_cursor()
+        _, cur = import_util.create_cursor()
         for departement in settings.DEPARTEMENTS:
             query = "select count(1) from %s where departement='%s'" % (
                 settings.OFFICE_TABLE,
@@ -89,7 +89,7 @@ class EtablissementExtractJob(Job):
     def get_sirets_from_database(self):
         query = "select siret from %s where siret != ''" % settings.OFFICE_TABLE
         logger.info("get etablissements from database")
-        con, cur = import_util.create_cursor()
+        _, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
         return [row[0] for row in rows]
@@ -113,7 +113,7 @@ class EtablissementExtractJob(Job):
         where siret=%%s""" % settings.OFFICE_TABLE
 
         count = 1
-        logger.info("update updatable etablissements in table %s" % settings.OFFICE_TABLE)
+        logger.info("update updatable etablissements in table %s", settings.OFFICE_TABLE)
         statements = []
         MAX_COUNT_EXECUTE = 500
         for siret in self.updatable_sirets:
@@ -140,7 +140,7 @@ class EtablissementExtractJob(Job):
         values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.OFFICE_TABLE
 
         count = 1
-        logger.info("create new etablissements in table %s" % settings.OFFICE_TABLE)
+        logger.info("create new etablissements in table %s", settings.OFFICE_TABLE)
         statements = []
         MAX_COUNT_EXECUTE = 500
         for siret in self.creatable_sirets:
@@ -166,7 +166,7 @@ class EtablissementExtractJob(Job):
                 cur.execute(query)
                 con.commit()
             except:
-                logger.warning("deletable_sirets=%s" % self.deletable_sirets)
+                logger.warning("deletable_sirets=%s", self.deletable_sirets)
                 raise
             logger.info("%i old offices deleted.", len(self.deletable_sirets))
 
@@ -178,7 +178,7 @@ class EtablissementExtractJob(Job):
         departement_errors = 0
         unprocessable_departement_errors = 0
         format_errors = 0
-        con, cur = import_util.create_cursor()
+        _, _ = import_util.create_cursor()
         departement_counter_dic = {}
         etablissements = {}
 
@@ -195,16 +195,15 @@ class EtablissementExtractJob(Job):
                 try:
                     fields = import_util.get_fields_from_csv_line(line)
                     if len(fields) != 16:
-                        logger.exception("wrong number of fields in line %s" % line)
+                        logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
 
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
                         libellerue, codecommune, codepostal, email, tel, \
-                        trancheeffectif_etablissement, effectif_etablissement, \
-                        trancheeffectif_entreprise, date_creation_entreprise, \
+                        trancheeffectif_etablissement, _, _, _, \
                         website1, website2 = fields
                 except ValueError:
-                    logger.exception("exception in line %s" % line)
+                    logger.exception("exception in line %s", line)
                     format_errors += 1
                     continue
 
@@ -243,12 +242,12 @@ class EtablissementExtractJob(Job):
                 else:
                     no_zipcode_count += 1
 
-        logger.info("%i etablissements total" % count)
-        logger.info("%i etablissements with incorrect departement" % departement_errors)
-        logger.info("%i etablissements with unprocessable departement" % unprocessable_departement_errors)
+        logger.info("%i etablissements total", count)
+        logger.info("%i etablissements with incorrect departement", departement_errors)
+        logger.info("%i etablissements with unprocessable departement", unprocessable_departement_errors)
         logger.info("%i etablissements with no zipcodes", no_zipcode_count)
         logger.info("%i etablissements not read because of format error", format_errors)
-        logger.info("%i number of departements from file" % len(departement_counter_dic))
+        logger.info("%i number of departements from file", len(departement_counter_dic))
         departement_count = sorted(departement_counter_dic.items())
         logger.info("per departement read %s", departement_count)
         logger.info("finished reading etablissements...")
@@ -262,12 +261,12 @@ class EtablissementExtractJob(Job):
         if format_errors > 5:
             raise "too many format_errors"
         if len(departement_counter_dic) not in [96, 15]:  # 96 in production, 15 in test
-            logger.exception("incorrect total number of departements : %s" % len(departement_counter_dic))
+            logger.exception("incorrect total number of departements : %s", len(departement_counter_dic))
             raise "incorrect total number of departements"
         if len(departement_counter_dic) == 96:
             for departement, count in departement_count:
                 if count < 10000:
-                    logger.exception("only %s etablissements in departement %s" % (count, departement))
+                    logger.exception("only %s etablissements in departement %s", count, departement)
                     raise "not enough etablissements in at least one departement"
 
         return etablissements

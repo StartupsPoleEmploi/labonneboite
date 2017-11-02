@@ -48,7 +48,7 @@ def check_for_updates(input_folder):
         if not is_processed(full_name):
             new_files.append(full_name)
         else:
-            logger.info("file %s was already processed and will thus be ignored" % full_name)
+            logger.info("file %s was already processed and will thus be ignored", full_name)
     return new_files
 
 
@@ -75,7 +75,7 @@ def back_up(backup_folder, table, name, timestamp, copy_to_remote_server=True, r
             table_new,
             backup_filename),
         shell=True)
-    
+
     if copy_to_remote_server:
         logger.info("copying the file to remote server")
         subprocess.check_call("scp %s %s@%s:%s " % (
@@ -112,9 +112,9 @@ def check_runnable(filename, file_type):
 def detect_runnable_file(file_type):
     logger.info("detect runnable file for file type: %s", file_type)
     for filename in check_for_updates(importer_settings.INPUT_SOURCE_FOLDER):
-        logger.info("inspecting file %s" % filename)
+        logger.info("inspecting file %s", filename)
         if check_runnable(filename, file_type):
-            logger.info("will run this file : %s" % filename)
+            logger.info("will run this file : %s", filename)
             return filename
     logger.info("no runnable file found!")
     return None
@@ -128,7 +128,7 @@ def reduce_scores_into_table(description, create_table_filename, departements, t
 
     WARNING : this drops the original target_table and repopulates it from scratch
     """
-    logger.info("reducing scores %s ..." % description)
+    logger.info("reducing scores %s ...", description)
     sql_filepath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", create_table_filename)
     init_query = open(sql_filepath, "r").read()
     if importer_settings.MYSQL_NO_PASSWORD:
@@ -148,10 +148,10 @@ def reduce_scores_into_table(description, create_table_filename, departements, t
         try:
             subprocess.check_call("""mysql -u %s %s %s -e'%s'""" % (DATABASE['USER'], password_statement, DATABASE['NAME'], query), shell=True)
         except:
-            logger.error("an error happened in reducing %s %s" % (departement, description))
+            logger.error("an error happened in reducing %s %s", departement, description)
             raise
-    logger.info("score reduction %s finished, all data available in table %s" % (
-        description, target_table))
+    logger.info("score reduction %s finished, all data available in table %s",
+                description, target_table)
 
 
 def get_select_fields_for_main_db():
@@ -294,7 +294,7 @@ def parse_dpae_line(line):
         "de 26 ans  50 ans": TRANCHE_AGE_MIDDLE,
         "+ de 50 ans": TRANCHE_AGE_SENIOR
     }
-    
+
     try:
         tranche_age = choices[remove_exotic_characters(fields[22])]
     except KeyError:

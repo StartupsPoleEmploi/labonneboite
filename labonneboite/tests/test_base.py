@@ -101,7 +101,7 @@ class DatabaseTest(AppTest):
     ES_OFFICE_TYPE = 'office'
 
     def drop_and_create_es_index(self):
-        self.es.indices.delete(index=self.ES_TEST_INDEX, ignore=[400, 404])
+        self.es.indices.delete(index=self.ES_TEST_INDEX, params={'ignore': [400, 404]})
         self.es.indices.create(index=self.ES_TEST_INDEX, body=request_body)
 
     def setUp(self):

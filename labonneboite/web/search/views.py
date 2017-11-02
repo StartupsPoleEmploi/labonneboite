@@ -10,6 +10,8 @@ from flask import Blueprint, current_app
 from flask_login import current_user
 
 from labonneboite.common import geocoding
+from labonneboite.common import doorbell
+from labonneboite.common import pro
 from labonneboite.common import util
 from labonneboite.common import search as search_util
 from labonneboite.common import mapping as mapping_util
@@ -105,7 +107,7 @@ def get_parameters(args):
         kwargs['public'] = search_util.PUBLIC_ALL
 
     # ensure PRO filters are never used in the public version
-    if not util.pro_version_enabled():
+    if not pro.pro_version_enabled():
         del kwargs['public']
 
     return kwargs
@@ -199,7 +201,7 @@ def results(city, zipcode, occupation):
         'companies': list(companies),
         'company_count': company_count,
         'distance': kwargs['distance'],
-        'doorbell_tags': util.get_doorbell_tags('results'),
+        'doorbell_tags': doorbell.get_tags('results'),
         'form': form,
         'headcount': kwargs['headcount'],
         'job_doesnt_exist': False,

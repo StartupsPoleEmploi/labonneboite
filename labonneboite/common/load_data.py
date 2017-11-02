@@ -46,7 +46,7 @@ def load_csv_file(filename, delimiter='|'):
         else:
             # first line of CSV file: headers should be ignored
             pass
-        
+
         len_previous_row = len(row)
 
     return rows
@@ -144,6 +144,3 @@ def load_naf_labels():
 @lru_cache(maxsize=None)
 def load_rome_naf_mapping():
     return load_csv_file(ROME_NAF_FILE, delimiter=',')
-
-
-

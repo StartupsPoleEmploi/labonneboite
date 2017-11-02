@@ -24,7 +24,8 @@ from flask_mandrill import Mandrill
 from flask_wtf.csrf import CSRFProtect
 
 # labonneboite.
-from labonneboite.common import util
+from labonneboite.common import hotjar
+from labonneboite.common import pro
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common.database import db_session, engine  # This is how we talk to the database.
 from labonneboite.common.models import User
@@ -182,12 +183,12 @@ def register_context_processors(flask_app):
     """
     def inject_dict_for_all_templates():
         return {
-            'hotjar_tag': util.get_hotjar_tag(),
+            'hotjar_tag': hotjar.get_hotjar_tag(),
             'is_alternance': session.get('search_args', {}).get('f_a') == u'1',
             'mapbox_css_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css',
             'mapbox_js_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js',
-            'user_is_pro': util.user_is_pro(),
-            'pro_version_enabled': util.pro_version_enabled()
+            'user_is_pro': pro.user_is_pro(),
+            'pro_version_enabled': pro.pro_version_enabled()
         }
 
     def inject_user():

@@ -2,12 +2,8 @@ import logging
 import os
 import tarfile
 
-import math
-from datetime import datetime
-
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings
-from labonneboite.importer.models.computing import ImportTask
 from .base import Job
 from .common import logger
 
@@ -20,7 +16,7 @@ def populate_flags():
 
 
 def populate_flag(flag):
-    logger.info("populating %s ... " % flag)
+    logger.info("populating %s ... ", flag)
     con, cur = import_util.create_cursor()
     query = """
         UPDATE
@@ -31,8 +27,8 @@ def populate_flag(flag):
     """ % (settings.EXPORT_ETABLISSEMENT_TABLE, flag, flag)
     cur.execute(query)
     con.commit()
-    logger.info("completed populating %s ... " % flag)
-    
+    logger.info("completed populating %s ... ", flag)
+
 
 def run_sql_script(sql_script):
     con, cur = import_util.create_cursor()
@@ -46,7 +42,7 @@ def run_sql_script(sql_script):
 
 def prepare_flags_junior_and_senior():
     logger.info("preparing flags_junior_and_senior...")
-    
+
     sql_script = """
         drop table if exists flag_tmp1;
         create table flag_tmp1 as
@@ -118,7 +114,7 @@ def prepare_flag_handicap():
             ( handicap_label = 'RQTH-MDT' )
         );
     """
-    
+
     run_sql_script(sql_script)
     logger.info("completed preparing flag_handicap.")
 
@@ -134,7 +130,7 @@ def dump():
 
     tar_filename = os.path.join(settings.BACKUP_FOLDER, "%s.tar.bz2" % timestamp)
     with tarfile.open(tar_filename, "w:bz2") as tar:
-        logger.info("creating tar file %s..." % tar_filename)
+        logger.info("creating tar file %s...", tar_filename)
         tar.add(etab_result, arcname=os.path.basename(etab_result))
         tar.close()
     return tar_filename

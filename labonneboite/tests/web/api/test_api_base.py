@@ -83,7 +83,7 @@ class ApiBaseTest(DatabaseTest):
         super(ApiBaseTest, self).setUp(*args, **kwargs)
 
         # Delete index.
-        self.es.indices.delete(index=self.ES_TEST_INDEX, ignore=[404])
+        self.es.indices.delete(index=self.ES_TEST_INDEX, params={'ignore': [404]})
 
         # Create new index.
         request_body = {

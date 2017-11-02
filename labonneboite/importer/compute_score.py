@@ -9,11 +9,16 @@ We train a machine learning algorithm on companies and employment data to create
 
 We use the scikit-learn library : more info http://scikit-learn.org/stable/documentation.html
 """
-import sys
-
 from datetime import date, datetime
-from dateutil.relativedelta import relativedelta
+import logging
 from operator import getitem
+import os
+import pickle
+import sys
+from urlparse import urlparse
+import validators
+
+from dateutil.relativedelta import relativedelta
 
 import pandas as pd
 import numpy as np
@@ -21,16 +26,10 @@ import sqlalchemy
 from sqlalchemy.pool import NullPool
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import DpaeStatistics
-from labonneboite.importer import util as import_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common.database import get_db_string
-import pickle
-import os
-from urlparse import urlparse
-import validators
+from .debug import listen
 
-import logging
-from debug import listen
 
 logger = logging.getLogger('main')
 listen()
@@ -51,29 +50,22 @@ class NotEnoughDataException(Exception):
 
 
 def raise_with_message(msg):
-    logger.info("WARNING exception: %s" % msg)
+    logger.info("WARNING exception: %s", msg)
     raise Exception(msg)
 
 
 def debug_df(df, description="no description"):
     if len(DEBUG_SIRETS) >= 1:
-        logger.debug("dataframe debug info [%s] about sirets %s" % (
-            description,
-            DEBUG_SIRETS
-        ))
+        logger.debug("dataframe debug info [%s] about sirets %s",
+                     description, DEBUG_SIRETS)
         columns = list(df.columns)
-        logger.debug("dataframe has %s rows and columns = %s" % (
-            len(df),
-            columns
-        ))
+        logger.debug("dataframe has %s rows and columns = %s", len(df), columns)
         if "siret" in columns:
             tmp_df = df[df.siret.isin(DEBUG_SIRETS)]
-            logger.debug("dataframe content :\n %s" % (
-                tmp_df
-            ))
+            logger.debug("dataframe content :\n %s", tmp_df)
         else:
             logger.debug("dataframe does not have a siret colum")
-            logger.debug("columns : %s" % columns)
+            logger.debug("columns : %s", columns)
 
 
 def discarded_check(departement):
@@ -156,7 +148,7 @@ def merge_and_normalize_websites(websites):
 
 
 def load_df(engine, etablissement_table, dpae_table, departement, most_recent_data_date):
-    logger.debug("reading data with most recent data date %s..." % most_recent_data_date)
+    logger.debug("reading data with most recent data date %s...", most_recent_data_date)
     if departement:
         logger.debug("filtering by departement (%s)...", departement)
         # keep only contract_type = 2 (CDI) and contract_type = 1 (CDD which last at least one month)
@@ -166,7 +158,7 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
             """ % (dpae_table, departement), engine)
         debug_df(df, "after loading from dpae table")
         if df.empty:
-            logger.warning("no dpae data for departement %s" % departement)
+            logger.warning("no dpae data for departement %s", departement)
             return None
         logger.debug("reading data from etablissements (%s)", departement)
         df_etab = pd.read_sql_query("""
@@ -187,15 +179,15 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
             raise Exception("missing website column")
 
         if df_etab.empty:
-            logger.warning("dataframe empty for departement %s" % departement)
+            logger.warning("dataframe empty for departement %s", departement)
             return None
     else:
         # FIXME cleanup - or reuse soon as we will compute all departements with a single model!?
         raise Exception("this code is never supposed to run")
-        logger.debug("selecting data from france, gonna be slow...")
-        df = pd.read_sql(dpae_table, engine)
-        logger.debug("reading data from etablissements")
-        df_etab = pd.read_sql(etablissement_table, engine)
+        # logger.debug("selecting data from france, gonna be slow...")
+        # df = pd.read_sql(dpae_table, engine)
+        # logger.debug("reading data from etablissements")
+        # df_etab = pd.read_sql(etablissement_table, engine)
     logger.debug("loading data (%s) OK (%i etablissements)!", departement, len(df_etab))
 
     debug_df(df, "before various filterings")
@@ -279,7 +271,7 @@ def compute_reference_date(most_recent_data_date):
         year_reference = most_recent_data_date.year
     reference_date = date(year_reference, month_reference, 1)
 
-    logger.info("reference date %s" % reference_date)
+    logger.info("reference date %s", reference_date)
     return reference_date
 
 
@@ -353,7 +345,7 @@ def add_features(df_final, departement, reference_date, feature_semester_count, 
                                                get_feature_names=True)
 
     semester = 'semester-%i' % (semester_lag + 1)
-    logger.debug("outcome: has hired in %s" % semester)
+    logger.debug("outcome: has hired in %s", semester)
     y = df_final.apply(has_hired_semester(semester), axis=1)
     y_regr = df_final.apply(total_hired_semester(semester), axis=1)
     if get_feature_names:
@@ -386,7 +378,7 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
         semester_lag,
         get_feature_names=True)
     debug_df(df_final, "df_final after add_features")
-    logger.debug("X_train_feature_names: %s" % X_train_feature_names)
+    logger.debug("X_train_feature_names: %s", X_train_feature_names)
 
     logger.debug("%s offices (%s)", len(df_final), departement)
 
@@ -397,21 +389,21 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
     logger.debug("fitting the model on X_train (%s)...", departement)
     clf.fit(X_train, y_train_bin)
     regr.fit(X_train, y_train_regr)
-    logger.debug("regression_coefficients (fitting done on X_train) : %s" % regr.coef_)
+    logger.debug("regression_coefficients (fitting done on X_train) : %s", regr.coef_)
     logger.debug("fitting done (%s)!", departement)
 
     y_train_bin_pred = clf.predict(X_train)
     y_train_regr_pred = regr.predict(X_train)
 
     X_test, X_test_feature_names = create_feature_vector(df_final, 0, debug_msg="X_test", get_feature_names=True)
-    logger.debug("X_test_feature_names: %s" % X_test_feature_names)
+    logger.debug("X_test_feature_names: %s", X_test_feature_names)
     y_test_bin = df_final.apply(has_hired_semester('semester-1'), axis=1)
     y_test_bin_pred = clf.predict(X_test)
     y_test_regr = df_final.apply(total_hired_semester('semester-1'), axis=1)
     y_test_regr_pred = regr.predict(X_test)
 
     X_live, X_live_feature_names = create_feature_vector(df_final, -2 + semester_lag, debug_msg="X_live", get_feature_names=True)
-    logger.debug("X_live_feature_names: %s" % X_live_feature_names)
+    logger.debug("X_live_feature_names: %s", X_live_feature_names)
 
     # 1) --- binary classification metrics
     precision_train, recall_train, _, _ = precision_recall_fscore_support(y_train_bin, y_train_bin_pred)
@@ -458,7 +450,7 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
         logger.info("support for %s: non-embauche %s, embauche %s", departement, support[0], support[1])
         logger.info("regression_train RMSE for %s: %s", departement, rmse_train)
         logger.info("regression_test RMSE for %s: %s", departement, rmse_test)
-        if not(rmse_test < importer_settings.RMSE_MAX):
+        if rmse_test >= importer_settings.RMSE_MAX:
             raise_with_message("rmse_test too high : %s > %s" % (rmse_test, importer_settings.RMSE_MAX))
     except IndexError:
         logger.warning("not enough data to compute RMSE for %s", departement)
@@ -497,7 +489,7 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
     if result:
         logger.debug("result obtained for departement %s", departement)
         reference_date = compute_reference_date(dpae_date)
-        df, df_dpae = result
+        df, _ = result
         train(df, departement, reference_date, semester_lag)
 
         logger.debug("fetching existing scores for %s", departement)
@@ -509,7 +501,7 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
         )
         debug_df(df_existing_score, "df_existing_score")
         if df_existing_score.empty:
-            logger.debug("no scores for now for departement %s, bypassing score regression..." % departement)
+            logger.debug("no scores for now for departement %s, bypassing score regression...", departement)
         else:
             logger.debug("merging existing scores for %s", departement)
             # merge doc : http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.merge.html
@@ -544,10 +536,13 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
         logger.warn("no result for departement %s", departement)
     return result
 
-
-if __name__ == "__main__":
+def main():
     logging.basicConfig(
         level=logging.DEBUG
     )
     most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
-    run(importer_settings.OFFICE_TABLE, importer_settings.DPAE_TABLE, sys.argv[1], most_recent_data_date, semester_lag=1)
+    run(importer_settings.OFFICE_TABLE, importer_settings.DPAE_TABLE,
+        sys.argv[1], most_recent_data_date, semester_lag=1)
+
+if __name__ == "__main__":
+    main()

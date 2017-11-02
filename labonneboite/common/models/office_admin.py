@@ -119,7 +119,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
 
     # Set `boost` to True to promote the offfice.
     boost = Column(Boolean, default=False, nullable=False)
-    
+
     # Stores a list of ROME codes as a string separated by `ROMES_SEPARATORS`.
     # If `romes_to_boost` is populated, boosting will be set only for specified ROME codes.
     romes_to_boost = Column(Text, default='', nullable=False)

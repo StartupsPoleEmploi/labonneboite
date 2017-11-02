@@ -72,7 +72,7 @@ class VariousModesTest(CreateIndexBaseTest):
     def test_create_index(self):
         script.update_data_profiling_wrapper(
             drop_indexes=False,
-            enable_profiling=False, 
+            enable_profiling=False,
             single_job=False,
             disable_parallel_computing=True,
         )
@@ -80,7 +80,7 @@ class VariousModesTest(CreateIndexBaseTest):
     def test_create_index_from_scratch(self):
         script.update_data_profiling_wrapper(
             drop_indexes=True,
-            enable_profiling=False, 
+            enable_profiling=False,
             single_job=False,
             disable_parallel_computing=True,
         )
@@ -88,7 +88,7 @@ class VariousModesTest(CreateIndexBaseTest):
     def test_create_index_from_scratch_with_profiling(self):
         script.update_data_profiling_wrapper(
             drop_indexes=True,
-            enable_profiling=True, 
+            enable_profiling=True,
             single_job=False,
             disable_parallel_computing=True,
         )
@@ -96,7 +96,7 @@ class VariousModesTest(CreateIndexBaseTest):
     def test_create_index_from_scratch_with_profiling_single_job(self):
         script.update_data_profiling_wrapper(
             drop_indexes=True,
-            enable_profiling=True, 
+            enable_profiling=True,
             single_job=True,
             disable_parallel_computing=True,
         )
@@ -106,7 +106,7 @@ class VariousModesTest(CreateIndexBaseTest):
         # thus we need to rebuild normal data now:
         script.update_data_profiling_wrapper(
             drop_indexes=True,
-            enable_profiling=False, 
+            enable_profiling=False,
             single_job=False,
             disable_parallel_computing=True,
         )
