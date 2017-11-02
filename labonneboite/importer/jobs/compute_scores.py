@@ -20,15 +20,8 @@ from labonneboite.importer import settings
 from labonneboite.importer import compute_score
 from labonneboite.importer import util as import_util
 from labonneboite.importer.models.computing import DpaeStatistics
-from labonneboite.importer.jobs.base import Job
-
-
-logger = logging.getLogger('main')
-formatter = logging.Formatter("%(levelname)s - IMPORTER - %(message)s")
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+from .base import Job
+from .common import logger
 
 COMPUTE_SCORE_TIMEOUT = 3600 * 8  # computing scores for 75 might take 4h+
 

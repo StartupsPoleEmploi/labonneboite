@@ -5,15 +5,6 @@ This module assists in finding and assigning geo coordinates to etablissements.
 
 """
 
-import logging
-
-logger = logging.getLogger('main')
-formatter = logging.Formatter("%(levelname)s - IMPORTER - %(message)s")
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 from labonneboite.common.database import db_session
 
 import gevent.monkey
@@ -38,12 +29,10 @@ CITY_NAMES = load_city_codes()
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.models.computing import Geolocation
-from base import Job
+from .base import Job
+from .common import logger
 
 from sqlalchemy.exc import IntegrityError
-
-import logging
-logger = logging.getLogger('main')
 
 
 class IncorrectAdressDataException(Exception):

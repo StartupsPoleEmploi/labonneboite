@@ -1,4 +1,5 @@
 # coding: utf8
+import logging
 import unittest
 
 from elasticsearch import Elasticsearch
@@ -40,6 +41,8 @@ class AppTest(unittest.TestCase):
         self.app = app.test_client()
         self.app_context = app.app_context()
         self.test_request_context = app.test_request_context()
+        # Disable logging
+        app.logger.setLevel(logging.CRITICAL)
         return super(AppTest, self).setUp()
 
     def url_for(self, endpoint, **kwargs):
@@ -104,6 +107,7 @@ class DatabaseTest(AppTest):
     def setUp(self):
 
         # Create MySQL tables.
+        delete_db()
         init_db()
 
         # Create ES index.

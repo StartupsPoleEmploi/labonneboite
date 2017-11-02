@@ -1,15 +1,7 @@
-import logging
-logger = logging.getLogger('main')
-formatter = logging.Formatter("%(levelname)s - IMPORTER - %(message)s")
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 import sys
 import os
 from labonneboite.importer import util as import_util
-
+from .common import logger
 
 if __name__ == "__main__":
     filename = import_util.detect_runnable_file("etablissements")

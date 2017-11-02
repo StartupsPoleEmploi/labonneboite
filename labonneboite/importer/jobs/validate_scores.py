@@ -3,16 +3,8 @@
 Validates scoring data produced by compute_scores.
 """
 
-import logging
-
-logger = logging.getLogger('main')
-formatter = logging.Formatter("%(levelname)s - IMPORTER - %(message)s")
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 from labonneboite.importer import sanity
+from .common import logger
 
 COMPUTE_SCORE_TIMEOUT = 3600 * 4  # four hours should be largely enough to compute scores for an entire departement
 

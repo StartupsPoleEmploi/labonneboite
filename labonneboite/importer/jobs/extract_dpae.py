@@ -15,17 +15,9 @@ from sqlalchemy.exc import OperationalError
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import parse_dpae_line, DepartementException, TooFewFieldsException
-from base import Job
 from labonneboite.importer.models.computing import DpaeStatistics, ImportTask
-
-import logging
-
-logger = logging.getLogger('main')
-formatter = logging.Formatter("%(levelname)s - IMPORTER - %(message)s")
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+from .base import Job
+from .common import logger
 
 
 class DpaeExtractJob(Job):
