@@ -157,6 +157,8 @@ def results(city, zipcode, occupation):
 
     if not zipcode_has_no_city_error:
         current_app.logger.debug("fetching companies and company_count")
+        # Note that if a NAF filter is selected, naf_aggregations will be a list of
+        # only one NAF, the one currently selected in the filter.
         companies, naf_aggregations = fetcher.get_companies()
         for alternative, count in fetcher.alternative_rome_codes.iteritems():
             if settings.ROME_DESCRIPTIONS.get(alternative) and count:
@@ -179,7 +181,11 @@ def results(city, zipcode, occupation):
         # position is later used in labonneboite/web/static/js/results.js
         company.position = position
 
-    # Get NAF code and their descriptions.
+    # If a NAF filter is selected, previous naf_aggregations returned by fetcher.get_companies()
+    # was actually only one NAF, the one NAF currently selected in the filter.
+    # Let's do a second call, only if a NAF filter is selected.
+    # This logic is designed to make only one elasticsearch call in the most frequent case (no NAF filter selected)
+    # and make two elasticsearch calls in the rarest case only (NAF filter selected).
     if kwargs["naf"]:
         naf_aggregations = fetcher.get_naf_aggregations()
 
