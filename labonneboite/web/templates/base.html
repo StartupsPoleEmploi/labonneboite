@@ -185,6 +185,13 @@
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
     ga('create', 'UA-69464544-1', 'auto');
     ga('send', 'pageview');
+
+    {% if pro_version_enabled %}
+    ga('set', 'dimension1', 1);
+    {% else %}
+    ga('set', 'dimension1', 0);
+    {% endif %}
+
   </script>
 
   {# Hotjar Tracking Code for labonneboite.pole-emploi.fr #}
