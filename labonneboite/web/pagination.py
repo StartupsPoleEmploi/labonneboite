@@ -68,9 +68,7 @@ class PaginationManager(object):
     def _run(self):
         min_page, max_page = self.get_lower_and_upper_pages()
         for ranking in range(min_page, max_page):
-            url_parts = list(urlparse.urlparse(self.full_path_url))
-            page = Page(ranking, self.company_count, self.current_from_number,
-                        url_parts)
+            page = self._get_page(ranking)
             self.pages.append(page)
 
     def should_show(self):
@@ -121,29 +119,24 @@ class PaginationManager(object):
         return max_page < self.get_page_count()
 
     def get_first_page(self):
-        ranking = 0
-        url_parts = list(urlparse.urlparse(self.full_path_url))
-        page = Page(ranking, self.company_count, self.current_from_number,
-                    url_parts)
-        return page
+        return self._get_page(0)
 
     def get_last_page(self):
-        ranking = self.get_page_count() - 1
-        url_parts = list(urlparse.urlparse(self.full_path_url))
-        page = Page(ranking, self.company_count, self.current_from_number,
-                    url_parts)
-        return page
+        return self._get_page(self.get_page_count() - 1)
+
+    def _get_page(self, ranking):
+        return Page(ranking, self.company_count, self.current_from_number, self.full_path_url)
 
 
 class Page(object):
 
-    def __init__(self, ranking, company_count, current_from_number, url_parts):
+    def __init__(self, ranking, company_count, current_from_number, original_url):
         self.ranking = ranking
         self.company_count = company_count
         self._from_number = None
         self._to_number = None
-        self.url_parts = url_parts
         self.current_from_number = current_from_number
+        self.url_parts = list(urlparse.urlparse(original_url))
 
     def get_from_number(self):
         if not self._from_number:
