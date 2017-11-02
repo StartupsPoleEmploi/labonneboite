@@ -147,12 +147,13 @@ def results(city, zipcode, occupation):
     alternative_rome_descriptions = []
     alternative_distances = {}
     zipcode_has_no_city_error = False
+    companies = []
+    naf_aggregations = []
+    company_count = 0
 
     try:
         fetcher.init_location()
     except search_util.ZipcodeHasNoCityError:
-        companies = []
-        company_count = 0
         zipcode_has_no_city_error = True
 
     if not zipcode_has_no_city_error:
