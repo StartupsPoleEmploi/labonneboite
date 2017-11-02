@@ -26,7 +26,7 @@ PUBLIC_HANDICAP = 3
 PUBLIC_CHOICES = [PUBLIC_ALL, PUBLIC_JUNIOR, PUBLIC_SENIOR, PUBLIC_HANDICAP]
 
 
-class LocationError(Exception):
+class ZipcodeHasNoCityError(Exception):
     pass
 
 class Fetcher(object):
@@ -77,7 +77,7 @@ class Fetcher(object):
         city = geocoding.get_city_by_zipcode(self.zipcode, self.city_slug)
         if not city:
             logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.city_slug)
-            raise LocationError
+            raise ZipcodeHasNoCityError
         self.latitude = city['coords']['lat']
         self.longitude = city['coords']['lon']
 

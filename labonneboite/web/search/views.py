@@ -146,16 +146,16 @@ def results(city, zipcode, occupation):
     fetcher = search_util.Fetcher(**kwargs)
     alternative_rome_descriptions = []
     alternative_distances = {}
-    location_error = False
+    zipcode_has_no_city_error = False
 
     try:
         fetcher.init_location()
-    except search_util.LocationError:
+    except search_util.ZipcodeHasNoCityError:
         companies = []
         company_count = 0
-        location_error = True
+        zipcode_has_no_city_error = True
 
-    if not location_error:
+    if not zipcode_has_no_city_error:
         current_app.logger.debug("fetching companies and company_count")
         companies, naf_aggregations = fetcher.get_companies()
         for alternative, count in fetcher.alternative_rome_codes.iteritems():
@@ -206,7 +206,7 @@ def results(city, zipcode, occupation):
         'headcount': kwargs['headcount'],
         'job_doesnt_exist': False,
         'location': full_location,
-        'location_error': location_error,
+        'zipcode_has_no_city_error': zipcode_has_no_city_error,
         'naf': kwargs['naf'],
         'naf_codes': naf_codes_with_descriptions,
         'page': current_page,
