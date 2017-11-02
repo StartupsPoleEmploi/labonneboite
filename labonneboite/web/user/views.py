@@ -3,7 +3,7 @@
 import urllib
 
 from flask import Blueprint, Markup
-from flask import abort, current_app, flash, redirect, render_template, request, session, url_for
+from flask import abort, current_app, flash, redirect, render_template, request, url_for
 
 import flask_login
 from flask_login import current_user
@@ -167,10 +167,7 @@ def pro_version():
     if not pro.user_is_pro:
         abort(401)
 
-    if pro.pro_version_enabled():
-        session.pop('pro_version')
-    else:
-        session['pro_version'] = True
+    pro.toggle_pro_version()
 
     redirect_url = request.args.get('next', '/')
 

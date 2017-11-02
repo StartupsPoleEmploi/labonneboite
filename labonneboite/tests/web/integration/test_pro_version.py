@@ -55,7 +55,7 @@ class ProVersionTest(DatabaseTest):
             self.assertFalse(pro.pro_version_enabled())
 
             with self.app.session_transaction() as sess:
-                self.assertNotIn('pro_version', sess)
+                self.assertNotIn(pro.PRO_VERSION_SESSION_KEY, sess)
 
             # Enable pro version.
             rv = self.app.get(url)
@@ -69,8 +69,8 @@ class ProVersionTest(DatabaseTest):
             # self.assertTrue(pro.pro_version_enabled())
 
             with self.app.session_transaction() as sess:
-                self.assertIn('pro_version', sess)
-                self.assertEqual(True, sess['pro_version'])
+                self.assertIn(pro.PRO_VERSION_SESSION_KEY, sess)
+                self.assertEqual(True, sess[pro.PRO_VERSION_SESSION_KEY])
 
             # Disable pro version.
             rv = self.app.get(url)
@@ -79,4 +79,4 @@ class ProVersionTest(DatabaseTest):
             self.assertFalse(pro.pro_version_enabled())
 
             with self.app.session_transaction() as sess:
-                self.assertNotIn('pro_version', sess)
+                self.assertNotIn(pro.PRO_VERSION_SESSION_KEY, sess)

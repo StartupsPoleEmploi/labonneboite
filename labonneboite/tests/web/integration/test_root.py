@@ -32,7 +32,7 @@ class RootTest(DatabaseTest):
 
             # enable pro version
             with self.app.session_transaction() as sess:
-                sess['pro_version'] = True
+                sess[pro.PRO_VERSION_SESSION_KEY] = True
 
             # Non-empty pdf file
             rv = self.app.get(self.url_for('root.kit'))

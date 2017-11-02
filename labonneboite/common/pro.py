@@ -8,6 +8,8 @@ from labonneboite.conf import settings
 from .util import get_user_ip
 
 
+PRO_VERSION_SESSION_KEY = 'pro_version'
+
 def user_is_pro():
     """
     The website has a special version called "Version PRO"
@@ -40,6 +42,12 @@ def user_is_pro():
     return False
 
 def pro_version_enabled():
-    if not user_is_pro() and 'pro_version' in session:
-        session.pop('pro_version')
-    return session.get('pro_version', False)
+    if not user_is_pro() and PRO_VERSION_SESSION_KEY in session:
+        session.pop(PRO_VERSION_SESSION_KEY)
+    return session.get(PRO_VERSION_SESSION_KEY, False)
+
+def toggle_pro_version():
+    if pro_version_enabled():
+        session.pop(PRO_VERSION_SESSION_KEY)
+    else:
+        session[PRO_VERSION_SESSION_KEY] = True
