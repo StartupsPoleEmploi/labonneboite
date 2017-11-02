@@ -136,7 +136,7 @@ class Page(object):
         self._from_number = None
         self._to_number = None
         self.current_from_number = current_from_number
-        self.url_parts = list(urlparse.urlparse(original_url))
+        self.url_parts = list(urlparse.urlparse(original_url.encode('utf8')))
 
     def get_from_number(self):
         if not self._from_number:
