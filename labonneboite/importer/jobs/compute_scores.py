@@ -27,7 +27,9 @@ COMPUTE_SCORES_DEBUG_MODE = False
 # departement 90 has the least offices - thus is it most suitable for a quick debugging
 COMPUTE_SCORES_DEBUG_DEPARTEMENTS = ["90"]
 
-DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING = True
+# If parallel computing is enabled, you cannot use debugger like ipdb from
+# within a job.
+DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING = False
 
 
 def abortable_worker(func, etab_table, dpae_table, departement, dpae_date):
