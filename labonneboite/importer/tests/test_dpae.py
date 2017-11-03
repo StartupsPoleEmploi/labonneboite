@@ -21,7 +21,7 @@ class TestDpae(DatabaseTest):
         self.assertEquals(Dpae.query.count(), 6)
 
     def test_extract_dpae_two_files_diff(self):
-        # Updated file contains duplicated records and one record from the future and only 2 really new valid records.
+        # Second file contains duplicated records and one record from the future and only 2 really new valid records.
         filename_first_month = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv")
         filename_second_month = self.get_data_file_path("LBB_XDPDPA_DPAE_20151110_20161210_20161210_094110.csv")
         extract_dpae.DpaeExtractJob.backup_first = False

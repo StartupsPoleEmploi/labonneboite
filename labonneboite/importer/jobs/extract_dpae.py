@@ -43,14 +43,18 @@ class DpaeExtractJob(Job):
     @timeit
     def run_task(self):
         logger.info("extracting %s ", self.input_filename)
+        # this pattern matches last occurence of 8 consecutive digits
+        # e.g. 'LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv'
+        # will match 20161110
         date_pattern = r'.*_(\d\d\d\d\d\d\d\d)'
         date_match = re.match(date_pattern, self.input_filename)
         if date_match:
             date_part = date_match.groups()[-1]
             self.most_recent_data_date = datetime.strptime(date_part, "%Y%m%d")
             logger.debug("identified most_recent_data_date=%s", self.most_recent_data_date)
-        else:  # FIXME
-            raise Exception("couldn't find a date pattern in filename. filename should be dpae_XYZ_20xxxxxx.csv")
+        else:
+            raise Exception("couldn't find a date pattern in filename. filename should be \
+                LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv or similar")
 
         count = 0
         statements = []
