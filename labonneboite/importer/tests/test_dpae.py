@@ -13,8 +13,9 @@ class TestDpae(DatabaseTest):
         self.assertEquals(Dpae.query.count(), 0)
 
     def test_extract_dpae(self):
+        self.assertEquals(Dpae.query.count(), 0)
         filename = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv")
-        extract_dpae.DpaeExtractJob.backup_first = False
+        extract_dpae.DpaeExtractJob.backup_first = False  # FIXME remove similar obsolete lines
         task = extract_dpae.DpaeExtractJob(filename)
         task.run()
         self.assertEquals(Dpae.query.count(), 6)

@@ -49,8 +49,8 @@ class DpaeExtractJob(Job):
             date_part = date_match.groups()[-1]
             self.most_recent_data_date = datetime.strptime(date_part, "%Y%m%d")
             logger.debug("identified most_recent_data_date=%s", self.most_recent_data_date)
-        else:
-            raise Exception("couldn't find a date pattern in filename. filename should be dpae_XYZ_20xxxxxx.tar.gz")
+        else:  # FIXME
+            raise Exception("couldn't find a date pattern in filename. filename should be dpae_XYZ_20xxxxxx.csv")
 
         count = 0
         statements = []
