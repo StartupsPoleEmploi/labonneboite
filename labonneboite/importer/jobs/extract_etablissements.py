@@ -9,8 +9,8 @@ from labonneboite.common import encoding as encoding_util
 from labonneboite.common.models import Office
 from labonneboite.common.database import db_session
 from labonneboite.conf import get_current_env, ENV_LBBDEV
-from .base import Job
-from .common import logger
+from labonneboite.importer.jobs.base import Job
+from labonneboite.importer.jobs.common import logger
 
 
 @timeit

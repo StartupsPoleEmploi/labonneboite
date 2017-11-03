@@ -3,7 +3,7 @@ import sys
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import parse_dpae_line
-from .common import logger
+from labonneboite.importer.jobs.common import logger
 
 
 def get_n_lines(path, n=5, ignore_header=True):

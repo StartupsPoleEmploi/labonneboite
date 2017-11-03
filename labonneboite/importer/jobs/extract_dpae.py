@@ -17,8 +17,8 @@ from labonneboite.importer import util as import_util
 from labonneboite.importer.util import parse_dpae_line, DepartementException, InvalidRowException
 from labonneboite.importer.models.computing import DpaeStatistics, ImportTask
 from labonneboite.conf import get_current_env, ENV_LBBDEV
-from .base import Job
-from .common import logger
+from labonneboite.importer.jobs.base import Job
+from labonneboite.importer.jobs.common import logger
 
 
 class DpaeExtractJob(Job):

@@ -3,8 +3,8 @@ import tarfile
 
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings
-from .base import Job
-from .common import logger
+from labonneboite.importer.jobs.base import Job
+from labonneboite.importer.jobs.common import logger
 
 
 def populate_flags():

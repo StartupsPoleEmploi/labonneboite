@@ -15,8 +15,8 @@ from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.models.computing import Geolocation
 from sqlalchemy.exc import IntegrityError
-from .base import Job
-from .common import logger
+from labonneboite.importer.jobs.base import Job
+from labonneboite.importer.jobs.common import logger
 
 gevent.monkey.patch_socket()
 

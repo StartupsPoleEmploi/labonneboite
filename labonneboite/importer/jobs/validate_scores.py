@@ -3,7 +3,7 @@
 Validates scoring data produced by compute_scores.
 """
 from labonneboite.importer import sanity
-from .common import logger
+from labonneboite.importer.jobs.common import logger
 
 COMPUTE_SCORE_TIMEOUT = 3600 * 4  # four hours should be largely enough to compute scores for an entire departement
 

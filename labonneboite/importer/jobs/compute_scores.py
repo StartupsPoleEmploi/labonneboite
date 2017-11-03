@@ -20,8 +20,8 @@ from labonneboite.importer import settings
 from labonneboite.importer import compute_score
 from labonneboite.importer import util as import_util
 from labonneboite.importer.models.computing import DpaeStatistics
-from .base import Job
-from .common import logger
+from labonneboite.importer.jobs.base import Job
+from labonneboite.importer.jobs.common import logger
 
 COMPUTE_SCORE_TIMEOUT = 3600 * 8  # computing scores for 75 might take 4h+
 
