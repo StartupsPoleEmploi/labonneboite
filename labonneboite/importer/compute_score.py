@@ -151,16 +151,14 @@ def merge_and_normalize_websites(websites):
 
 def load_df(engine, etablissement_table, dpae_table, departement, most_recent_data_date):
     logger.debug("reading data with most recent data date %s...", most_recent_data_date)
-    # FIXME investigate - link all dpae to etabs
-    # FIXME drop classification stuff
     logger.debug("filtering by departement (%s)...", departement)
     # keep only contract_type = 2 (CDI) and contract_type = 1 (CDD which last at least one month)
-    df = pd.read_sql_query("""
+    df_dpae = pd.read_sql_query("""
         select siret, hiring_date, contract_type, contract_duration from %s where departement = %s
         and (contract_type = 2 or (contract_type = 1 and contract_duration > 31))
         """ % (dpae_table, departement), engine)
-    debug_df(df, "after loading from dpae table")
-    if df.empty:
+    debug_df(df_dpae, "after loading from dpae table")
+    if df_dpae.empty:
         logger.warning("no dpae data for departement %s", departement)
         return None
     logger.debug("reading data from etablissements (%s)", departement)
@@ -170,6 +168,14 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
     debug_df(df_etab, "after loading from etablissements_importer table")
     if "website1" not in list(df_etab.columns):
         raise Exception("missing website1 column")
+
+    # if departement == '69':
+    #     import ipdb; ipdb.set_trace()  # FIXME
+
+    if df_etab.empty:
+        logger.warning("dataframe empty for departement %s", departement)
+        return None
+    logger.debug("loading data (%s) OK (%i etablissements)!", departement, len(df_etab))
 
     # tricky dataframe operation: merge two columns into one using an element wise function
     # http://stackoverflow.com/questions/13331698/how-to-apply-a-function-to-two-columns-of-pandas-dataframe
@@ -181,42 +187,37 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
     if "website" not in list(df_etab.columns):
         raise Exception("missing website column")
 
-    if df_etab.empty:
-        logger.warning("dataframe empty for departement %s", departement)
-        return None
-    logger.debug("loading data (%s) OK (%i etablissements)!", departement, len(df_etab))
+    debug_df(df_dpae, "before various filterings")
+    df_dpae = df_dpae[df_dpae.hiring_date >= importer_settings.FIRST_DAY_DPAE]
+    debug_df(df_dpae, "after filtering hiring_date >= importer_settings.FIRST_DAY_DPAE")
+    df_dpae = df_dpae[df_dpae.hiring_date <= most_recent_data_date]
+    debug_df(df_dpae, "after filtering hiring_date <= most_recent_data_date")
 
-    debug_df(df, "before various filterings")
-    df = df[df.hiring_date >= importer_settings.FIRST_DAY_DPAE]
-    debug_df(df, "after filtering hiring_date >= importer_settings.FIRST_DAY_DPAE")
-    df = df[df.hiring_date <= most_recent_data_date]
-    debug_df(df, "after filtering hiring_date <= most_recent_data_date")
+    df_dpae["hiring_date_month"] = pd.DatetimeIndex(df_dpae["hiring_date"]).month
+    df_dpae["hiring_date_year"] = pd.DatetimeIndex(df_dpae["hiring_date"]).year
 
-    df["hiring_date_month"] = pd.DatetimeIndex(df["hiring_date"]).month
-    df["hiring_date_year"] = pd.DatetimeIndex(df["hiring_date"]).year
-
-    df2 = df.groupby(["siret", "hiring_date_year", "hiring_date_month"]).count().reset_index()
-    debug_df(df2, "after group by")
+    df_dpae = df_dpae.groupby(["siret", "hiring_date_year", "hiring_date_month"]).count().reset_index()
+    debug_df(df_dpae, "after group by")
     logger.debug("pivoting table dpae (%s)...", departement)
-    df3 = pd.pivot_table(df2, values="hiring_date", index="siret", columns=["hiring_date_year", "hiring_date_month"])
-    debug_df(df3, "after pivot")
+    df_dpae = pd.pivot_table(df_dpae, values="hiring_date", index="siret", columns=["hiring_date_year", "hiring_date_month"])
+    debug_df(df_dpae, "after pivot")
     logger.debug("pivoting table (%s) ok!", departement)
-    df3["siret"] = df3.index
-    df3 = df3.fillna(0)
+    df_dpae["siret"] = df_dpae.index
+    df_dpae = df_dpae.fillna(0)
 
-    df3.columns = [''.join(str(col).strip()) for col in df3.columns.values]
-    df3['siret'] = df3[u"('siret', '')"]
-    debug_df(df3, "after transform")
+    df_dpae.columns = [''.join(str(col).strip()) for col in df_dpae.columns.values]
+    df_dpae['siret'] = df_dpae[u"('siret', '')"]
+    debug_df(df_dpae, "after transform")
 
     logger.debug("merging dpae with etablissements (%s)...", departement)
     # inner join to keep only etabs which have at least one dpae
-    df_final = pd.merge(df3, df_etab, on='siret', how="inner")
-    debug_df(df_final, "after merge")
-    logger.debug("merging done with %s offices(%s)!", len(df_final), departement)
-    if "website" not in list(df_final.columns):
+    df_etab = pd.merge(df_dpae, df_etab, on='siret', how="inner")
+    debug_df(df_etab, "after merge")
+    logger.debug("merging done with %s offices(%s)!", len(df_etab), departement)
+    if "website" not in list(df_etab.columns):
         raise Exception("missing website column")
 
-    df_final = df_final.fillna(0)
+    df_etab = df_etab.fillna(0)
 
     # Add effectif from trancheeffectif
     def tranche_to_effectif(tranche):
@@ -242,10 +243,10 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
         return map_tranche_to_effectif[tranche]
 
     logger.debug("adding effectif (%s)...", departement)
-    df_final['effectif'] = df_final['trancheeffectif'].map(tranche_to_effectif)
+    df_etab['effectif'] = df_etab['trancheeffectif'].map(tranche_to_effectif)
     logger.debug("effectif done (%s)!", departement)
 
-    return df_final, df3
+    return df_etab, df_dpae
 
 
 def compute_reference_date(most_recent_data_date):
@@ -269,12 +270,6 @@ def compute_reference_date(most_recent_data_date):
 
     logger.info("reference date %s", reference_date)
     return reference_date
-
-
-def has_hired_semester(semester):
-    def f(office):
-        return office[semester] > 0
-    return f
 
 
 def total_hired_semester(semester):
@@ -324,6 +319,8 @@ def add_features(df_final, departement, reference_date, feature_semester_count, 
     semester_count_columns = []
     for i in range(1, feature_semester_count + 1):
         column = 'semester-%s' % i
+        # difficult unsolved pylint warning here
+        # see https://stackoverflow.com/questions/25314547/cell-var-from-loop-warning-from-pylint
         df_final[column] = df_final.apply(lambda office: hiring_count_semester(office, i), axis=1)
         semester_count_columns.append(column)
     logger.debug("finished calculating temporal features (%s)!", departement)
@@ -342,31 +339,20 @@ def add_features(df_final, departement, reference_date, feature_semester_count, 
 
     semester = 'semester-%i' % (semester_lag + 1)
     logger.debug("outcome: has hired in %s", semester)
-    y = df_final.apply(has_hired_semester(semester), axis=1)
     y_regr = df_final.apply(total_hired_semester(semester), axis=1)
     if get_feature_names:
-        return df_final, X, y, y_regr, X_feature_names
+        return df_final, X, y_regr, X_feature_names
     else:
-        return df_final, X, y, y_regr
+        return df_final, X, y_regr
 
 
 def train(df_final, departement, reference_date, semester_lag, feature_semester_count=7):
-
-    # 1) --- modeling the problem as a binary classification
-    # from sklearn.ensemble import RandomForestClassifier
-    from sklearn.ensemble import GradientBoostingClassifier
-    from sklearn.metrics import precision_recall_fscore_support
-    # from sklearn.metrics import precision_score, classification_report, recall_score
-    # clf = LogisticRegression()
-    # clf = RandomForestClassifier()
-    clf = GradientBoostingClassifier()
-
-    # 2) --- modeling the problem as a regression
+    # We model the problem as a regression.
     from sklearn import linear_model
     from sklearn.metrics import mean_squared_error
     regr = linear_model.LinearRegression()
 
-    df_final, X_train, y_train_bin, y_train_regr, X_train_feature_names = add_features(
+    df_final, X_train, y_train_regr, X_train_feature_names = add_features(
         df_final,
         departement,
         reference_date,
@@ -378,23 +364,19 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
 
     logger.debug("%s offices (%s)", len(df_final), departement)
 
-    if len(df_final) < 50:
+    if not len(df_final) >= importer_settings.MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL:
         # problems happen if we don't have enough offices to train on...
         # throw an exception to show we don't have enough data for this departement
         raise NotEnoughDataException("only %s offices !" % len(df_final))
     logger.debug("fitting the model on X_train (%s)...", departement)
-    clf.fit(X_train, y_train_bin)
     regr.fit(X_train, y_train_regr)
     logger.debug("regression_coefficients (fitting done on X_train) : %s", regr.coef_)
     logger.debug("fitting done (%s)!", departement)
 
-    y_train_bin_pred = clf.predict(X_train)
     y_train_regr_pred = regr.predict(X_train)
 
     X_test, X_test_feature_names = create_feature_vector(df_final, 0, debug_msg="X_test", get_feature_names=True)
     logger.debug("X_test_feature_names: %s", X_test_feature_names)
-    y_test_bin = df_final.apply(has_hired_semester('semester-1'), axis=1)
-    y_test_bin_pred = clf.predict(X_test)
     y_test_regr = df_final.apply(total_hired_semester('semester-1'), axis=1)
     y_test_regr_pred = regr.predict(X_test)
 
@@ -403,10 +385,7 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
     )
     logger.debug("X_live_feature_names: %s", X_live_feature_names)
 
-    # 1) --- binary classification metrics
-    precision_train, recall_train, _, _ = precision_recall_fscore_support(y_train_bin, y_train_bin_pred)
-    precision, recall, fscore, support = precision_recall_fscore_support(y_test_bin, y_test_bin_pred)
-    # 2) --- regression metrics
+    # --- regression metrics
     rmse_train = mean_squared_error(y_train_regr, y_train_regr_pred)
     rmse_test = mean_squared_error(y_test_regr, y_test_regr_pred)
 
@@ -415,15 +394,6 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
         "X_train_feature_names": X_train_feature_names,
         "X_test_feature_names": X_test_feature_names,
         "X_live_feature_names": X_live_feature_names,
-        "classifier": clf,
-        "classifier_scores": {
-            "precision": precision,
-            "precision_train": precision_train,
-            "recall": recall,
-            "recall_train": recall_train,
-            "fscore": fscore,
-            "support": support
-        },
         "regression": regr,
         "regression_coefficients": regr.coef_,
         "regression_scores": {
@@ -440,14 +410,6 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
     pickle.dump(pickle_data, open(pickle_filename, "wb"))
 
     try:
-        logger.info("precision for %s: non-embauche %s, embauche %s", departement, precision[0], precision[1])
-        logger.info("precision_train for %s: non-embauche %s, embauche %s",
-            departement, precision_train[0], precision_train[1]
-        )
-        logger.info("recall for %s: non-embauche %s, embauche %s", departement, recall[0], recall[1])
-        logger.info("recall_train for %s: non-embauche %s, embauche %s", departement, recall_train[0], recall_train[1])
-        logger.info("fscore for %s: non-embauche %s, embauche %s", departement, fscore[0], fscore[1])
-        logger.info("support for %s: non-embauche %s, embauche %s", departement, support[0], support[1])
         logger.info("regression_train RMSE for %s: %s", departement, rmse_train)
         logger.info("regression_test RMSE for %s: %s", departement, rmse_test)
         if rmse_test >= importer_settings.RMSE_MAX:
@@ -456,8 +418,6 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
         logger.warning("not enough data to compute RMSE for %s", departement)
 
     try:
-        # old deprecated score based on binary classification - we now use regression instead
-        # df_final["score"] = [int(res[1] * 100) for res in clf.predict_proba(X_live)]
         df_final["score_regr"] = [res for res in regr.predict(X_live)]
         df_final["score"] = [scoring_util.get_score_from_hirings(h) for h in df_final["score_regr"]]
     except IndexError:
@@ -485,14 +445,13 @@ def export(engine, df_final, departement):
 
 def run(source_etablissement_table, dpae_table, departement, dpae_date, semester_lag=1):
     engine = sqlalchemy.create_engine(get_db_string(), poolclass=NullPool)
-    result = load_df(engine, source_etablissement_table, dpae_table, departement, dpae_date)
-    if result:
-        df, _ = result
+    df_etab, df_dpae = load_df(engine, source_etablissement_table, dpae_table, departement, dpae_date)
+    if df_etab:
         logger.debug("result obtained for departement %s", departement)
         reference_date = compute_reference_date(dpae_date)
-        train(df, departement, reference_date, semester_lag)
+        train(df_etab, departement, reference_date, semester_lag)
 
-        logger.debug("fetching existing scores for %s", departement)
+        logger.debug("fetching existing scores for %s", departement)  # FIXME
         df_existing_score = pd.read_sql_query(
             "select siret, score as existing_score from %s where departement=%s" % (
                 importer_settings.EXPORT_ETABLISSEMENT_TABLE, departement
@@ -508,33 +467,33 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
             # by default how='inner' use intersection of keys from both frames (SQL: inner join)
             # what we need here is how=left: use only keys from left frame (SQL: left outer join)
             # because we keep all companies from current extract, whether or not they were present before
-            debug_df(df, "before merge with df_existing_score")
-            df = pd.merge(df, df_existing_score, on="siret", how="left")
-            debug_df(df, "after merge with df_existing_score and how=left")
-            df["diff_score"] = df["score"] - df["existing_score"]
+            debug_df(df_etab, "before merge with df_existing_score")
+            df_etab = pd.merge(df_etab, df_existing_score, on="siret", how="left")
+            debug_df(df_etab, "after merge with df_existing_score and how=left")
+            df_etab["diff_score"] = df_etab["score"] - df_etab["existing_score"]
             logger.info(
                 "mean difference of scores: %s new score %s existing score %s",
-                df[["diff_score"]].mean()[0],
-                df[["score"]].mean()[0],
-                df[["existing_score"]].mean()[0]
+                df_etab[["diff_score"]].mean()[0],
+                df_etab[["score"]].mean()[0],
+                df_etab[["existing_score"]].mean()[0]
             )
             # abort if the mean between the existing score and the new just computed score is too high
-            check_mean_between_existing_and_new_score(departement, df)
+            check_mean_between_existing_and_new_score(departement, df_etab)
 
-            high_existing_scores = df[df["existing_score"] > 50]["siret"].count()
-            high_new_scores = df[df["score"] > 50]["siret"].count()
+            high_existing_scores = df_etab[df_etab["existing_score"] > 50]["siret"].count()
+            high_new_scores = df_etab[df_etab["score"] > 50]["siret"].count()
             logger.info("existing high scores > 50: %s", high_existing_scores)
             logger.info("new high scores > 50: %s", high_new_scores)
             # abort if the number of highly scored companies varies much
             check_highly_scored_companies_evolution(departement, high_existing_scores, high_new_scores)
             check_number_highly_scored_companies(departement, high_new_scores)
 
-            logger.debug("merging done (%s)!", departement)
+            logger.debug("training done for departement %s", departement)
 
-        export(engine, df, departement)
+        export(engine, df_etab, departement)
     else:
         logger.warn("no result for departement %s", departement)
-    return result
+    return df_etab, df_dpae
 
 
 def run_main():

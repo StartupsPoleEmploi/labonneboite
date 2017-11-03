@@ -32,6 +32,12 @@
         - xvfb
         - graphviz
         - htop
+        # needed in order to: pip install scipy
+        # see https://stackoverflow.com/questions/11114225/installing-scipy-and-numpy-using-pip
+        - libblas-dev
+        - liblapack-dev 
+        - libatlas-base-dev
+        - gfortran
       become: true
 
     - name: Install french locale.

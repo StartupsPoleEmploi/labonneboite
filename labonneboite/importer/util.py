@@ -124,6 +124,7 @@ def back_up(backup_folder, table, name, timestamp, copy_to_remote_server=True, r
             backup_filename),
         shell=True)
 
+
     if copy_to_remote_server:
         logger.info("copying the file to remote server")
         subprocess.check_call("scp %s %s@%s:%s " % (
@@ -139,18 +140,6 @@ def is_processed(filename):
     in order to track whether its contents were imported or not.
     This function lets us know whether contents were imported or not.
     """
-    # from labonneboite.common.models import Office, User, UserFavoriteOffice
-    # from labonneboite.common.models import *
-    # sqlalchemy.orm.instrumentation.unregister_class(Office)
-    # sqlalchemy.orm.instrumentation.unregister_class(UserFavoriteOffice)
-    # from labonneboite.importer.models.computing import ImportTask
-    # from labonneboite.importer.models.computing import *
-    #
-    # import sqlalchemy
-    # from labonneboite.common.models import Office
-    # 
-    #
-    # import ipdb; ipdb.set_trace()
     import_tasks = ImportTask.query.filter(
         ImportTask.filename == os.path.basename(filename),
         ImportTask.state >= ImportTask.FILE_READ).all()
@@ -192,10 +181,13 @@ def reduce_scores_into_table(
     This step combines all etablissements into a single MySQL table, ready to be exported.
 
     WARNING : this drops the original target_table and repopulates it from scratch
+
+    FIXME parallelize and optimize performance
     """
     logger.info("reducing scores %s ...", description)
     sql_filepath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", create_table_filename)
     init_query = open(sql_filepath, "r").read()
+    errors = successes = 0
     if importer_settings.MYSQL_NO_PASSWORD:
         password_statement = ''
     else:
@@ -208,7 +200,7 @@ def reduce_scores_into_table(
         departement_table = "etablissements_%s" % departement
         query = """insert into %s select %s from %s""" % (
             target_table, select_fields, departement_table)
-        if drop_low_scores:
+        if drop_low_scores:  # FIXME
             query += " where score >= 50"
         try:
             subprocess.check_call(
@@ -220,9 +212,15 @@ def reduce_scores_into_table(
                 ), 
                 shell=True
             )
-        except:
-            logger.error("an error happened in reducing %s %s", departement, description)
-            raise
+            successes += 1
+        except subprocess.CalledProcessError:
+            logger.error("an error happened while reducing departement=%s description=%s using query [%s]",
+                departement, description, query)
+            errors += 1
+    if errors > importer_settings.MAXIMUM_COMPUTE_SCORE_JOB_FAILURES:
+        msg = "too many job failures: %s (max %s) vs %s successes" % (errors,
+            importer_settings.MAXIMUM_COMPUTE_SCORE_JOB_FAILURES, successes)
+        raise Exception(msg)
     logger.info("score reduction %s finished, all data available in table %s",
                 description, target_table)
 
@@ -238,6 +236,7 @@ def get_select_fields_for_main_db():
         trancheeffectif, numerorue, libellerue, codepostal,
         tel, email, website, """
         + "0, 0, 0, 0, " # stand for flag_alternance, flag_junior, flag_senior, flag_handicap
+        + "0, " # stand for has_multi_geolocation
         + "codecommune, "
         + "0, 0, " # stand for coordinates_x, coordinates_y
         + "departement, score "
@@ -259,9 +258,9 @@ def get_select_fields_for_backoffice():
 def reduce_scores_for_main_db(departements):
     reduce_scores_into_table(
         description="[main_db]",
-        create_table_filename="db/etablissements_main_db.sql",
+        create_table_filename=importer_settings.SCORE_REDUCING_TARGET_TABLE_CREATE_FILE,
         departements=departements,
-        target_table=importer_settings.EXPORT_ETABLISSEMENT_TABLE,
+        target_table=importer_settings.SCORE_REDUCING_TARGET_TABLE,
         select_fields=get_select_fields_for_main_db(),
         drop_low_scores=True
     )
@@ -271,7 +270,7 @@ def reduce_scores_for_main_db(departements):
 def reduce_scores_for_backoffice(departements):
     reduce_scores_into_table(
         description="[backoffice]",
-        create_table_filename="db/etablissements_backoffice.sql",
+        create_table_filename=importer_settings.BACKOFFICE_ETABLISSEMENT_TABLE_CREATE_FILE,
         departements=departements,
         target_table=importer_settings.BACKOFFICE_ETABLISSEMENT_TABLE,
         select_fields=get_select_fields_for_backoffice(),
@@ -280,7 +279,7 @@ def reduce_scores_for_backoffice(departements):
 
 
 @timeit
-def clean_tables():
+def clean_temporary_tables():
     if importer_settings.MYSQL_NO_PASSWORD:
         password_statement = ''
     else:
