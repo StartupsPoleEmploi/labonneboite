@@ -445,8 +445,10 @@ def export(engine, df_final, departement):
 
 def run(source_etablissement_table, dpae_table, departement, dpae_date, semester_lag=1):
     engine = sqlalchemy.create_engine(get_db_string(), poolclass=NullPool)
-    df_etab, df_dpae = load_df(engine, source_etablissement_table, dpae_table, departement, dpae_date)
-    if df_etab:
+    # result might either be None or a tuple (df_etab, df_dpae)
+    result = load_df(engine, source_etablissement_table, dpae_table, departement, dpae_date)
+    if result:
+        df_etab, _ = result
         logger.debug("result obtained for departement %s", departement)
         reference_date = compute_reference_date(dpae_date)
         train(df_etab, departement, reference_date, semester_lag)
@@ -493,7 +495,8 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
         export(engine, df_etab, departement)
     else:
         logger.warn("no result for departement %s", departement)
-    return df_etab, df_dpae
+    # result might either be None or a tuple (df_etab, df_dpae)
+    return result
 
 
 def run_main():
