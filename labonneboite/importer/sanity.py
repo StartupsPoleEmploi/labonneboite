@@ -1,12 +1,14 @@
 import logging
 from sqlalchemy import and_
 
+from labonneboite.importer.util import timeit
 from labonneboite.importer import settings
 from labonneboite.common.models import Office
 
 logger = logging.getLogger('main')
 
 
+@timeit
 def check_scores(departements=settings.DEPARTEMENTS, minimum_office_count=100):
     errors = []
     for departement in departements:

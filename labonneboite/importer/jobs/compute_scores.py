@@ -19,6 +19,7 @@ import logging
 from labonneboite.importer import settings
 from labonneboite.importer import compute_score
 from labonneboite.importer import util as import_util
+from labonneboite.importer.util import timeit
 from labonneboite.importer.models.computing import DpaeStatistics
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
@@ -50,6 +51,7 @@ def abortable_worker(func, etab_table, dpae_table, departement, dpae_date, **kwa
         return None
 
 
+@timeit
 def compute(etab, dpae, departement, dpae_date):
     try:
         result = compute_score.run(etab, dpae, departement, dpae_date)
@@ -63,6 +65,7 @@ def compute(etab, dpae, departement, dpae_date):
 
 class ScoreComputingJob(Job):
 
+    @timeit
     def run(self):
         """
         Tricky parallelization.
@@ -107,6 +110,7 @@ class ScoreComputingJob(Job):
         return results
 
 
+@timeit
 def run_main():
     import_util.clean_tables()
     task = ScoreComputingJob()

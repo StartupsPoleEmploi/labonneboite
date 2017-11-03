@@ -2,11 +2,13 @@ import os
 import tarfile
 
 from labonneboite.importer import util as import_util
+from labonneboite.importer.util import timeit
 from labonneboite.importer import settings
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
 
+@timeit
 def populate_flags():
     logger.info("going to populate office boolean flags...")
     for flag in import_util.OFFICE_FLAGS:
@@ -14,6 +16,7 @@ def populate_flags():
     logger.info("all flags populated!")
 
 
+@timeit
 def populate_flag(flag):
     logger.info("populating %s ... ", flag)
     con, cur = import_util.create_cursor()
@@ -39,6 +42,7 @@ def run_sql_script(sql_script):
             con.commit()
 
 
+@timeit
 def prepare_flags_junior_and_senior():
     logger.info("preparing flags_junior_and_senior...")
 
@@ -97,6 +101,8 @@ def prepare_flags_junior_and_senior():
     run_sql_script(sql_script)
     logger.info("completed preparing flags_junior_and_senior.")
 
+
+@timeit
 def prepare_flag_handicap():
     logger.info("preparing flag_handicap...")
 
@@ -117,6 +123,8 @@ def prepare_flag_handicap():
     run_sql_script(sql_script)
     logger.info("completed preparing flag_handicap.")
 
+
+@timeit
 def dump():
     timestamp = settings.NOW.strftime('%Y_%m_%d_%H%M')
 

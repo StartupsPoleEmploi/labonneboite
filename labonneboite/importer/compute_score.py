@@ -151,7 +151,7 @@ def merge_and_normalize_websites(websites):
 
 def load_df(engine, etablissement_table, dpae_table, departement, most_recent_data_date):
     logger.debug("reading data with most recent data date %s...", most_recent_data_date)
-    # FIXME investigate 57
+    # FIXME investigate - link all dpae to etabs
     # FIXME drop classification stuff
     logger.debug("filtering by departement (%s)...", departement)
     # keep only contract_type = 2 (CDI) and contract_type = 1 (CDD which last at least one month)

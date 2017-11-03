@@ -8,13 +8,14 @@ import requests
 import gevent
 from gevent.pool import Pool
 import gevent.monkey
+from sqlalchemy.exc import IntegrityError
 
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_city_codes
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
+from labonneboite.importer.util import timeit
 from labonneboite.importer.models.computing import Geolocation
-from sqlalchemy.exc import IntegrityError
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
@@ -57,6 +58,7 @@ class GeocodeJob(Job):
         full_address = "%s %s %s %s" % (street_number, street_name, zipcode, city)
         return full_address.strip()
 
+    @timeit
     def create_geocoding_jobs(self):
         query = """
             select
@@ -95,6 +97,7 @@ class GeocodeJob(Job):
         return geocoding_jobs
 
 
+    @timeit
     def update_coordinates(self, coordinates_updates):
         con, cur = import_util.create_cursor()
         count = 0
@@ -116,6 +119,7 @@ class GeocodeJob(Job):
             count += 1
 
 
+    @timeit
     def validate_coordinates(self):
         _, cur = import_util.create_cursor()
         query = """
@@ -130,6 +134,7 @@ class GeocodeJob(Job):
             raise AbnormallyLowGeocodingRatioException
 
 
+    @timeit
     def run_geocoding_jobs(self, geocoding_jobs):
         ban_jobs = []
         coordinates_updates = []
@@ -151,6 +156,7 @@ class GeocodeJob(Job):
         return coordinates_updates
 
 
+    @timeit
     def run(self):
         logger.info("starting geocoding task...")
         geocoding_jobs = self.create_geocoding_jobs()
