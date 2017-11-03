@@ -26,6 +26,7 @@ if get_current_env() == ENV_LBBDEV:
     MAXIMUM_COMPUTE_SCORE_JOB_FAILURES = 0
     SCORE_REDUCING_TARGET_TABLE = EXPORT_ETABLISSEMENT_TABLE
     SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements.sql"
+    SCORE_REDUCING_MINIMUM_THRESHOLD = 50
 elif get_current_env() == ENV_DEVELOPMENT:
     INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
     SCORE_COEFFICIENT_OF_VARIATION_MAX = 3.0
@@ -34,6 +35,7 @@ elif get_current_env() == ENV_DEVELOPMENT:
     MAXIMUM_COMPUTE_SCORE_JOB_FAILURES = 94
     SCORE_REDUCING_TARGET_TABLE = 'etablissements_reduced'
     SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements_reduced.sql"
+    SCORE_REDUCING_MINIMUM_THRESHOLD = 0
 elif get_current_env() == ENV_TEST:
     pass
 else:
