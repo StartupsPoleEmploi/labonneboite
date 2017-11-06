@@ -150,14 +150,18 @@
         </div>
       {% endfor %}
 
-
-      {% if companies and companies|length < 10 and alternative_rome_descriptions and alternative_distances %}
+      
+      {% if companies and companies|length < 10 and (alternative_rome_descriptions or alternative_distances) %}
         <div class="lbb-bright-container">
           <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
-          <p>...dans d'autres métiers :</p>
-          {% include "includes/alternative_rome_descriptions.html" %}
-          <p>...plus loin :</p>
-          {% include "includes/alternative_distances.html" %}
+          {% if alternative_rome_descriptions %}
+            <p>...dans d'autres métiers :</p>
+            {% include "includes/alternative_rome_descriptions.html" %}
+          {% endif %}
+          {% if alternative_distances %}
+            <p>...plus loin :</p>
+            {% include "includes/alternative_distances.html" %}
+          {% endif %}
         </div>
       {% endif %}
 
@@ -200,8 +204,8 @@
       {% endif %}
 
 
-    </div><!-- END .lbb-content-with-sidebar -->
-  </div><!-- END .lbb-content -->
-</div><!-- END .lbb-content-purple-wrapper -->
+    </div><{# END .lbb-content-with-sidebar #}
+  </div>{# END .lbb-content #}
+</div><{# END .lbb-content-purple-wrapper #}
 {% endblock %}
 
