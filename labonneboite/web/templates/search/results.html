@@ -33,7 +33,7 @@
             <b>{{ company_count }} entreprises</b> susceptibles
           {% endif %}
           de recruter en
-          <b>{% if industry_description %}{{ industry_description }}{% else %}{{ rome_description }}{% endif %}</b>
+          <b>{{ rome_description }}</b>
           autour de
           <b>{{ location }}</b>
         </h1>
@@ -110,31 +110,29 @@
             <p>Le métier que vous avez choisi n'est pas valide. Veuillez réessayer.</p>
           {% elif location_error %}
             <p>La ville que vous avez choisi n'est pas valide. Veuillez réessayer.</p>
-          {% elif industry_description or alternative_rome_descriptions or alternative_distances %}
+          {% elif  alternative_rome_descriptions or alternative_distances %}
             <p>
               Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour
-              <b>{% if industry_description %}{{ industry_description }}{% else %}{{ rome_description }}{% endif %}</b>
+              <b>{{ rome_description }}</b>
               à {{ distance }} km de {{ location }}.
             </p>
-            {% if not industry_description %}
-              {% if alternative_rome_descriptions and alternative_distances %}
-                  <div class="grid-row grid-spacing">
-                    <div class="grid-col-6">
-                      <h3>Elargir aux métiers suivants :</h3>
-                      {% include "includes/alternative_rome_descriptions.html" %}
-                    </div>
-                    <div class="grid-col-3">
-                      <h3>Elargir aux alentours :</h3>
-                      {% include "includes/alternative_distances.html" %}
-                    </div>
+            {% if alternative_rome_descriptions and alternative_distances %}
+                <div class="grid-row grid-spacing">
+                  <div class="grid-col-6">
+                    <h3>Elargir aux métiers suivants :</h3>
+                    {% include "includes/alternative_rome_descriptions.html" %}
                   </div>
-              {% elif alternative_rome_descriptions %}
-                <h3>Elargir aux métiers suivants :</h3>
-                {% include "includes/alternative_rome_descriptions.html" %}
-              {% elif alternative_distances %}
-                <h3>Elargir aux alentours :</h3>
-                {% include "includes/alternative_distances.html" %}
-              {% endif %}
+                  <div class="grid-col-3">
+                    <h3>Elargir aux alentours :</h3>
+                    {% include "includes/alternative_distances.html" %}
+                  </div>
+                </div>
+            {% elif alternative_rome_descriptions %}
+              <h3>Elargir aux métiers suivants :</h3>
+              {% include "includes/alternative_rome_descriptions.html" %}
+            {% elif alternative_distances %}
+              <h3>Elargir aux alentours :</h3>
+              {% include "includes/alternative_distances.html" %}
             {% endif %}
           {% else %}
             Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour votre recherche.
