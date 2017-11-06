@@ -37,7 +37,20 @@
         <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
       </li>
 
-      <li class="float-right">
+      <li>
+        <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
+          <a href="#" class="lbb-header-btn">
+            <img src="{{ url_for('static', filename='images/user.svg') }}" alt="">
+            <span>Connexion &#x25BE;</span>
+          </a>
+          <div class="lbb-dropdown lbb-dropdown-right text-right">
+            <p>
+              <a class="logo-pe-connect" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ request.url | urlencode }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Pôle emploi Connect"></a><br>
+              <i>Connectez-vous à La Bonne Boite en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
+            </p>
+          </div>
+        </div>
+
         <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
           <a href="#" class="lbb-header-btn">
             <img src="{{ url_for('static', filename='images/user-color.svg') }}" alt="">

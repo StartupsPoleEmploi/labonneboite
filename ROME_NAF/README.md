@@ -59,7 +59,7 @@ Le notebook `opendata.ipynb` produit un fichier CSV expurgé des données permet
 
 # Editorialisation
 
-Les tableaux produits sont adaptés aux besoins de La Bonne Boîte.
+Les tableaux produits sont adaptés aux besoins de La Bonne Boite.
 
 ## Pertinence des associations
 
@@ -67,7 +67,7 @@ En particulier, seuls les associations ROME/NAF jugées pertinentes sont prises 
 
 Un tableau XLSX est produit par code ROME ainsi qu'un fichier `suggestions.pickle`.
 
-Le notebook `tableau_LBB.ipynb` produit un fichier CSV `tableau_LBB.csv` utilisation par le backend de La Bonne Boîte.
+Le notebook `tableau_LBB.ipynb` produit un fichier CSV `tableau_LBB.csv` utilisation par le backend de La Bonne Boite.
 
 ## Partition des codes OGR d'un code ROME (*"ROMEbis"*)
 

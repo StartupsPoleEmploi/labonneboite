@@ -68,7 +68,7 @@ class OfficeAdminRemove(CRUDMixin, Base):
     INITIATIVE_LBB = u'lbb'
     INITIATIVE_CHOICES = [
         (INITIATIVE_OFFICE, u"L'entreprise"),
-        (INITIATIVE_LBB, u"La Bonne Boîte"),
+        (INITIATIVE_LBB, u"La Bonne Boite"),
     ]
 
     id = Column(Integer, primary_key=True)
