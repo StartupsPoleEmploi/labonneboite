@@ -76,8 +76,9 @@ Vagrant.configure(2) do |config|
     cpus = 2
   end
 
-  # convert 'mem' to MB then give VM 1/4 of total system memory 
-  mem = mem / 1024 / 4
+  # convert 'mem' from KB to MB then give VM 1/4 of total system memory 
+  # and ensure at least 2 GB of RAM
+  mem = [mem / 1024 / 4, 2048].max
   v.customize ["modifyvm", :id, "--memory", mem]
 
   # give access to all cpu cores on the host
