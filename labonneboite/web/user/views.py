@@ -124,7 +124,6 @@ def favorites_list_as_pdf():
                      attachment_filename='mes_favoris.pdf', cache_timeout=5)
 
 
-
 def make_csv_response(csv_text, attachment_name):
     # Return csv file
     response = make_response(csv_text)

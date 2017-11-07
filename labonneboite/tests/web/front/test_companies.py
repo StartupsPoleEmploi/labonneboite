@@ -2,12 +2,15 @@
 import unittest.mock
 
 from labonneboite.common.models import Office
+from labonneboite.common import pdf
 from labonneboite.tests.test_base import DatabaseTest
 
 
-class RouteTest(DatabaseTest):
+class DownloadTest(DatabaseTest):
 
-    def create_example_office(self):
+    def setUp(self):
+        super().setUp()
+
         # Create an office.
         self.office = Office(
             departement='75',
@@ -24,12 +27,13 @@ class RouteTest(DatabaseTest):
         )
         self.office.save()
 
-    def test_office_fields_and_properties_are_unicode(self):
-        """
-        Check if office fields are unicode
-        """
+        # Remove pdf file if it already exists
+        pdf.delete_file(self.office)
 
-        self.create_example_office()
+    def test_office_fields_and_properties_are_str(self):
+        """
+        Check if office fields are str
+        """
 
         self.assertEqual(type(self.office.company_name), str)
         self.assertEqual(type(self.office.address_as_text), str)
@@ -40,8 +44,6 @@ class RouteTest(DatabaseTest):
         """
         Test the office details page of a regular office.
         """
-
-        self.create_example_office()
 
         rv = self.app.get(self.url_for('office.details', siret=self.office.siret))
         self.assertEqual(rv.status_code, 200)
@@ -60,7 +62,6 @@ class RouteTest(DatabaseTest):
         Test the office details page of an office having NAF 9900Z.
         """
 
-        self.create_example_office()
         self.office.naf = '9900Z'
         self.office.save()
 
@@ -71,9 +72,6 @@ class RouteTest(DatabaseTest):
         """
         Test the office PDF download
         """
-
-        self.create_example_office()
-
         # normal behavior
         rv = self.app.get(self.url_for('office.download', siret=self.office.siret))
 
@@ -82,7 +80,6 @@ class RouteTest(DatabaseTest):
         self.assertLess(1000, rv.content_length)
 
     def test_download_triggers_activity_log(self):
-        self.create_example_office()
         with unittest.mock.patch('labonneboite.common.activity.log') as activity_log:
             self.app.get(self.url_for('office.download', siret=self.office.siret))
             activity_log.assert_called_with('telecharger-pdf', siret=self.office.siret)
@@ -99,8 +96,6 @@ class RouteTest(DatabaseTest):
         """
         Test the office PDF download of an office having NAF 9900Z.
         """
-
-        self.create_example_office()
         self.office.naf = '9900Z'
         self.office.save()
 
@@ -108,7 +103,6 @@ class RouteTest(DatabaseTest):
         self.assertEqual(rv.status_code, 200)
 
     def test_toggle_details_event(self):
-        self.create_example_office()
         with unittest.mock.patch('labonneboite.common.activity.log') as activity_log:
             rv = self.app.post(self.url_for('office.toggle_details_event', siret=self.office.siret))
             activity_log.assert_called_with('afficher-details', siret=self.office.siret)
