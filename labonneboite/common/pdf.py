@@ -11,9 +11,9 @@ logger = logging.getLogger('main')
 
 
 def get_file_path(office):
-    file_path = "pdf/%s/%s/%s/%s.pdf" % (office.departement, office.naf, slugify(office.name.strip()[0]), office.siret)
-    full_path = os.path.join(settings.GLOBAL_STATIC_PATH, file_path)
-    return full_path
+    return os.path.join(settings.GLOBAL_STATIC_PATH, "pdf",
+                        office.departement, office.naf, slugify(office.name.strip()[0]),
+                        "%s.pdf" % office.siret)
 
 
 def write_file(office, data):

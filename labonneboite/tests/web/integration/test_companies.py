@@ -1,11 +1,14 @@
 # coding: utf8
 from labonneboite.common.models import Office
+from labonneboite.common import pdf
 from labonneboite.tests.test_base import DatabaseTest
 
 
-class RouteTest(DatabaseTest):
+class DownloadTest(DatabaseTest):
 
-    def create_example_office(self):
+    def setUp(self):
+        super(DownloadTest, self).setUp()
+
         # Create an office.
         self.office = Office(
             departement=u'75',
@@ -22,12 +25,13 @@ class RouteTest(DatabaseTest):
         )
         self.office.save()
 
+        # Remove pdf file if it already exists
+        pdf.delete_file(self.office)
+
     def test_office_fields_and_properties_are_unicode(self):
         """
         Check if office fields are unicode
         """
-
-        self.create_example_office()
 
         self.assertEqual(type(self.office.company_name), unicode)
         self.assertEqual(type(self.office.address_as_text), unicode)
@@ -38,8 +42,6 @@ class RouteTest(DatabaseTest):
         """
         Test the office details page of a regular office.
         """
-
-        self.create_example_office()
 
         rv = self.app.get('/%s/details' % self.office.siret)
         self.assertEqual(rv.status_code, 200)
@@ -58,7 +60,6 @@ class RouteTest(DatabaseTest):
         Test the office details page of an office having NAF 9900Z.
         """
 
-        self.create_example_office()
         self.office.naf = u'9900Z'
         self.office.save()
 
@@ -69,10 +70,6 @@ class RouteTest(DatabaseTest):
         """
         Test the office PDF download
         """
-
-        self.create_example_office()
-
-        # normal behavior
         rv = self.app.get("/%s/download" % self.office.siret)
 
         self.assertEqual(rv.status_code, 200)
@@ -92,7 +89,6 @@ class RouteTest(DatabaseTest):
         Test the office PDF download of an office having NAF 9900Z.
         """
 
-        self.create_example_office()
         self.office.naf = u'9900Z'
         self.office.save()
 

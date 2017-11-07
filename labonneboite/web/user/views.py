@@ -25,7 +25,7 @@ from labonneboite.web.user.forms import UserAccountDeleteForm
 userBlueprint = Blueprint('user', __name__)
 
 
-@userBlueprint.route('/account', methods=['GET'])
+@userBlueprint.route('/account')
 @flask_login.login_required
 def account():
     """
@@ -74,7 +74,7 @@ def account_delete():
     return render_template('user/account_delete.html', **context)
 
 
-@userBlueprint.route('/favorites/list', methods=['GET'])
+@userBlueprint.route('/favorites/list')
 @flask_login.login_required
 def favorites_list():
     """
