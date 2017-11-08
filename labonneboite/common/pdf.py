@@ -4,12 +4,13 @@ import logging
 import os
 import io
 
+from flask import render_template
 from slugify import slugify
 from xhtml2pdf import pisa
 
+from labonneboite.common import util
 from labonneboite.conf import settings
 from labonneboite.web import WEB_DIR
-
 
 logger = logging.getLogger('main')
 
@@ -57,3 +58,18 @@ def convert_to_pdf(pdf_data):
     )
     pdf_target.seek(0)
     return pdf_target
+
+
+def render_favorites(offices):
+    """
+    Render the list of companies as favorites.
+
+    Return: a file-like object.
+    """
+    companies = [
+        (company, util.get_contact_mode_for_rome_and_office(None, company)) for company in offices
+    ]
+    pdf_data = render_template(
+        'office/pdf_list.html', companies=companies,
+    )
+    return convert_to_pdf(pdf_data)

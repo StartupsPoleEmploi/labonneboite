@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style type="text/css">
+        {% include "includes/office/pdf_style.css" %}
+    </style>
+  </head>
+  <body>
+
+    {% include "includes/office/pdf_header.html" %}
+
+    {% for company, contact_mode in companies %}
+    {% include "includes/office/info_table.html" %}
+    <br>
+    {% endfor %}
+  </body>
+</html>

@@ -32,8 +32,8 @@ class FavoriteBaseTest(DatabaseTest):
         },
     }
 
-    def setUp(self, *args, **kwargs):
-        super(FavoriteBaseTest, self).setUp(*args, **kwargs)
+    def setUp(self):
+        super(FavoriteBaseTest, self).setUp()
 
         # Create a user.
         self.user = User.create(email='j@test.com', gender='male', first_name='John', last_name='Doe')
@@ -238,3 +238,17 @@ class FavoriteTest(FavoriteBaseTest):
             rv = self.app.get(url_list)
             self.assertEqual(rv.status_code, 200)
             self.assertTrue('Aucun favori pour le moment.' in rv.data.decode('utf-8'))
+
+    def test_favorites_download_list_as_pdf(self):
+        url_favorites_download = self.url_for('user.favorites_list_as_pdf')
+        office = Office.query.filter(Office.siret == u'00000000000001').one()
+        UserFavoriteOffice.create(user_id=self.user.id, office_siret=office.siret)
+
+        with self.test_request_context:
+            self.login(self.user)
+            rv = self.app.get(url_favorites_download)
+
+        self.assertEqual(rv.status_code, 200)
+        self.assertEqual('application/pdf', rv.mimetype)
+        # Unfortunately, it's difficult to do any more testing on the content of the pdf
+        self.assertLess(1000, len(rv.data))
