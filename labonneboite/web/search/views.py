@@ -125,7 +125,7 @@ def results(city, zipcode, occupation):
     canonical = '/entreprises/%s-%s/%s' % (city, zipcode, occupation)
 
     # Remove keys with empty values.
-    form_kwargs = {key: val for key, val in dict(**kwargs).items() if val}
+    form_kwargs = {key: val for key, val in kwargs.items() if val}
 
     city = city.replace('-', ' ').capitalize()
     full_location = '%s (%s)' % (city, zipcode)

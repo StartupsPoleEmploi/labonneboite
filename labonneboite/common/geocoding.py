@@ -5,6 +5,7 @@ import json
 import os
 
 from slugify import slugify
+from . import departements
 
 
 CACHE = {}
@@ -156,10 +157,10 @@ def is_commune_id(value):
     return value in CACHE['cities_by_commune_id']
 
 
-@cities_cache_required
 def is_departement(value):
     """
     Returns true if the given string is a departement, false otherwise.
+
+    Note: this requires searching in a list of 96 elements, but it's not that bad.
     """
-    departements = set([item[:2] for item in CACHE['cities_by_zipcode'].keys()])
-    return value in departements
+    return value in departements.DEPARTEMENTS

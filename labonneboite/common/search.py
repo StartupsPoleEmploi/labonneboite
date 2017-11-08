@@ -427,9 +427,16 @@ def get_companies_from_es_and_db(json_body, sort):
         company_objects = Office.query.filter(Office.siret.in_(siret_list))
         company_dict = {}
 
+        es_companies_by_siret = {
+            item['_source']['siret']: item for item in res['hits']['hits']
+        }
+
+        # FIXME it's not great to add new properties to an existing object. It
+        # would be better to wrap the office objects in a new OfficeResult
+        # class that would add new properties related to the query.
         for obj in company_objects:
             # Get the corresponding item from the Elasticsearch results.
-            es_company = next((item for item in res['hits']['hits'] if item["_source"]["siret"] == obj.siret))
+            es_company = es_companies_by_siret[obj.siret]
             # Add an extra `distance` attribute.
             obj.distance = int(round(es_company["sort"][distance_sort_index]))
             # Add an extra `scores_by_rome` attribute: this will allow us to identify boosted offices
