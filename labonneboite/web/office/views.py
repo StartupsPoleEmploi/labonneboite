@@ -1,12 +1,7 @@
 # coding: utf8
 
-from datetime import date
-import os
-import StringIO
-
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
-from xhtml2pdf import pisa
 
 from flask import abort, redirect, render_template, flash
 from flask import Blueprint, current_app
@@ -14,11 +9,9 @@ from flask import send_file
 from flask import request, url_for
 
 from labonneboite.common import pdf as pdf_util
-from labonneboite.common import util
 from labonneboite.common.email_util import MandrillClient
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
-from labonneboite.conf.common.contact_mode import CONTACT_MODE_STAGES
 
 from labonneboite.web.office.forms import OfficeRemovalForm
 
@@ -85,23 +78,6 @@ def change_info():
     return render_template('office/change_info.html', form=form)
 
 
-def detail(siret, rome):
-    company = Office.query.filter(Office.siret == siret).one()
-    contact_mode = util.get_contact_mode_for_rome_and_naf(rome, company.naf)
-    stages = CONTACT_MODE_STAGES[contact_mode]
-
-    return {
-        'company': company,
-        'contact_mode': contact_mode,
-        'stages': stages,
-    }
-
-
-def fetch_resources(uri, rel):
-    url = "https://%s%s" % (settings.HOST, uri)
-    return url
-
-
 @officeBlueprint.route('/<siret>/download')
 def download(siret=None):
     """
@@ -112,16 +88,8 @@ def download(siret=None):
     except NoResultFound:
         abort(404)
 
-    full_path = pdf_util.get_file_path(office)
-    if not os.path.exists(full_path):
-        rome = request.args.get('r')
-        rome = rome if rome in settings.ROME_DESCRIPTIONS else None
-        office_details = detail(siret, rome)
-        pdf_data = render_template('office/pdf_detail.html', date=date.today(), **office_details)
-
-        pdf_target = StringIO.StringIO()
-        pisa.CreatePDF(StringIO.StringIO(pdf_data), pdf_target, link_callback=fetch_resources)
-        pdf_util.write_file(office_details['company'], pdf_target.getvalue())
-
+    rome = request.args.get('r')
+    rome = rome if rome in settings.ROME_DESCRIPTIONS else None
+    full_path = pdf_util.render(office, rome)
     attachment_name = 'fiche_entreprise_%s.pdf' % slugify(office.name, separator='_')
     return send_file(full_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)
