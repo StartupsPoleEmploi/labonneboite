@@ -9,13 +9,13 @@ import traceback
 # External packages.
 from opbeat.contrib.flask import Opbeat
 from opbeat.handlers.logging import OpbeatHandler
-from social_core.exceptions import AuthCanceled
+from social_core.exceptions import AuthCanceled, AuthException, AuthFailed, AuthStateMissing
 from social_flask_sqlalchemy.models import init_social
 from werkzeug.contrib.fixers import ProxyFix
 import logstash
 
 # Flask.
-from flask import g, Flask, redirect, render_template, request, session, url_for
+from flask import g, flash, Flask, redirect, render_template, request, session, url_for
 from flask_admin import Admin
 from flask_assets import Environment, Bundle
 from flask_babelex import Babel
@@ -323,11 +323,17 @@ def log_extra_context():
     return extra_msg
 
 
+@app.errorhandler(AuthFailed)
 @app.errorhandler(AuthCanceled)
-def social_auth_canceled(error):
+@app.errorhandler(AuthStateMissing)
+@app.errorhandler(AuthException)
+def social_auth_error(error):
     """
     Handle the situation where a user clicks the `cancel` button on a third party auth provider website.
     """
+    if type(error).__name__ in ["AuthFailed", "AuthCanceled", "AuthStateMissing"]:
+        flash(u"Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
+
     # If there us a next url in session and it's safe, redirect to it.
     next_url = session.get('next')
     if next_url:
@@ -337,7 +343,6 @@ def social_auth_canceled(error):
             return redirect(next_url)
     # Otherwise redirect to the home page.
     return redirect(url_for('root.home'))
-
 
 @app.errorhandler(401)
 def error_401(error):
