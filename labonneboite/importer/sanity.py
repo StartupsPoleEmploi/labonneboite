@@ -12,6 +12,7 @@ logger = logging.getLogger('main')
 def check_scores(departements=settings.DEPARTEMENTS, minimum_office_count=100):
     errors = []
     for departement in departements:
+        # FIXME point to etablissements_reduced instead of etablissements
         departement_count = Office.query.filter(
             and_(
                 Office.departement == departement,

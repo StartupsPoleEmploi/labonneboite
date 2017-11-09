@@ -197,21 +197,23 @@ run_importer_jobs:
 	make run_importer_job_03_check_dpae && \
 	make run_importer_job_04_extract_dpae && \
 	make run_importer_job_05_compute_scores && \
+	make run_importer_job_06_validate_scores && \
 	echo done
 
 run_importer_job_00_reset_all:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		rm data/*.csv jenkins/*.jenkins ; \
 		echo delete from import_tasks | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		echo delete from etablissements_importer | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		echo delete from dpae_statistics | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		rm data/*.csv jenkins/*.jenkins ; \
+		cp tests/data/LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv data/ && \
+		cp tests/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
 		echo done';
 
 run_importer_job_01_check_etablissements:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		cp tests/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
 		python jobs/check_etablissements.py';
 
 run_importer_job_02_extract_etablissements:
@@ -222,7 +224,6 @@ run_importer_job_02_extract_etablissements:
 run_importer_job_03_check_dpae:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		cp tests/data/LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv data/ && \
 		python jobs/check_dpae.py';
 
 run_importer_job_04_extract_dpae:
@@ -234,3 +235,8 @@ run_importer_job_05_compute_scores:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
 		python jobs/compute_scores.py';
+
+run_importer_job_06_validate_scores:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/validate_scores.py';

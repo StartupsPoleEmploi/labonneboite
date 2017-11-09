@@ -1,12 +1,12 @@
 # coding: utf8
 import datetime
 
-from sqlalchemy import Column, Integer, BigInteger, String, Float, DateTime, Boolean
+from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime
 
 from labonneboite.importer import settings
 from labonneboite.common.database import Base
 from labonneboite.common.models.base import CRUDMixin
-
+from labonneboite.common.models import PrimitiveOfficeMixin
 
 class Dpae(CRUDMixin, Base):
     __tablename__ = settings.DPAE_TABLE
@@ -26,26 +26,22 @@ class Dpae(CRUDMixin, Base):
         return '%s %s' % (self.siret, self.hiring_date)
 
 
-class RawOffice(CRUDMixin, Base):
+class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
     """
-    raw importer table including all 10M offices
+    raw importer table storing all 10M offices
+    FIXME DNRY mixin
     """
     __tablename__ = settings.OFFICE_TABLE
-    siret = Column(String(14), primary_key=True)
-    company_name = Column('raisonsociale', String(191))
-    office_name = Column('enseigne', String(191))
-    naf = Column('codenaf', String(8))
-    street_number = Column('numerorue', String(191))
-    street_name = Column('libellerue', String(191))
-    city_code = Column('codecommune', String(191))
-    zipcode = Column('codepostal', String(8))
-    email = Column(String(191))
-    tel = Column(String(191))
+    __table_args__ = (
+        Index('dept_i', 'departement'),
+        PrimaryKeyConstraint('siret'),
+    )
+    #     siret = Column(String(14), primary_key=True)
+
+    # begin specific
     website1 = Column(String(191))
     website2 = Column(String(191))
-
-    departement = Column(String(8))
-    headcount = Column('trancheeffectif', String(2))
+    # end specific
 
 
 class Geolocation(CRUDMixin, Base):
@@ -59,6 +55,7 @@ class Geolocation(CRUDMixin, Base):
     y = Column('coordinates_y', Float)  # latitude
 
 
+# FIXME DNRY mixin
 # class ExportableOffice(CRUDMixin, Base):
 #     """
 #     importer table including selected offices (~500K)

@@ -22,15 +22,8 @@ logger = logging.getLogger('main')
 CITY_NAMES = load_city_codes()
 
 
-class OfficeMixin(object):
-    """
-    This mixin provides the fields that must be common between the `Office`
-    model and the `OfficeAdminAdd` model.
-
-    Don't forget to create a new migration for `OfficeAdminAdd` when you add
-    or remove a field here to keep models in sync.
-    """
-    siret = Column('siret', String(191))
+class PrimitiveOfficeMixin(object):
+    siret = Column(String(191))
     company_name = Column('raisonsociale', String(191), nullable=False)
     office_name = Column('enseigne', String(191), default='', nullable=False)
     naf = Column('codenaf', String(8), nullable=False)
@@ -38,21 +31,40 @@ class OfficeMixin(object):
     street_name = Column('libellerue', String(191), default='', nullable=False)
     city_code = Column('codecommune', String(191), nullable=False)
     zipcode = Column('codepostal', String(8), nullable=False)
-    email = Column('email', String(191), default='', nullable=False)
-    tel = Column('tel', String(191), default='', nullable=False)
-    website = Column('website', String(191), default='', nullable=False)
+    email = Column(String(191), default='', nullable=False)
+    tel = Column(String(191), default='', nullable=False)
+    departement = Column(String(8), nullable=False)
+    headcount = Column('trancheeffectif', String(2))
+
+
+class OfficeMixin(PrimitiveOfficeMixin):
+    """
+    This mixin provides the fields that must be common between the `Office`
+    model and the `OfficeAdminAdd` model.
+
+    Don't forget to create a new migration for `OfficeAdminAdd` when you add
+    or remove a field here to keep models in sync.
+    """
+
+    # begin specific
+    website = Column(String(191), default='', nullable=False)
     flag_alternance = Column(Boolean, default=False, nullable=False)
     flag_junior = Column(Boolean, default=False, nullable=False)
     flag_senior = Column(Boolean, default=False, nullable=False)
     flag_handicap = Column(Boolean, default=False, nullable=False)
-    departement = Column('departement', String(8), nullable=False)
-    headcount = Column('trancheeffectif', String(2))
-    score = Column('score', Integer, default=0, nullable=False)
+    # end specific
+
+    # begin specific
+    score = Column(Integer, default=0, nullable=False)
     x = Column('coordinates_x', Float)  # Longitude.
     y = Column('coordinates_y', Float)  # Latitude.
 
 
-class Office(OfficeMixin, CRUDMixin, Base):
+class FinalOfficeMixin(OfficeMixin):
+    # A flag that is True if the office also recruits beyond the boundaries of its primary geolocation.
+    has_multi_geolocations = Column(Boolean, default=False, nullable=False)
+
+class Office(FinalOfficeMixin, CRUDMixin, Base):
     """
     An office.
 
@@ -65,11 +77,6 @@ class Office(OfficeMixin, CRUDMixin, Base):
         Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),
     )
-
-    # Almost all fields are provided by the `OfficeMixin`.
-
-    # A flag that is True if the office also recruits beyond the boundaries of its primary geolocation.
-    has_multi_geolocations = Column(Boolean, default=False, nullable=False)
 
     def __unicode__(self):
         return u"%s - %s" % (self.siret, self.name)
