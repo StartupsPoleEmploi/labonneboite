@@ -7,7 +7,8 @@ from sqlalchemy import PrimaryKeyConstraint
 from labonneboite.importer import settings as importer_settings
 from labonneboite.common.database import Base
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.common.models import PrimitiveOfficeMixin
+from labonneboite.common.models import PrimitiveOfficeMixin, FinalOfficeMixin
+
 
 class Dpae(CRUDMixin, Base):
     __tablename__ = importer_settings.DPAE_TABLE
@@ -45,6 +46,14 @@ class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
     # end specific
 
 
+class ExportableOffice(FinalOfficeMixin, CRUDMixin, Base):
+    __tablename__ = importer_settings.SCORE_REDUCING_TARGET_TABLE
+    __table_args__ = (
+        Index('dept_i', 'departement'),
+        PrimaryKeyConstraint('siret'),
+    )
+
+
 class Geolocation(CRUDMixin, Base):
     """
     cache each full_address <=> coordinates(longitude, latitude) match
@@ -54,41 +63,6 @@ class Geolocation(CRUDMixin, Base):
     full_address = Column(String(191), primary_key=True)
     x = Column('coordinates_x', Float)  # longitude
     y = Column('coordinates_y', Float)  # latitude
-
-
-# FIXME DNRY mixin
-# class ExportableOffice(CRUDMixin, Base):
-#     """
-#     importer table including selected offices (~500K)
-#     ready to be exported to staging and production
-#     -
-#     note that this is actually a duplicate of the Office model
-#     in common/models/office.py
-#     FIXME fix duplication of office model between app and importer
-#     """
-#     __tablename__ = 'etablissements'
-#     siret = Column(String(14), primary_key=True)
-#     company_name = Column('raisonsociale', String(191))
-#     office_name = Column('enseigne', String(191))
-#     naf = Column('codenaf', String(8))
-#     street_number = Column('numerorue', String(191))
-#     street_name = Column('libellerue', String(191))
-#     city_code = Column('codecommune', String(191))
-#     zipcode = Column('codepostal', String(8))
-#     email = Column(String(191))
-#     tel = Column(String(191))
-#     website = Column(String(191))
-#     flag_alternance = Column(Boolean, default=False, nullable=False)
-#     flag_junior = Column(Boolean, default=False, nullable=False)
-#     flag_senior = Column(Boolean, default=False, nullable=False)
-#     flag_handicap = Column(Boolean, default=False, nullable=False)
-#     has_multi_geolocations = Column(Boolean, default=False, nullable=False)
-
-#     departement = Column(String(8))
-#     headcount = Column('trancheeffectif', String(2))
-#     score = Column(Integer)
-#     x = Column('coordinates_x', Float)  # longitude
-#     y = Column('coordinates_y', Float)  # latitude
 
 
 class ImportTask(CRUDMixin, Base):

@@ -9,7 +9,7 @@ from labonneboite.importer.jobs.common import logger
 if __name__ == "__main__":
     errors = sanity.check_scores()
     if errors:
-        msg = "departements with errors: %s", " ".join(errors)
+        msg = "departements with errors: %s" % ",".join(errors)
         logger.error(msg)
         raise Exception(msg)
     logger.info("validate_scores task: FINISHED")

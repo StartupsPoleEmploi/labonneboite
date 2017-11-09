@@ -15,38 +15,9 @@ BACKOFFICE_ETABLISSEMENT_TABLE = 'etablissements_backoffice'
 BACKOFFICE_ETABLISSEMENT_TABLE_CREATE_FILE = "importer/db/etablissements_backoffice.sql"
 EXPORT_ETABLISSEMENT_TABLE = 'etablissements'  # FIXME DNRY
 OFFICE_TABLE = 'etablissements_importer'
-DPAE_TABLE = 'dpae'
 
-if get_current_env() == ENV_LBBDEV:
-    INPUT_SOURCE_FOLDER = '/srv/lbb/data'
-    SCORE_COEFFICIENT_OF_VARIATION_MAX = 0.35
-    MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL = 50
-    RMSE_MAX = 300
-    MAXIMUM_COMPUTE_SCORE_JOB_FAILURES = 0
-    SCORE_REDUCING_TARGET_TABLE = EXPORT_ETABLISSEMENT_TABLE
-    SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements.sql"
-    SCORE_REDUCING_MINIMUM_THRESHOLD = 50
-    HIGH_SCORE_COMPANIES_COUNT_MIN = 100
-    MINIMUM_OFFICES_PER_DEPARTEMENT = 100
-elif get_current_env() == ENV_DEVELOPMENT:
-    INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
-    SCORE_COEFFICIENT_OF_VARIATION_MAX = 3.0
-    MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL = 0
-    RMSE_MAX = 5000
-    MAXIMUM_COMPUTE_SCORE_JOB_FAILURES = 94  # 96 = 2 successes + 94 failures
-    SCORE_REDUCING_TARGET_TABLE = 'etablissements_reduced'
-    SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements_reduced.sql"
-    SCORE_REDUCING_MINIMUM_THRESHOLD = 0
-    HIGH_SCORE_COMPANIES_COUNT_MIN = 100
-    MINIMUM_OFFICES_PER_DEPARTEMENT = 100
-elif get_current_env() == ENV_TEST:
-    INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/tests/data'
-    SCORE_COEFFICIENT_OF_VARIATION_MAX = 1.0
-    HIGH_SCORE_COMPANIES_COUNT_MIN = 0
-    MINIMUM_OFFICES_PER_DEPARTEMENT = 1
-    pass
-else:
-    raise Exception("unknown environment for importer")
+DPAE_TABLE = 'dpae'
+SCORE_REDUCING_TARGET_TABLE = 'etablissements_reduced'
 
 BACKUP_FOLDER = '/srv/lbb/backups'
 BACKUP_INPUT_FOLDER = '/srv/lbb/backups/inputs'
@@ -69,3 +40,36 @@ def get_departements(largest_ones_first=False):
 
 DEPARTEMENTS = get_departements()
 DEPARTEMENTS_WITH_LARGEST_ONES_FIRST = get_departements(largest_ones_first=True)
+
+if get_current_env() == ENV_LBBDEV:
+    INPUT_SOURCE_FOLDER = '/srv/lbb/data'
+    SCORE_COEFFICIENT_OF_VARIATION_MAX = 0.35
+    MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL = 50
+    RMSE_MAX = 300
+    MAXIMUM_COMPUTE_SCORE_JOB_FAILURES = 0
+    SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements.sql"
+    SCORE_REDUCING_MINIMUM_THRESHOLD = 50
+    HIGH_SCORE_COMPANIES_COUNT_MIN = 100
+    MINIMUM_OFFICES_PER_DEPARTEMENT = 100
+    DEPARTEMENTS_TO_BE_SANITY_CHECKED = DEPARTEMENTS
+elif get_current_env() == ENV_DEVELOPMENT:
+    INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
+    SCORE_COEFFICIENT_OF_VARIATION_MAX = 3.0
+    MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL = 0
+    RMSE_MAX = 5000
+    MAXIMUM_COMPUTE_SCORE_JOB_FAILURES = 94  # 96 = 2 successes + 94 failures
+    SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements_reduced.sql"
+    SCORE_REDUCING_MINIMUM_THRESHOLD = 0
+    HIGH_SCORE_COMPANIES_COUNT_MIN = 100
+    MINIMUM_OFFICES_PER_DEPARTEMENT = 1
+    DEPARTEMENTS_TO_BE_SANITY_CHECKED = ['14', '69']
+elif get_current_env() == ENV_TEST:
+    INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/tests/data'
+    SCORE_COEFFICIENT_OF_VARIATION_MAX = 1.0
+    SCORE_REDUCING_MINIMUM_THRESHOLD = 50
+    HIGH_SCORE_COMPANIES_COUNT_MIN = 0
+    MINIMUM_OFFICES_PER_DEPARTEMENT = 1
+    DEPARTEMENTS_TO_BE_SANITY_CHECKED = []
+else:
+    raise Exception("unknown environment for importer")
+

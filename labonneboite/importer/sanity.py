@@ -3,21 +3,21 @@ from sqlalchemy import and_
 
 from labonneboite.importer.util import timeit
 from labonneboite.importer import settings
-from labonneboite.common.models import Office
+from labonneboite.importer.models.computing import ExportableOffice
 
 logger = logging.getLogger('main')
 
 
 @timeit
-def check_scores(departements=settings.DEPARTEMENTS):
+def check_scores(departements=settings.DEPARTEMENTS_TO_BE_SANITY_CHECKED):
     errors = []
     for departement in departements:
-        # FIXME point to etablissements_reduced instead of etablissements
-        departement_count = Office.query.filter(
+        departement_count = ExportableOffice.query.filter(
             and_(
-                Office.departement == departement,
-                Office.score > 50)).count()
-        logger.debug("%i offices with score > 50 in departement %s", departement_count, departement)
+                ExportableOffice.departement == departement,
+                ExportableOffice.score >= settings.SCORE_REDUCING_MINIMUM_THRESHOLD)).count()
+        logger.debug("%i offices with score > %s in departement %s", 
+            settings.SCORE_REDUCING_MINIMUM_THRESHOLD, departement_count, departement)
         ok = departement_count >= settings.MINIMUM_OFFICES_PER_DEPARTEMENT
         if not ok:
             errors.append(departement)
