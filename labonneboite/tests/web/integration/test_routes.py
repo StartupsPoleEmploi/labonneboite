@@ -40,6 +40,7 @@ class RouteTest(AppTest):
         """
         rv = self.app.get("/entreprises/nancy-54100/strategie-commerciale")
         self.assertEqual(rv.status_code, 200)
+        self.assertIn("La ville que vous avez choisi n'est pas valide", rv.data)
 
 
 class GenericUrlSearchRedirectionTest(AppTest):
