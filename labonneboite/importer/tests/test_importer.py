@@ -4,7 +4,20 @@ from labonneboite.importer.tests.test_base import DatabaseTest
 
 
 def make_office(departement="04", siret="1234", score=60):
-    office = Office(departement=departement, siret=siret, score=score)
+    office = Office(
+        siret=siret,
+        company_name="SNCF",
+        street_number="30",
+        street_name="rue Edouard Poisson",
+        zipcode="93300",
+        city_code="93001",
+        departement=departement,
+        headcount="11",
+        naf="2363Z",
+        x=1.1,
+        y=1.1,
+        score=score,
+    )
     return office
 
 
@@ -13,7 +26,7 @@ class TestSanity(DatabaseTest):
     def test_check_succeeds(self):
         office = make_office()
         office.save()
-        errors = sanity.check_scores(departements=["04",], minimum_office_count=1)
+        errors = sanity.check_scores(departements=["04",], minimum_office_count=1)  # FIXME settingify minimum_office_count
         self.assertEquals(len(errors), 0)
 
     def test_check_other_departement_fails(self):

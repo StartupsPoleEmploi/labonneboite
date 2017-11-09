@@ -1,18 +1,19 @@
-from labonneboite.common.models import Office
+from labonneboite.importer.models.computing import RawOffice
 from labonneboite.importer.jobs.extract_etablissements import EtablissementExtractJob
 from labonneboite.importer.tests.test_base import DatabaseTest
 
 
-def make_geocoded_office():
-    office = Office(
+def make_raw_office():
+    office = RawOffice(
         siret=1234,
+        company_name="SNCF",
         street_number="30",
         street_name="rue Edouard Poisson",
         zipcode="93300",
         city_code="93001",
-        x=1.1,
-        y=1.1,
+        departement="57",
         headcount="11",
+        naf="2363Z",
     )
     office.save()
 
@@ -24,7 +25,7 @@ class TestEtablissements(DatabaseTest):
         task = EtablissementExtractJob(filename)
         etabs = task.get_sirets_from_database()
         self.assertEquals(len(etabs), 0)
-        make_geocoded_office()
+        make_raw_office()
         etabs = task.get_sirets_from_database()
         self.assertEquals(len(etabs), 1)
         self.assertEquals(etabs[0], '1234')
@@ -43,7 +44,7 @@ class TestEtablissements(DatabaseTest):
             "00565014800033", "00685016800011"
         ]
         task.create_creatable_offices()
-        self.assertEquals(len(Office.query.all()), 2)
+        self.assertEquals(len(RawOffice.query.all()), 2)
 
     def test_delete_offices(self):
         filename = self.get_data_file_path("LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv")
@@ -55,5 +56,5 @@ class TestEtablissements(DatabaseTest):
         task.create_creatable_offices()
         task.deletable_sirets = set(["00565014800033"])
         task.delete_deletable_offices()
-        self.assertEquals(len(Office.query.all()), 1)
-        self.assertEquals(Office.query.first().siret, "00685016800011")
+        self.assertEquals(len(RawOffice.query.all()), 1)
+        self.assertEquals(RawOffice.query.first().siret, "00685016800011")

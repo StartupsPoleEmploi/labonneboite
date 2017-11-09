@@ -7,13 +7,16 @@ from labonneboite.importer.tests.test_base import DatabaseTest
 def make_geocoded_office():
     office = Office(
         siret=1234,
+        company_name="SNCF",
         street_number="30",
         street_name="rue Edouard Poisson",
         zipcode="93300",
         city_code="93001",
+        departement="57",
+        headcount="11",
+        naf="2363Z",
         x=1.1,
         y=1.1,
-        headcount="11",
     )
     office.save()
 

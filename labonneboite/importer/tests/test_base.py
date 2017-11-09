@@ -6,9 +6,10 @@ from labonneboite.common.database import db_session, init_db, delete_db, engine
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 
+# FIXME move all these values to dynamic settings
 importer_settings.INPUT_SOURCE_FOLDER = os.path.join(os.path.dirname(__file__), 'data')
 importer_settings.MIN_DPAE_COUNT_PER_DAY = 0
-importer_settings.OFFICE_TABLE = 'etablissements'
+# importer_settings.OFFICE_TABLE = 'etablissements'  # FIXME why ???
 importer_settings.SCORE_COEFFICIENT_OF_VARIATION_MAX = 1.0
 
 

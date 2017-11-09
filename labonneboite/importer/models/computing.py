@@ -2,14 +2,15 @@
 import datetime
 
 from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime
+from sqlalchemy import PrimaryKeyConstraint
 
-from labonneboite.importer import settings
+from labonneboite.importer import settings as importer_settings
 from labonneboite.common.database import Base
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.common.models import PrimitiveOfficeMixin
 
 class Dpae(CRUDMixin, Base):
-    __tablename__ = settings.DPAE_TABLE
+    __tablename__ = importer_settings.DPAE_TABLE
 
     _id = Column('id', BigInteger, primary_key=True)
     siret = Column(String(191))
@@ -31,7 +32,7 @@ class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
     raw importer table storing all 10M offices
     FIXME DNRY mixin
     """
-    __tablename__ = settings.OFFICE_TABLE
+    __tablename__ = importer_settings.OFFICE_TABLE
     __table_args__ = (
         Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),
@@ -127,4 +128,4 @@ class DpaeStatistics(CRUDMixin, Base):
         except AttributeError:
             # if there was no import of dpae thus far, return the date for which
             # we don't want to import dpae before that date
-            return settings.MOST_RECENT_DPAE_DATE
+            return importer_settings.MOST_RECENT_DPAE_DATE

@@ -9,9 +9,6 @@
 SET @PREVIOUS_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;
 SET FOREIGN_KEY_CHECKS = 0;
 
-# The `generations` table is now unused. Drop it just in case it still exists in a developer database.
-DROP TABLE IF EXISTS `generations`;
-
 
 # Configure the `etablissements` table encoding.
 #
