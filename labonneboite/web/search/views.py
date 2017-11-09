@@ -146,17 +146,17 @@ def results(city, zipcode, occupation):
     fetcher = search_util.Fetcher(**kwargs)
     alternative_rome_descriptions = []
     alternative_distances = {}
-    zipcode_has_no_city_error = False
     companies = []
     naf_aggregations = []
     company_count = 0
 
     try:
         fetcher.init_location()
-    except search_util.ZipcodeHasNoCityError:
-        zipcode_has_no_city_error = True
+        zipcode_is_invalid = False
+    except search_util.InvalidZipcodeError:
+        zipcode_is_invalid = True
 
-    if not zipcode_has_no_city_error:
+    if not zipcode_is_invalid:
         current_app.logger.debug("fetching companies and company_count")
         # Note that if a NAF filter is selected, naf_aggregations will be a list of
         # only one NAF, the one currently selected in the filter.
@@ -213,7 +213,7 @@ def results(city, zipcode, occupation):
         'headcount': kwargs['headcount'],
         'job_doesnt_exist': False,
         'location': full_location,
-        'zipcode_has_no_city_error': zipcode_has_no_city_error,
+        'zipcode_is_invalid': zipcode_is_invalid,
         'naf': kwargs['naf'],
         'naf_codes': naf_codes_with_descriptions,
         'page': current_page,
