@@ -8,12 +8,12 @@ from flask import Blueprint, current_app
 from flask import send_file
 from flask import request, url_for
 
-from labonneboite.common import pdf as pdf_util
 from labonneboite.common.email_util import MandrillClient
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 
 from labonneboite.web.office.forms import OfficeRemovalForm
+from . import pdf as pdf_util
 
 
 officeBlueprint = Blueprint('office', __name__)

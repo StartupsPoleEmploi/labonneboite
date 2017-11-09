@@ -11,6 +11,7 @@ from xhtml2pdf import pisa
 from labonneboite.common import util
 from labonneboite.conf import settings
 from labonneboite.conf.common.contact_mode import CONTACT_MODE_STAGES
+from labonneboite.web import WEB_DIR
 
 logger = logging.getLogger('main')
 
@@ -86,9 +87,13 @@ def convert_to_pdf(pdf_data):
     Return: a file-like object
     """
     pdf_target = StringIO.StringIO()
+    # The link callback is a function that is used to determine the path of
+    # local static assets required to generate the pdf. This should not point
+    # to http://labonneboite.
+    link_callback = lambda uri, rel: os.path.join(WEB_DIR, uri.strip("/"))
     pisa.CreatePDF(
         StringIO.StringIO(pdf_data), pdf_target,
-        link_callback=lambda uri, rel: "https://%s%s" % (settings.HOST, uri)
+        link_callback=link_callback
     )
     pdf_target.seek(0)
     return pdf_target

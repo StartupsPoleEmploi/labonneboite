@@ -15,10 +15,10 @@ from labonneboite.common.models import get_user_social_auth
 from labonneboite.common.models import Office
 from labonneboite.common.models import User
 from labonneboite.common.models import UserFavoriteOffice
-from labonneboite.common import pdf as pdf_util
 from labonneboite.common import pro
 from labonneboite.common import util
 from labonneboite.web.auth.views import logout
+from labonneboite.web.office import pdf as pdf_util
 from labonneboite.web.pagination import Pagination
 from labonneboite.web.user.forms import UserAccountDeleteForm
 

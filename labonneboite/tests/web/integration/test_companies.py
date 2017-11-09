@@ -1,6 +1,6 @@
 # coding: utf8
 from labonneboite.common.models import Office
-from labonneboite.common import pdf
+from labonneboite.web.office import pdf
 from labonneboite.tests.test_base import DatabaseTest
 
 
