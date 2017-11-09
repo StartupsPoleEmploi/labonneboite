@@ -9,7 +9,7 @@ logger = logging.getLogger('main')
 
 
 @timeit
-def check_scores(departements=settings.DEPARTEMENTS, minimum_office_count=100):
+def check_scores(departements=settings.DEPARTEMENTS):
     errors = []
     for departement in departements:
         # FIXME point to etablissements_reduced instead of etablissements
@@ -18,7 +18,7 @@ def check_scores(departements=settings.DEPARTEMENTS, minimum_office_count=100):
                 Office.departement == departement,
                 Office.score > 50)).count()
         logger.debug("%i offices with score > 50 in departement %s", departement_count, departement)
-        ok = departement_count >= minimum_office_count
+        ok = departement_count >= settings.MINIMUM_OFFICES_PER_DEPARTEMENT
         if not ok:
             errors.append(departement)
     return errors

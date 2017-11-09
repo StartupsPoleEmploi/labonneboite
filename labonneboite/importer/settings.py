@@ -4,7 +4,6 @@ from labonneboite.conf import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_
 
 SCORE_COMPUTING_MAX_DIFF_MEAN = 30
 HIGH_SCORE_COMPANIES_DIFF_MAX = 30
-HIGH_SCORE_COMPANIES_COUNT_MIN = 100
 
 FIRST_DAY_DPAE = datetime(2012, 1, 1)
 LAST_DAY_DPAE = datetime(2015, 6, 30)
@@ -27,6 +26,8 @@ if get_current_env() == ENV_LBBDEV:
     SCORE_REDUCING_TARGET_TABLE = EXPORT_ETABLISSEMENT_TABLE
     SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements.sql"
     SCORE_REDUCING_MINIMUM_THRESHOLD = 50
+    HIGH_SCORE_COMPANIES_COUNT_MIN = 100
+    MINIMUM_OFFICES_PER_DEPARTEMENT = 100
 elif get_current_env() == ENV_DEVELOPMENT:
     INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
     SCORE_COEFFICIENT_OF_VARIATION_MAX = 3.0
@@ -36,7 +37,13 @@ elif get_current_env() == ENV_DEVELOPMENT:
     SCORE_REDUCING_TARGET_TABLE = 'etablissements_reduced'
     SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements_reduced.sql"
     SCORE_REDUCING_MINIMUM_THRESHOLD = 0
+    HIGH_SCORE_COMPANIES_COUNT_MIN = 100
+    MINIMUM_OFFICES_PER_DEPARTEMENT = 100
 elif get_current_env() == ENV_TEST:
+    INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/tests/data'
+    SCORE_COEFFICIENT_OF_VARIATION_MAX = 1.0
+    HIGH_SCORE_COMPANIES_COUNT_MIN = 0
+    MINIMUM_OFFICES_PER_DEPARTEMENT = 1
     pass
 else:
     raise Exception("unknown environment for importer")

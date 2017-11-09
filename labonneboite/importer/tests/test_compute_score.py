@@ -32,8 +32,6 @@ def make_dpae():
 class TestComputeScore(DatabaseTest):
 
     def test_happy_path(self):
-        settings.SCORE_COEFFICIENT_OF_VARIATION_MAX = 1.0
-        settings.HIGH_SCORE_COMPANIES_COUNT_MIN = 0
         make_office()
         make_dpae()
         dpae_date = datetime.now()
