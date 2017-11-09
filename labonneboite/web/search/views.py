@@ -145,18 +145,19 @@ def results(city, zipcode, occupation):
     # Fetch companies and alternatives.
     fetcher = search_util.Fetcher(**kwargs)
     alternative_rome_descriptions = []
-    alternative_distances = {}
-    companies = []
-    naf_aggregations = []
-    company_count = 0
-
+    
     try:
         fetcher.init_location()
         zipcode_is_invalid = False
     except search_util.InvalidZipcodeError:
         zipcode_is_invalid = True
 
-    if not zipcode_is_invalid:
+    if zipcode_is_invalid:
+        companies = []
+        naf_aggregations = []
+        company_count = 0
+        alternative_distances = {}
+    else:
         current_app.logger.debug("fetching companies and company_count")
         # Note that if a NAF filter is selected, naf_aggregations will be a list of
         # only one NAF, the one currently selected in the filter.
@@ -168,19 +169,6 @@ def results(city, zipcode, occupation):
                 alternative_rome_descriptions.append([alternative, desc, slug, count])
         company_count = fetcher.company_count
         alternative_distances = fetcher.alternative_distances
-
-
-    # Pagination.
-    from_number_param = int(kwargs.get('from') or 1)
-    to_number_param = int(kwargs.get('to') or 10)
-    pagination_manager = PaginationManager(company_count, from_number_param, to_number_param, request.full_path)
-    current_page = pagination_manager.get_current_page()
-
-    # Get contact mode and position.
-    for position, company in enumerate(companies, start=1):
-        company.contact_mode = util.get_contact_mode_for_rome_and_naf(fetcher.rome, company.naf)
-        # position is later used in labonneboite/web/static/js/results.js
-        company.position = position
 
     # If a NAF filter is selected, previous naf_aggregations returned by fetcher.get_companies()
     # was actually only one NAF, the one NAF currently selected in the filter.
@@ -194,6 +182,18 @@ def results(city, zipcode, occupation):
     for naf_aggregate in naf_aggregations:
         naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["naf"]), naf_aggregate["count"])
         naf_codes_with_descriptions.append((naf_aggregate["naf"], naf_description))
+
+    # Pagination.
+    from_number_param = int(kwargs.get('from') or 1)
+    to_number_param = int(kwargs.get('to') or 10)
+    pagination_manager = PaginationManager(company_count, from_number_param, to_number_param, request.full_path)
+    current_page = pagination_manager.get_current_page()
+
+    # Get contact mode and position.
+    for position, company in enumerate(companies, start=1):
+        company.contact_mode = util.get_contact_mode_for_rome_and_naf(fetcher.rome, company.naf)
+        # position is later used in labonneboite/web/static/js/results.js
+        company.position = position
 
     form_kwargs['job'] = settings.ROME_DESCRIPTIONS[rome]
     form = CompanySearchForm(**form_kwargs)
