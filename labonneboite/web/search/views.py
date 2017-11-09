@@ -187,7 +187,7 @@ def results(city, zipcode, occupation):
     # Let's do a second call, only if a NAF filter is selected.
     # This logic is designed to make only one elasticsearch call in the most frequent case (no NAF filter selected)
     # and make two elasticsearch calls in the rarest case only (NAF filter selected).
-    if kwargs["naf"]:
+    if kwargs.get("naf"):
         naf_aggregations = fetcher.get_naf_aggregations()
 
     naf_codes_with_descriptions = []
