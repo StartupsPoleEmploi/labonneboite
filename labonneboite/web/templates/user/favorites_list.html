@@ -22,7 +22,10 @@
             <li><a href="{{ url_for('user.account') }}">Mon compte</a></li>
             <li>Mes favoris</li>
         </ol>
-        <h2>Mes favoris</h2>
+        <h2>
+            Mes favoris
+            <a href="{{ url_for('user.favorites_download') }}"><img src="{{ url_for('static', filename='images/pdf-file-icon.png') }}" alt="Exporter mes favoris en PDF" style="vertical-align: middle; float: right;"></a>
+        </h2>
       </div>
 
       {% if not favorites.count() %}
