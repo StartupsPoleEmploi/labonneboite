@@ -145,18 +145,22 @@ def results(city, zipcode, occupation):
     # Fetch companies and alternatives.
     fetcher = search_util.Fetcher(**kwargs)
     alternative_rome_descriptions = []
-    alternative_distances = {}
-    location_error = False
-
+    
     try:
         fetcher.init_location()
-    except search_util.LocationError:
-        companies = []
-        company_count = 0
-        location_error = True
+        zipcode_is_invalid = False
+    except search_util.InvalidZipcodeError:
+        zipcode_is_invalid = True
 
-    if not location_error:
+    if zipcode_is_invalid:
+        companies = []
+        naf_aggregations = []
+        company_count = 0
+        alternative_distances = {}
+    else:
         current_app.logger.debug("fetching companies and company_count")
+        # Note that if a NAF filter is selected, naf_aggregations will be a list of
+        # only one NAF, the one currently selected in the filter.
         companies, naf_aggregations = fetcher.get_companies()
         for alternative, count in fetcher.alternative_rome_codes.iteritems():
             if settings.ROME_DESCRIPTIONS.get(alternative) and count:
@@ -166,6 +170,18 @@ def results(city, zipcode, occupation):
         company_count = fetcher.company_count
         alternative_distances = fetcher.alternative_distances
 
+    # If a NAF filter is selected, previous naf_aggregations returned by fetcher.get_companies()
+    # was actually only one NAF, the one NAF currently selected in the filter.
+    # Let's do a second call, only if a NAF filter is selected.
+    # This logic is designed to make only one elasticsearch call in the most frequent case (no NAF filter selected)
+    # and make two elasticsearch calls in the rarest case only (NAF filter selected).
+    if kwargs.get("naf"):
+        naf_aggregations = fetcher.get_naf_aggregations()
+
+    naf_codes_with_descriptions = []
+    for naf_aggregate in naf_aggregations:
+        naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["naf"]), naf_aggregate["count"])
+        naf_codes_with_descriptions.append((naf_aggregate["naf"], naf_description))
 
     # Pagination.
     from_number_param = int(kwargs.get('from') or 1)
@@ -178,15 +194,6 @@ def results(city, zipcode, occupation):
         company.contact_mode = util.get_contact_mode_for_rome_and_naf(fetcher.rome, company.naf)
         # position is later used in labonneboite/web/static/js/results.js
         company.position = position
-
-    # Get NAF code and their descriptions.
-    if kwargs["naf"]:
-        naf_aggregations = fetcher.get_naf_aggregations()
-
-    naf_codes_with_descriptions = []
-    for naf_aggregate in naf_aggregations:
-        naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["naf"]), naf_aggregate["count"])
-        naf_codes_with_descriptions.append((naf_aggregate["naf"], naf_description))
 
     form_kwargs['job'] = settings.ROME_DESCRIPTIONS[rome]
     form = CompanySearchForm(**form_kwargs)
@@ -206,7 +213,7 @@ def results(city, zipcode, occupation):
         'headcount': kwargs['headcount'],
         'job_doesnt_exist': False,
         'location': full_location,
-        'location_error': location_error,
+        'zipcode_is_invalid': zipcode_is_invalid,
         'naf': kwargs['naf'],
         'naf_codes': naf_codes_with_descriptions,
         'page': current_page,

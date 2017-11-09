@@ -4,7 +4,7 @@ import unittest
 from labonneboite.common import util
 
 
-class UtilTest(unittest.TestCase):
+class SafeUrlTest(unittest.TestCase):
 
     def test_is_safe_url(self):
 

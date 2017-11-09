@@ -32,6 +32,16 @@ class RouteTest(AppTest):
         rv = self.app.get("/entreprises/grenoble-38000/strategie-commerciale")
         self.assertEqual(rv.status_code, 200)
 
+    def test_search_url_with_wrong_zipcode_does_not_break(self):
+        """
+        Nancy has zipcode 54000 and not 54100.
+        However some bots happened to call this URL which was broken.
+        https://github.com/StartupsPoleEmploi/labonneboite/pull/61
+        """
+        rv = self.app.get("/entreprises/nancy-54100/strategie-commerciale")
+        self.assertEqual(rv.status_code, 200)
+        self.assertIn("La ville que vous avez choisi n'est pas valide", rv.data)
+
 
 class GenericUrlSearchRedirectionTest(AppTest):
 
