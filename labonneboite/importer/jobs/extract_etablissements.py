@@ -56,7 +56,7 @@ class EtablissementExtractJob(Job):
 
     @timeit
     def run_task(self):
-        self.benchmark_loading_using_pandas()  # FIXME
+        self.benchmark_loading_using_pandas()
         self.csv_offices = self.get_offices_from_file()
         self.csv_sirets = self.csv_offices.keys()
         self.existing_sirets = self.get_sirets_from_database()
@@ -66,10 +66,7 @@ class EtablissementExtractJob(Job):
         self.creatable_sirets = csv_set - existing_set
         num_created = self.create_creatable_offices()
         # 2 - delete offices which no longer exist
-        if get_current_env() == ENV_LBBDEV:
-            self.deletable_sirets = existing_set - csv_set
-        else:
-            self.deletable_sirets = set()
+        self.deletable_sirets = existing_set - csv_set
         self.delete_deletable_offices()
         # 3 - update existing offices
         self.updatable_sirets = existing_set - self.deletable_sirets
