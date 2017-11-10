@@ -1,6 +1,6 @@
-DROP TABLE if exists etablissements_backoffice;
+DROP TABLE if exists etablissements_exportable;
 
-CREATE TABLE `etablissements_backoffice` (
+CREATE TABLE `etablissements_exportable` (
   `siret` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `raisonsociale` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `enseigne` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -22,17 +22,6 @@ CREATE TABLE `etablissements_backoffice` (
   `coordinates_y` float DEFAULT NULL,
   `departement` varchar(11) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `score` int(11) DEFAULT NULL,
-  `semester-1` double DEFAULT NULL,
-  `semester-2` double DEFAULT NULL,
-  `semester-3` double DEFAULT NULL,
-  `semester-4` double DEFAULT NULL,
-  `semester-5` double DEFAULT NULL,
-  `semester-6` double DEFAULT NULL,
-  `semester-7` double DEFAULT NULL,
-  `effectif` double DEFAULT NULL,
-  `score_regr` float DEFAULT NULL,
   PRIMARY KEY (`siret`),
   KEY dept_i (departement)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-
-

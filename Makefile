@@ -187,6 +187,21 @@ test_selenium:
 	&& export LBB_ENV=development \
 	&& nosetests -s /srv/lbb/labonneboite/tests/web/selenium';
 
+# Alembic migrations
+# ------------------
+
+alembic_migrate:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb && alembic upgrade head';
+
+alembic_rollback:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb && alembic downgrade -1';
+
+alembic_autogenerate_migration_for_all_existing_tables:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb && alembic revision --autogenerate';
+
 # Importer jobs
 # -------------
 
@@ -202,13 +217,13 @@ run_importer_jobs:
 	make run_importer_job_08_populate_flags && \
 	echo "all importer jobs completed successfully."
 
-run_importer_job_00_prepare_all:
+run_importer_job_00_prepare_all:  # FIXME DNRY table names
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
 		echo delete from import_tasks              | mysql -u root -D labonneboite --host 127.0.0.1 && \
-		echo delete from etablissements_importer   | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		echo delete from etablissements_raw        | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		echo delete from etablissements_backoffice | mysql -u root -D labonneboite --host 127.0.0.1 && \
-		echo delete from etablissements_reduced    | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		echo delete from etablissements_exportable | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \

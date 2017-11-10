@@ -12,9 +12,10 @@ LAST_DAY_DPAE = datetime(2015, 6, 30)
 NOW = datetime.now()
 
 BACKOFFICE_ETABLISSEMENT_TABLE = 'etablissements_backoffice'
-RAW_OFFICE_TABLE = 'etablissements_importer'
+RAW_OFFICE_TABLE = 'etablissements_raw'
 DPAE_TABLE = 'dpae'
-SCORE_REDUCING_TARGET_TABLE = 'etablissements_reduced'
+SCORE_REDUCING_TARGET_TABLE = 'etablissements_exportable'
+SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements_exportable.sql"
 BACKOFFICE_ETABLISSEMENT_TABLE_CREATE_FILE = "importer/db/etablissements_backoffice.sql"
 BACKUP_INPUT_FOLDER = '/srv/lbb/backups/inputs'
 MOST_RECENT_DPAE_DATE = datetime(2012, 1, 1)
@@ -52,7 +53,6 @@ if get_current_env() == ENV_LBBDEV:
     MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL = 50
     RMSE_MAX = 300
     MAXIMUM_COMPUTE_SCORE_JOB_FAILURES = 0
-    SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements.sql"
     SCORE_REDUCING_MINIMUM_THRESHOLD = 50
     HIGH_SCORE_COMPANIES_COUNT_MIN = 100
     MINIMUM_OFFICES_PER_DEPARTEMENT = 100
@@ -74,7 +74,6 @@ elif get_current_env() == ENV_DEVELOPMENT:
     MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL = 0
     RMSE_MAX = 5000
     MAXIMUM_COMPUTE_SCORE_JOB_FAILURES = 94  # 96 = 2 successes + 94 failures
-    SCORE_REDUCING_TARGET_TABLE_CREATE_FILE = "importer/db/etablissements_reduced.sql"
     SCORE_REDUCING_MINIMUM_THRESHOLD = 0
     HIGH_SCORE_COMPANIES_COUNT_MIN = 100
     MINIMUM_OFFICES_PER_DEPARTEMENT = 1

@@ -165,7 +165,7 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
     df_etab = pd.read_sql_query("""
         select * from %s where departement = %s and siret != ''
         """ % (etablissement_table, departement), engine)
-    debug_df(df_etab, "after loading from etablissements_importer table")
+    debug_df(df_etab, "after loading from raw office table")
     if "website1" not in list(df_etab.columns):
         raise Exception("missing website1 column")
 

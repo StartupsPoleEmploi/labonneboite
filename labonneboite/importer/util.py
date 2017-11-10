@@ -41,7 +41,7 @@ def create_cursor():
     return con, cur
 
 
-def timeit(func):
+def timeit(func):  # FIXME disable in tests
     @wraps(func)
     def wrap(*args, **kw):
         ts = time()
