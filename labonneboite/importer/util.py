@@ -27,6 +27,7 @@ TRANCHE_AGE_MIDDLE = "26-50"
 
 OFFICE_FLAGS = ['flag_alternance', 'flag_junior', 'flag_senior', 'flag_handicap']
 
+# FIXME move those to settings
 if get_current_env() == ENV_LBBDEV:
     JENKINS_ETAB_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties.jenkins")
     JENKINS_DPAE_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties_dpae.jenkins")

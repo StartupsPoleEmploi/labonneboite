@@ -70,7 +70,7 @@ class GeocodeJob(Job):
                 coordinates_x,
                 coordinates_y
             from %s
-        """ % (settings.EXPORT_ETABLISSEMENT_TABLE)
+        """ % (settings.SCORE_REDUCING_TARGET_TABLE)
         _, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
@@ -103,34 +103,39 @@ class GeocodeJob(Job):
         count = 0
         statements = []
         update_query = "update %s set coordinates_x=%%s, coordinates_y=%%s where siret=%%s" % \
-            settings.EXPORT_ETABLISSEMENT_TABLE
+            settings.SCORE_REDUCING_TARGET_TABLE
+
         for siret, coordinates in coordinates_updates:
+            count += 1
             statements.append([coordinates[0], coordinates[1], siret])
-            if not count % 1000:
-                logger.info(
-                    "geocoding with ban... %i done (example: coordinates_x=%s, coordinates_y=%s",
-                    count,
-                    statements[0][0],
-                    statements[0][1]
-                )
+            if len(statements) == 1000:
+                logger.info("geocoding with ban... %i of %i done", count, len(coordinates_updates))
                 cur.executemany(update_query, statements)
                 con.commit()
                 statements = []
-            count += 1
 
+        if len(statements) >= 1:
+            logger.info("geocoding with ban... %i of %i done", count, len(coordinates_updates))
+            cur.executemany(update_query, statements)
+            con.commit()   
+            
 
     @timeit
     def validate_coordinates(self):
         _, cur = import_util.create_cursor()
         query = """
         select
-        sum(coordinates_x > 0 and coordinates_y > 0)/count(*)
+        sum(
+            (coordinates_x > 0 or coordinates_x < 0)
+            and
+            (coordinates_y > 0 or coordinates_y < 0)
+        )/count(*)
         from %s
-        """ % settings.EXPORT_ETABLISSEMENT_TABLE
+        """ % settings.SCORE_REDUCING_TARGET_TABLE
         cur.execute(query)
         geocoding_ratio = cur.fetchall()[0][0]
         logger.info("geocoding_ratio = %s", geocoding_ratio)
-        if geocoding_ratio < 0.75:
+        if geocoding_ratio < settings.MINIMUM_GEOCODING_RATIO:
             raise AbnormallyLowGeocodingRatioException
 
 
