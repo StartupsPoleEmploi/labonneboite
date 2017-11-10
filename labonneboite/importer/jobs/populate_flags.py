@@ -1,5 +1,6 @@
 import os
 import tarfile
+from shutil import copyfile
 
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import timeit
@@ -24,9 +25,9 @@ def populate_flag(flag):
         UPDATE
         %s e
         INNER JOIN %s f
-        ON e.siret = f.siret
+        ON e.siret = f.siret COLLATE utf8mb4_unicode_ci
         SET e.%s = True;
-    """ % (settings.EXPORT_ETABLISSEMENT_TABLE, flag, flag)
+    """ % (settings.SCORE_REDUCING_TARGET_TABLE, flag, flag)
     cur.execute(query)
     con.commit()
     logger.info("completed populating %s ... ", flag)
@@ -129,9 +130,9 @@ def dump():
     timestamp = settings.NOW.strftime('%Y_%m_%d_%H%M')
 
     copy_to_remote_server = Job().backup_first
-    logger.info("backing up export_etablissement")
+    logger.info("backing up table %s ...", settings.SCORE_REDUCING_TARGET_TABLE)
     etab_result = import_util.back_up(
-        settings.BACKUP_OUTPUT_FOLDER, settings.EXPORT_ETABLISSEMENT_TABLE,
+        settings.BACKUP_OUTPUT_FOLDER, settings.SCORE_REDUCING_TARGET_TABLE,
         "export_etablissement", timestamp, copy_to_remote_server,
         rename_table=True)
 
@@ -145,12 +146,19 @@ def dump():
 
 def make_link_file_to_new_archive(archive_path):
     link_path = os.path.join(settings.BACKUP_FOLDER, "latest_data.tar.bz2")
+
     try:
         os.remove(link_path)
     except OSError:
-        pass
-    # this is a hard link, not a symlink
-    os.link(archive_path, link_path)
+        pass  # link_path did not already exist
+    
+    try:
+        # this is a hard link, not a symlink
+        # hard linking fails on Vagrant, error seems to be known:
+        # https://github.com/pypa/setuptools/issues/516
+        os.link(archive_path, link_path)
+    except OSError:
+        copyfile(archive_path, link_path)
 
 
 if __name__ == "__main__":

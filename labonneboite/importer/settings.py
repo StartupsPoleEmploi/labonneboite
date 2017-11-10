@@ -19,9 +19,7 @@ OFFICE_TABLE = 'etablissements_importer'
 DPAE_TABLE = 'dpae'
 SCORE_REDUCING_TARGET_TABLE = 'etablissements_reduced'
 
-BACKUP_FOLDER = '/srv/lbb/backups'
 BACKUP_INPUT_FOLDER = '/srv/lbb/backups/inputs'
-BACKUP_OUTPUT_FOLDER = '/srv/lbb/backups/outputs'
 
 MOST_RECENT_DPAE_DATE = datetime(2012, 1, 1)
 
@@ -53,6 +51,8 @@ if get_current_env() == ENV_LBBDEV:
     HIGH_SCORE_COMPANIES_COUNT_MIN = 100
     MINIMUM_OFFICES_PER_DEPARTEMENT = 100
     DEPARTEMENTS_TO_BE_SANITY_CHECKED = DEPARTEMENTS
+    BACKUP_OUTPUT_FOLDER = '/srv/lbb/backups/outputs'
+    BACKUP_FOLDER = '/srv/lbb/backups'
 elif get_current_env() == ENV_DEVELOPMENT:
     INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
     SCORE_COEFFICIENT_OF_VARIATION_MAX = 3.0
@@ -64,6 +64,8 @@ elif get_current_env() == ENV_DEVELOPMENT:
     HIGH_SCORE_COMPANIES_COUNT_MIN = 100
     MINIMUM_OFFICES_PER_DEPARTEMENT = 1
     DEPARTEMENTS_TO_BE_SANITY_CHECKED = ['14', '69']
+    BACKUP_OUTPUT_FOLDER = '/srv/lbb/labonneboite/importer/output'
+    BACKUP_FOLDER = '/srv/lbb/labonneboite/importer/output'
 elif get_current_env() == ENV_TEST:
     INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/tests/data'
     SCORE_COEFFICIENT_OF_VARIATION_MAX = 1.0

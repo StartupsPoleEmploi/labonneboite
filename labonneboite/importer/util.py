@@ -100,11 +100,11 @@ def check_for_updates(input_folder):
 
 
 @timeit
-def back_up(backup_folder, table, name, timestamp, copy_to_remote_server=True, rename_table=False):
-    timestamp_filename = '%s_backup_%s.sql.gz' % (name, timestamp)
+def back_up(backup_folder, table, filename, timestamp, copy_to_remote_server=True, rename_table=False):
+    timestamp_filename = '%s_backup_%s.sql.gz' % (filename, timestamp)
     backup_filename = os.path.join(backup_folder, timestamp_filename)
     password_statement = "-p'%s'" % DATABASE['PASSWORD']
-    logger.info("backing up %s into %s", name, backup_filename)
+    logger.info("backing up table %s into %s", table, backup_filename)
     if rename_table:
         table_new = table+"_new"
     else:
