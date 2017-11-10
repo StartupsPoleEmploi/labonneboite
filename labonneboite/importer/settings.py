@@ -11,23 +11,15 @@ LAST_DAY_DPAE = datetime(2015, 6, 30)
 
 NOW = datetime.now()
 
-# FIXME rename all those
 BACKOFFICE_ETABLISSEMENT_TABLE = 'etablissements_backoffice'
-BACKOFFICE_ETABLISSEMENT_TABLE_CREATE_FILE = "importer/db/etablissements_backoffice.sql"
-EXPORT_ETABLISSEMENT_TABLE = 'etablissements'  # FIXME DNRY
-OFFICE_TABLE = 'etablissements_importer'
-
+RAW_OFFICE_TABLE = 'etablissements_importer'
 DPAE_TABLE = 'dpae'
 SCORE_REDUCING_TARGET_TABLE = 'etablissements_reduced'
-
+BACKOFFICE_ETABLISSEMENT_TABLE_CREATE_FILE = "importer/db/etablissements_backoffice.sql"
 BACKUP_INPUT_FOLDER = '/srv/lbb/backups/inputs'
-
 MOST_RECENT_DPAE_DATE = datetime(2012, 1, 1)
-
 DPAE_ERROR_RATE_MAX = 0.1
 MINIMUM_GEOCODING_RATIO = 0.75
-
-MYSQL_NO_PASSWORD = False
 
 
 @lru_cache(maxsize=None)
@@ -38,10 +30,17 @@ def get_departements(largest_ones_first=False):
         departements[:0] = ['75']
     return departements
 
+
 DEPARTEMENTS = get_departements()
 DEPARTEMENTS_WITH_LARGEST_ONES_FIRST = get_departements(largest_ones_first=True)
 
+
+# @alexandre @regis let's discuss the best DNRY way to manage all environment-specific importer settings below!
+# i could split them in 3 files settings-lbbdev.py / settings-dev.py / settings-test.py
+# but i don't like this solution as I have no way to write DNRY comments about what each parameter is about.
+
 if get_current_env() == ENV_LBBDEV:
+
     BACKUP_FIRST = True
     INPUT_SOURCE_FOLDER = '/srv/lbb/data'
     DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 96
@@ -60,7 +59,9 @@ if get_current_env() == ENV_LBBDEV:
     DEPARTEMENTS_TO_BE_SANITY_CHECKED = DEPARTEMENTS
     BACKUP_OUTPUT_FOLDER = '/srv/lbb/backups/outputs'
     BACKUP_FOLDER = '/srv/lbb/backups'
+
 elif get_current_env() == ENV_DEVELOPMENT:
+
     BACKUP_FIRST = False
     INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
     DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 1
@@ -80,7 +81,9 @@ elif get_current_env() == ENV_DEVELOPMENT:
     DEPARTEMENTS_TO_BE_SANITY_CHECKED = ['14', '69']
     BACKUP_OUTPUT_FOLDER = '/srv/lbb/labonneboite/importer/output'
     BACKUP_FOLDER = '/srv/lbb/labonneboite/importer/output'
+
 elif get_current_env() == ENV_TEST:
+
     BACKUP_FIRST = False
     INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/tests/data'
     DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 15
@@ -91,6 +94,8 @@ elif get_current_env() == ENV_TEST:
     HIGH_SCORE_COMPANIES_COUNT_MIN = 0
     MINIMUM_OFFICES_PER_DEPARTEMENT = 1
     DEPARTEMENTS_TO_BE_SANITY_CHECKED = []
+
 else:
+
     raise Exception("unknown environment for importer")
 

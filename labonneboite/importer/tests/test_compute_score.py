@@ -36,7 +36,7 @@ class TestComputeScore(DatabaseTest):
         make_dpae()
         dpae_date = datetime.now()
         departement = "57"
-        compute_score.run(settings.OFFICE_TABLE, settings.DPAE_TABLE, departement, dpae_date)
+        compute_score.run(settings.RAW_OFFICE_TABLE, settings.DPAE_TABLE, departement, dpae_date)
 
     def test_normalize_url(self):
         self.assertEqual(compute_score.normalize_website_url(None), None)

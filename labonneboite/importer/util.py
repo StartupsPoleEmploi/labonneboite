@@ -161,10 +161,7 @@ def reduce_scores_into_table(
     sql_filepath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", create_table_filename)
     init_query = open(sql_filepath, "r").read()
     errors = successes = 0
-    if importer_settings.MYSQL_NO_PASSWORD:
-        password_statement = ''
-    else:
-        password_statement = "-p'%s'" % DATABASE['PASSWORD']
+    password_statement = "-p'%s'" % DATABASE['PASSWORD']
 
     subprocess.check_call("""mysql -u %s %s %s -e'%s'""" % (
         DATABASE['USER'], password_statement, DATABASE['NAME'], init_query), shell=True)
@@ -253,10 +250,7 @@ def reduce_scores_for_backoffice(departements):
 
 @timeit
 def clean_temporary_tables():
-    if importer_settings.MYSQL_NO_PASSWORD:
-        password_statement = ''
-    else:
-        password_statement = "-p'%s'" % DATABASE['PASSWORD']
+    password_statement = "-p'%s'" % DATABASE['PASSWORD']
 
     logger.info("clean all departement database tables...")
     departements = importer_settings.DEPARTEMENTS

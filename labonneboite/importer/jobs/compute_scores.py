@@ -69,7 +69,7 @@ class ScoreComputingJob(Job):
 
         if DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING:  # single thread computing
             for departement in departements:
-                compute_result = compute(settings.OFFICE_TABLE,
+                compute_result = compute(settings.RAW_OFFICE_TABLE,
                     settings.DPAE_TABLE, departement, most_recent_data_date)
                 compute_results[departement] = compute_result
         else:  # parallel computing
@@ -77,7 +77,7 @@ class ScoreComputingJob(Job):
                 abortable_func = partial(abortable_worker, compute)
                 compute_result = pool.apply_async(
                     abortable_func,
-                    args=(settings.OFFICE_TABLE, settings.DPAE_TABLE, departement, most_recent_data_date)
+                    args=(settings.RAW_OFFICE_TABLE, settings.DPAE_TABLE, departement, most_recent_data_date)
                 )
                 compute_results[departement] = compute_result.get()
 

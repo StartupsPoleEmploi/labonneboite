@@ -17,7 +17,7 @@ from labonneboite.importer.jobs.common import logger
 def check_departements(departements):
     for dep in departements:
         con, cur = import_util.create_cursor()
-        cur.execute("select count(1) from %s where departement='%s'" % (settings.OFFICE_TABLE, dep))
+        cur.execute("select count(1) from %s where departement='%s'" % (settings.RAW_OFFICE_TABLE, dep))
         con.commit()
         count = cur.fetchone()[0]
         if count < 1000:
@@ -27,7 +27,7 @@ def check_departements(departements):
 class EtablissementExtractJob(Job):
     file_type = "etablissements"
     import_type = ImportTask.ETABLISSEMENT
-    table_name = settings.OFFICE_TABLE
+    table_name = settings.RAW_OFFICE_TABLE
 
     def __init__(self, etablissement_filename):
         self.input_filename = etablissement_filename
@@ -78,7 +78,7 @@ class EtablissementExtractJob(Job):
 
     @timeit
     def get_sirets_from_database(self):
-        query = "select siret from %s where siret != ''" % settings.OFFICE_TABLE
+        query = "select siret from %s where siret != ''" % settings.RAW_OFFICE_TABLE
         logger.info("get offices from database")
         _, cur = import_util.create_cursor()
         cur.execute(query)
@@ -102,10 +102,10 @@ class EtablissementExtractJob(Job):
             trancheeffectif=%%s,
             website1=%%s,
             website2=%%s
-        where siret=%%s""" % settings.OFFICE_TABLE
+        where siret=%%s""" % settings.RAW_OFFICE_TABLE
 
         count = 0
-        logger.info("update updatable offices in table %s", settings.OFFICE_TABLE)
+        logger.info("update updatable offices in table %s", settings.RAW_OFFICE_TABLE)
         statements = []
         MAX_COUNT_EXECUTE = 500
         for siret in self.updatable_sirets:
@@ -130,10 +130,10 @@ class EtablissementExtractJob(Job):
         query = """INSERT into %s(siret, raisonsociale, enseigne, codenaf, numerorue,
             libellerue, codecommune, codepostal, email, tel, departement, trancheeffectif,
             website1, website2)
-        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.OFFICE_TABLE
+        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.RAW_OFFICE_TABLE
 
         count = 1
-        logger.info("create new offices in table %s", settings.OFFICE_TABLE)
+        logger.info("create new offices in table %s", settings.RAW_OFFICE_TABLE)
         statements = []
         MAX_COUNT_EXECUTE = 500
         for siret in self.creatable_sirets:
@@ -155,7 +155,7 @@ class EtablissementExtractJob(Job):
         if self.deletable_sirets:
             stringified_siret_list = ",".join(self.deletable_sirets)
             logger.info("going to delete %i offices...", len(self.deletable_sirets))
-            query = """DELETE FROM %s where siret IN (%s)""" % (settings.OFFICE_TABLE, stringified_siret_list)
+            query = """DELETE FROM %s where siret IN (%s)""" % (settings.RAW_OFFICE_TABLE, stringified_siret_list)
             try:
                 cur.execute(query)
                 con.commit()

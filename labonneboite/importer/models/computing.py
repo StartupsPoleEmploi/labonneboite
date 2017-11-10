@@ -12,7 +12,8 @@ from labonneboite.common.models import PrimitiveOfficeMixin, FinalOfficeMixin
 
 class Dpae(CRUDMixin, Base):
     """
-    FIXME doc
+    DPAE = Déclaration préalable à l'embauche.
+    Each entry details a single hiring of a single office.
     """
     __tablename__ = importer_settings.DPAE_TABLE
 
@@ -36,7 +37,7 @@ class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
     raw importer table storing all 10M offices
     FIXME doc
     """
-    __tablename__ = importer_settings.OFFICE_TABLE
+    __tablename__ = importer_settings.RAW_OFFICE_TABLE
     __table_args__ = (
         Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),

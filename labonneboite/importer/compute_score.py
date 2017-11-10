@@ -453,7 +453,7 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
         logger.debug("fetching existing scores for %s", departement)
         df_existing_score = pd.read_sql_query(
             "select siret, score as existing_score from %s where departement=%s" % (
-                importer_settings.EXPORT_ETABLISSEMENT_TABLE, departement
+                importer_settings.SCORE_REDUCING_TARGET_TABLE, departement
             ),
             engine
         )
@@ -499,7 +499,7 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
 def run_main():
     most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
     run(
-        importer_settings.OFFICE_TABLE,
+        importer_settings.RAW_OFFICE_TABLE,
         importer_settings.DPAE_TABLE,
         sys.argv[1],
         most_recent_data_date,
