@@ -59,6 +59,7 @@ if get_current_env() == ENV_LBBDEV:
     DEPARTEMENTS_TO_BE_SANITY_CHECKED = DEPARTEMENTS
     BACKUP_OUTPUT_FOLDER = '/srv/lbb/backups/outputs'
     BACKUP_FOLDER = '/srv/lbb/backups'
+    ENABLE_TIMEIT_TIMERS = True
 
 elif get_current_env() == ENV_DEVELOPMENT:
 
@@ -80,6 +81,7 @@ elif get_current_env() == ENV_DEVELOPMENT:
     DEPARTEMENTS_TO_BE_SANITY_CHECKED = ['14', '69']
     BACKUP_OUTPUT_FOLDER = '/srv/lbb/labonneboite/importer/output'
     BACKUP_FOLDER = '/srv/lbb/labonneboite/importer/output'
+    ENABLE_TIMEIT_TIMERS = True
 
 elif get_current_env() == ENV_TEST:
 
@@ -93,6 +95,7 @@ elif get_current_env() == ENV_TEST:
     HIGH_SCORE_COMPANIES_COUNT_MIN = 0
     MINIMUM_OFFICES_PER_DEPARTEMENT = 1
     DEPARTEMENTS_TO_BE_SANITY_CHECKED = []
+    ENABLE_TIMEIT_TIMERS = False
 
 else:
 

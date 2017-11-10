@@ -41,18 +41,19 @@ def create_cursor():
     return con, cur
 
 
-def timeit(func):  # FIXME disable in tests
+def timeit(func):
     @wraps(func)
     def wrap(*args, **kw):
         ts = time()
         result = func(*args, **kw)
         te = time()
-        msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
-          (func.__name__, te-ts, args, kw)
-        # logger messages are displayed immediately in jenkins console output
-        logger.info(msg)
-        # print messages are displayed all at once when the job ends in jenkins console output
-        print(msg)
+        if importer_settings.ENABLE_TIMEIT_TIMERS:
+            msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
+              (func.__name__, te-ts, args, kw)
+            # logger messages are displayed immediately in jenkins console output
+            logger.info(msg)
+            # print messages are displayed all at once when the job ends in jenkins console output
+            print(msg)
         return result
     return wrap
 
