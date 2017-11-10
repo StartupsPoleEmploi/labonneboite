@@ -34,25 +34,32 @@ class Dpae(CRUDMixin, Base):
 
 class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
     """
-    raw importer table storing all 10M offices
-    FIXME doc
+    Initial large table storing all 10M offices and acting as the 'input' of the importer jobs.
+    Stores the totality of officially existing offices at the time.
+    About 10M sirets are indeed officially registered in France.
     """
     __tablename__ = importer_settings.RAW_OFFICE_TABLE
     __table_args__ = (
         Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),
     )
-    #     siret = Column(String(14), primary_key=True)
 
-    # begin specific
+    # columns specific to this very model
     website1 = Column(String(191))
     website2 = Column(String(191))
-    # end specific
 
 
 class ExportableOffice(FinalOfficeMixin, CRUDMixin, Base):
     """
-    FIXME doc
+    Final output table of the importer jobs, typically storing only 500K offices
+    which are selected by the importers jobs as having the highest hiring
+    potential amongst all existing 10M offices stored in the raw office table.
+
+    This model is exactly similar to the main Office model, the only difference
+    is that they are stored in two different tables.
+
+    When a new dataset built by the importer is deployed, the content of this
+    table will replace the content of the main Office table.
     """
     __tablename__ = importer_settings.SCORE_REDUCING_TARGET_TABLE
     __table_args__ = (
@@ -74,7 +81,8 @@ class Geolocation(CRUDMixin, Base):
 
 class ImportTask(CRUDMixin, Base):
     """
-    FIXME doc
+    Used to store and remember which ETAB and/or DPAE exports have already been processed
+    by the importer jobs.
     """
     __tablename__ = "import_tasks"
 
@@ -100,7 +108,7 @@ class ImportTask(CRUDMixin, Base):
 
 class DpaeStatistics(CRUDMixin, Base):
     """
-    FIXME doc
+    Used to store details about the last DPAE import.
     """
     __tablename__ = "dpae_statistics"
 

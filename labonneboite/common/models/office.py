@@ -24,8 +24,11 @@ CITY_NAMES = load_city_codes()
 
 class PrimitiveOfficeMixin(object):
     """
-    FIXME doc
-    """
+    Mixin providing fields shared by models: RawOffice, ExportableOffice, Office, OfficeAdminAdd.
+
+    Don't forget to create a new migration for each of these models
+    each time you add/change/remove a field here to keep all models
+    in sync.    """
     siret = Column(String(191))
     company_name = Column('raisonsociale', String(191), nullable=False)
     office_name = Column('enseigne', String(191), default='', nullable=False)
@@ -42,22 +45,17 @@ class PrimitiveOfficeMixin(object):
 
 class OfficeMixin(PrimitiveOfficeMixin):
     """
-    This mixin provides the fields that must be common between the `Office`
-    model and the `OfficeAdminAdd` model.
+    Mixin providing fields shared by models: ExportableOffice, Office, OfficeAdminAdd.
 
-    Don't forget to create a new migration for `OfficeAdminAdd` when you add
-    or remove a field here to keep models in sync.
+    Don't forget to create a new migration for each of these models
+    each time you add/change/remove a field here to keep all models
+    in sync.
     """
-
-    # begin specific
     website = Column(String(191), default='', nullable=False)
     flag_alternance = Column(Boolean, default=False, nullable=False)
     flag_junior = Column(Boolean, default=False, nullable=False)
     flag_senior = Column(Boolean, default=False, nullable=False)
     flag_handicap = Column(Boolean, default=False, nullable=False)
-    # end specific
-
-    # begin specific
     score = Column(Integer, default=0, nullable=False)
     x = Column('coordinates_x', Float)  # Longitude.
     y = Column('coordinates_y', Float)  # Latitude.
@@ -65,17 +63,22 @@ class OfficeMixin(PrimitiveOfficeMixin):
 
 class FinalOfficeMixin(OfficeMixin):
     """
-    FIXME doc
+    Mixin providing fields shared by models: ExportableOffice, Office.
+
+    Don't forget to create a new migration for each of these models
+    each time you add/change/remove a field here to keep all models
+    in sync.
     """
     # A flag that is True if the office also recruits beyond the boundaries of its primary geolocation.
     has_multi_geolocations = Column(Boolean, default=False, nullable=False)
+
 
 class Office(FinalOfficeMixin, CRUDMixin, Base):
     """
     An office.
 
     Warning: this model is currently excluded from the migration system
-    because it's entirely dropped and recreated during an import process.
+    because it is entirely dropped and recreated during an import process.
     """
 
     __tablename__ = settings.OFFICE_TABLE
