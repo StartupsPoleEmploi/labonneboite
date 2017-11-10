@@ -11,19 +11,11 @@ from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import timeit
 from labonneboite.importer.models.computing import ImportTask
-from labonneboite.conf import get_current_env, ENV_LBBDEV
 
 logger = logging.getLogger('main')
 
 
 class Job(object):
-    # enable/disable backup here to affect all processes (extract_dpae + extract_etablissements + populate_flags) (DNRY)
-    # comes handy as backup VM is often down and up again... (dec 2016)
-    if get_current_env() == ENV_LBBDEV:
-        backup_first = False  # FIXME rollback me to True
-    else:
-        backup_first = False
-
     file_type = None
     table_name = None
     import_type = None
@@ -34,7 +26,7 @@ class Job(object):
         if self.file_type:
             logger.info("file type:%s, checking the task is runnable with that file", self.file_type)
             self.check_runnable()
-        if self.backup_first:
+        if settings.BACKUP_FIRST:
             logger.info("backing up existing table before proceeding...")
             self.back_up_input_table()
         if self.import_type:

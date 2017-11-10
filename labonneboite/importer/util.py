@@ -201,7 +201,7 @@ def reduce_scores_into_table(
         departement_table = "etablissements_%s" % departement
         query = """insert into %s select %s from %s""" % (
             target_table, select_fields, departement_table)
-        if drop_low_scores:  # FIXME
+        if drop_low_scores:
             query += " where score >= %s" % importer_settings.SCORE_REDUCING_MINIMUM_THRESHOLD
         try:
             subprocess.check_call(

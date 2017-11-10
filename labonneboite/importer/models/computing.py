@@ -11,6 +11,9 @@ from labonneboite.common.models import PrimitiveOfficeMixin, FinalOfficeMixin
 
 
 class Dpae(CRUDMixin, Base):
+    """
+    FIXME doc
+    """
     __tablename__ = importer_settings.DPAE_TABLE
 
     _id = Column('id', BigInteger, primary_key=True)
@@ -31,7 +34,7 @@ class Dpae(CRUDMixin, Base):
 class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
     """
     raw importer table storing all 10M offices
-    FIXME DNRY mixin
+    FIXME doc
     """
     __tablename__ = importer_settings.OFFICE_TABLE
     __table_args__ = (
@@ -47,6 +50,9 @@ class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
 
 
 class ExportableOffice(FinalOfficeMixin, CRUDMixin, Base):
+    """
+    FIXME doc
+    """
     __tablename__ = importer_settings.SCORE_REDUCING_TARGET_TABLE
     __table_args__ = (
         Index('dept_i', 'departement'),
@@ -66,6 +72,9 @@ class Geolocation(CRUDMixin, Base):
 
 
 class ImportTask(CRUDMixin, Base):
+    """
+    FIXME doc
+    """
     __tablename__ = "import_tasks"
 
     # Import state
@@ -89,6 +98,9 @@ class ImportTask(CRUDMixin, Base):
 
 
 class DpaeStatistics(CRUDMixin, Base):
+    """
+    FIXME doc
+    """
     __tablename__ = "dpae_statistics"
 
     _id = Column('id', BigInteger, primary_key=True)

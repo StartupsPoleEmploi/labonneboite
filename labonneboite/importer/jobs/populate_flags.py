@@ -5,7 +5,6 @@ from shutil import copyfile
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import timeit
 from labonneboite.importer import settings
-from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
 
@@ -129,7 +128,7 @@ def prepare_flag_handicap():
 def dump():
     timestamp = settings.NOW.strftime('%Y_%m_%d_%H%M')
 
-    copy_to_remote_server = Job().backup_first
+    copy_to_remote_server = settings.BACKUP_FIRST
     logger.info("backing up table %s ...", settings.SCORE_REDUCING_TARGET_TABLE)
     etab_result = import_util.back_up(
         settings.BACKUP_OUTPUT_FOLDER, settings.SCORE_REDUCING_TARGET_TABLE,

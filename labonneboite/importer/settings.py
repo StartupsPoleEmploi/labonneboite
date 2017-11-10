@@ -41,6 +41,7 @@ DEPARTEMENTS = get_departements()
 DEPARTEMENTS_WITH_LARGEST_ONES_FIRST = get_departements(largest_ones_first=True)
 
 if get_current_env() == ENV_LBBDEV:
+    BACKUP_FIRST = True
     INPUT_SOURCE_FOLDER = '/srv/lbb/data'
     SCORE_COEFFICIENT_OF_VARIATION_MAX = 0.35
     MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL = 50
@@ -54,6 +55,7 @@ if get_current_env() == ENV_LBBDEV:
     BACKUP_OUTPUT_FOLDER = '/srv/lbb/backups/outputs'
     BACKUP_FOLDER = '/srv/lbb/backups'
 elif get_current_env() == ENV_DEVELOPMENT:
+    BACKUP_FIRST = False
     INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
     SCORE_COEFFICIENT_OF_VARIATION_MAX = 3.0
     MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL = 0
@@ -67,6 +69,7 @@ elif get_current_env() == ENV_DEVELOPMENT:
     BACKUP_OUTPUT_FOLDER = '/srv/lbb/labonneboite/importer/output'
     BACKUP_FOLDER = '/srv/lbb/labonneboite/importer/output'
 elif get_current_env() == ENV_TEST:
+    BACKUP_FIRST = False
     INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/tests/data'
     SCORE_COEFFICIENT_OF_VARIATION_MAX = 1.0
     SCORE_REDUCING_MINIMUM_THRESHOLD = 50

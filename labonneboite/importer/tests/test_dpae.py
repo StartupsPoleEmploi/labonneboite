@@ -15,7 +15,6 @@ class TestDpae(DatabaseTest):
     def test_extract_dpae(self):
         self.assertEquals(Dpae.query.count(), 0)
         filename = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv")
-        extract_dpae.DpaeExtractJob.backup_first = False  # FIXME remove similar obsolete lines
         task = extract_dpae.DpaeExtractJob(filename)
         task.run()
         self.assertEquals(Dpae.query.count(), 6)
@@ -24,7 +23,6 @@ class TestDpae(DatabaseTest):
         # Second file contains duplicated records and one record from the future and only 2 really new valid records.
         filename_first_month = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv")
         filename_second_month = self.get_data_file_path("LBB_XDPDPA_DPAE_20151110_20161210_20161210_094110.csv")
-        extract_dpae.DpaeExtractJob.backup_first = False
         task = extract_dpae.DpaeExtractJob(filename_first_month)
         task.run()
         self.assertEquals(Dpae.query.count(), 6)
@@ -38,14 +36,12 @@ class TestDpae(DatabaseTest):
 
     def test_extract_gz_format(self):
         filename = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.gz")
-        extract_dpae.DpaeExtractJob.backup_first = False
         task = extract_dpae.DpaeExtractJob(filename)
         task.run()
         self.assertEquals(Dpae.query.count(), 6)
 
     def test_extract_bz2_format(self):
         filename = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.bz2")
-        extract_dpae.DpaeExtractJob.backup_first = False
         task = extract_dpae.DpaeExtractJob(filename)
         task.run()
         self.assertEquals(Dpae.query.count(), 6)

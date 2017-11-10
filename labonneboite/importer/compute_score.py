@@ -169,9 +169,6 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
     if "website1" not in list(df_etab.columns):
         raise Exception("missing website1 column")
 
-    # if departement == '69':
-    #     import ipdb; ipdb.set_trace()  # FIXME
-
     if df_etab.empty:
         logger.warning("dataframe empty for departement %s", departement)
         return None
@@ -453,7 +450,7 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
         reference_date = compute_reference_date(dpae_date)
         train(df_etab, departement, reference_date, semester_lag)
 
-        logger.debug("fetching existing scores for %s", departement)  # FIXME
+        logger.debug("fetching existing scores for %s", departement)
         df_existing_score = pd.read_sql_query(
             "select siret, score as existing_score from %s where departement=%s" % (
                 importer_settings.EXPORT_ETABLISSEMENT_TABLE, departement

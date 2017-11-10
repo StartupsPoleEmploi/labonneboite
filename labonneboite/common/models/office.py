@@ -23,6 +23,9 @@ CITY_NAMES = load_city_codes()
 
 
 class PrimitiveOfficeMixin(object):
+    """
+    FIXME doc
+    """
     siret = Column(String(191))
     company_name = Column('raisonsociale', String(191), nullable=False)
     office_name = Column('enseigne', String(191), default='', nullable=False)
@@ -61,6 +64,9 @@ class OfficeMixin(PrimitiveOfficeMixin):
 
 
 class FinalOfficeMixin(OfficeMixin):
+    """
+    FIXME doc
+    """
     # A flag that is True if the office also recruits beyond the boundaries of its primary geolocation.
     has_multi_geolocations = Column(Boolean, default=False, nullable=False)
 
