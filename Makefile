@@ -191,7 +191,7 @@ test_selenium:
 # -------------
 
 run_importer_jobs:
-	make run_importer_job_00_reset_all && \
+	make run_importer_job_00_prepare_all && \
 	make run_importer_job_01_check_etablissements && \
 	make run_importer_job_02_extract_etablissements && \
 	make run_importer_job_03_check_dpae && \
@@ -202,7 +202,7 @@ run_importer_jobs:
 	make run_importer_job_08_populate_flags && \
 	echo "all importer jobs completed successfully."
 
-run_importer_job_00_reset_all:
+run_importer_job_00_prepare_all:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
 		echo delete from import_tasks              | mysql -u root -D labonneboite --host 127.0.0.1 && \
@@ -214,7 +214,7 @@ run_importer_job_00_reset_all:
 		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
 		cp tests/data/LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv data/ && \
 		cp tests/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
-		echo done';
+		echo "completed importer run preparation."';
 
 run_importer_job_01_check_etablissements:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \

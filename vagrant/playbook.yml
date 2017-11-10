@@ -32,12 +32,18 @@
         - xvfb
         - graphviz
         - htop
-        # needed in order to: pip install scipy
-        # see https://stackoverflow.com/questions/11114225/installing-scipy-and-numpy-using-pip
-        - libblas-dev
-        - liblapack-dev 
-        - libatlas-base-dev
-        - gfortran
+        - libblas-dev  # needed for pip install scipy
+        - liblapack-dev  # needed for pip install scipy
+        - libatlas-base-dev  # needed for pip install scipy
+        - gfortran  # needed for pip install scipy
+        # packages mentioned in deprecated setup.sh (only for the record)
+        # - python-pip 
+        # - libmariadbclient-dev
+        # - mariadb-server
+        # - mariadb-client-core-5.5
+        # - libssl-dev
+        # - libhdf5-dev
+        # - libopenblas-dev
       become: true
 
     - name: Install french locale.
