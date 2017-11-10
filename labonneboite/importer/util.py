@@ -16,8 +16,6 @@ from labonneboite.conf import settings
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common.database import DATABASE
 from labonneboite.common import encoding as encoding_util
-from labonneboite.conf import get_current_env, ENV_LBBDEV, ENV_TEST, ENV_DEVELOPMENT
-
 
 logger = logging.getLogger('main')
 
@@ -26,32 +24,6 @@ TRANCHE_AGE_JUNIOR = "00-25"
 TRANCHE_AGE_MIDDLE = "26-50"
 
 OFFICE_FLAGS = ['flag_alternance', 'flag_junior', 'flag_senior', 'flag_handicap']
-
-# FIXME move those to settings
-if get_current_env() == ENV_LBBDEV:
-    JENKINS_ETAB_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties.jenkins")
-    JENKINS_DPAE_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties_dpae.jenkins")
-    MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 10000
-else:
-    JENKINS_ETAB_PROPERTIES_FILENAME = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        "jenkins/properties.jenkins",
-    )
-    JENKINS_DPAE_PROPERTIES_FILENAME = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        "jenkins/properties_dpae.jenkins",
-    )
-    MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 1
-
-if get_current_env() == ENV_TEST:
-    DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 15
-    DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE = 15
-elif get_current_env() == ENV_DEVELOPMENT:
-    DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 1
-    DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE = 15
-else:
-    DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 96
-    DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE = 96
 
 
 class DepartementException(Exception):

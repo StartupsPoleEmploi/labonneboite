@@ -167,7 +167,7 @@ if __name__ == "__main__":
     if get_current_env() == ENV_LBBDEV:
         dpae_filename = sys.argv[1]
     else:
-        with open(import_util.JENKINS_DPAE_PROPERTIES_FILENAME, "r") as f:
+        with open(settings.JENKINS_DPAE_PROPERTIES_FILENAME, "r") as f:
             dpae_filename = f.read().strip().split('=')[1]
     task = DpaeExtractJob(dpae_filename)
     task.run()

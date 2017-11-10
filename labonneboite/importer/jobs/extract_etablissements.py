@@ -37,20 +37,20 @@ class EtablissementExtractJob(Job):
         query = db_session.query(Office.departement.distinct().label("departement"))
         departements = [row.departement for row in query.all()]
 
-        if len(departements) != import_util.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
+        if len(departements) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
             msg = "wrong number of departements : %s instead of expected %s" % (
                 len(departements),
-                import_util.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
+                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
             )
             raise Exception(msg)
 
         for departement in departements:
             count = Office.query.filter_by(departement=departement).count()
             logger.info("number of companies in departement %s : %i", departement, count)
-            if not count >= import_util.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
+            if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
                 msg = "too few companies in departement : %s instead of expected %s" % (
                     count,
-                    import_util.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT
+                    settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT
                 )
                 raise Exception(msg)
 
@@ -168,6 +168,8 @@ class EtablissementExtractJob(Job):
     def benchmark_loading_using_pandas(self):
         return  # not working yet, see below
         
+        # FIXME retry this very soon, as soon as we have the pipe delimiter
+
         # ValueError: Falling back to the 'python' engine because the separator encoded in UTF-8 is > 1 char long,
         # and the 'c' engine does not support such separators, but this causes 'error_bad_lines' to be ignored as
         # it is not supported by the 'python' engine.
@@ -270,27 +272,31 @@ class EtablissementExtractJob(Job):
             raise Exception("too many no_zipcode_count")
         if format_errors > 5:
             raise Exception("too many format_errors")
-        if len(departement_counter_dic) != import_util.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE:
+        if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE:
             msg = "incorrect total number of departements : %s instead of expected %s" % (
                 len(departement_counter_dic),
-                import_util.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE
+                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE
             )
             raise Exception(msg)
         for departement, count in departement_count:
-            if not count >= import_util.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
+            if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
                 logger.exception("only %s offices in departement %s", count, departement)
                 raise Exception("not enough offices in at least one departement")
 
         return offices
 
 
-if __name__ == "__main__":
+def run():
     if get_current_env() == ENV_LBBDEV:
         etablissement_filename = sys.argv[1]
     else:
-        with open(import_util.JENKINS_ETAB_PROPERTIES_FILENAME, "r") as f:
+        with open(settings.JENKINS_ETAB_PROPERTIES_FILENAME, "r") as f:
             # file content looks like this:
             # LBB_ETABLISSEMENT_INPUT_FILE=/srv/lbb/labonneboite/importer/data/LBB_EGCEMP_ENTREPRISE_123.csv.bz2\n
             etablissement_filename = f.read().strip().split('=')[1]
     task = EtablissementExtractJob(etablissement_filename)
     task.run()
+
+if __name__ == "__main__":
+    run()
+

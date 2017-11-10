@@ -61,7 +61,7 @@ if __name__ == "__main__":
     filename = import_util.detect_runnable_file("dpae")
     if filename:
         check_file(filename)
-        with open(import_util.JENKINS_DPAE_PROPERTIES_FILENAME, "w") as f:
+        with open(settings.JENKINS_DPAE_PROPERTIES_FILENAME, "w") as f:
             f.write("LBB_DPAE_INPUT_FILE=%s\n" % filename)
         sys.exit(0)
     else:

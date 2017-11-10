@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from backports.functools_lru_cache import lru_cache
 from labonneboite.conf import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
@@ -43,6 +44,11 @@ DEPARTEMENTS_WITH_LARGEST_ONES_FIRST = get_departements(largest_ones_first=True)
 if get_current_env() == ENV_LBBDEV:
     BACKUP_FIRST = True
     INPUT_SOURCE_FOLDER = '/srv/lbb/data'
+    DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 96
+    DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE = 96
+    JENKINS_ETAB_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties.jenkins")
+    JENKINS_DPAE_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties_dpae.jenkins")
+    MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 10000
     SCORE_COEFFICIENT_OF_VARIATION_MAX = 0.35
     MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL = 50
     RMSE_MAX = 300
@@ -57,6 +63,12 @@ if get_current_env() == ENV_LBBDEV:
 elif get_current_env() == ENV_DEVELOPMENT:
     BACKUP_FIRST = False
     INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
+    DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 1
+    DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE = 15
+    dirname = os.path.dirname(os.path.realpath(__file__))
+    JENKINS_ETAB_PROPERTIES_FILENAME = os.path.join(dirname, "jenkins/properties.jenkins")
+    JENKINS_DPAE_PROPERTIES_FILENAME = os.path.join(dirname, "jenkins/properties_dpae.jenkins")
+    MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 1
     SCORE_COEFFICIENT_OF_VARIATION_MAX = 3.0
     MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL = 0
     RMSE_MAX = 5000
@@ -71,6 +83,8 @@ elif get_current_env() == ENV_DEVELOPMENT:
 elif get_current_env() == ENV_TEST:
     BACKUP_FIRST = False
     INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/tests/data'
+    DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 15
+    DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE = 15
     SCORE_COEFFICIENT_OF_VARIATION_MAX = 1.0
     SCORE_REDUCING_MINIMUM_THRESHOLD = 50
     HIGH_SCORE_COMPANIES_COUNT_MIN = 0
