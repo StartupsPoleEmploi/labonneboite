@@ -191,6 +191,11 @@
     {% else %}
     ga('set', 'dimension1', 0);
     {% endif %}
+    {% if user.is_authenticated %}
+    ga('set', 'dimension2', 1);
+    {% else %}
+    ga('set', 'dimension2', 0);
+    {% endif %}
 
   </script>
 
