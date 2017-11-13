@@ -1,5 +1,6 @@
 import os
 import tarfile
+from datetime import datetime
 from shutil import copyfile
 
 from labonneboite.importer import util as import_util
@@ -126,7 +127,7 @@ def prepare_flag_handicap():
 
 @timeit
 def dump():
-    timestamp = settings.NOW.strftime('%Y_%m_%d_%H%M')
+    timestamp = datetime.now().strftime('%Y_%m_%d_%H%M')
 
     copy_to_remote_server = settings.BACKUP_FIRST
     logger.info("backing up table %s ...", settings.SCORE_REDUCING_TARGET_TABLE)

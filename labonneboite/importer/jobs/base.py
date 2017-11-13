@@ -6,6 +6,7 @@ Every child class of this Job class is launchable via a jenkins job on the compu
 
 
 import os
+from datetime import datetime
 import logging
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
@@ -60,5 +61,5 @@ class Job(object):
 
     @timeit
     def back_up_input_table(self):
-        timestamp = settings.NOW.strftime('%Y_%m_%d_%H%M')
+        timestamp = datetime.now().strftime('%Y_%m_%d_%H%M')
         import_util.back_up(settings.BACKUP_INPUT_FOLDER, self.table_name, self.file_type, timestamp)
