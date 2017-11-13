@@ -136,7 +136,6 @@ def normalize_website_url(url):
     return url
 
 
-# def merge_and_normalize_websites(w1, w2):
 def merge_and_normalize_websites(websites):
     w1, w2 = websites
     w1 = normalize_website_url(w1)
@@ -149,6 +148,7 @@ def merge_and_normalize_websites(websites):
         return ""
 
 
+# FIXME inconsistent method return value (None or tuple)
 def load_df(engine, etablissement_table, dpae_table, departement, most_recent_data_date):
     logger.debug("reading data with most recent data date %s...", most_recent_data_date)
     logger.debug("filtering by departement (%s)...", departement)
