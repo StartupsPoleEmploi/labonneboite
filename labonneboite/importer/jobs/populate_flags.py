@@ -25,7 +25,7 @@ def populate_flag(flag):
         UPDATE
         %s e
         INNER JOIN %s f
-        ON e.siret = f.siret COLLATE utf8mb4_unicode_ci
+        ON e.siret = f.siret
         SET e.%s = True;
     """ % (settings.SCORE_REDUCING_TARGET_TABLE, flag, flag)
     cur.execute(query)

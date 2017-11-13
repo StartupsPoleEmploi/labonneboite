@@ -11,5 +11,5 @@ if __name__ == "__main__":
     if errors:
         msg = "departements with errors: %s" % ",".join(errors)
         logger.error(msg)
-        raise Exception(msg)
+        raise ValueError(msg)
     logger.info("validate_scores task: FINISHED")

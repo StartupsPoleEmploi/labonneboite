@@ -13,11 +13,11 @@ import sys
 from sqlalchemy.exc import OperationalError
 
 from labonneboite.importer import settings
+from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import timeit
 from labonneboite.importer.util import parse_dpae_line, DepartementException, InvalidRowException
 from labonneboite.importer.models.computing import DpaeStatistics, ImportTask
-from labonneboite.conf import get_current_env, ENV_LBBDEV
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
@@ -164,10 +164,6 @@ if __name__ == "__main__":
     import logging
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger('main')
-    if get_current_env() == ENV_LBBDEV:
-        dpae_filename = sys.argv[1]
-    else:
-        with open(settings.JENKINS_DPAE_PROPERTIES_FILENAME, "r") as f:
-            dpae_filename = f.read().strip().split('=')[1]
+    dpae_filename = jenkins.get_dpae_filename()
     task = DpaeExtractJob(dpae_filename)
     task.run()

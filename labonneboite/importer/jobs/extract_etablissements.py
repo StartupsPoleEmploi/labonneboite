@@ -1,14 +1,13 @@
-import sys
 import pandas as pd
 
 from labonneboite.importer import settings
+from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import timeit
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common.models import Office
 from labonneboite.common.database import db_session
-from labonneboite.conf import get_current_env, ENV_LBBDEV
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
@@ -264,33 +263,27 @@ class EtablissementExtractJob(Job):
         logger.info("finished reading offices...")
 
         if unprocessable_departement_errors > 2000:
-            raise Exception("too many unprocessable_departement_errors")
+            raise ValueError("too many unprocessable_departement_errors")
         if no_zipcode_count > 50000:
-            raise Exception("too many no_zipcode_count")
+            raise ValueError("too many no_zipcode_count")
         if format_errors > 5:
-            raise Exception("too many format_errors")
+            raise ValueError("too many format_errors")
         if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE:
             msg = "incorrect total number of departements : %s instead of expected %s" % (
                 len(departement_counter_dic),
                 settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE
             )
-            raise Exception(msg)
+            raise ValueError(msg)
         for departement, count in departement_count:
             if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
                 logger.exception("only %s offices in departement %s", count, departement)
-                raise Exception("not enough offices in at least one departement")
+                raise ValueError("not enough offices in at least one departement")
 
         return offices
 
 
 def run():
-    if get_current_env() == ENV_LBBDEV:
-        etablissement_filename = sys.argv[1]
-    else:
-        with open(settings.JENKINS_ETAB_PROPERTIES_FILENAME, "r") as f:
-            # file content looks like this:
-            # LBB_ETABLISSEMENT_INPUT_FILE=/srv/lbb/labonneboite/importer/data/LBB_EGCEMP_ENTREPRISE_123.csv.bz2\n
-            etablissement_filename = f.read().strip().split('=')[1]
+    etablissement_filename = jenkins.get_etablissement_filename()
     task = EtablissementExtractJob(etablissement_filename)
     task.run()
 

@@ -196,7 +196,8 @@ def load_df(engine, etablissement_table, dpae_table, departement, most_recent_da
     df_dpae = df_dpae.groupby(["siret", "hiring_date_year", "hiring_date_month"]).count().reset_index()
     debug_df(df_dpae, "after group by")
     logger.debug("pivoting table dpae (%s)...", departement)
-    df_dpae = pd.pivot_table(df_dpae, values="hiring_date", index="siret", columns=["hiring_date_year", "hiring_date_month"])
+    df_dpae = pd.pivot_table(df_dpae, values="hiring_date", index="siret",
+        columns=["hiring_date_year", "hiring_date_month"])
     debug_df(df_dpae, "after pivot")
     logger.debug("pivoting table (%s) ok!", departement)
     df_dpae["siret"] = df_dpae.index
@@ -275,7 +276,7 @@ def total_hired_semester(semester):
     return f
 
 
-def create_feature_vector(df, semester_lag, debug_msg="Unnamed", get_feature_names=False):
+def create_feature_vector(df, semester_lag, debug_msg="Unnamed"):
     temporal_features = []
     for i in reversed(range(1, 5)):
         index = semester_lag + 1 + i
@@ -289,13 +290,10 @@ def create_feature_vector(df, semester_lag, debug_msg="Unnamed", get_feature_nam
     df_for_debug = df[["siret"] + features]
     debug_df(df_for_debug, debug_msg)
 
-    if get_feature_names:
-        return X, features
-    else:
-        return X
+    return X, features
 
 
-def add_features(df_final, departement, reference_date, feature_semester_count, semester_lag, get_feature_names=False):
+def add_features(df_final, departement, reference_date, feature_semester_count, semester_lag):
     def hiring_count_semester(office, minus):
         start_date = reference_date + relativedelta(months=-6 * minus - 1)
         columns = []
@@ -316,8 +314,7 @@ def add_features(df_final, departement, reference_date, feature_semester_count, 
     semester_count_columns = []
     for i in range(1, feature_semester_count + 1):
         column = 'semester-%s' % i
-        # difficult unsolved pylint warning here
-        # see https://stackoverflow.com/questions/25314547/cell-var-from-loop-warning-from-pylint
+        # pylint: disable=cell-var-from-loop
         df_final[column] = df_final.apply(lambda office: hiring_count_semester(office, i), axis=1)
         semester_count_columns.append(column)
     logger.debug("finished calculating temporal features (%s)!", departement)
@@ -331,16 +328,12 @@ def add_features(df_final, departement, reference_date, feature_semester_count, 
 
     X, X_feature_names = create_feature_vector(df_final,
                                                semester_lag,
-                                               debug_msg="add_features (X_train)",
-                                               get_feature_names=True)
+                                               debug_msg="add_features (X_train)")
 
     semester = 'semester-%i' % (semester_lag + 1)
     logger.debug("outcome: has hired in %s", semester)
     y_regr = df_final.apply(total_hired_semester(semester), axis=1)
-    if get_feature_names:
-        return df_final, X, y_regr, X_feature_names
-    else:
-        return df_final, X, y_regr
+    return df_final, X, y_regr, X_feature_names
 
 
 def train(df_final, departement, reference_date, semester_lag, feature_semester_count=7):
@@ -354,14 +347,13 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
         departement,
         reference_date,
         feature_semester_count,
-        semester_lag,
-        get_feature_names=True)
+        semester_lag)
     debug_df(df_final, "df_final after add_features")
     logger.debug("X_train_feature_names: %s", X_train_feature_names)
 
     logger.debug("%s offices (%s)", len(df_final), departement)
 
-    if not len(df_final) >= importer_settings.MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL:
+    if len(df_final) < importer_settings.MINIMUM_OFFICES_REQUIRED_TO_TRAIN_MODEL:
         # problems happen if we don't have enough offices to train on...
         # throw an exception to show we don't have enough data for this departement
         raise NotEnoughDataException("only %s offices !" % len(df_final))
@@ -372,13 +364,13 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
 
     y_train_regr_pred = regr.predict(X_train)
 
-    X_test, X_test_feature_names = create_feature_vector(df_final, 0, debug_msg="X_test", get_feature_names=True)
+    X_test, X_test_feature_names = create_feature_vector(df_final, 0, debug_msg="X_test")
     logger.debug("X_test_feature_names: %s", X_test_feature_names)
     y_test_regr = df_final.apply(total_hired_semester('semester-1'), axis=1)
     y_test_regr_pred = regr.predict(X_test)
 
     X_live, X_live_feature_names = create_feature_vector(
-        df_final, -2 + semester_lag, debug_msg="X_live", get_feature_names=True
+        df_final, -2 + semester_lag, debug_msg="X_live"
     )
     logger.debug("X_live_feature_names: %s", X_live_feature_names)
 

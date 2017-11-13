@@ -354,17 +354,19 @@ def get_reader(filename):
 @lru_cache(maxsize=128*1024)
 def get_departement_from_zipcode(zipcode):
     zipcode = str(zipcode).strip()
-    departement = None
-    if len(zipcode) in range(1, 6):
-        if len(zipcode) == 1:
-            departement = "0%s" % zipcode[0]
-        elif len(zipcode) == 2:
-            departement = zipcode
-        elif len(zipcode) == 4:
-            departement = "0%s" % zipcode[0]
-        elif len(zipcode) == 5:
-            departement = zipcode[:2]
-    if departement == "2A" or departement == "2B":
+
+    if len(zipcode) == 1:
+        departement = "0%s" % zipcode[0]
+    elif len(zipcode) == 2:
+        departement = zipcode
+    elif len(zipcode) == 4:
+        departement = "0%s" % zipcode[0]
+    elif len(zipcode) == 5:
+        departement = zipcode[:2]
+    else:
+        departement = None
+    
+    if departement in ["2A", "2B"]:  # special case of Corsica
         departement = "20"
     return departement
 

@@ -39,7 +39,8 @@ class UserFavoriteOffice(CRUDMixin, Base):
 
     user = relationship('User')
     if get_current_env() == ENV_LBBDEV:
-        # disable relationship which mysteriously breaks on lbbdev only, not needed there anyway.
+        # Disable relationship which mysteriously breaks on lbbdev only, not needed there anyway.
+        # FIXME try again to fix this bug. Bug happens in lbbdev environment only.
         pass
     else:
         office = relationship('Office', lazy='joined')
