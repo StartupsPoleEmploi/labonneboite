@@ -198,6 +198,8 @@ alembic_rollback:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 	cd /srv/lbb && alembic downgrade -1';
 
+# FIXME something is still wrong with this one
+# upgrade and downgrade methods should be swapped in resulting migration
 alembic_autogenerate_migration_for_all_existing_tables:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 	cd /srv/lbb && alembic revision --autogenerate';
