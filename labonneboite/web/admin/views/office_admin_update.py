@@ -36,6 +36,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_to_boost',
         'romes_to_remove',
         'new_email',
+        'email_alternance',
         'new_phone',
         'new_website',
         'remove_email',
@@ -67,6 +68,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement",
         'romes_to_remove': u"Retirer des codes ROME associés à une entreprise",
         'new_email': u"Nouvel email",
+        'email_alternance': u"Email dédié à l'alternance",
         'new_phone': u"Nouveau téléphone",
         'new_website': u"Nouveau site web",
         'remove_email': u"Ne pas afficher l'email",
@@ -118,6 +120,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_to_boost',
         'romes_to_remove',
         'new_email',
+        'email_alternance',
         'new_phone',
         'new_website',
         'remove_email',
@@ -145,6 +148,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             'filters': [strip_filter],
         },
         'new_email': {
+            'validators': [validators.optional(), validators.Email()],
+        },
+        'email_alternance': {
             'validators': [validators.optional(), validators.Email()],
         },
         'new_phone': {
