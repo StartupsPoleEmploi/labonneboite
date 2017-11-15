@@ -1,26 +1,19 @@
 # coding: utf8
 
-from datetime import date
-import os
-import StringIO
-
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
-from xhtml2pdf import pisa
 
 from flask import abort, redirect, render_template, flash
 from flask import Blueprint, current_app
-from flask import make_response, send_file
-from flask import request, session, url_for
+from flask import send_file
+from flask import request, url_for
 
-from labonneboite.common import pdf as pdf_util
-from labonneboite.common import util
 from labonneboite.common.email_util import MandrillClient
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
-from labonneboite.conf.common.contact_mode import CONTACT_MODE_STAGES
 
 from labonneboite.web.office.forms import OfficeRemovalForm
+from . import pdf as pdf_util
 
 
 officeBlueprint = Blueprint('office', __name__)
@@ -85,41 +78,6 @@ def change_info():
     return render_template('office/change_info.html', form=form)
 
 
-def detail(siret):
-    company = Office.query.filter(Office.siret == siret).one()
-
-    if 'search_args' in session:
-        search_url = util.get_search_url('/resultat', session['search_args'])
-    else:
-        search_url = None
-    rome = request.args.get('r')
-    if rome not in settings.ROME_DESCRIPTIONS:
-        rome = None
-        rome_description = None
-    else:
-        rome_description = settings.ROME_DESCRIPTIONS[rome]
-
-    contact_mode = util.get_contact_mode_for_rome_and_naf(rome, company.naf)
-
-    google_search = "%s+%s" % (company.name.replace(' ', '+'), company.city.replace(' ', '+'))
-    google_url = "https://www.google.fr/search?q=%s" % google_search
-
-    return {
-        'company': company,
-        'contact_mode': contact_mode,
-        'rome': rome,
-        'rome_description': rome_description,
-        'google_url': google_url,
-        'kompass_url': "http://fr.kompass.com/searchCompanies?text=%s" % company.siret,
-        'search_url': search_url,
-    }
-
-
-def fetch_resources(uri, rel):
-    url = "https://%s%s" % (settings.HOST, uri)
-    return url
-
-
 @officeBlueprint.route('/<siret>/download')
 def download(siret=None):
     """
@@ -129,21 +87,9 @@ def download(siret=None):
         office = Office.query.filter(Office.siret == siret).one()
     except NoResultFound:
         abort(404)
+
+    rome = request.args.get('r')
+    rome = rome if rome in settings.ROME_DESCRIPTIONS else None
+    full_path = pdf_util.render(office, rome)
     attachment_name = 'fiche_entreprise_%s.pdf' % slugify(office.name, separator='_')
-    full_path = pdf_util.get_file_path(office)
-    if os.path.exists(full_path):
-        return send_file(full_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)
-    else:
-        dic = detail(siret)
-        office = dic['company']
-        pdf_target = StringIO.StringIO()
-        dic['stages'] = CONTACT_MODE_STAGES[dic['contact_mode']]
-        dic['date'] = date.today()
-        pdf_data = render_template('office/pdf_detail.html', **dic)
-        pisa.CreatePDF(StringIO.StringIO(pdf_data), pdf_target, link_callback=fetch_resources)
-        data_to_write = pdf_target.getvalue()
-        response = make_response(data_to_write)
-        pdf_util.write_file(office, data_to_write)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
-        return response
+    return send_file(full_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)

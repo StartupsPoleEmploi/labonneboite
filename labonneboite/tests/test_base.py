@@ -43,6 +43,8 @@ class AppTest(unittest.TestCase):
         self.test_request_context = app.test_request_context()
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
+        logging.getLogger('main').setLevel(logging.CRITICAL)
+        logging.getLogger('elasticsearch').setLevel(logging.CRITICAL)
         return super(AppTest, self).setUp()
 
     def url_for(self, endpoint, **kwargs):

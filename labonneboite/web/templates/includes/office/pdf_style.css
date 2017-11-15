@@ -1,0 +1,77 @@
+h1.headline {
+  color: #77a2cd;
+  text-align: center;
+  font-size: 20px;
+}
+
+h2 {
+  color: #77a2cd;
+  text-align: center;
+  font-size: 16px;
+}
+
+table {
+  width: 100%;
+}
+
+th, td {
+  padding: 6px;
+}
+
+div, h1, h2 {
+  padding: 10px 0;
+}
+
+.company-name {
+  color: #7c408b;
+}
+
+.company-block {
+  font-size: 16px;
+  color: #77a2cd;
+  text-align: center;
+  border-left: #7c408b 2px dotted;
+  border-right: #7c408b 2px dotted;
+  border-top: #7c408b 2px dashed;
+}
+
+.company-info {
+  font-size: 16px;
+  border-left: #7c408b 2px dotted;
+  border-right: #7c408b 2px dotted;
+}
+
+.bigcell {
+  font-size: 14px;
+  text-align: center;
+  vertical-align: center;
+}
+
+.contact-mode {
+  font-size: 18px;
+  background: #7c408b;
+  color: white;
+  border: 2px solid #7c408b;
+  text-align: center;
+}
+
+.planning td,
+.planning th {
+  border: 3px solid #eef3fb;
+  font-size: 16px;
+  text-align: center;
+}
+
+.planning th {
+  color: #fff;
+  background: #77a2cd;
+}
+
+.planning td {
+  color: #000;
+  background: #fff;
+}
+
+.planning .done {
+  background: #f9f9f9
+}

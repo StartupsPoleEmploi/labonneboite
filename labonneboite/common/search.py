@@ -82,18 +82,21 @@ class Fetcher(object):
         self.longitude = city['coords']['lon']
 
     def _get_company_count(self, rome_code, distance):
-        return count_companies(
-            self.naf_codes,
-            rome_code,
-            self.latitude,
-            self.longitude,
-            distance,
-            flag_alternance=self.flag_alternance,
-            flag_junior=self.flag_junior,
-            flag_senior=self.flag_senior,
-            flag_handicap=self.flag_handicap,
-            headcount_filter=self.headcount_filter,
+        kwargs = {
+            'flag_alternance': self.flag_alternance,
+            'flag_junior': self.flag_junior,
+            'flag_senior': self.flag_senior,
+            'flag_handicap': self.flag_handicap,
+            'headcount_filter': self.headcount_filter,
+        }
+        json_body = build_json_body_elastic_search(
+            self.naf_codes, rome_code, self.latitude, self.longitude, distance, **kwargs
         )
+        del json_body["sort"]
+        es = Elasticsearch()
+        res = es.count(index='labonneboite', doc_type="office", body=json_body)
+        return res["count"]
+
 
     def get_naf_aggregations(self):
         _, _, aggregations = fetch_companies(
@@ -171,14 +174,6 @@ class Fetcher(object):
 
         return result, aggregations
 
-
-def count_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
-    index = kwargs.pop('index', 'labonneboite')
-    json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
-    del json_body["sort"]
-    es = Elasticsearch()
-    res = es.count(index=index, doc_type="office", body=json_body)
-    return res["count"]
 
 def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
     index = kwargs.pop('index', 'labonneboite')

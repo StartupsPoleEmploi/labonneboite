@@ -16,7 +16,6 @@ from sqlalchemy import inspect
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
-from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
@@ -24,6 +23,7 @@ from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
+from labonneboite.web.office import pdf as pdf_util
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')

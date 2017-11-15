@@ -3,7 +3,7 @@
 import urllib
 
 from flask import Blueprint, Markup
-from flask import abort, current_app, flash, redirect, render_template, request, url_for
+from flask import abort, current_app, flash, redirect, render_template, request, send_file, url_for
 
 import flask_login
 from flask_login import current_user
@@ -18,6 +18,7 @@ from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common import pro
 from labonneboite.common import util
 from labonneboite.web.auth.views import logout
+from labonneboite.web.office import pdf as pdf_util
 from labonneboite.web.pagination import Pagination
 from labonneboite.web.user.forms import UserAccountDeleteForm
 
@@ -25,7 +26,7 @@ from labonneboite.web.user.forms import UserAccountDeleteForm
 userBlueprint = Blueprint('user', __name__)
 
 
-@userBlueprint.route('/account', methods=['GET'])
+@userBlueprint.route('/account')
 @flask_login.login_required
 def account():
     """
@@ -74,7 +75,7 @@ def account_delete():
     return render_template('user/account_delete.html', **context)
 
 
-@userBlueprint.route('/favorites/list', methods=['GET'])
+@userBlueprint.route('/favorites/list')
 @flask_login.login_required
 def favorites_list():
     """
@@ -158,6 +159,17 @@ def favorites_delete(siret):
         return redirect(urllib.unquote(next_url))
 
     return redirect(url_for('user.favorites_list'))
+
+
+@userBlueprint.route('/favorites/download')
+@flask_login.login_required
+def favorites_download():
+    favorites = UserFavoriteOffice.query.filter(UserFavoriteOffice.user_id == current_user.id)
+    # TODO this is probably wildly inefficient. Can we do this in just one query?
+    companies = [favorite.office for favorite in favorites]
+    pdf_file = pdf_util.render_favorites(companies)
+    return send_file(pdf_file, mimetype='application/pdf', as_attachment=True, attachment_filename='mes_favoris.pdf')
+
 
 @userBlueprint.route('/pro-version')
 def pro_version():

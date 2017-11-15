@@ -22,7 +22,10 @@
             <li><a href="{{ url_for('user.account') }}">Mon compte</a></li>
             <li>Mes favoris</li>
         </ol>
-        <h2>Mes favoris</h2>
+        <h2>
+            Mes favoris
+            <a href="{{ url_for('user.favorites_download') }}"><img src="{{ url_for('static', filename='images/pdf-file-icon.png') }}" alt="Exporter mes favoris en PDF" style="vertical-align: middle; float: right;"></a>
+        </h2>
       </div>
 
       {% if not favorites.count() %}
@@ -39,8 +42,8 @@
           {% with company = fav.office %}
             <div class="lbb-bright-container lbb-result">
               {% with show_more_info=1 %}
-                {% include "includes/office_header.html" %}
-                {% include "includes/office_content.html" %}
+                {% include "includes/office/header.html" %}
+                {% include "includes/office/content.html" %}
               {% endwith %}
             </div>
           {% endwith %}

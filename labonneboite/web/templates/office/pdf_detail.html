@@ -2,123 +2,16 @@
 <html>
   <head>
     <style type="text/css">
-
-      h1.headline {
-        color: #77a2cd;
-        text-align: center;
-        font-size: 20px;
-      }
-
-      h2 {
-        color: #77a2cd;
-        text-align: center;
-        font-size: 16px;
-      }
-
-      table {
-        width: 100%;
-      }
-
-      th, td {
-        padding: 6px;
-      }
-
-      div, h1, h2 {
-        padding: 10px 0;
-      }
-
-      .company-name {
-        color: #7c408b;
-      }
-
-      .company-block {
-        font-size: 16px;
-        color: #77a2cd;
-        text-align: center;
-        border-left: #7c408b 2px dotted;
-        border-right: #7c408b 2px dotted;
-        border-top: #7c408b 2px dashed;
-      }
-
-      .company-info {
-        font-size: 16px;
-        border-left: #7c408b 2px dotted;
-        border-right: #7c408b 2px dotted;
-      }
-
-      .bigcell {
-        font-size: 14px;
-        text-align: center;
-        vertical-align: center;
-      }
-
-      .contact-mode {
-        font-size: 18px;
-        background: #7c408b;
-        color: white;
-        border: 2px solid #7c408b;
-        text-align: center;
-      }
-
-      .planning td,
-      .planning th {
-        border: 3px solid #eef3fb;
-        font-size: 16px;
-        text-align: center;
-      }
-
-      .planning th {
-        color: #fff;
-        background: #77a2cd;
-      }
-
-      .planning td {
-        color: #000;
-        background: #fff;
-      }
-
-      .planning .done {
-        background: #f9f9f9
-      }
-
+        {% include "includes/office/pdf_style.css" %}
     </style>
   </head>
   <body>
 
-    <table>
-      <tr>
-        <td style="text-align: left;">
-          <img src="{{ url_for('static',filename='images/logo-lbb.png') }}">
-        </td>
-        <td style="text-align: right;">
-          <img src="{{ url_for('static',filename='images/logo-pole-emploi-new.png') }}">
-        </td>
-      </tr>
-    </table>
+    {% include "includes/office/pdf_header.html" %}
 
     <h1 class="headline">L'entreprise <span class="company-name">{{ company.name }}</span> est recommandée (*) par La Bonne Boite</h1>
 
-    <div class="company-block"><span class="company-name">{{ company.name }}</span> en un clin d'oeil</div>
-
-    <table class="company-info">
-      <tr>
-        <td style="vertical-align: top;">
-          <b>Secteur d'activités</b> {{ company.naf_text }}<br>
-          <b>Nombre de salariés</b> {{ company.headcount_text }}<br>
-        </td>
-        <td style="vertical-align: top;">
-          {% if company.email %}<b><a href="mailto:{{ company.email }}">E-mail</a></b><br>{% endif %}
-          {% if company.website %}<b><a href="{{ company.website }}">Site web</a></b><br>{% endif %}
-          {% if company.phone %}<b>Téléphone</b> : {{ company.phone }}<br>{% endif %}
-          <b>Adresse</b>
-          {% for field in  company.address_fields %}
-          {{ field }}<br>
-          {% endfor %}
-        </td>
-      </tr>
-    </table>
-
-    <div class="contact-mode"><b>Mode de contact à privilégier :</b> {{ contact_mode }}</div>
+    {% include "includes/office/info_table.html" %}
 
     <h2 style="font-size: 16px;">La voie du succès pour travailler chez <span class="company-name">{{ company.name }}</span></h2>
 
