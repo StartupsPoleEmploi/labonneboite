@@ -16,6 +16,7 @@ from sqlalchemy import inspect
 from labonneboite.common import encoding as encoding_util
 from labonneboite.importer.util import timeit
 from labonneboite.common import geocoding
+from labonneboite.common import util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
@@ -24,7 +25,6 @@ from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
-from labonneboite.importer import settings as importer_settings
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -452,7 +452,7 @@ def create_offices(enable_profiling=False, disable_parallel_computing=False):
         func = create_offices_for_departement
 
     if disable_parallel_computing:
-        for departement in importer_settings.DEPARTEMENTS:
+        for departement in util.DEPARTEMENTS:
             func(departement)
         return
 
@@ -462,7 +462,7 @@ def create_offices(enable_profiling=False, disable_parallel_computing=False):
     # maxtasksperchild default is infinite, which means memory is never freed up, and grows indefinitely :-/
     # maxtasksperchild=1 ensures memory is freed up after every departement computation.
     pool = mp.Pool(processes=int(1.25*mp.cpu_count()), maxtasksperchild=1)
-    pool.map(func, importer_settings.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
+    pool.map(func, util.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
     pool.close()
     pool.join()
 
@@ -502,7 +502,7 @@ def create_offices_for_departement(departement):
         "COMPLETED indexing offices for departement=%s (%s of %s jobs completed)",
         departement,
         completed_jobs_counter.value,
-        len(importer_settings.DEPARTEMENTS),
+        len(util.DEPARTEMENTS),
     )
 
     display_performance_stats(departement)

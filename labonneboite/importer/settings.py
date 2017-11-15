@@ -11,22 +11,11 @@ conf/lbbdev.py
 """
 import os
 from datetime import datetime
-from backports.functools_lru_cache import lru_cache
 from labonneboite.conf import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
+from labonneboite.common import util
 
 # performance profiling timer used on many importer methods (@timeit decorator)
 ENABLE_TIMEIT_TIMERS = True
-
-@lru_cache(maxsize=None)
-def get_departements(largest_ones_first=False):
-    departements = ["{:02d}".format(d) for d in range(1, 96)] + ['97']
-    if largest_ones_first:
-        departements.remove('75')
-        departements[:0] = ['75']
-    return departements
-
-DEPARTEMENTS = get_departements()
-DEPARTEMENTS_WITH_LARGEST_ONES_FIRST = get_departements(largest_ones_first=True)
 
 # --- importer tables (names and schema)
 BACKOFFICE_ETABLISSEMENT_TABLE = 'etablissements_backoffice'
@@ -68,7 +57,7 @@ HIGH_SCORE_COMPANIES_COUNT_MIN = 100
 # --- job 6/8 : validate_scores
 SCORE_REDUCING_MINIMUM_THRESHOLD = 50
 MINIMUM_OFFICES_PER_DEPARTEMENT = 1
-DEPARTEMENTS_TO_BE_SANITY_CHECKED = DEPARTEMENTS
+DEPARTEMENTS_TO_BE_SANITY_CHECKED = util.DEPARTEMENTS
 
 # --- job 7/8 : geocode
 MINIMUM_GEOCODING_RATIO = 0.75

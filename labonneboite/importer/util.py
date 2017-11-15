@@ -11,6 +11,7 @@ from backports.functools_lru_cache import lru_cache
 
 import MySQLdb as mdb
 
+from labonneboite.common import util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.conf import settings
 from labonneboite.importer.models.computing import ImportTask
@@ -254,7 +255,7 @@ def clean_temporary_tables():
     password_statement = "-p'%s'" % DATABASE['PASSWORD']
 
     logger.info("clean all departement database tables...")
-    departements = importer_settings.DEPARTEMENTS
+    departements = util.DEPARTEMENTS
     for departement in departements:
         departement_table = "etablissements_%s" % departement
         drop_table_query = "drop table if exists %s" % departement_table

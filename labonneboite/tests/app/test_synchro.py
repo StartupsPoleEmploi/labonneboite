@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from labonneboite.common.database import db_session, get_db_string
 from labonneboite.common.database import ENGINE_PARAMS, REAL_DATABASE
 from labonneboite.common.models import Office
-from labonneboite.importer import settings as importer_settings
+from labonneboite.common import util
 
 
 class SynchronizationIndexAndDatabaseTest(unittest.TestCase):
@@ -47,7 +47,7 @@ class SynchronizationIndexAndDatabaseTest(unittest.TestCase):
         """
         Test that the data is synchronized between the SQL database and Elasticsearch.
         """
-        departement = random.choice(importer_settings.DEPARTEMENTS)
+        departement = random.choice(util.DEPARTEMENTS)
         offices = Office.query.filter(Office.departement == departement).limit(100)
 
         # If we got no results here, assume that tests are running locally,

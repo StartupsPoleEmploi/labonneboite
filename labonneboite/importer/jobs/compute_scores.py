@@ -12,6 +12,7 @@ import multiprocessing as mp
 from multiprocessing.dummy import Pool as ThreadPool
 from functools import partial
 
+from labonneboite.common import util
 from labonneboite.importer import settings
 from labonneboite.importer import compute_score
 from labonneboite.importer import util as import_util
@@ -61,7 +62,7 @@ class ScoreComputingJob(Job):
         compute_results = {}
         most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
 
-        departements = settings.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST
+        departements = util.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST
 
         if COMPUTE_SCORES_DEBUG_MODE:
             if len(COMPUTE_SCORES_DEBUG_DEPARTEMENTS) >= 1:

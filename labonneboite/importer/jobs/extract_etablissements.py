@@ -5,6 +5,7 @@ from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import timeit
 from labonneboite.importer.models.computing import ImportTask
+from labonneboite.common import util
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common.models import Office
 from labonneboite.common.database import db_session
@@ -184,7 +185,7 @@ class EtablissementExtractJob(Job):
         # https://stackoverflow.com/questions/8717179/chunking-data-from-a-large-file-for-multiprocessing
         # https://docs.python.org/2/library/itertools.html#itertools.islice
         logger.info("extracting %s...", self.input_filename)
-        departements = settings.DEPARTEMENTS
+        departements = util.DEPARTEMENTS
         count = 0
         no_zipcode_count = 0
         unprocessable_departement_errors = 0
