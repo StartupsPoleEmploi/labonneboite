@@ -420,6 +420,23 @@ class UpdateOfficesTest(CreateIndexBaseTest):
                         score=office.score, rome_code=rome, naf_code=office.naf)
                     self.assertTrue(score < script.SCORE_FOR_ROME_MINIMUM)
 
+    def test_update_office_add_email_alternance(self):
+        """
+        Test `update_offices` to add an email for alternance
+        """
+        office_to_update = OfficeAdminUpdate(
+            siret=self.office.siret,
+            name=self.office.company_name,
+            email_alternance=u"email_alternance@mail.com",
+        )
+        office_to_update.save()
+
+        script.update_offices()
+        time.sleep(1)  # Sleep required by ES to register new documents.
+
+        office = Office.get(self.office.siret)
+        self.assertEquals(office.email_alternance, "email_alternance@mail.com")
+
 class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
     """
     Test update_offices_geolocations().
