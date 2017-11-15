@@ -1,7 +1,7 @@
 import logging
 from sqlalchemy import and_
 
-from labonneboite.importer.util import timeit
+from labonneboite.common.util import timeit
 from labonneboite.importer import settings
 from labonneboite.importer.models.computing import ExportableOffice
 

@@ -4,17 +4,15 @@ import logging
 import os
 
 import multiprocessing as mp
-# profiling libraries
 from cProfile import Profile
 from pyprof2calltree import convert
-# other libraries
 from elasticsearch import Elasticsearch
 from elasticsearch import TransportError
 from elasticsearch.helpers import bulk
 from sqlalchemy import inspect
 
 from labonneboite.common import encoding as encoding_util
-from labonneboite.importer.util import timeit
+from labonneboite.common.util import timeit
 from labonneboite.common import geocoding
 from labonneboite.common import util
 from labonneboite.common import mapping as mapping_util

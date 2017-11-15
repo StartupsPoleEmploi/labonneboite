@@ -3,7 +3,7 @@ import pandas as pd
 from labonneboite.importer import settings
 from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import timeit
+from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common import util
 from labonneboite.common import encoding as encoding_util

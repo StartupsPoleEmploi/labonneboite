@@ -4,7 +4,7 @@ from datetime import datetime
 from shutil import copyfile
 
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import timeit
+from labonneboite.common.util import timeit
 from labonneboite.importer import settings
 from labonneboite.importer.jobs.common import logger
 

@@ -15,7 +15,7 @@ from sqlalchemy.exc import OperationalError
 from labonneboite.importer import settings
 from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import timeit
+from labonneboite.common.util import timeit
 from labonneboite.importer.util import parse_dpae_line, DepartementException, InvalidRowException
 from labonneboite.importer.models.computing import DpaeStatistics, ImportTask
 from labonneboite.importer.jobs.base import Job

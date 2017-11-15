@@ -10,7 +10,7 @@ from datetime import datetime
 import logging
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import timeit
+from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import ImportTask
 
 logger = logging.getLogger('main')

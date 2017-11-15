@@ -14,7 +14,7 @@ from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_city_codes
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import timeit
+from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import Geolocation
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger

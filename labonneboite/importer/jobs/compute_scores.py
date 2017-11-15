@@ -16,7 +16,7 @@ from labonneboite.common import util
 from labonneboite.importer import settings
 from labonneboite.importer import compute_score
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import timeit
+from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import DpaeStatistics
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger

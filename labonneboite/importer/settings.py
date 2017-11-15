@@ -14,9 +14,6 @@ from datetime import datetime
 from labonneboite.conf import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
 from labonneboite.common import util
 
-# performance profiling timer used on many importer methods (@timeit decorator)
-ENABLE_TIMEIT_TIMERS = True
-
 # --- importer tables (names and schema)
 BACKOFFICE_ETABLISSEMENT_TABLE = 'etablissements_backoffice'
 RAW_OFFICE_TABLE = 'etablissements_raw'

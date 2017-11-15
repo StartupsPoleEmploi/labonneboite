@@ -3,8 +3,6 @@ import gzip
 import bz2
 import re
 import subprocess
-from functools import wraps
-from time import time
 from datetime import datetime
 import logging
 from backports.functools_lru_cache import lru_cache
@@ -12,6 +10,7 @@ from backports.functools_lru_cache import lru_cache
 import MySQLdb as mdb
 
 from labonneboite.common import util
+from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
 from labonneboite.conf import settings
 from labonneboite.importer.models.computing import ImportTask
@@ -40,23 +39,6 @@ def create_cursor():
         use_unicode=True, charset="utf8")
     cur = con.cursor()
     return con, cur
-
-
-def timeit(func):
-    @wraps(func)
-    def wrap(*args, **kw):
-        ts = time()
-        result = func(*args, **kw)
-        te = time()
-        if importer_settings.ENABLE_TIMEIT_TIMERS:
-            msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
-              (func.__name__, te-ts, args, kw)
-            # logger messages are displayed immediately in jenkins console output
-            logger.info(msg)
-            # print messages are displayed all at once when the job ends in jenkins console output
-            print(msg)
-        return result
-    return wrap
 
 
 def check_for_updates(input_folder):

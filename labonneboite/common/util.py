@@ -4,6 +4,8 @@ from urlparse import urlparse
 import logging
 import unicodedata
 import urllib
+from functools import wraps
+from time import time
 from backports.functools_lru_cache import lru_cache
 
 from flask import request
@@ -13,6 +15,10 @@ from labonneboite.common.load_data import load_contact_modes
 
 logger = logging.getLogger('main')
 
+# performance profiling timer used on many importer + create_index methods (@timeit decorator)
+ENABLE_TIMEIT_TIMERS = True
+
+
 @lru_cache(maxsize=None)
 def get_departements(largest_ones_first=False):
     departements = ["{:02d}".format(d) for d in range(1, 96)] + ['97']
@@ -21,8 +27,27 @@ def get_departements(largest_ones_first=False):
         departements[:0] = ['75']
     return departements
 
+
 DEPARTEMENTS = get_departements()
 DEPARTEMENTS_WITH_LARGEST_ONES_FIRST = get_departements(largest_ones_first=True)
+
+
+def timeit(func):
+    @wraps(func)
+    def wrap(*args, **kw):
+        ts = time()
+        result = func(*args, **kw)
+        te = time()
+        if ENABLE_TIMEIT_TIMERS:
+            msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
+              (func.__name__, te-ts, args, kw)
+            # logger messages are displayed immediately in jenkins console output
+            logger.info(msg)
+            # print messages are displayed all at once when the job ends in jenkins console output
+            print(msg)
+        return result
+    return wrap
+
 
 def get_search_url(base_url, request_args, naf=None):
     query_string = {}
