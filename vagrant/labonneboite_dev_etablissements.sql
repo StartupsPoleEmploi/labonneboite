@@ -86,6 +86,7 @@ SET @create = CONCAT(
   `codecommune` varchar(191) DEFAULT NULL,
   `codepostal` varchar(11) DEFAULT NULL,
   `email` varchar(191) DEFAULT NULL,
+  `email_alternance` varchar(191) DEFAULT NULL,
   `tel` varchar(191) DEFAULT NULL,
   `departement` varchar(11) DEFAULT NULL,
   `trancheeffectif` varchar(191) DEFAULT NULL,
