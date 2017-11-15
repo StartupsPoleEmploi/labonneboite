@@ -160,6 +160,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'codecommune': self.city_code,
             'codepostal': self.zipcode,
             'email': self.email,
+            'email_alternance': self.email_alternance,
             'tel': self.phone,
             'departement': self.departement,
             'trancheeffectif': self.headcount,
