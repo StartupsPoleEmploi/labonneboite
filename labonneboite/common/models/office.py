@@ -77,8 +77,26 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     """
     An office.
 
-    Warning: this model is currently excluded from the migration system
-    because it is entirely dropped and recreated during an import process.
+    Warning: the table behind this model is regularly entirely dropped and recreated
+    at the end of an importer cycle when a new dataset is deployed (once a month in theory).
+
+    For example, if you want to add a new column, first be sure to give it a default value,
+    as when the importer imports a new office dataset, this column will be entirely populated
+    by this default value.
+
+    Do *not* add this new column here in this model, but rather in the proper Mixin above,
+    take time to read each Mixin role and choose the right one for your need.
+
+    Then you need to add a migration to create this column in each relevant model,
+    not just the Office model, see your Mixin documentation for the list of models.
+
+    You also need to add this new column in these two files:
+    labonneboite/importer/db/etablissements_exportable.sql
+    labonneboite/importer/db/etablissements_backoffice.sql
+    and in method importer.util.get_select_fields_for_main_db
+
+    Then, be sure to double check that both `make run_importer_jobs` and
+    `make test_all` complete successfully.
     """
 
     __tablename__ = settings.OFFICE_TABLE
@@ -86,6 +104,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),
     )
+
+    # You should normally *not* add any column here - see documentation above.
 
     def __unicode__(self):
         return u"%s - %s" % (self.siret, self.name)

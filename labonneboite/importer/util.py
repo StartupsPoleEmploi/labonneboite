@@ -183,16 +183,16 @@ def reduce_scores_into_table(
 def get_select_fields_for_main_db():
     """
     These fields should exactly match (and in the same order)
-    the fields in etablissements_main_db.sql
+    the fields in labonneboite/importer/db/etablissements_exportable.sql
     """
     return (
         """siret, raisonsociale, enseigne, codenaf,
         trancheeffectif, numerorue, libellerue, codepostal,
         tel, email, website, """
         + "0, 0, 0, 0, " # stand for flag_alternance, flag_junior, flag_senior, flag_handicap
-        + "0, " # stand for has_multi_geolocation
+        + "0, " # stands for has_multi_geolocation
         + "codecommune, "
-        + "0, 0, " # stand for coordinates_x, coordinates_y
+        + "0, 0, " # stands for coordinates_x, coordinates_y
         + "departement, score "
         )
 
@@ -200,7 +200,7 @@ def get_select_fields_for_main_db():
 def get_select_fields_for_backoffice():
     """
     These fields should exactly match (and in the same order)
-    the fields in etablissements_backoffice_db.sql
+    the fields in labonneboite/importer/db/etablissements_backoffice.sql
     """
     fields = get_select_fields_for_main_db()
     fields += ", `semester-1`, `semester-2`, `semester-3`, `semester-4`, `semester-5`, `semester-6`, `semester-7`"
