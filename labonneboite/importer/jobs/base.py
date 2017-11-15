@@ -44,7 +44,9 @@ class Job(object):
                 for name in os.listdir(settings.INPUT_SOURCE_FOLDER)
         ]
         if not self.input_filename in files:
-            raise "file does not exist"
+            msg = "File %s does not exist: not found in list %s" % (
+                self.input_filename, ','.join(files))
+            raise Exception(msg)
         if import_util.is_processed(self.input_filename):
             raise "fatal error : cannot run task %s which is already marked as processed" % self.input_filename
 
