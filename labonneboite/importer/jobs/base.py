@@ -43,15 +43,15 @@ class Job(object):
             os.path.join(os.path.normpath(settings.INPUT_SOURCE_FOLDER), name)
                 for name in os.listdir(settings.INPUT_SOURCE_FOLDER)
         ]
-        # We only compare basename here, to solve a bug met in jenkins environment only.
+        # We only compare realpath here, to solve a bug met in jenkins environment only.
         # In jenkins environment:
         # /srv/lbb is a symlink to /srv/jenkins/workspace/lbb
         # so that /srv/lbb/labonneboite path is the same on both local test and jenkins test.
         # However here,
         # self.input_filename == /srv/jenkins/workspace/lbb/labonneboite/importer/tests/data/...
         # but files are like /srv/lbb/labonneboite/importer/tests/data/...
-        # hence why we use basename here.
-        if not os.path.basename(self.input_filename) in [os.path.basename(f) for f in files]:
+        # hence why we use realpath here.
+        if not os.path.realpath(self.input_filename) in [os.path.realpath(f) for f in files]:
             msg = "File %s does not exist: not found in list %s" % (
                 self.input_filename, ','.join(files))
             raise Exception(msg)
