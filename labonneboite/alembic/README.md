@@ -9,10 +9,6 @@ We use Alembic which is a lightweight database migration tool for usage with the
 
 ## Creating migrations scripts
 
-Migrations scripts have to be created manually because some tables are dropped and created by the offices import process.
-
-There is one table currently excluded from the migration system: **`etablissements`**.
-
 To create a new migration file:
 
 1. Connect to your Vagrant machine: `make vagrant_ssh_dev`
@@ -41,5 +37,5 @@ Sometimes you have to add things manually, e.g. some constraints are not auto-ge
 
 You may need to run the migrations manually when developing a new feature:
 
-- `alembic upgrade head`
-- `alembic downgrade -1`
+- `alembic upgrade head` or just `make alembic_migrate`
+- `alembic downgrade -1` or just `make alembic_rollback`

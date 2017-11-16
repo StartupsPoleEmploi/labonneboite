@@ -204,6 +204,9 @@ alembic_autogenerate_migration_for_all_existing_tables:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 	cd /srv/lbb && alembic revision --autogenerate';
 
+alembic_generate_single_migration:
+	echo 'run this command from inside vagrant: alembic revision -m "create account table"'
+
 # Importer jobs
 # -------------
 

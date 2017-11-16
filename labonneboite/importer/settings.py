@@ -33,13 +33,14 @@ INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
 dirname = os.path.dirname(os.path.realpath(__file__))
 JENKINS_ETAB_PROPERTIES_FILENAME = os.path.join(dirname, "jenkins/properties.jenkins")
 DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 96
-DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE = 96
 MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 1
 
 # --- job 3/8 & 4/8 : check_dpae & extract_dpae
 JENKINS_DPAE_PROPERTIES_FILENAME = os.path.join(dirname, "jenkins/properties_dpae.jenkins")
 DPAE_ERROR_RATE_MAX = 0.1
 MOST_RECENT_DPAE_DATE = datetime(2012, 1, 1)
+MAXIMUM_ZIPCODE_ERRORS = 0
+MAXIMUM_INVALID_ROWS = 0
 
 # --- job 5/8 : compute_scores
 SCORE_COMPUTING_MAX_DIFF_MEAN = 30

@@ -52,6 +52,7 @@ def check_complete_test(dpae_filename):
 
 def check_file(dpae_filename):
     logger.info("going to check file %s", dpae_filename)
+    # FIXME detect column positions from header
     check_smoke_test(dpae_filename)
     check_complete_test(dpae_filename)
     logger.info("all tests passed with flying colors!")

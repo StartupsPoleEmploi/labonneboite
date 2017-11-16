@@ -17,7 +17,7 @@ def check_scores(departements=settings.DEPARTEMENTS_TO_BE_SANITY_CHECKED):
                 ExportableOffice.departement == departement,
                 ExportableOffice.score >= settings.SCORE_REDUCING_MINIMUM_THRESHOLD)).count()
         logger.debug("%i offices with score > %s in departement %s", 
-            settings.SCORE_REDUCING_MINIMUM_THRESHOLD, departement_count, departement)
+            departement_count, settings.SCORE_REDUCING_MINIMUM_THRESHOLD, departement)
         ok = departement_count >= settings.MINIMUM_OFFICES_PER_DEPARTEMENT
         if not ok:
             errors.append(departement)

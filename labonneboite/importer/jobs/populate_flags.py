@@ -57,7 +57,6 @@ def prepare_flags_junior_and_senior():
         count(*) as contrats
         from
         dpae
-        where (contract_type=2) or (contract_type=1 and contract_duration > 31)
         group by
         siret,
         tranche_age
@@ -112,12 +111,7 @@ def prepare_flag_handicap():
         create table flag_handicap as
         (
         select distinct(siret) from dpae
-        where
-            (
-                (contract_type=2) or (contract_type=1 and contract_duration > 31)
-            )
-            and
-            ( handicap_label = 'RQTH-MDT' )
+        where handicap_label = 'RQTH-MDT'
         );
     """
 
@@ -134,7 +128,7 @@ def dump():
     etab_result = import_util.back_up(
         settings.BACKUP_OUTPUT_FOLDER, settings.SCORE_REDUCING_TARGET_TABLE,
         "export_etablissement", timestamp, copy_to_remote_server,
-        rename_table=True)
+        new_table_name="etablissements_new")
 
     tar_filename = os.path.join(settings.BACKUP_FOLDER, "%s.tar.bz2" % timestamp)
     with tarfile.open(tar_filename, "w:bz2") as tar:

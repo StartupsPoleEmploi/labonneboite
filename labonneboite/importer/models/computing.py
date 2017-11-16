@@ -16,6 +16,9 @@ class Dpae(CRUDMixin, Base):
     Each entry details a single hiring of a single office.
     """
     __tablename__ = importer_settings.DPAE_TABLE
+    __table_args__ = (
+        Index('dept_i', 'departement'),
+    )
 
     _id = Column('id', BigInteger, primary_key=True)
     siret = Column(String(191))
@@ -27,6 +30,7 @@ class Dpae(CRUDMixin, Base):
     iiann = Column(String(191))
     age_group = Column('tranche_age', String(191))
     handicap_label = Column(String(191))
+    duree_pec = Column(Integer, nullable=True)
 
     def __str__(self):
         return '%s %s' % (self.siret, self.hiring_date)
@@ -63,7 +67,6 @@ class ExportableOffice(FinalOfficeMixin, CRUDMixin, Base):
     """
     __tablename__ = importer_settings.SCORE_REDUCING_TARGET_TABLE
     __table_args__ = (
-        Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),
     )
 

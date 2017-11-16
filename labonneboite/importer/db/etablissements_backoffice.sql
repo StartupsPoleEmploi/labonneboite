@@ -31,8 +31,7 @@ CREATE TABLE `etablissements_backoffice` (
   `semester-7` double DEFAULT NULL,
   `effectif` double DEFAULT NULL,
   `score_regr` float DEFAULT NULL,
-  PRIMARY KEY (`siret`),
-  KEY dept_i (departement)
+  PRIMARY KEY (`siret`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 
 

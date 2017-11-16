@@ -22,6 +22,5 @@ CREATE TABLE `etablissements_exportable` (
   `coordinates_y` float DEFAULT NULL,
   `departement` varchar(11) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `score` int(11) DEFAULT NULL,
-  PRIMARY KEY (`siret`),
-  KEY dept_i (departement)
+  PRIMARY KEY (`siret`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
