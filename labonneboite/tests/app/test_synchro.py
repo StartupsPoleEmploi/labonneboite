@@ -47,6 +47,7 @@ class SynchronizationIndexAndDatabaseTest(unittest.TestCase):
         """
         Test that the data is synchronized between the SQL database and Elasticsearch.
         """
+        random.seed(99)  # use a seed to get deterministic random numbers
         departement = random.choice(dpt.DEPARTEMENTS)
         offices = Office.query.filter(Office.departement == departement).limit(100)
 
