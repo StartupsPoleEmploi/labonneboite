@@ -44,10 +44,6 @@
       inputOccupation.val(item.occupation);
     }
   }
-  var resetJob = function () {
-    inputJob.val('');
-    inputOccupation.val('');
-  };
 
   // Location.
   var setLocation = function (item) {
@@ -56,11 +52,6 @@
       inputCity.val(item.city);
     }
   }
-  var resetLocation = function () {
-    inputLocation.val('');
-    inputZipcode.val('');
-    inputCity.val('');
-  };
 
   var getLocationsFromLBB = function (request, responseCB) {
     $.getJSON('/suggest_locations?term=' + request.term, function (lbb_response) {
@@ -122,9 +113,6 @@
         },
       });
 
-      // Reset any previous result.
-      inputJob.on('mousedown', resetJob);
-      inputLocation.on('mousedown', resetLocation);
 
       // When the search form is submitted.
       searchForm.on('submit', function () {
