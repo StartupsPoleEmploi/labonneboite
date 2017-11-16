@@ -186,3 +186,89 @@ test_selenium:
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=development \
 	&& nosetests -s /srv/lbb/labonneboite/tests/web/selenium';
+
+# Alembic migrations
+# ------------------
+
+alembic_migrate:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb && alembic upgrade head';
+
+alembic_rollback:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb && alembic downgrade -1';
+
+# FIXME something is still wrong with this one
+# upgrade and downgrade methods should be swapped in resulting migration
+alembic_autogenerate_migration_for_all_existing_tables:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb && alembic revision --autogenerate';
+
+# Importer jobs
+# -------------
+
+run_importer_jobs:
+	make run_importer_job_00_prepare_all && \
+	make run_importer_job_01_check_etablissements && \
+	make run_importer_job_02_extract_etablissements && \
+	make run_importer_job_03_check_dpae && \
+	make run_importer_job_04_extract_dpae && \
+	make run_importer_job_05_compute_scores && \
+	make run_importer_job_06_validate_scores && \
+	make run_importer_job_07_geocode && \
+	make run_importer_job_08_populate_flags && \
+	echo "all importer jobs completed successfully."
+
+run_importer_job_00_prepare_all:  # FIXME DNRY table names
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		echo delete from import_tasks              | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		echo delete from etablissements_raw        | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		echo delete from etablissements_backoffice | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		echo delete from etablissements_exportable | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 && \
+		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
+		cp tests/data/LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv data/ && \
+		cp tests/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
+		echo "completed importer run preparation."';
+
+run_importer_job_01_check_etablissements:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/check_etablissements.py';
+
+run_importer_job_02_extract_etablissements:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/extract_etablissements.py';
+
+run_importer_job_03_check_dpae:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/check_dpae.py';
+
+run_importer_job_04_extract_dpae:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/extract_dpae.py';
+
+run_importer_job_05_compute_scores:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/compute_scores.py';
+
+run_importer_job_06_validate_scores:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/validate_scores.py';
+
+run_importer_job_07_geocode:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/geocode.py';
+
+run_importer_job_08_populate_flags:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+		cd /srv/lbb/labonneboite && cd importer && \
+		python jobs/populate_flags.py';

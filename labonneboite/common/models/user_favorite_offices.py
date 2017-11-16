@@ -10,6 +10,7 @@ from sqlalchemy.orm import relationship
 from labonneboite.common.database import Base
 from labonneboite.common.database import db_session
 from labonneboite.common.models.base import CRUDMixin
+from labonneboite.conf import get_current_env, ENV_LBBDEV
 
 
 class UserFavoriteOffice(CRUDMixin, Base):
@@ -37,7 +38,12 @@ class UserFavoriteOffice(CRUDMixin, Base):
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
 
     user = relationship('User')
-    office = relationship('labonneboite.common.models.office.Office', lazy='joined')
+    if get_current_env() == ENV_LBBDEV:
+        # Disable relationship which mysteriously breaks on lbbdev only, not needed there anyway.
+        # FIXME try again to fix this bug. Bug happens in lbbdev environment only.
+        pass
+    else:
+        office = relationship('Office', lazy='joined')
 
     __mapper_args__ = {
         'order_by': desc(date_created),  # Default order_by for all queries.

@@ -1,15 +1,21 @@
 # coding: utf8
 import datetime
 
-from sqlalchemy import Column, Integer, BigInteger, String, Float, DateTime, Boolean
+from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime
+from sqlalchemy import PrimaryKeyConstraint
 
-from labonneboite.importer import settings
+from labonneboite.importer import settings as importer_settings
 from labonneboite.common.database import Base
 from labonneboite.common.models.base import CRUDMixin
+from labonneboite.common.models import PrimitiveOfficeMixin, FinalOfficeMixin
 
 
 class Dpae(CRUDMixin, Base):
-    __tablename__ = settings.DPAE_TABLE
+    """
+    DPAE = Déclaration préalable à l'embauche.
+    Each entry details a single hiring of a single office.
+    """
+    __tablename__ = importer_settings.DPAE_TABLE
 
     _id = Column('id', BigInteger, primary_key=True)
     siret = Column(String(191))
@@ -26,26 +32,40 @@ class Dpae(CRUDMixin, Base):
         return '%s %s' % (self.siret, self.hiring_date)
 
 
-class Office(CRUDMixin, Base):
+class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
     """
-    raw importer table including all 10M offices
+    Initial large table storing all 10M offices and acting as the 'input' of the importer jobs.
+    Stores the totality of officially existing offices at the time.
+    About 10M sirets are indeed officially registered in France.
     """
-    __tablename__ = settings.OFFICE_TABLE
-    siret = Column(String(14), primary_key=True)
-    company_name = Column('raisonsociale', String(191))
-    office_name = Column('enseigne', String(191))
-    naf = Column('codenaf', String(8))
-    street_number = Column('numerorue', String(191))
-    street_name = Column('libellerue', String(191))
-    city_code = Column('codecommune', String(191))
-    zipcode = Column('codepostal', String(8))
-    email = Column(String(191))
-    tel = Column(String(191))
+    __tablename__ = importer_settings.RAW_OFFICE_TABLE
+    __table_args__ = (
+        Index('dept_i', 'departement'),
+        PrimaryKeyConstraint('siret'),
+    )
+
+    # columns specific to this very model
     website1 = Column(String(191))
     website2 = Column(String(191))
 
-    departement = Column(String(8))
-    headcount = Column('trancheeffectif', String(2))
+
+class ExportableOffice(FinalOfficeMixin, CRUDMixin, Base):
+    """
+    Final output table of the importer jobs, typically storing only 500K offices
+    which are selected by the importers jobs as having the highest hiring
+    potential amongst all existing 10M offices stored in the raw office table.
+
+    This model is exactly similar to the main Office model, the only difference
+    is that they are stored in two different tables.
+
+    When a new dataset built by the importer is deployed, the content of this
+    table will replace the content of the main Office table.
+    """
+    __tablename__ = importer_settings.SCORE_REDUCING_TARGET_TABLE
+    __table_args__ = (
+        Index('dept_i', 'departement'),
+        PrimaryKeyConstraint('siret'),
+    )
 
 
 class Geolocation(CRUDMixin, Base):
@@ -59,41 +79,11 @@ class Geolocation(CRUDMixin, Base):
     y = Column('coordinates_y', Float)  # latitude
 
 
-class ExportableOffice(CRUDMixin, Base):
-    """
-    importer table including selected offices (~500K)
-    ready to be exported to staging and production
-    -
-    note that this is actually a duplicate of the Office model
-    in common/models/office.py
-    TOFIX somehow eliminate this confusing code duplication
-    """
-    __tablename__ = settings.EXPORT_ETABLISSEMENT_TABLE
-    siret = Column(String(14), primary_key=True)
-    company_name = Column('raisonsociale', String(191))
-    office_name = Column('enseigne', String(191))
-    naf = Column('codenaf', String(8))
-    street_number = Column('numerorue', String(191))
-    street_name = Column('libellerue', String(191))
-    city_code = Column('codecommune', String(191))
-    zipcode = Column('codepostal', String(8))
-    email = Column(String(191))
-    tel = Column(String(191))
-    website = Column(String(191))
-    flag_alternance = Column(Boolean, default=False, nullable=False)
-    flag_junior = Column(Boolean, default=False, nullable=False)
-    flag_senior = Column(Boolean, default=False, nullable=False)
-    flag_handicap = Column(Boolean, default=False, nullable=False)
-    has_multi_geolocations = Column(Boolean, default=False, nullable=False)
-
-    departement = Column(String(8))
-    headcount = Column('trancheeffectif', String(2))
-    score = Column(Integer)
-    x = Column('coordinates_x', Float)  # longitude
-    y = Column('coordinates_y', Float)  # latitude
-
-
 class ImportTask(CRUDMixin, Base):
+    """
+    Used to store and remember which ETAB and/or DPAE exports have already been processed
+    by the importer jobs.
+    """
     __tablename__ = "import_tasks"
 
     # Import state
@@ -112,11 +102,14 @@ class ImportTask(CRUDMixin, Base):
     created_date = Column(DateTime, default=datetime.datetime.utcnow)
 
     @classmethod
-    def is_last_import_dpae(clazz):
-        return clazz.query.order_by(clazz.created_date.desc()).first().import_type == ImportTask.DPAE
+    def is_last_import_dpae(cls):
+        return cls.query.order_by(cls.created_date.desc()).first().import_type == ImportTask.DPAE
 
 
 class DpaeStatistics(CRUDMixin, Base):
+    """
+    Used to store details about the last DPAE import.
+    """
     __tablename__ = "dpae_statistics"
 
     _id = Column('id', BigInteger, primary_key=True)
@@ -124,10 +117,10 @@ class DpaeStatistics(CRUDMixin, Base):
     most_recent_data_date = Column(DateTime, default=datetime.datetime.utcnow)
 
     @classmethod
-    def get_most_recent_data_date(clazz):
+    def get_most_recent_data_date(cls):
         try:
-            return clazz.query.order_by(clazz.most_recent_data_date.desc()).first().most_recent_data_date
+            return cls.query.order_by(cls.most_recent_data_date.desc()).first().most_recent_data_date
         except AttributeError:
             # if there was no import of dpae thus far, return the date for which
             # we don't want to import dpae before that date
-            return settings.MOST_RECENT_DPAE_DATE
+            return importer_settings.MOST_RECENT_DPAE_DATE

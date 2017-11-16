@@ -4,14 +4,35 @@ from urlparse import urlparse
 import logging
 import unicodedata
 import urllib
+from functools import wraps
+from time import time
 
 from flask import request
 
 from labonneboite.conf.common.contact_mode import CONTACT_MODE_DEFAULT
 from labonneboite.common.load_data import load_contact_modes
 
-
 logger = logging.getLogger('main')
+
+# performance profiling timer used on many importer + create_index methods (@timeit decorator)
+ENABLE_TIMEIT_TIMERS = True
+
+
+def timeit(func):
+    @wraps(func)
+    def wrap(*args, **kw):
+        ts = time()
+        result = func(*args, **kw)
+        te = time()
+        if ENABLE_TIMEIT_TIMERS:
+            msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
+              (func.__name__, te-ts, args, kw)
+            # logger messages are displayed immediately in jenkins console output
+            logger.info(msg)
+            # print messages are displayed all at once when the job ends in jenkins console output
+            print(msg)
+        return result
+    return wrap
 
 
 def get_search_url(base_url, request_args, naf=None):
@@ -103,3 +124,4 @@ def get_contact_mode_for_rome_and_naf(rome, naf):
         return naf_prefix_to_rome_to_contact_mode[naf_prefix].values()[0]
     except (KeyError, IndexError):
         return CONTACT_MODE_DEFAULT
+

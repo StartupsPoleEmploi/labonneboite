@@ -22,15 +22,14 @@ logger = logging.getLogger('main')
 CITY_NAMES = load_city_codes()
 
 
-class OfficeMixin(object):
+class PrimitiveOfficeMixin(object):
     """
-    This mixin provides the fields that must be common between the `Office`
-    model and the `OfficeAdminAdd` model.
+    Mixin providing fields shared by models: RawOffice, ExportableOffice, Office, OfficeAdminAdd.
 
-    Don't forget to create a new migration for `OfficeAdminAdd` when you add
-    or remove a field here to keep models in sync.
-    """
-    siret = Column('siret', String(191))
+    Don't forget to create a new migration for each of these models
+    each time you add/change/remove a field here to keep all models
+    in sync.    """
+    siret = Column(String(191))
     company_name = Column('raisonsociale', String(191), nullable=False)
     office_name = Column('enseigne', String(191), default='', nullable=False)
     naf = Column('codenaf', String(8), nullable=False)
@@ -38,26 +37,66 @@ class OfficeMixin(object):
     street_name = Column('libellerue', String(191), default='', nullable=False)
     city_code = Column('codecommune', String(191), nullable=False)
     zipcode = Column('codepostal', String(8), nullable=False)
-    email = Column('email', String(191), default='', nullable=False)
-    tel = Column('tel', String(191), default='', nullable=False)
-    website = Column('website', String(191), default='', nullable=False)
+    email = Column(String(191), default='', nullable=False)
+    tel = Column(String(191), default='', nullable=False)
+    departement = Column(String(8), nullable=False)
+    headcount = Column('trancheeffectif', String(2))
+
+
+class OfficeMixin(PrimitiveOfficeMixin):
+    """
+    Mixin providing fields shared by models: ExportableOffice, Office, OfficeAdminAdd.
+
+    Don't forget to create a new migration for each of these models
+    each time you add/change/remove a field here to keep all models
+    in sync.
+    """
+    website = Column(String(191), default='', nullable=False)
     flag_alternance = Column(Boolean, default=False, nullable=False)
     flag_junior = Column(Boolean, default=False, nullable=False)
     flag_senior = Column(Boolean, default=False, nullable=False)
     flag_handicap = Column(Boolean, default=False, nullable=False)
-    departement = Column('departement', String(8), nullable=False)
-    headcount = Column('trancheeffectif', String(2))
-    score = Column('score', Integer, default=0, nullable=False)
-    x = Column('coordinates_x', Float, nullable=False)  # Longitude.
-    y = Column('coordinates_y', Float, nullable=False)  # Latitude.
+    score = Column(Integer, default=0, nullable=False)
+    x = Column('coordinates_x', Float)  # Longitude.
+    y = Column('coordinates_y', Float)  # Latitude.
 
 
-class Office(OfficeMixin, CRUDMixin, Base):
+class FinalOfficeMixin(OfficeMixin):
+    """
+    Mixin providing fields shared by models: ExportableOffice, Office.
+
+    Don't forget to create a new migration for each of these models
+    each time you add/change/remove a field here to keep all models
+    in sync.
+    """
+    # A flag that is True if the office also recruits beyond the boundaries of its primary geolocation.
+    has_multi_geolocations = Column(Boolean, default=False, nullable=False)
+
+
+class Office(FinalOfficeMixin, CRUDMixin, Base):
     """
     An office.
 
-    Warning: this model is currently excluded from the migration system
-    because it's entirely dropped and recreated during an import process.
+    Warning: the table behind this model is regularly entirely dropped and recreated
+    at the end of an importer cycle when a new dataset is deployed (once a month in theory).
+
+    For example, if you want to add a new column, first be sure to give it a default value,
+    as when the importer imports a new office dataset, this column will be entirely populated
+    by this default value.
+
+    Do *not* add this new column here in this model, but rather in the proper Mixin above,
+    take time to read each Mixin role and choose the right one for your need.
+
+    Then you need to add a migration to create this column in each relevant model,
+    not just the Office model, see your Mixin documentation for the list of models.
+
+    You also need to add this new column in these two files:
+    labonneboite/importer/db/etablissements_exportable.sql
+    labonneboite/importer/db/etablissements_backoffice.sql
+    and in method importer.util.get_select_fields_for_main_db
+
+    Then, be sure to double check that both `make run_importer_jobs` and
+    `make test_all` complete successfully.
     """
 
     __tablename__ = settings.OFFICE_TABLE
@@ -66,10 +105,7 @@ class Office(OfficeMixin, CRUDMixin, Base):
         PrimaryKeyConstraint('siret'),
     )
 
-    # Almost all fields are provided by the `OfficeMixin`.
-
-    # A flag that is True if the office also recruits beyond the boundaries of its primary geolocation.
-    has_multi_geolocations = Column(Boolean, default=False, nullable=False)
+    # You should normally *not* add any column here - see documentation above.
 
     def __unicode__(self):
         return u"%s - %s" % (self.siret, self.name)

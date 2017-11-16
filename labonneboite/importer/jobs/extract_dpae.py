@@ -13,11 +13,13 @@ import sys
 from sqlalchemy.exc import OperationalError
 
 from labonneboite.importer import settings
+from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import parse_dpae_line, DepartementException, TooFewFieldsException
+from labonneboite.common.util import timeit
+from labonneboite.importer.util import parse_dpae_line, DepartementException, InvalidRowException
 from labonneboite.importer.models.computing import DpaeStatistics, ImportTask
-from .base import Job
-from .common import logger
+from labonneboite.importer.jobs.base import Job
+from labonneboite.importer.jobs.common import logger
 
 
 class DpaeExtractJob(Job):
@@ -25,21 +27,18 @@ class DpaeExtractJob(Job):
     import_type = ImportTask.DPAE
     table_name = settings.DPAE_TABLE
 
-    def __init__(self, dpae_gz_filename):
-        self.input_filename = dpae_gz_filename
+    def __init__(self, filename):
+        self.input_filename = filename
         self.most_recent_data_date = None
         self.zipcode_errors = 0
         self.invalid_row_errors = 0
 
-    # actually never used
-    def print_dpae_distribution(self, imported_dpae_distribution):
-        for year, _ in sorted(imported_dpae_distribution.items()):
-            for month, _ in sorted(imported_dpae_distribution[year].items()):
-                for day, count in sorted(imported_dpae_distribution[year][month].items()):
-                    logger.info("year: %s, month: %s, day: %s, dpae count %s", year, month, day, count)
-
+    @timeit
     def run_task(self):
         logger.info("extracting %s ", self.input_filename)
+        # this pattern matches last occurence of 8 consecutive digits
+        # e.g. 'LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv'
+        # will match 20161110
         date_pattern = r'.*_(\d\d\d\d\d\d\d\d)'
         date_match = re.match(date_pattern, self.input_filename)
         if date_match:
@@ -47,12 +46,26 @@ class DpaeExtractJob(Job):
             self.most_recent_data_date = datetime.strptime(date_part, "%Y%m%d")
             logger.debug("identified most_recent_data_date=%s", self.most_recent_data_date)
         else:
-            raise Exception("couldn't find a date pattern in filename. filename should be dpae_XYZ_20xxxxxx.tar.gz")
+            raise Exception("couldn't find a date pattern in filename. filename should be \
+                LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv or similar")
 
         count = 0
         statements = []
         something_new = False
-        query = "INSERT into %s(siret, hiring_date, zipcode, contract_type, departement, contract_duration, iiann, tranche_age, handicap_label) values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)" % settings.DPAE_TABLE
+        query = """
+            INSERT into %s(
+                siret,
+                hiring_date,
+                zipcode,
+                contract_type,
+                departement,
+                contract_duration,
+                iiann,
+                tranche_age,
+                handicap_label
+                )
+            values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
+        """ % settings.DPAE_TABLE
         imported_dpae = 0
         imported_dpae_distribution = {}
         not_imported_dpae = 0
@@ -85,22 +98,31 @@ class DpaeExtractJob(Job):
                         statements = []
                         raise
                 try:
-                    siret, hiring_date, zipcode, contract_type, departement, contract_duration, iiann, tranche_age, handicap_label = parse_dpae_line(line)
+                    siret, hiring_date, zipcode, contract_type, departement, contract_duration, \
+                    iiann, tranche_age, handicap_label = parse_dpae_line(line)
                 except ValueError:
                     self.zipcode_errors += 1
                     continue
                 except DepartementException:
                     self.zipcode_errors += 1
                     continue
-                except TooFewFieldsException:
+                except InvalidRowException:
                     logger.info("invalid_row met at row: %i", count)
                     self.invalid_row_errors += 1
                     continue
 
                 if hiring_date > initial_most_recent_data_date and hiring_date <= self.most_recent_data_date:
-                    statement = (siret, hiring_date, zipcode, contract_type,
-                                 departement, contract_duration, iiann,
-                                 tranche_age, handicap_label)
+                    statement = (
+                        siret,
+                        hiring_date,
+                        zipcode,
+                        contract_type,
+                        departement,
+                        contract_duration,
+                        iiann,
+                        tranche_age,
+                        handicap_label
+                    )
                     statements.append(statement)
                     imported_dpae += 1
 
@@ -142,6 +164,6 @@ if __name__ == "__main__":
     import logging
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger('main')
-    filename = sys.argv[1]
-    task = DpaeExtractJob(filename)
+    dpae_filename = jenkins.get_dpae_filename()
+    task = DpaeExtractJob(dpae_filename)
     task.run()

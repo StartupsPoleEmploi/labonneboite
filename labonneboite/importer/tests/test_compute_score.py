@@ -1,16 +1,16 @@
 from datetime import datetime, timedelta
 import random
 
-from labonneboite.common.models import Office
 from labonneboite.importer import compute_score
 from labonneboite.importer import settings
-from labonneboite.importer.models.computing import Dpae
+from labonneboite.importer.models.computing import Dpae, RawOffice
 from labonneboite.importer.tests.test_base import DatabaseTest
 
 
 def make_office():
     for i in range(0, 200):
-        office = Office(departement="57", siret=str(i), headcount="03")
+        office = RawOffice(departement="57", siret=str(i), headcount="03", company_name="SNCF",
+            naf="2363Z", city_code="57463", zipcode="57000")
         office.save()
 
 
@@ -32,13 +32,11 @@ def make_dpae():
 class TestComputeScore(DatabaseTest):
 
     def test_happy_path(self):
-        settings.SCORE_COEFFICIENT_OF_VARIATION_MAX = 1.0
-        settings.HIGH_SCORE_COMPANIES_COUNT_MIN = 0
         make_office()
         make_dpae()
         dpae_date = datetime.now()
         departement = "57"
-        compute_score.run(settings.OFFICE_TABLE, settings.DPAE_TABLE, departement, dpae_date)
+        compute_score.run(settings.RAW_OFFICE_TABLE, settings.DPAE_TABLE, departement, dpae_date)
 
     def test_normalize_url(self):
         self.assertEqual(compute_score.normalize_website_url(None), None)

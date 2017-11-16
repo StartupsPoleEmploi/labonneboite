@@ -32,6 +32,18 @@
         - xvfb
         - graphviz
         - htop
+        - libblas-dev  # needed for pip install scipy
+        - liblapack-dev  # needed for pip install scipy
+        - libatlas-base-dev  # needed for pip install scipy
+        - gfortran  # needed for pip install scipy
+        # packages mentioned in deprecated setup.sh (only for the record)
+        # - python-pip 
+        # - libmariadbclient-dev
+        # - mariadb-server
+        # - mariadb-client-core-5.5
+        # - libssl-dev
+        # - libhdf5-dev
+        # - libopenblas-dev
       become: true
 
     - name: Install french locale.
@@ -75,13 +87,13 @@
     - name: create mysql test user
       mysql_user: name=lbb_test password=lbb_test priv=*.*:ALL state=present
 
-    - name: create mysql test db
+    - name: create mysql test database
       mysql_db: name=lbb_test2 state=present encoding=utf8mb4 collation=utf8mb4_unicode_ci
 
     - name: import labonneboite_test.sql
       mysql_db: state=import name=lbb_test2 target={{ db_dir }}/labonneboite_test.sql
 
-    - name: Run database migrations
+    - name: Run database migrations against development database
       shell: "cd {{project_dir}}; {{ virtual_env }}/bin/alembic upgrade head"
 
     - name: create elastic search indexes.

@@ -7,23 +7,19 @@ bypassing the Global Interpreter Lock limits.
 
 Each compute_score job is launched on a given departement.
 """
-
 import sys
-import traceback
-
 import multiprocessing as mp
 from multiprocessing.dummy import Pool as ThreadPool
 from functools import partial
-import logging
 
+from labonneboite.common import departements as dpt
 from labonneboite.importer import settings
 from labonneboite.importer import compute_score
 from labonneboite.importer import util as import_util
+from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import DpaeStatistics
-from .base import Job
-from .common import logger
-
-COMPUTE_SCORE_TIMEOUT = 3600 * 8  # computing scores for 75 might take 4h+
+from labonneboite.importer.jobs.base import Job
+from labonneboite.importer.jobs.common import logger
 
 # Only enable if you know what you are doing - this will compute only selected departements then fail on purpose
 COMPUTE_SCORES_DEBUG_MODE = False
@@ -32,83 +28,78 @@ COMPUTE_SCORES_DEBUG_MODE = False
 # departement 90 has the least offices - thus is it most suitable for a quick debugging
 COMPUTE_SCORES_DEBUG_DEPARTEMENTS = ["90"]
 
+# If parallel computing is enabled, you cannot use debugger like ipdb from
+# within a job.
+DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING = False
 
-def abortable_worker(func, etab_table, dpae_table, departement, dpae_date, **kwargs):
-    timeout = kwargs.get('timeout', None)
+
+def abortable_worker(func, etab_table, dpae_table, departement, dpae_date):
     p = ThreadPool(1)
     res = p.apply_async(func, args=(etab_table, dpae_table, departement, dpae_date))
-    try:
-        out = res.get(timeout)  # Wait timeout seconds for func to complete.
-        logger.info("got result before timeout(%s)", departement)
-        return out
-    except mp.TimeoutError:
-        logger.warning("timeout error for departement (%s)", departement)
-        p.terminate()
-        return None
-    except:
-        logger.error("abortable_worker traceback: %s", traceback.format_exc())
-        return None
+    result = res.get()
+    logger.info("got result for departement %s", departement)
+    return result
 
 
+@timeit
 def compute(etab, dpae, departement, dpae_date):
-    try:
-        result = compute_score.run(etab, dpae, departement, dpae_date)
-        logger.info("finished compute_score.run (%s)", departement)
-    except:
-        logger.error("error in departement %s : %s", departement, sys.exc_info()[1])
-        logger.error("compute_score traceback: %s", traceback.format_exc())
-        result = None
+    result = compute_score.run(etab, dpae, departement, dpae_date)
+    logger.info("finished compute_score.run (%s)", departement)
     return result
 
 
 class ScoreComputingJob(Job):
 
+    @timeit
     def run(self):
         """
-        Tricky parallelization.
-        In some cases the jobs take a long time to run, so there's COMPUTE_SCORE_TIMEOUT for that.
-        If a job was not finished before the timeout, it will be added to a list to be processed sequentially.
+        Tricky parallelization on all available CPU cores.
         """
         results = []
-        # Use parallel computing on all available CPU cores.
         # maxtasksperchild default is infinite, which means memory is never freed up, and grows up to 200G :-/
         # maxtasksperchild=1 ensures memory is freed up after every departement computation.
         pool = mp.Pool(processes=mp.cpu_count(), maxtasksperchild=1)
-        async_results = {}
+        compute_results = {}
         most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
 
-        departements = settings.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST
+        departements = dpt.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST
 
         if COMPUTE_SCORES_DEBUG_MODE:
             if len(COMPUTE_SCORES_DEBUG_DEPARTEMENTS) >= 1:
                 departements = COMPUTE_SCORES_DEBUG_DEPARTEMENTS
 
-        for departement in departements:
-            abortable_func = partial(abortable_worker, compute, timeout=COMPUTE_SCORE_TIMEOUT)
-            async_result = pool.apply_async(
-                abortable_func,
-                args=(settings.OFFICE_TABLE, settings.DPAE_TABLE, departement, most_recent_data_date)
-            )
-            async_results[departement] = async_result
+        if DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING:  # single thread computing
+            for departement in departements:
+                compute_result = compute(settings.RAW_OFFICE_TABLE,
+                    settings.DPAE_TABLE, departement, most_recent_data_date)
+                compute_results[departement] = compute_result
+        else:  # parallel computing
+            for departement in departements:
+                abortable_func = partial(abortable_worker, compute)
+                compute_result = pool.apply_async(
+                    abortable_func,
+                    args=(settings.RAW_OFFICE_TABLE, settings.DPAE_TABLE, departement, most_recent_data_date)
+                )
+                compute_results[departement] = compute_result.get()
 
-        logger.info("going to close process pool...")
-        pool.close()
-        logger.info("going to join pool")
-        pool.join()
-        logger.info("all compute_score done, analyzing results...")
+            logger.info("going to close process pool...")
+            pool.close()
+            logger.info("going to join pool")
+            pool.join()
+            logger.info("all compute_score done, analyzing results...")
 
-        for departement, async_result in async_results.iteritems():
-            result = async_result.get()
-            if not bool(result):
+        for departement, compute_result in compute_results.iteritems():
+            if not bool(compute_result):
                 logger.info("departement with error : %s", departement)
-            results.append([departement, bool(result)])
+            results.append([departement, bool(compute_result)])
 
         logger.info("compute_scores FINISHED")
         return results
 
 
-if __name__ == "__main__":
-    import_util.clean_tables()
+@timeit
+def run_main():
+    import_util.clean_temporary_tables()
     task = ScoreComputingJob()
     results = task.run()
     no_results = []
@@ -117,11 +108,15 @@ if __name__ == "__main__":
         departements.append(departement)
         if not result:
             no_results.append(departement)
-    if len(no_results) > 0:
+    if len(no_results) > settings.MAXIMUM_COMPUTE_SCORE_JOB_FAILURES:
+        results = set(departements) - set(no_results)
         logger.warning(
-            "compute_scores did not return results for following departement (%i failures), aborting...\n%s",
+            "compute_scores by departement : %i failures (%s) vs %i successes (%s), aborting...",
             len(no_results),
-            ",".join(no_results))
+            ",".join(no_results),
+            len(results),
+            ",".join(results),
+        )
         sys.exit(-1)
 
     import_util.reduce_scores_for_backoffice(departements)
@@ -129,5 +124,10 @@ if __name__ == "__main__":
         logger.warning("debug mode enabled, failing on purpose for debugging of temporary tables")
         sys.exit(-1)
     import_util.reduce_scores_for_main_db(departements)
-    import_util.clean_tables()
+    import_util.clean_temporary_tables()
     logger.info("compute_scores task: FINISHED")
+
+
+if __name__ == "__main__":
+    run_main()
+    

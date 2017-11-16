@@ -274,11 +274,15 @@ We recommend you use a pylint git pre-commit hook:
     # and/or
     import ipdb; ipdb.set_trace()
 
-# Process workflow
+# Importer
 
-Here is the workflow of our data processes managed by jenkins:
+The importer jobs are designed to recreate from scratch a complete dataset of offices.
+
+Here is their normal workflow:
 
 `check_etab` => `extract_etab` => `check_dpae` => `extract_dpae` => `compute_scores` => `validate_scores` => `geocode` => `populate_flags`
+
+Use `make run_importer_jobs` to run all these jobs in local environment.
 
 # Single-ROME vs Multi-ROME search
 

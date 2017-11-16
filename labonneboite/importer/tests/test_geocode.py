@@ -1,20 +1,22 @@
-from labonneboite.common.models import Office
+from labonneboite.importer.models.computing import ExportableOffice
 from labonneboite.importer.jobs.geocode import GeocodeJob
 from labonneboite.importer.jobs.geocode import GeocodeUnit
-from labonneboite.importer.models.computing import ExportableOffice as ComputingOffice
 from labonneboite.importer.tests.test_base import DatabaseTest
 
 
 def make_geocoded_office():
-    office = ComputingOffice(
+    office = ExportableOffice(
         siret=1234,
+        company_name="SNCF",
         street_number="30",
         street_name="rue Edouard Poisson",
         zipcode="93300",
         city_code="93001",
+        departement="57",
+        headcount="11",
+        naf="2363Z",
         x=1.1,
         y=1.1,
-        headcount="11",
     )
     office.save()
 
@@ -58,6 +60,6 @@ class TestGeocode(DatabaseTest):
         task = GeocodeJob()
         updates = [["1234", [0, 43]]]
         task.update_coordinates(updates)
-        office = Office.query.first()
+        office = ExportableOffice.query.first()
         self.assertEquals(int(office.x), 0)
         self.assertEquals(int(office.y), 43)

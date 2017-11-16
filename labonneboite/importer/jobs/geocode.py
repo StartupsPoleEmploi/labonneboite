@@ -4,15 +4,23 @@ Etablissements are imported for Pole Emploi databases without geo coordinates.
 This module assists in finding and assigning geo coordinates to etablissements.
 
 """
-
-from labonneboite.common.database import db_session
-
-import gevent.monkey
-gevent.monkey.patch_socket()
-
 import requests
 import gevent
 from gevent.pool import Pool
+import gevent.monkey
+from sqlalchemy.exc import IntegrityError
+
+from labonneboite.common.database import db_session
+from labonneboite.common.load_data import load_city_codes
+from labonneboite.importer import settings
+from labonneboite.importer import util as import_util
+from labonneboite.common.util import timeit
+from labonneboite.importer.models.computing import Geolocation
+from labonneboite.importer.jobs.base import Job
+from labonneboite.importer.jobs.common import logger
+
+gevent.monkey.patch_socket()
+
 connection_limit = 10
 adapter = requests.adapters.HTTPAdapter(pool_connections=connection_limit,
                                         pool_maxsize=connection_limit,
@@ -23,16 +31,8 @@ jobs = []
 pool_size = 10
 pool = Pool(pool_size)
 
-from labonneboite.common.load_data import load_city_codes
 CITY_NAMES = load_city_codes()
-
-from labonneboite.importer import settings
-from labonneboite.importer import util as import_util
-from labonneboite.importer.models.computing import Geolocation
-from .base import Job
-from .common import logger
-
-from sqlalchemy.exc import IntegrityError
+GEOCODING_STATS = {}
 
 
 class IncorrectAdressDataException(Exception):
@@ -41,9 +41,6 @@ class IncorrectAdressDataException(Exception):
 
 class AbnormallyLowGeocodingRatioException(Exception):
     pass
-
-
-GEOCODING_STATS = {}
 
 
 class GeocodeJob(Job):
@@ -61,8 +58,19 @@ class GeocodeJob(Job):
         full_address = "%s %s %s %s" % (street_number, street_name, zipcode, city)
         return full_address.strip()
 
+    @timeit
     def create_geocoding_jobs(self):
-        query = """select siret, numerorue, libellerue, codepostal, codecommune, coordinates_x, coordinates_y from %s""" % (settings.EXPORT_ETABLISSEMENT_TABLE)
+        query = """
+            select
+                siret,
+                numerorue,
+                libellerue,
+                codepostal,
+                codecommune,
+                coordinates_x,
+                coordinates_y
+            from %s
+        """ % (settings.SCORE_REDUCING_TARGET_TABLE)
         _, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
@@ -89,35 +97,49 @@ class GeocodeJob(Job):
         return geocoding_jobs
 
 
+    @timeit
     def update_coordinates(self, coordinates_updates):
         con, cur = import_util.create_cursor()
         count = 0
         statements = []
-        update_query = "update %s set coordinates_x=%%s, coordinates_y=%%s where siret=%%s" % settings.EXPORT_ETABLISSEMENT_TABLE
+        update_query = "update %s set coordinates_x=%%s, coordinates_y=%%s where siret=%%s" % \
+            settings.SCORE_REDUCING_TARGET_TABLE
+
         for siret, coordinates in coordinates_updates:
+            count += 1
             statements.append([coordinates[0], coordinates[1], siret])
-            if not count % 1000:
-                logger.info("geocoding with ban... %i done (example: coordinates_x=%s, coordinates_y=%s", count, statements[0][0], statements[0][1])
+            if len(statements) == 1000:
+                logger.info("geocoding with ban... %i of %i done", count, len(coordinates_updates))
                 cur.executemany(update_query, statements)
                 con.commit()
                 statements = []
-            count += 1
 
+        if len(statements) >= 1:
+            logger.info("geocoding with ban... %i of %i done", count, len(coordinates_updates))
+            cur.executemany(update_query, statements)
+            con.commit()   
+            
 
+    @timeit
     def validate_coordinates(self):
         _, cur = import_util.create_cursor()
         query = """
         select
-        sum(coordinates_x > 0 and coordinates_y > 0)/count(*)
+        sum(
+            (coordinates_x > 0 or coordinates_x < 0)
+            and
+            (coordinates_y > 0 or coordinates_y < 0)
+        )/count(*)
         from %s
-        """ % settings.EXPORT_ETABLISSEMENT_TABLE
+        """ % settings.SCORE_REDUCING_TARGET_TABLE
         cur.execute(query)
         geocoding_ratio = cur.fetchall()[0][0]
         logger.info("geocoding_ratio = %s", geocoding_ratio)
-        if geocoding_ratio < 0.75:
+        if geocoding_ratio < settings.MINIMUM_GEOCODING_RATIO:
             raise AbnormallyLowGeocodingRatioException
 
 
+    @timeit
     def run_geocoding_jobs(self, geocoding_jobs):
         ban_jobs = []
         coordinates_updates = []
@@ -139,6 +161,7 @@ class GeocodeJob(Job):
         return coordinates_updates
 
 
+    @timeit
     def run(self):
         logger.info("starting geocoding task...")
         geocoding_jobs = self.create_geocoding_jobs()

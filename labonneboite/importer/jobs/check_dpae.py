@@ -1,10 +1,10 @@
 import sys
-import os
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.util import parse_dpae_line
-from .common import logger
+from labonneboite.importer.jobs.common import logger
+
 
 def get_n_lines(path, n=5, ignore_header=True):
     results = []
@@ -15,7 +15,8 @@ def get_n_lines(path, n=5, ignore_header=True):
         for line in myfile:
             results.append(line)
             count += 1
-            if (count >= n): break
+            if count >= n:
+                break
     return results
 
 
@@ -38,7 +39,7 @@ def check_complete_test(dpae_filename):
         try:
             parse_dpae_line(line)
             success += 1
-        except:
+        except (ValueError, IndexError):
             errors += 1
     logger.info("%i lines parsed with success", success)
     logger.info("%i lines parsed with error", errors)
@@ -60,12 +61,8 @@ if __name__ == "__main__":
     filename = import_util.detect_runnable_file("dpae")
     if filename:
         check_file(filename)
-        try:
-            f = open(os.path.join(os.environ["WORKSPACE"], "properties_dpae.jenkins"), "w")
+        with open(settings.JENKINS_DPAE_PROPERTIES_FILENAME, "w") as f:
             f.write("LBB_DPAE_INPUT_FILE=%s\n" % filename)
-            f.close()
-        except KeyError:
-            logger.warn("WORKSPACE environment variable does not exist. If I was called outside of Jenkins, this is normal !")
         sys.exit(0)
     else:
         sys.exit(-1)

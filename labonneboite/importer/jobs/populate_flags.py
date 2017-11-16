@@ -1,13 +1,15 @@
-import logging
 import os
 import tarfile
+from datetime import datetime
+from shutil import copyfile
 
 from labonneboite.importer import util as import_util
+from labonneboite.common.util import timeit
 from labonneboite.importer import settings
-from .base import Job
-from .common import logger
+from labonneboite.importer.jobs.common import logger
 
 
+@timeit
 def populate_flags():
     logger.info("going to populate office boolean flags...")
     for flag in import_util.OFFICE_FLAGS:
@@ -15,6 +17,7 @@ def populate_flags():
     logger.info("all flags populated!")
 
 
+@timeit
 def populate_flag(flag):
     logger.info("populating %s ... ", flag)
     con, cur = import_util.create_cursor()
@@ -24,7 +27,7 @@ def populate_flag(flag):
         INNER JOIN %s f
         ON e.siret = f.siret
         SET e.%s = True;
-    """ % (settings.EXPORT_ETABLISSEMENT_TABLE, flag, flag)
+    """ % (settings.SCORE_REDUCING_TARGET_TABLE, flag, flag)
     cur.execute(query)
     con.commit()
     logger.info("completed populating %s ... ", flag)
@@ -40,6 +43,7 @@ def run_sql_script(sql_script):
             con.commit()
 
 
+@timeit
 def prepare_flags_junior_and_senior():
     logger.info("preparing flags_junior_and_senior...")
 
@@ -98,6 +102,8 @@ def prepare_flags_junior_and_senior():
     run_sql_script(sql_script)
     logger.info("completed preparing flags_junior_and_senior.")
 
+
+@timeit
 def prepare_flag_handicap():
     logger.info("preparing flag_handicap...")
 
@@ -118,13 +124,15 @@ def prepare_flag_handicap():
     run_sql_script(sql_script)
     logger.info("completed preparing flag_handicap.")
 
-def dump():
-    timestamp = settings.NOW.strftime('%Y_%m_%d_%H%M')
 
-    copy_to_remote_server = Job().backup_first
-    logger.info("backing up export_etablissement")
+@timeit
+def dump():
+    timestamp = datetime.now().strftime('%Y_%m_%d_%H%M')
+
+    copy_to_remote_server = settings.BACKUP_FIRST
+    logger.info("backing up table %s ...", settings.SCORE_REDUCING_TARGET_TABLE)
     etab_result = import_util.back_up(
-        settings.BACKUP_OUTPUT_FOLDER, settings.EXPORT_ETABLISSEMENT_TABLE,
+        settings.BACKUP_OUTPUT_FOLDER, settings.SCORE_REDUCING_TARGET_TABLE,
         "export_etablissement", timestamp, copy_to_remote_server,
         rename_table=True)
 
@@ -138,12 +146,19 @@ def dump():
 
 def make_link_file_to_new_archive(archive_path):
     link_path = os.path.join(settings.BACKUP_FOLDER, "latest_data.tar.bz2")
+
     try:
         os.remove(link_path)
     except OSError:
-        pass
-    # this is a hard link, not a symlink
-    os.link(archive_path, link_path)
+        pass  # link_path did not already exist
+    
+    try:
+        # this is a hard link, not a symlink
+        # hard linking fails on Vagrant, error seems to be known:
+        # https://github.com/pypa/setuptools/issues/516
+        os.link(archive_path, link_path)
+    except OSError:
+        copyfile(archive_path, link_path)
 
 
 if __name__ == "__main__":

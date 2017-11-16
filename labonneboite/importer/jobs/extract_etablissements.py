@@ -1,47 +1,23 @@
-"""
-Extracts offices("etablissements").
-
-To be done.
-"""
-import sys
+import pandas as pd
 
 from labonneboite.importer import settings
+from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
+from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import ImportTask
+from labonneboite.common import departements as dpt
 from labonneboite.common import encoding as encoding_util
-from .base import Job
-from .common import logger
+from labonneboite.common.models import Office
+from labonneboite.common.database import db_session
+from labonneboite.importer.jobs.base import Job
+from labonneboite.importer.jobs.common import logger
 
 
-class DepartementException(Exception):
-    pass
-
-
-def extract_departement_from_zipcode(zipcode, siret):
-    zipcode = zipcode.strip()
-    departement = None
-    if len(zipcode) in range(1, 6):
-        if len(zipcode) == 1:
-            departement = "0%s" % zipcode[0]
-        elif len(zipcode) == 2:
-            departement = zipcode
-        elif len(zipcode) == 4:
-            departement = "0%s" % zipcode[0]
-        elif len(zipcode) == 5:
-            departement = zipcode[:2]
-        else:
-            raise DepartementException("length ok but departement not recognized for siret='%s' and zipcode='%s'" % (siret, zipcode))
-    else:
-        raise DepartementException("departement not recognized for siret='%s' and zipcode='%s'" % (siret, zipcode))
-    if departement == "2A" or departement == "2B":
-        departement = "20"
-    return departement
-
-
+@timeit
 def check_departements(departements):
     for dep in departements:
         con, cur = import_util.create_cursor()
-        cur.execute("select count(1) from %s where departement='%s'" % (settings.OFFICE_TABLE, dep))
+        cur.execute("select count(1) from %s where departement='%s'" % (settings.RAW_OFFICE_TABLE, dep))
         con.commit()
         count = cur.fetchone()[0]
         if count < 1000:
@@ -51,25 +27,36 @@ def check_departements(departements):
 class EtablissementExtractJob(Job):
     file_type = "etablissements"
     import_type = ImportTask.ETABLISSEMENT
-    table_name = settings.OFFICE_TABLE
+    table_name = settings.RAW_OFFICE_TABLE
 
     def __init__(self, etablissement_filename):
         self.input_filename = etablissement_filename
 
+    @timeit
     def after_check(self):
-        _, cur = import_util.create_cursor()
-        for departement in settings.DEPARTEMENTS:
-            query = "select count(1) from %s where departement='%s'" % (
-                settings.OFFICE_TABLE,
-                departement)
-            cur.execute(query)
-            result = cur.fetchone()
-            count = result[0]
-            logger.info("number of companies in departement %s : %i", departement, count)
-            if count <= 1000:
-                raise "too few companies"
+        query = db_session.query(Office.departement.distinct().label("departement"))
+        departements = [row.departement for row in query.all()]
 
+        if len(departements) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
+            msg = "wrong number of departements : %s instead of expected %s" % (
+                len(departements),
+                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
+            )
+            raise Exception(msg)
+
+        for departement in departements:
+            count = Office.query.filter_by(departement=departement).count()
+            logger.info("number of companies in departement %s : %i", departement, count)
+            if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
+                msg = "too few companies in departement : %s instead of expected %s" % (
+                    count,
+                    settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT
+                )
+                raise Exception(msg)
+
+    @timeit
     def run_task(self):
+        self.benchmark_loading_using_pandas()
         self.csv_offices = self.get_offices_from_file()
         self.csv_sirets = self.csv_offices.keys()
         self.existing_sirets = self.get_sirets_from_database()
@@ -86,14 +73,16 @@ class EtablissementExtractJob(Job):
         self.update_updatable_offices()
         return num_created
 
+    @timeit
     def get_sirets_from_database(self):
-        query = "select siret from %s where siret != ''" % settings.OFFICE_TABLE
-        logger.info("get etablissements from database")
+        query = "select siret from %s where siret != ''" % settings.RAW_OFFICE_TABLE
+        logger.info("get offices from database")
         _, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
         return [row[0] for row in rows]
 
+    @timeit
     def update_updatable_offices(self):
         con, cur = import_util.create_cursor()
         query = """UPDATE %s SET
@@ -110,10 +99,10 @@ class EtablissementExtractJob(Job):
             trancheeffectif=%%s,
             website1=%%s,
             website2=%%s
-        where siret=%%s""" % settings.OFFICE_TABLE
+        where siret=%%s""" % settings.RAW_OFFICE_TABLE
 
-        count = 1
-        logger.info("update updatable etablissements in table %s", settings.OFFICE_TABLE)
+        count = 0
+        logger.info("update updatable offices in table %s", settings.RAW_OFFICE_TABLE)
         statements = []
         MAX_COUNT_EXECUTE = 500
         for siret in self.updatable_sirets:
@@ -127,20 +116,21 @@ class EtablissementExtractJob(Job):
         if statements:
             cur.executemany(query, statements)
             con.commit()
-        logger.info("%i etablissements updated.", count)
+        logger.info("%i offices updated.", count)
 
+    @timeit
     def create_creatable_offices(self):
         """
-        create new etablissements (that are not yet in our etablissement table)
+        create new offices (that are not yet in our etablissement table)
         """
         con, cur = import_util.create_cursor()
         query = """INSERT into %s(siret, raisonsociale, enseigne, codenaf, numerorue,
             libellerue, codecommune, codepostal, email, tel, departement, trancheeffectif,
             website1, website2)
-        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.OFFICE_TABLE
+        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.RAW_OFFICE_TABLE
 
         count = 1
-        logger.info("create new etablissements in table %s", settings.OFFICE_TABLE)
+        logger.info("create new offices in table %s", settings.RAW_OFFICE_TABLE)
         statements = []
         MAX_COUNT_EXECUTE = 500
         for siret in self.creatable_sirets:
@@ -154,33 +144,54 @@ class EtablissementExtractJob(Job):
         if statements:
             cur.executemany(query, statements)
             con.commit()
-        logger.info("%i new etablissements created.", count)
+        logger.info("%i new offices created.", count)
 
+    @timeit
     def delete_deletable_offices(self):
         con, cur = import_util.create_cursor()
         if self.deletable_sirets:
             stringified_siret_list = ",".join(self.deletable_sirets)
             logger.info("going to delete %i offices...", len(self.deletable_sirets))
-            query = """DELETE FROM %s where siret IN (%s)""" % (settings.OFFICE_TABLE, stringified_siret_list)
+            query = """DELETE FROM %s where siret IN (%s)""" % (settings.RAW_OFFICE_TABLE, stringified_siret_list)
             try:
                 cur.execute(query)
                 con.commit()
             except:
                 logger.warning("deletable_sirets=%s", self.deletable_sirets)
                 raise
-            logger.info("%i old offices deleted.", len(self.deletable_sirets))
+        logger.info("%i old offices deleted.", len(self.deletable_sirets))
 
+    @timeit
+    def benchmark_loading_using_pandas(self):
+        return  # not working yet, see below
+        
+        # FIXME retry this very soon, as soon as we have the pipe delimiter
+
+        # ValueError: Falling back to the 'python' engine because the separator encoded in UTF-8 is > 1 char long,
+        # and the 'c' engine does not support such separators, but this causes 'error_bad_lines' to be ignored as
+        # it is not supported by the 'python' engine.
+        df = pd.read_csv(
+            self.input_filename,
+            sep='\xa5',
+            error_bad_lines=False,  # no longer raise Exception when a row is incorrect (wrong number of fields...)
+            warn_bad_lines=True,  # still display warning about those ignored incorrect rows
+        )
+
+
+    @timeit
     def get_offices_from_file(self):
+        # FIXME elegantly parallelize this stuff
+        # see
+        # https://stackoverflow.com/questions/8717179/chunking-data-from-a-large-file-for-multiprocessing
+        # https://docs.python.org/2/library/itertools.html#itertools.islice
         logger.info("extracting %s...", self.input_filename)
-        departements = settings.DEPARTEMENTS
+        departements = dpt.DEPARTEMENTS
         count = 0
         no_zipcode_count = 0
-        departement_errors = 0
         unprocessable_departement_errors = 0
         format_errors = 0
-        _, _ = import_util.create_cursor()
         departement_counter_dic = {}
-        etablissements = {}
+        offices = {}
 
         with import_util.get_reader(self.input_filename) as myfile:
             header_line = myfile.readline().strip()
@@ -212,67 +223,71 @@ class EtablissementExtractJob(Job):
                 email = encoding_util.strip_french_accents(email)
 
                 if codecommune.strip():
-                    try:
-                        departement = extract_departement_from_zipcode(codepostal, siret)
-                        process_this_departement = departement in departements
-                        if process_this_departement:
+                    departement = import_util.get_departement_from_zipcode(codepostal)
+                    process_this_departement = departement in departements
+                    if process_this_departement:
 
-                            if len(codepostal) == 4:
-                                codepostal = "0%s" % codepostal
-                            etab_create_fields = siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
-                                codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-                                website1, website2
-                            etab_update_fields = raisonsociale, enseigne, codenaf, numerorue, libellerue, \
-                                codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-                                website1, website2, siret
-                            if codepostal.startswith(departement):
-                                departement_counter_dic.setdefault(departement, 0)
-                                departement_counter_dic[departement] += 1
-                                etablissements[siret] = {
-                                    "create_fields": etab_create_fields,
-                                    "update_fields": etab_update_fields,
-                                }
-                            else:
-                                logger.info("zipcode and departement dont match code commune: %s, code postal: %s, departement: %s", codecommune, codepostal, departement)
+                        if len(codepostal) == 4:
+                            codepostal = "0%s" % codepostal
+                        etab_create_fields = siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
+                            codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
+                            website1, website2
+                        etab_update_fields = raisonsociale, enseigne, codenaf, numerorue, libellerue, \
+                            codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
+                            website1, website2, siret
+                        if codepostal.startswith(departement):
+                            departement_counter_dic.setdefault(departement, 0)
+                            departement_counter_dic[departement] += 1
+                            offices[siret] = {
+                                "create_fields": etab_create_fields,
+                                "update_fields": etab_update_fields,
+                            }
                         else:
-                            unprocessable_departement_errors += 1
-                    except DepartementException:
-                        logger.exception("departement exception")
-                        departement_errors += 1
+                            logger.info(
+                                "zipcode %s and departement %s don't match commune_id %s",
+                                codepostal,
+                                departement,
+                                codecommune,
+                            )
+                    else:
+                        unprocessable_departement_errors += 1
                 else:
                     no_zipcode_count += 1
 
-        logger.info("%i etablissements total", count)
-        logger.info("%i etablissements with incorrect departement", departement_errors)
-        logger.info("%i etablissements with unprocessable departement", unprocessable_departement_errors)
-        logger.info("%i etablissements with no zipcodes", no_zipcode_count)
-        logger.info("%i etablissements not read because of format error", format_errors)
-        logger.info("%i number of departements from file", len(departement_counter_dic))
+        logger.info("%i offices total", count)
+        logger.info("%i offices with unprocessable departement", unprocessable_departement_errors)
+        logger.info("%i offices with no zipcodes", no_zipcode_count)
+        logger.info("%i offices not read because of format error", format_errors)
+        logger.info("%i distinct departements from file", len(departement_counter_dic))
         departement_count = sorted(departement_counter_dic.items())
         logger.info("per departement read %s", departement_count)
-        logger.info("finished reading etablissements...")
+        logger.info("finished reading offices...")
 
-        if departement_errors > 500:
-            raise "too many departement_errors"
         if unprocessable_departement_errors > 2000:
-            raise "too many unprocessable_departement_errors"
-        if no_zipcode_count > 40000:
-            raise "too many no_zipcode_count"
+            raise ValueError("too many unprocessable_departement_errors")
+        if no_zipcode_count > 50000:
+            raise ValueError("too many no_zipcode_count")
         if format_errors > 5:
-            raise "too many format_errors"
-        if len(departement_counter_dic) not in [96, 15]:  # 96 in production, 15 in test
-            logger.exception("incorrect total number of departements : %s", len(departement_counter_dic))
-            raise "incorrect total number of departements"
-        if len(departement_counter_dic) == 96:
-            for departement, count in departement_count:
-                if count < 10000:
-                    logger.exception("only %s etablissements in departement %s", count, departement)
-                    raise "not enough etablissements in at least one departement"
+            raise ValueError("too many format_errors")
+        if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE:
+            msg = "incorrect total number of departements : %s instead of expected %s" % (
+                len(departement_counter_dic),
+                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE
+            )
+            raise ValueError(msg)
+        for departement, count in departement_count:
+            if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
+                logger.exception("only %s offices in departement %s", count, departement)
+                raise ValueError("not enough offices in at least one departement")
 
-        return etablissements
+        return offices
 
 
-if __name__ == "__main__":
-    etablissement_filename = sys.argv[1]
+def run():
+    etablissement_filename = jenkins.get_etablissement_filename()
     task = EtablissementExtractJob(etablissement_filename)
     task.run()
+
+if __name__ == "__main__":
+    run()
+
