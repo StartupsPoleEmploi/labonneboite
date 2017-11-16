@@ -170,13 +170,13 @@ def results(city, zipcode, occupation):
         company_count = fetcher.company_count
         alternative_distances = fetcher.alternative_distances
 
-    # If a NAF filter is selected, previous naf_aggregations returned by fetcher.get_companies()
-    # was actually only one NAF, the one NAF currently selected in the filter.
-    # Let's do a second call, only if a NAF filter is selected.
-    # This logic is designed to make only one elasticsearch call in the most frequent case (no NAF filter selected)
-    # and make two elasticsearch calls in the rarest case only (NAF filter selected).
-    if kwargs.get("naf"):
-        naf_aggregations = fetcher.get_naf_aggregations()
+        # If a NAF filter is selected, previous naf_aggregations returned by fetcher.get_companies()
+        # was actually only one NAF, the one NAF currently selected in the filter.
+        # Let's do a second call, only if a NAF filter is selected.
+        # This logic is designed to make only one elasticsearch call in the most frequent case (no NAF filter selected)
+        # and make two elasticsearch calls in the rarest case only (NAF filter selected).
+        if kwargs.get("naf"):
+            naf_aggregations = fetcher.get_naf_aggregations()
 
     naf_codes_with_descriptions = []
     for naf_aggregate in naf_aggregations:

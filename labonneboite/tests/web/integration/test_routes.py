@@ -1,5 +1,6 @@
 # coding: utf8
 from urlparse import parse_qsl, urlparse
+from flask import url_for
 
 from labonneboite.tests.test_base import AppTest
 
@@ -41,6 +42,17 @@ class RouteTest(AppTest):
         rv = self.app.get("/entreprises/nancy-54100/strategie-commerciale")
         self.assertEqual(rv.status_code, 200)
         self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data)
+
+    def test_search_with_wrong_zipcode_and_naf_filter(self):
+        # Because of a wrong zipcode, the naf filter should not be taken into
+        # account
+        with self.test_request_context:
+            url = url_for('search.results', city='nancy', zipcode='54100', occupation='strategie-commerciale')
+            url += '?naf=8610Z'
+            rv = self.app.get(url)
+            self.assertEqual(rv.status_code, 200)
+            self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data)
+
 
 
 class GenericUrlSearchRedirectionTest(AppTest):
