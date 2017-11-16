@@ -6,7 +6,6 @@ import unicodedata
 import urllib
 from functools import wraps
 from time import time
-from backports.functools_lru_cache import lru_cache
 
 from flask import request
 
@@ -19,7 +18,6 @@ logger = logging.getLogger('main')
 ENABLE_TIMEIT_TIMERS = True
 
 
-@lru_cache(maxsize=None)
 def get_departements(largest_ones_first=False):
     departements = ["{:02d}".format(d) for d in range(1, 96)] + ['97']
     if largest_ones_first:
