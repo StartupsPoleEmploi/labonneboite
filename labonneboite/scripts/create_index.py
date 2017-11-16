@@ -14,7 +14,7 @@ from sqlalchemy import inspect
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common.util import timeit
 from labonneboite.common import geocoding
-from labonneboite.common import util
+from labonneboite.common import departements as dpt
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
@@ -450,7 +450,7 @@ def create_offices(enable_profiling=False, disable_parallel_computing=False):
         func = create_offices_for_departement
 
     if disable_parallel_computing:
-        for departement in util.DEPARTEMENTS:
+        for departement in dpt.DEPARTEMENTS:
             func(departement)
         return
 
@@ -460,7 +460,7 @@ def create_offices(enable_profiling=False, disable_parallel_computing=False):
     # maxtasksperchild default is infinite, which means memory is never freed up, and grows indefinitely :-/
     # maxtasksperchild=1 ensures memory is freed up after every departement computation.
     pool = mp.Pool(processes=int(1.25*mp.cpu_count()), maxtasksperchild=1)
-    pool.map(func, util.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
+    pool.map(func, dpt.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
     pool.close()
     pool.join()
 
@@ -500,7 +500,7 @@ def create_offices_for_departement(departement):
         "COMPLETED indexing offices for departement=%s (%s of %s jobs completed)",
         departement,
         completed_jobs_counter.value,
-        len(util.DEPARTEMENTS),
+        len(dpt.DEPARTEMENTS),
     )
 
     display_performance_stats(departement)

@@ -12,7 +12,7 @@ conf/lbbdev.py
 import os
 from datetime import datetime
 from labonneboite.conf import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
-from labonneboite.common import util
+from labonneboite.common import departements as dpt
 
 # --- importer tables (names and schema)
 BACKOFFICE_ETABLISSEMENT_TABLE = 'etablissements_backoffice'
@@ -54,7 +54,7 @@ HIGH_SCORE_COMPANIES_COUNT_MIN = 100
 # --- job 6/8 : validate_scores
 SCORE_REDUCING_MINIMUM_THRESHOLD = 50
 MINIMUM_OFFICES_PER_DEPARTEMENT = 1
-DEPARTEMENTS_TO_BE_SANITY_CHECKED = util.DEPARTEMENTS
+DEPARTEMENTS_TO_BE_SANITY_CHECKED = dpt.DEPARTEMENTS
 
 # --- job 7/8 : geocode
 MINIMUM_GEOCODING_RATIO = 0.75
