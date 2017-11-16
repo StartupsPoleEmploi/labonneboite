@@ -54,7 +54,7 @@ class Job(object):
         if not os.path.realpath(self.input_filename) in [os.path.realpath(f) for f in files]:
             msg = "File %s does not exist: not found in list %s" % (
                 self.input_filename, ','.join(files))
-            raise Exception(msg)
+            raise IOError(msg)
         if import_util.is_processed(self.input_filename):
             raise "fatal error : cannot run task %s which is already marked as processed" % self.input_filename
 
