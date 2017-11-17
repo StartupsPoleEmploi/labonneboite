@@ -29,3 +29,60 @@
 {% block content %}
 {% include 'search/results_content.html' %}
 {% endblock %}
+
+{% block footer_scripts %}
+  <script>
+    ga('set', 'dimension3', "{{ city }}");
+    ga('set', 'dimension4', "{{ rome_description }}");
+    ga('set', 'dimension5', "{{ distance }}");
+
+    {# Load travel durations to companies #}
+    {% if city %}
+    (function() {
+      var companySirets = [];
+      var companyCoordinates = [];
+      $(".travel-duration").each(function(){
+          companySirets.push($(this).attr("data-siret"));
+          companyCoordinates.push([
+              parseFloat($(this).attr("data-latitude")),
+              parseFloat($(this).attr("data-longitude")),
+          ]);
+      });
+      
+      $.ajax({
+          url: "{{ url_for('maps.durations') }}",
+          method: 'POST',
+          data: JSON.stringify({
+            origin: [{{ city.location.latitude }}, {{ city.location.longitude }}],
+            destinations: companyCoordinates,
+            travel_mode: "{{ travel_mode }}",
+            {# csrf_token: "{{ csrf_token() }}" #}
+          }),
+          contentType: 'application/json',
+          dataType: 'json',
+          headers: {
+            "X-CSRFToken": "{{ csrf_token() }}"
+          }
+      }).success(function(durations) {
+          // Fill durations
+          for(var i = 0; i < durations.length; i += 1) {
+              if(durations[i]) {
+                  // Convert duration from seconds to minutes
+                  var duration = durations[i] / 60;
+                  if(Math.floor(duration) < duration) {
+                    duration += 1;
+                  }
+                  duration = Math.floor(duration);
+
+                  // Fill html
+                  var html = '<img class="img-icon" src="{{ url_for('static', filename='images/icons/travel/' + travel_mode + '.svg') }}"> ' + duration + ' minutes';
+                  $(".travel-duration[data-siret='" + companySirets[i] + "']").html(html);
+              }
+          }
+      }).fail(function(e){
+        // In case of error, don't do anything
+      });
+    })();
+    {% endif %}
+  </script>
+{% endblock %}

@@ -162,7 +162,39 @@ GOOGLE_SITE_VERIFICATION_CODE = None
 
 SCAM_EMAILS_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'scripts', 'scam_emails')
 
+# Available backends: dummy, datagouv, google, graphhopper, ign, navitia
+TRAVEL_VENDOR_BACKENDS = {
+    'isochrone': {
+        'car': 'ign',
+        'public': 'navitia',
+    },
+    'durations': {
+        'car': 'ign',
+        'public': 'navitia',
+    },
+    'directions': {
+        'car': 'ign',
+        'public': 'navitia',
+    },
+}
 
+# Redis cache (unnecessary if we use local cache)
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+
+# 'dummy, 'local' or 'redis'
+TRAVEL_CACHE = 'local'
+
+# Google API key for interfacing with diverse services, including the maps API.
+GOOGLE_API_KEY = ''
+# IGN credentials for fetching directions and isochrones
+IGN_CREDENTIALS = {
+    'key': '',
+    'username': '',
+    'password': ''
+}
+
+# This must be last in order to override settings
 if get_current_env() == ENV_LBBDEV:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.lbbdev import *

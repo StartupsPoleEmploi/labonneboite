@@ -160,6 +160,15 @@
       $(':radio[name=d][value=' + this.dataset.distance + ']').prop('checked', true);
       searchForm.submit();
     });
+
+    // TODO ISOCHRONIE do we need this?
+    //// Autosubmit when a transport icon is clicked
+    //searchForm.find('[data-travelmode]').on('click', function(){
+      //var travelMode = $(this).attr("data-travelmode");
+      //searchForm.find('.travelmode-choice').toggleClass('hidden');
+      //searchForm.find("[name='travel_mode']").attr("value", travelMode);
+      //searchForm.submit();
+    //});
   }
 
   $(document).on('lbbready', function () {

@@ -19,6 +19,7 @@ from labonneboite.common import search as search_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common.locations import CityLocation, Location, NamedLocation
+from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.web.utils import fix_csrf_session
 
@@ -146,6 +147,8 @@ PARAMETER_FIELD_MAPPING = {
     'r': 'rome',
     'j': 'job',
     'd': 'distance',
+    'tr': 'travel_mode',
+    'dur': 'duration',
     'l': 'location',
     'h': 'headcount',
     'naf': 'naf',
@@ -166,6 +169,17 @@ def get_parameters(args):
         kwargs['distance'] = int(kwargs.get('distance'))
     except ValueError:
         kwargs['distance'] = settings.DISTANCE_FILTER_DEFAULT
+
+    kwargs['travel_mode'] = kwargs.get('travel_mode')
+    if kwargs['travel_mode'] not in maps_constants.TRAVEL_MODES:
+        kwargs['travel_mode'] = maps_constants.DEFAULT_TRAVEL_MODE
+
+    try:
+        kwargs['duration'] = int(kwargs.get('duration'))
+        if kwargs['duration'] not in maps_constants.ISOCHRONE_DURATIONS_MINUTES:
+            kwargs['duration'] = None
+    except (ValueError, TypeError):
+        kwargs['duration'] = None
 
     try:
         kwargs['headcount'] = int(kwargs.get('headcount'))
@@ -292,6 +306,8 @@ def entreprises():
         location,
         romes=[rome],
         distance=parameters['distance'],
+        travel_mode=parameters['travel_mode'],
+        duration=parameters['duration'],
         sort=parameters['sort'],
         from_number=parameters['from_number'],
         to_number=parameters['to_number'],
@@ -366,6 +382,8 @@ def entreprises():
         'show_favorites': True,
         'sort': fetcher.sort,
         'tile_server_url': settings.TILE_SERVER_URL,
+        'travel_mode': fetcher.travel_mode,
+        'travel_modes': maps_constants.TRAVEL_MODES,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
     }
 
