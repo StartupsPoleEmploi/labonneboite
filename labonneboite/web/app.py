@@ -326,12 +326,11 @@ def log_extra_context():
 @app.errorhandler(AuthFailed)
 @app.errorhandler(AuthCanceled)
 @app.errorhandler(AuthStateMissing)
-@app.errorhandler(AuthException)
 def social_auth_error(error):
     """
     Handle the situation where a user clicks the `cancel` button on a third party auth provider website.
     """
-    if isinstance(error, (AuthCanceled, AuthFailed, AuthStateMissing)):
+    if isinstance(error, (AuthException, AuthFailed, AuthStateMissing)):
         flash(u"Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
         app.logger.warn("PEAM error: %s", error)
 
