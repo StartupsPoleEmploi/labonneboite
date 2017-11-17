@@ -184,7 +184,6 @@ class AddOfficesTest(CreateIndexBaseTest):
         office_to_add.save()
 
         script.add_offices()
-        time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(office_to_add.siret)
         self.assertEquals(office.company_name, office_to_add.company_name)
@@ -249,7 +248,6 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office_to_update.save()
 
         script.update_offices()
-        time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
         self.assertEquals(office.email, office_to_update.new_email)
@@ -287,7 +285,6 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office_to_update.save()
 
         script.update_offices()
-        time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
         self.assertEquals(office.email, u'')
@@ -319,7 +316,6 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office_to_update.save()
 
         script.update_offices()
-        time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
@@ -359,7 +355,6 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office_to_update.save()
 
         script.update_offices()
-        time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
@@ -399,7 +394,6 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office_to_update.save()
 
         script.update_offices()
-        time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
@@ -426,16 +420,15 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         """
         office = Office.get(self.office.siret)
         self.assertNotEquals(office.email_alternance, "email_alternance@mail.com")
-
+        
         office_to_update = OfficeAdminUpdate(
             siret=self.office.siret,
             name=self.office.company_name,
             email_alternance=u"email_alternance@mail.com",
         )
-        office_to_update.save()
+        office_to_update.save(commit=True)
 
         script.update_offices()
-        time.sleep(1)  # Sleep required by ES to register new documents.
 
         office = Office.get(self.office.siret)
         self.assertEquals(office.email_alternance, "email_alternance@mail.com")
@@ -454,10 +447,9 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
             siret=self.office.siret,
             codes=u"75110\n13055",  # Paris 10 + Marseille
         )
-        extra_geolocation.save()
+        extra_geolocation.save(commit=True)
 
         script.update_offices_geolocations()
-        time.sleep(1)  # Sleep required by ES to register new documents.
 
         # The office should now have 3 geolocations in ES (the original one + Paris 10 + Marseille).
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
@@ -477,7 +469,6 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         self.assertTrue(extra_geolocation.is_outdated())
 
         script.update_offices_geolocations()
-        time.sleep(1)  # Sleep required by ES to register new documents.
 
         # The office extra geolocations should now be reset.
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
