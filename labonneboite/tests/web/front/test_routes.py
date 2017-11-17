@@ -1,6 +1,8 @@
 # coding: utf8
 from unittest import mock
-import urllib.request, urllib.parse, urllib.error
+import urllib.error
+import urllib.parse
+import urllib.request
 from urllib.parse import parse_qsl
 
 from flask import url_for
@@ -20,7 +22,6 @@ class SearchEntreprisesTest(DatabaseTest):
             'city': 'Gotham'
         }
 
-
     def test_search_by_coordinates(self):
         url = self.url_for('search.entreprises', lat=42, lon=6, occupation='strategie-commerciale')
 
@@ -33,7 +34,6 @@ class SearchEntreprisesTest(DatabaseTest):
 
         self.assertIn("Gotham City 19100", response.data.decode())
 
-
     def test_search_by_coordinates_with_no_associated_address(self):
         url = self.url_for('search.entreprises', lat=42, lon=6, occupation='strategie-commerciale')
         with mock.patch('labonneboite.common.geocoding.get_address', return_value=[]) as get_address:
@@ -42,14 +42,12 @@ class SearchEntreprisesTest(DatabaseTest):
             get_address.assert_called_once_with(42, 6, limit=1)
             self.assertEqual(200, response.status_code)
 
-
     def test_search_by_invalid_coordinates(self):
         url = self.url_for('search.entreprises', lat=91, lon=181, occupation='strategie-commerciale')
         addresses = [self.gotham_city]
         with mock.patch('labonneboite.common.geocoding.get_address', return_value=addresses):
             response = self.app.get(url)
         self.assertEqual(200, response.status_code)
-
 
     def test_search_by_non_float_coordinates(self):
         self.es.index(index=settings.ES_INDEX, doc_type='ogr', id=1, body={
@@ -65,7 +63,6 @@ class SearchEntreprisesTest(DatabaseTest):
         self.assertEqual(200, response.status_code)
         self.assertIn("La ville que vous avez choisie n'est pas valide", response.data.decode())
 
-
     def test_canonical_url(self):
         with self.app_context:
             url = get_canonical_results_url('05100', 'Cervières', 'Boucherie')
@@ -77,13 +74,40 @@ class SearchEntreprisesTest(DatabaseTest):
         )
         self.assertEqual(200, response.status_code)
 
+    def test_search_correctly_redirects(self):
+        with self.test_request_context:
+            rv = self.app.get(url_for('search.search', **{
+                'sort': 'score',
+                'naf': '',
+                'distance': 50,
+                'duration': 15,
+                'headcount': 1,
+                'flag_alternance': 0,
+                'job': 'Boucherie',
+                'location': 'Metz (57000)',
+                'city': 'metz',
+                'zipcode': '57000',
+                'occupation': 'boucherie',
+            }))
+            expected_location = url_for('search.results', city='metz', zipcode='57000', occupation='boucherie')
+
+        self.assertEqual(rv.status_code, 302)
+        location = parse_qsl(rv.location)
+        self.assertEqual(expected_location, location.path)
+        self.assertEqual({
+            'sort': 'score',
+            'd': '50',
+            'dur': '15',
+            'f_a': '0',
+            'h': '1'
+        }, dict(parse_qsl(location.query)))
+
 
 class EntreprisesLocationTest(AppTest):
 
     def test_get_location_no_arguments(self):
         location, named_location = get_location({})
         self.assertIsNone(location, named_location)
-
 
     def test_get_location_incorrect_coordinates(self):
         with mock.patch('labonneboite.common.geocoding.get_address', return_value=[]):
@@ -95,7 +119,6 @@ class EntreprisesLocationTest(AppTest):
         self.assertEqual(0, location.latitude)
         self.assertEqual(0, location.longitude)
         self.assertIsNone(named_location)
-
 
     def test_get_location_invalid_coordinates_valid_name(self):
         metz = {
@@ -118,7 +141,6 @@ class EntreprisesLocationTest(AppTest):
         self.assertEqual('Wurst City', named_location.city)
         self.assertEqual('01000', named_location.zipcode)
 
-
     def test_get_location_correct_coordinates(self):
         addresses = [{
             'label': 'Copacabana',
@@ -138,11 +160,10 @@ class EntreprisesLocationTest(AppTest):
         self.assertEqual('666', named_location.zipcode)
         self.assertEqual('Copacabana', named_location.name)
 
-
     def test_get_location_location_not_found(self):
         with mock.patch('labonneboite.common.geocoding.get_coordinates', return_value=[]):
             location, named_location = get_location({
-                'l': 42, # I swear, this happened in production
+                'l': 42,  # I swear, this happened in production
             })
         self.assertIsNone(location)
         self.assertIsNone(named_location)
@@ -177,12 +198,10 @@ class SearchLegacyResultsTest(DatabaseTest):
         rv = self.app.get(url, follow_redirects=True)
         self.assertEqual(rv.status_code, 200)
 
-
     def test_search_results_with_unicode_city(self):
         url = self.url_for('search.results', city='nîmes', zipcode='30000', occupation='strategie-commerciale')
         rv = self.app.get(url, follow_redirects=True)
         self.assertEqual(rv.status_code, 200)
-
 
     def test_search_url_with_wrong_zipcode_does_not_break(self):
         """
@@ -204,7 +223,6 @@ class SearchLegacyResultsTest(DatabaseTest):
             rv = self.app.get(url, follow_redirects=True)
             self.assertEqual(rv.status_code, 200)
             self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data.decode())
-
 
 
 class GenericUrlSearchRedirectionTest(AppTest):

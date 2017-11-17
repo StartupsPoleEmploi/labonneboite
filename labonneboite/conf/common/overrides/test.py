@@ -23,3 +23,18 @@ API_ADRESSE_BASE_URL = 'http://urlintrouvablepourlbb.fr'
 
 SENTRY_ENVIRONMENT = "test"
 WTF_CSRF_ENABLED = False
+
+TRAVEL_VENDOR_BACKENDS = {
+    'isochrone': {
+        'car': 'dummy',
+        'public': 'dummy',
+    },
+    'durations': {
+        'car': 'dummy',
+        'public': 'dummy',
+    },
+    'directions': {
+        'car': 'dummy',
+        'public': 'dummy',
+    },
+}

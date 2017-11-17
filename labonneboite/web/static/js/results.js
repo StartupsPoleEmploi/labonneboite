@@ -75,6 +75,26 @@ var trackOutboundLink = function(url) {
           .setLngLat(coords)
           .setPopup(popup)
           .addTo(map);
+
+        // TODO ISOCHRONIE do we need this?
+        // Add start marker
+        //L.marker([locationLat, locationLon], {title: locationName}).addTo(map).bindPopup(locationName);
+        //// Add company destination marker
+        //L.marker(coords).addTo(map).bindPopup(companyName).openPopup();
+        //// Add directions
+        //$.getJSON("/maps/directions", {
+          //from: locationLat + "," + locationLon,
+          //to: lat + "," + lon,
+          //tr: travelMode,
+        //}, function(coordinates) {
+          //// Note that we do not give any travel indications here, although it
+          //// may be useful, for example for public transports
+          //var polyline = L.polyline(coordinates, {color: '#7c408b'}).addTo(map);
+          //// Fitting to the boundaries of the polyline is actually not very elegant
+          ////map.fitBounds(polyline.getBounds());
+        //}).fail(function() {
+          //// die silently without warning the user
+        //});
       });
       $mapContainer.find('.map').click(function (e) {
         e.stopPropagation();

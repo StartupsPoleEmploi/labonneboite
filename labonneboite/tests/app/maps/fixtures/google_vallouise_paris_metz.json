@@ -1,0 +1,36 @@
+{
+   "destination_addresses" : [
+      "12-14 Rue Guichard, 75016 Paris, France",
+      "4 Allée de Londres, 57950 Montigny-lès-Metz, France"
+   ],
+   "origin_addresses" : [ "Unnamed Road, 05340 Pelvoux, France" ],
+   "rows" : [
+      {
+         "elements" : [
+            {
+               "distance" : {
+                  "text" : "761 km",
+                  "value" : 761026
+               },
+               "duration" : {
+                  "text" : "7 hours 56 mins",
+                  "value" : 28574
+               },
+               "status" : "OK"
+            },
+            {
+               "distance" : {
+                  "text" : "749 km",
+                  "value" : 749234
+               },
+               "duration" : {
+                  "text" : "7 hours 46 mins",
+                  "value" : 27942
+               },
+               "status" : "OK"
+            }
+         ]
+      }
+   ],
+   "status" : "OK"
+}

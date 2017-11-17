@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="{{ mapbox_js_url }}"></script>
+        <link href="{{ mapbox_css_url }}" rel="stylesheet" type="text/css">
+        <style>
+            body {
+                margin:0; padding:0;
+            }
+            #map {
+                position:absolute; top:0; bottom:0; width:100%;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="map"></div>
+    </body>
+    
+    {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+    <script>
+        L.mapbox.accessToken = 'pk.eyJ1IjoibGFib25uZWJvaXRlIiwiYSI6ImNpaDNoN3A0cDAwcmdybGx5aXF1Z21lOGIifQ.znyUeU7KoIY9Ns_AQPquAg';
+        var lat = {{ latitude }};
+        var lng = {{ longitude }};
+        var coords = [lat, lng];
+        var map = L.mapbox.map('map', 'mapbox.streets').setView(coords, 13);
+
+        var isochrones = {{ isochrone }};
+        for (var i = 0; i < isochrones.length; i+=1) {
+            map.addLayer(L.polygon(isochrones[i]));
+        }
+    </script>
+</html>
