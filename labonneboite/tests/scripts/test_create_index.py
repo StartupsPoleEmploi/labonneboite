@@ -426,7 +426,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         """
         office = Office.get(self.office.siret)
         self.assertNotEquals(office.email_alternance, "email_alternance@mail.com")
-        
+
         office_to_update = OfficeAdminUpdate(
             siret=self.office.siret,
             name=self.office.company_name,
