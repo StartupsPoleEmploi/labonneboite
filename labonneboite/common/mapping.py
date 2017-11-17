@@ -128,7 +128,6 @@ class Rome2NafMapper(object):
                     naf_codes.add(naf)
         return list(naf_codes)
 
-    @lru_cache(maxsize=1024)  # about 700 naf_codes
     def romes_for_naf(self, naf):
         """
         Returns ROME codes matching the given NAF code as a list of named tuples ordered by the number of hires.
@@ -145,7 +144,6 @@ class Rome2NafMapper(object):
         Rome = namedtuple('Rome', ['code', 'name', 'nafs'])
         return [Rome(rome[0], settings.ROME_DESCRIPTIONS[rome[0]], rome[1]) for rome in romes_for_naf]
 
-    @lru_cache(maxsize=8*1024)  # about 500 rome_codes in current dataset and 5000 in sliced dataset
     def nafs_for_rome(self, rome):
         """
         Returns NAF codes matching the given ROME code as a list of named tuples ordered by the number of hires.
