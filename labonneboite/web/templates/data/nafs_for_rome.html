@@ -24,6 +24,7 @@
             <br>
             <span class="badge badge-info">{{ total_hirings_for_rome }}</span>
           </th>
+          <th>Coefficient d'affinité: pourcentage des recrutements de ce NAF qui sont fait avec ce ROME</th>
           <th> </th>
         </tr>
       </thead>
@@ -37,6 +38,9 @@
             </td>
             <td>
               {{ (naf.hirings / total_hirings_for_rome * 100) | round(2) }} %
+            </td>
+            <td>
+              {{ (naf.affinity * 100) | round(2) }} %
             </td>
             <td>
               <small><a href="{{ url_for('data.romes_for_naf', naf=naf.code) }}">ROME associés</a></small>

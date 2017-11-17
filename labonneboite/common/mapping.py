@@ -90,6 +90,21 @@ def get_total_naf_hirings(naf):
     return sum(MANUAL_NAF_ROME_MAPPING[naf][rome] for rome in romes)
 
 
+@lru_cache(maxsize=32*1024)
+def get_affinity_between_rome_and_naf(rome_code, naf_code):
+    """
+    Ratio of hirings of this NAF made by this ROME.
+    """
+    current_rome_hirings = MANUAL_NAF_ROME_MAPPING[naf_code][rome_code]
+    total_naf_hirings = get_total_naf_hirings(naf_code)
+
+    if not (current_rome_hirings >= 1 and current_rome_hirings <= total_naf_hirings):
+        raise Exception("error in hiring data for rome_code=%s and naf_code=%s" % (rome_code, naf_code))
+
+    # 1.0 used to force float result, otherwise int/int like 30/100 give... zero
+    return 1.0 * current_rome_hirings / total_naf_hirings
+
+
 class Rome2NafMapper(object):
 
     def __init__(self):
@@ -113,6 +128,7 @@ class Rome2NafMapper(object):
                     naf_codes.add(naf)
         return list(naf_codes)
 
+    @lru_cache(maxsize=1024)  # about 700 naf_codes
     def romes_for_naf(self, naf):
         """
         Returns ROME codes matching the given NAF code as a list of named tuples ordered by the number of hires.
@@ -129,21 +145,27 @@ class Rome2NafMapper(object):
         Rome = namedtuple('Rome', ['code', 'name', 'nafs'])
         return [Rome(rome[0], settings.ROME_DESCRIPTIONS[rome[0]], rome[1]) for rome in romes_for_naf]
 
+    @lru_cache(maxsize=8*1024)  # about 500 rome_codes in current dataset and 5000 in sliced dataset
     def nafs_for_rome(self, rome):
         """
         Returns NAF codes matching the given ROME code as a list of named tuples ordered by the number of hires.
         E.g. for ROME M1607:
         [
-            Naf(code='8810A', name=u'Aide à domicile', hirings=2830),
-            Naf(code='6831Z', name=u'Agences immobilières', hirings=897),
-            Naf(code='8422Z', name=u'Défense', hirings=6),
+            Naf(code='8810A', name=u'Aide à domicile', hirings=2830, affinity=0.04),
+            Naf(code='6831Z', name=u'Agences immobilières', hirings=897, affinity=0.08),
+            Naf(code='8422Z', name=u'Défense', hirings=6, affinity=0.20),
             ...
         ]
         """
         nafs = self.rome_2_naf_dict.get(rome, {})
         nafs = sorted(nafs.items(), key=lambda (k, v): v, reverse=True)
-        Naf = namedtuple('Naf', ['code', 'name', 'hirings'])
-        return [Naf(naf[0], settings.NAF_CODES[naf[0]], naf[1]) for naf in nafs]
+        Naf = namedtuple('Naf', ['code', 'name', 'hirings', 'affinity'])
+        return [Naf(
+            naf[0],
+            settings.NAF_CODES[naf[0]],
+            naf[1],
+            get_affinity_between_rome_and_naf(rome, naf[0]),
+            ) for naf in nafs]
 
     @staticmethod
     def romes_is_valid(rome):
