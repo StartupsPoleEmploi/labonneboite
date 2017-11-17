@@ -76,6 +76,14 @@ class ApiBaseTest(DatabaseTest):
             }],
             'zip_code': u'64000',
             'commune_id': u'64445',
+        },
+        'poitiers': {
+            'coords': [{
+                'lat': 46.5833,
+                'lon': 0.3333,
+            }],
+            'zip_code': u'86000',
+            'commune_id': u'86194',
         }
     }
 
@@ -256,6 +264,16 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['pau']['coords'],
                 'name': u'Office 14',
                 'flag_alternance': 0
+            },
+            # For flag_alternance in response
+            {
+                'naf': u'4648Z',  # Map to Rome B1603
+                'siret': u'00000000000015',
+                'score': 80,
+                'headcount': 53, # headcount_text : '10 000 salariés et plus'
+                'locations': self.positions['poitiers']['coords'],
+                'name': u'Office 15',
+                'flag_alternance': 1
             }
         ]
         for i, doc in enumerate(docs, start=1):
