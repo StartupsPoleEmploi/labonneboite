@@ -11,6 +11,7 @@ CREATE TABLE `etablissements_backoffice` (
   `codepostal` varchar(11) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `tel` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email_alternance` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `website` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `flag_alternance` tinyint(1) NOT NULL,
   `flag_junior` tinyint(1) NOT NULL,

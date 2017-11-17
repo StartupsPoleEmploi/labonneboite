@@ -188,7 +188,7 @@ def get_select_fields_for_main_db():
     return (
         """siret, raisonsociale, enseigne, codenaf,
         trancheeffectif, numerorue, libellerue, codepostal,
-        tel, email, website, """
+        tel, email, email_alternance, website, """
         + "0, 0, 0, 0, " # stand for flag_alternance, flag_junior, flag_senior, flag_handicap
         + "0, " # stands for has_multi_geolocation
         + "codecommune, "
