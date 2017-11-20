@@ -159,10 +159,17 @@
 }
 
 .lbb-result__actions .btn,
-.lbb-result__actions .memoImportButton {
+.lbb-result__actions .btn-memo {
     vertical-align: middle;
     display: inline-block;
     margin: 5px 5px 5px 0;
+}
+
+.lbb-result__actions .btn-memo {
+    display: inline-block;
+    width: 215px;
+    height: 31px;
+    background: #fff;
 }
 
 /* Actions (after the content): download PDF etc.

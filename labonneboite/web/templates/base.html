@@ -206,15 +206,23 @@
 
   {# Memo button code https://memo.pole-emploi.fr/jsp/testButton.jsp #}
   <script type="text/javascript">
-    (function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (!d.getElementById(id)) {
+    !function(d,s,id) {
+        var js, fjs= d.getElementsByTagName(s)[0];
+        if(!d.getElementById(id)) {
             js = d.createElement(s);
             js.id = id;
-            js.src = "https://memo.pole-emploi.fr/js/ctj-button.js";
-            fjs.parentNode.insertBefore(js, fjs);
+            js.async = true;
+
+            if(window.location.hostname.indexOf('boomerang')>=0)
+                js.src="http://boomerang:8080/js/importButton/memoButton-min.js";
+            else if(window.location.hostname.indexOf('beta')>=0)
+                js.src="http://memo.beta.pole-emploi.fr/recette/js/importButton/memoButton-min.js";
+            else
+                js.src="https://memo.pole-emploi.fr/js/importButton/memoButton-min.js";
+ 
+            fjs.parentNode.insertBefore(js,fjs);
         }
-    })(document, "script", "ctj-script");
+    }(document,"script","memoButton");
   </script>
 
 </body>
