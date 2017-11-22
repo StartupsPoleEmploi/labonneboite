@@ -27,43 +27,76 @@ PUBLIC_HANDICAP = 3
 PUBLIC_CHOICES = [PUBLIC_ALL, PUBLIC_JUNIOR, PUBLIC_SENIOR, PUBLIC_HANDICAP]
 
 
-class InvalidZipcodeError(Exception):
-    pass
+class CityLocation(object):
+
+    def __init__(self, slug, zipcode):
+        self.slug = slug
+        self.zipcode = zipcode
+        self._coords = None
+
+    @property
+    def coords(self):
+        if not self._coords:
+            result = geocoding.get_city_by_zipcode(self.zipcode, self.slug)
+            if not result:
+                logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.slug)
+                result = {'coords': None}
+            self._coords = result['coords']
+        return self._coords
+    @property
+    def latitude(self):
+        return self.coords['lat'] if self.is_location_correct else None
+    @property
+    def longitude(self):
+        return self.coords['lon'] if self.is_location_correct else None
+    @property
+    def is_location_correct(self):
+        return self.coords is not None
+
+    @property
+    def name(self):
+        return self.slug.replace('-', ' ').capitalize()
+
+    @property
+    def full_name(self):
+        return '%s (%s)' % (self.name, self.zipcode)
 
 class Fetcher(object):
 
-    def __init__(self, **kwargs):
-        self.city_slug = kwargs.get('city')
-        self.occupation_slug = kwargs.get('occupation')
-        self.distance = kwargs.get('distance')
-        self.sort = kwargs.get('sort')
-        self.zipcode = kwargs.get('zipcode')
+    def __init__(self, city, occupation=None, distance=None, sort=None,
+                 from_number=1, to_number=10, flag_alternance=None,
+                 public=None, headcount=None, naf=None, **kwargs):
+        """
+        This constructor takes many arguments; the goal is to reduce this list
+        and to never rely on kwargs.
 
+        Args:
+            city (CityLocation)
+        """
+        self.occupation_slug = occupation
+        self.distance = distance
+        self.sort = sort
+        self.city = city
 
         # Pagination.
-        self.from_number = int(kwargs.get('from') or 1)
-        self.to_number = int(kwargs.get('to') or 10)
+        self.from_number = from_number
+        self.to_number = to_number
 
         # Flags.
-        self.flag_alternance = kwargs.get('flag_alternance')
-        public = kwargs.get('public')
-        self.flag_handicap = public == PUBLIC_HANDICAP
-        self.flag_junior = public == PUBLIC_JUNIOR
-        self.flag_senior = public == PUBLIC_SENIOR
+        self.flag_alternance = flag_alternance
+        self.public = public
 
         # Headcount.
-        self.headcount = kwargs.get('headcount')
         try:
-            self.headcount_filter = int(self.headcount)
+            self.headcount = int(headcount)
         except (TypeError, ValueError):
-            self.headcount_filter = settings.HEADCOUNT_WHATEVER
+            self.headcount = settings.HEADCOUNT_WHATEVER
 
         # NAF, ROME and NAF codes.
-        self.naf = kwargs.get('naf')
-
         self.rome = mapping_util.SLUGIFIED_ROME_LABELS[self.occupation_slug]
 
         # Empty list is needed to handle companies with ROME not related to their NAF
+        self.naf = naf
         self.naf_codes = {}
         if self.naf:
             self.naf_codes = mapping_util.map_romes_to_nafs([self.rome], [self.naf])
@@ -72,41 +105,42 @@ class Fetcher(object):
         self.alternative_distances = collections.OrderedDict()
         self.company_count = None
 
-    def init_location(self):
-        # Latitude/longitude.
-        city = geocoding.get_city_by_zipcode(self.zipcode, self.city_slug)
-        if not city:
-            logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.city_slug)
-            raise InvalidZipcodeError
-        self.latitude = city['coords']['lat']
-        self.longitude = city['coords']['lon']
+    @property
+    def flag_handicap(self):
+        return self.public == PUBLIC_HANDICAP
+    @property
+    def flag_junior(self):
+        return self.public == PUBLIC_JUNIOR
+    @property
+    def flag_senior(self):
+        return self.public == PUBLIC_SENIOR
 
     def _get_company_count(self, rome_code, distance):
         return count_companies(
             self.naf_codes,
             rome_code,
-            self.latitude,
-            self.longitude,
+            self.city.latitude,
+            self.city.longitude,
             distance,
             flag_alternance=self.flag_alternance,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
-            headcount_filter=self.headcount_filter,
+            headcount=self.headcount,
         )
 
     def get_naf_aggregations(self):
         _, _, aggregations = fetch_companies(
             {}, # No naf filter
             self.rome,
-            self.latitude,
-            self.longitude,
+            self.city.latitude,
+            self.city.longitude,
             self.distance,
             flag_alternance=self.flag_alternance,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
-            headcount_filter=self.headcount_filter,
+            headcount=self.headcount,
             aggregate_by="naf"
         )
         return aggregations
@@ -137,8 +171,8 @@ class Fetcher(object):
             result, _, aggregations = fetch_companies(
                 self.naf_codes,
                 self.rome,
-                self.latitude,
-                self.longitude,
+                self.city.latitude,
+                self.city.longitude,
                 self.distance,
                 from_number=self.from_number,
                 to_number=self.to_number,
@@ -146,7 +180,7 @@ class Fetcher(object):
                 flag_junior=self.flag_junior,
                 flag_senior=self.flag_senior,
                 flag_handicap=self.flag_handicap,
-                headcount_filter=self.headcount_filter,
+                headcount=self.headcount,
                 sort=self.sort,
                 aggregate_by="naf"
             )
@@ -249,7 +283,7 @@ def build_json_body_elastic_search(
         distance,
         from_number=None,
         to_number=None,
-        headcount_filter=settings.HEADCOUNT_WHATEVER,
+        headcount=settings.HEADCOUNT_WHATEVER,
         sort=sorting.SORT_FILTER_DEFAULT,
         flag_alternance=0,
         flag_junior=0,
@@ -272,25 +306,25 @@ def build_json_body_elastic_search(
 
     # in some cases, a string is given as input, let's ensure it is an int from now on
     try:
-        headcount_filter = int(headcount_filter)
+        headcount = int(headcount)
     except ValueError:
-        headcount_filter = settings.HEADCOUNT_WHATEVER
+        headcount = settings.HEADCOUNT_WHATEVER
 
     max_office_size = None
     min_office_size = None
-    if headcount_filter == settings.HEADCOUNT_SMALL_ONLY:
+    if headcount == settings.HEADCOUNT_SMALL_ONLY:
         max_office_size = settings.HEADCOUNT_SMALL_ONLY_MAXIMUM
-    elif headcount_filter == settings.HEADCOUNT_BIG_ONLY:
+    elif headcount == settings.HEADCOUNT_BIG_ONLY:
         min_office_size = settings.HEADCOUNT_BIG_ONLY_MINIMUM
 
     if min_office_size or max_office_size:
         if min_office_size:
-            headcount_filter = {"gte": min_office_size}
+            headcount = {"gte": min_office_size}
         if max_office_size:
-            headcount_filter = {"lte": max_office_size}
+            headcount = {"lte": max_office_size}
         filters.append({
             "numeric_range": {
-                "headcount": headcount_filter
+                "headcount": headcount
             }
         })
 

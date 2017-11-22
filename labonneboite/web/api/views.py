@@ -156,13 +156,11 @@ def company_list():
         else:
             flag_alternance = CONTRACT_VALUES[contract]
 
-    headcount_filter = settings.HEADCOUNT_WHATEVER
+    headcount = settings.HEADCOUNT_WHATEVER
     if 'headcount' in request.args:
-        headcount = request.args.get('headcount')
-        if headcount not in HEADCOUNT_VALUES.keys():
+        headcount = HEADCOUNT_VALUES.get(request.args.get('headcount'))
+        if not headcount:
             return u'invalid headcount value. Possible values : %s' % ', '.join(HEADCOUNT_VALUES.keys()), 400
-        else:
-            headcount_filter = HEADCOUNT_VALUES[headcount]
 
     companies, companies_count, _ = search.fetch_companies(
         naf_codes_list,
@@ -170,7 +168,7 @@ def company_list():
         latitude,
         longitude,
         distance,
-        headcount_filter=headcount_filter,
+        headcount=headcount,
         from_number=from_number,
         to_number=to_number,
         flag_alternance=flag_alternance,
