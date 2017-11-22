@@ -187,6 +187,7 @@ def register_context_processors(flask_app):
             'is_alternance': session.get('search_args', {}).get('f_a') == u'1',
             'mapbox_css_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css',
             'mapbox_js_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js',
+            'memo_js_url': 'https://memo.pole-emploi.fr/js/importButton/memoButton-min.js',
             'user_is_pro': pro.user_is_pro(),
             'pro_version_enabled': pro.pro_version_enabled()
         }

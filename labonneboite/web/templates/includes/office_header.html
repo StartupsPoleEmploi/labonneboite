@@ -82,7 +82,7 @@
 
     {# START Memo button. #}
     <a
-      class="ctj-import-button"
+      class="memo-import-button"
       data-url="{{ url_for('api.office_details', siret=company.siret, _external=True) }}"
       {% if rome_description %}data-job="{{ rome_description }}"{% endif %}
       data-height="31"
