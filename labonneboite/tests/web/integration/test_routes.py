@@ -5,7 +5,23 @@ from flask import url_for
 from labonneboite.tests.test_base import AppTest
 
 
-class RouteTest(AppTest):
+class SearchTest(AppTest):
+
+    def test_search_missing_location(self):
+        with self.test_request_context:
+            rv = self.app.get(url_for('search.search') + '?job=ramoufleur')
+
+        self.assertEqual(rv.status_code, 200)
+        self.assertIn('Veuillez préciser le lieu de votre recherche.', rv.data)
+
+    def test_search_incorrect_city(self):
+        with self.test_request_context:
+            rv = self.app.get(url_for('search.search') + '?job=ramoufleur&location=gotham')
+        self.assertEqual(rv.status_code, 200)
+        self.assertIn('Entreprises qui recrutent | La Bonne Boite', rv.data)
+
+
+class SearchResultsTest(AppTest):
 
     def test_zicodes_mistakenly_used_as_commune_ids(self):
         # 14118 is a commune_id, normal behavior
