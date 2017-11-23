@@ -108,8 +108,8 @@ def get_affinity_between_rome_and_naf(rome_code, naf_code):
 def map_romes_to_nafs(rome_codes, optional_naf_codes=None):
     naf_codes = set()
     for rome in rome_codes:
-        if rome not in settings.ROME_DESCRIPTIONS.keys():
-            raise Exception('bad rome code %s' % rome)
+        if rome not in settings.ROME_DESCRIPTIONS:
+            raise ValueError('bad rome code : %s' % rome)
         try:
             naf_codes_with_hirings = MANUAL_ROME_NAF_MAPPING[rome]
         except KeyError:
