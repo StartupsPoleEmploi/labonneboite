@@ -61,12 +61,11 @@ class Fetcher(object):
         self.naf = kwargs.get('naf')
 
         self.rome = mapping_util.SLUGIFIED_ROME_LABELS[self.occupation_slug]
-        mapper = mapping_util.Rome2NafMapper()
 
         # Empty list is needed to handle companies with ROME not related to their NAF
         self.naf_codes = {}
         if self.naf:
-            self.naf_codes = mapper.map([self.rome], [self.naf])
+            self.naf_codes = mapping_util.map_romes_to_nafs([self.rome], [self.naf])
         # Other properties.
         self.alternative_rome_codes = {}
         self.alternative_distances = collections.OrderedDict()
@@ -189,13 +188,15 @@ def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, **kwarg
     except KeyError:
         distance_sort = True
 
-    companies, companies_count, aggregations = get_companies_from_es_and_db(json_body, index=index, distance_sort=distance_sort)
+    companies, companies_count, aggregations = get_companies_from_es_and_db(
+        json_body, index=index, distance_sort=distance_sort)
     companies = shuffle_companies(companies, distance_sort, rome_code)
 
     # Extract aggregation
     if aggregations:
         aggregations = aggregations[kwargs["aggregate_by"]]["buckets"]
-        aggregations = [{"naf": naf_aggregate['key'], "count": naf_aggregate['doc_count']} for naf_aggregate in aggregations]
+        aggregations = [{"naf": naf_aggregate['key'], "count": naf_aggregate['doc_count']}
+            for naf_aggregate in aggregations]
 
     return companies, companies_count, aggregations
 

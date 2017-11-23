@@ -34,7 +34,7 @@ class NafForm(FlaskForm):
         csrf = False
 
     def validate_naf(self, field):
-        if field.data and not mapping_util.Rome2NafMapper.naf_is_valid(field.data):
+        if field.data and not mapping_util.naf_is_valid(field.data):
             raise ValidationError(u"Ce code NAF n'est pas valide.")
 
 
@@ -54,7 +54,7 @@ class RomeForm(FlaskForm):
         csrf = False
 
     def validate_rome(self, field):
-        if field.data and not mapping_util.Rome2NafMapper.romes_is_valid(field.data):
+        if field.data and not mapping_util.rome_is_valid(field.data):
             raise ValidationError(u"Ce code ROME n'est pas valide.")
 
 

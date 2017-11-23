@@ -90,71 +90,90 @@ def get_total_naf_hirings(naf):
     return sum(MANUAL_NAF_ROME_MAPPING[naf][rome] for rome in romes)
 
 
-class Rome2NafMapper(object):
+@lru_cache(maxsize=32*1024)
+def get_affinity_between_rome_and_naf(rome_code, naf_code):
+    """
+    Ratio of hirings of this NAF made by this ROME.
+    """
+    current_rome_hirings = MANUAL_NAF_ROME_MAPPING[naf_code][rome_code]
+    total_naf_hirings = get_total_naf_hirings(naf_code)
 
-    def __init__(self):
-        self.rome_2_naf_dict = MANUAL_ROME_NAF_MAPPING
+    if not (current_rome_hirings >= 1 and current_rome_hirings <= total_naf_hirings):
+        raise Exception("error in hiring data for rome_code=%s and naf_code=%s" % (rome_code, naf_code))
 
-    def map(self, rome_codes, optional_naf_codes=None):
-        naf_codes = set()
-        for rome in rome_codes:
-            if rome not in settings.ROME_DESCRIPTIONS.keys():
-                raise Exception('bad rome code %s' % rome)
-            try:
-                naf_codes_with_hirings = self.rome_2_naf_dict[rome]
-            except KeyError:
-                logger.error('soft fail: no NAF codes for ROME %s', rome)
-                naf_codes_with_hirings = {}
-            for naf, _ in naf_codes_with_hirings.iteritems():
-                if optional_naf_codes:
-                    if naf in optional_naf_codes:
-                        naf_codes.add(naf)
-                else:
+    # 1.0 used to force float result, otherwise int/int like 30/100 give... zero
+    return 1.0 * current_rome_hirings / total_naf_hirings
+
+
+def map_romes_to_nafs(rome_codes, optional_naf_codes=None):
+    naf_codes = set()
+    for rome in rome_codes:
+        if rome not in settings.ROME_DESCRIPTIONS:
+            raise ValueError('bad rome code : %s' % rome)
+        try:
+            naf_codes_with_hirings = MANUAL_ROME_NAF_MAPPING[rome]
+        except KeyError:
+            logger.error('soft fail: no NAF codes for ROME %s', rome)
+            naf_codes_with_hirings = {}
+        for naf, _ in naf_codes_with_hirings.iteritems():
+            if optional_naf_codes:
+                if naf in optional_naf_codes:
                     naf_codes.add(naf)
-        return list(naf_codes)
+            else:
+                naf_codes.add(naf)
+    return list(naf_codes)
 
-    def romes_for_naf(self, naf):
-        """
-        Returns ROME codes matching the given NAF code as a list of named tuples ordered by the number of hires.
-        E.g. for NAF 4212Z:
-        [
-            Rome(code='F1702', name=u'Construction de routes et voies', nafs={'4212Z': 395, '8130Z': 112}),
-            Rome(code='F1201', name=u'Conduite de travaux du BTP', nafs={'4212Z': 86, '7810Z': 17}),
-            Rome(code='N4403', name=u'Manoeuvre du réseau ferré', nafs={'4910Z': 12, '4920Z': 8}),
-            ...
-        ]
-        """
-        romes_for_naf = {k: v for (k, v) in self.rome_2_naf_dict.items() if naf in v}
-        romes_for_naf = sorted(romes_for_naf.items(), key=lambda (k, v): v[naf], reverse=True)
-        Rome = namedtuple('Rome', ['code', 'name', 'nafs'])
-        return [Rome(rome[0], settings.ROME_DESCRIPTIONS[rome[0]], rome[1]) for rome in romes_for_naf]
 
-    def nafs_for_rome(self, rome):
-        """
-        Returns NAF codes matching the given ROME code as a list of named tuples ordered by the number of hires.
-        E.g. for ROME M1607:
-        [
-            Naf(code='8810A', name=u'Aide à domicile', hirings=2830),
-            Naf(code='6831Z', name=u'Agences immobilières', hirings=897),
-            Naf(code='8422Z', name=u'Défense', hirings=6),
-            ...
-        ]
-        """
-        nafs = self.rome_2_naf_dict.get(rome, {})
-        nafs = sorted(nafs.items(), key=lambda (k, v): v, reverse=True)
-        Naf = namedtuple('Naf', ['code', 'name', 'hirings'])
-        return [Naf(naf[0], settings.NAF_CODES[naf[0]], naf[1]) for naf in nafs]
+@lru_cache(maxsize=1024)  # about 700 naf_codes
+def romes_for_naf(naf):
+    """
+    Returns ROME codes matching the given NAF code as a list of named tuples ordered by the number of hires.
+    E.g. for NAF 4212Z:
+    [
+        Rome(code='F1702', name=u'Construction de routes et voies', nafs={'4212Z': 395, '8130Z': 112}),
+        Rome(code='F1201', name=u'Conduite de travaux du BTP', nafs={'4212Z': 86, '7810Z': 17}),
+        Rome(code='N4403', name=u'Manoeuvre du réseau ferré', nafs={'4910Z': 12, '4920Z': 8}),
+        ...
+    ]
+    """
+    romes = {k: v for (k, v) in MANUAL_ROME_NAF_MAPPING.items() if naf in v}
+    romes = sorted(romes.items(), key=lambda (k, v): v[naf], reverse=True)
+    Rome = namedtuple('Rome', ['code', 'name', 'nafs'])
+    return [Rome(rome[0], settings.ROME_DESCRIPTIONS[rome[0]], rome[1]) for rome in romes]
 
-    @staticmethod
-    def romes_is_valid(rome):
-        """
-        Returns True if the given ROME code is valid, False otherwise.
-        """
-        return rome in settings.ROME_DESCRIPTIONS
 
-    @staticmethod
-    def naf_is_valid(naf):
-        """
-        Returns True if the given NAF code is valid, False otherwise.
-        """
-        return naf in settings.NAF_CODES
+@lru_cache(maxsize=8*1024)  # about 500 rome_codes in current dataset and 5000 in sliced dataset
+def nafs_for_rome(rome):
+    """
+    Returns NAF codes matching the given ROME code as a list of named tuples ordered by the number of hires.
+    E.g. for ROME M1607:
+    [
+        Naf(code='8810A', name=u'Aide à domicile', hirings=2830, affinity=0.04),
+        Naf(code='6831Z', name=u'Agences immobilières', hirings=897, affinity=0.08),
+        Naf(code='8422Z', name=u'Défense', hirings=6, affinity=0.20),
+        ...
+    ]
+    """
+    nafs = MANUAL_ROME_NAF_MAPPING.get(rome, {})
+    nafs = sorted(nafs.items(), key=lambda (k, v): v, reverse=True)
+    Naf = namedtuple('Naf', ['code', 'name', 'hirings', 'affinity'])
+    return [Naf(
+        naf[0],
+        settings.NAF_CODES[naf[0]],
+        naf[1],
+        get_affinity_between_rome_and_naf(rome, naf[0]),
+        ) for naf in nafs]
+
+
+def rome_is_valid(rome):
+    """
+    Returns True if the given ROME code is valid, False otherwise.
+    """
+    return rome in settings.ROME_DESCRIPTIONS
+
+
+def naf_is_valid(naf):
+    """
+    Returns True if the given NAF code is valid, False otherwise.
+    """
+    return naf in settings.NAF_CODES

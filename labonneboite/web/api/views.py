@@ -134,8 +134,7 @@ def company_list():
         if invalid_nafs:
             return u'invalid NAF code(s): %s' % ' '.join(invalid_nafs), 400
 
-        rome_2_naf_mapper = mapping_util.Rome2NafMapper()
-        expected_naf_codes = rome_2_naf_mapper.map([rome_code, ])
+        expected_naf_codes = mapping_util.map_romes_to_nafs([rome_code, ])
         invalid_nafs = [naf for naf in naf_codes_list if naf not in expected_naf_codes]
         if invalid_nafs:
             return u'invalid NAF code(s): %s. Possible values : %s ' % (

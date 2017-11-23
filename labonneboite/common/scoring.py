@@ -49,9 +49,11 @@ def _get_score_from_hirings(hirings, as_float=False):
     elif hirings >= settings.SCORE_100_HIRINGS:
         score = 100
     elif hirings <= settings.SCORE_60_HIRINGS:
-        score = 50 + 10 * (hirings - settings.SCORE_50_HIRINGS) / (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS)
+        score = (50 + 10 * (hirings - settings.SCORE_50_HIRINGS) /
+            (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS))
     elif hirings <= settings.SCORE_80_HIRINGS:
-        score = 60 + 20 * (hirings - settings.SCORE_60_HIRINGS) / (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS)
+        score = (60 + 20 * (hirings - settings.SCORE_60_HIRINGS) /
+            (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS))
     elif hirings <= settings.SCORE_100_HIRINGS:
         score = 80 + 20.0/math.log10(settings.SCORE_100_HIRINGS) * math.log10(1 + hirings - settings.SCORE_80_HIRINGS)
     else:
@@ -84,9 +86,11 @@ def get_hirings_from_score(score):
     if score <= 50:
         hirings = settings.SCORE_50_HIRINGS * score / 50.0
     elif score <= 60:
-        hirings = settings.SCORE_50_HIRINGS + (score - 50) / 10.0 * (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS)
+        hirings = (settings.SCORE_50_HIRINGS +
+            (score - 50) / 10.0 * (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS))
     elif score <= 80:
-        hirings = settings.SCORE_60_HIRINGS + (score - 60) / 20.0 * (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS)
+        hirings = (settings.SCORE_60_HIRINGS +
+            (score - 60) / 20.0 * (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS))
     elif score <= 100:
         hirings = -1 + settings.SCORE_80_HIRINGS + 10.0 ** ((score-80) / 20.0 * math.log10(settings.SCORE_100_HIRINGS))
     else:
@@ -110,14 +114,8 @@ def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
         return score
 
     total_office_hirings = get_hirings_from_score(score)
-    total_naf_hirings = mapping_util.get_total_naf_hirings(naf_code)
-    current_rome_hirings = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome_code]
-
-    if not (current_rome_hirings >= 1 and current_rome_hirings <= total_naf_hirings):
-        raise Exception("error in hiring data for rome_code=%s and naf_code=%s" % (rome_code, naf_code))
-
-    # 1.0 used to force float result, otherwise int/int like 30/100 give... zero
-    office_hirings_for_current_rome = total_office_hirings * (1.0 * current_rome_hirings / total_naf_hirings)
+    affinity = mapping_util.get_affinity_between_rome_and_naf(rome_code, naf_code)
+    office_hirings_for_current_rome = total_office_hirings * affinity
 
     # result should be integer
     return get_score_from_hirings(office_hirings_for_current_rome, as_float=False)

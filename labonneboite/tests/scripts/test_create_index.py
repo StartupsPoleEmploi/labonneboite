@@ -265,10 +265,9 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         # Global score should always be the same.
         self.assertEquals(res['_source']['score'], office.score)
         # Check scores for ROME.
-        mapper = mapping_util.Rome2NafMapper()
         # Since `romes_to_boost` is empty, all `scores_by_rome` should be set to 100.
         self.assertEquals(office_to_update.romes_to_boost, u"")
-        for rome in mapper.romes_for_naf(office.naf):
+        for rome in mapping_util.romes_for_naf(office.naf):
             self.assertEquals(res['_source']['scores_by_rome'][rome.code], 100)
 
     def test_update_office_by_removing_contact(self):
@@ -303,8 +302,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         """
         Test `update_offices` to update an office: boost score for specific ROME codes.
         """
-        mapper = mapping_util.Rome2NafMapper()
-        romes_for_office = [rome.code for rome in mapper.romes_for_naf(self.office.naf)]
+        romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office.naf)]
 
         # Ensure the following ROME codes are related to the office.
         self.assertIn(u"D1507", romes_for_office)
@@ -344,8 +342,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         Test `update_offices` to update an office: boost score for specific ROME codes
         but with romes not associated to the office.
         """
-        mapper = mapping_util.Rome2NafMapper()
-        romes_for_office = [rome.code for rome in mapper.romes_for_naf(self.office.naf)]
+        romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office.naf)]
 
         self.assertNotIn(u"D1506", romes_for_office) # Rome not related to the office
         self.assertIn(u"D1507", romes_for_office) # Rome related to the office
@@ -383,8 +380,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         """
         Test `update_offices` to update an office: remove specific ROME to an office
         """
-        mapper = mapping_util.Rome2NafMapper()
-        romes_for_office = [rome.code for rome in mapper.romes_for_naf(self.office.naf)]
+        romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office.naf)]
 
         self.assertIn(u"D1101", romes_for_office) # Rome related to the office
         self.assertIn(u"D1507", romes_for_office) # Rome related to the office
