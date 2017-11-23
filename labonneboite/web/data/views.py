@@ -34,8 +34,7 @@ def romes_for_naf():
     if naf and form.validate():
         naf = form.naf.data
         naf_name = settings.NAF_CODES.get(naf)
-        mapper = mapping_util.Rome2NafMapper()
-        romes = mapper.romes_for_naf(naf)
+        romes = mapping_util.romes_for_naf(naf)
     context = {
         'current_tab': 'romes_for_naf',
         'form': form,
@@ -60,8 +59,7 @@ def nafs_for_rome():
     if rome and form.validate():
         rome = form.rome.data
         rome_name = settings.ROME_DESCRIPTIONS.get(rome)
-        mapper = mapping_util.Rome2NafMapper()
-        nafs = mapper.nafs_for_rome(rome)
+        nafs = mapping_util.nafs_for_rome(rome)
 
     context = {
         'current_tab': 'nafs_for_rome',
@@ -89,8 +87,7 @@ def romes_for_siret():
         naf = form.office.naf
         naf_name = settings.NAF_CODES.get(naf)
         siret = form.siret.data
-        mapper = mapping_util.Rome2NafMapper()
-        romes = mapper.romes_for_naf(naf)
+        romes = mapping_util.romes_for_naf(naf)
 
     context = {
         'current_tab': 'romes_for_siret',

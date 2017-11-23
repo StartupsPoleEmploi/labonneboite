@@ -60,14 +60,12 @@ class ApiGenericTest(ApiBaseTest):
         Ensure that those ROME codes can be used accurately in other tests.
         In order to ensure this, they should map to NAF codes used in the documents test data.
         """
-        rome_to_naf_mapper = mapping_util.Rome2NafMapper()
-
         rome = u'D1405'
-        naf_codes = rome_to_naf_mapper.map([rome])
+        naf_codes = mapping_util.map_romes_to_nafs([rome])
         self.assertIn(u'7320Z', naf_codes)
 
         rome = u'M1801'
-        naf_codes = rome_to_naf_mapper.map([rome])
+        naf_codes = mapping_util.map_romes_to_nafs([rome])
         self.assertIn(u'9511Z', naf_codes)
 
 

@@ -192,9 +192,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 flash(msg, 'error')
                 return False
 
-            mapper = mapping_util.Rome2NafMapper()
             for rome in OfficeAdminUpdate.romes_as_list(romes_to_boost):
-                if not mapper.romes_is_valid(rome):
+                if not mapping_util.rome_is_valid(rome):
                     msg = (
                         u"`%s` n'est pas un code ROME valide."
                         u"<br>"
@@ -214,11 +213,10 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 flash(msg, 'error')
                 return False
 
-            mapper = mapping_util.Rome2NafMapper()
-            office_romes = [item.code for item in mapper.romes_for_naf(office_to_update.naf)]
+            office_romes = [item.code for item in mapping_util.romes_for_naf(office_to_update.naf)]
             for rome in OfficeAdminUpdate.romes_as_list(romes_to_remove):
 
-                if not mapper.romes_is_valid(rome):
+                if not mapping_util.rome_is_valid(rome):
                     msg = (
                         u"`%s` n'est pas un code ROME valide."
                         u"<br>"
