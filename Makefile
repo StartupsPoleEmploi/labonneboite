@@ -151,9 +151,12 @@ start_locust_against_localhost:
 # Tests
 # -----
 
-.PHONY: test_all test_app test_importer test_api test_integration test_scripts test_selenium
+.PHONY: test_all test_unit test_app test_importer test_api test_integration test_scripts test_selenium
 
-test_all: clean_pyc test_app test_importer test_api test_integration test_scripts test_selenium
+test_unit: clean_pyc test_app test_importer test_api test_integration test_scripts
+
+test_all: test_unit test_selenium
+
 
 test_app:
 	cd vagrant; \
