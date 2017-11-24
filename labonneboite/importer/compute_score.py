@@ -22,6 +22,7 @@ import pandas as pd
 import numpy as np
 import sqlalchemy
 from sqlalchemy.pool import NullPool
+from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import DpaeStatistics
 from labonneboite.common import scoring as scoring_util
@@ -149,6 +150,7 @@ def merge_and_normalize_websites(websites):
 
 
 # FIXME inconsistent method return value (None or tuple)
+@timeit
 def load_df(engine, etablissement_table, dpae_table, departement, most_recent_data_date):
     logger.debug("reading data with most recent data date %s...", most_recent_data_date)
     logger.debug("filtering by departement (%s)...", departement)
@@ -336,6 +338,7 @@ def add_features(df_final, departement, reference_date, feature_semester_count, 
     return df_final, X, y_regr, X_feature_names
 
 
+@timeit
 def train(df_final, departement, reference_date, semester_lag, feature_semester_count=7):
     # We model the problem as a regression.
     from sklearn import linear_model
@@ -417,6 +420,7 @@ def train(df_final, departement, reference_date, semester_lag, feature_semester_
     logger.info('score distribution for %s', df_final.groupby(pd.cut(df_final.score, ranges))['score'].agg('count'))
 
 
+@timeit
 def export(engine, df_final, departement):
     logger.debug("writing sql (%s)...", departement)
 
@@ -432,6 +436,7 @@ def export(engine, df_final, departement):
     logger.debug("sql done (%s)!", departement)
 
 
+@timeit
 def run(source_etablissement_table, dpae_table, departement, dpae_date, semester_lag=1):
     engine = sqlalchemy.create_engine(get_db_string(), poolclass=NullPool)
     # result might either be None or a tuple (df_etab, df_dpae)
@@ -488,6 +493,7 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
     return result
 
 
+@timeit
 def run_main():
     most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
     run(
