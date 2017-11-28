@@ -14,7 +14,7 @@ from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
-
+from labonneboite.common.rome_mobilities import ROME_MOBILITIES
 
 logger = logging.getLogger('main')
 
@@ -153,7 +153,7 @@ class Fetcher(object):
         if self.company_count < 10:
 
             # Suggest other jobs.
-            alternative_rome_codes = settings.ROME_MOBILITIES[self.rome]
+            alternative_rome_codes = ROME_MOBILITIES[self.rome]
             for rome in alternative_rome_codes:
                 if not rome == self.rome:
                     company_count = self._get_company_count(rome, self.distance)

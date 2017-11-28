@@ -1,8 +1,5 @@
 # coding: utf8
 
-# pylint: disable=unused-import
-from labonneboite.conf.common.rome_mobilities import ROME_MOBILITIES
-# pylint: enable=unused-import
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 
 ROME_DESCRIPTIONS = load_rome_labels()
