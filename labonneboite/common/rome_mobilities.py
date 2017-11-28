@@ -1,3 +1,5 @@
+# coding: utf8
+
 # Used on the frontend
 # to offer alternative ROME codes to search
 # in case the current search has no result.

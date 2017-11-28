@@ -52,17 +52,6 @@ HEADCOUNT_VALUES = {
 # Contract Value
 CONTRACT_VALUES = {'all': 0, 'alternance': 1}
 
-# Sorting
-SORTING_CHOICES = (
-    (u'distance', u'Distance'),
-    (u'score', u'Potentiel d\'embauche'),
-)
-
-SORT_FILTER_SCORE = "score"
-SORT_FILTER_DISTANCE = "distance"
-SORT_FILTERS = [SORT_FILTER_SCORE, SORT_FILTER_DISTANCE]
-SORT_FILTER_DEFAULT = SORT_FILTER_SCORE
-
 # Paginaton
 PAGINATION_MAX_PAGES = 10
 PAGINATION_COMPANIES_PER_PAGE = 10

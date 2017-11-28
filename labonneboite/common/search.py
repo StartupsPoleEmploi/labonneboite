@@ -12,6 +12,7 @@ from slugify import slugify
 
 from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
+from labonneboite.common import sorting
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
@@ -183,7 +184,7 @@ def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, **kwarg
     try:
         sort = kwargs['sort']
     except KeyError:
-        sort = settings.SORT_FILTER_DEFAULT
+        sort = sorting.SORT_FILTER_DEFAULT
 
     companies, companies_count, aggregations = get_companies_from_es_and_db(json_body, sort=sort)
     companies = shuffle_companies(companies, sort, rome_code)
@@ -210,9 +211,9 @@ def shuffle_companies(companies, sort, rome_code):
     """
     buckets = collections.OrderedDict()
     for company in companies:
-        if sort == settings.SORT_FILTER_DISTANCE:
+        if sort == sorting.SORT_FILTER_DISTANCE:
             key = company.distance
-        elif sort == settings.SORT_FILTER_SCORE:
+        elif sort == sorting.SORT_FILTER_SCORE:
             if hasattr(company, 'scores_by_rome') and company.scores_by_rome.get(rome_code) == 100:
                 # make an exception for offices which were manually boosted (score for rome = 100)
                 # to ensure they consistently appear on top of results
@@ -249,7 +250,7 @@ def build_json_body_elastic_search(
         from_number=None,
         to_number=None,
         headcount_filter=settings.HEADCOUNT_WHATEVER,
-        sort=settings.SORT_FILTER_DEFAULT,
+        sort=sorting.SORT_FILTER_DEFAULT,
         flag_alternance=0,
         flag_junior=0,
         flag_senior=0,
@@ -339,9 +340,9 @@ def build_json_body_elastic_search(
 
     # Build sort.
 
-    if sort not in settings.SORT_FILTERS:
+    if sort not in sorting.SORT_FILTERS:
         logger.info('unknown sort: %s', sort)
-        sort = settings.SORT_FILTER_DEFAULT
+        sort = sorting.SORT_FILTER_DEFAULT
 
     distance_sort = {
         "_geo_distance": {
@@ -361,10 +362,10 @@ def build_json_body_elastic_search(
         }
     }
 
-    if sort == settings.SORT_FILTER_DISTANCE:
+    if sort == sorting.SORT_FILTER_DISTANCE:
         sort_attrs.append(distance_sort)
         sort_attrs.append(score_sort)
-    elif sort == settings.SORT_FILTER_SCORE:
+    elif sort == sorting.SORT_FILTER_SCORE:
         sort_attrs.append(score_sort)
         sort_attrs.append(distance_sort)
 
@@ -418,7 +419,7 @@ def get_companies_from_es_and_db(json_body, sort):
 
     if siret_list:
 
-        if sort == settings.SORT_FILTER_DISTANCE:
+        if sort == sorting.SORT_FILTER_DISTANCE:
             distance_sort_index = 0
         else:
             distance_sort_index = 1
