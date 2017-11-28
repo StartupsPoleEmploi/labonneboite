@@ -18,7 +18,7 @@ from labonneboite.common import util
 from labonneboite.common.email_util import MandrillClient
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
-from labonneboite.conf.common.contact_mode import CONTACT_MODE_STAGES
+from labonneboite.common.contact_mode import CONTACT_MODE_STAGES
 
 from labonneboite.web.office.forms import OfficeRemovalForm
 
