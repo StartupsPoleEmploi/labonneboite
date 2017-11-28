@@ -61,15 +61,15 @@
               {{ form.naf }}
             </div>
             <div class="lbb-sidebar-item">
-              <p>Distance</p>
+              <p>{{ form.distance.label.text }}</p>
               {{ form.distance }}
             </div>
             <div class="lbb-sidebar-item">
-              <p>Taille d'entreprise</p>
+              <p>{{ form.headcount.label.text }}</p>
               {{ form.headcount }}
             </div>
             <div class="lbb-sidebar-item">
-              <p>Type de contrat</p>
+              <p>{{ form.flag_alternance.label.text }}</p>
               {{ form.flag_alternance }}
             </div>
             {% if pro_version_enabled %}
@@ -202,4 +202,3 @@
   </div>{# END .lbb-content #}
 </div>{# END .lbb-content-purple-wrapper #}
 {% endblock %}
-
