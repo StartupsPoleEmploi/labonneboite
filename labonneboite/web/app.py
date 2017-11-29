@@ -29,6 +29,7 @@ from labonneboite.common import pro
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common.database import db_session, engine  # This is how we talk to the database.
 from labonneboite.common.models import User
+from labonneboite.common.models import Office
 from labonneboite.conf import settings
 
 # labonneboite web.
@@ -189,7 +190,8 @@ def register_context_processors(flask_app):
             'mapbox_js_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js',
             'memo_js_url': 'https://memo.pole-emploi.fr/js/importButton/memoButton-min.js',
             'user_is_pro': pro.user_is_pro(),
-            'pro_version_enabled': pro.pro_version_enabled()
+            'pro_version_enabled': pro.pro_version_enabled(),
+            'last_data_deploy_date': Office.get_date_of_last_data_deploy(),
         }
 
     def inject_user():
