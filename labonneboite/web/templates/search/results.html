@@ -61,21 +61,15 @@
               {{ form.naf }}
             </div>
             <div class="lbb-sidebar-item">
-              <p>
-                {{ form.distance.label }}
-              </p>
+              <p>{{ form.distance.label.text }}</p>
               {{ form.distance }}
             </div>
             <div class="lbb-sidebar-item">
-              <p>
-                {{ form.headcount.label }}
-              </p>
+              <p>{{ form.headcount.label.text }}</p>
               {{ form.headcount }}
             </div>
             <div class="lbb-sidebar-item">
-              <p>
-                {{ form.flag_alternance.label }}
-              </p>
+              <p>{{ form.flag_alternance.label.text }}</p>
               {{ form.flag_alternance }}
             </div>
             {% if pro_version_enabled %}
@@ -204,8 +198,7 @@
       {% endif %}
 
 
-    </div><{# END .lbb-content-with-sidebar #}
+    </div>{# END .lbb-content-with-sidebar #}
   </div>{# END .lbb-content #}
-</div><{# END .lbb-content-purple-wrapper #}
+</div>{# END .lbb-content-purple-wrapper #}
 {% endblock %}
-
