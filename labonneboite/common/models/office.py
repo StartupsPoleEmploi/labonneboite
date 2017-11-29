@@ -2,14 +2,16 @@
 
 from __future__ import division
 import logging
+from babel.dates import format_date
 
 from flask import url_for
 from sqlalchemy import Column, Index, Integer, String, Float, Boolean
 from sqlalchemy import PrimaryKeyConstraint
+from backports.functools_lru_cache import lru_cache
 
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import scoring as scoring_util
-from labonneboite.common.database import Base
+from labonneboite.common.database import Base, db_session, DATABASE
 from labonneboite.common.load_data import load_city_codes
 from labonneboite.common import util
 from labonneboite.common.models.base import CRUDMixin
@@ -317,3 +319,22 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
                 return False
             return True
         return False
+
+    @classmethod
+    @lru_cache(maxsize=None)
+    def get_date_of_last_data_deploy(cls):
+        """
+        Get date of when the 'etablissements' table was (re)created by the deploy_data process.
+        """
+        query = """
+            SELECT CREATE_TIME
+                FROM information_schema.tables
+                WHERE TABLE_SCHEMA = '%s'
+                    AND TABLE_NAME = '%s';
+        """ % (DATABASE['NAME'], settings.OFFICE_TABLE)
+        last_data_deploy_date = db_session.execute(query).first()[0]
+        # Formatting date in french format using locale.setlocale is strongly discouraged.
+        # Using babel instead is the recommended way.
+        # See https://stackoverflow.com/questions/985505/locale-date-formatting-in-python
+        last_data_deploy_date_formated_as_french = format_date(last_data_deploy_date, locale='fr', format='long')
+        return last_data_deploy_date_formated_as_french
