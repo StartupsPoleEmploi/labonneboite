@@ -1,7 +1,7 @@
 import os
 
 # --- importer table backuping process
-BACKUP_FIRST = False  # FIXME
+BACKUP_FIRST = True
 
 # --- importer input directory of DPAE and ETABLISSEMENT exports
 INPUT_SOURCE_FOLDER = '/srv/lbb/data'
