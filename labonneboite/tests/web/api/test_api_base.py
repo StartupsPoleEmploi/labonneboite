@@ -321,6 +321,7 @@ class ApiBaseTest(DatabaseTest):
                 zipcode=zip_code,
                 email=u'foo@bar.com',
                 departement=zip_code[:2],
+                flag_alternance=doc['flag_alternance'],
                 headcount=doc['headcount'],
                 x=doc['locations'][0]['lon'],
                 y=doc['locations'][0]['lat'],
