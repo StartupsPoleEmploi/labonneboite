@@ -1,8 +1,5 @@
 # coding: utf8
 
-# pylint: disable=unused-import
-from labonneboite.conf.common.rome_mobilities import ROME_MOBILITIES
-# pylint: enable=unused-import
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 
 ROME_DESCRIPTIONS = load_rome_labels()
@@ -14,6 +11,8 @@ LOCALE = 'fr_FR.utf8'
 SEARCHING_TIME = 10000
 
 HOST = 'labonneboite.pole-emploi.fr'
+
+DISTANCE_FILTER_DEFAULT = 10
 
 # Headcount
 HEADCOUNT_INSEE = {
@@ -53,13 +52,6 @@ HEADCOUNT_VALUES = {
 # Contract Value
 CONTRACT_VALUES = {'all': 0, 'alternance': 1}
 
-# Sort
-SORTING_CHOICES = (
-    (u'distance', u'Distance'),
-    (u'score', u'Potentiel d\'embauche'),
-)
-SORT_FILTER_DEFAULT = "score"
-
 # Paginaton
 PAGINATION_MAX_PAGES = 10
 PAGINATION_COMPANIES_PER_PAGE = 10
@@ -75,5 +67,3 @@ COMPANY_RESULTS_MAX = 100
 AUTOCOMPLETE_MAX = 5
 
 ROME_NAF_PROBABILITY_CUTOFF = 0.05
-
-DISTANCE_FILTER_DEFAULT = 10

@@ -20,6 +20,8 @@ class CreateIndexBaseTest(DatabaseTest):
 
         # use custom ES index for tests
         script.INDEX_NAME = self.ES_TEST_INDEX
+        # FIXME ideally we should point to ES test index
+        # settings.ES_INDEX = self.ES_TEST_INDEX
 
         # Create 1 office.
         self.office = Office(
@@ -67,6 +69,8 @@ class VariousModesTest(CreateIndexBaseTest):
     Test various modes of create_index script.
     Always disable parallel computing because it does not play well with testing,
     as it basically hangs.
+
+    FIXME this is actually quite ugly, as it manipulates dev ES index and not test ES index
     """
 
     def test_create_index(self):

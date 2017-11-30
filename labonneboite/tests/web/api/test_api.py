@@ -27,7 +27,6 @@ class ApiGenericTest(ApiBaseTest):
             latitude,
             longitude,
             distance,
-            index=self.ES_TEST_INDEX,
         )
         sirets = [company.siret for company in companies]
         self.assertIn(u'00000000000001', sirets)
@@ -47,7 +46,6 @@ class ApiGenericTest(ApiBaseTest):
             latitude,
             longitude,
             distance,
-            index=self.ES_TEST_INDEX,
             headcount_filter=headcount_filter,
         )
         sirets = [company.siret for company in companies]

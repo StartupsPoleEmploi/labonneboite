@@ -23,7 +23,7 @@ clean_pyc:
 # Code quality
 # ------------
 
-.PHONY: pylint
+.PHONY: pylint_all pylint
 
 # Run pylint on the whole project.
 pylint_all:
@@ -69,7 +69,7 @@ vagrant_reload:
 # Local dev
 # ---------
 
-.PHONY: serve_web_app create_sitemap create_index create_index_from_scratch
+.PHONY: serve_web_app create_sitemap prepare_mailing_data create_index create_index_from_scratch
 .PHONY: create_index_from_scratch_with_profiling create_index_from_scratch_with_profiling_on_staging
 .PHONY: create_index_from_scratch_with_profiling_line_by_line
 .PHONY: mysql_local_shell rebuild_importer_tests_compressed_files
@@ -81,6 +81,12 @@ serve_web_app:
 create_sitemap:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 	cd /srv/lbb/labonneboite && python scripts/create_sitemap.py sitemap';
+
+prepare_mailing_data:
+	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
+	cd /srv/lbb/labonneboite && \
+	python scripts/prepare_mailing_data.py && \
+	echo please consult result in file labonneboite/scripts/mailing_data/users_sample_prepared.csv';
 
 create_index:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \

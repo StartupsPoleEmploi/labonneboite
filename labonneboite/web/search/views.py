@@ -13,6 +13,7 @@ from labonneboite.common import geocoding
 from labonneboite.common import doorbell
 from labonneboite.common import pro
 from labonneboite.common import util
+from labonneboite.common import sorting
 from labonneboite.common import search as search_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import UserFavoriteOffice
@@ -93,7 +94,7 @@ def get_parameters(args):
         kwargs['to'] = kwargs['from'] + settings.PAGINATION_COMPANIES_PER_PAGE - 1
 
     if kwargs.get('sort') == '':
-        kwargs['sort'] = settings.SORT_FILTER_DEFAULT
+        kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
     for flag_name in ['flag_alternance', 'public']:
         try:

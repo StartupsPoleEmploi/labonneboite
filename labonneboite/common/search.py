@@ -12,9 +12,10 @@ from slugify import slugify
 
 from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
+from labonneboite.common import sorting
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
-
+from labonneboite.common.rome_mobilities import ROME_MOBILITIES
 
 logger = logging.getLogger('main')
 
@@ -147,14 +148,13 @@ class Fetcher(object):
                 flag_handicap=self.flag_handicap,
                 headcount_filter=self.headcount_filter,
                 sort=self.sort,
-                index=settings.ES_INDEX,
                 aggregate_by="naf"
             )
 
         if self.company_count < 10:
 
             # Suggest other jobs.
-            alternative_rome_codes = settings.ROME_MOBILITIES[self.rome]
+            alternative_rome_codes = ROME_MOBILITIES[self.rome]
             for rome in alternative_rome_codes:
                 if not rome == self.rome:
                     company_count = self._get_company_count(rome, self.distance)
@@ -172,50 +172,48 @@ class Fetcher(object):
 
 
 def count_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
-    index = kwargs.pop('index', 'labonneboite')
     json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
     del json_body["sort"]
     es = Elasticsearch()
-    res = es.count(index=index, doc_type="office", body=json_body)
+    res = es.count(index=settings.ES_INDEX, doc_type="office", body=json_body)
     return res["count"]
 
 def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
-    index = kwargs.pop('index', 'labonneboite')
     json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
 
     try:
-        distance_sort = kwargs['sort'] == 'distance'
+        sort = kwargs['sort']
     except KeyError:
-        distance_sort = True
+        sort = sorting.SORT_FILTER_DEFAULT
 
-    companies, companies_count, aggregations = get_companies_from_es_and_db(
-        json_body, index=index, distance_sort=distance_sort)
-    companies = shuffle_companies(companies, distance_sort, rome_code)
+    companies, companies_count, aggregations = get_companies_from_es_and_db(json_body, sort=sort)
+    companies = shuffle_companies(companies, sort, rome_code)
 
     # Extract aggregation
     if aggregations:
         aggregations = aggregations[kwargs["aggregate_by"]]["buckets"]
-        aggregations = [{"naf": naf_aggregate['key'], "count": naf_aggregate['doc_count']}
-            for naf_aggregate in aggregations]
+        aggregations = [
+            {"naf": naf_aggregate['key'], "count": naf_aggregate['doc_count']} for naf_aggregate in aggregations
+        ]
 
     return companies, companies_count, aggregations
 
 
-def shuffle_companies(companies, distance_sort, rome_code):
+def shuffle_companies(companies, sort, rome_code):
     """
     Slightly shuffle the results of a company search this way:
-    1) in case of sort by score (default)
+    1) in case of sort by score
     - split results in groups of companies having the exact same stars (e.g. 2.3 or 4.9)
     - shuffle each of these groups in a predictable reproductible way
     Note that the scores are adjusted to the contextual rome_code.
     2) in case of sort by distance
-    same things as 1°, grouping instead companies having the same distance in km.
+    same things as 1), grouping instead companies having the same distance in km.
     """
     buckets = collections.OrderedDict()
     for company in companies:
-        if distance_sort:
+        if sort == sorting.SORT_FILTER_DISTANCE:
             key = company.distance
-        else:
+        elif sort == sorting.SORT_FILTER_SCORE:
             if hasattr(company, 'scores_by_rome') and company.scores_by_rome.get(rome_code) == 100:
                 # make an exception for offices which were manually boosted (score for rome = 100)
                 # to ensure they consistently appear on top of results
@@ -224,6 +222,8 @@ def shuffle_companies(companies, distance_sort, rome_code):
                 key = 100  # special value designed to be distinct from 5.0 stars
             else:
                 key = company.get_stars_for_rome_code(rome_code)
+        else:
+            raise ValueError("unknown sorting")
         if key not in buckets:
             buckets[key] = []
         buckets[key].append(company)
@@ -250,7 +250,7 @@ def build_json_body_elastic_search(
         from_number=None,
         to_number=None,
         headcount_filter=settings.HEADCOUNT_WHATEVER,
-        sort='distance',
+        sort=sorting.SORT_FILTER_DEFAULT,
         flag_alternance=0,
         flag_junior=0,
         flag_senior=0,
@@ -340,9 +340,9 @@ def build_json_body_elastic_search(
 
     # Build sort.
 
-    if sort not in ['distance', 'score']:
-        logger.info('sort should be distance or score: %s', sort)
-        sort = 'distance'
+    if sort not in sorting.SORT_FILTERS:
+        logger.info('unknown sort: %s', sort)
+        sort = sorting.SORT_FILTER_DEFAULT
 
     distance_sort = {
         "_geo_distance": {
@@ -362,10 +362,10 @@ def build_json_body_elastic_search(
         }
     }
 
-    if sort == "distance":
+    if sort == sorting.SORT_FILTER_DISTANCE:
         sort_attrs.append(distance_sort)
         sort_attrs.append(score_sort)
-    elif sort == "score":
+    elif sort == sorting.SORT_FILTER_SCORE:
         sort_attrs.append(score_sort)
         sort_attrs.append(distance_sort)
 
@@ -402,7 +402,7 @@ def build_json_body_elastic_search(
     return json_body
 
 
-def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonneboite"):
+def get_companies_from_es_and_db(json_body, sort):
     """
     Fetch companies first from Elasticsearch, then from the database.
 
@@ -411,7 +411,7 @@ def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonnebo
     in Elasticsearch) and `companies_count` an integer of the results number.
     """
     es = Elasticsearch()
-    res = es.search(index=index, doc_type="office", body=json_body)
+    res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
     logger.info("Elastic Search request : %s", json_body)
 
     companies = []
@@ -419,7 +419,7 @@ def get_companies_from_es_and_db(json_body, distance_sort=True, index="labonnebo
 
     if siret_list:
 
-        if distance_sort:
+        if sort == sorting.SORT_FILTER_DISTANCE:
             distance_sort_index = 0
         else:
             distance_sort_index = 1
@@ -507,7 +507,10 @@ def build_location_suggestions(term):
         },
         "size": 10
     }
-    res = es.search(index="labonneboite", doc_type="location", body=body)
+    # FIXME ugly : in tests we use dev ES index instead of test ES index
+    # we should use index=settings.ES_INDEX instead of index='labonneboite'
+    # however we cannot yet since location+ogr data is not yet in ES test index data
+    res = es.search(index='labonneboite', doc_type="location", body=body)
 
     suggestions = []
     first_score = None
@@ -570,7 +573,10 @@ def build_job_label_suggestions(term):
         "size": 0,
     }
 
-    res = es.search(index="labonneboite", doc_type="ogr", body=body)
+    # FIXME ugly : in tests we use dev ES index instead of test ES index
+    # we should use index=settings.ES_INDEX instead of index='labonneboite'
+    # however we cannot yet since location+ogr data is not yet in ES test index data
+    res = es.search(index='labonneboite', doc_type="ogr", body=body)
 
     suggestions = []
 

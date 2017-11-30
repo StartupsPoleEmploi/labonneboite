@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, Optional
 from labonneboite.conf import settings
 from labonneboite.common import pro
 from labonneboite.common import search
-from labonneboite.conf.common.settings_common import SORTING_CHOICES
+from labonneboite.common import sorting
 
 
 class CompanySearchForm(FlaskForm):
@@ -70,8 +70,8 @@ class CompanySearchForm(FlaskForm):
 
     sort = RadioField(
         u'Classement par',
-        choices=SORTING_CHOICES,
-        default=settings.SORT_FILTER_DEFAULT,
+        choices=sorting.SORTING_CHOICES,
+        default=sorting.SORT_FILTER_DEFAULT,
         validators=[Optional()])
 
     naf = SelectField(

@@ -5,6 +5,7 @@ import time
 from labonneboite.common.models import Office
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.api import util
+from labonneboite.conf import settings
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import scoring as scoring_util
 
@@ -81,6 +82,8 @@ class ApiBaseTest(DatabaseTest):
 
     def setUp(self, *args, **kwargs):
         super(ApiBaseTest, self).setUp(*args, **kwargs)
+
+        settings.ES_INDEX = self.ES_TEST_INDEX  # Override the setting value.
 
         # Delete index.
         self.es.indices.delete(index=self.ES_TEST_INDEX, params={'ignore': [404]})
