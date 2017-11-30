@@ -48,8 +48,13 @@ pylint:
 
 .PHONY: vagrant_start vagrant_stop vagrant_ssh_dev vagrant_ssh_test vagrant_reload
 
-vagrant_start:
-	cd vagrant && vagrant up --provision;
+vagrant_up:
+	cd vagrant && vagrant up;
+
+vagrant_provision:
+	cd vagrant && vagrant provision;
+
+vagrant_start: vagrant_up vagrant_provision
 
 vagrant_stop:
 	cd vagrant && vagrant halt;
@@ -64,7 +69,7 @@ vagrant_ssh_test:
 
 # Reload Vagrant and Vagrantfile quickly.
 vagrant_reload:
-	cd vagrant && vagrant reload --provision;
+	cd vagrant && vagrant reload;
 
 # Local dev
 # ---------
