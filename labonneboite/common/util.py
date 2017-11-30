@@ -24,9 +24,11 @@ def timeit(func):
         ts = time()
         result = func(*args, **kw)
         te = time()
-        if ENABLE_TIMEIT_TIMERS:
+        duration = te-ts
+        # anything under 1sec is not worth polluting the logs
+        if ENABLE_TIMEIT_TIMERS and duration >= 1.0:
             msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
-              (func.__name__, te-ts, args, kw)
+              (func.__name__, duration, args, kw)
             # logger messages are displayed immediately in jenkins console output
             logger.info(msg)
             # print messages are displayed all at once when the job ends in jenkins console output

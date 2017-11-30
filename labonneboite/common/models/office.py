@@ -5,7 +5,7 @@ import logging
 from babel.dates import format_date
 
 from flask import url_for
-from sqlalchemy import Column, Index, Integer, String, Float, Boolean
+from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy import PrimaryKeyConstraint
 from backports.functools_lru_cache import lru_cache
 
@@ -81,6 +81,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     Warning: the table behind this model is regularly entirely dropped and recreated
     at the end of an importer cycle when a new dataset is deployed (once a month in theory).
+    For this reason, it is very important that Office and ExportableOffice are kept 100% in
+    sync, i.e. have the exact same columns.
 
     For example, if you want to add a new column, first be sure to give it a default value,
     as when the importer imports a new office dataset, this column will be entirely populated
@@ -103,7 +105,6 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     __tablename__ = settings.OFFICE_TABLE
     __table_args__ = (
-        Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),
     )
 

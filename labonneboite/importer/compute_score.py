@@ -75,8 +75,10 @@ def check_coefficient_of_variation(departement, coefficient_of_variation):
     logger.info("checking mean_between_existing_and_new_score: %s", coefficient_of_variation)
     if not discarded_check(departement):
         if not coefficient_of_variation < importer_settings.SCORE_COEFFICIENT_OF_VARIATION_MAX:
-            raise_with_message("coefficient_of_variation too high: %s > %s" % (
-                coefficient_of_variation, importer_settings.SCORE_COEFFICIENT_OF_VARIATION_MAX
+            raise_with_message("[dpt%s] coefficient_of_variation too high: %s > %s" % (
+                departement,
+                coefficient_of_variation,
+                importer_settings.SCORE_COEFFICIENT_OF_VARIATION_MAX
             ))
 
 
@@ -154,10 +156,9 @@ def merge_and_normalize_websites(websites):
 def load_df(engine, etablissement_table, dpae_table, departement, most_recent_data_date):
     logger.debug("reading data with most recent data date %s...", most_recent_data_date)
     logger.debug("filtering by departement (%s)...", departement)
-    # keep only contract_type = 2 (CDI) and contract_type = 1 (CDD which last at least one month)
+    
     df_dpae = pd.read_sql_query("""
-        select siret, hiring_date, contract_type, contract_duration from %s where departement = %s
-        and (contract_type = 2 or (contract_type = 1 and contract_duration > 31))
+        select siret, hiring_date from %s where departement = %s
         """ % (dpae_table, departement), engine)
     debug_df(df_dpae, "after loading from dpae table")
     if df_dpae.empty:
@@ -432,6 +433,11 @@ def export(engine, df_final, departement):
 
     df_final['departement'] = df_final.apply(departement_to_str, axis=1)
 
+    # FIXME control more precisely the schema (indexes!) of temporary tables created by to_sql,
+    # current version adds an 'index' column (which is the panda dataframe index column itself,
+    # nothing to do with our app) and makes it a primary key.
+    # see https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_sql.html
+    # Maybe using no index at all (no primary key) would be faster.
     df_final.to_sql("etablissements_%s" % departement, engine, if_exists='replace', chunksize=10000)
     logger.debug("sql done (%s)!", departement)
 
@@ -460,8 +466,8 @@ def run(source_etablissement_table, dpae_table, departement, dpae_date, semester
         else:
             logger.debug("merging existing scores for %s", departement)
             # merge doc : http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.merge.html
-            # by default how='inner' use intersection of keys from both frames (SQL: inner join)
-            # what we need here is how=left: use only keys from left frame (SQL: left outer join)
+            # by default how='inner' use intersection of keys from both dataframes (SQL: inner join)
+            # what we need here is how='left': use only keys from left dataframe (SQL: left outer join)
             # because we keep all companies from current extract, whether or not they were present before
             debug_df(df_etab, "before merge with df_existing_score")
             df_etab = pd.merge(df_etab, df_existing_score, on="siret", how="left")

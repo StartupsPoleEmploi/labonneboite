@@ -5,9 +5,9 @@ from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
 from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import ImportTask
+from labonneboite.importer.models.computing import RawOffice
 from labonneboite.common import departements as dpt
 from labonneboite.common import encoding as encoding_util
-from labonneboite.common.models import Office
 from labonneboite.common.database import db_session
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
@@ -34,7 +34,7 @@ class EtablissementExtractJob(Job):
 
     @timeit
     def after_check(self):
-        query = db_session.query(Office.departement.distinct().label("departement"))
+        query = db_session.query(RawOffice.departement.distinct().label("departement"))
         departements = [row.departement for row in query.all()]
 
         if len(departements) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
@@ -44,8 +44,9 @@ class EtablissementExtractJob(Job):
             )
             raise Exception(msg)
 
+        # FIXME parallelize for better performance
         for departement in departements:
-            count = Office.query.filter_by(departement=departement).count()
+            count = RawOffice.query.filter_by(departement=departement).count()
             logger.info("number of companies in departement %s : %i", departement, count)
             if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
                 msg = "too few companies in departement : %s instead of expected %s" % (
@@ -194,7 +195,7 @@ class EtablissementExtractJob(Job):
         offices = {}
 
         with import_util.get_reader(self.input_filename) as myfile:
-            header_line = myfile.readline().strip()
+            header_line = myfile.readline().strip()  # FIXME detect column positions from header
             if "siret" not in header_line:
                 logger.debug(header_line)
                 raise "wrong header line"
@@ -204,7 +205,7 @@ class EtablissementExtractJob(Job):
                     logger.debug("reading line %i", count)
 
                 try:
-                    fields = import_util.get_fields_from_csv_line(line)
+                    fields = import_util.get_fields_from_csv_line(line, sep='\xa5')
                     if len(fields) != 16:
                         logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
@@ -263,16 +264,16 @@ class EtablissementExtractJob(Job):
         logger.info("per departement read %s", departement_count)
         logger.info("finished reading offices...")
 
-        if unprocessable_departement_errors > 2000:
+        if unprocessable_departement_errors > 2500:
             raise ValueError("too many unprocessable_departement_errors")
         if no_zipcode_count > 50000:
             raise ValueError("too many no_zipcode_count")
         if format_errors > 5:
             raise ValueError("too many format_errors")
-        if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE:
+        if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
             msg = "incorrect total number of departements : %s instead of expected %s" % (
                 len(departement_counter_dic),
-                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES_FROM_FILE
+                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
             )
             raise ValueError(msg)
         for departement, count in departement_count:

@@ -62,9 +62,10 @@ class DpaeExtractJob(Job):
                 contract_duration,
                 iiann,
                 tranche_age,
-                handicap_label
+                handicap_label,
+                duree_pec
                 )
-            values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
+            values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
         """ % settings.DPAE_TABLE
         imported_dpae = 0
         imported_dpae_distribution = {}
@@ -76,7 +77,7 @@ class DpaeExtractJob(Job):
 
         with import_util.get_reader(self.input_filename) as myfile:
             con, cur = import_util.create_cursor()
-            header_line = myfile.readline().strip()
+            header_line = myfile.readline().strip()   # FIXME detect column positions from header
             if "siret" not in header_line:
                 logger.debug(header_line)
                 raise Exception("wrong header line")
@@ -99,11 +100,8 @@ class DpaeExtractJob(Job):
                         raise
                 try:
                     siret, hiring_date, zipcode, contract_type, departement, contract_duration, \
-                    iiann, tranche_age, handicap_label = parse_dpae_line(line)
-                except ValueError:
-                    self.zipcode_errors += 1
-                    continue
-                except DepartementException:
+                    iiann, tranche_age, handicap_label, duree_pec = parse_dpae_line(line)
+                except (ValueError, DepartementException):
                     self.zipcode_errors += 1
                     continue
                 except InvalidRowException:
@@ -111,7 +109,16 @@ class DpaeExtractJob(Job):
                     self.invalid_row_errors += 1
                     continue
 
-                if hiring_date > initial_most_recent_data_date and hiring_date <= self.most_recent_data_date:
+                dpae_should_be_imported = (
+                    hiring_date > initial_most_recent_data_date 
+                    and hiring_date <= self.most_recent_data_date
+                    # in DPAE we only keep contract_type == 2 (CDI)
+                    # and contract_type == 1 (CDD which last at least one month)
+                    # we ignore contract_type == 3 (Seasonal contracts)
+                    and (contract_type == 2 or (contract_type == 1 and contract_duration > 31))
+                )
+
+                if dpae_should_be_imported:
                     statement = (
                         siret,
                         hiring_date,
@@ -121,7 +128,8 @@ class DpaeExtractJob(Job):
                         contract_duration,
                         iiann,
                         tranche_age,
-                        handicap_label
+                        handicap_label,
+                        duree_pec,
                     )
                     statements.append(statement)
                     imported_dpae += 1
@@ -149,10 +157,10 @@ class DpaeExtractJob(Job):
         logger.info("not imported dpae: %i", not_imported_dpae)
         logger.info("zipcode errors: %i", self.zipcode_errors)
         logger.info("invalid_row errors: %i", self.invalid_row_errors)
-        if self.zipcode_errors >= 100:
-            raise Exception('too many zipcode errors')
-        if self.invalid_row_errors >= 100:
-            raise Exception('too many invalid_row errors')
+        if self.zipcode_errors > settings.MAXIMUM_ZIPCODE_ERRORS:
+            raise IOError('too many zipcode errors')
+        if self.invalid_row_errors > settings.MAXIMUM_INVALID_ROWS:
+            raise IOError('too many invalid_row errors')
         statistics = DpaeStatistics(last_import=datetime.now(), most_recent_data_date=self.most_recent_data_date)
         statistics.save()
         con.commit()

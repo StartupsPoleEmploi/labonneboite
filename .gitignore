@@ -85,3 +85,4 @@ labonneboite/importer/data/*.csv
 labonneboite/importer/jenkins/*.jenkins
 labonneboite/importer/output/*.bz2
 labonneboite/importer/output/*.gz
+labonneboite/importer/output/*.sql

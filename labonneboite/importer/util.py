@@ -56,13 +56,13 @@ def check_for_updates(input_folder):
 
 
 @timeit
-def back_up(backup_folder, table, filename, timestamp, copy_to_remote_server=True, rename_table=False):
+def back_up(backup_folder, table, filename, timestamp, copy_to_remote_server=True, new_table_name=None):
     timestamp_filename = '%s_backup_%s.sql.gz' % (filename, timestamp)
     backup_filename = os.path.join(backup_folder, timestamp_filename)
     password_statement = "-p'%s'" % DATABASE['PASSWORD']
     logger.info("backing up table %s into %s", table, backup_filename)
-    if rename_table:
-        table_new = table+"_new"
+    if new_table_name:
+        table_new = new_table_name
     else:
         table_new = table
 
@@ -245,22 +245,17 @@ def clean_temporary_tables():
             DATABASE['USER'], password_statement, DATABASE['NAME'], drop_table_query), shell=True)
 
 
-def get_fields_from_csv_line(line):
+def get_fields_from_csv_line(line, sep='|'):
     # get rid of invisible space characters (\xc2) if present
     line = line.strip().replace('\xc2', '')
-    # ignore enclosing quotes if present
-    if (line[0] in ["'", '"']):
-        line = line[1:]
-    if (line[-1] in ["'", '"']):
-        line = line[:-1]
     # split using delimiter special character \xa5
-    fields = [encoding_util.sanitize_string(f) for f in line.split('\xa5')]
+    fields = [encoding_util.sanitize_string(f) for f in line.split(sep)]
     return fields
 
 
 def parse_dpae_line(line):
     fields = get_fields_from_csv_line(line)
-    required_fields = 24
+    required_fields = 25
     if len(fields) != required_fields:  # an assert statement here does not work from nosetests
         msg = ("found %s fields instead of %s in line: %s" % (
             len(fields), required_fields, line
@@ -300,15 +295,20 @@ def parse_dpae_line(line):
         "+ de 50 ans": TRANCHE_AGE_SENIOR
     }
 
-    try:
-        tranche_age = choices[remove_exotic_characters(fields[22])]
-    except KeyError:
-        raise ValueError("unknown tranche_age %s" % fields[22])
+    handicap_label = fields[22]
 
-    handicap_label = fields[23]
+    try:
+        tranche_age = choices[remove_exotic_characters(fields[23])]
+    except KeyError:
+        raise ValueError("unknown tranche_age %s" % fields[23])
+
+    try:
+        duree_pec = int(fields[24])
+    except ValueError:
+        duree_pec = None
 
     return (siret, hiring_date, zipcode, contract_type, departement,
-        contract_duration, iiann, tranche_age, handicap_label)
+        contract_duration, iiann, tranche_age, handicap_label, duree_pec)
 
 
 def get_file_extension(filename):

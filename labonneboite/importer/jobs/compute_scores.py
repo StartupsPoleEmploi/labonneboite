@@ -69,18 +69,20 @@ class ScoreComputingJob(Job):
                 departements = COMPUTE_SCORES_DEBUG_DEPARTEMENTS
 
         if DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING:  # single thread computing
+            logger.info("starting single thread computing pool...")
             for departement in departements:
                 compute_result = compute(settings.RAW_OFFICE_TABLE,
                     settings.DPAE_TABLE, departement, most_recent_data_date)
                 compute_results[departement] = compute_result
         else:  # parallel computing
+            logger.info("starting parallel computing pool (%s jobs in parallel)...", mp.cpu_count())
             for departement in departements:
                 abortable_func = partial(abortable_worker, compute)
-                compute_result = pool.apply_async(
+                # apply_async returns immediately
+                compute_results[departement] = pool.apply_async(
                     abortable_func,
                     args=(settings.RAW_OFFICE_TABLE, settings.DPAE_TABLE, departement, most_recent_data_date)
                 )
-                compute_results[departement] = compute_result.get()
 
             logger.info("going to close process pool...")
             pool.close()
@@ -88,6 +90,20 @@ class ScoreComputingJob(Job):
             pool.join()
             logger.info("all compute_score done, analyzing results...")
 
+            at_least_one_departement_failed = False
+
+            for departement in departements:
+                # get() blocks until job is completed, this is why we run it only after
+                # all jobs have completed.
+                try:
+                    compute_results[departement] = compute_results[departement].get()
+                except Exception as e:
+                    logger.info("departement %s met exception : %s", departement, repr(e))
+                    at_least_one_departement_failed = True
+
+            if at_least_one_departement_failed:
+                raise Exception('At least one departement failed. See above for details.')
+                    
         for departement, compute_result in compute_results.iteritems():
             if not bool(compute_result):
                 logger.info("departement with error : %s", departement)

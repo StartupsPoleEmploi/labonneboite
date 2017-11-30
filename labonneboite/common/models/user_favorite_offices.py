@@ -19,11 +19,11 @@ class UserFavoriteOffice(CRUDMixin, Base):
 
     Important:
     This model has a relation to the `etablissements` model via the `office_siret` field.
-    But the `etablissements` table is dropped and recreated during the offices import
-    process (remember that `etablissements` is currently excluded from the migration system).
+    But the `etablissements` table is dropped and recreated during the offices import process.
     Some entries in `etablissements` may disappear during this process.
     Therefore the `office_siret` foreign key integrity may be broken.
-    So the foreign key integrity must be enforced by the script of the data deployment process.
+    The data deployment process takes care of dropping then recreating the foreign key
+    during import. Favorites linked to no longer existing offices will be dropped.
     """
     __tablename__ = 'user_favorite_offices'
     __table_args__ = (
@@ -40,7 +40,7 @@ class UserFavoriteOffice(CRUDMixin, Base):
     user = relationship('User')
     if get_current_env() == ENV_LBBDEV:
         # Disable relationship which mysteriously breaks on lbbdev only, not needed there anyway.
-        # FIXME try again to fix this bug. Bug happens in lbbdev environment only.
+        # FIXME very ugly, try again to fix this bug. Bug happens in lbbdev environment only.
         pass
     else:
         office = relationship('Office', lazy='joined')

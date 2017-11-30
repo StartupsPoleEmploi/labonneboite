@@ -3,6 +3,9 @@ Etablissements are imported for Pole Emploi databases without geo coordinates.
 
 This module assists in finding and assigning geo coordinates to etablissements.
 
+Documentation about the open data API we use here:
+https://adresse.data.gouv.fr/api/
+https://adresse.data.gouv.fr/faq/
 """
 import requests
 import gevent
@@ -21,14 +24,16 @@ from labonneboite.importer.jobs.common import logger
 
 gevent.monkey.patch_socket()
 
-connection_limit = 10
+# maximum 10 requests in parrallel, as can be seen on
+# https://adresse.data.gouv.fr/faq/
+pool_size = 10
+connection_limit = pool_size
 adapter = requests.adapters.HTTPAdapter(pool_connections=connection_limit,
                                         pool_maxsize=connection_limit,
                                         max_retries=4)
 session = requests.session()
 session.mount('http://', adapter)
 jobs = []
-pool_size = 10
 pool = Pool(pool_size)
 
 CITY_NAMES = load_city_codes()
@@ -150,9 +155,10 @@ class GeocodeJob(Job):
             ban_jobs.append(job_id)
             count += 1
             if not count % 1000:
-                logger.info("running geocoding jobs : started %s jobs, collected %s coordinates so far",
+                logger.info("running geocoding jobs : started %s of %s jobs, collected %s coordinates so far",
                         count,
-                        len(coordinates_updates)
+                        len(geocoding_jobs),
+                        len(coordinates_updates),
                         )
                 gevent.joinall(ban_jobs)
                 ban_jobs = []
