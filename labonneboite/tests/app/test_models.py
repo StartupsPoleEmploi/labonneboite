@@ -127,4 +127,3 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         self.assertEqual(office.naf, office_json['naf'])
         self.assertEqual(office.distance, office_json['distance'])
         self.assertEqual(office.flag_alternance, office_json['alternance'])
-        print office_json
