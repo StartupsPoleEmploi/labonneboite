@@ -1,8 +1,9 @@
 # coding: utf8
 import datetime
 
+from labonneboite.conf import settings
 from labonneboite.common.database import db_session
-from labonneboite.common.models import OfficeAdminExtraGeoLocation
+from labonneboite.common.models import Office, OfficeAdminExtraGeoLocation
 from labonneboite.tests.test_base import DatabaseTest
 
 
@@ -100,3 +101,30 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         codes_as_json_geolocations = OfficeAdminExtraGeoLocation.codes_as_json_geolocations(codes)
         expected = '[[48.8815994262695, 2.36229991912841]]'
         self.assertEqual(expected, codes_as_json_geolocations)
+
+    def test_office_as_json(self):
+        # Create office
+        office = Office(
+            siret=u'00000000000001',
+            company_name=u'1',
+            headcount=u'11',
+            city_code=u'57070',
+            zipcode=u'57070',
+            naf=u'7320Z',
+            score=90,
+            x=6.166667,
+            y=49.133333,
+            flag_alternance=1
+        )
+        office.distance = 10
+
+        office_json = office.as_json()
+        self.assertEqual(office.siret, office_json['siret'])
+        self.assertEqual(office.company_name, office_json['name'])
+        self.assertEqual(settings.HEADCOUNT_INSEE[office.headcount], office_json['headcount_text'])
+        self.assertEqual(office.x, office_json['lon'])
+        self.assertEqual(office.y, office_json['lat'])
+        self.assertEqual(office.naf, office_json['naf'])
+        self.assertEqual(office.distance, office_json['distance'])
+        self.assertEqual(office.flag_alternance, office_json['alternance'])
+        print office_json
