@@ -270,9 +270,18 @@ class ApiBaseTest(DatabaseTest):
                 'naf': u'4648Z',  # Map to Rome B1603
                 'siret': u'00000000000015',
                 'score': 80,
-                'headcount': 53, # headcount_text : '10 000 salariés et plus'
+                'headcount': 53,
                 'locations': self.positions['poitiers']['coords'],
                 'name': u'Office 15',
+                'flag_alternance': 0
+            },
+            {
+                'naf': u'4648Z',  # Map to Rome B1603
+                'siret': u'00000000000016',
+                'score': 70,
+                'headcount': 53,
+                'locations': self.positions['poitiers']['coords'],
+                'name': u'Office 16',
                 'flag_alternance': 1
             }
         ]
