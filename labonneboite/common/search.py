@@ -441,7 +441,12 @@ def get_companies_from_es_and_db(json_body, sort):
             company_dict[obj.siret] = obj
 
         for siret in siret_list:
-            company = company_dict[siret]
+            try:
+                company = company_dict[siret]
+            except KeyError as e:
+                e.message = "ES and DB out of sync: siret %s is in ES but not in DB - this should never happen" % siret
+                logger.exception(e)
+                raise
             if company.has_city():
                 companies.append(company)
             else:
