@@ -105,6 +105,8 @@ class DatabaseTest(AppTest):
         self.es.indices.create(index=self.ES_TEST_INDEX, body=request_body)
 
     def setUp(self):
+        # Disable elasticsearch logging
+        logging.getLogger('elasticsearch').setLevel(logging.CRITICAL)
 
         # Create MySQL tables.
         delete_db()
@@ -118,7 +120,6 @@ class DatabaseTest(AppTest):
         return super(DatabaseTest, self).setUp()
 
     def tearDown(self):
-
         # Drop MySQL tables.
         db_session.remove()
         engine.dispose()
