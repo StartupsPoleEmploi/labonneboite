@@ -490,7 +490,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         """
         office = Office.get(self.office.siret)
         self.assertNotEquals(office.email_alternance, "email_alternance@mail.com")
-        
+
         office_to_update = OfficeAdminUpdate(
             siret=self.office.siret,
             name=self.office.company_name,
@@ -502,6 +502,49 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         office = Office.get(self.office.siret)
         self.assertEquals(office.email_alternance, "email_alternance@mail.com")
+
+    def test_update_office_add_naf(self):
+        romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office.naf)]
+        romes_for_office += [rome.code for rome in mapping_util.romes_for_naf("4772A")]
+
+        office_to_update = OfficeAdminUpdate(
+            siret=self.office.siret,
+            name=self.office.company_name,
+            nafs_to_add=["4772A"]
+        )
+        office_to_update.save()
+
+        script.update_offices()
+        time.sleep(1)  # Sleep required by ES to register new documents.
+
+        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
+
+        # There is no duplicate romes between '4772A' and '4711D'
+        self.assertEquals(len(romes_for_office), len(res['_source']['scores_by_rome']))
+
+    def test_update_office_add_naf_no_duplicate_rome(self):
+        # Avoid removing romes if its score is too low
+        script.SCORE_FOR_ROME_MINIMUM = 0
+
+        romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office.naf)]
+        romes_for_office += [rome.code for rome in mapping_util.romes_for_naf("7010Z")]
+
+        office_to_update = OfficeAdminUpdate(
+            siret=self.office.siret,
+            name=self.office.company_name,
+            nafs_to_add=["7010Z"]
+        )
+        office_to_update.save()
+
+        script.update_offices()
+        time.sleep(1)  # Sleep required by ES to register new documents.
+
+        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
+
+        # There is some duplicate romes between '4711D' and '7010Z'
+        # which have to be here once
+        self.assertEquals(len(set(romes_for_office)), len(res['_source']['scores_by_rome']))
+        self.assertNotEquals(len(romes_for_office), len(res['_source']['scores_by_rome']))
 
 class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
     """

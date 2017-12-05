@@ -106,7 +106,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
 
     __tablename__ = 'etablissements_admin_update'
 
-    ROMES_SEPARATORS = [u'\n', u'\r']
+    SEPARATORS = [u'\n', u'\r']
 
     id = Column(Integer, primary_key=True)
     siret = Column(String(191), nullable=False, unique=True)
@@ -121,13 +121,17 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     # Set `boost` to True to promote the offfice.
     boost = Column(Boolean, default=False, nullable=False)
 
-    # Stores a list of ROME codes as a string separated by `ROMES_SEPARATORS`.
+    # Stores a list of ROME codes as a string separated by `SEPARATORS`.
     # If `romes_to_boost` is populated, boosting will be set only for specified ROME codes.
     romes_to_boost = Column(Text, default='', nullable=False)
 
-    # Stores a list of ROME codes as a string separated by `ROMES_SEPARATORS`.
+    # Stores a list of ROME codes as a string separated by `SEPARATORS`.
     # If `romes_to_remove` is populated, these ROME codes will not be indexed
     romes_to_remove = Column(Text, default='', nullable=False)
+
+    # Stores a list of NAF codes as a string separated by `SEPARATORS`.
+    # If `nafs_to_add` is populated, all the romes associated to this NAF will be added.
+    nafs_to_add = Column(Text, default='', nullable=False)
 
     # Info to remove.
     remove_email = Column(Boolean, default=False, nullable=False)
@@ -161,17 +165,17 @@ class OfficeAdminUpdate(CRUDMixin, Base):
         on a `before_insert` or `before_update` event via `listens_for`.
         """
         # Remove multiple newlines in `romes_to_boost`.
-        separator = self.ROMES_SEPARATORS[0]
-        self.romes_to_boost = separator.join(self.romes_as_list(self.romes_to_boost))
+        separator = self.SEPARATORS[0]
+        self.romes_to_boost = separator.join(self.as_list(self.romes_to_boost))
 
     @staticmethod
-    def romes_as_list(codes):
+    def as_list(codes):
         """
         Converts the given string of ROME codes to a Python list of unique ROME codes.
         """
         if not codes:
             return []
-        separators = OfficeAdminUpdate.ROMES_SEPARATORS
+        separators = OfficeAdminUpdate.SEPARATORS
         codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
         return sorted(set(codes))
 
@@ -181,7 +185,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
         Used in the admin UI.
         """
         html = []
-        for rome in self.romes_as_list(romes):
+        for rome in self.as_list(romes):
             html.append(u"{0} - {1}".format(rome, settings.ROME_DESCRIPTIONS[rome]))
         return '<br>'.join(html)
 

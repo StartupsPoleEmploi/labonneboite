@@ -393,23 +393,31 @@ def get_scores_by_rome(office, office_to_update=None):
 
     # fetch all rome_codes mapped to the naf of this office
     # as we will compute a score adjusted for each of them
-    try:
-        rome_codes = mapping_util.get_romes_for_naf(office.naf)
-    except KeyError:
-        # unfortunately some NAF codes have no matching ROME at all
-        rome_codes = []
+    office_nafs = [office.naf]
+    # Handle NAFs added to a company
+    if office_to_update:
+        office_nafs += list(office_to_update.as_list(office_to_update.nafs_to_add))
+
+
+    rome_codes = []
+    for naf in office_nafs:
+        try:
+            rome_codes += mapping_util.get_romes_for_naf(naf)
+        except KeyError:
+            # unfortunately some NAF codes have no matching ROME at all
+            pass
 
     romes_to_boost = []
     if office_to_update:
         # Add unrelated rome for indexing (with boost)
-        romes_to_boost = office_to_update.romes_as_list(office_to_update.romes_to_boost)
+        romes_to_boost = office_to_update.as_list(office_to_update.romes_to_boost)
         rome_codes += list(set(romes_to_boost) - set(rome_codes))
 
         # Remove unwanted romes
-        romes_to_remove = office_to_update.romes_as_list(office_to_update.romes_to_remove)
+        romes_to_remove = office_to_update.as_list(office_to_update.romes_to_remove)
         rome_codes = list(set(rome_codes) - set(romes_to_remove))
 
-    for rome_code in rome_codes:
+    for rome_code in set(rome_codes):
         score = 0
 
         # With boosting.
