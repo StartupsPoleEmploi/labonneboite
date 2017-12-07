@@ -77,6 +77,14 @@ class ApiBaseTest(DatabaseTest):
             }],
             'zip_code': u'64000',
             'commune_id': u'64445',
+        },
+        'poitiers': {
+            'coords': [{
+                'lat': 46.5833,
+                'lon': 0.3333,
+            }],
+            'zip_code': u'86000',
+            'commune_id': u'86194',
         }
     }
 
@@ -259,6 +267,25 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['pau']['coords'],
                 'name': u'Office 14',
                 'flag_alternance': 0
+            },
+            # For flag_alternance in response
+            {
+                'naf': u'4648Z',  # Map to Rome B1603
+                'siret': u'00000000000015',
+                'score': 80,
+                'headcount': 53,
+                'locations': self.positions['poitiers']['coords'],
+                'name': u'Office 15',
+                'flag_alternance': 0
+            },
+            {
+                'naf': u'4648Z',  # Map to Rome B1603
+                'siret': u'00000000000016',
+                'score': 70,
+                'headcount': 53,
+                'locations': self.positions['poitiers']['coords'],
+                'name': u'Office 16',
+                'flag_alternance': 1
             }
         ]
         for i, doc in enumerate(docs, start=1):
@@ -306,6 +333,7 @@ class ApiBaseTest(DatabaseTest):
                 zipcode=zip_code,
                 email=u'foo@bar.com',
                 departement=zip_code[:2],
+                flag_alternance=doc['flag_alternance'],
                 headcount=doc['headcount'],
                 x=doc['locations'][0]['lon'],
                 y=doc['locations'][0]['lat'],

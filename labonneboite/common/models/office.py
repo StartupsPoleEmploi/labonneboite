@@ -127,6 +127,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         `extra_query_string` (dict): extra query string to be added to the API
         urls for each office.
         """
+
         extra_query_string = extra_query_string or {}
         json = {
             'address': self.address_as_text,
@@ -141,6 +142,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'stars': self.get_stars_for_rome_code(rome_code),
             'url': self.get_url_for_rome_code(rome_code, **extra_query_string),
             'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
+            'alternance': self.flag_alternance,
             # Warning: the `distance` field is added by `get_companies_from_es_and_db`,
             # this is NOT a model field or property!
             'distance': self.distance,
