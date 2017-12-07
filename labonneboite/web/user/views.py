@@ -169,9 +169,9 @@ def pro_version():
 
     pro.toggle_pro_version()
 
-    redirect_url = request.args.get('next', '/')
+    redirect_url = request.args.get(u'next', u'/')
 
-    if not util.is_safe_url(redirect_url):
-        redirect_url = '/'
+    if not redirect_url or not util.is_safe_url(redirect_url):
+        redirect_url = u'/'
 
     return redirect(redirect_url)
