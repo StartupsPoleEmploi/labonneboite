@@ -396,56 +396,61 @@ def get_scores_by_rome(office, office_to_update=None):
     office_nafs = [office.naf]
     # Handle NAFs added to a company
     if office_to_update:
-        office_nafs += list(office_to_update.as_list(office_to_update.nafs_to_add))
+        office_nafs += office_to_update.as_list(office_to_update.nafs_to_add)
 
+    romes_to_boost = romes_to_remove = []
+    if office_to_update:
+        romes_to_boost = office_to_update.as_list(office_to_update.romes_to_boost)
+        romes_to_remove = office_to_update.as_list(office_to_update.romes_to_remove)
 
-    rome_codes = []
     for naf in office_nafs:
         try:
-            rome_codes += mapping_util.get_romes_for_naf(naf)
+            rome_codes = mapping_util.get_romes_for_naf(naf)
         except KeyError:
             # unfortunately some NAF codes have no matching ROME at all
-            pass
+            continue
 
-    romes_to_boost = []
-    if office_to_update:
         # Add unrelated rome for indexing (with boost)
-        romes_to_boost = office_to_update.as_list(office_to_update.romes_to_boost)
         rome_codes += list(set(romes_to_boost) - set(rome_codes))
 
         # Remove unwanted romes
-        romes_to_remove = office_to_update.as_list(office_to_update.romes_to_remove)
         rome_codes = list(set(rome_codes) - set(romes_to_remove))
 
-    for rome_code in set(rome_codes):
-        score = 0
+        for rome_code in rome_codes:
+            score = 0
 
-        # With boosting.
-        if office_to_update and office_to_update.boost:
-            if not office_to_update.romes_to_boost:
-                # Boost the score for all ROME codes.
-                # @vermeer guaranteed that a "real" score will never be equal to 100.
-                score = 100
-            else:
-                # Boost the score for some ROME codes only.
-                if rome_code in romes_to_boost:
+            # With boosting.
+            if office_to_update and office_to_update.boost:
+                if not office_to_update.romes_to_boost:
+                    # Boost the score for all ROME codes.
+                    # @vermeer guaranteed that a "real" score will never be equal to 100.
                     score = 100
                 else:
-                    score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                        score=office.score,
-                        rome_code=rome_code,
-                        naf_code=office.naf)
+                    # Boost the score for some ROME codes only.
+                    if rome_code in romes_to_boost:
+                        score = 100
+                    else:
+                        score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                            score=office.score,
+                            rome_code=rome_code,
+                            naf_code=naf)
 
-        # Without boosting.
-        else:
-            score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                score=office.score,
-                rome_code=rome_code,
-                naf_code=office.naf)
+            # Without boosting.
+            else:
+                score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                    score=office.score,
+                    rome_code=rome_code,
+                    naf_code=naf)
 
-        if score >= SCORE_FOR_ROME_MINIMUM:
-            scores_by_rome[rome_code] = score
-            st.increment_office_score_for_rome_count()
+            if score >= SCORE_FOR_ROME_MINIMUM:
+                try:
+                    # Max score if a score already exists for this rome
+                    if scores_by_rome[rome_code] < score:
+                        scores_by_rome[rome_code] = score
+                except KeyError:
+                    # New rome code
+                    scores_by_rome[rome_code] = score
+                    st.increment_office_score_for_rome_count()
 
     return scores_by_rome
 

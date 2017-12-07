@@ -229,7 +229,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 flash(msg, 'error')
                 return False
 
-            print office_to_update.naf
             office_romes = [item.code for item in mapping_util.romes_for_naf(office_to_update.naf)]
             for rome in OfficeAdminUpdate.as_list(romes_to_remove):
 

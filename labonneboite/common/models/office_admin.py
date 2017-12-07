@@ -171,7 +171,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     @staticmethod
     def as_list(codes):
         """
-        Converts the given string of ROME codes to a Python list of unique ROME codes.
+        Converts the given string of codes to a Python list of unique codes.
         """
         if not codes:
             return []
