@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name=viewport content="width=device-width, initial-scale=1">
     <meta name="google-site-verification" content="u049KXeNisFhYyb2alIBRJGWP1E6Y0YFfgyk1nWH1Xs">
-    <title>{% block title %} | La Bonne Boite{% endblock %}</title>
+    <title>{% block fulltitle %}{% block title %}{% endblock %} | La Bonne Boite{% endblock %}</title>
     {% block extrahead %}{% endblock %}
     {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
 </head>

@@ -70,15 +70,13 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 
 - Create a settings file (see below)
 
-- `cd labonneboite/vagrant`
-
-- `vagrant up`
+- `make vagrant_start`
 
 Go get coffee and look into the LBB code in the meantime, it's going to take a while.
 
 Most likely, `vagrant up` **will throw some error and not finish the first time**, we need to finish the provisioning process by running:
 
-- `vagrant provision`
+- `make vagrant_provision`
 
 until it does.
 

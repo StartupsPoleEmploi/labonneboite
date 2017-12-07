@@ -40,14 +40,14 @@ class ApiGenericTest(ApiBaseTest):
         latitude = 49.305658  # 15 Avenue François Mitterrand, 57290 Fameck, France.
         longitude = 6.116853
         distance = 100
-        headcount_filter = settings.HEADCOUNT_SMALL_ONLY
+        headcount = settings.HEADCOUNT_SMALL_ONLY
         companies, _, _ = fetch_companies(
             naf_codes,
             rome_code,
             latitude,
             longitude,
             distance,
-            headcount_filter=headcount_filter,
+            headcount=headcount,
         )
         sirets = [company.siret for company in companies]
         self.assertIn(u'00000000000001', sirets)  # this is the only office with small headcount

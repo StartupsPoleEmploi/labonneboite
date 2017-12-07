@@ -60,8 +60,8 @@ PARAMETER_FIELD_MAPPING = {
     'mode': 'mode',
     'naf': 'naf',
     'sort': 'sort',
-    'from': 'from',
-    'to': 'to',
+    'from': 'from_number',
+    'to': 'to_number',
     'f_a': 'flag_alternance',
     'p': 'public',
 }
@@ -84,14 +84,14 @@ def get_parameters(args):
         kwargs['headcount'] = settings.HEADCOUNT_FILTER_DEFAULT
 
     try:
-        kwargs['from'] = int(kwargs.get('from'))
+        kwargs['from_number'] = int(kwargs.get('from_number'))
     except ValueError:
-        kwargs['from'] = 1
+        kwargs['from_number'] = 1
 
     try:
-        kwargs['to'] = int(kwargs.get('to'))
+        kwargs['to_number'] = int(kwargs.get('to_number'))
     except ValueError:
-        kwargs['to'] = kwargs['from'] + settings.PAGINATION_COMPANIES_PER_PAGE - 1
+        kwargs['to_number'] = kwargs['from_number'] + settings.PAGINATION_COMPANIES_PER_PAGE - 1
 
     if kwargs.get('sort') == '':
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
@@ -118,18 +118,16 @@ def get_parameters(args):
 def results(city, zipcode, occupation):
 
     kwargs = get_parameters(request.args)
-    kwargs['city'] = city
-    kwargs['zipcode'] = zipcode
+    city = search_util.CityLocation(city, zipcode)
     kwargs['occupation'] = occupation
 
     canonical = '/entreprises/%s-%s/%s' % (city, zipcode, occupation)
 
     # Remove keys with empty values.
-    form_kwargs = {key: val for key, val in dict(**kwargs).items() if val}
-
-    city = city.replace('-', ' ').capitalize()
-    full_location = '%s (%s)' % (city, zipcode)
-    form_kwargs['location'] = full_location
+    form_kwargs = {key: val for key, val in kwargs.items() if val}
+    form_kwargs['location'] = city.full_name
+    form_kwargs['city'] = city.slug
+    form_kwargs['zipcode'] = city.zipcode
 
     # Get ROME code (Répertoire Opérationnel des Métiers et des Emplois).
     rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
@@ -138,22 +136,15 @@ def results(city, zipcode, occupation):
     if not rome:
         form_kwargs['job'] = occupation
         form = CompanySearchForm(**form_kwargs)
-        context = {'job_doesnt_exist': True, 'form': form}
-        return render_template('search/results.html', **context)
+        return render_template('search/results.html', job_doesnt_exist=True, form=form)
 
     session['search_args'] = request.args
 
     # Fetch companies and alternatives.
-    fetcher = search_util.Fetcher(**kwargs)
+    fetcher = search_util.Fetcher(city, **kwargs)
     alternative_rome_descriptions = []
-    
-    try:
-        fetcher.init_location()
-        zipcode_is_invalid = False
-    except search_util.InvalidZipcodeError:
-        zipcode_is_invalid = True
 
-    if zipcode_is_invalid:
+    if not city.is_location_correct:
         companies = []
         naf_aggregations = []
         company_count = 0
@@ -176,7 +167,7 @@ def results(city, zipcode, occupation):
         # Let's do a second call, only if a NAF filter is selected.
         # This logic is designed to make only one elasticsearch call in the most frequent case (no NAF filter selected)
         # and make two elasticsearch calls in the rarest case only (NAF filter selected).
-        if kwargs.get("naf"):
+        if fetcher.naf:
             naf_aggregations = fetcher.get_naf_aggregations()
 
     naf_codes_with_descriptions = []
@@ -185,9 +176,7 @@ def results(city, zipcode, occupation):
         naf_codes_with_descriptions.append((naf_aggregate["naf"], naf_description))
 
     # Pagination.
-    from_number_param = int(kwargs.get('from') or 1)
-    to_number_param = int(kwargs.get('to') or 10)
-    pagination_manager = PaginationManager(company_count, from_number_param, to_number_param, request.full_path)
+    pagination_manager = PaginationManager(company_count, fetcher.from_number, fetcher.to_number, request.full_path)
     current_page = pagination_manager.get_current_page()
 
     # Get contact mode and position.
@@ -208,24 +197,21 @@ def results(city, zipcode, occupation):
         'city': city,
         'companies': list(companies),
         'company_count': company_count,
-        'distance': kwargs['distance'],
+        'distance': fetcher.distance,
         'doorbell_tags': doorbell.get_tags('results'),
         'form': form,
-        'headcount': kwargs['headcount'],
+        'headcount': fetcher.headcount,
         'job_doesnt_exist': False,
-        'location': full_location,
-        'zipcode_is_invalid': zipcode_is_invalid,
-        'naf': kwargs['naf'],
+        'naf': fetcher.naf,
         'naf_codes': naf_codes_with_descriptions,
         'page': current_page,
         'pagination': pagination_manager,
         'rome_code': rome,
         'rome_description': settings.ROME_DESCRIPTIONS.get(fetcher.rome, ''),
         'show_favorites': True,
-        'sort': kwargs['sort'],
+        'sort': fetcher.sort,
         'tile_server_url': settings.TILE_SERVER_URL,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
-        'zipcode': zipcode,
     }
     return render_template('search/results.html', **context)
 

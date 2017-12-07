@@ -31,7 +31,7 @@ pylint_all:
 	vagrant ssh -c '$(VAGRANT_ACTIVATE_VENV) && \
 	pylint --rcfile=$(VAGRANT_PYLINT_RC) --reports=no \
 		--output-format=colorized $(VAGRANT_PACKAGE_SRC_DIR) || \
-	true';
+	true'
 
 # Run pylint on a specific file, e.g.:
 # make pylint FILE=labonneboite/web/app.py
@@ -40,7 +40,7 @@ pylint:
 	vagrant ssh -c '$(VAGRANT_ACTIVATE_VENV) && \
 	pylint --rcfile=$(VAGRANT_PYLINT_RC) --reports=no \
 		--output-format=colorized $(VAGRANT_PACKAGE_SRC_PATH)$(FILE) || \
-	true';
+	true'
 
 
 # Vagrant
@@ -48,23 +48,28 @@ pylint:
 
 .PHONY: vagrant_start vagrant_stop vagrant_ssh_dev vagrant_ssh_test vagrant_reload
 
-vagrant_start:
-	cd vagrant && vagrant up --provision;
+vagrant_up:
+	cd vagrant && vagrant up
+
+vagrant_provision:
+	cd vagrant && vagrant provision
+
+vagrant_start: vagrant_up vagrant_provision
 
 vagrant_stop:
-	cd vagrant && vagrant halt;
+	cd vagrant && vagrant halt
 
 vagrant_ssh_dev:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb && bash';
+	cd /srv/lbb && bash'
 
 vagrant_ssh_test:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=test && \
-	cd /srv/lbb && bash';
+	cd /srv/lbb && bash'
 
 # Reload Vagrant and Vagrantfile quickly.
 vagrant_reload:
-	cd vagrant && vagrant reload --provision;
+	cd vagrant && vagrant reload
 
 # Local dev
 # ---------
@@ -76,11 +81,11 @@ vagrant_reload:
 
 serve_web_app:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	python /srv/lbb/labonneboite/web/app.py';
+	python /srv/lbb/labonneboite/web/app.py'
 
 create_sitemap:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_sitemap.py sitemap';
+	cd /srv/lbb/labonneboite && python scripts/create_sitemap.py sitemap'
 
 prepare_mailing_data:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
@@ -90,15 +95,15 @@ prepare_mailing_data:
 
 create_index:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_index.py';
+	cd /srv/lbb/labonneboite && python scripts/create_index.py'
 
 create_index_from_scratch:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1';
+	cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1'
 
 create_index_from_scratch_with_profiling:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1 -p 1';
+	cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1 -p 1'
 
 create_index_from_scratch_with_profiling_on_staging:
 	ssh deploy@lbbstaging -t 'bash -c "\
@@ -107,18 +112,18 @@ create_index_from_scratch_with_profiling_on_staging:
         cd /home/deploy/code/current/labonneboite/labonneboite && \
         time python scripts/create_index.py -d 1 -p 1"' && \
     scp deploy@lbbstaging:/home/deploy/code/current/labonneboite/labonneboite/scripts/profiling_results/*.kgrind \
-    	labonneboite/scripts/profiling_results/staging/;
+    	labonneboite/scripts/profiling_results/staging/
 
 create_index_from_scratch_with_profiling_single_job:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1 -p 1 -s 1';
+	cd /srv/lbb/labonneboite && python scripts/create_index.py -d 1 -p 1 -s 1'
 
 create_index_from_scratch_with_profiling_line_by_line:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && kernprof -v -l scripts/create_index.py -d 1 -p 1 -s 1';
+	cd /srv/lbb/labonneboite && kernprof -v -l scripts/create_index.py -d 1 -p 1 -s 1'
 
 mysql_local_shell:
-	cd vagrant && vagrant ssh --command 'mysql -u root -D labonneboite --host 127.0.0.1';
+	cd vagrant && vagrant ssh --command 'mysql -u root -D labonneboite --host 127.0.0.1'
 
 rebuild_importer_tests_compressed_files:
 	cd labonneboite/importer/tests/data && \
@@ -146,44 +151,47 @@ start_locust_against_localhost:
 		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
 	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --slave & \
 		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
-	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --master';
+	&& locust --locustfile=scripts/loadtesting.py --host=http://localhost:5000 --master'
 
 # Tests
 # -----
 
-.PHONY: test_all test_app test_importer test_api test_integration test_scripts test_selenium
+.PHONY: test_all test_unit test_app test_importer test_api test_integration test_scripts test_selenium
 
-test_all: clean_pyc test_app test_importer test_api test_integration test_scripts test_selenium
+test_unit: clean_pyc test_app test_importer test_api test_integration test_scripts
+
+test_all: test_unit test_selenium
+
 
 test_app:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/tests/app';
+	&& nosetests -s /srv/lbb/labonneboite/tests/app'
 
 test_importer:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/importer/tests';
+	&& nosetests -s /srv/lbb/labonneboite/importer/tests'
 
 test_api:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/tests/web/api';
+	&& nosetests -s /srv/lbb/labonneboite/tests/web/api'
 
 test_integration:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/tests/web/integration';
+	&& nosetests -s /srv/lbb/labonneboite/tests/web/integration'
 
 test_scripts:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/tests/scripts';
+	&& nosetests -s /srv/lbb/labonneboite/tests/scripts'
 
 # Selenium tests are run against the full database (not the test one)
 # as of now: we use LBB_ENV=development.
@@ -191,24 +199,24 @@ test_selenium:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=development \
-	&& nosetests -s /srv/lbb/labonneboite/tests/web/selenium';
+	&& nosetests -s /srv/lbb/labonneboite/tests/web/selenium'
 
 # Alembic migrations
 # ------------------
 
 alembic_migrate:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb && alembic upgrade head';
+	cd /srv/lbb && alembic upgrade head'
 
 alembic_rollback:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb && alembic downgrade -1';
+	cd /srv/lbb && alembic downgrade -1'
 
 # FIXME something is still wrong with this one
 # upgrade and downgrade methods should be swapped in resulting migration
 alembic_autogenerate_migration_for_all_existing_tables:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb && alembic revision --autogenerate';
+	cd /srv/lbb && alembic revision --autogenerate'
 
 alembic_generate_single_migration:
 	echo 'run this command from inside vagrant: alembic revision -m "create account table"'
@@ -240,44 +248,44 @@ run_importer_job_00_prepare_all:  # FIXME DNRY table names
 		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
 		cp tests/data/LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv data/ && \
 		cp tests/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
-		echo "completed importer run preparation."';
+		echo "completed importer run preparation."'
 
 run_importer_job_01_check_etablissements:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		python jobs/check_etablissements.py';
+		python jobs/check_etablissements.py'
 
 run_importer_job_02_extract_etablissements:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		python jobs/extract_etablissements.py';
+		python jobs/extract_etablissements.py'
 
 run_importer_job_03_check_dpae:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		python jobs/check_dpae.py';
+		python jobs/check_dpae.py'
 
 run_importer_job_04_extract_dpae:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		python jobs/extract_dpae.py';
+		python jobs/extract_dpae.py'
 
 run_importer_job_05_compute_scores:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		python jobs/compute_scores.py';
+		python jobs/compute_scores.py'
 
 run_importer_job_06_validate_scores:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		python jobs/validate_scores.py';
+		python jobs/validate_scores.py'
 
 run_importer_job_07_geocode:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		python jobs/geocode.py';
+		python jobs/geocode.py'
 
 run_importer_job_08_populate_flags:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 		cd /srv/lbb/labonneboite && cd importer && \
-		python jobs/populate_flags.py';
+		python jobs/populate_flags.py'

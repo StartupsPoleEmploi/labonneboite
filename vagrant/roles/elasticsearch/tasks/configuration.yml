@@ -24,6 +24,6 @@
     - "elasticsearch hard nofile 32000"
   notify: restart elasticsearch
 
-- name: ensure service is started
-  service: name=elasticsearch state=started
+- name: ensure service is started now and on boot
+  service: name=elasticsearch state=started enabled=yes
   when: es_manage_service
