@@ -182,7 +182,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         """
         is_valid = super(OfficeAdminAddModelView, self).validate_form(form)
         if is_valid:
-            office_to_remove = OfficeAdminRemove.query.filter_by(siret=form.data['siret']).first()
+            office_to_remove = OfficeAdminRemove.query.filter_by(id=form.data['id']).first()
             if office_to_remove:
                 # Use the link of the list view with a filter on the `siret`, because
                 # the delete button is missing on the edit and/or detail view.

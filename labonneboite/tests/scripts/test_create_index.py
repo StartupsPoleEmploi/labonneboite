@@ -2,12 +2,18 @@
 import datetime
 import time
 
+from flask import url_for
+from social_flask_sqlalchemy.models import UserSocialAuth
+
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
-from labonneboite.common.models import OfficeAdminExtraGeoLocation
+from labonneboite.common.models import OfficeAdminExtraGeoLocation, User
+from labonneboite.common.database import db_session
 from labonneboite.scripts import create_index as script
 from labonneboite.tests.test_base import DatabaseTest
+from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
+
 
 
 class CreateIndexBaseTest(DatabaseTest):
@@ -62,6 +68,70 @@ class CreateIndexBaseTest(DatabaseTest):
         # Ensure that the office is the one that has been indexed in ES.
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office.siret)
         self.assertEquals(res['_source']['email'], self.office.email)
+
+class DeleteOfficeAdminTest(CreateIndexBaseTest):
+    def test_remove_office_admin(self):
+        # Create officeAdminRemove and OfficeAdminAdd
+        office_to_remove = OfficeAdminRemove(
+            id=1,
+            siret=self.office.siret,
+            name=self.office.company_name,
+            reason=u"N/A",
+            initiative=False,
+        )
+        office_to_add = OfficeAdminAdd(
+            id=1,
+            siret=self.office.siret,
+            company_name=self.office.company_name,
+            office_name=self.office.office_name,
+            naf=self.office.naf,
+            street_number=self.office.street_number,
+            street_name=self.office.street_name,
+            zipcode=self.office.zipcode,
+            city_code=self.office.city_code,
+            flag_alternance=self.office.flag_alternance,
+            flag_junior=self.office.flag_junior,
+            flag_senior=self.office.flag_senior,
+            departement=self.office.departement,
+            headcount=self.office.headcount,
+            score=self.office.score,
+            x=self.office.x,
+            y=self.office.y,
+            reason=u"Demande de mise en avant",
+        )
+        office_to_remove.save()
+        office_to_add.save()
+
+        self.assertEquals(1, OfficeAdminRemove.query.filter_by(id=1).count())
+        self.assertEquals(1, OfficeAdminAdd.query.filter_by(id=1).count())
+
+        with self.test_request_context:
+            # Create an user admin
+            self.user = User(email=u'john@doe.com', gender=u'male',
+                             first_name=u'John', last_name=u'Doe', active=True,
+                             is_admin=True)
+            db_session.add(self.user)
+            db_session.flush()
+
+            user_social_auth = UserSocialAuth(
+                provider=PEAMOpenIdConnect.name,
+                extra_data={'id_token': 'fake'},
+                user_id=self.user.id,
+            )
+            db_session.add(user_social_auth)
+            db_session.commit()
+
+            # Login as user admin
+            self.user = db_session.query(User).filter_by(id=self.user.id).first()
+            self.assertEquals(db_session.query(User).count(), 1)
+            self.login(self.user)
+
+            # Calls to delete OfficeAdminRemove and OfficeAdminAdd
+            self.app.post(url_for('officeadminadd.delete_view'), data={'id': 1})
+            self.app.post(url_for('officeadminremove.delete_view'), data={'id': 1})
+
+            self.assertEquals(0, OfficeAdminRemove.query.filter_by(id=1).count())
+            self.assertEquals(0, OfficeAdminAdd.query.filter_by(id=1).count())
 
 
 class VariousModesTest(CreateIndexBaseTest):
