@@ -1,5 +1,5 @@
 # coding: utf8
-from flask import flash
+from flask import flash, request
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView
 from wtforms import validators
@@ -173,9 +173,27 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         },
     }
 
+    def create_form(self):
+        form = super(OfficeAdminUpdateModelView, self).create_form()
+        if 'siret' in request.args:
+            form.siret.data = request.args['siret']
+        if 'name' in request.args:
+            form.name.data = request.args['name']
+        if 'requested_by_email' in request.args:
+            form.requested_by_email.data = request.args['requested_by_email']
+        if 'requested_by_first_name' in request.args:
+            form.requested_by_first_name.data = request.args['requested_by_first_name']
+        if 'requested_by_last_name' in request.args:
+            form.requested_by_last_name.data = request.args['requested_by_last_name']
+        if 'requested_by_phone' in request.args:
+            form.requested_by_phone.data = request.args['requested_by_phone']
+        if 'reason' in request.args:
+            form.reason.data = request.args['reason']
+
+        return form
+
     def validate_form(self, form):
         is_valid = super(OfficeAdminUpdateModelView, self).validate_form(form)
-
         # Codes ROMES to boost or to add
         if is_valid and form.data.get('romes_to_boost'):
 
