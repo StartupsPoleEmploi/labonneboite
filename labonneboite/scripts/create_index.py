@@ -398,7 +398,8 @@ def get_scores_by_rome(office, office_to_update=None):
     if office_to_update:
         office_nafs += office_to_update.as_list(office_to_update.nafs_to_add)
 
-    romes_to_boost = romes_to_remove = []
+    romes_to_boost = []
+    romes_to_remove = []
     if office_to_update:
         romes_to_boost = office_to_update.as_list(office_to_update.romes_to_boost)
         romes_to_remove = office_to_update.as_list(office_to_update.romes_to_remove)
@@ -410,11 +411,8 @@ def get_scores_by_rome(office, office_to_update=None):
             # unfortunately some NAF codes have no matching ROME at all
             continue
 
-        # Add unrelated rome for indexing (with boost)
-        rome_codes += list(set(romes_to_boost) - set(rome_codes))
-
-        # Remove unwanted romes
-        rome_codes = list(set(rome_codes) - set(romes_to_remove))
+        # Add unrelated rome for indexing (with boost) and remove unwanted romes
+        rome_codes = set(rome_codes) + set(romes_to_boost) - set(romes_to_remove)
 
         for rome_code in rome_codes:
             score = 0
@@ -443,12 +441,9 @@ def get_scores_by_rome(office, office_to_update=None):
                     naf_code=naf)
 
             if score >= SCORE_FOR_ROME_MINIMUM:
-                try:
-                    # Max score if a score already exists for this rome
-                    if scores_by_rome[rome_code] < score:
-                        scores_by_rome[rome_code] = score
-                except KeyError:
-                    # New rome code
+                if rome_code in scores_by_rome and score > scores_by_rome[rome_code]:
+                    scores_by_rome[rome_code] = score
+                else:
                     scores_by_rome[rome_code] = score
                     st.increment_office_score_for_rome_count()
 
