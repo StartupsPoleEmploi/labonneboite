@@ -2,7 +2,7 @@
 create email_alternance column
 
 Revision ID: 11fc7f39f7fc
-Revises: 0592646101eb
+Revises: 4db5a80597e7
 Create Date: 2017-11-20 11:19:59.347665
 """
 from alembic import op
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 # Revision identifiers, used by Alembic.
 revision = '11fc7f39f7fc'
-down_revision = '0592646101eb'
+down_revision = '4db5a80597e7'
 branch_labels = None
 depends_on = None
 

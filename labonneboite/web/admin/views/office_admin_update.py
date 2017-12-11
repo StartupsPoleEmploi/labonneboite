@@ -8,6 +8,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office, OfficeAdminUpdate
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter, siret_validator
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
+from labonneboite.conf import settings
 
 
 class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
@@ -35,6 +36,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'boost',
         'romes_to_boost',
         'romes_to_remove',
+        'nafs_to_add',
         'new_email',
         'email_alternance',
         'new_phone',
@@ -67,6 +69,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'boost': u"Booster le score",
         'romes_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement",
         'romes_to_remove': u"Retirer des codes ROME associés à une entreprise",
+        'nafs_to_add': u"Ajouter un ou plusieurs NAF à une entreprise",
         'new_email': u"Nouvel email",
         'email_alternance': u"Email dédié à l'alternance",
         'new_phone': u"Nouveau téléphone",
@@ -97,6 +100,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             u"<br>"
             u"<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
         ),
+        'nafs_to_add': Markup(
+            u"Veuillez entrer un NAF par ligne."
+        ),
         'romes_to_remove': Markup(
             u"Veuillez entrer un ROME par ligne."
             u"<br>"
@@ -119,6 +125,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'boost',
         'romes_to_boost',
         'romes_to_remove',
+        'nafs_to_add',
         'new_email',
         'email_alternance',
         'new_phone',
@@ -145,6 +152,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             'filters': [strip_filter],
         },
         'romes_to_remove': {
+            'filters': [strip_filter],
+        },
+        'nafs_to_add': {
             'filters': [strip_filter],
         },
         'new_email': {
@@ -198,7 +208,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 flash(msg, 'error')
                 return False
 
-            for rome in OfficeAdminUpdate.romes_as_list(romes_to_boost):
+            for rome in OfficeAdminUpdate.as_list(romes_to_boost):
                 if not mapping_util.rome_is_valid(rome):
                     msg = (
                         u"`%s` n'est pas un code ROME valide."
@@ -220,7 +230,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 return False
 
             office_romes = [item.code for item in mapping_util.romes_for_naf(office_to_update.naf)]
-            for rome in OfficeAdminUpdate.romes_as_list(romes_to_remove):
+            for rome in OfficeAdminUpdate.as_list(romes_to_remove):
 
                 if not mapping_util.rome_is_valid(rome):
                     msg = (
@@ -237,5 +247,24 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                     flash(msg, 'error')
                     return False
 
+        # Codes NAF to add
+        if is_valid and form.data.get('nafs_to_add'):
+            nafs_to_add = form.data.get('nafs_to_add')
+
+            office_to_update = Office.query.filter_by(siret=form.data['siret']).first()
+            if not office_to_update:
+                msg = u"Le siret `%s` n'est pas présent sur LBB." % form.data['siret']
+                flash(msg, 'error')
+                return False
+
+            for naf in OfficeAdminUpdate.as_list(nafs_to_add):
+                if naf not in settings.NAF_CODES:
+                    msg = u"`%s` n'est pas un code NAF valide." % naf
+                    flash(msg, 'error')
+                    return False
+                if naf == office_to_update.naf:
+                    msg = u"Le NAF `%s` est déjà associé à cette entreprise." % naf
+                    flash(msg, 'error')
+                    return False
 
         return is_valid
