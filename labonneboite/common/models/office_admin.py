@@ -114,6 +114,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
 
     # Info to update.
     new_email = Column(String(191), default='', nullable=False)
+    email_alternance = Column(String(191), default='', nullable=False)
     new_phone = Column(String(191), default='', nullable=False)
     new_website = Column(String(191), default='', nullable=False)
 

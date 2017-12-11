@@ -54,6 +54,7 @@ class OfficeMixin(PrimitiveOfficeMixin):
     in sync.
     """
     website = Column(String(191), default='', nullable=False)
+    email_alternance = Column('email_alternance', String(191), default='', nullable=True)
     flag_alternance = Column(Boolean, default=False, nullable=False)
     flag_junior = Column(Boolean, default=False, nullable=False)
     flag_senior = Column(Boolean, default=False, nullable=False)
@@ -164,6 +165,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'codecommune': self.city_code,
             'codepostal': self.zipcode,
             'email': self.email,
+            'email_alternance': self.email_alternance,
             'tel': self.phone,
             'departement': self.departement,
             'trancheeffectif': self.headcount,
