@@ -412,7 +412,7 @@ def get_scores_by_rome(office, office_to_update=None):
             continue
 
         # Add unrelated rome for indexing (with boost) and remove unwanted romes
-        rome_codes = set(rome_codes) + set(romes_to_boost) - set(romes_to_remove)
+        rome_codes = set(rome_codes).union(set(romes_to_boost)) - set(romes_to_remove)
 
         for rome_code in rome_codes:
             score = 0
