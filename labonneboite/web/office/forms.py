@@ -10,9 +10,9 @@ from wtforms.validators import DataRequired, Email, Regexp
 class OfficeRemovalForm(FlaskForm):
 
     ACTION_CHOICES = (
-        (u'promouvoir', u'Que mon entreprise soit davantage mise en avant'),
-        (u'enlever', u'Supprimer mon entreprise des résultats'),
-        (u'modifier', u'Mettre à jour les informations de mon entreprise'),
+        (u'promouvoir', u'Promouvoir mon entreprise sur le site'),
+        (u'enlever', u'Retirer mon entreprise du site'),
+        (u'modifier', u'Modifier les coordonnées de mon entreprise sur le site'),
         (u'autre', u'Autre')
     )
 
