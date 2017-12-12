@@ -70,31 +70,30 @@ class CreateIndexBaseTest(DatabaseTest):
         self.assertEquals(res['_source']['email'], self.office.email)
 
 class DeleteOfficeAdminTest(CreateIndexBaseTest):
-    def test_remove_office_admin_add(self):
-        # Create OfficeAdminAdd
-        office_to_add = OfficeAdminAdd(
-            id=1,
-            siret=self.office.siret,
-            company_name=self.office.company_name,
-            office_name=self.office.office_name,
-            naf=self.office.naf,
-            street_number=self.office.street_number,
-            street_name=self.office.street_name,
-            zipcode=self.office.zipcode,
-            city_code=self.office.city_code,
-            flag_alternance=self.office.flag_alternance,
-            flag_junior=self.office.flag_junior,
-            flag_senior=self.office.flag_senior,
-            departement=self.office.departement,
-            headcount=self.office.headcount,
-            score=self.office.score,
-            x=self.office.x,
-            y=self.office.y,
-            reason=u"Demande de mise en avant",
-        )
-        office_to_add.save()
-
-        self.assertEquals(1, OfficeAdminAdd.query.filter_by(id=1).count())
+    def test_office_admin_add(self):
+        form = {
+            "siret": u"78548035101646",
+            "company_name": u"SUPERMARCHES MATCH",
+            "office_name": u"SUPERMARCHES MATCH",
+            "naf": u"4711D",
+            "street_number": u"45",
+            "street_name": u"AVENUE ANDRE MALRAUX",
+            "city_code": u"57463",
+            "zipcode": u"57000",
+            "email": u"supermarche@match.com",
+            "tel": u"0387787878",
+            "website": u"http://www.supermarchesmatch.fr",
+            "flag_alternance": 0,
+            "flag_junior": 0,
+            "flag_senior": 0,
+            "flag_handicap": 0,
+            "departement": u"57",
+            "headcount": u"12",
+            "score": 90,
+            "x": 6.17952,
+            "y": 49.1044,
+            "reason": u"Demande de mise en avant",
+        }
 
         with self.test_request_context:
             # Create an user admin
@@ -117,22 +116,23 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
             self.assertEquals(db_session.query(User).count(), 1)
             self.login(self.user)
 
-            # Calls to delete OfficeAdminAdd
+            # Create OfficeAdminRemove
+            self.assertEquals(0, OfficeAdminAdd.query.filter_by(id=1).count())
+            self.app.post(url_for('officeadminadd.create_view'), data=form)
+            self.assertEquals(1, OfficeAdminAdd.query.filter_by(id=1).count())
+
+            # Delete OfficeAdminAdd
             self.app.post(url_for('officeadminadd.delete_view'), data={'id': 1})
             self.assertEquals(0, OfficeAdminRemove.query.filter_by(id=1).count())
 
-    def test_remove_office_admin_remove(self):
+    def test_office_admin_remove(self):
         # Create officeAdminRemove
-        office_to_remove = OfficeAdminRemove(
-            id=1,
-            siret=self.office.siret,
-            name=self.office.company_name,
-            reason=u"N/A",
-            initiative=False,
-        )
-        office_to_remove.save()
-
-        self.assertEquals(1, OfficeAdminRemove.query.filter_by(id=1).count())
+        form = {
+            'siret': u'01234567891234',
+            'name': u'Test company',
+            'reason': u'N/A',
+            'initiative': u'office',
+        }
 
         with self.test_request_context:
             # Create an user admin
@@ -155,7 +155,12 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
             self.assertEquals(db_session.query(User).count(), 1)
             self.login(self.user)
 
-            # Calls to delete OfficeAdminRemove
+            # Create OfficeAdminRemove
+            self.assertEquals(0, OfficeAdminRemove.query.filter_by(siret=u'01234567891234').count())
+            self.app.post(url_for('officeadminremove.create_view'), data=form)
+            self.assertEquals(1, OfficeAdminRemove.query.filter_by(siret=u'01234567891234').count())
+
+            # Delete OfficeAdminRemove
             self.app.post(url_for('officeadminremove.delete_view'), data={'id': 1})
             self.assertEquals(0, OfficeAdminRemove.query.filter_by(id=1).count())
 
