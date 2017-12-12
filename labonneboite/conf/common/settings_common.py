@@ -84,6 +84,7 @@ ROME_NAF_PROBABILITY_CUTOFF = 0.05
 # GA/GO snippets are only useful in production and staging
 GOOGLE_ANALYTICS_ID = ''
 GOOGLE_OPTIMIZE_ID = ''
+GOOGLE_TAG_MANAGER_ID = 'AAA-AAAAAAA'
 
 if get_current_env() == ENV_LBBDEV:
     # pylint: disable=wildcard-import,unused-wildcard-import

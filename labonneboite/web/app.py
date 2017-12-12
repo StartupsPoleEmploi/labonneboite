@@ -194,6 +194,7 @@ def register_context_processors(flask_app):
             'last_data_deploy_date': Office.get_date_of_last_data_deploy(),
             'google_analytics_id': settings.GOOGLE_ANALYTICS_ID,
             'google_optimize_id': settings.GOOGLE_OPTIMIZE_ID,
+            'google_tag_manager_id': settings.GOOGLE_TAG_MANAGER_ID,
         }
 
     def inject_user():
