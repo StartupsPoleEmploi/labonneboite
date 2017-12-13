@@ -608,16 +608,19 @@ def update_offices():
         office = Office.query.filter_by(siret=office_to_update.siret).first()
 
         if office:
-
             # Apply changes in DB.
             office.email = u'' if office_to_update.remove_email else (office_to_update.new_email or office.email)
-            office.email_alternance = office_to_update.email_alternance or u''
+            office.email_alternance = u'' if office_to_update.remove_flag_alternance else (office_to_update.email_alternance or u'')
             office.tel = u'' if office_to_update.remove_phone else (office_to_update.new_phone or office.tel)
             office.website = u'' if office_to_update.remove_website else (office_to_update.new_website or office.website)
+            office.flag_alternance = False if office_to_update.remove_flag_alternance else office.flag_alternance
             office.save()
 
             # Apply changes in ElasticSearch.
-            body = {'doc': {'email': office.email, 'phone': office.tel, 'website': office.website }}
+            body = {'doc':
+                {'email': office.email, 'phone': office.tel, 'website': office.website,
+                'flag_alternance': 1 if office.flag_alternance else 0 }
+            }
 
             scores_by_rome = get_scores_by_rome(office, office_to_update)
             if scores_by_rome:

@@ -44,6 +44,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'remove_email',
         'remove_phone',
         'remove_website',
+        'remove_flag_alternance',
         'requested_by_email',
         'requested_by_first_name',
         'requested_by_last_name',
@@ -77,6 +78,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'remove_email': u"Ne pas afficher l'email",
         'remove_phone': u"Ne pas afficher le téléphone",
         'remove_website': u"Ne pas afficher le site web",
+        'remove_flag_alternance': u'Ne pas afficher le libellé "Alternance"',
         'requested_by_email': u"Email",
         'requested_by_first_name': u"Prénom",
         'requested_by_last_name': u"Nom",
@@ -116,6 +118,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'remove_email': u"Cocher cette case pour supprimer l'email",
         'remove_phone': u"Cocher cette case pour supprimer le téléphone",
         'remove_website': u"Cocher cette case pour supprimer le site web",
+        'remove_flag_alternance': u"Cocher cette case pour supprimer le libellé 'alternance' et l'email dédié à l'alternance",
         'reason': u"Raison de la modification.",
     }
 
@@ -133,6 +136,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'remove_email',
         'remove_phone',
         'remove_website',
+        'remove_flag_alternance',
         'requested_by_email',
         'requested_by_first_name',
         'requested_by_last_name',

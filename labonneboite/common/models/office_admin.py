@@ -137,6 +137,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     remove_email = Column(Boolean, default=False, nullable=False)
     remove_phone = Column(Boolean, default=False, nullable=False)
     remove_website = Column(Boolean, default=False, nullable=False)
+    remove_flag_alternance = Column(Boolean, default=False, nullable=False)
 
     # Update requested by.
     requested_by_email = Column(String(191), default='', nullable=False)

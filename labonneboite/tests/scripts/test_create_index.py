@@ -528,11 +528,43 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             email_alternance=u"email_alternance@mail.com",
         )
         office_to_update.save(commit=True)
-
         script.update_offices()
 
         office = Office.get(self.office.siret)
         self.assertEquals(office.email_alternance, "email_alternance@mail.com")
+
+    def test_update_office_remove_alternance(self):
+        """
+        Test `update_offices` to remove the flag_alternance and email_alternance
+        """
+        self.office.flag_alternance = 1
+        self.office.save()
+
+        # Add flag_alternance and email_alternance
+        office_to_update = OfficeAdminUpdate(
+            siret=self.office.siret,
+            name=self.office.company_name,
+            email_alternance=u"email_alternance@mail.com",
+        )
+        office_to_update.save(commit=True)
+        script.update_offices()
+
+
+        # Expected alternance infos
+        office = Office.get(self.office.siret)
+        self.assertEquals(office.flag_alternance, 1)
+        self.assertEquals(office.email_alternance, "email_alternance@mail.com")
+
+        # Remove alternance for this company
+        office_to_update.remove_flag_alternance = 1
+        office_to_update.save(commit=True)
+        script.update_offices()
+
+        # Expected no alternance infos
+        office = Office.get(self.office.siret)
+        self.assertEquals(office.flag_alternance, 0)
+        self.assertEquals(office.email_alternance, "")
+
 
     def test_update_office_add_naf(self):
         # Avoid removing romes if its score is too low
