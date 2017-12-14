@@ -174,6 +174,14 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         'reason': {
             'filters': [strip_filter],
         },
+        'x': {
+            'filters': [strip_filter, nospace_filter],
+            'validators': [validators.required()],
+        },
+        'y': {
+            'filters': [strip_filter, nospace_filter],
+            'validators': [validators.required()],
+        },
     }
 
     def validate_form(self, form):
