@@ -10,7 +10,7 @@ from sqlalchemy.dialects import mysql
 import sqlalchemy as sa
 
 # works - even if there is a pylint warning which says it does not.
-from labonneboite.conf import get_current_env, ENV_LBBDEV
+from labonneboite.common.env import get_current_env, ENV_LBBDEV
 
 migration_should_run_in_this_environment = get_current_env() != ENV_LBBDEV
 

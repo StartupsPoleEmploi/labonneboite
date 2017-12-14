@@ -11,7 +11,7 @@ conf/lbbdev.py
 """
 import os
 from datetime import datetime
-from labonneboite.conf import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
+from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
 from labonneboite.common import departements as dpt
 
 # --- importer tables (names and schema)

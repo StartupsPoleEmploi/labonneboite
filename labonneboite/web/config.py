@@ -1,5 +1,9 @@
 # coding: utf8
-from labonneboite.conf import get_current_env, settings, ENV_DEVELOPMENT, ENV_PRODUCTION, ENV_STAGING, ENV_TEST
+"""
+Flask app configuration settings.
+"""
+from labonneboite.conf import settings
+from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT, ENV_PRODUCTION, ENV_STAGING, ENV_TEST
 
 
 class BaseConfig(object):

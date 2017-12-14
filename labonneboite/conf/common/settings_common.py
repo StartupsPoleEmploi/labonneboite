@@ -1,5 +1,18 @@
 # coding: utf8
+"""
+Main app default settings.
 
+This file gathers default value and documentation about each setting.
+
+Environment-specific values of these parameters are overriden in files:
+
+overrides/development.py
+overrides/test.py
+overrides/lbbdev.py
+overrides/staging.py
+overrides/production.py
+"""
+from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST, ENV_STAGING, ENV_PRODUCTION
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 
 ROME_DESCRIPTIONS = load_rome_labels()
@@ -67,3 +80,26 @@ COMPANY_RESULTS_MAX = 100
 AUTOCOMPLETE_MAX = 5
 
 ROME_NAF_PROBABILITY_CUTOFF = 0.05
+
+# GA/GO snippets are only useful in production and staging
+GOOGLE_ANALYTICS_ID = ''
+GOOGLE_OPTIMIZE_ID = ''
+
+if get_current_env() == ENV_LBBDEV:
+    # pylint: disable=wildcard-import,unused-wildcard-import
+    from .overrides.lbbdev import *
+elif get_current_env() == ENV_DEVELOPMENT:
+    # pylint: disable=wildcard-import,unused-wildcard-import
+    from .overrides.development import *
+elif get_current_env() == ENV_TEST:
+    # pylint: disable=wildcard-import,unused-wildcard-import
+    from .overrides.test import *
+elif get_current_env() == ENV_STAGING:
+    # pylint: disable=wildcard-import,unused-wildcard-import
+    from .overrides.staging import *
+elif get_current_env() == ENV_PRODUCTION:
+    # pylint: disable=wildcard-import,unused-wildcard-import
+    from .overrides.production import *
+else:
+    raise Exception("unknown environment")
+
