@@ -7,8 +7,20 @@
     <title>{% block fulltitle %}{% block title %}{% endblock %} | La Bonne Boite{% endblock %}</title>
     {% block extrahead %}{% endblock %}
     {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
+
+    {# Google Tag Manager (GTM) must be placed in HEAD section #}
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','{{ google_tag_manager_id }}');</script>
+
 </head>
 <body>
+
+  {# GTM (noscript version) must be placed at very beginning of BODY section #}
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ google_tag_manager_id }}"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <div class="cookies-banner">
     <p>Les cookies assurent le bon fonctionnement de nos services. En utilisant ces derniers, vous acceptez l'utilisation des cookies.</p>
@@ -185,7 +197,7 @@
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    ga('create', 'UA-69464544-1', 'auto');
+    ga('create', '{{ google_analytics_id }}', 'auto');
     ga('send', 'pageview');
 
     ga('set', 'dimension1', {{ 1 if pro_version_enabled else 0 }});
@@ -219,6 +231,20 @@
         }
     })(document,"script","memoButton");
   </script>
+
+  {# Adblock tracking #}
+  {# https://juliencoquet.com/en/2015/12/29/measuring-the-impact-of-adblocking-with-google-analytics/ #}
+  <script src="{{ url_for('static', filename='js/ads.js') }}" type="text/javascript"></script>
+  <script type="text/javascript">// <![CDATA[
+  jQuery(document).ready(checkAds()); 
+          function checkAds() {
+              if (document.getElementById('adsense') != undefined) {
+                  document.write("<script>dataLayer.push({'event':'adBlock','blocked':'false'});</sc" + "ript>");
+              } else {
+                  document.write("<script>dataLayer.push({'event':'adBlock','blocked':'true'});</sc" + "ript>");
+              }
+          }
+  // ]]></script>
 
   {% block footer_scripts %}{% endblock %}
 

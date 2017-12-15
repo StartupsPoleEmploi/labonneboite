@@ -7,7 +7,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from labonneboite.conf import get_current_env, settings, ENV_DEVELOPMENT, ENV_TEST
+from labonneboite.conf import settings
+from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT, ENV_TEST
 
 
 CURRENT_ENV = get_current_env()

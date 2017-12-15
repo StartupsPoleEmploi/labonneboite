@@ -1,6 +1,6 @@
 import sys
 from labonneboite.importer import settings
-from labonneboite.conf import get_current_env, ENV_LBBDEV
+from labonneboite.common.env import get_current_env, ENV_LBBDEV
 
 def get_dpae_filename():
     if get_current_env() == ENV_LBBDEV:
