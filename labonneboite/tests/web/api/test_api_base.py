@@ -85,7 +85,23 @@ class ApiBaseTest(DatabaseTest):
             }],
             'zip_code': u'86000',
             'commune_id': u'86194',
-        }
+        },
+        'paris': {
+            'coords': [{
+                'lat': 48.87950,
+                'lon': 2.283439,
+            }],
+            'zip_code': u'75004',
+            'commune_id': u'75056',
+        },
+        'neuilly-sur-seine': {
+            'coords': [{
+                'lat': 48.884831,
+                'lon': 2.26851,
+            }],
+            'zip_code': u'92200',
+            'commune_id': u'92051',
+        },
     }
 
     def setUp(self, *args, **kwargs):
@@ -306,6 +322,27 @@ class ApiBaseTest(DatabaseTest):
                 'name': u'Office 16',
                 'flag_alternance': 1,
                 'department': self.positions['poitiers']['zip_code'][0:2],
+            },
+            # For filter_by_department
+            {
+                'naf': u'5229A',  # Map to Rome N1202
+                'siret': u'00000000000017',
+                'score': 90,
+                'headcount': 53,
+                'locations': self.positions['paris']['coords'],
+                'name': u'Office 17',
+                'flag_alternance': 0,
+                'department': self.positions['paris']['zip_code'][0:2],
+            },
+            {
+                'naf': u'5229A',  # Map to Rome N1202
+                'siret': u'00000000000018',
+                'score': 78,
+                'headcount': 53,
+                'locations': self.positions['neuilly-sur-seine']['coords'],
+                'name': u'Office 18',
+                'flag_alternance': 0,
+                'department': self.positions['neuilly-sur-seine']['zip_code'][0:2],
             }
         ]
         for i, doc in enumerate(docs, start=1):
