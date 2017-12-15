@@ -122,26 +122,26 @@ def detail(siret):
 
 def make_save_suggestion(form):
     # Save informations
-    company = Office.query.filter(Office.siret == form.siret.data).first()
+    company = Office.query.filter_by(siret = form.siret.data).first()
     if not company:
         # OfficeAdminRemove already exits ?
-        office_admin_remove = OfficeAdminRemove.query.filter(OfficeAdminRemove.siret == form.siret.data).first()
+        office_admin_remove = OfficeAdminRemove.query.filter_by(siret = form.siret.data).first()
         if office_admin_remove:
-            url = '%s?id=%s' % (url_for("officeadminremove.edit_view"), office_admin_remove.id)
+            url = url_for("officeadminremove.edit_view", id=office_admin_remove.id)
             return u"Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % url
         else:
             return u'Aucune entreprise trouvée avec le siret %s' % form.siret.data
 
     # OfficeAdminAdd already exits ?
-    office_admin_add = OfficeAdminAdd.query.filter(OfficeAdminAdd.siret == form.siret.data).first()
+    office_admin_add = OfficeAdminAdd.query.filter_by(siret = form.siret.data).first()
     if office_admin_add:
-        url = '%s?id=%s' % (url_for("officeadminadd.edit_view"), office_admin_add.id)
+        url = url_for("officeadminadd.edit_view", id=office_admin_add.id)
         return u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % url
 
     # OfficeAdminUpdate already exits ?
-    office_admin_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.siret == form.siret.data).first()
+    office_admin_update = OfficeAdminUpdate.query.filter_by(siret = form.siret.data).first()
     if office_admin_update:
-        url = '%s?id=%s' % (url_for("officeadminupdate.edit_view"), office_admin_update.id)
+        url = url_for("officeadminupdate.edit_view", id=office_admin_update.id)
         return u"Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % url
 
 

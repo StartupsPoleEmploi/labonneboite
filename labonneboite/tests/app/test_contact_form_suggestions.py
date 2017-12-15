@@ -40,7 +40,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form.siret = StringField(u'Siret')
             form.siret.data = u"12345678901234"
 
-            url = '%s?id=%s' % (url_for("officeadminremove.edit_view"), 1)
+            url = url_for("officeadminremove.edit_view", id=1)
             expected_text = u"Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % url
 
             self.assertEquals(expected_text, make_save_suggestion(form))
@@ -80,7 +80,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form.siret = StringField(u'Siret')
             form.siret.data = u"78548035101646"
 
-            url = '%s?id=%s' % (url_for("officeadminadd.edit_view"), office_admin_add.id)
+            url = url_for("officeadminadd.edit_view", id=office_admin_add.id)
             expected_text = u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % url
 
             self.assertEquals(expected_text, make_save_suggestion(form))
@@ -101,7 +101,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form.siret = StringField(u'Siret')
             form.siret.data = u"78548035101646"
 
-            url = '%s?id=%s' % (url_for("officeadminupdate.edit_view"), office_to_update.id)
+            url = url_for("officeadminupdate.edit_view", id=office_to_update.id)
             expected_text = u"Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % url
 
             self.assertEquals(expected_text, make_save_suggestion(form))
@@ -109,62 +109,11 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
     # Company exists and no OfficeAdmin found and the user ask for a delete
     def test_company_and_no_office_admin_and_ask_remove(self):
         with self.test_request_context:
-            # Create office
-            office = Office(
-                siret=u"78548035101648",
-                company_name=u"Test company",
-                office_name=u"Test company",
-                naf=u"4711D",
-                street_number=u"45",
-                street_name=u"AVENUE ANDRE MALRAUX",
-                city_code=u"57463",
-                zipcode=u"57000",
-                email=u"test@match.com",
-                tel=u"0387787878",
-                website=u"http://www.dummy.fr",
-                flag_alternance=0,
-                flag_junior=0,
-                flag_senior=0,
-                flag_handicap=0,
-                departement=u"57",
-                headcount=u"12",
-                score=90,
-                x=6.17952,
-                y=49.1044,
-            )
+            office = self.create_office()
             office.save()
 
-            # Create form
-            form = OfficeRemovalForm()
-            form.siret = StringField(u'Siret')
-            form.action = SelectField(u'Je souhaite *')
-            form.name = StringField(u"Nom de l'entreprise")
-            form.email = EmailField(u'Email')
-            form.first_name = StringField(u'Prénom')
-            form.last_name = StringField(u'Nom')
-            form.phone = TelField(u'Téléphone')
-            form.comment = TextAreaField(u'Raison')
-
-            # Set form values
-            form.siret.data = u"78548035101648"
-            form.name.data = u"Test company"
-            form.email.data = u"test@mail.com"
-            form.first_name.data = u"firstName"
-            form.last_name.data = u"lastName"
-            form.phone.data = u"010000000"
-            form.comment.data = u"Raison"
-            form.action.data = u"enlever" # Ask to remove the company
-
-            # Prepare expected URL
-            params = {
-                'siret': form.siret.data,
-                'name': form.name.data,
-                'requested_by_email': form.email.data,
-                'requested_by_first_name': form.first_name.data,
-                'requested_by_last_name': form.last_name.data,
-                'requested_by_phone': form.phone.data,
-                'reason': form.comment.data,
-            }
+            form = self.create_form(u'enlever')
+            params = self.create_params(form)
 
             url = '%s?%s' % (url_for("officeadminremove.create_view"), urlencode(params))
             expected_text = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>" % url
@@ -174,64 +123,73 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
     # Company exists and no OfficeAdmin found : suggest officeAdminAdd
     def test_company_and_no_office_admin(self):
         with self.test_request_context:
-            # Create office
-            office = Office(
-                siret=u"78548035101648",
-                company_name=u"Test company",
-                office_name=u"Test company",
-                naf=u"4711D",
-                street_number=u"45",
-                street_name=u"AVENUE ANDRE MALRAUX",
-                city_code=u"57463",
-                zipcode=u"57000",
-                email=u"test@match.com",
-                tel=u"0387787878",
-                website=u"http://www.dummy.fr",
-                flag_alternance=0,
-                flag_junior=0,
-                flag_senior=0,
-                flag_handicap=0,
-                departement=u"57",
-                headcount=u"12",
-                score=90,
-                x=6.17952,
-                y=49.1044,
-            )
+            office = self.create_office()
             office.save()
 
-            # Create form
-            form = OfficeRemovalForm()
-            form.siret = StringField(u'Siret')
-            form.action = SelectField(u'Je souhaite *')
-            form.name = StringField(u"Nom de l'entreprise")
-            form.email = EmailField(u'Email')
-            form.first_name = StringField(u'Prénom')
-            form.last_name = StringField(u'Nom')
-            form.phone = TelField(u'Téléphone')
-            form.comment = TextAreaField(u'Raison')
-
-            # Set form values
-            form.siret.data = u"78548035101648"
-            form.name.data = u"Test company"
-            form.email.data = u"test@mail.com"
-            form.first_name.data = u"firstName"
-            form.last_name.data = u"lastName"
-            form.phone.data = u"010000000"
-            form.comment.data = u"Raison"
-            form.action.data = u"" # No specific value
-
-            # Prepare expected URL
-            params = {
-                'siret': form.siret.data,
-                'name': form.name.data,
-                'requested_by_email': form.email.data,
-                'requested_by_first_name': form.first_name.data,
-                'requested_by_last_name': form.last_name.data,
-                'requested_by_phone': form.phone.data,
-                'reason': form.comment.data,
-            }
+            form = self.create_form()
+            params = self.create_params(form)
 
             url = '%s?%s' % (url_for("officeadminupdate.create_view"), urlencode(params))
             expected_text = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>" % url
 
             self.assertEquals(expected_text, make_save_suggestion(form))
+
+
+    # Create a valid
+    def create_form(self, action=u''):
+        form = OfficeRemovalForm()
+        form.siret = StringField(u'Siret')
+        form.action = SelectField(u'Je souhaite *')
+        form.name = StringField(u"Nom de l'entreprise")
+        form.email = EmailField(u'Email')
+        form.first_name = StringField(u'Prénom')
+        form.last_name = StringField(u'Nom')
+        form.phone = TelField(u'Téléphone')
+        form.comment = TextAreaField(u'Raison')
+
+        # Set form values
+        form.siret.data = u"78548035101648"
+        form.name.data = u"Test company"
+        form.email.data = u"test@mail.com"
+        form.first_name.data = u"firstName"
+        form.last_name.data = u"lastName"
+        form.phone.data = u"010000000"
+        form.comment.data = u"Raison"
+        form.action.data = action
+
+        return form
+
+    def create_params(self, form):
+        return {
+            'siret': form.siret.data,
+            'name': form.name.data,
+            'requested_by_email': form.email.data,
+            'requested_by_first_name': form.first_name.data,
+            'requested_by_last_name': form.last_name.data,
+            'requested_by_phone': form.phone.data,
+            'reason': form.comment.data,
+        }
+
+    def create_office(self):
+        return Office(
+            siret=u"78548035101648",
+            company_name=u"Test company",
+            office_name=u"Test company",
+            naf=u"4711D",
+            street_number=u"45",
+            street_name=u"AVENUE ANDRE MALRAUX",
+            city_code=u"57463",
+            zipcode=u"57000",
+            email=u"test@match.com",
+            tel=u"0387787878",
+            website=u"http://www.dummy.fr",
+            flag_alternance=0,
+            flag_junior=0,
+            flag_senior=0,
+            flag_handicap=0,
+            departement=u"57",
+            headcount=u"12",
+            score=90,
+            x=6.17952,
+            y=49.1044,
+        )
