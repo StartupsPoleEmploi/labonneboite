@@ -289,7 +289,9 @@ def build_json_body_elastic_search(
         flag_junior=0,
         flag_senior=0,
         flag_handicap=0,
-        aggregate_by=None):
+        aggregate_by=None,
+        departments=None,
+    ):
 
     score_for_rome_field_name = "scores_by_rome.%s" % rome_code
 
@@ -371,6 +373,15 @@ def build_json_body_elastic_search(
             }
         }
     })
+
+
+    if departments:
+        regex = '|'.join(departments)
+        filters.append({
+            'regexp': {
+                'department': regex
+            }
+        })
 
     # Build sort.
 

@@ -162,6 +162,13 @@ def company_list():
         if not headcount:
             return u'invalid headcount value. Possible values : %s' % ', '.join(HEADCOUNT_VALUES.keys()), 400
 
+    departments = []
+    if 'departments' in request.args and request.args.get('departments'):
+        departments = request.args.get('departments').split(',')
+        unknown_departments = [dep for dep in departments if not geocoding.is_departement(dep)]
+        if unknown_departments:
+            return u'invalid departments : %s' % ', '.join(unknown_departments), 400
+
     companies, companies_count, _ = search.fetch_companies(
         naf_codes_list,
         rome_code,
@@ -173,6 +180,7 @@ def company_list():
         to_number=to_number,
         flag_alternance=flag_alternance,
         sort=sort,
+        departments=departments,
     )
 
     # Define additional query string to add to office urls

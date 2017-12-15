@@ -125,6 +125,10 @@ class ApiBaseTest(DatabaseTest):
                             "type": "integer",
                             "index": "not_analyzed"
                         },
+                        "department": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        },
                         "locations": {
                             "type": "geo_point",
                         }
@@ -144,7 +148,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 11,
                 'locations': self.positions['bayonville_sur_mad']['coords'],
                 'name': u'Office 1',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['bayonville_sur_mad']['zip_code'][0:2],
             },
             {
                 'naf': u'7320Z',  # Map to ROME D1405.
@@ -153,7 +158,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 31,
                 'locations': self.positions['bayonville_sur_mad']['coords'],
                 'name': u'Office 2',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['bayonville_sur_mad']['zip_code'][0:2],
             },
             {
                 'naf': u'7320Z',  # Map to ROME D1405.
@@ -162,7 +168,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 31,
                 'locations': self.positions['bayonville_sur_mad']['coords'],
                 'name': u'Office 3',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['bayonville_sur_mad']['zip_code'][0:2],
             },
             {
                 'naf': u'7320Z',  # Map to ROME D1405.
@@ -171,7 +178,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 31,
                 'locations': self.positions['caen']['coords'],
                 'name': u'Office 4',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['caen']['zip_code'][0:2],
             },
             {
                 'naf': u'9511Z',  # Map to ROME M1801.
@@ -180,7 +188,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 31,
                 'locations': self.positions['caen']['coords'],
                 'name': u'Office 5',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['caen']['zip_code'][0:2],
             },
             # For NAF filter
             {
@@ -190,7 +199,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 31,
                 'locations': self.positions['metz']['coords'],
                 'name': u'Office 6',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['metz']['zip_code'][0:2],
             },
             {
                 'naf': u'5610C',  # Map to ROME D1508.
@@ -199,7 +209,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 50,
                 'locations': self.positions['metz']['coords'],
                 'name': u'Office 7',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['metz']['zip_code'][0:2],
             },
             # For result sort
             {
@@ -209,7 +220,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 50,
                 'locations': self.positions['nantes']['coords'],
                 'name': u'Office 8',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['nantes']['zip_code'][0:2],
             },
             {
                 'naf': u'7010Z', # Map to ROME D1211
@@ -218,7 +230,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 50,
                 'locations': self.positions['reze']['coords'], # City close to Nantes
                 'name': u'Office 9',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['reze']['zip_code'][0:2],
             },
             # For contract filter
             {
@@ -228,7 +241,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 34,
                 'locations': self.positions['lille']['coords'],
                 'name': u'Office 10',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['lille']['zip_code'][0:2],
             },
             {
                 'naf': u'4669A', # Map to Rome D1213
@@ -237,7 +251,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 65,
                 'locations': self.positions['lille']['coords'],
                 'name': u'Office 11',
-                'flag_alternance': 1
+                'flag_alternance': 1,
+                'department': self.positions['lille']['zip_code'][0:2],
             },
             # For headcount filter
             {
@@ -247,7 +262,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 11,
                 'locations': self.positions['toulouse']['coords'],
                 'name': u'Office 12',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['toulouse']['zip_code'][0:2],
             },
             {
                 'naf': u'7010Z',  # Map to Rome M1202
@@ -256,7 +272,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 22,
                 'locations': self.positions['toulouse']['coords'],
                 'name': u'Office 13',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['toulouse']['zip_code'][0:2],
             },
             # For headcount_text
             {
@@ -266,7 +283,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 53, # headcount_text : '10 000 salariés et plus'
                 'locations': self.positions['pau']['coords'],
                 'name': u'Office 14',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['pau']['zip_code'][0:2],
             },
             # For flag_alternance in response
             {
@@ -276,7 +294,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 53,
                 'locations': self.positions['poitiers']['coords'],
                 'name': u'Office 15',
-                'flag_alternance': 0
+                'flag_alternance': 0,
+                'department': self.positions['poitiers']['zip_code'][0:2],
             },
             {
                 'naf': u'4648Z',  # Map to Rome B1603
@@ -285,7 +304,8 @@ class ApiBaseTest(DatabaseTest):
                 'headcount': 53,
                 'locations': self.positions['poitiers']['coords'],
                 'name': u'Office 16',
-                'flag_alternance': 1
+                'flag_alternance': 1,
+                'department': self.positions['poitiers']['zip_code'][0:2],
             }
         ]
         for i, doc in enumerate(docs, start=1):
