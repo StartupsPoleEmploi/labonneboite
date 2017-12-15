@@ -7,6 +7,7 @@ import StringIO
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
 from xhtml2pdf import pisa
+from urllib import urlencode
 
 from flask import abort, redirect, render_template, flash
 from flask import Blueprint, current_app
@@ -16,7 +17,7 @@ from flask import request, session, url_for
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import util
 from labonneboite.common.email_util import MandrillClient
-from labonneboite.common.models import Office
+from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
 from labonneboite.common.contact_mode import CONTACT_MODE_STAGES
 
@@ -60,7 +61,11 @@ def change_info():
                 - Nom : %s, <br>
                 - E-mail : %s,<br>
                 - Tél. : %s,<br>
-                - Commentaire : %s<br><br>
+                - Commentaire : %s<br>
+                <hr>
+                - Status SAVE : %s
+                <hr>
+
                 Cordialement,<br>
                 La Bonne Boite""" % (
                     form.action.data,
@@ -70,7 +75,8 @@ def change_info():
                     form.email.data,
                     form.phone.data,
                     form.comment.data,
-               )
+                    make_save_suggestion(form)
+                )
             )
             msg = u"Merci pour votre message, nous reviendrons vers vous dès que possible."
             flash(msg, 'success')
@@ -113,6 +119,50 @@ def detail(siret):
         'kompass_url': "http://fr.kompass.com/searchCompanies?text=%s" % company.siret,
         'search_url': search_url,
     }
+
+def make_save_suggestion(form):
+    # Save informations
+    company = Office.query.filter_by(siret = form.siret.data).first()
+    if not company:
+        # OfficeAdminRemove already exits ?
+        office_admin_remove = OfficeAdminRemove.query.filter_by(siret = form.siret.data).first()
+        if office_admin_remove:
+            url = url_for("officeadminremove.edit_view", id=office_admin_remove.id)
+            return u"Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % url
+        else:
+            return u'Aucune entreprise trouvée avec le siret %s' % form.siret.data
+
+    # OfficeAdminAdd already exits ?
+    office_admin_add = OfficeAdminAdd.query.filter_by(siret = form.siret.data).first()
+    if office_admin_add:
+        url = url_for("officeadminadd.edit_view", id=office_admin_add.id)
+        return u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % url
+
+    # OfficeAdminUpdate already exits ?
+    office_admin_update = OfficeAdminUpdate.query.filter_by(siret = form.siret.data).first()
+    if office_admin_update:
+        url = url_for("officeadminupdate.edit_view", id=office_admin_update.id)
+        return u"Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % url
+
+
+    # No office AdminOffice found : suggest to create an OfficeAdminRemove and OfficeRemoveUpdate
+    params = {
+        'siret': form.siret.data,
+        'name': company.company_name,
+        'requested_by_email': form.email.data,
+        'requested_by_first_name': form.first_name.data,
+        'requested_by_last_name': form.last_name.data,
+        'requested_by_phone': form.phone.data,
+        'reason': form.comment.data,
+    }
+    if form.action.data == "enlever":
+        url = '%s?%s' % (url_for("officeadminremove.create_view"), urlencode(params))
+        status_save = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>" % url
+    else:
+        url = '%s?%s' % (url_for("officeadminupdate.create_view"), urlencode(params))
+        status_save = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>" % url
+
+    return status_save
 
 
 def fetch_resources(uri, rel):
