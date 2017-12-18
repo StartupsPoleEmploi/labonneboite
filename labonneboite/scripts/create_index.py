@@ -243,6 +243,10 @@ mapping_office = {
             "type": "integer",
             "index": "not_analyzed",
         },
+        "department": {
+            "type": "string",
+            "index": "not_analyzed"
+        },
         "locations": {
             "type": "geo_point",
         },
@@ -368,6 +372,7 @@ def get_office_as_es_doc(office):
         'email': sanitized_email,
         'tel': office.tel,
         'website': sanitized_website,
+        'department': office.departement,
         'flag_alternance': int(office.flag_alternance),
         'flag_junior': int(office.flag_junior),
         'flag_senior': int(office.flag_senior),

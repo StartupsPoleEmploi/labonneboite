@@ -704,6 +704,71 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][1]['siret'], u'00000000000016')
             self.assertEqual(data['companies'][1]['alternance'], True)
 
+    def test_department_filters(self):
+        with self.test_request_context:
+            # Invalid departments filter => Expected error message
+            params = self.add_security_params({
+                'commune_id': self.positions['paris']['commune_id'],
+                'rome_codes': u'N1202',
+                'user': u'labonneboite',
+                'departments': u'75,XX,YY'
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 400)
+            self.assertIn(u'invalid departments : XX, YY', rv.data)
+
+            # no departments filter => Expected 2 results
+            params = self.add_security_params({
+                'commune_id': self.positions['paris']['commune_id'],
+                'rome_codes': u'N1202',
+                'user': u'labonneboite'
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['companies_count'], 2)
+            self.assertEqual(data['companies'][0]['siret'], u'00000000000017')
+            self.assertEqual(data['companies'][1]['siret'], u'00000000000018')
+
+            # Check two departments => Expected 2 results
+            params = self.add_security_params({
+                'commune_id': self.positions['paris']['commune_id'],
+                'rome_codes': u'N1202',
+                'user': u'labonneboite',
+                'departments': u'75,92'
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['companies_count'], 2)
+            self.assertEqual(data['companies'][0]['siret'], u'00000000000017')
+            self.assertEqual(data['companies'][1]['siret'], u'00000000000018')
+
+            # Check department 75 => Expected 1 result
+            params = self.add_security_params({
+                'commune_id': self.positions['paris']['commune_id'],
+                'rome_codes': u'N1202',
+                'user': u'labonneboite',
+                'departments': u'75'
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['companies_count'], 1)
+            self.assertEqual(data['companies'][0]['siret'], u'00000000000017')
+
+            # Check department 92 => Expected 1 result
+            params = self.add_security_params({
+                'commune_id': self.positions['paris']['commune_id'],
+                'rome_codes': u'N1202',
+                'user': u'labonneboite',
+                'departments': u'92'
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['companies_count'], 1)
+            self.assertEqual(data['companies'][0]['siret'], u'00000000000018')
 
 class ApiCompanyListTrackingCodesTest(ApiBaseTest):
 
