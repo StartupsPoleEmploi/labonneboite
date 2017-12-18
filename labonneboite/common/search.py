@@ -376,10 +376,9 @@ def build_json_body_elastic_search(
 
 
     if departments:
-        regex = '|'.join(departments)
         filters.append({
-            'regexp': {
-                'department': regex
+            'terms': {
+                'department': departments
             }
         })
 
