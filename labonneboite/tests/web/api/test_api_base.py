@@ -8,6 +8,7 @@ from labonneboite.web.api import util
 from labonneboite.conf import settings
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import scoring as scoring_util
+from labonneboite.scripts.create_index import mapping_office
 
 
 class ApiBaseTest(DatabaseTest):
@@ -115,41 +116,7 @@ class ApiBaseTest(DatabaseTest):
         # Create new index.
         request_body = {
             "mappings": {
-                "office": {
-                    "properties": {
-                        "naf": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "siret": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "name": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "score": {
-                            "type": "integer",
-                            "index": "not_analyzed"
-                        },
-                        "flag_alternance": {
-                            "type": "integer",
-                            "index": "not_analyzed"
-                        },
-                        "headcount": {
-                            "type": "integer",
-                            "index": "not_analyzed"
-                        },
-                        "department": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "locations": {
-                            "type": "geo_point",
-                        }
-                    }
-                }
+                "office": mapping_office
             }
         }
 
