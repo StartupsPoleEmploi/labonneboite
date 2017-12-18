@@ -706,6 +706,17 @@ class ApiCompanyListTest(ApiBaseTest):
 
     def test_department_filters(self):
         with self.test_request_context:
+            # Invalid departments filter => Expected error message
+            params = self.add_security_params({
+                'commune_id': self.positions['paris']['commune_id'],
+                'rome_codes': u'N1202',
+                'user': u'labonneboite',
+                'departments': u'75,XX,YY'
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 400)
+            self.assertIn(u'invalid departments : XX, YY', rv.data)
+
             # no departments filter => Expected 2 results
             params = self.add_security_params({
                 'commune_id': self.positions['paris']['commune_id'],
