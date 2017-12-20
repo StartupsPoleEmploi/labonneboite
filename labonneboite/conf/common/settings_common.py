@@ -81,10 +81,13 @@ AUTOCOMPLETE_MAX = 5
 
 ROME_NAF_PROBABILITY_CUTOFF = 0.05
 
-# GA/GO snippets are only useful in production and staging
-GOOGLE_ANALYTICS_ID = ''
-GOOGLE_OPTIMIZE_ID = ''
+# GA/GO snippets are only useful in production and staging,
+# we use dummy values everywhere else
+GOOGLE_ANALYTICS_ID = 'UA-00000000-0'
+GOOGLE_OPTIMIZE_ID = 'GTM-AAAA00A'
 GOOGLE_TAG_MANAGER_ID = 'AAA-AAAAAAA'
+ENABLE_ADBLOCK_TRACKING = False
+ENABLE_GOOGLE_OPTIMIZE = False
 
 if get_current_env() == ENV_LBBDEV:
     # pylint: disable=wildcard-import,unused-wildcard-import
