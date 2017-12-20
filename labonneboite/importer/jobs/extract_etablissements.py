@@ -57,6 +57,9 @@ class EtablissementExtractJob(Job):
 
     @timeit
     def run_task(self):
+        # the strategy used here consumes way too much RAM (20G+)
+        # because it needs the whole CSV dataset in memory
+        # FIXME improve this by processing the CSV on-the-fly instead
         self.benchmark_loading_using_pandas()
         self.csv_offices = self.get_offices_from_file()
         self.csv_sirets = self.csv_offices.keys()
@@ -85,6 +88,7 @@ class EtablissementExtractJob(Job):
 
     @timeit
     def update_updatable_offices(self):
+        # FIXME parallelize and/or batch for better performance
         con, cur = import_util.create_cursor()
         query = """UPDATE %s SET
             raisonsociale=%%s,
@@ -114,6 +118,8 @@ class EtablissementExtractJob(Job):
                 cur.executemany(query, statements)
                 con.commit()
                 statements = []
+                if not count % 100000:
+                    logger.info("updated %s offices", count)
         if statements:
             cur.executemany(query, statements)
             con.commit()
@@ -142,6 +148,8 @@ class EtablissementExtractJob(Job):
                 cur.executemany(query, statements)
                 con.commit()
                 statements = []
+                if not count % 10000:
+                    logger.info("created %s offices", count)
         if statements:
             cur.executemany(query, statements)
             con.commit()
@@ -202,7 +210,7 @@ class EtablissementExtractJob(Job):
             for line in myfile:
                 count += 1
                 if not count % 100000:
-                    logger.debug("reading line %i", count)
+                    logger.debug("processed %s lines", count)
 
                 try:
                     fields = import_util.get_fields_from_csv_line(line, sep='\xa5')
