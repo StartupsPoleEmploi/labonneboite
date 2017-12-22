@@ -83,7 +83,7 @@ def change_info():
 
         except Exception as e:  # pylint: disable=W0703
             current_app.logger.error(
-                u"/informations-entreprise - An error occurred while sending an email: %s", e.message)
+                u"/informations-entreprise - An error occurred while sending an email: %s", repr(e))
             msg = u"Erreur dans l'envoi du mail, vous pouvez envoyer un email directement à %s" % settings.CONTACT_EMAIL
             flash(msg, 'error')
 
