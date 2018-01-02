@@ -118,6 +118,8 @@ def get_city_by_commune_id(commune_id):
     """
     Returns the city corresponding to the given commune_id string or None.
     """
+    if isinstance(commune_id, int):
+        commune_id = str(commune_id)
     return CACHE['cities_by_commune_id'].get(commune_id)
 
 

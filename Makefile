@@ -90,8 +90,7 @@ create_sitemap:
 prepare_mailing_data:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
 	cd /srv/lbb/labonneboite && \
-	python scripts/prepare_mailing_data.py && \
-	echo please consult result in file labonneboite/scripts/mailing_data/users_sample_prepared.csv';
+	python scripts/prepare_mailing_data.py';
 
 create_index:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
