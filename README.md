@@ -102,7 +102,6 @@ CONTACT_EMAIL = '<set it>'
 FORM_EMAIL = '<set it>'
 GMAIL_USER = '<set it>'
 GMAIL_PASSWORD = '<set it>'
-STAGING_SERVER_URL = 'http://localhost:5000'
 
 API_KEYS = {
     'labonneboite': '1234567890abcdef',

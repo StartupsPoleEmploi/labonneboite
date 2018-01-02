@@ -18,7 +18,7 @@ class LbbSeleniumTestCase(unittest.TestCase):
     http://selenium-python.readthedocs.io/index.html
     """
 
-    HOME_URL = settings.STAGING_SERVER_URL
+    HOME_URL = settings.SERVER_NAME
 
     def setUp(self):
         super(LbbSeleniumTestCase, self).setUp()

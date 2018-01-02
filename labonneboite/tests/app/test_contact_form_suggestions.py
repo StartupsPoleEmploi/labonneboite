@@ -40,7 +40,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form.siret = StringField(u'Siret')
             form.siret.data = u"12345678901234"
 
-            url = url_for("officeadminremove.edit_view", id=1)
+            url = url_for("officeadminremove.edit_view", id=1, _external=True)
             expected_text = u"Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % url
 
             self.assertEquals(expected_text, make_save_suggestion(form))
@@ -80,7 +80,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form.siret = StringField(u'Siret')
             form.siret.data = u"78548035101646"
 
-            url = url_for("officeadminadd.edit_view", id=office_admin_add.id)
+            url = url_for("officeadminadd.edit_view", id=office_admin_add.id, _external=True)
             expected_text = u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % url
 
             self.assertEquals(expected_text, make_save_suggestion(form))
@@ -101,7 +101,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form.siret = StringField(u'Siret')
             form.siret.data = u"78548035101646"
 
-            url = url_for("officeadminupdate.edit_view", id=office_to_update.id)
+            url = url_for("officeadminupdate.edit_view", id=office_to_update.id, _external=True)
             expected_text = u"Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % url
 
             self.assertEquals(expected_text, make_save_suggestion(form))
@@ -115,7 +115,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form = self.create_form(u'enlever')
             params = self.create_params(form)
 
-            url = '%s?%s' % (url_for("officeadminremove.create_view"), urlencode(params))
+            url = '%s?%s' % (url_for("officeadminremove.create_view", _external=True), urlencode(params))
             expected_text = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>" % url
 
             self.assertEquals(expected_text, make_save_suggestion(form))
@@ -129,7 +129,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form = self.create_form()
             params = self.create_params(form)
 
-            url = '%s?%s' % (url_for("officeadminupdate.create_view"), urlencode(params))
+            url = '%s?%s' % (url_for("officeadminupdate.create_view", _external=True), urlencode(params))
             expected_text = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>" % url
 
             self.assertEquals(expected_text, make_save_suggestion(form))

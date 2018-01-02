@@ -11,6 +11,9 @@ class BaseConfig(object):
 
     SECRET_KEY = settings.FLASK_SECRET_KEY
 
+    SERVER_NAME = settings.SERVER_NAME
+    PREFERRED_URL_SCHEME = settings.PREFERRED_URL_SCHEME
+
     VERSIONS = 'timestamp'
     URL_EXPIRE = True
     JSON_AS_ASCII = False
