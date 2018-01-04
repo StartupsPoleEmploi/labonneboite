@@ -144,7 +144,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'missing arguments: either commune_id or latitude and longitude')
+            self.assertEqual(rv.data, u'Invalid request argument: missing arguments: either commune_id or latitude and longitude')
 
     def test_unknown_commune_id(self):
         with self.test_request_context:
@@ -158,7 +158,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'could not resolve latitude and longitude from given commune_id')
+            self.assertEqual(rv.data, u'Invalid request argument: could not resolve latitude and longitude from given commune_id')
 
     def test_correct_headcount_text(self):
         with self.test_request_context:
@@ -183,7 +183,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'missing argument: rome_codes')
+            self.assertEqual(rv.data, u'Invalid request argument: missing rome_codes')
 
     def test_page_size_too_large(self):
         with self.test_request_context:
@@ -196,7 +196,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'page_size is too large. Maximum value is 100')
+            self.assertEqual(rv.data, u'Invalid request argument: page_size is too large. Maximum value is 100')
 
     def test_wrong_distance_value(self):
         """
@@ -231,7 +231,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'invalid rome code: INVALID')
+            self.assertEqual(rv.data, u'Invalid request argument: rome_codes: INVALID')
 
     def test_count_pagination(self):
         with self.test_request_context:
@@ -450,7 +450,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'invalid NAF code(s): INVALID INVALID_TOO')
+            self.assertEqual(rv.data, u'Invalid request argument: NAF code(s): INVALID INVALID_TOO')
 
     def test_same_rome_with_no_naf_filters(self):
         with self.test_request_context:
@@ -523,7 +523,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertIn(u'invalid NAF code(s): 9499Z. Possible values : ', rv.data)
+            self.assertIn(u'Invalid request argument: NAF code(s): 9499Z. Possible values : ', rv.data)
 
     def test_wrong_value_in_sort(self):
         with self.test_request_context:
@@ -535,7 +535,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'invalid sort value. Possible values : distance, score')
+            self.assertEqual(rv.data, u'Invalid request argument: sort. Possible values : distance, score')
 
     def test_sort_by_distance(self):
         with self.test_request_context:
@@ -583,7 +583,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'invalid contract value. Possible values : all, alternance')
+            self.assertEqual(rv.data, u'Invalid request argument: contract. Possible values : all, alternance')
 
     def test_contract_all(self):
         with self.test_request_context:
@@ -625,7 +625,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'invalid headcount value. Possible values : small, big, all')
+            self.assertEqual(rv.data, u'Invalid request argument: headcount. Possible values : small, big, all')
 
     def test_headcount_all(self):
         with self.test_request_context:
@@ -715,7 +715,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertIn(u'invalid departments : XX, YY', rv.data)
+            self.assertIn(u'Invalid request argument: departments : XX, YY', rv.data)
 
             # no departments filter => Expected 2 results
             params = self.add_security_params({
@@ -769,6 +769,149 @@ class ApiCompanyListTest(ApiBaseTest):
             data = json.loads(rv.data)
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(data['companies'][0]['siret'], u'00000000000018')
+
+    def test_filters_in_api_response(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['toulon']['commune_id'],
+                'rome_codes': u'N4403',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+
+            # Check distance filter
+            self.assertEqual(data['filters']['distance']['less_30_km'], 4)
+            self.assertEqual(data['filters']['distance']['less_50_km'], 5)
+            self.assertEqual(data['filters']['distance']['less_100_km'], 6)
+            self.assertEqual(data['filters']['distance']['france'], 7)
+
+            # Check naf filter
+            nafs_expected = {
+                u'4910Z': [u'4910Z', 2, u'Transport ferroviaire interurbain de voyageurs'],
+                u'4920Z': [u'4920Z', 1, u'Transports ferroviaires de fret'],
+            }
+            self.assertEqual(len(nafs_expected), len(data['filters']['naf']))
+            for naf_filter in data['filters']['naf']:
+                naf_expected = nafs_expected[naf_filter['code']]
+
+                self.assertEqual(naf_expected[0], naf_filter['code'])
+                self.assertEqual(naf_expected[1], naf_filter['count'])
+                self.assertEqual(naf_expected[2], naf_filter['label'])
+
+            # Check headcount filter
+            self.assertEqual(data['filters']['headcount']['small'], 2)
+            self.assertEqual(data['filters']['headcount']['big'], 1)
+
+            # Check contract filter
+            self.assertEqual(data['filters']['contract']['all'], 3)
+            self.assertEqual(data['filters']['contract']['alternance'], 1)
+
+
+    def test_filters_when_filtering_by_naf(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['toulon']['commune_id'],
+                'rome_codes': u'N4403',
+                'naf_codes': u'4910Z',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            nafs_expected = {
+                u'4910Z': [u'4910Z', 2, u'Transport ferroviaire interurbain de voyageurs'],
+                u'4920Z': [u'4920Z', 1, u'Transports ferroviaires de fret'],
+            }
+            self.assertEqual(len(nafs_expected), len(data['filters']['naf']))
+            for naf_filter in data['filters']['naf']:
+                naf_expected = nafs_expected[naf_filter['code']]
+
+    def test_filters_when_filtering_by_headcount(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['toulon']['commune_id'],
+                'rome_codes': u'N4403',
+                'headcount': u'big',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['filters']['headcount']['small'], 2)
+            self.assertEqual(data['filters']['headcount']['big'], 1)
+
+            params = self.add_security_params({
+                'commune_id': self.positions['toulon']['commune_id'],
+                'rome_codes': u'N4403',
+                'headcount': u'small',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['filters']['headcount']['small'], 2)
+            self.assertEqual(data['filters']['headcount']['big'], 1)
+
+    def test_filters_when_filtering_by_contract(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['toulon']['commune_id'],
+                'rome_codes': u'N4403',
+                'contract': u'all',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['filters']['contract']['all'], 3)
+            self.assertEqual(data['filters']['contract']['alternance'], 1)
+
+            params = self.add_security_params({
+                'commune_id': self.positions['toulon']['commune_id'],
+                'rome_codes': u'N4403',
+                'contract': u'alternance',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['filters']['contract']['all'], 3)
+            self.assertEqual(data['filters']['contract']['alternance'], 1)
+
+    def test_filters_when_filtering_by_distance(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['toulon']['commune_id'],
+                'rome_codes': u'N4403',
+                'distance': u'50',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+
+            self.assertEqual(data['filters']['distance']['less_10_km'], 3)
+            self.assertEqual(data['filters']['distance']['less_30_km'], 4)
+            self.assertEqual(data['filters']['distance']['less_50_km'], 5)
+            self.assertEqual(data['filters']['distance']['less_100_km'], 6)
+            self.assertEqual(data['filters']['distance']['france'], 7)
+
+            params = self.add_security_params({
+                'commune_id': self.positions['toulon']['commune_id'],
+                'rome_codes': u'N4403',
+                'distance': u'100',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['filters']['distance']['less_10_km'], 3)
+            self.assertEqual(data['filters']['distance']['less_30_km'], 4)
+            self.assertEqual(data['filters']['distance']['less_50_km'], 5)
+            self.assertEqual(data['filters']['distance']['less_100_km'], 6)
+            self.assertEqual(data['filters']['distance']['france'], 7)
 
 class ApiCompanyListTrackingCodesTest(ApiBaseTest):
 

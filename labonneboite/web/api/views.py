@@ -25,6 +25,9 @@ SORTING_VALUES = [key for key, _ in sorting.SORTING_CHOICES]
 API_INTERNAL_CONSUMERS = ['labonneboite', 'memo']
 
 
+class InvalidFetcherArgument(Exception):
+    pass
+
 def api_auth_required(function):
     """
     A decorator that checks that auth and security params are valid.
@@ -59,129 +62,18 @@ def api_auth_required(function):
 @apiBlueprint.route('/company/', methods=['GET'])
 @api_auth_required
 def company_list():
-    """
-    Returns a list of companies given a set of parameters.
-
-    Required parameters:
-    - `rome_codes`: one or more "Pôle emploi ROME" codes, comma separated.
-    - `commune_id`: "code INSEE" of the city near which to search. If empty `latitude` and `longitude` are required.
-    - `latitude` and `longitude`: coordinates of a location near which to search. If empty `commune_id` is required.
-
-    Optional parameters:
-    - `distance`: perimeter of the search radius (in Km) in which to search.
-    - `page`: number of the requested page.
-    - `page_size`: number of results per page (maximum : 100).
-    - `naf_codes`: one or more naf_codes, comma separated. If empty or missing, no filter will be used
-    - `contract`: one value, only between 'all' (default) or 'alternance'
-    - `sort`: one value, only between 'score' (default) and 'distance'
-    - `headcount`: one value, only between 'all' (default), 'small' or 'big'
-    """
 
     current_app.logger.debug("API request received: %s", request.full_path)
 
-    city = {}
-    if 'commune_id' in request.args:
-        city = geocoding.get_city_by_commune_id(request.args.get('commune_id'))
-        if not city:
-            return u'could not resolve latitude and longitude from given commune_id', 400
-        latitude = city['coords']['lat']
-        longitude = city['coords']['lon']
-    elif 'latitude' in request.args and 'longitude' in request.args:
-        latitude = request.args.get('latitude')
-        longitude = request.args.get('longitude')
-    else:
-        return u'missing arguments: either commune_id or latitude and longitude', 400
-
-    rome_codes = request.args.get('rome_codes')
-    if not rome_codes:
-        return u'missing argument: rome_codes', 400
-
-    rome_code_list = [code.upper() for code in rome_codes.split(',')]
-    for rome in rome_code_list:
-        if rome.encode('ascii', 'ignore') not in ROME_CODES:  # ROME_CODES contains ascii data but rome is unicode.
-            return u'invalid rome code: %s' % rome, 400
-
-    if len(rome_code_list) > 1:
-        # Reasons why we only support single-rome search are detailed in README.md
-        return u'Multi ROME search is no longer supported, please use single ROME search only.', 400
-    rome_code = rome_code_list[0]
-
     try:
-        page = int(request.args.get('page'))
-    except TypeError:
-        page = 1
+        location, zipcode = get_location(request.args)
+        fetcher = create_fetcher(location, request.args)
+    except InvalidFetcherArgument as e:
+        message = 'Invalid request argument: {}'.format(e.message)
+        return message, 400
 
-    try:
-        page_size = int(request.args.get('page_size'))
-    except TypeError:
-        page_size = 10
-
-    if page_size > 100:
-        return u'page_size is too large. Maximum value is 100', 400
-
-    to_number = page * page_size
-    from_number = to_number - page_size + 1
-
-    try:
-        distance = int(request.args.get('distance'))
-    except (TypeError, ValueError):
-        distance = settings.DISTANCE_FILTER_DEFAULT
-
-    naf_codes_list = {}
-    naf_codes = request.args.get('naf_codes')
-    if naf_codes:
-        naf_codes_list = [naf.upper() for naf in naf_codes.split(',')]
-        invalid_nafs = [naf for naf in naf_codes_list if naf not in NAF_CODES]
-        if invalid_nafs:
-            return u'invalid NAF code(s): %s' % ' '.join(invalid_nafs), 400
-
-        expected_naf_codes = mapping_util.map_romes_to_nafs([rome_code, ])
-        invalid_nafs = [naf for naf in naf_codes_list if naf not in expected_naf_codes]
-        if invalid_nafs:
-            return u'invalid NAF code(s): %s. Possible values : %s ' % (
-                ' '.join(invalid_nafs), ', '.join(expected_naf_codes)
-            ), 400
-
-    sort = sorting.SORT_FILTER_DEFAULT
-    if 'sort' in request.args:
-        sort = request.args.get('sort')
-        if sort not in SORTING_VALUES:
-            return u'invalid sort value. Possible values : %s' % ', '.join(SORTING_VALUES), 400
-
-    flag_alternance = CONTRACT_VALUES['all']
-    if 'contract' in request.args:
-        contract = request.args.get('contract')
-        if contract not in CONTRACT_VALUES:
-            return u'invalid contract value. Possible values : %s' % ', '.join(CONTRACT_VALUES), 400
-        else:
-            flag_alternance = CONTRACT_VALUES[contract]
-
-    headcount = settings.HEADCOUNT_WHATEVER
-    if 'headcount' in request.args:
-        headcount = HEADCOUNT_VALUES.get(request.args.get('headcount'))
-        if not headcount:
-            return u'invalid headcount value. Possible values : %s' % ', '.join(HEADCOUNT_VALUES.keys()), 400
-
-    departments = []
-    if 'departments' in request.args and request.args.get('departments'):
-        departments = request.args.get('departments').split(',')
-        unknown_departments = [dep for dep in departments if not geocoding.is_departement(dep)]
-        if unknown_departments:
-            return u'invalid departments : %s' % ', '.join(unknown_departments), 400
-
-    companies, companies_count, _ = search.fetch_companies(
-        naf_codes_list,
-        rome_code,
-        latitude,
-        longitude,
-        distance,
-        headcount=headcount,
-        from_number=from_number,
-        to_number=to_number,
-        flag_alternance=flag_alternance,
-        sort=sort,
-        departments=departments,
-    )
+    companies, _ = fetcher.get_companies(add_suggestions=False)
+    companies_count = fetcher.company_count
 
     # Define additional query string to add to office urls
     office_query_string = {
@@ -196,15 +88,196 @@ def company_list():
     result = {
         'companies': [
             company.as_json(
-                rome_code=rome_code, distance=distance, zipcode=city.get('zipcode'),
+                rome_code=fetcher.rome, distance=fetcher.distance, zipcode=zipcode,
                 extra_query_string=office_query_string
             )
             for company in companies
         ],
-        'companies_count': companies_count
+        'companies_count': companies_count,
     }
+
     return jsonify(result)
 
+
+@apiBlueprint.route('/filter/', methods=['GET'])
+@api_auth_required
+def company_filter_list():
+    current_app.logger.debug("API request received: %s", request.full_path)
+
+    try:
+        location, _ = get_location(request.args)
+        fetcher = create_fetcher(location, request.args)
+    except InvalidFetcherArgument as e:
+        message = 'Invalid request argument: {}'.format(e.message)
+        return message, 400
+
+    # Add aggregations
+    fetcher.aggregate_by = search.FILTERS
+
+    _, aggregations = fetcher.get_companies(add_suggestions=False)
+
+    result = {}
+    if fetcher.aggregate_by:
+        result['filters'] = aggregations
+
+        # If a filter or more are selected, the aggregations returned by fetcher.get_companies()
+        # will be filtered too... To avoid that, we are doing additionnal calls (one by filter activated)
+        if 'naf_codes' in request.args and 'naf' in fetcher.aggregate_by:
+            result['filters']['naf'] = fetcher.get_naf_aggregations()
+        if 'headcount' in request.args and 'headcount' in fetcher.aggregate_by:
+            result['filters']['headcount'] = fetcher.get_headcount_aggregations()
+        if 'contract' in request.args and 'flag_alternance' in fetcher.aggregate_by:
+            result['filters']['contract'] = fetcher.get_contract_aggregations()
+        if 'distance' in fetcher.aggregate_by and fetcher.distance != search.DISTANCE_FILTER_MAX:
+            result['filters']['distance'] = fetcher.get_distance_aggregations()
+
+    return jsonify(result)
+
+def get_location(request_args):
+    """
+    Parse request arguments to compute location objects.
+
+    Args:
+        request_args (dict)
+
+    Return:
+        location (Location)
+        zipcode (str)
+    """
+    location = None
+    zipcode = None
+
+    # Commune_id or longitude/latitude
+    if 'commune_id' in request_args:
+        city = geocoding.get_city_by_commune_id(request_args.get('commune_id'))
+        if not city:
+            raise InvalidFetcherArgument(u'could not resolve latitude and longitude from given commune_id')
+        location = search.Location(city['coords']['lat'], city['coords']['lon'])
+        zipcode = city['zipcode']
+    elif 'latitude' in request_args and 'longitude' in request_args:
+        location = search.Location(request_args.get('latitude'), request_args.get('longitude'))
+    else:
+        raise InvalidFetcherArgument(u'missing arguments: either commune_id or latitude and longitude')
+
+    return location, zipcode
+
+
+def create_fetcher(location, request_args):
+    """
+    Returns the filters given a set of parameters.
+
+    Required parameters:
+    - `location` (Location)
+    - `rome_codes`: one or more "Pôle emploi ROME" codes, comma separated.
+    - `commune_id`: "code INSEE" of the city near which to search. If empty `latitude` and `longitude` are required.
+    - `latitude` and `longitude`: coordinates of a location near which to search. If empty `commune_id` is required.
+
+    Optional parameters:
+    - `distance`: perimeter of the search radius (in Km) in which to search.
+    - `page`: number of the requested page.
+    - `page_size`: number of results per page (maximum : 100).
+    - `naf_codes`: one or more naf_codes, comma separated. If empty or missing, no filter will be used
+    - `contract`: one value, only between 'all' (default) or 'alternance'
+    - `sort`: one value, only between 'score' (default) and 'distance'
+    - `headcount`: one value, only between 'all' (default), 'small' or 'big'
+    """
+    # Arguments to build the Fetcher object
+    kwargs = {}
+
+    # Rome_code
+    rome_codes = request_args.get('rome_codes')
+    if not rome_codes:
+        raise InvalidFetcherArgument(u'missing rome_codes')
+    rome_code_list = [code.upper() for code in rome_codes.split(',')]
+
+    for rome in rome_code_list:
+        if rome.encode('ascii', 'ignore') not in ROME_CODES:  # ROME_CODES contains ascii data but rome is unicode.
+            raise InvalidFetcherArgument(u'rome_codes: %s' % rome)
+
+    if len(rome_code_list) > 1:
+        # Reasons why we only support single-rome search are detailed in README.md
+        raise InvalidFetcherArgument(u'Multi ROME search is no longer supported, please use single ROME search only.')
+    kwargs['rome'] = rome_code_list[0]
+
+
+    # Page and page_size
+    try:
+        page = int(request_args.get('page'))
+    except TypeError:
+        page = 1
+    try:
+        page_size = int(request_args.get('page_size'))
+    except TypeError:
+        page_size = 10
+
+    if page_size > 100:
+        raise InvalidFetcherArgument(u'page_size is too large. Maximum value is 100')
+
+    kwargs['to_number'] = page * page_size
+    kwargs['from_number'] = kwargs['to_number'] - page_size + 1
+
+    # Distance
+    try:
+        distance = int(request_args.get('distance'))
+    except (TypeError, ValueError):
+        distance = settings.DISTANCE_FILTER_DEFAULT
+    kwargs['distance'] = distance
+
+    # Naf
+    naf_codes_list = {}
+    naf_codes = request_args.get('naf_codes')
+    if naf_codes:
+        naf_codes_list = [naf.upper() for naf in naf_codes.split(',')]
+        invalid_nafs = [naf for naf in naf_codes_list if naf not in NAF_CODES]
+        if invalid_nafs:
+            raise InvalidFetcherArgument(u'NAF code(s): %s' % ' '.join(invalid_nafs))
+
+        expected_naf_codes = mapping_util.map_romes_to_nafs([kwargs['rome'], ])
+        invalid_nafs = [naf for naf in naf_codes_list if naf not in expected_naf_codes]
+        if invalid_nafs:
+            raise InvalidFetcherArgument(u'NAF code(s): %s. Possible values : %s ' % (
+                ' '.join(invalid_nafs), ', '.join(expected_naf_codes)
+            ))
+    kwargs['naf_codes'] = naf_codes_list
+
+
+    # Sort
+    sort = sorting.SORT_FILTER_DEFAULT
+    if 'sort' in request_args:
+        sort = request_args.get('sort')
+        if sort not in SORTING_VALUES:
+            raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(SORTING_VALUES))
+    kwargs['sort'] = sort
+
+
+    # Flag_alternance
+    flag_alternance = CONTRACT_VALUES['all']
+    if 'contract' in request_args:
+        contract = request_args.get('contract')
+        if contract not in CONTRACT_VALUES:
+            raise InvalidFetcherArgument(u'contract. Possible values : %s' % ', '.join(CONTRACT_VALUES))
+        else:
+            flag_alternance = CONTRACT_VALUES[contract]
+    kwargs['flag_alternance'] = flag_alternance
+
+    # Headcount
+    headcount = settings.HEADCOUNT_WHATEVER
+    if 'headcount' in request_args:
+        headcount = HEADCOUNT_VALUES.get(request_args.get('headcount'))
+        if not headcount:
+            raise InvalidFetcherArgument(u'headcount. Possible values : %s' % ', '.join(HEADCOUNT_VALUES.keys()))
+    kwargs['headcount'] = headcount
+
+    # Departments
+    departments = []
+    if 'departments' in request_args and request_args.get('departments'):
+        departments = request_args.get('departments').split(',')
+        unknown_departments = [dep for dep in departments if not geocoding.is_departement(dep)]
+        if unknown_departments:
+            raise InvalidFetcherArgument(u'departments : %s' % ', '.join(unknown_departments))
+    kwargs['departments'] = departments
+
+    return search.Fetcher(location, **kwargs)
 
 @apiBlueprint.route('/office/<siret>/details', methods=['GET'])
 @api_auth_required

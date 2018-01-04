@@ -117,11 +117,11 @@ def get_parameters(args):
 @searchBlueprint.route('/entreprises/<city>-<zipcode>/<occupation>')
 def results(city, zipcode, occupation):
 
-    kwargs = get_parameters(request.args)
-    city = search_util.CityLocation(city, zipcode)
-    kwargs['occupation'] = occupation
-
     canonical = '/entreprises/%s-%s/%s' % (city, zipcode, occupation)
+    city = search_util.CityLocation(city, zipcode)
+
+    kwargs = get_parameters(request.args)
+    kwargs['occupation'] = occupation
 
     # Remove keys with empty values.
     form_kwargs = {key: val for key, val in kwargs.items() if val}
@@ -140,20 +140,23 @@ def results(city, zipcode, occupation):
 
     session['search_args'] = request.args
 
-    # Fetch companies and alternatives.
-    fetcher = search_util.Fetcher(city, **kwargs)
+    # Fetch companies and alternatives
+    kwargs['rome'] = rome
+    kwargs['aggregate_by'] = ['naf']
+
+    fetcher = search_util.Fetcher(city.location, **kwargs)
     alternative_rome_descriptions = []
+    naf_codes_with_descriptions = []
 
     if not city.is_location_correct:
         companies = []
-        naf_aggregations = []
+        aggregations = []
         company_count = 0
         alternative_distances = {}
     else:
         current_app.logger.debug("fetching companies and company_count")
-        # Note that if a NAF filter is selected, naf_aggregations will be a list of
-        # only one NAF, the one currently selected in the filter.
-        companies, naf_aggregations = fetcher.get_companies()
+
+        companies, aggregations = fetcher.get_companies(add_suggestions=True)
         for alternative, count in fetcher.alternative_rome_codes.iteritems():
             if settings.ROME_DESCRIPTIONS.get(alternative) and count:
                 desc = settings.ROME_DESCRIPTIONS.get(alternative)
@@ -162,18 +165,18 @@ def results(city, zipcode, occupation):
         company_count = fetcher.company_count
         alternative_distances = fetcher.alternative_distances
 
-        # If a NAF filter is selected, previous naf_aggregations returned by fetcher.get_companies()
-        # was actually only one NAF, the one NAF currently selected in the filter.
-        # Let's do a second call, only if a NAF filter is selected.
-        # This logic is designed to make only one elasticsearch call in the most frequent case (no NAF filter selected)
-        # and make two elasticsearch calls in the rarest case only (NAF filter selected).
-        if fetcher.naf:
-            naf_aggregations = fetcher.get_naf_aggregations()
+        # If a filter or more are selected, the aggregations returned by fetcher.get_companies()
+        # will be filtered too... To avoid that, we are doing additionnal calls (one by filter activated)
+        if aggregations:
+            fetcher.update_aggregations(aggregations)
 
-    naf_codes_with_descriptions = []
-    for naf_aggregate in naf_aggregations:
-        naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["naf"]), naf_aggregate["count"])
-        naf_codes_with_descriptions.append((naf_aggregate["naf"], naf_description))
+    # Generates values for the NAF filter
+    # aggregations could be empty if errors or empty results
+    if aggregations:
+        for naf_aggregate in aggregations['naf']:
+            naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["code"]), naf_aggregate["count"])
+            naf_codes_with_descriptions.append((naf_aggregate["code"], naf_description))
+
 
     # Pagination.
     pagination_manager = PaginationManager(company_count, fetcher.from_number, fetcher.to_number, request.full_path)
@@ -206,7 +209,7 @@ def results(city, zipcode, occupation):
         'naf_codes': naf_codes_with_descriptions,
         'page': current_page,
         'pagination': pagination_manager,
-        'rome_code': rome,
+        'rome_code': fetcher.rome,
         'rome_description': settings.ROME_DESCRIPTIONS.get(fetcher.rome, ''),
         'show_favorites': True,
         'sort': fetcher.sort,
