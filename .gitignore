@@ -90,3 +90,9 @@ labonneboite/importer/output/*.sql
 # Mailing data #
 ################
 labonneboite/scripts/mailing_data/users_sample_*.csv
+
+# OGR ROME mapping update #
+###########################
+labonneboite/common/data/ogr_rome_mapping_update/rome_labels.csv
+labonneboite/common/data/ogr_rome_mapping_update/ogr_labels.csv
+labonneboite/common/data/ogr_rome_mapping_update/ogr_rome_mapping.csv

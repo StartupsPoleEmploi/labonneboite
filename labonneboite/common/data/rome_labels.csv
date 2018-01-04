@@ -1,5 +1,5 @@
 rome_id|rome_label
-A1101|Conduite d'engins d'exploitation agricole et forestière
+A1101|Conduite d'engins agricoles et forestiers
 A1201|Bûcheronnage et élagage
 A1202|Entretien des espaces naturels
 A1203|Entretien des espaces verts
@@ -31,7 +31,7 @@ A1503|Toilettage des animaux
 A1504|Santé animale
 B1101|Création en arts plastiques
 B1201|Réalisation d'objets décoratifs et utilitaires en céramique et matériaux de synthèse
-B1301|Décoration d'espaces de vente
+B1301|Décoration d'espaces de vente et d'exposition
 B1302|Décoration d'objets d'art et artisanaux
 B1303|Gravure - ciselure
 B1401|Réalisation d'objets en lianes, fibres et brins végétaux
@@ -118,7 +118,7 @@ E1103|Communication
 E1104|Conception de contenus multimédias
 E1105|Coordination d'édition
 E1106|Journalisme et information média
-E1107|Organisation d'événementiel
+E1107|Organisation d'évènementiel
 E1108|Traduction, interprétariat
 E1201|Photographie
 E1202|Production en laboratoire cinématographique
@@ -217,7 +217,7 @@ H1209|Intervention technique en études et développement électronique
 H1210|Intervention technique en études, recherche et développement
 H1301|Inspection de conformité
 H1302|Management et ingénierie Hygiène Sécurité Environnement -HSE- industriels
-H1303|Intervention technique en Hygiène Sécurité Environnement  -HSE- industriel
+H1303|Intervention technique en Hygiène Sécurité Environnement -HSE- industriel
 H1401|Management et ingénierie gestion industrielle et logistique
 H1402|Management et ingénierie méthodes et industrialisation
 H1403|Intervention technique en gestion industrielle et logistique
@@ -257,7 +257,7 @@ H2414|Préparation et finition d'articles en cuir et matériaux souples
 H2415|Contrôle en industrie du cuir et du textile
 H2501|Encadrement de production de matériel électrique et électronique
 H2502|Management et ingénierie de production
-H2503|Pilotage d'unité élémentaire de production mécanique
+H2503|Pilotage d'unité élémentaire de production mécanique ou de travail des métaux
 H2504|Encadrement d'équipe en industrie de transformation
 H2505|Encadrement d'équipe ou d'atelier en matériaux souples
 H2601|Bobinage électrique
@@ -292,7 +292,7 @@ H3202|Réglage d'équipement de formage des plastiques et caoutchoucs
 H3203|Fabrication de pièces en matériaux composites
 H3301|Conduite d'équipement de conditionnement
 H3302|Opérations manuelles d'assemblage, tri ou emballage
-H3303|Préparation de matières et produits industriels (broyage, mélange, …)
+H3303|Préparation de matières et produits industriels (broyage, mélange, ...)
 H3401|Conduite de traitement d'abrasion de surface
 H3402|Conduite de traitement par dépôt de surface
 H3403|Conduite de traitement thermique
@@ -321,7 +321,7 @@ I1503|Intervention en milieux et produits nocifs
 I1601|Installation et maintenance en nautisme
 I1602|Maintenance d'aéronefs
 I1603|Maintenance d'engins de chantier, levage, manutention et de machines agricoles
-I1604|Mécanique automobile
+I1604|Mécanique automobile et entretien de véhicules
 I1605|Mécanique de marine
 I1606|Réparation de carrosserie
 I1607|Réparation de cycles, motocycles et motoculteurs de loisirs
@@ -364,8 +364,8 @@ K1104|Psychologie
 K1201|Action sociale
 K1202|Éducation de jeunes enfants
 K1203|Encadrement technique en insertion professionnelle
-K1204|Facilitation de la vie sociale
-K1205|Information et médiation sociale
+K1204|Médiation sociale et facilitation de la vie en société
+K1205|Information sociale
 K1206|Intervention socioculturelle
 K1207|Intervention socioéducative
 K1301|Accompagnement médicosocial
@@ -446,9 +446,10 @@ L1503|Décor et accessoires spectacle
 L1504|Éclairage spectacle
 L1505|Image cinématographique et télévisuelle
 L1506|Machinerie spectacle
-L1507|Montage et post-production
+L1507|Montage audiovisuel et post-production
 L1508|Prise de son et sonorisation
 L1509|Régie générale
+L1510|Films d'animation et effets spéciaux
 M1101|Achats
 M1102|Direction des achats
 M1201|Analyse et ingénierie financière
@@ -484,11 +485,11 @@ M1705|Marketing
 M1706|Promotion des ventes
 M1707|Stratégie commerciale
 M1801|Administration de systèmes d'information
-M1802|Conseil et maîtrise d'ouvrage en systèmes d'information
+M1802|Expertise et support en systèmes d'information
 M1803|Direction des systèmes d'information
 M1804|Études et développement de réseaux de télécoms
 M1805|Études et développement informatique
-M1806|Expertise et support technique en systèmes d'information
+M1806|Conseil et maîtrise d'ouvrage en systèmes d'information
 M1807|Exploitation de systèmes de communication et de commandement
 M1808|Information géographique
 M1809|Information météorologique
