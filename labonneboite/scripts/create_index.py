@@ -59,7 +59,7 @@ OGR_TYPE = 'ogr'
 LOCATION_TYPE = 'location'
 ES_TIMEOUT = 300
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
-SCORE_FOR_ROME_MINIMUM = 20  # at least 1.0 stars over 5.0
+SCORE_FOR_ROME_MINIMUM = 20  # at least 20 over 100
 
 
 class Counter(object):
@@ -261,6 +261,10 @@ mapping_office = {
             "type": "object",
             "index": "not_analyzed",
         },
+        "boosted_romes": {
+            "type": "object",
+            "index": "not_analyzed",
+        },
         "headcount": {
             "type": "integer",
             "index": "not_analyzed",
@@ -274,6 +278,29 @@ mapping_office = {
         },
     },
 }
+
+# Below was an attempt at fixing the following issue:
+# ElasticsearchException[Unable to find a field mapper for field [scores_by_rome.A0000]]
+# which happens when a rome is orphaned (no company has a score for this rome).
+#
+# This attempt was unsuccessful but may be retried at some point. The idea was to ensure
+# that scores_by_rome.%s fields were present in at least one office for every rome even orphaned ones.
+#
+# This raises a new issue:
+# java.lang.NumberFormatException: Invalid shift value in prefixCoded bytes (is encoded value really an INT?)
+# which is tricky to investigate.
+#
+# For full information about this issue see common/search.py/get_companies_from_es_and_db.
+# 
+# for rome in mapping_util.MANUAL_ROME_NAF_MAPPING:
+#     mapping_office["properties"]["scores_by_rome.%s" % rome] = {
+#         "type": "integer",
+#         "index": "not_analyzed",
+#     }
+#     mapping_office["properties"]["boosted_romes.%s" % rome] = {
+#         "type": "integer",
+#         "index": "not_analyzed",
+#     }
 
 request_body = {
     "settings": {
@@ -408,15 +435,17 @@ def get_office_as_es_doc(office):
             {'lat': office.y, 'lon': office.x},
         ]
 
-    scores_by_rome = get_scores_by_rome(office)
+    scores_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office)
     if scores_by_rome:
         doc['scores_by_rome'] = scores_by_rome
+        doc['boosted_romes'] = boosted_romes
 
     return doc
 
 
-def get_scores_by_rome(office, office_to_update=None):
+def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
     scores_by_rome = {}
+    boosted_romes = {}  # elasticsearch does not understand sets, so we use a dict of 'key => True' instead
 
     # fetch all rome_codes mapped to the naf of this office
     # as we will compute a score adjusted for each of them
@@ -444,37 +473,32 @@ def get_scores_by_rome(office, office_to_update=None):
         for rome_code in rome_codes:
             score = 0
 
-            # With boosting.
+            # Manage office boosting
             if office_to_update and office_to_update.boost:
                 if not office_to_update.romes_to_boost:
                     # Boost the score for all ROME codes.
-                    # @vermeer guaranteed that a "real" score will never be equal to 100.
-                    score = 100
-                else:
+                    boosted_romes[rome_code] = True
+                elif rome_code in romes_to_boost:
                     # Boost the score for some ROME codes only.
-                    if rome_code in romes_to_boost:
-                        score = 100
-                    else:
-                        score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                            score=office.score,
-                            rome_code=rome_code,
-                            naf_code=naf)
+                    boosted_romes[rome_code] = True
 
-            # Without boosting.
-            else:
-                score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                    score=office.score,
-                    rome_code=rome_code,
-                    naf_code=naf)
+            score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                score=office.score,
+                rome_code=rome_code,
+                naf_code=naf)
 
-            if score >= SCORE_FOR_ROME_MINIMUM:
-                if rome_code in scores_by_rome and score > scores_by_rome[rome_code]:
-                    scores_by_rome[rome_code] = score
+            if score >= SCORE_FOR_ROME_MINIMUM or rome_code in boosted_romes:
+                if rome_code in scores_by_rome:
+                    if score > scores_by_rome[rome_code]:
+                        scores_by_rome[rome_code] = score
                 else:
                     scores_by_rome[rome_code] = score
                     st.increment_office_score_for_rome_count()
 
-    return scores_by_rome
+    return scores_by_rome, boosted_romes
+
+
+
 
 
 def create_offices(enable_profiling=False, disable_parallel_computing=False):
@@ -631,6 +655,7 @@ def update_offices():
     es = Elasticsearch(timeout=ES_TIMEOUT)
 
     for office_to_update in db_session.query(OfficeAdminUpdate).all():
+
         for siret in OfficeAdminUpdate.as_list(office_to_update.sirets):
 
             office = Office.query.filter_by(siret=siret).first()
@@ -650,9 +675,10 @@ def update_offices():
                     'flag_alternance': 1 if office.flag_alternance else 0 }
                 }
 
-                scores_by_rome = get_scores_by_rome(office, office_to_update)
+                scores_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)
                 if scores_by_rome:
                     body['doc']['scores_by_rome'] = scores_by_rome
+                    body['doc']['boosted_romes'] = boosted_romes
 
                 # The update API makes partial updates: existing `scalar` fields are overwritten,
                 # but `objects` fields are merged together.
@@ -672,6 +698,7 @@ def update_offices():
 
                 # Delete the current PDF, it will be regenerated at next download attempt.
                 pdf_util.delete_file(office)
+
 
 @timeit
 def update_offices_geolocations():

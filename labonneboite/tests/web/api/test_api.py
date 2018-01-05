@@ -535,7 +535,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'Invalid request argument: sort. Possible values : distance, score')
+            self.assertEqual(rv.data, u'Invalid request argument: sort. Possible values : score, distance')
 
     def test_sort_by_distance(self):
         with self.test_request_context:
@@ -569,9 +569,8 @@ class ApiCompanyListTest(ApiBaseTest):
             data = json.loads(rv.data)
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
-            self.assertEqual(data["companies"][0]['siret'], u'00000000000009')
-            self.assertEqual(data["companies"][1]['siret'], u'00000000000008')
-            self.assertGreater(data["companies"][0]['stars'], data["companies"][1]['stars'])
+            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
+            self.assertEqual(sirets, set([u'00000000000009', u'00000000000008']))
 
     def test_wrong_contract_value(self):
         with self.test_request_context:
@@ -699,10 +698,13 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
-            self.assertEqual(data['companies'][0]['siret'], u'00000000000015')
-            self.assertEqual(data['companies'][0]['alternance'], False)
-            self.assertEqual(data['companies'][1]['siret'], u'00000000000016')
-            self.assertEqual(data['companies'][1]['alternance'], True)
+            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
+            self.assertEqual(sirets, set([u'00000000000015', u'00000000000016']))
+            for company in data['companies']:
+                if company['siret'] == u'00000000000015':
+                    self.assertEqual(company['alternance'], False)
+                if company['siret'] == u'00000000000016':
+                    self.assertEqual(company['alternance'], True)
 
     def test_department_filters(self):
         with self.test_request_context:
@@ -727,8 +729,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
             self.assertEqual(data['companies_count'], 2)
-            self.assertEqual(data['companies'][0]['siret'], u'00000000000017')
-            self.assertEqual(data['companies'][1]['siret'], u'00000000000018')
+            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
+            self.assertEqual(sirets, set([u'00000000000017', u'00000000000018']))
 
             # Check two departments => Expected 2 results
             params = self.add_security_params({
@@ -741,8 +743,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
             self.assertEqual(data['companies_count'], 2)
-            self.assertEqual(data['companies'][0]['siret'], u'00000000000017')
-            self.assertEqual(data['companies'][1]['siret'], u'00000000000018')
+            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
+            self.assertEqual(sirets, set([u'00000000000017', u'00000000000018']))
 
             # Check department 75 => Expected 1 result
             params = self.add_security_params({

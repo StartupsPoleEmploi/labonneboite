@@ -401,10 +401,10 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         # Global score should always be the same.
         self.assertEquals(res['_source']['score'], office.score)
         # Check scores for ROME.
-        # Since `romes_to_boost` is empty, all `scores_by_rome` should be set to 100.
+        # Since `romes_to_boost` is empty, all romes should be boosted.
         self.assertEquals(office_to_update.romes_to_boost, u"")
         for rome in mapping_util.romes_for_naf(office.naf):
-            self.assertEquals(res['_source']['scores_by_rome'][rome.code], 100)
+            self.assertEquals(res['_source']['boosted_romes'][rome.code], True)
 
     def test_update_office_by_removing_contact(self):
         """
@@ -457,19 +457,13 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
-        self.assertEquals(res['_source']['scores_by_rome']['D1507'], 100)
-        self.assertEquals(res['_source']['scores_by_rome']['D1103'], 100)
+        self.assertEquals(res['_source']['boosted_romes']['D1507'], True)
+        self.assertEquals(res['_source']['boosted_romes']['D1103'], True)
 
         # Other scores should not be boosted.
         for rome in romes_for_office:
             if rome not in [u"D1507", u"D1103"]:
-                try:
-                    self.assertNotEqual(res['_source']['scores_by_rome'][rome], 100)
-                except KeyError:
-                    # Score for ROME has not been indexed because it was too low.
-                    score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                        score=office.score, rome_code=rome, naf_code=office.naf)
-                    self.assertTrue(score < script.SCORE_FOR_ROME_MINIMUM)
+                self.assertNotIn(rome, res['_source']['boosted_romes'])
 
     def test_update_office_boost_unrelated_romes(self):
         """
@@ -495,19 +489,13 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
-        self.assertEquals(res['_source']['scores_by_rome']['D1506'], 100)
-        self.assertEquals(res['_source']['scores_by_rome']['D1507'], 100)
+        self.assertEquals(res['_source']['boosted_romes']['D1506'], True)
+        self.assertEquals(res['_source']['boosted_romes']['D1507'], True)
 
         # Other scores should not be boosted.
         for rome in romes_for_office:
             if rome not in [u"D1507"]:
-                try:
-                    self.assertNotEqual(res['_source']['scores_by_rome'][rome], 100)
-                except KeyError:
-                    # Score for ROME has not been indexed because it was too low.
-                    score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                        score=office.score, rome_code=rome, naf_code=office.naf)
-                    self.assertTrue(score < script.SCORE_FOR_ROME_MINIMUM)
+                self.assertNotIn(rome, res['_source']['boosted_romes'])
 
     def test_update_office_removed_romes(self):
         """
@@ -540,13 +528,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         # Other scores should not be boosted.
         for rome in romes_for_office:
             if rome not in [u"D1507"]:
-                try:
-                    self.assertNotEqual(res['_source']['scores_by_rome'][rome], 100)
-                except KeyError:
-                    # Score for ROME has not been indexed because it was too low.
-                    score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                        score=office.score, rome_code=rome, naf_code=office.naf)
-                    self.assertTrue(score < script.SCORE_FOR_ROME_MINIMUM)
+                self.assertNotIn(rome, res['_source']['boosted_romes'])
 
     def test_update_office_add_email_alternance(self):
         """
@@ -582,7 +564,6 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office_to_update.save(commit=True)
         script.update_offices()
 
-
         # Expected alternance infos
         office = Office.get(self.office1.siret)
         self.assertEquals(office.flag_alternance, 1)
@@ -598,10 +579,9 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEquals(office.flag_alternance, 0)
         self.assertEquals(office.email_alternance, "")
 
-
     def test_update_office_add_naf(self):
         # Avoid removing romes if its score is too low
-        script.SCORE_FOR_ROME_MINIMUM = 0
+        scoring_util.SCORE_FOR_ROME_MINIMUM = 0
 
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
         romes_for_office += [rome.code for rome in mapping_util.romes_for_naf(u"4772A")]
@@ -618,7 +598,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEquals(len(set(romes_for_office)), len(res['_source']['scores_by_rome']))
 
         # Restore value
-        script.SCORE_FOR_ROME_MINIMUM = 20
+        scoring_util.SCORE_FOR_ROME_MINIMUM = 20
+
 
     def test_remove_contacts_multi_siret(self):
         sirets = [self.office1.siret, self.office2.siret]

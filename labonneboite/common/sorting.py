@@ -1,8 +1,16 @@
 # coding: utf8
 
+SCORE_SORTING_LABEL = u'Tri optimisé %s' % (
+	u'<span class="badge badge-large badge-info" data-toggle="tooltip" data-placement="right" title="%s">?</span>' % (
+		u"""
+		Tri exclusif LaBonneBoite basé sur le potentiel d'embauche des entreprises mis à jour toutes les 24 heures.
+		"""
+	)
+)
+
 SORTING_CHOICES = (
+    (u'score', SCORE_SORTING_LABEL),
     (u'distance', u'Distance'),
-    (u'score', u'Potentiel d\'embauche'),
 )
 
 SORT_FILTER_SCORE = "score"
