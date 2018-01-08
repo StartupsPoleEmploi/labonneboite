@@ -65,10 +65,6 @@ HEADCOUNT_VALUES = {
 # Contract Value
 CONTRACT_VALUES = {'all': 0, 'alternance': 1}
 
-# Paginaton
-PAGINATION_MAX_PAGES = 10
-PAGINATION_COMPANIES_PER_PAGE = 10
-
 ES_INDEX = 'labonneboite'
 
 LOGSTASH_HOST = "localhost"
@@ -76,8 +72,8 @@ LOGSTASH_PORT = 5959
 
 TILE_SERVER_URL = "http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}"
 
-COMPANY_RESULTS_MAX = 100
-AUTOCOMPLETE_MAX = 5
+AUTOCOMPLETE_MAX_JOBS = 5
+AUTOCOMPLETE_MAX_LOCATIONS = 10
 
 ROME_NAF_PROBABILITY_CUTOFF = 0.05
 

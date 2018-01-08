@@ -11,6 +11,7 @@ from labonneboite.common import scoring as scoring_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office
 from labonneboite.common.search import fetch_companies
+from labonneboite.common import pagination
 from labonneboite.conf import settings
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest
 
@@ -147,8 +148,10 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data,
-                u'Invalid request argument: missing arguments: either commune_id or latitude and longitude')
+            self.assertEqual(
+                rv.data, 
+                u'Invalid request argument: missing arguments: either commune_id or latitude and longitude'
+            )
 
     def test_unknown_commune_id(self):
         with self.test_request_context:
@@ -162,8 +165,10 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data,
-                u'Invalid request argument: could not resolve latitude and longitude from given commune_id')
+            self.assertEqual(
+                rv.data,
+                u'Invalid request argument: could not resolve latitude and longitude from given commune_id'
+            )
 
     def test_correct_headcount_text(self):
         with self.test_request_context:
@@ -195,13 +200,42 @@ class ApiCompanyListTest(ApiBaseTest):
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'page': 2,
-                'page_size': 101,
+                'page_size': pagination.OFFICES_MAXIMUM_PAGE_SIZE + 1,
                 'rome_codes': u'D1405',
                 'user': u'labonneboite',
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'Invalid request argument: page_size is too large. Maximum value is 100')
+            self.assertEqual(
+                rv.data,
+                u'Invalid request argument: page_size is too large. Maximum value is %s' % (
+                    pagination.OFFICES_MAXIMUM_PAGE_SIZE
+                )
+            )
+
+    def test_maximum_page_size_is_ok(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['caen']['commune_id'],
+                'page': 1,
+                'page_size': pagination.OFFICES_MAXIMUM_PAGE_SIZE,
+                'rome_codes': u'D1405',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+
+    def test_exotic_page_size_is_ok(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['caen']['commune_id'],
+                'page': 1,
+                'page_size': 42,
+                'rome_codes': u'D1405',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
 
     def test_wrong_distance_value(self):
         """

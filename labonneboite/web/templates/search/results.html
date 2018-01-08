@@ -152,7 +152,7 @@
       {% endfor %}
 
       
-      {% if companies and companies|length < 10 and (alternative_rome_descriptions or alternative_distances) %}
+      {% if companies and companies|length < companies_per_page and (alternative_rome_descriptions or alternative_distances) %}
         <div class="lbb-bright-container">
           <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
           {% if alternative_rome_descriptions %}
