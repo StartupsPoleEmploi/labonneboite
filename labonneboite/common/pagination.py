@@ -4,7 +4,7 @@ from math import ceil
 from urllib import urlencode
 import urlparse
 
-OFFICES_PER_PAGE = 10  # constant for Frontend, variable default for API
+OFFICES_PER_PAGE = 20  # constant for Frontend, variable default for API
 OFFICES_MAXIMUM_PAGE_SIZE = 100  # API only as of now
 FAVORITES_PER_PAGE = 10
 
