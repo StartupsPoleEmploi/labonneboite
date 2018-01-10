@@ -1,4 +1,4 @@
-SERVER_NAME = 'https://labonneboite.pole-emploi.fr'
+SERVER_NAME = 'labonneboite.pole-emploi.fr'
 PREFERRED_URL_SCHEME = 'https'
 
 GOOGLE_ANALYTICS_ID = 'UA-69464544-1'

@@ -16,7 +16,7 @@ from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 
 # Server name
-SERVER_NAME = 'https://localhost:8090'
+SERVER_NAME = None
 PREFERRED_URL_SCHEME = 'http'
 
 ROME_DESCRIPTIONS = load_rome_labels()
