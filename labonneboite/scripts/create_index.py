@@ -26,13 +26,20 @@ from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocati
 from labonneboite.conf import settings
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
+# use this instead if you wish to investigate from which logger exactly comes each line of log
+# logging.basicConfig(level=logging.INFO)
 
-def disable_all_existing_loggers():
-    for _, logger in logging.root.manager.loggerDict.iteritems():
+VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main', 'elasticsearch.trace']
+
+def get_verbose_loggers():
+    return [logging.getLogger(logger_name) for logger_name in VERBOSE_LOGGER_NAMES]
+
+def disable_verbose_loggers():
+    for logger in get_verbose_loggers():
         logger.disabled = True
 
-def enable_all_existing_loggers():
-    for _, logger in logging.root.manager.loggerDict.iteritems():
+def enable_verbose_loggers():
+    for logger in get_verbose_loggers():
         logger.disabled = False
 
 # FIXME shouldn't create_index script also be used to populate test ES index as well?
@@ -733,7 +740,7 @@ def sanity_check_rome_codes():
     logging.info("rome_id|rome_label|offices_in_france")
     for rome_id in romes_from_rome_naf_mapping:
         naf_code_list = mapping_util.map_romes_to_nafs([rome_id])
-        disable_all_existing_loggers()
+        disable_verbose_loggers()
         offices, _, _ = fetch_companies(
             naf_codes=naf_code_list,
             rome_code=rome_id,
@@ -743,7 +750,7 @@ def sanity_check_rome_codes():
             from_number=1,
             to_number=10,
         )
-        enable_all_existing_loggers()
+        enable_verbose_loggers()
         if len(offices) < 5:
             logging.info("%s|%s|%s", rome_id, rome_labels[rome_id], len(offices))
 
