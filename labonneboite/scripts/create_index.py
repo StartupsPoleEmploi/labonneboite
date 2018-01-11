@@ -59,7 +59,6 @@ OGR_TYPE = 'ogr'
 LOCATION_TYPE = 'location'
 ES_TIMEOUT = 300
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
-SCORE_FOR_ROME_MINIMUM = 20  # at least 20 over 100
 
 
 class Counter(object):
@@ -487,7 +486,7 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                 rome_code=rome_code,
                 naf_code=naf)
 
-            if score >= SCORE_FOR_ROME_MINIMUM or rome_code in boosted_romes:
+            if score >= scoring_util.SCORE_FOR_ROME_MINIMUM or rome_code in boosted_romes:
                 if rome_code in scores_by_rome:
                     if score > scores_by_rome[rome_code]:
                         scores_by_rome[rome_code] = score

@@ -6,6 +6,10 @@ from backports.functools_lru_cache import lru_cache
 from labonneboite.common import mapping as mapping_util
 from labonneboite.conf import settings
 
+SCORE_FOR_ROME_MINIMUM = 20  # at least 20 over 100
+STARS_MINIMUM = 2.5
+STARS_MAXIMUM = 5.0
+
 # ############### WARNING about matching scores vs hirings ################
 # Methods scoring_util.get_hirings_from_score
 # and scoring_util.get_score_from_hirings
@@ -119,3 +123,53 @@ def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
 
     # result should be integer
     return get_score_from_hirings(office_hirings_for_current_rome, as_float=False)
+
+
+def get_stars_from_score(score):
+    """
+    Convert the score (integer theoretically between 0 and 100)
+    to a number of stars (float theoretically between 0.0 and 5.0).
+
+    All documentation below is based on the assumption that SCORE_FOR_ROME_MINIMUM is 20,
+    STARS_MINIMUM is 2.5 and STARS_MAXIMUM is 5.0. This makes things
+    more readable hopefully.
+
+    The score is actually between 20 and 100, as lower scores were filtered out by the create_index process.
+    Exception: this stays true for all scores per rome_code, but not for
+    the general all-jobs-included score which might still sometimes be below 20.
+
+    Stars were initially between 1.0 and 5.0, matching scores between 20 and 100,
+    however as lower stars may give a bad unjustified feeling about the company, we artificially raise the
+    stars to be guaranteed to be between 2.5 and 5.0.
+
+    Returned stars number always has 1 digit exactly. (i.e. 4.3 or 3.0 but not 4.35)
+    """
+    score_min = SCORE_FOR_ROME_MINIMUM
+    score_max = 100.0
+
+    # adjust for rare case of all-jobs-included score below 20
+    # happens for example on the office details page without rome_code context
+    score = max(score, score_min)
+
+    # normalize score between 0 and 1
+    normalized_score = (score - score_min) / (score_max - score_min)
+
+    stars = STARS_MINIMUM + normalized_score * (STARS_MAXIMUM - STARS_MINIMUM)
+    
+    # round to 1 digit
+    stars = round(stars, 1)
+
+    if stars < STARS_MINIMUM or stars > STARS_MAXIMUM:
+        raise Exception("unexpected stars value %s" % stars)
+
+    return stars
+
+def get_score_from_stars(stars):
+    """
+    Reverse of get_stars_from_score(score).
+    """
+    score_min = SCORE_FOR_ROME_MINIMUM
+    score_max = 100.0
+    normalized_score = (stars - STARS_MINIMUM) / (STARS_MAXIMUM - STARS_MINIMUM)
+    score = score_min + normalized_score * (score_max - score_min)
+    return score

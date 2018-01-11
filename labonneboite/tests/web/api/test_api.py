@@ -295,6 +295,12 @@ class ApiCompanyListTest(ApiBaseTest):
                 'rome_codes': rome_code,
                 'user': u'labonneboite',
             })
+
+            # The example in this test has a very low score under the usual SCORE_FOR_ROME_MINIMUM,
+            # which is why we need to lower the threshold just for this test, in order
+            # to be able to compute back the score from the stars.
+            scoring_util.SCORE_FOR_ROME_MINIMUM = 0.0
+
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
@@ -318,24 +324,22 @@ class ApiCompanyListTest(ApiBaseTest):
             # on the score you see in production.
             # #########################################################################
 
-            # general score/stars/hirings values (all rome_codes included)
+            # general score/hirings values (all rome_codes included)
             self.assertEqual(office.score, 71)
-            self.assertEqual(office.stars, 3.55)
             self.assertEqual(scoring_util.get_hirings_from_score(office.score), 77.5)
 
             # now let's see values adjusted for current rome_code
             stars_for_rome_code = office_json['stars']
             self.assertEqual(stars_for_rome_code, office.get_stars_for_rome_code(rome_code))
-            # stars from 0 to 5, score from 0 to 100 (x20)
-            score_for_rome = stars_for_rome_code * 20.0
-            self.assertEqual(score_for_rome, 3.0)
-            self.assertEqual(scoring_util.get_hirings_from_score(score_for_rome), 0.6)
+            score_for_rome = scoring_util.get_score_from_stars(stars_for_rome_code)
+            self.assertEqual(round(score_for_rome, 5), 4.0)
+            self.assertEqual(round(scoring_util.get_hirings_from_score(score_for_rome), 5), 0.8)
 
             # let's see how adjusting for this rome decreased hirings
             # from 77.5 (hirings for all rome_codes included)
-            # to 0.6 (hirings for only the current rome_code)
+            # to 0.8 (hirings for only the current rome_code)
             #
-            # 0.6 is approx 1% of 77.5
+            # 0.8 is approx 1% of 77.5
             # which means that on average, companies of this naf_code hire 1% in this rome_code
             # and 99% in all other rome_codes associated to this naf_code
             #

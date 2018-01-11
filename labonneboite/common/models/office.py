@@ -263,24 +263,13 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return self.get_stars_for_rome_code(None)
 
     def get_stars_for_rome_code(self, rome_code):
-        """
-        Converts the score (int from 0 to 100) to a number of stars (float from 0.0 and 5.0).
-        In case a rome_code is given, instead of using general all-jobs-included score,
-        use the score adjusted to the given rome_code.
-        """
         score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
             score=self.score,
             rome_code=rome_code,
             naf_code=self.naf
             )
-        stars_num = score / (100 / 5)
-        if stars_num < 0.0 or stars_num > 5.0:
-            raise Exception("unexpected starts_num value %s for siret %s and rome_code %s" % (
-                stars_num,
-                self.siret,
-                rome_code
-                ))
-        return stars_num
+
+        return scoring_util.get_stars_from_score(score)
 
     def get_stars_for_rome_code_as_percentage(self, rome_code):
         """
