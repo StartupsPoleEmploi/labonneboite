@@ -207,7 +207,9 @@
           </li>
         {% endif %}
       </ul>
+      {% if last_data_deploy_date %}
       <center>Données mises à jour le {{ last_data_deploy_date }}</center>
+      {% endif %}
     </div>
   </footer>
 
