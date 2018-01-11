@@ -109,7 +109,10 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     SEPARATORS = [u'\n', u'\r']
 
     id = Column(Integer, primary_key=True)
-    siret = Column(String(191), nullable=False, unique=True)
+
+    # Stores a list of SIRET as a string separated by `SEPARATORS`
+    siret = Column(Text, default='', nullable=False, unique=False)
+
     name = Column(String(191), default='', nullable=False)
 
     # Info to update.

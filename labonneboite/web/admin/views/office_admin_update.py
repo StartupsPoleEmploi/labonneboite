@@ -10,6 +10,14 @@ from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
 
+def is_siret(siret):
+    # A valid SIRET is composed by 14 digits
+    try:
+        int(siret)
+    except ValueError:
+        return False
+
+    return len(siret) == 14
 
 class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     """
@@ -64,7 +72,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     }
 
     column_labels = {
-        'siret': u"Siret",
+        'siret': u"Sirets",
         'name': u"Nom de l'entreprise",
         'reason': u"Raison",
         'boost': u"Booster le score",
@@ -90,6 +98,11 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     }
 
     column_descriptions = {
+        'siret': Markup(
+            u"Veuillez entrer un siret par ligne"
+            u"<br>"
+            u"Tous les sirets doivent être associés au même NAF (le premier NAF servant de référence)"
+        ),
         'requested_by_email': u"Email de la personne qui demande la suppression.",
         'requested_by_first_name': u"Prénom de la personne qui demande la suppression.",
         'requested_by_last_name': u"Nom de la personne qui demande la suppression.",
@@ -147,7 +160,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     form_args = {
         'siret': {
             'filters': [strip_filter, nospace_filter],
-            'validators': [siret_validator],
         },
         'name': {
             'filters': [strip_filter],
@@ -214,6 +226,48 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
     def validate_form(self, form):
         is_valid = super(OfficeAdminUpdateModelView, self).validate_form(form)
+
+        # All sirets must be well formed
+        sirets = OfficeAdminUpdate.as_list(form.data['siret'])
+        only_one_siret = len(sirets) == 1
+
+        if is_valid:
+            for siret in sirets:
+                if not is_siret(siret):
+                    message = u"Ce siret suivant n'est pas composé de 14 chiffres : {}".format(siret)
+                    flash(message, 'error')
+                    return False
+
+        # If only one siret, we valdate it
+        # If more than one siret : no siret validation
+        if is_valid and only_one_siret:
+            siret = sirets[0]
+            office = Office.query.filter_by(siret=siret).first()
+            if not office:
+                message = u"Le siret suivant n'est pas présent sur LBB: {}".format(siret)
+                flash(message, 'error')
+                return False
+
+        if is_valid:
+            for siret in sirets:
+                if 'id' in request.args:
+                    # Avoid conflict with himself if update by adding id != request.args['id']
+                    office_update_conflict = OfficeAdminUpdate.query.filter(
+                        OfficeAdminUpdate.siret.like("%{}%".format(siret)),
+                        OfficeAdminUpdate.id != request.args['id']
+                    )
+                else:
+                    office_update_conflict = OfficeAdminUpdate.query.filter(
+                        OfficeAdminUpdate.siret.like("%{}%".format(siret))
+                    )
+
+                if office_update_conflict.count() > 0:
+                    message = u""""
+                        Le siret {} est déjà présent dans la fiche n°{}
+                    """.format(siret, office_update_conflict[0].id)
+                    flash(message, 'error')
+                    return False
+
         # Codes ROMES to boost or to add
         if is_valid and form.data.get('romes_to_boost'):
 
@@ -224,11 +278,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 flash(msg, 'error')
                 return False
 
-            office_to_update = Office.query.filter_by(siret=form.data['siret']).first()
-            if not office_to_update:
-                msg = u"Le siret `%s` n'est pas présent sur LBB." % form.data['siret']
-                flash(msg, 'error')
-                return False
 
             for rome in OfficeAdminUpdate.as_list(romes_to_boost):
                 if not mapping_util.rome_is_valid(rome):
@@ -241,17 +290,11 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                     flash(Markup(msg), 'error')
                     return False
 
+        office_to_update = Office.query.filter_by(siret=sirets[0]).first()
         # Codes ROMES to remove
         if is_valid and form.data.get('romes_to_remove'):
             romes_to_remove = form.data.get('romes_to_remove')
 
-            office_to_update = Office.query.filter_by(siret=form.data['siret']).first()
-            if not office_to_update:
-                msg = u"Le siret `%s` n'est pas présent sur LBB." % form.data['siret']
-                flash(msg, 'error')
-                return False
-
-            office_romes = [item.code for item in mapping_util.romes_for_naf(office_to_update.naf)]
             for rome in OfficeAdminUpdate.as_list(romes_to_remove):
 
                 if not mapping_util.rome_is_valid(rome):
@@ -264,27 +307,23 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                     flash(Markup(msg), 'error')
                     return False
 
-                if rome not in office_romes:
-                    msg = u"`%s` n'est pas un code ROME lié au NAF de cette entreprise." % rome
-                    flash(msg, 'error')
-                    return False
+                if only_one_siret:
+                    office_romes = [item.code for item in mapping_util.romes_for_naf(office_to_update.naf)]
+                    if rome not in office_romes:
+                        msg = u"`%s` n'est pas un code ROME lié au NAF de cette entreprise." % rome
+                        flash(msg, 'error')
+                        return False
 
         # Codes NAF to add
         if is_valid and form.data.get('nafs_to_add'):
             nafs_to_add = form.data.get('nafs_to_add')
-
-            office_to_update = Office.query.filter_by(siret=form.data['siret']).first()
-            if not office_to_update:
-                msg = u"Le siret `%s` n'est pas présent sur LBB." % form.data['siret']
-                flash(msg, 'error')
-                return False
 
             for naf in OfficeAdminUpdate.as_list(nafs_to_add):
                 if naf not in settings.NAF_CODES:
                     msg = u"`%s` n'est pas un code NAF valide." % naf
                     flash(msg, 'error')
                     return False
-                if naf == office_to_update.naf:
+                if naf == office_to_update.naf and only_one_siret:
                     msg = u"Le NAF `%s` est déjà associé à cette entreprise." % naf
                     flash(msg, 'error')
                     return False
