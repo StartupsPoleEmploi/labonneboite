@@ -219,7 +219,10 @@ alembic_autogenerate_migration_for_all_existing_tables:
 	cd /srv/lbb && alembic revision --autogenerate'
 
 alembic_generate_single_migration:
-	echo 'run this command from inside vagrant: alembic revision -m "create account table"'
+	echo "run:\
+		\n$ make vagrant_ssh_dev\
+		\nthen for example:\
+		\n$ alembic revision -m 'create account table'"
 
 # Importer jobs
 # -------------
