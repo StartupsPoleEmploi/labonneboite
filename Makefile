@@ -162,7 +162,6 @@ test_unit: clean_pyc test_app test_importer test_api test_integration test_scrip
 
 test_all: test_unit test_selenium
 
-
 test_app:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
@@ -200,6 +199,15 @@ test_selenium:
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=development \
 	&& nosetests -s /srv/lbb/labonneboite/tests/web/selenium'
+
+# Convenient reminder about how to run a specific test manually.
+test_custom:
+	echo "to run a specific test, first run:\
+		\n$ make vagrant_ssh_test\
+		\nthen for example:\
+		\n$ nosetests -s labonneboite/tests/web/api/test_api.py\
+		\nand you can even run a specific method:\
+		\n$ nosetests -s labonneboite/tests/web/api/test_api.py:ApiCompanyListTest.test_query_returns_scores_adjusted_to_rome_code_context"
 
 # Alembic migrations
 # ------------------
