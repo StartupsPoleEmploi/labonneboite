@@ -231,6 +231,11 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         sirets = OfficeAdminUpdate.as_list(form.data['siret'])
         only_one_siret = len(sirets) == 1
 
+        if is_valid and not sirets:
+            message = u"Le champs 'Sirets' est obligatoire. Veuillez le renseigner."
+            flash(message, 'error')
+            return False
+
         if is_valid:
             for siret in sirets:
                 if not is_siret(siret):
