@@ -26,32 +26,45 @@ PUBLIC_SENIOR = 2
 PUBLIC_HANDICAP = 3
 PUBLIC_CHOICES = [PUBLIC_ALL, PUBLIC_JUNIOR, PUBLIC_SENIOR, PUBLIC_HANDICAP]
 
+KEY_TO_LABEL_DISTANCES = {
+    u'*-10.0': u'less_10_km',
+    u'*-30.0': u'less_30_km',
+    u'*-50.0': u'less_50_km',
+    u'*-100.0': u'less_100_km',
+    u'*-3000.0': u'france',
+}
+
+FILTERS = ['naf', 'headcount', 'flag_alternance', 'distance']
+DISTANCE_FILTER_MAX = 3000
+
+
+class Location(object):
+    def __init__(self, latitude, longitude):
+        self.latitude = latitude
+        self.longitude = longitude
+
+    def __repr__(self):
+        return "lon: {} - lat: {}".format(self.longitude, self.latitude)
+
 
 class CityLocation(object):
 
     def __init__(self, slug, zipcode):
         self.slug = slug
         self.zipcode = zipcode
-        self._coords = None
+        # Location attribute may be None if slug/zipcode combination is incorrect
+        self.location = None
+
+        city = geocoding.get_city_by_zipcode(self.zipcode, self.slug)
+        if not city:
+            logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.slug)
+        else:
+            coordinates = city['coords']
+            self.location = Location(coordinates['lat'], coordinates['lon'])
 
     @property
-    def coords(self):
-        if not self._coords:
-            result = geocoding.get_city_by_zipcode(self.zipcode, self.slug)
-            if not result:
-                logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.slug)
-                result = {'coords': None}
-            self._coords = result['coords']
-        return self._coords
-    @property
-    def latitude(self):
-        return self.coords['lat'] if self.is_location_correct else None
-    @property
-    def longitude(self):
-        return self.coords['lon'] if self.is_location_correct else None
-    @property
     def is_location_correct(self):
-        return self.coords is not None
+        return self.location is not None
 
     @property
     def name(self):
@@ -61,22 +74,25 @@ class CityLocation(object):
     def full_name(self):
         return '%s (%s)' % (self.name, self.zipcode)
 
+
 class Fetcher(object):
 
-    def __init__(self, city, occupation=None, distance=None, sort=None,
+    def __init__(self, search_location, rome=None, distance=None, sort=None,
                  from_number=1, to_number=10, flag_alternance=None,
-                 public=None, headcount=None, naf=None, **kwargs):
+                 public=None, headcount=None, naf=None, naf_codes=None,
+                 aggregate_by=None, departments=None, **kwargs):
         """
         This constructor takes many arguments; the goal is to reduce this list
         and to never rely on kwargs.
 
         Args:
-            city (CityLocation)
+            search_location (Location)
         """
-        self.occupation_slug = occupation
+        self.location = search_location
+
+        self.rome = rome
         self.distance = distance
         self.sort = sort
-        self.city = city
 
         # Pagination.
         self.from_number = from_number
@@ -92,18 +108,20 @@ class Fetcher(object):
         except (TypeError, ValueError):
             self.headcount = settings.HEADCOUNT_WHATEVER
 
-        # NAF, ROME and NAF codes.
-        self.rome = mapping_util.SLUGIFIED_ROME_LABELS[self.occupation_slug]
-
         # Empty list is needed to handle companies with ROME not related to their NAF
         self.naf = naf
-        self.naf_codes = {}
-        if self.naf:
+        self.naf_codes = naf_codes or {}
+        if self.naf and not self.naf_codes:
             self.naf_codes = mapping_util.map_romes_to_nafs([self.rome], [self.naf])
+
+        # Aggregate_by
+        self.aggregate_by = aggregate_by
+
         # Other properties.
         self.alternative_rome_codes = {}
         self.alternative_distances = collections.OrderedDict()
         self.company_count = None
+        self.departments = departments
 
     @property
     def flag_handicap(self):
@@ -115,37 +133,104 @@ class Fetcher(object):
     def flag_senior(self):
         return self.public == PUBLIC_SENIOR
 
+    def update_aggregations(self, aggregations):
+        if self.headcount and 'headcount' in aggregations:
+            aggregations['headcount'] = self.get_headcount_aggregations()
+        if self.flag_alternance and 'flag_alternance' in aggregations:
+            aggregations['contract'] = self.get_headcount_aggregations()
+        if self.distance != DISTANCE_FILTER_MAX and 'distance' in aggregations:
+            aggregations['distance'] = self.get_distance_aggregations()
+        if self.naf and 'naf' in aggregations:
+            aggregations['naf'] = self.get_naf_aggregations()
+
     def _get_company_count(self, rome_code, distance):
+
         return count_companies(
             self.naf_codes,
             rome_code,
-            self.city.latitude,
-            self.city.longitude,
+            self.location.latitude,
+            self.location.longitude,
             distance,
             flag_alternance=self.flag_alternance,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount=self.headcount,
+            departments=self.departments,
+            aggregate_by=None,
         )
 
     def get_naf_aggregations(self):
         _, _, aggregations = fetch_companies(
             {}, # No naf filter
             self.rome,
-            self.city.latitude,
-            self.city.longitude,
+            self.location.latitude,
+            self.location.longitude,
             self.distance,
+            aggregate_by=["naf"], # Only naf aggregate
             flag_alternance=self.flag_alternance,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount=self.headcount,
-            aggregate_by="naf"
+            departments=self.departments,
         )
-        return aggregations
+        return aggregations['naf']
 
-    def get_companies(self):
+    def get_headcount_aggregations(self):
+        _, _, aggregations = fetch_companies(
+            self.naf_codes,
+            self.rome,
+            self.location.latitude,
+            self.location.longitude,
+            self.distance,
+            aggregate_by=["headcount"], # Only headcount aggregate
+            flag_alternance=self.flag_alternance,
+            flag_junior=self.flag_junior,
+            flag_senior=self.flag_senior,
+            flag_handicap=self.flag_handicap,
+            headcount=settings.HEADCOUNT_WHATEVER, # No headcount filter
+            departments=self.departments,
+        )
+        return aggregations['headcount']
+
+    def get_contract_aggregations(self):
+        _, _, aggregations = fetch_companies(
+            self.naf_codes,
+            self.rome,
+            self.location.latitude,
+            self.location.longitude,
+            self.distance,
+            aggregate_by=['flag_alternance'], # Only flag_alternance aggregate
+            flag_alternance=None, # No flag_alternance filter
+            flag_junior=self.flag_junior,
+            flag_senior=self.flag_senior,
+            flag_handicap=self.flag_handicap,
+            headcount=self.headcount,
+            departments=self.departments,
+        )
+        return aggregations['contract']
+
+
+    def get_distance_aggregations(self):
+        _, _, aggregations = fetch_companies(
+            self.naf_codes,
+            self.rome,
+            self.location.latitude,
+            self.location.longitude,
+            DISTANCE_FILTER_MAX, # France
+            aggregate_by=["distance"],
+            flag_alternance=self.flag_alternance,
+            flag_junior=self.flag_junior,
+            flag_senior=self.flag_senior,
+            flag_handicap=self.flag_handicap,
+            headcount=self.headcount,
+            departments=self.departments,
+        )
+        return aggregations['distance']
+
+
+    def get_companies(self, add_suggestions=False):
 
         self.company_count = self._get_company_count(self.rome, self.distance)
         logger.debug("set company_count to %s from fetch_companies", self.company_count)
@@ -166,13 +251,14 @@ class Fetcher(object):
             self.from_number = 1
             self.to_number = 10
 
-        result = aggregations = []
+        result = []
+        aggregations = []
         if self.company_count:
             result, _, aggregations = fetch_companies(
                 self.naf_codes,
                 self.rome,
-                self.city.latitude,
-                self.city.longitude,
+                self.location.latitude,
+                self.location.longitude,
                 self.distance,
                 from_number=self.from_number,
                 to_number=self.to_number,
@@ -182,10 +268,11 @@ class Fetcher(object):
                 flag_handicap=self.flag_handicap,
                 headcount=self.headcount,
                 sort=self.sort,
-                aggregate_by="naf"
+                departments=self.departments,
+                aggregate_by=self.aggregate_by,
             )
 
-        if self.company_count < 10:
+        if self.company_count < 10 and add_suggestions:
 
             # Suggest other jobs.
             alternative_rome_codes = ROME_MOBILITIES[self.rome]
@@ -208,30 +295,97 @@ class Fetcher(object):
 def count_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
     json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
     del json_body["sort"]
+    return count_companies_from_es(json_body)
+
+def count_companies_from_es(json_body):
     es = Elasticsearch()
     res = es.count(index=settings.ES_INDEX, doc_type="office", body=json_body)
     return res["count"]
 
-def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
-    json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
+def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, aggregate_by=None, **kwargs):
+    json_body = build_json_body_elastic_search(
+        naf_codes,
+        rome_code,
+        latitude,
+        longitude,
+        distance,
+        aggregate_by=aggregate_by,
+        **kwargs
+    )
 
     try:
         sort = kwargs['sort']
     except KeyError:
         sort = sorting.SORT_FILTER_DEFAULT
 
-    companies, companies_count, aggregations = get_companies_from_es_and_db(json_body, sort=sort)
+    companies, companies_count, aggregations_raw = get_companies_from_es_and_db(json_body, sort=sort)
     companies = shuffle_companies(companies, sort, rome_code)
 
-    # Extract aggregation
-    if aggregations:
-        aggregations = aggregations[kwargs["aggregate_by"]]["buckets"]
-        aggregations = [
-            {"naf": naf_aggregate['key'], "count": naf_aggregate['doc_count']} for naf_aggregate in aggregations
-        ]
+    # Extract aggregations
+    aggregations = {}
+    if aggregate_by:
+        if "naf" in aggregate_by:
+            aggregations['naf'] = aggregate_naf(aggregations_raw)
+        if "flag_alternance" in aggregate_by:
+            aggregations['contract'] = aggregate_contract(aggregations_raw)
+        if 'headcount' in aggregate_by:
+            aggregations['headcount'] = aggregate_headcount(aggregations_raw)
+        if 'distance' in aggregate_by:
+            if distance == DISTANCE_FILTER_MAX:
+                aggregations['distance'] = aggregate_distance(aggregations_raw)
 
     return companies, companies_count, aggregations
 
+def aggregate_naf(aggregations_raw):
+    return [{
+            "code": naf_aggregate['key'],
+            "count": naf_aggregate['doc_count'],
+            'label': settings.NAF_CODES.get(naf_aggregate['key']),
+        } for naf_aggregate in aggregations_raw['naf']['buckets']]
+
+def aggregate_contract(aggregations_raw):
+    alternance_key = 1
+    alternance = 0
+    total = 0
+
+    for contract_aggregate in aggregations_raw["flag_alternance"]["buckets"]:
+        # key=1 means flag_alternance
+        if contract_aggregate['key'] == alternance_key:
+            alternance = contract_aggregate['doc_count']
+        # All contracts
+        total += contract_aggregate['doc_count']
+
+    return {'alternance': alternance, 'all': total}
+
+
+def aggregate_headcount(aggregations_raw):
+    small = 0
+    big = 0
+
+    # Count by HEADCOUNT_INSEE values
+    for contract_aggregate in aggregations_raw["headcount"]["buckets"]:
+        key = contract_aggregate['key']
+        if  key <= settings.HEADCOUNT_SMALL_ONLY_MAXIMUM:
+            small += contract_aggregate['doc_count']
+        elif key >= settings.HEADCOUNT_BIG_ONLY_MINIMUM:
+            big += contract_aggregate['doc_count']
+
+    return {'small': small, 'big': big}
+
+def aggregate_distance(aggregations_raw):
+    distances_aggregations = {}
+    for distance_aggregate in aggregations_raw['distance']['buckets']:
+        key = distance_aggregate['key']
+        try:
+            label = KEY_TO_LABEL_DISTANCES[key]
+        except KeyError as e:
+            e.message = "Unknown distance_aggretions key : %s" % distance_aggregate['key']
+            logger.exception(e)
+            continue
+
+        distances_aggregations[label] = distance_aggregate['doc_count']
+
+    return distances_aggregations
 
 def shuffle_companies(companies, sort, rome_code):
     """
@@ -428,12 +582,26 @@ def build_json_body_elastic_search(
 
     # Add aggregate
     if aggregate_by:
+
         json_body['aggs'] = {}
-        json_body['aggs'][aggregate_by] = {
-            "terms" : {
-                "field": aggregate_by
-            }
-        }
+        for aggregate in aggregate_by:
+            # Distance if not an ES field, so we have to do a specefic aggregations
+            if aggregate == 'distance':
+                json_body['aggs']['distance'] = {
+                    'geo_distance' : {
+                        "field": "locations",
+                        "origin": "%s,%s"  % (latitude, longitude),
+                        'unit': 'km',
+                        'ranges': [{'to': 10}, {'to': 30}, {'to': 50}, {'to': 100}, {'to': 3000}]
+                    }
+                }
+            else:
+                json_body['aggs'][aggregate] = {
+                    "terms" : {
+                        "field": aggregate
+                    }
+                }
+
 
     if from_number:
         json_body["from"] = from_number - 1
@@ -443,6 +611,7 @@ def build_json_body_elastic_search(
                 logger.exception("to_number < from_number : %s < %s", to_number, from_number)
                 raise Exception("to_number < from_number")
             json_body["size"] = to_number - from_number + 1
+
     return json_body
 
 

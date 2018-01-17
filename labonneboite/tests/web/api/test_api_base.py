@@ -103,6 +103,52 @@ class ApiBaseTest(DatabaseTest):
             'zip_code': u'92200',
             'commune_id': u'92051',
         },
+        # For filters in response tests
+        'toulon': {
+            'coords': [{
+                'lat': 43.1167,
+                'lon': 5.9333,
+            }],
+            'zip_code': u'83000',
+            'commune_id': u'83137',
+        },
+        # Located at 15km of Toulon
+        'hyeres': {
+            'coords': [{
+                'lat': 43.1167,
+                'lon': 6.1167,
+            }],
+            'zip_code': u'83400',
+            'commune_id': u'83069',
+        },
+        # Located at 35km of Toulon
+        'aubagne': {
+            'coords': [{
+                'lat': 43.283329,
+                'lon': 5.56667,
+            }],
+            'zip_code': u'13400',
+            'commune_id': u'13005',
+        },
+        # Located at 60km of Toulon
+        'draguignan': {
+            'coords': [{
+                'lat': 43.53772,
+                'lon': 6.464993,
+            }],
+            'zip_code': u'83300',
+            'commune_id': u'83050',
+        },
+        # Located at 500km of Toulon
+        'limoges': {
+            'coords': [{
+                'lat': 45.849998,
+                'lon': 1.25,
+            }],
+            'zip_code': u'87000',
+            'commune_id': u'87085',
+        },
+
     }
 
     def setUp(self, *args, **kwargs):
@@ -310,7 +356,82 @@ class ApiBaseTest(DatabaseTest):
                 'name': u'Office 18',
                 'flag_alternance': 0,
                 'department': self.positions['neuilly-sur-seine']['zip_code'][0:2],
-            }
+            },
+            # For filters in response tests
+            {
+                'naf': u'4910Z',  # Map to Rome N4403
+                'siret': u'00000000000019',
+                'score': 76,
+                'headcount': 01,
+                'locations': self.positions['toulon']['coords'],
+                'name': u'Office 19',
+                'flag_alternance': 0,
+                'department': self.positions['toulon']['zip_code'][0:2],
+            },
+            {
+                'naf': u'4910Z',  # Map to Rome N4403
+                'siret': u'00000000000020',
+                'score': 90,
+                'headcount': 03,
+                'locations': self.positions['toulon']['coords'],
+                'name': u'Office 20',
+                'flag_alternance': 0,
+                'department': self.positions['toulon']['zip_code'][0:2],
+            },
+            {
+                'naf': u'4920Z',  # Map to Rome N4403
+                'siret': u'00000000000021',
+                'score': 43,
+                'headcount': 53,
+                'locations': self.positions['toulon']['coords'],
+                'name': u'Office 21',
+                'flag_alternance': 1,
+                'department': self.positions['toulon']['zip_code'][0:2],
+            },
+            # For distance filter => between 10-30km
+            {
+                'naf': u'4910Z',  # Map to Rome N4403
+                'siret': u'00000000000023',
+                'score': 89,
+                'headcount': 31,
+                'locations': self.positions['hyeres']['coords'], # 15km of Toulon
+                'name': u'Office 23',
+                'flag_alternance': 0,
+                'department': self.positions['hyeres']['zip_code'][0:2],
+            },
+            # For distance filter => between 30-50km
+            {
+                'naf': u'4910Z',  # Map to Rome N4403
+                'siret': u'00000000000024',
+                'score': 30,
+                'headcount': 12,
+                'locations': self.positions['aubagne']['coords'], # 35km of Toulon
+                'name': u'Office 24',
+                'flag_alternance': 0,
+                'department': self.positions['aubagne']['zip_code'][0:2],
+            },
+            # For distance between 50-100km
+            {
+                'naf': u'4910Z',  # Map to Rome N4403
+                'siret': u'00000000000025',
+                'score': 82,
+                'headcount': 11,
+                'locations': self.positions['draguignan']['coords'], # 60km of Toulon
+                'name': u'Office 25',
+                'flag_alternance': 0,
+                'department': self.positions['draguignan']['zip_code'][0:2],
+            },
+            # For distance filter => between 100-3000km
+            {
+                'naf': u'4910Z',  # Map to Rome N4403
+                'siret': u'00000000000026',
+                'score': 67,
+                'headcount': 51,
+                'locations': self.positions['limoges']['coords'], # 500km of Toulon
+                'name': u'Office 26',
+                'flag_alternance': 0,
+                'department': self.positions['limoges']['zip_code'][0:2],
+            },
         ]
         for i, doc in enumerate(docs, start=1):
             # Build scores for relevant ROME codes.
