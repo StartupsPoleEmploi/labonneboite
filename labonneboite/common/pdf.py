@@ -32,6 +32,7 @@ def write_file(office, data):
 
 
 def delete_file(office):
+    # FIXME : Works only on one front-end...
     filename = get_file_path(office)
     if os.path.exists(filename):
         os.remove(filename)
