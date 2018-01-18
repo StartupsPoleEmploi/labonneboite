@@ -6,18 +6,10 @@ from wtforms import validators
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office, OfficeAdminUpdate
+from labonneboite.common.siret import is_siret
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter, siret_validator
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
-
-def is_siret(siret):
-    # A valid SIRET is composed by 14 digits
-    try:
-        int(siret)
-    except ValueError:
-        return False
-
-    return len(siret) == 14
 
 class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     """
@@ -256,7 +248,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         if is_valid:
             for siret in sirets:
                 if 'id' in request.args:
-                    # Avoid conflict with himself if update by adding id != request.args['id']
+                    # Avoid conflict with itself if update by adding id != request.args['id']
                     office_update_conflict = OfficeAdminUpdate.query.filter(
                         OfficeAdminUpdate.siret.like("%{}%".format(siret)),
                         OfficeAdminUpdate.id != request.args['id']
