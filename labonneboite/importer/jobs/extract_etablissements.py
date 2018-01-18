@@ -213,7 +213,7 @@ class EtablissementExtractJob(Job):
                     logger.debug("processed %s lines", count)
 
                 try:
-                    fields = import_util.get_fields_from_csv_line(line, sep='\xa5')
+                    fields = import_util.get_fields_from_csv_line(line)
                     if len(fields) != 16:
                         logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
