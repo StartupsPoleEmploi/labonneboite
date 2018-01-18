@@ -3,6 +3,7 @@
 from functools import wraps
 
 from flask import abort, Blueprint, current_app, jsonify, request
+from flasgger import swag_from
 
 from labonneboite.common import geocoding
 from labonneboite.common import search
@@ -58,8 +59,8 @@ def api_auth_required(function):
 
 # Note: `company` should be renamed to `office` wherever possible.
 # Unfortunately old routes cannot change.
-
 @apiBlueprint.route('/company/', methods=['GET'])
+@swag_from('./swagger/company.yml')
 @api_auth_required
 def company_list():
 
@@ -100,6 +101,7 @@ def company_list():
 
 
 @apiBlueprint.route('/filter/', methods=['GET'])
+@swag_from('./swagger/filter.yml')
 @api_auth_required
 def company_filter_list():
     current_app.logger.debug("API request received: %s", request.full_path)
@@ -280,6 +282,7 @@ def create_fetcher(location, request_args):
     return search.Fetcher(location, **kwargs)
 
 @apiBlueprint.route('/office/<siret>/details', methods=['GET'])
+@swag_from('./swagger/office_siret_detail.yml')
 @api_auth_required
 def office_details(siret):
     """

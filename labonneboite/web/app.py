@@ -12,6 +12,7 @@ from opbeat.handlers.logging import OpbeatHandler
 from social_core.exceptions import AuthCanceled, AuthException, AuthFailed, AuthStateMissing
 from social_flask_sqlalchemy.models import init_social
 from werkzeug.contrib.fixers import ProxyFix
+from flasgger import Swagger
 import logstash
 
 # Flask.
@@ -31,6 +32,8 @@ from labonneboite.common.database import db_session, engine  # This is how we ta
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
+from labonneboite.web.api.swagger.conf import config as swagger_config
+from labonneboite.web.api.swagger.conf import template as swagger_template
 
 # labonneboite web.
 from labonneboite.web.config import get_config
@@ -101,6 +104,7 @@ def register_extensions(flask_app):
     mandrill.init_app(flask_app)
     flask_app.extensions['mandrill'] = mandrill  # Provide easy access to the mandrill extension in Blueprints.
     login_manager.init_app(flask_app)
+    Swagger(flask_app, template=swagger_template, config=swagger_config)
     init_social(flask_app, db_session)
 
 
