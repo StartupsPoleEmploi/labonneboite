@@ -264,7 +264,10 @@ def parse_dpae_line(line):
 
     siret = fields[0]
     hiring_date_raw = fields[7]
-    hiring_date = datetime.strptime(hiring_date_raw, "%Y-%m-%d %H:%M:%S")
+    try:
+        hiring_date = datetime.strptime(hiring_date_raw, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        hiring_date = datetime.strptime(hiring_date_raw, "%Y-%m-%d %H:%M:%S.0")
 
     try:
         zipcode = int(fields[3])
