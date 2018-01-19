@@ -192,7 +192,15 @@ def create_fetcher(location, request_args):
 
     for rome in rome_code_list:
         if rome.encode('ascii', 'ignore') not in ROME_CODES:  # ROME_CODES contains ascii data but rome is unicode.
-            raise InvalidFetcherArgument(u'rome_codes: %s' % rome)
+            msg = u'Unknown rome_code: %s - Possible reasons: 1) %s 2) %s' % (
+                rome,
+                'This rome_code does not exist.',
+                'This rome code exists but is very recent and thus \
+                    we do not have enough data yet to build relevant results for it. \
+                    We typically need at least 12 months of data before we can build \
+                    relevant results for a given rome_code.'
+            )
+            raise InvalidFetcherArgument(msg)
 
     if len(rome_code_list) > 1:
         # Reasons why we only support single-rome search are detailed in README.md

@@ -231,7 +231,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'Invalid request argument: rome_codes: INVALID')
+            self.assertTrue(rv.data.startswith(u'Invalid request argument: Unknown rome_code: INVALID'))
 
     def test_count_pagination(self):
         with self.test_request_context:

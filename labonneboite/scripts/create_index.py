@@ -18,15 +18,37 @@ from labonneboite.common import departements as dpt
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
+from labonneboite.common.search import fetch_companies
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
 
+logging.basicConfig(level=logging.INFO, format='%(message)s')
+# use this instead if you wish to investigate from which logger exactly comes each line of log
+# logging.basicConfig(level=logging.INFO)
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main', 'elasticsearch.trace']
 
+def get_verbose_loggers():
+    return [logging.getLogger(logger_name) for logger_name in VERBOSE_LOGGER_NAMES]
+
+def disable_verbose_loggers():
+    """
+    We disable some loggers at specific points of this script in order to have a clean output
+    (especially of the sanity_check_rome_codes part) and avoit it being polluted by useless
+    unwanted logs detailing every MysQL and ES request.
+    """
+    for logger in get_verbose_loggers():
+        # For some unknown reason, logger.setLevel(logging.ERROR) here does not work as expected as
+        # 'INFO' level messages are still visible. Hence we brutally disable the logger instead.
+        # FIXME try again to increase logger level instead of disabling it.
+        logger.disabled = True
+
+def enable_verbose_loggers():
+    for logger in get_verbose_loggers():
+        logger.disabled = False
 
 # FIXME shouldn't create_index script also be used to populate test ES index as well?
 # we should use settings.ES_INDEX here instead
@@ -676,6 +698,71 @@ def update_offices_geolocations():
             es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
 
 
+@timeit
+def sanity_check_rome_codes():
+    ogr_rome_mapping = load_ogr_rome_mapping()
+    rome_labels = settings.ROME_DESCRIPTIONS
+    rome_naf_mapping = mapping_util.MANUAL_ROME_NAF_MAPPING
+
+    romes_from_ogr_rome_mapping = set(ogr_rome_mapping.values())
+    romes_from_rome_labels = set(rome_labels.keys())
+    romes_from_rome_naf_mapping = set(rome_naf_mapping.keys())
+
+    subset1 = romes_from_ogr_rome_mapping - romes_from_rome_labels
+    subset2 = romes_from_rome_labels - romes_from_ogr_rome_mapping
+    subset3 = romes_from_rome_naf_mapping - romes_from_rome_labels
+    subset4 = romes_from_rome_labels - romes_from_rome_naf_mapping
+
+    msg = """
+        -------------- SANITY CHECK ON ROME CODES --------------
+        found %s distinct rome_codes in romes_from_ogr_rome_mapping
+        found %s distinct rome_codes in romes_from_rome_labels
+        found %s distinct rome_codes in romes_from_rome_naf_mapping
+
+        found %s rome_codes present in romes_from_ogr_rome_mapping but not in romes_from_rome_labels: %s
+
+        found %s rome_codes present in romes_from_rome_labels but not in romes_from_ogr_rome_mapping: %s
+
+        found %s rome_codes present in romes_from_rome_naf_mapping but not in romes_from_rome_labels: %s
+
+        found %s rome_codes present in romes_from_rome_labels but not in romes_from_rome_naf_mapping: %s
+        """ % (
+            len(romes_from_ogr_rome_mapping),
+            len(romes_from_rome_labels),
+            len(romes_from_rome_naf_mapping),
+            len(subset1), subset1,
+            len(subset2), subset2,
+            len(subset3), subset3,
+            len(subset4),
+            # CSV style output for easier manipulation afterwards
+            "".join(["\n%s|%s" % (r, rome_labels[r]) for r in subset4]),
+        )
+    logging.info(msg)
+
+    city = geocoding.get_city_by_commune_id('75056')
+    latitude = city['coords']['lat']
+    longitude = city['coords']['lon']
+    distance = 1000
+
+    # CSV style output for easier manipulation afterwards
+    logging.info("rome_id|rome_label|offices_in_france")
+    for rome_id in romes_from_rome_naf_mapping:
+        naf_code_list = mapping_util.map_romes_to_nafs([rome_id])
+        disable_verbose_loggers()
+        offices, _, _ = fetch_companies(
+            naf_codes=naf_code_list,
+            rome_code=rome_id,
+            latitude=latitude,
+            longitude=longitude,
+            distance=distance,
+            from_number=1,
+            to_number=10,
+        )
+        enable_verbose_loggers()
+        if len(offices) < 5:
+            logging.info("%s|%s|%s", rome_id, rome_labels[rome_id], len(offices))
+
+
 def display_performance_stats(departement):
     methods = [
                '_get_score_from_hirings',
@@ -714,6 +801,10 @@ def update_data(drop_indexes, enable_profiling, single_job, disable_parallel_com
     remove_offices()
     update_offices()
     update_offices_geolocations()
+
+    if drop_indexes:
+        sanity_check_rome_codes()
+
 
 def update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job, disable_parallel_computing=False):
     if enable_profiling:
