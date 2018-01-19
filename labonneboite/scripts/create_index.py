@@ -35,7 +35,15 @@ def get_verbose_loggers():
     return [logging.getLogger(logger_name) for logger_name in VERBOSE_LOGGER_NAMES]
 
 def disable_verbose_loggers():
+    """
+    We disable some loggers at specific points of this script in order to have a clean output
+    (especially of the sanity_check_rome_codes part) and avoit it being polluted by useless
+    unwanted logs detailing every MysQL and ES request.
+    """
     for logger in get_verbose_loggers():
+        # For some unknown reason, logger.setLevel(logging.ERROR) here does not work as expected as
+        # 'INFO' level messages are still visible. Hence we brutally disable the logger instead.
+        # FIXME try again to increase logger level instead of disabling it.
         logger.disabled = True
 
 def enable_verbose_loggers():
