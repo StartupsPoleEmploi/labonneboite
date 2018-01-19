@@ -851,6 +851,7 @@ def update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job, di
         update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)
         logging.info("COMPLETED run without profiling")
 
+
 def run():
     parser = argparse.ArgumentParser(
         description="Update elasticsearch data: offices, ogr_codes and locations.")
