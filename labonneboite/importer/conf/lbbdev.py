@@ -1,7 +1,11 @@
 import os
 
-# --- importer table backuping process
-BACKUP_FIRST = True
+# --- importer table backuping process (DPAE + ETABLISSEMENTS)
+# As of Jan 2018 we no longer make backups in order to accelerate the process, and for the following reasons:
+# Exports are files on lbbbackup server, mounted via NFS to lbbdev. Thus, as original files
+# are stored on lbbbackup and as db tables are stored on lbbdev, data is already physically on two different
+# servers, which we can consider as a rough backup good enough for now.
+BACKUP_FIRST = False
 
 # --- importer input directory of DPAE and ETABLISSEMENT exports
 INPUT_SOURCE_FOLDER = '/srv/lbb/data'
