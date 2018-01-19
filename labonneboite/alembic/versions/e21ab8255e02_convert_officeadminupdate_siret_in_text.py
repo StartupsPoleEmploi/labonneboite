@@ -18,18 +18,11 @@ depends_on = None
 
 
 def upgrade():
-    op.alter_column(
-        table_name='etablissements_admin_update',
-        column_name='siret',
-        type=mysql.TEXT(collation=u'utf8mb4_unicode_ci', length=65000),
-        null=False
-    )
+    conn = op.get_bind()
+    conn.execute("ALTER TABLE `etablissements_admin_update` CHANGE siret sirets TEXT;")
+
 
 
 def downgrade():
-    op.alter_column(
-        table_name='etablissements_admin_update',
-        column_name='siret',
-        type=mysql.VARCHAR(collation=u'utf8mb4_unicode_ci', length=191),
-        null=False
-    )
+    conn = op.get_bind()
+    conn.execute("ALTER TABLE `etablissements_admin_update` CHANGE sirets siret VARCHAR(191);")

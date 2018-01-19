@@ -609,7 +609,7 @@ def update_offices():
     es = Elasticsearch(timeout=ES_TIMEOUT)
 
     for office_to_update in db_session.query(OfficeAdminUpdate).all():
-        for siret in OfficeAdminUpdate.as_list(office_to_update.siret):
+        for siret in OfficeAdminUpdate.as_list(office_to_update.sirets):
 
             office = Office.query.filter_by(siret=siret).first()
 

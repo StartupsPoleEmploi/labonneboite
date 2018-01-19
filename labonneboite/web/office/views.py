@@ -149,7 +149,7 @@ def make_save_suggestion(form):
         return u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % dirty_fix_url(url)
 
     # OfficeAdminUpdate already exits ?
-    office_admin_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.siret.like("%{}%".format(form.siret.data))).first()
+    office_admin_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets.like("%{}%".format(form.siret.data))).first()
 
     if office_admin_update:
         url = url_for("officeadminupdate.edit_view", id=office_admin_update.id)

@@ -19,19 +19,19 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
     can_delete = False
     can_view_details = True
-    column_searchable_list = ['siret', 'name']
+    column_searchable_list = ['sirets', 'name']
     column_default_sort = ('date_created', True)
     page_size = 100
 
     column_list = [
-        'siret',
+        'sirets',
         'name',
         'reason',
         'date_created',
     ]
 
     column_details_list = [
-        'siret',
+        'sirets',
         'name',
         'boost',
         'romes_to_boost',
@@ -64,7 +64,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     }
 
     column_labels = {
-        'siret': u"Sirets",
+        'sirets': u"Sirets",
         'name': u"Nom de l'entreprise",
         'reason': u"Raison",
         'boost': u"Booster le score",
@@ -90,7 +90,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     }
 
     column_descriptions = {
-        'siret': Markup(
+        'sirets': Markup(
             u"Veuillez entrer un siret par ligne"
             u"<br>"
             u"Tous les sirets doivent être associés au même NAF (le premier NAF servant de référence)"
@@ -128,7 +128,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     }
 
     form_columns = [
-        'siret',
+        'sirets',
         'name',
         'boost',
         'romes_to_boost',
@@ -150,7 +150,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     ]
 
     form_args = {
-        'siret': {
+        'sirets': {
             'filters': [strip_filter, nospace_filter],
         },
         'name': {
@@ -200,7 +200,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     def create_form(self):
         form = super(OfficeAdminUpdateModelView, self).create_form()
         if 'siret' in request.args:
-            form.siret.data = request.args['siret']
+            form.sirets.data = request.args['siret']
         if 'name' in request.args:
             form.name.data = request.args['name']
         if 'requested_by_email' in request.args:
@@ -220,7 +220,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         is_valid = super(OfficeAdminUpdateModelView, self).validate_form(form)
 
         # All sirets must be well formed
-        sirets = OfficeAdminUpdate.as_list(form.data['siret'])
+        sirets = OfficeAdminUpdate.as_list(form.data['sirets'])
         only_one_siret = len(sirets) == 1
 
         if is_valid and not sirets:
@@ -250,12 +250,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 if 'id' in request.args:
                     # Avoid conflict with itself if update by adding id != request.args['id']
                     office_update_conflict = OfficeAdminUpdate.query.filter(
-                        OfficeAdminUpdate.siret.like("%{}%".format(siret)),
+                        OfficeAdminUpdate.sirets.like("%{}%".format(siret)),
                         OfficeAdminUpdate.id != request.args['id']
                     )
                 else:
                     office_update_conflict = OfficeAdminUpdate.query.filter(
-                        OfficeAdminUpdate.siret.like("%{}%".format(siret))
+                        OfficeAdminUpdate.sirets.like("%{}%".format(siret))
                     )
 
                 if office_update_conflict.count() > 0:
