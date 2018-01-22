@@ -29,7 +29,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             office_to_remove = OfficeAdminRemove(
                 id=1,
                 siret=u'12345678901234',
-                name=self.office.company_name,
+                name=self.office1.company_name,
                 reason=u"N/A",
                 initiative=u'office',
             )
@@ -91,7 +91,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             # Create OfficeAdminUpdate
             office_to_update = OfficeAdminUpdate(
                 id=1,
-                siret=u"78548035101646",
+                sirets=u"78548035101646",
                 name=u"SUPERMARCHES MATCH"
             )
             office_to_update.save(commit=True)

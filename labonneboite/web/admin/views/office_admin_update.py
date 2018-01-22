@@ -287,9 +287,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                     flash(Markup(msg), 'error')
                     return False
 
-        office_to_update = Office.query.filter_by(siret=sirets[0]).first()
         # Codes ROMES to remove
         if is_valid and form.data.get('romes_to_remove'):
+            office_to_update = Office.query.filter_by(siret=sirets[0]).first()
             romes_to_remove = form.data.get('romes_to_remove')
 
             for rome in OfficeAdminUpdate.as_list(romes_to_remove):
@@ -313,6 +313,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
         # Codes NAF to add
         if is_valid and form.data.get('nafs_to_add'):
+            office_to_update = Office.query.filter_by(siret=sirets[0]).first()
             nafs_to_add = form.data.get('nafs_to_add')
 
             for naf in OfficeAdminUpdate.as_list(nafs_to_add):

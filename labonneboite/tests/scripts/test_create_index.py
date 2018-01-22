@@ -373,7 +373,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         Test `update_offices` to update an office: update email and website, keep current phone.
         """
         office_to_update = OfficeAdminUpdate(
-            siret=self.office1.siret,
+            sirets=self.office1.siret,
             name=self.office1.company_name,
             boost=True,
             new_email=u"foo@pole-emploi.fr",
@@ -411,7 +411,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         Test `update_offices` to update an office: remove email, phone and website.
         """
         office_to_update = OfficeAdminUpdate(
-            siret=self.office1.siret,
+            sirets=self.office1.siret,
             name=self.office1.company_name,
             new_email=u"foo@pole-emploi.fr",  # Should be overriden by remove_email.
             new_website=u"https://foo.pole-emploi.fr",  # Should be overriden by remove_website.
@@ -444,7 +444,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertIn(u"D1103", romes_for_office)
 
         office_to_update = OfficeAdminUpdate(
-            siret=self.office1.siret,
+            sirets=self.office1.siret,
             name=self.office1.company_name,
             boost=True,
             romes_to_boost=u"D1507\nD1103",  # Boost score only for those ROME.
@@ -482,7 +482,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertIn(u"D1507", romes_for_office) # Rome related to the office
 
         office_to_update = OfficeAdminUpdate(
-            siret=self.office1.siret,
+            sirets=self.office1.siret,
             name=self.office1.company_name,
             boost=True,
             romes_to_boost=u"D1506\nD1507",  # Boost score only for those ROME.
@@ -519,7 +519,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertIn(u"D1507", romes_for_office) # Rome related to the office
 
         office_to_update = OfficeAdminUpdate(
-            siret=self.office1.siret,
+            sirets=self.office1.siret,
             name=self.office1.company_name,
             boost=False,
             romes_to_boost='',
@@ -556,7 +556,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertNotEquals(office.email_alternance, "email_alternance@mail.com")
 
         office_to_update = OfficeAdminUpdate(
-            siret=self.office1.siret,
+            sirets=self.office1.siret,
             name=self.office1.company_name,
             email_alternance=u"email_alternance@mail.com",
         )
@@ -575,7 +575,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         # Add flag_alternance and email_alternance
         office_to_update = OfficeAdminUpdate(
-            siret=self.office1.siret,
+            sirets=self.office1.siret,
             name=self.office1.company_name,
             email_alternance=u"email_alternance@mail.com",
         )
@@ -607,7 +607,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         romes_for_office += [rome.code for rome in mapping_util.romes_for_naf(u"4772A")]
 
         office_to_update = OfficeAdminUpdate(
-            siret=self.office1.siret,
+            sirets=self.office1.siret,
             name=self.office1.company_name,
             nafs_to_add=u"4772A",
         )
@@ -624,7 +624,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         sirets = [self.office1.siret, self.office2.siret]
 
         office_to_update = OfficeAdminUpdate(
-            siret='\n'.join(sirets),
+            sirets='\n'.join(sirets),
             name="Supermarché",
             remove_email=True,
             remove_phone=True,
@@ -650,7 +650,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         sirets = [self.office1.siret, self.office2.siret]
 
         office_to_update = OfficeAdminUpdate(
-            siret='\n'.join(sirets),
+            sirets='\n'.join(sirets),
             name="Supermarché",
             email_alternance=u"email_alternance@mail.com",
         )
@@ -666,7 +666,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         sirets = [self.office1.siret, self.office2.siret]
 
         office_to_update = OfficeAdminUpdate(
-            siret='\n'.join(sirets),
+            sirets='\n'.join(sirets),
             name="Supermarché",
             boost=True,
         )
@@ -686,7 +686,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         sirets = [self.office1.siret, self.office2.siret]
 
         office_to_update = OfficeAdminUpdate(
-            siret='\n'.join(sirets),
+            sirets='\n'.join(sirets),
             name="Supermarchés",
             new_email=u"foo@pole-emploi.fr",
             new_phone=u"0240656459",
@@ -719,7 +719,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         sirets = [self.office1.siret, self.office2.siret]
 
         office_to_update = OfficeAdminUpdate(
-            siret='\n'.join(sirets),
+            sirets='\n'.join(sirets),
             name="Supermarchés",
             nafs_to_add=u"4772A",
         )
@@ -743,7 +743,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertIn(u"D1103", romes_for_office)
 
         office_to_update = OfficeAdminUpdate(
-            siret='\n'.join(sirets),
+            sirets='\n'.join(sirets),
             name="Supermarchés",
             boost=True,
             romes_to_boost=u"D1507\nD1103",  # Boost score only for those ROME.
@@ -770,7 +770,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertIn(u"D1507", romes_for_office) # Rome related to the office
 
         office_to_update = OfficeAdminUpdate(
-            siret='\n'.join(sirets),
+            sirets='\n'.join(sirets),
             name="Supermarchés",
             boost=False,
             romes_to_boost='',
