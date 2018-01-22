@@ -1,14 +1,14 @@
 # coding: utf8
 
 from wtforms import ValidationError
-
+from labonneboite.common.siret import is_siret
 
 def siret_validator(form, field):
     """
     Validate siret number.
     http://wtforms.readthedocs.io/en/latest/validators.html#custom-validators
     """
-    if not field.data.isdigit() or len(field.data) != 14:
+    if not is_siret(field.data):
         raise ValidationError(u"Le numéro SIRET doit être composé de 14 chiffres")
 
 

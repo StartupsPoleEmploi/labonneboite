@@ -631,46 +631,47 @@ def update_offices():
     es = Elasticsearch(timeout=ES_TIMEOUT)
 
     for office_to_update in db_session.query(OfficeAdminUpdate).all():
+        for siret in OfficeAdminUpdate.as_list(office_to_update.sirets):
 
-        office = Office.query.filter_by(siret=office_to_update.siret).first()
+            office = Office.query.filter_by(siret=siret).first()
 
-        if office:
-            # Apply changes in DB.
-            office.email = u'' if office_to_update.remove_email else (office_to_update.new_email or office.email)
-            office.email_alternance = u'' if office_to_update.remove_flag_alternance else (office_to_update.email_alternance or u'')
-            office.tel = u'' if office_to_update.remove_phone else (office_to_update.new_phone or office.tel)
-            office.website = u'' if office_to_update.remove_website else (office_to_update.new_website or office.website)
-            office.flag_alternance = False if office_to_update.remove_flag_alternance else office.flag_alternance
-            office.save()
+            if office:
+                # Apply changes in DB.
+                office.email = u'' if office_to_update.remove_email else (office_to_update.new_email or office.email)
+                office.email_alternance = u'' if office_to_update.remove_flag_alternance else (office_to_update.email_alternance or u'')
+                office.tel = u'' if office_to_update.remove_phone else (office_to_update.new_phone or office.tel)
+                office.website = u'' if office_to_update.remove_website else (office_to_update.new_website or office.website)
+                office.flag_alternance = False if office_to_update.remove_flag_alternance else office.flag_alternance
+                office.save()
 
-            # Apply changes in ElasticSearch.
-            body = {'doc':
-                {'email': office.email, 'phone': office.tel, 'website': office.website,
-                'flag_alternance': 1 if office.flag_alternance else 0 }
-            }
+                # Apply changes in ElasticSearch.
+                body = {'doc':
+                    {'email': office.email, 'phone': office.tel, 'website': office.website,
+                    'flag_alternance': 1 if office.flag_alternance else 0 }
+                }
 
-            scores_by_rome = get_scores_by_rome(office, office_to_update)
-            if scores_by_rome:
-                body['doc']['scores_by_rome'] = scores_by_rome
+                scores_by_rome = get_scores_by_rome(office, office_to_update)
+                if scores_by_rome:
+                    body['doc']['scores_by_rome'] = scores_by_rome
 
-            # The update API makes partial updates: existing `scalar` fields are overwritten,
-            # but `objects` fields are merged together.
-            # https://www.elastic.co/guide/en/elasticsearch/guide/1.x/partial-updates.html
-            # However `scores_by_rome` needs to be overwritten because it may change over time.
-            # To do this, we perform 2 requests: the first one reset `scores_by_rome`, the
-            # second one populate it.
-            delete_body = {'doc': {'scores_by_rome': None}}
+                # The update API makes partial updates: existing `scalar` fields are overwritten,
+                # but `objects` fields are merged together.
+                # https://www.elastic.co/guide/en/elasticsearch/guide/1.x/partial-updates.html
+                # However `scores_by_rome` needs to be overwritten because it may change over time.
+                # To do this, we perform 2 requests: the first one reset `scores_by_rome`, the
+                # second one populate it.
+                delete_body = {'doc': {'scores_by_rome': None}}
 
-            # Unfortunately these cannot easily be bulked :-(
-            # The reason is there is no way to tell bulk to ignore missing documents (404)
-            # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
-            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=delete_body,
-                      params={'ignore': 404})
-            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_update.siret, body=body,
-                      params={'ignore': 404})
+                # Unfortunately these cannot easily be bulked :-(
+                # The reason is there is no way to tell bulk to ignore missing documents (404)
+                # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
+                es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret, body=delete_body,
+                        params={'ignore': 404})
+                es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret, body=body,
+                        params={'ignore': 404})
 
-            # Delete the current PDF, it will be regenerated at next download attempt.
-            pdf_util.delete_file(office)
+                # Delete the current PDF, it will be regenerated at next download attempt.
+                pdf_util.delete_file(office)
 
 @timeit
 def update_offices_geolocations():
