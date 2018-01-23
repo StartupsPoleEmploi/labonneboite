@@ -296,6 +296,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 'user': u'labonneboite',
             })
 
+            # FIXME mock.patch
             # The example in this test has a very low score under the usual SCORE_FOR_ROME_MINIMUM,
             # which is why we need to lower the threshold just for this test, in order
             # to be able to compute back the score from the stars.
@@ -702,13 +703,11 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
-            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
-            self.assertEqual(sirets, set([u'00000000000015', u'00000000000016']))
-            for company in data['companies']:
-                if company['siret'] == u'00000000000015':
-                    self.assertEqual(company['alternance'], False)
-                if company['siret'] == u'00000000000016':
-                    self.assertEqual(company['alternance'], True)
+            sirets = {c['siret']: c for c in data['companies']}
+            self.assertEqual(sorted(sirets.keys()), [u'00000000000015', u'00000000000016'])
+            self.assertEqual(sirets[u'00000000000015']['alternance'], False)
+            self.assertEqual(sirets[u'00000000000016']['alternance'], True)
+
 
     def test_department_filters(self):
         with self.test_request_context:

@@ -682,10 +682,11 @@ def update_offices():
                 # The update API makes partial updates: existing `scalar` fields are overwritten,
                 # but `objects` fields are merged together.
                 # https://www.elastic.co/guide/en/elasticsearch/guide/1.x/partial-updates.html
-                # However `scores_by_rome` needs to be overwritten because it may change over time.
-                # To do this, we perform 2 requests: the first one reset `scores_by_rome`, the
-                # second one populate it.
-                delete_body = {'doc': {'scores_by_rome': None}}
+                # However `scores_by_rome` and `boosted_romes` need to be overwritten because they
+                # may change over time.
+                # To do this, we perform 2 requests: the first one resets `scores_by_rome` and
+                # `boosted_romes` and the second one populates them.
+                delete_body = {'doc': {'scores_by_rome': None, 'boosted_romes': None}}
 
                 # Unfortunately these cannot easily be bulked :-(
                 # The reason is there is no way to tell bulk to ignore missing documents (404)
@@ -695,7 +696,7 @@ def update_offices():
                 es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret, body=body,
                         params={'ignore': 404})
 
-                # Delete the current PDF, it will be regenerated at next download attempt.
+                # Delete the current PDF thus it will be regenerated at the next download attempt.
                 pdf_util.delete_file(office)
 
 

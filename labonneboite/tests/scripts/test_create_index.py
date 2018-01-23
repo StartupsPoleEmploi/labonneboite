@@ -1,12 +1,12 @@
 # coding: utf8
 import datetime
 import time
+import mock
 
 from flask import url_for
 from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common import mapping as mapping_util
-from labonneboite.common import scoring as scoring_util
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.common.models import OfficeAdminExtraGeoLocation, User
 from labonneboite.common.database import db_session
@@ -580,9 +580,6 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEquals(office.email_alternance, "")
 
     def test_update_office_add_naf(self):
-        # Avoid removing romes if its score is too low
-        scoring_util.SCORE_FOR_ROME_MINIMUM = 0
-
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
         romes_for_office += [rome.code for rome in mapping_util.romes_for_naf(u"4772A")]
 
@@ -592,13 +589,14 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             nafs_to_add=u"4772A",
         )
         office_to_update.save()
-        script.update_offices()
+
+        # Use a mock to temporarily adjust scoring_util.SCORE_FOR_ROME_MINIMUM
+        # and avoid removing romes if their score is too low.
+        with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0):
+            script.update_offices()
 
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office1.siret)
         self.assertEquals(len(set(romes_for_office)), len(res['_source']['scores_by_rome']))
-
-        # Restore value
-        scoring_util.SCORE_FOR_ROME_MINIMUM = 20
 
 
     def test_remove_contacts_multi_siret(self):
@@ -658,10 +656,11 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             office = Office.get(siret)
             res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
 
-            # Since `romes_to_boost` is empty, all `scores_by_rome` should be set to 100.
+            # Since `romes_to_boost` is empty, all `scores_by_rome` should be boosted.
             self.assertEquals(office_to_update.romes_to_boost, u"")
             for rome in mapping_util.romes_for_naf(office.naf):
-                self.assertEquals(res['_source']['scores_by_rome'][rome.code], 100)
+                self.assertEquals(res['_source']['boosted_romes'][rome.code], True)
+
 
     def test_new_contact_multi_siret(self):
         sirets = [self.office1.siret, self.office2.siret]
@@ -690,10 +689,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             self.assertEquals(res['_source']['phone'], office_to_update.new_phone)
             self.assertEquals(res['_source']['website'], office_to_update.new_website)
 
-    def test_nafs_to_add_multi_siret(self):
-        # Avoid removing romes if its score is too low
-        script.SCORE_FOR_ROME_MINIMUM = 0
 
+    def test_nafs_to_add_multi_siret(self):
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
         romes_for_office += [rome.code for rome in mapping_util.romes_for_naf(u"4772A")]
 
@@ -705,14 +702,16 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             nafs_to_add=u"4772A",
         )
         office_to_update.save()
-        script.update_offices()
+
+        # Use a mock to temporarily adjust scoring_util.SCORE_FOR_ROME_MINIMUM
+        # and avoid removing romes if their score is too low.
+        with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0):
+            script.update_offices()
 
         for siret in sirets:
             res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
             self.assertEquals(len(set(romes_for_office)), len(res['_source']['scores_by_rome']))
 
-        # Restore value
-        script.SCORE_FOR_ROME_MINIMUM = 20
 
     def test_romes_to_boost_multi_siret(self):
         sirets = [self.office1.siret, self.office2.siret]
@@ -738,8 +737,9 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
 
             # Check boosted scores.
-            self.assertEquals(res['_source']['scores_by_rome']['D1507'], 100)
-            self.assertEquals(res['_source']['scores_by_rome']['D1103'], 100)
+            self.assertEquals(res['_source']['boosted_romes']['D1507'], True)
+            self.assertEquals(res['_source']['boosted_romes']['D1103'], True)
+
 
     def romes_to_remove_multi_siret(self):
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
