@@ -4,6 +4,7 @@ import datetime
 import json
 from urllib import urlencode
 import urlparse
+import mock
 
 from flask import url_for
 from labonneboite.common import scoring as scoring_util
@@ -300,64 +301,63 @@ class ApiCompanyListTest(ApiBaseTest):
                 'user': u'labonneboite',
             })
 
-            # FIXME mock.patch
-            # The example in this test has a very low score under the usual SCORE_FOR_ROME_MINIMUM,
+            # The example in this test has a very low score (below SCORE_FOR_ROME_MINIMUM),
             # which is why we need to lower the threshold just for this test, in order
             # to be able to compute back the score from the stars.
-            scoring_util.SCORE_FOR_ROME_MINIMUM = 0
+            with mock.patch.object(scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0):
+                rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+                self.assertEqual(rv.status_code, 200)
+                data = json.loads(rv.data)
+                self.assertEqual(data['companies_count'], 1)
+                self.assertEqual(len(data['companies']), 1)
 
-            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
-            self.assertEqual(data['companies_count'], 1)
-            self.assertEqual(len(data['companies']), 1)
+                office_json = data['companies'][0]
+                siret = office_json['siret']
+                office = Office.query.get(siret)
 
-            office_json = data['companies'][0]
-            siret = office_json['siret']
-            office = Office.query.get(siret)
+                # ############### WARNING about matching scores vs hirings ################
+                # Methods scoring_util.get_hirings_from_score
+                # and scoring_util.get_score_from_hirings
+                # rely on special coefficients SCORE_50_HIRINGS, SCORE_60_HIRINGS etc..
+                # which values in github repository are *fake* and used for dev and test only.
+                #
+                # The real values are confidential, stored outside of github repo,
+                # and only used in staging and production.
+                #
+                # This is designed so that you *CANNOT* guess the hirings based
+                # on the score you see in production.
+                # #########################################################################
 
-            # ############### WARNING about matching scores vs hirings ################
-            # Methods scoring_util.get_hirings_from_score
-            # and scoring_util.get_score_from_hirings
-            # rely on special coefficients SCORE_50_HIRINGS, SCORE_60_HIRINGS etc..
-            # which values in github repository are *fake* and used for dev and test only.
-            #
-            # The real values are confidential, stored outside of github repo,
-            # and only used in staging and production.
-            #
-            # This is designed so that you *CANNOT* guess the hirings based
-            # on the score you see in production.
-            # #########################################################################
+                # general score/hirings values (all rome_codes included)
+                self.assertEqual(office.score, 71)
+                self.assertEqual(scoring_util.get_hirings_from_score(office.score), 77.5)
 
-            # general score/hirings values (all rome_codes included)
-            self.assertEqual(office.score, 71)
-            self.assertEqual(scoring_util.get_hirings_from_score(office.score), 77.5)
+                # now let's see values adjusted for current rome_code
+                stars_for_rome_code = office_json['stars']
+                self.assertEqual(stars_for_rome_code, office.get_stars_for_rome_code(rome_code))
+                score_for_rome = scoring_util.get_score_from_stars(stars_for_rome_code)
+                self.assertEqual(round(score_for_rome, 5), 4.0)
+                self.assertEqual(round(scoring_util.get_hirings_from_score(score_for_rome), 5), 0.8)
 
-            # now let's see values adjusted for current rome_code
-            stars_for_rome_code = office_json['stars']
-            self.assertEqual(stars_for_rome_code, office.get_stars_for_rome_code(rome_code))
-            score_for_rome = scoring_util.get_score_from_stars(stars_for_rome_code)
-            self.assertEqual(round(score_for_rome, 5), 4.0)
-            self.assertEqual(round(scoring_util.get_hirings_from_score(score_for_rome), 5), 0.8)
+                # let's see how adjusting for this rome decreased hirings
+                # from 77.5 (hirings for all rome_codes included)
+                # to 0.8 (hirings for only the current rome_code)
+                #
+                # 0.8 is approx 1% of 77.5
+                # which means that on average, companies of this naf_code hire 1% in this rome_code
+                # and 99% in all other rome_codes associated to this naf_code
+                #
+                # let's check we can find back this 1% ratio in our rome-naf mapping data
+                naf_code = office.naf
+                rome_codes = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code].keys()
+                total_naf_hirings = sum(mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome] for rome in rome_codes)
+                self.assertEqual(total_naf_hirings, 7844)
+                current_rome_hirings = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome_code]
+                self.assertEqual(current_rome_hirings, 52)
+                # 52 hirings for this rome_code only is indeed roughly 1% of 7844 hirings for all rome_codes.
+                # The match is not exact because some rounding occur during calculations, but you should
+                # now get the main idea of how scores are adjusted to a given rome_code.
 
-            # let's see how adjusting for this rome decreased hirings
-            # from 77.5 (hirings for all rome_codes included)
-            # to 0.8 (hirings for only the current rome_code)
-            #
-            # 0.8 is approx 1% of 77.5
-            # which means that on average, companies of this naf_code hire 1% in this rome_code
-            # and 99% in all other rome_codes associated to this naf_code
-            #
-            # let's check we can find back this 1% ratio in our rome-naf mapping data
-            naf_code = office.naf
-            rome_codes = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code].keys()
-            total_naf_hirings = sum(mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome] for rome in rome_codes)
-            self.assertEqual(total_naf_hirings, 7844)
-            current_rome_hirings = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome_code]
-            self.assertEqual(current_rome_hirings, 52)
-            # 52 hirings for this rome_code only is indeed roughly 1% of 7844 hirings for all rome_codes.
-            # The match is not exact because some rounding occur during calculations, but you should
-            # now get the main idea of how scores are adjusted to a given rome_code.
 
     def test_empty_result_does_not_crash(self):
         with self.test_request_context:
