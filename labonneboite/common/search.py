@@ -239,7 +239,7 @@ class Fetcher(object):
 
         max_page_size = pagination.OFFICES_MAXIMUM_PAGE_SIZE
         current_page_size = self.to_number - self.from_number + 1
-        
+
         invalid_pagination = (
             self.from_number < 1
             or current_page_size < 1  # this happens when a page out of bound is requested
