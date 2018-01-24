@@ -377,7 +377,7 @@ class ApiCompanyListTest(ApiBaseTest):
 
     def test_no_contact_details(self):
         """
-        Test that sensitive contact data (such as `email`) is not be exposed in responses.
+        Test that sensitive contact data (such as `email`) is not exposed in responses.
         """
         with self.test_request_context:
             params = self.add_security_params({
