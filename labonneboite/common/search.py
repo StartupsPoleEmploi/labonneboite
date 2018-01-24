@@ -677,6 +677,9 @@ def get_companies_from_es_and_db(json_body, sort):
         elif sort == sorting.SORT_FILTER_SCORE:
             distance_sort_index = 2
         else:
+            # This should never happen.
+            # An API request would have already raised a InvalidFetcherArgument exception,
+            # and a Frontend request would have fallbacked to default sorting.
             raise ValueError("unknown sorting : %s" % sort)
 
         company_objects = Office.query.filter(Office.siret.in_(siret_list))

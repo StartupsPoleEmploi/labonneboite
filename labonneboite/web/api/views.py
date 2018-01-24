@@ -19,7 +19,6 @@ apiBlueprint = Blueprint('api', __name__)
 
 OGR_ROME_CODES = load_ogr_rome_mapping()
 ROME_CODES = OGR_ROME_CODES.values()
-SORTING_VALUES = [key for key, _ in sorting.SORTING_CHOICES]
 
 # Some internal services of Pôle emploi can sometimes have access to sensitive information.
 API_INTERNAL_CONSUMERS = ['labonneboite', 'memo']
@@ -253,8 +252,8 @@ def create_fetcher(location, request_args):
     sort = sorting.SORT_FILTER_DEFAULT
     if 'sort' in request_args:
         sort = request_args.get('sort')
-        if sort not in SORTING_VALUES:
-            raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(SORTING_VALUES))
+        if sort not in sorting.SORTING_VALUES:
+            raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(sorting.SORTING_VALUES))
     kwargs['sort'] = sort
 
 

@@ -13,6 +13,8 @@ SORTING_CHOICES = (
     (u'distance', u'Distance'),
 )
 
+SORTING_VALUES = [key for key, _ in SORTING_CHOICES]
+
 SORT_FILTER_SCORE = "score"
 SORT_FILTER_DISTANCE = "distance"
 SORT_FILTERS = [SORT_FILTER_SCORE, SORT_FILTER_DISTANCE]

@@ -138,6 +138,10 @@ def results(city, zipcode, occupation):
         form = CompanySearchForm(**form_kwargs)
         return render_template('search/results.html', job_doesnt_exist=True, form=form)
 
+    # Fallback to default sorting.
+    if form_kwargs['sort'] not in sorting.SORTING_VALUES:
+        form_kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
+
     session['search_args'] = request.args
 
     # Fetch companies and alternatives
