@@ -79,8 +79,8 @@ class CityLocation(object):
 
 class Fetcher(object):
 
-    def __init__(self, search_location, from_number, to_number,
-                 rome=None, distance=None, sort=None, flag_alternance=None,
+    def __init__(self, search_location, rome=None, distance=None, sort=None,
+                 from_number=1, to_number=pagination.OFFICES_PER_PAGE, flag_alternance=None,
                  public=None, headcount=None, naf=None, naf_codes=None,
                  aggregate_by=None, departments=None, **kwargs):
         """
