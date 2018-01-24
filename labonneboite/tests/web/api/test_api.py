@@ -92,7 +92,9 @@ class ApiSecurityTest(ApiBaseTest):
                 'rome_codes': u'D1405',
                 'user': u'labonneboite',
             })
-            params['timestamp'] = (datetime.datetime.now() - datetime.timedelta(minutes=20)).strftime('%Y-%m-%dT%H:%M:%S')
+            params['timestamp'] = (
+                datetime.datetime.now() - datetime.timedelta(minutes=20)
+            ).strftime('%Y-%m-%dT%H:%M:%S')
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(rv.data, u'timestamp has expired')
@@ -144,7 +146,8 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'Invalid request argument: missing arguments: either commune_id or latitude and longitude')
+            self.assertEqual(rv.data,
+                u'Invalid request argument: missing arguments: either commune_id or latitude and longitude')
 
     def test_unknown_commune_id(self):
         with self.test_request_context:
@@ -158,7 +161,8 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'Invalid request argument: could not resolve latitude and longitude from given commune_id')
+            self.assertEqual(rv.data,
+                u'Invalid request argument: could not resolve latitude and longitude from given commune_id')
 
     def test_correct_headcount_text(self):
         with self.test_request_context:
@@ -300,7 +304,7 @@ class ApiCompanyListTest(ApiBaseTest):
             # The example in this test has a very low score under the usual SCORE_FOR_ROME_MINIMUM,
             # which is why we need to lower the threshold just for this test, in order
             # to be able to compute back the score from the stars.
-            scoring_util.SCORE_FOR_ROME_MINIMUM = 0.0
+            scoring_util.SCORE_FOR_ROME_MINIMUM = 0
 
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
@@ -372,10 +376,10 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 0)
 
     def test_no_contact_details(self):
+        """
+        Test that sensitive contact data (such as `email`) is not be exposed in responses.
+        """
         with self.test_request_context:
-            """
-            Test that sensitive contact data (such as `email`) is not be exposed in responses.
-            """
             params = self.add_security_params({
                 'distance': 20,
                 'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
@@ -404,10 +408,10 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEquals(rv.headers['Content-Type'], 'application/json')
 
     def test_romes_for_commune_id(self):
+        """
+        Perform queries in Caen to test the `rome_codes` param with one or more values.
+        """
         with self.test_request_context:
-            """
-            Perform queries in Caen to test the `rome_codes` param with one or more values.
-            """
             # 1) Search for `D1405` ROME code only. We should get 1 result.
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
@@ -832,6 +836,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(nafs_expected), len(data['filters']['naf']))
             for naf_filter in data['filters']['naf']:
                 naf_expected = nafs_expected[naf_filter['code']]
+                # FIXME naf_expected never used?
+
 
     def test_filters_when_filtering_by_headcount(self):
         with self.test_request_context:
