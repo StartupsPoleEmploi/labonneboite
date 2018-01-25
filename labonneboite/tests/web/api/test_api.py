@@ -798,7 +798,6 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(nafs_expected), len(data['filters']['naf']))
             for naf_filter in data['filters']['naf']:
                 naf_expected = nafs_expected[naf_filter['code']]
-
                 self.assertEqual(naf_expected[0], naf_filter['code'])
                 self.assertEqual(naf_expected[1], naf_filter['count'])
                 self.assertEqual(naf_expected[2], naf_filter['label'])
@@ -830,7 +829,9 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(nafs_expected), len(data['filters']['naf']))
             for naf_filter in data['filters']['naf']:
                 naf_expected = nafs_expected[naf_filter['code']]
-                # FIXME naf_expected never used?
+                self.assertEqual(naf_expected[0], naf_filter['code'])
+                self.assertEqual(naf_expected[1], naf_filter['count'])
+                self.assertEqual(naf_expected[2], naf_filter['label'])
 
 
     def test_filters_when_filtering_by_headcount(self):
