@@ -93,7 +93,8 @@ def get_parameters(args):
     except ValueError:
         kwargs['to_number'] = kwargs['from_number'] + settings.PAGINATION_COMPANIES_PER_PAGE - 1
 
-    if kwargs.get('sort') == '':
+    # Fallback to default sorting.
+    if kwargs.get('sort') not in sorting.SORTING_VALUES:
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
     for flag_name in ['flag_alternance', 'public']:
@@ -137,10 +138,6 @@ def results(city, zipcode, occupation):
         form_kwargs['job'] = occupation
         form = CompanySearchForm(**form_kwargs)
         return render_template('search/results.html', job_doesnt_exist=True, form=form)
-
-    # Fallback to default sorting.
-    if form_kwargs['sort'] not in sorting.SORTING_VALUES:
-        form_kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
     session['search_args'] = request.args
 
