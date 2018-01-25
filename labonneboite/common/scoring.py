@@ -159,9 +159,6 @@ def get_stars_from_score(score):
     # round to 1 digit
     stars = round(stars, 1)
 
-    if stars < STARS_MINIMUM or stars > STARS_MAXIMUM:
-        raise Exception("unexpected stars value %s" % stars)
-
     return stars
 
 def get_score_from_stars(stars):
