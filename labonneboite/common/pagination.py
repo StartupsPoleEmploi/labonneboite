@@ -4,7 +4,14 @@ from math import ceil
 from urllib import urlencode
 import urlparse
 
-from labonneboite.conf import settings
+OFFICES_PER_PAGE = 20  # constant for Frontend, variable default for API
+OFFICES_MAXIMUM_PAGE_SIZE = 100  # API only as of now
+FAVORITES_PER_PAGE = 10
+
+# Has no real impact, only cosmetic impact on frontend, to avoid showing too many links
+# at the same time in the search footer paginator in case they are hundreds of pages.
+# All hundreds of pages are still perfectly browsable.
+MAX_PAGES = 10
 
 
 class Pagination(object):
@@ -54,7 +61,7 @@ class Pagination(object):
 
 class PaginationManager(object):
     """
-    A pagination class which is specific for offices search results.
+    Specific pagination class for office search results.
     """
     def __init__(self, company_count, current_from_number, current_to_number,
                  full_path_url):
@@ -79,31 +86,31 @@ class PaginationManager(object):
         page_count = self.get_page_count()
         current_page = self.get_current_page()
 
-        if current_page < int(settings.PAGINATION_MAX_PAGES / 2) + 1:
+        if current_page < int(MAX_PAGES / 2) + 1:
             min_page = 0
-            max_page = min(settings.PAGINATION_MAX_PAGES, page_count)
+            max_page = min(MAX_PAGES, page_count)
         else:
             max_page = min(
-                current_page + int(settings.PAGINATION_MAX_PAGES / 2),
+                current_page + int(MAX_PAGES / 2),
                 page_count
             )
             if max_page == page_count:
-                min_page = max(1, page_count - settings.PAGINATION_MAX_PAGES)
+                min_page = max(1, page_count - MAX_PAGES)
             else:
                 min_page = max(
                     0,
-                    current_page - int(settings.PAGINATION_MAX_PAGES / 2) - 1
+                    current_page - int(MAX_PAGES / 2) - 1
                 )
         return min_page, max_page
 
     def get_current_page(self):
         if not self._current_page:
-            self._current_page = 1 + int(self.current_from_number / 10)
+            self._current_page = 1 + int(self.current_from_number / OFFICES_PER_PAGE)
         return self._current_page
 
     def get_page_count(self):
         return 1 + \
-            (self.company_count - 1) / settings.PAGINATION_COMPANIES_PER_PAGE
+            (self.company_count - 1) / OFFICES_PER_PAGE
 
     def get_pages(self):
         if not self.pages:
@@ -147,12 +154,12 @@ class Page(object):
 
     def get_from_number(self):
         if not self._from_number:
-            self._from_number = 1 + self.ranking * 10
+            self._from_number = 1 + self.ranking * OFFICES_PER_PAGE
         return self._from_number
 
     def get_to_number(self):
         if not self._to_number:
-            self._to_number = min((self.ranking + 1) * 10, self.company_count)
+            self._to_number = min((self.ranking + 1) * OFFICES_PER_PAGE, self.company_count)
         return self._to_number
 
     def is_active(self):

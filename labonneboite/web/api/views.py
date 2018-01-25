@@ -8,6 +8,7 @@ from labonneboite.common import geocoding
 from labonneboite.common import search
 from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
+from labonneboite.common import pagination
 from labonneboite.common.load_data import load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
@@ -174,7 +175,10 @@ def create_fetcher(location, request_args):
     Optional parameters:
     - `distance`: perimeter of the search radius (in Km) in which to search.
     - `page`: number of the requested page.
-    - `page_size`: number of results per page (maximum : 100).
+    - `page_size`: number of results per page (
+        maximum : pagination.OFFICES_MAXIMUM_PAGE_SIZE,
+        default: pagination.OFFICES_PER_PAGE
+        ).
     - `naf_codes`: one or more naf_codes, comma separated. If empty or missing, no filter will be used
     - `contract`: one value, only between 'all' (default) or 'alternance'
     - `sort`: one value, only between 'score' (default) and 'distance'
@@ -215,10 +219,12 @@ def create_fetcher(location, request_args):
     try:
         page_size = int(request_args.get('page_size'))
     except TypeError:
-        page_size = 10
+        page_size = pagination.OFFICES_PER_PAGE
 
-    if page_size > 100:
-        raise InvalidFetcherArgument(u'page_size is too large. Maximum value is 100')
+    if page_size > pagination.OFFICES_MAXIMUM_PAGE_SIZE:
+        raise InvalidFetcherArgument(
+            u'page_size is too large. Maximum value is %s' % pagination.OFFICES_MAXIMUM_PAGE_SIZE
+        )
 
     kwargs['to_number'] = page * page_size
     kwargs['from_number'] = kwargs['to_number'] - page_size + 1

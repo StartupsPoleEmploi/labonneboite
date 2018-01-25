@@ -16,10 +16,10 @@ from labonneboite.common import util
 from labonneboite.common import sorting
 from labonneboite.common import search as search_util
 from labonneboite.common import mapping as mapping_util
+from labonneboite.common import pagination
 from labonneboite.common.models import UserFavoriteOffice
 
 from labonneboite.conf import settings
-from labonneboite.web.pagination import PaginationManager
 from labonneboite.web.search.forms import CompanySearchForm
 
 
@@ -91,7 +91,16 @@ def get_parameters(args):
     try:
         kwargs['to_number'] = int(kwargs.get('to_number'))
     except ValueError:
-        kwargs['to_number'] = kwargs['from_number'] + settings.PAGINATION_COMPANIES_PER_PAGE - 1
+        kwargs['to_number'] = kwargs['from_number'] + pagination.OFFICES_PER_PAGE - 1
+
+    # Fix pagination when needed
+    if not kwargs['from_number'] >= 1:
+        kwargs['from_number'] = 1
+    current_page_size = kwargs['to_number'] - kwargs['from_number'] + 1
+    if current_page_size <= 0:  # this may happen when a 'out of bound' page is requested
+        kwargs['to_number'] = kwargs['from_number'] + pagination.OFFICES_PER_PAGE - 1
+    if current_page_size > pagination.OFFICES_MAXIMUM_PAGE_SIZE:
+        kwargs['to_number'] = kwargs['from_number'] + pagination.OFFICES_MAXIMUM_PAGE_SIZE - 1
 
     # Fallback to default sorting.
     if kwargs.get('sort') not in sorting.SORTING_VALUES:
@@ -180,7 +189,12 @@ def results(city, zipcode, occupation):
 
 
     # Pagination.
-    pagination_manager = PaginationManager(company_count, fetcher.from_number, fetcher.to_number, request.full_path)
+    pagination_manager = pagination.PaginationManager(
+        company_count,
+        fetcher.from_number,
+        fetcher.to_number,
+        request.full_path,
+    )
     current_page = pagination_manager.get_current_page()
 
     # Get contact mode and position.
@@ -200,6 +214,7 @@ def results(city, zipcode, occupation):
         'canonical': canonical,
         'city': city,
         'companies': list(companies),
+        'companies_per_page': pagination.OFFICES_PER_PAGE,
         'company_count': company_count,
         'distance': fetcher.distance,
         'doorbell_tags': doorbell.get_tags('results'),

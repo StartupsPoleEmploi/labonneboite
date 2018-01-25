@@ -18,7 +18,7 @@ from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common import pro
 from labonneboite.common import util
 from labonneboite.web.auth.views import logout
-from labonneboite.web.pagination import Pagination
+from labonneboite.common.pagination import Pagination, FAVORITES_PER_PAGE
 from labonneboite.web.user.forms import UserAccountDeleteForm
 
 
@@ -86,7 +86,7 @@ def favorites_list():
         page = 1
 
     favorites = UserFavoriteOffice.query.filter(UserFavoriteOffice.user_id == current_user.id)
-    limit = 10
+    limit = FAVORITES_PER_PAGE
     pagination = Pagination(page, limit, favorites.count())
     if page > 1:
         favorites = favorites.offset((page - 1) * limit)

@@ -2,9 +2,7 @@
 
 from datetime import datetime
 import collections
-import itertools
 import logging
-import random
 import unidecode
 
 from elasticsearch import Elasticsearch
@@ -14,6 +12,8 @@ from slugify import slugify
 from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import sorting
+from labonneboite.common import autocomplete
+from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
@@ -79,7 +79,7 @@ class CityLocation(object):
 class Fetcher(object):
 
     def __init__(self, search_location, rome=None, distance=None, sort=None,
-                 from_number=1, to_number=10, flag_alternance=None,
+                 from_number=1, to_number=OFFICES_PER_PAGE, flag_alternance=None,
                  public=None, headcount=None, naf=None, naf_codes=None,
                  aggregate_by=None, departments=None, **kwargs):
         """
@@ -236,21 +236,11 @@ class Fetcher(object):
         self.company_count = self._get_company_count(self.rome, self.distance)
         logger.debug("set company_count to %s from fetch_companies", self.company_count)
 
-        if self.from_number < 1:
-            self.from_number = 1
-            self.to_number = 10
-        if (self.from_number - 1) % 10:
-            self.from_number = 1
-            self.to_number = 10
+        current_page_size = self.to_number - self.from_number + 1
+
+        # adjustement needed when the last page is requested and does not have exactly page_size items
         if self.to_number > self.company_count + 1:
             self.to_number = self.company_count + 1
-        if self.to_number < self.from_number:
-            # this happens if a page out of bound is requested
-            self.from_number = 1
-            self.to_number = 10
-        if self.to_number - self.from_number > settings.PAGINATION_COMPANIES_PER_PAGE:
-            self.from_number = 1
-            self.to_number = 10
 
         result = []
         aggregations = []
@@ -273,7 +263,7 @@ class Fetcher(object):
                 aggregate_by=self.aggregate_by,
             )
 
-        if self.company_count < 10 and add_suggestions:
+        if self.company_count <= current_page_size and add_suggestions:
 
             # Suggest other jobs.
             alternative_rome_codes = ROME_MOBILITIES[self.rome]
@@ -771,7 +761,7 @@ def build_location_suggestions(term):
                 }
             },
         },
-        "size": 10
+        "size": autocomplete.MAX_LOCATIONS
     }
     # FIXME ugly : in tests we use dev ES index instead of test ES index
     # we should use index=settings.ES_INDEX instead of index='labonneboite'
@@ -852,7 +842,7 @@ def build_job_label_suggestions(term):
     results.sort(key=lambda e: e['by_top_hit']['hits']['max_score'], reverse=True)
 
     for hit in results:
-        if len(suggestions) < settings.AUTOCOMPLETE_MAX:
+        if len(suggestions) < autocomplete.MAX_JOBS:
             hit = hit[u'by_top_hit'][u'hits'][u'hits'][0]
             source = hit['_source']
             highlight = hit.get('highlight', {})
