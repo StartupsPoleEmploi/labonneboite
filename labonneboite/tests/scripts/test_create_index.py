@@ -404,7 +404,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         # Since `romes_to_boost` is empty, all romes should be boosted.
         self.assertEquals(office_to_update.romes_to_boost, u"")
         for rome in mapping_util.romes_for_naf(office.naf):
-            self.assertEquals(res['_source']['boosted_romes'][rome.code], True)
+            self.assertTrue(res['_source']['boosted_romes'][rome.code])
 
     def test_update_office_by_removing_contact(self):
         """
@@ -457,8 +457,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
-        self.assertEquals(res['_source']['boosted_romes']['D1507'], True)
-        self.assertEquals(res['_source']['boosted_romes']['D1103'], True)
+        self.assertTrue(res['_source']['boosted_romes']['D1507'])
+        self.assertTrue(res['_source']['boosted_romes']['D1103'])
 
         # Other scores should not be boosted.
         for rome in romes_for_office:
@@ -489,8 +489,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
-        self.assertEquals(res['_source']['boosted_romes']['D1506'], True)
-        self.assertEquals(res['_source']['boosted_romes']['D1507'], True)
+        self.assertTrue(res['_source']['boosted_romes']['D1506'])
+        self.assertTrue(res['_source']['boosted_romes']['D1507'])
 
         # Other scores should not be boosted.
         for rome in romes_for_office:
@@ -659,7 +659,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             # Since `romes_to_boost` is empty, all `scores_by_rome` should be boosted.
             self.assertEquals(office_to_update.romes_to_boost, u"")
             for rome in mapping_util.romes_for_naf(office.naf):
-                self.assertEquals(res['_source']['boosted_romes'][rome.code], True)
+                self.assertTrue(res['_source']['boosted_romes'][rome.code])
 
 
     def test_new_contact_multi_siret(self):
@@ -737,8 +737,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
 
             # Check boosted scores.
-            self.assertEquals(res['_source']['boosted_romes']['D1507'], True)
-            self.assertEquals(res['_source']['boosted_romes']['D1103'], True)
+            self.assertTrue(res['_source']['boosted_romes']['D1507'])
+            self.assertTrue(res['_source']['boosted_romes']['D1103'])
 
 
     def romes_to_remove_multi_siret(self):

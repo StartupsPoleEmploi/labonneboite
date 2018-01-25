@@ -621,7 +621,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], u'00000000000011')
-            self.assertEqual(data['companies'][0]['alternance'], True)
+            self.assertTrue(data['companies'][0]['alternance'])
 
     def test_wrong_headcount_value(self):
         with self.test_request_context:
@@ -709,8 +709,8 @@ class ApiCompanyListTest(ApiBaseTest):
             data = json.loads(rv.data)
             sirets = {c['siret']: c for c in data['companies']}
             self.assertEqual(sorted(sirets.keys()), [u'00000000000015', u'00000000000016'])
-            self.assertEqual(sirets[u'00000000000015']['alternance'], False)
-            self.assertEqual(sirets[u'00000000000016']['alternance'], True)
+            self.assertFalse(sirets[u'00000000000015']['alternance'])
+            self.assertTrue(sirets[u'00000000000016']['alternance'])
 
 
     def test_department_filters(self):
