@@ -39,7 +39,7 @@ SQLAlchemy-Utils==0.32.13
 SQLAlchemy==1.1.11
 
 # Elasticsearch
-# as of Oct 2017 we're using Elasticsearch 1.7, a very old version.
+# as of Jan 2018 we are using Elasticsearch 1.7, a very old version.
 # According to http://elasticsearch-py.readthedocs.io/en/master/index.html
 # we should thus use the major 1.x.y version of the python library.
 # To figure out which 1.x.y version is the latest, run:

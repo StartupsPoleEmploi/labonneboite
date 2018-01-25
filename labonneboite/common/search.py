@@ -8,6 +8,7 @@ import random
 import unidecode
 
 from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import RequestError
 from slugify import slugify
 
 from labonneboite.common import geocoding
@@ -294,7 +295,12 @@ class Fetcher(object):
 
 def count_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
     json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
+    # Drop the sorting clause as it is not needed anyway for a simple count.
     del json_body["sort"]
+    # Drop the potentially problematic "field_value_factor" clause, in case of orphaned rome,
+    # as it is not needed anyway for a simple count.
+    # For full information about this issue see common/search.py/get_companies_from_es_and_db.
+    json_body['query']['function_score']['functions'] = [{'random_score': {}}]
     return count_companies_from_es(json_body)
 
 def count_companies_from_es(json_body):
@@ -319,7 +325,6 @@ def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, aggrega
         sort = sorting.SORT_FILTER_DEFAULT
 
     companies, companies_count, aggregations_raw = get_companies_from_es_and_db(json_body, sort=sort)
-    companies = shuffle_companies(companies, sort, rome_code)
 
     # Extract aggregations
     aggregations = {}
@@ -387,48 +392,6 @@ def aggregate_distance(aggregations_raw):
 
     return distances_aggregations
 
-def shuffle_companies(companies, sort, rome_code):
-    """
-    Slightly shuffle the results of a company search this way:
-    1) in case of sort by score
-    - split results in groups of companies having the exact same stars (e.g. 2.3 or 4.9)
-    - shuffle each of these groups in a predictable reproductible way
-    Note that the scores are adjusted to the contextual rome_code.
-    2) in case of sort by distance
-    same things as 1), grouping instead companies having the same distance in km.
-    """
-    buckets = collections.OrderedDict()
-    for company in companies:
-        if sort == sorting.SORT_FILTER_DISTANCE:
-            key = company.distance
-        elif sort == sorting.SORT_FILTER_SCORE:
-            if hasattr(company, 'scores_by_rome') and company.scores_by_rome.get(rome_code) == 100:
-                # make an exception for offices which were manually boosted (score for rome = 100)
-                # to ensure they consistently appear on top of results
-                # and are not shuffled with other offices having 5.0 stars,
-                # but only score 99 and not 100
-                key = 100  # special value designed to be distinct from 5.0 stars
-            else:
-                key = company.get_stars_for_rome_code(rome_code)
-        else:
-            raise ValueError("unknown sorting")
-        if key not in buckets:
-            buckets[key] = []
-        buckets[key].append(company)
-
-    # generating now predictable yet divergent seed for shuffle
-    # the list of results should be noticeably different from one day to the other,
-    # but stay the same for a given day
-    day_of_year = datetime.now().timetuple().tm_yday
-    shuffle_seed = day_of_year / 366.0
-
-    for _, bucket in buckets.iteritems():
-        random.shuffle(bucket, lambda: shuffle_seed)
-    companies = list(itertools.chain.from_iterable(buckets.values()))
-
-    return companies
-
-
 def build_json_body_elastic_search(
         naf_codes,
         rome_code,
@@ -448,15 +411,14 @@ def build_json_body_elastic_search(
     ):
 
     score_for_rome_field_name = "scores_by_rome.%s" % rome_code
-
-    sort_attrs = []
+    boosted_rome_field_name = "boosted_romes.%s" % rome_code
 
     # Build filters.
     filters = []
     if naf_codes:
         filters = [{
             "terms": {
-                "naf": naf_codes
+                "naf": naf_codes,
             }
         }]
 
@@ -480,41 +442,41 @@ def build_json_body_elastic_search(
             headcount = {"lte": max_office_size}
         filters.append({
             "numeric_range": {
-                "headcount": headcount
+                "headcount": headcount,
             }
         })
 
     if flag_alternance == 1:
         filters.append({
             "term": {
-                "flag_alternance": 1
+                "flag_alternance": 1,
             }
         })
 
     if flag_junior == 1:
         filters.append({
             "term": {
-                "flag_junior": 1
+                "flag_junior": 1,
             }
         })
 
     if flag_senior == 1:
         filters.append({
             "term": {
-                "flag_senior": 1
+                "flag_senior": 1,
             }
         })
 
     if flag_handicap == 1:
         filters.append({
             "term": {
-                "flag_handicap": 1
+                "flag_handicap": 1,
             }
         })
 
     filters.append({
         "exists": {
-            "field": score_for_rome_field_name
+            "field": score_for_rome_field_name,
         }
     })
 
@@ -523,20 +485,73 @@ def build_json_body_elastic_search(
             "distance": "%skm" % distance,
             "locations": {
                 "lat": latitude,
-                "lon": longitude
+                "lon": longitude,
             }
         }
     })
 
-
     if departments:
         filters.append({
             'terms': {
-                'department': departments
+                'department': departments,
             }
         })
 
-    # Build sort.
+    main_query = {
+        "filtered": {
+            "filter": {
+                "bool": {
+                    "must": filters,
+                }
+            }
+        }
+    }
+
+    # Build sorting.
+
+    if sort == sorting.SORT_FILTER_SCORE:
+        # overload main_query to add smart randomization
+        main_query = {
+            # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
+            "function_score": {
+                "query": main_query,
+                "functions": [
+                    {
+                        "random_score": {
+                            # Use a different seed every day. This way results are shuffled again
+                            # every 24 hours.
+                            "seed": datetime.today().strftime('%Y-%m-%d'),
+                        },
+                    },
+                    {
+                        # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-field-value-factor
+                        "field_value_factor": {
+                            "field": score_for_rome_field_name,
+                            "modifier": "none",
+                            # Fallback value used in case the field score_for_rome_field_name is absent.
+                            # Never happens in practice since we require it to be present in "exists" filter above.
+                            # However this is required in case no company at all matches this rome, as an 
+                            # attempt to fix the following issue:
+                            # ElasticsearchException[Unable to find a field mapper for field [scores_by_rome.A0000]]
+                            # For full information about this issue see common/search.py/get_companies_from_es_and_db.
+                            "missing": 0,
+                        }
+                    }
+                ],
+                # How to combine the result of the two functions 'random_score' and 'field_value_factor'.
+                # This way, on average the combined _score of a company having score 100 will be 5 times as much
+                # as the combined _score of a company having score 20, and thus will be 5 times more likely
+                # to appear on first page.
+                "score_mode": "multiply",
+                # How to combine the result of function_score with the original _score from the query.
+                # We overwrite it as our combined _score (random x score_for_rome) is all we need.
+                "boost_mode": "replace",
+            }
+        }
+
+        # FTR we have contributed this ES weighted shuffling example to these posts:
+        # https://stackoverflow.com/questions/34128770/weighted-random-sampling-in-elasticsearch
+        # https://github.com/elastic/elasticsearch/issues/7783#issuecomment-64880008
 
     if sort not in sorting.SORT_FILTERS:
         logger.info('unknown sort: %s', sort)
@@ -546,38 +561,39 @@ def build_json_body_elastic_search(
         "_geo_distance": {
             "locations": {
                 "lat": latitude,
-                "lon": longitude
+                "lon": longitude,
             },
             "order": "asc",
-            "unit": "km"
+            "unit": "km",
         }
     }
 
-    score_sort = {
-        score_for_rome_field_name: {
-            "order": "desc",
+    boosted_romes_sort = {
+        boosted_rome_field_name: {
+            # offices without boost (missing field) are showed last
+            "missing" : "_last",
+            # required, see
+            # https://stackoverflow.com/questions/17051709/no-mapping-found-for-field-in-order-to-sort-on-in-elasticsearch
             "ignore_unmapped": True,
         }
     }
 
-    if sort == sorting.SORT_FILTER_DISTANCE:
-        sort_attrs.append(distance_sort)
-        sort_attrs.append(score_sort)
-    elif sort == sorting.SORT_FILTER_SCORE:
-        sort_attrs.append(score_sort)
+    randomized_score_sort = "_score"
+
+    sort_attrs = []
+
+    if sort == sorting.SORT_FILTER_SCORE:
+        # always show boosted offices first then sort by randomized score
+        sort_attrs.append(boosted_romes_sort)
+        sort_attrs.append(randomized_score_sort)
+        sort_attrs.append(distance_sort)  # required so that office distance can be extracted and displayed on frontend
+    elif sort == sorting.SORT_FILTER_DISTANCE:
+        # no randomization nor boosting happens when sorting by distance
         sort_attrs.append(distance_sort)
 
     json_body = {
         "sort": sort_attrs,
-        "query": {
-            "filtered": {
-                "filter": {
-                    "bool": {
-                        "must": filters
-                    }
-                }
-            }
-        }
+        "query": main_query,
     }
 
     # Add aggregate
@@ -592,17 +608,17 @@ def build_json_body_elastic_search(
                         "field": "locations",
                         "origin": "%s,%s"  % (latitude, longitude),
                         'unit': 'km',
-                        'ranges': [{'to': 10}, {'to': 30}, {'to': 50}, {'to': 100}, {'to': 3000}]
+                        'ranges': [{'to': 10}, {'to': 30}, {'to': 50}, {'to': 100}, {'to': 3000}],
                     }
                 }
             else:
                 json_body['aggs'][aggregate] = {
                     "terms" : {
-                        "field": aggregate
+                        "field": aggregate,
                     }
                 }
 
-
+    # Process from_number and to_number.
     if from_number:
         json_body["from"] = from_number - 1
         if to_number:
@@ -624,18 +640,47 @@ def get_companies_from_es_and_db(json_body, sort):
     in Elasticsearch) and `companies_count` an integer of the results number.
     """
     es = Elasticsearch()
-    res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
     logger.info("Elastic Search request : %s", json_body)
+    try:
+        res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
+    except RequestError as e:
+        # The following ES bug is known and has been fixed in ES 2.1.0
+        # https://github.com/elastic/elasticsearch/pull/13060
+        # however as of Jan 2018 we are using Elasticsearch 1.7 so we have to live with it.
+        #
+        # When the field_value_factor clause is applied to a non existing field (this is
+        # the case for an orphaned rome i.e. no company has a score_for_rome.A0000 field for it),
+        # even if the field_value_factor clause has a 'missing' value, the ES request will still fail
+        # with a 'Unable to find a field mapper for field' error. This is fixed in ES 2.1.0.
+        orphan_rome_known_bug = (
+            e[0] == 400
+            and u'ElasticsearchException[Unable to find a field mapper for field [scores_by_rome' in e[1]
+        )
+        if orphan_rome_known_bug:
+            # Drop the problematic "field_value_factor" clause and run again.
+            # As the rome is orphaned, no company will match anyway.
+            json_body['query']['function_score']['functions'] = [{'random_score': {}}]
+            logger.info("Elastic Search request fixed : %s", json_body)
+            res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
+        else:
+            raise e
 
     companies = []
     siret_list = [office["_source"]["siret"] for office in res['hits']['hits']]
 
     if siret_list:
 
+        # FIXME These hardcoded values are soooooo ugly, unfortunately it is not so
+        # easy to make it DNRY.
         if sort == sorting.SORT_FILTER_DISTANCE:
             distance_sort_index = 0
+        elif sort == sorting.SORT_FILTER_SCORE:
+            distance_sort_index = 2
         else:
-            distance_sort_index = 1
+            # This should never happen.
+            # An API request would have already raised a InvalidFetcherArgument exception,
+            # and a Frontend request would have fallbacked to default sorting.
+            raise ValueError("unknown sorting : %s" % sort)
 
         company_objects = Office.query.filter(Office.siret.in_(siret_list))
         company_dict = {}
@@ -652,12 +697,6 @@ def get_companies_from_es_and_db(json_body, sort):
             es_company = es_companies_by_siret[obj.siret]
             # Add an extra `distance` attribute.
             obj.distance = int(round(es_company["sort"][distance_sort_index]))
-            # Add an extra `scores_by_rome` attribute: this will allow us to identify boosted offices
-            # in the search result HTML template.
-            try:
-                obj.scores_by_rome = es_company["_source"]["scores_by_rome"]
-            except KeyError:
-                obj.scores_by_rome = {}
             company_dict[obj.siret] = obj
 
         for siret in siret_list:
@@ -718,12 +757,14 @@ def build_location_suggestions(term):
 
     body = {
         "query": {
+            # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
             "function_score": {
                 "query": {
                     "bool": {
                         "should": filters
                     },
                 },
+                # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-field-value-factor
                 "field_value_factor": {
                     "field": "population",
                     "modifier": "log1p"

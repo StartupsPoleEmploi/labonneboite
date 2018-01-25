@@ -4,6 +4,7 @@ import datetime
 import json
 from urllib import urlencode
 import urlparse
+import mock
 
 from flask import url_for
 from labonneboite.common import scoring as scoring_util
@@ -92,7 +93,9 @@ class ApiSecurityTest(ApiBaseTest):
                 'rome_codes': u'D1405',
                 'user': u'labonneboite',
             })
-            params['timestamp'] = (datetime.datetime.now() - datetime.timedelta(minutes=20)).strftime('%Y-%m-%dT%H:%M:%S')
+            params['timestamp'] = (
+                datetime.datetime.now() - datetime.timedelta(minutes=20)
+            ).strftime('%Y-%m-%dT%H:%M:%S')
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(rv.data, u'timestamp has expired')
@@ -144,7 +147,8 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'Invalid request argument: missing arguments: either commune_id or latitude and longitude')
+            self.assertEqual(rv.data,
+                u'Invalid request argument: missing arguments: either commune_id or latitude and longitude')
 
     def test_unknown_commune_id(self):
         with self.test_request_context:
@@ -158,7 +162,8 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'Invalid request argument: could not resolve latitude and longitude from given commune_id')
+            self.assertEqual(rv.data,
+                u'Invalid request argument: could not resolve latitude and longitude from given commune_id')
 
     def test_correct_headcount_text(self):
         with self.test_request_context:
@@ -295,60 +300,64 @@ class ApiCompanyListTest(ApiBaseTest):
                 'rome_codes': rome_code,
                 'user': u'labonneboite',
             })
-            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
-            self.assertEqual(data['companies_count'], 1)
-            self.assertEqual(len(data['companies']), 1)
 
-            office_json = data['companies'][0]
-            siret = office_json['siret']
-            office = Office.query.get(siret)
+            # The example in this test has a very low score (below SCORE_FOR_ROME_MINIMUM),
+            # which is why we need to lower the threshold just for this test, in order
+            # to be able to compute back the score from the stars.
+            with mock.patch.object(scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0):
+                rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+                self.assertEqual(rv.status_code, 200)
+                data = json.loads(rv.data)
+                self.assertEqual(data['companies_count'], 1)
+                self.assertEqual(len(data['companies']), 1)
 
-            # ############### WARNING about matching scores vs hirings ################
-            # Methods scoring_util.get_hirings_from_score
-            # and scoring_util.get_score_from_hirings
-            # rely on special coefficients SCORE_50_HIRINGS, SCORE_60_HIRINGS etc..
-            # which values in github repository are *fake* and used for dev and test only.
-            #
-            # The real values are confidential, stored outside of github repo,
-            # and only used in staging and production.
-            #
-            # This is designed so that you *CANNOT* guess the hirings based
-            # on the score you see in production.
-            # #########################################################################
+                office_json = data['companies'][0]
+                siret = office_json['siret']
+                office = Office.query.get(siret)
 
-            # general score/stars/hirings values (all rome_codes included)
-            self.assertEqual(office.score, 71)
-            self.assertEqual(office.stars, 3.55)
-            self.assertEqual(scoring_util.get_hirings_from_score(office.score), 77.5)
+                # ############### WARNING about matching scores vs hirings ################
+                # Methods scoring_util.get_hirings_from_score
+                # and scoring_util.get_score_from_hirings
+                # rely on special coefficients SCORE_50_HIRINGS, SCORE_60_HIRINGS etc..
+                # which values in github repository are *fake* and used for dev and test only.
+                #
+                # The real values are confidential, stored outside of github repo,
+                # and only used in staging and production.
+                #
+                # This is designed so that you *CANNOT* guess the hirings based
+                # on the score you see in production.
+                # #########################################################################
 
-            # now let's see values adjusted for current rome_code
-            stars_for_rome_code = office_json['stars']
-            self.assertEqual(stars_for_rome_code, office.get_stars_for_rome_code(rome_code))
-            # stars from 0 to 5, score from 0 to 100 (x20)
-            score_for_rome = stars_for_rome_code * 20.0
-            self.assertEqual(score_for_rome, 3.0)
-            self.assertEqual(scoring_util.get_hirings_from_score(score_for_rome), 0.6)
+                # general score/hirings values (all rome_codes included)
+                self.assertEqual(office.score, 71)
+                self.assertEqual(scoring_util.get_hirings_from_score(office.score), 77.5)
 
-            # let's see how adjusting for this rome decreased hirings
-            # from 77.5 (hirings for all rome_codes included)
-            # to 0.6 (hirings for only the current rome_code)
-            #
-            # 0.6 is approx 1% of 77.5
-            # which means that on average, companies of this naf_code hire 1% in this rome_code
-            # and 99% in all other rome_codes associated to this naf_code
-            #
-            # let's check we can find back this 1% ratio in our rome-naf mapping data
-            naf_code = office.naf
-            rome_codes = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code].keys()
-            total_naf_hirings = sum(mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome] for rome in rome_codes)
-            self.assertEqual(total_naf_hirings, 7844)
-            current_rome_hirings = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome_code]
-            self.assertEqual(current_rome_hirings, 52)
-            # 52 hirings for this rome_code only is indeed roughly 1% of 7844 hirings for all rome_codes.
-            # The match is not exact because some rounding occur during calculations, but you should
-            # now get the main idea of how scores are adjusted to a given rome_code.
+                # now let's see values adjusted for current rome_code
+                stars_for_rome_code = office_json['stars']
+                self.assertEqual(stars_for_rome_code, office.get_stars_for_rome_code(rome_code))
+                score_for_rome = scoring_util.get_score_from_stars(stars_for_rome_code)
+                self.assertEqual(round(score_for_rome, 5), 4.0)
+                self.assertEqual(round(scoring_util.get_hirings_from_score(score_for_rome), 5), 0.8)
+
+                # let's see how adjusting for this rome decreased hirings
+                # from 77.5 (hirings for all rome_codes included)
+                # to 0.8 (hirings for only the current rome_code)
+                #
+                # 0.8 is approx 1% of 77.5
+                # which means that on average, companies of this naf_code hire 1% in this rome_code
+                # and 99% in all other rome_codes associated to this naf_code
+                #
+                # let's check we can find back this 1% ratio in our rome-naf mapping data
+                naf_code = office.naf
+                rome_codes = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code].keys()
+                total_naf_hirings = sum(mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome] for rome in rome_codes)
+                self.assertEqual(total_naf_hirings, 7844)
+                current_rome_hirings = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome_code]
+                self.assertEqual(current_rome_hirings, 52)
+                # 52 hirings for this rome_code only is indeed roughly 1% of 7844 hirings for all rome_codes.
+                # The match is not exact because some rounding occur during calculations, but you should
+                # now get the main idea of how scores are adjusted to a given rome_code.
+
 
     def test_empty_result_does_not_crash(self):
         with self.test_request_context:
@@ -366,11 +375,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 0)
             self.assertEqual(len(data['companies']), 0)
 
-    def test_no_contact_details(self):
+    def test_sensitive_contact_data_such_as_email_is_not_exposed(self):
         with self.test_request_context:
-            """
-            Test that sensitive contact data (such as `email`) is not be exposed in responses.
-            """
             params = self.add_security_params({
                 'distance': 20,
                 'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
@@ -398,11 +404,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             self.assertEquals(rv.headers['Content-Type'], 'application/json')
 
-    def test_romes_for_commune_id(self):
+    def test_multi_romes_search_is_no_longer_supported(self):
         with self.test_request_context:
-            """
-            Perform queries in Caen to test the `rome_codes` param with one or more values.
-            """
             # 1) Search for `D1405` ROME code only. We should get 1 result.
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
@@ -535,7 +538,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'Invalid request argument: sort. Possible values : distance, score')
+            self.assertEqual(rv.data, u'Invalid request argument: sort. Possible values : score, distance')
 
     def test_sort_by_distance(self):
         with self.test_request_context:
@@ -569,9 +572,8 @@ class ApiCompanyListTest(ApiBaseTest):
             data = json.loads(rv.data)
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
-            self.assertEqual(data["companies"][0]['siret'], u'00000000000009')
-            self.assertEqual(data["companies"][1]['siret'], u'00000000000008')
-            self.assertGreater(data["companies"][0]['stars'], data["companies"][1]['stars'])
+            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
+            self.assertEqual(sirets, set([u'00000000000009', u'00000000000008']))
 
     def test_wrong_contract_value(self):
         with self.test_request_context:
@@ -613,7 +615,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], u'00000000000011')
-            self.assertEqual(data['companies'][0]['alternance'], True)
+            self.assertTrue(data['companies'][0]['alternance'])
 
     def test_wrong_headcount_value(self):
         with self.test_request_context:
@@ -699,10 +701,11 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
-            self.assertEqual(data['companies'][0]['siret'], u'00000000000015')
-            self.assertEqual(data['companies'][0]['alternance'], False)
-            self.assertEqual(data['companies'][1]['siret'], u'00000000000016')
-            self.assertEqual(data['companies'][1]['alternance'], True)
+            sirets = {c['siret']: c for c in data['companies']}
+            self.assertEqual(sorted(sirets.keys()), [u'00000000000015', u'00000000000016'])
+            self.assertFalse(sirets[u'00000000000015']['alternance'])
+            self.assertTrue(sirets[u'00000000000016']['alternance'])
+
 
     def test_department_filters(self):
         with self.test_request_context:
@@ -727,8 +730,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
             self.assertEqual(data['companies_count'], 2)
-            self.assertEqual(data['companies'][0]['siret'], u'00000000000017')
-            self.assertEqual(data['companies'][1]['siret'], u'00000000000018')
+            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
+            self.assertEqual(sirets, set([u'00000000000017', u'00000000000018']))
 
             # Check two departments => Expected 2 results
             params = self.add_security_params({
@@ -741,8 +744,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
             self.assertEqual(data['companies_count'], 2)
-            self.assertEqual(data['companies'][0]['siret'], u'00000000000017')
-            self.assertEqual(data['companies'][1]['siret'], u'00000000000018')
+            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
+            self.assertEqual(sirets, set([u'00000000000017', u'00000000000018']))
 
             # Check department 75 => Expected 1 result
             params = self.add_security_params({
@@ -795,7 +798,6 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(nafs_expected), len(data['filters']['naf']))
             for naf_filter in data['filters']['naf']:
                 naf_expected = nafs_expected[naf_filter['code']]
-
                 self.assertEqual(naf_expected[0], naf_filter['code'])
                 self.assertEqual(naf_expected[1], naf_filter['count'])
                 self.assertEqual(naf_expected[2], naf_filter['label'])
@@ -827,6 +829,10 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(nafs_expected), len(data['filters']['naf']))
             for naf_filter in data['filters']['naf']:
                 naf_expected = nafs_expected[naf_filter['code']]
+                self.assertEqual(naf_expected[0], naf_filter['code'])
+                self.assertEqual(naf_expected[1], naf_filter['count'])
+                self.assertEqual(naf_expected[2], naf_filter['label'])
+
 
     def test_filters_when_filtering_by_headcount(self):
         with self.test_request_context:

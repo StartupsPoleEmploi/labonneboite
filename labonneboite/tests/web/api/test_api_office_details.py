@@ -22,7 +22,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
             u'lon': 6.0,
             u'headcount_text': u'10 à 19 salariés',
             u'phone': u'',
-            u'stars': 3.4,
+            u'stars': 4.0,
             u'address': {
                 u'city': u'BAYONVILLE-SUR-MAD',
                 u'street_name': u'',
