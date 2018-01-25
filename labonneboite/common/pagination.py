@@ -14,10 +14,6 @@ FAVORITES_PER_PAGE = 10
 MAX_PAGES = 10
 
 
-class InvalidPaginationArgument(Exception):
-    pass
-
-
 class Pagination(object):
     """
     A generic pagination class.

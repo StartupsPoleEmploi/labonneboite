@@ -93,6 +93,15 @@ def get_parameters(args):
     except ValueError:
         kwargs['to_number'] = kwargs['from_number'] + pagination.OFFICES_PER_PAGE - 1
 
+    # Fix pagination when needed
+    if not kwargs['from_number'] >= 1:
+        kwargs['from_number'] = 1
+    current_page_size = kwargs['to_number'] - kwargs['from_number'] + 1
+    if current_page_size <= 0:  # this may happen when a 'out of bound' page is requested
+        kwargs['to_number'] = kwargs['from_number'] + pagination.OFFICES_PER_PAGE - 1
+    if current_page_size > pagination.OFFICES_MAXIMUM_PAGE_SIZE:
+        kwargs['to_number'] = kwargs['from_number'] + pagination.OFFICES_MAXIMUM_PAGE_SIZE - 1
+
     # Fallback to default sorting.
     if kwargs.get('sort') not in sorting.SORTING_VALUES:
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT

@@ -2,9 +2,7 @@
 
 from datetime import datetime
 import collections
-import itertools
 import logging
-import random
 import unidecode
 
 from elasticsearch import Elasticsearch
@@ -14,7 +12,7 @@ from slugify import slugify
 from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import sorting
-from labonneboite.common import pagination
+from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
@@ -80,7 +78,7 @@ class CityLocation(object):
 class Fetcher(object):
 
     def __init__(self, search_location, rome=None, distance=None, sort=None,
-                 from_number=1, to_number=pagination.OFFICES_PER_PAGE, flag_alternance=None,
+                 from_number=1, to_number=OFFICES_PER_PAGE, flag_alternance=None,
                  public=None, headcount=None, naf=None, naf_codes=None,
                  aggregate_by=None, departments=None, **kwargs):
         """
@@ -237,23 +235,7 @@ class Fetcher(object):
         self.company_count = self._get_company_count(self.rome, self.distance)
         logger.debug("set company_count to %s from fetch_companies", self.company_count)
 
-        max_page_size = pagination.OFFICES_MAXIMUM_PAGE_SIZE
         current_page_size = self.to_number - self.from_number + 1
-
-        invalid_pagination = (
-            self.from_number < 1
-            or current_page_size < 1  # this happens when a page out of bound is requested
-            or current_page_size > max_page_size
-        )
-
-        if invalid_pagination:
-            msg = "Invalid pagination error: max_page_size=%s from=%s to=%s company_count=%s" % (
-                max_page_size,
-                self.from_number,
-                self.to_number,
-                self.company_count,
-            )
-            raise pagination.InvalidPaginationArgument(msg)
 
         # adjustement needed when the last page is requested and does not have exactly page_size items
         if self.to_number > self.company_count + 1:
