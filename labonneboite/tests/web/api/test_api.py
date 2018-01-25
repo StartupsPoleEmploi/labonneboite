@@ -375,10 +375,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 0)
             self.assertEqual(len(data['companies']), 0)
 
-    def test_no_contact_details(self):
-        """
-        Test that sensitive contact data (such as `email`) is not exposed in responses.
-        """
+    def test_sensitive_contact_data_such_as_email_is_not_exposed(self):
         with self.test_request_context:
             params = self.add_security_params({
                 'distance': 20,
@@ -407,10 +404,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             self.assertEquals(rv.headers['Content-Type'], 'application/json')
 
-    def test_romes_for_commune_id(self):
-        """
-        Perform queries in Caen to test the `rome_codes` param with one or more values.
-        """
+    def test_multi_romes_search_is_no_longer_supported(self):
         with self.test_request_context:
             # 1) Search for `D1405` ROME code only. We should get 1 result.
             params = self.add_security_params({
