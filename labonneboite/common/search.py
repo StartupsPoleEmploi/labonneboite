@@ -12,6 +12,7 @@ from slugify import slugify
 from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import sorting
+from labonneboite.common import autocomplete
 from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
@@ -760,7 +761,7 @@ def build_location_suggestions(term):
                 }
             },
         },
-        "size": settings.AUTOCOMPLETE_MAX_LOCATIONS
+        "size": autocomplete.MAX_LOCATIONS
     }
     # FIXME ugly : in tests we use dev ES index instead of test ES index
     # we should use index=settings.ES_INDEX instead of index='labonneboite'
@@ -841,7 +842,7 @@ def build_job_label_suggestions(term):
     results.sort(key=lambda e: e['by_top_hit']['hits']['max_score'], reverse=True)
 
     for hit in results:
-        if len(suggestions) < settings.AUTOCOMPLETE_MAX_JOBS:
+        if len(suggestions) < autocomplete.MAX_JOBS:
             hit = hit[u'by_top_hit'][u'hits'][u'hits'][0]
             source = hit['_source']
             highlight = hit.get('highlight', {})

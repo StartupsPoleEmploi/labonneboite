@@ -72,9 +72,6 @@ LOGSTASH_PORT = 5959
 
 TILE_SERVER_URL = "http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}"
 
-AUTOCOMPLETE_MAX_JOBS = 10
-AUTOCOMPLETE_MAX_LOCATIONS = 10
-
 ROME_NAF_PROBABILITY_CUTOFF = 0.05
 
 # GA/GO snippets are only useful in production and staging,
