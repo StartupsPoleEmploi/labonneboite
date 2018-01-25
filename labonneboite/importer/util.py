@@ -245,11 +245,10 @@ def clean_temporary_tables():
             DATABASE['USER'], password_statement, DATABASE['NAME'], drop_table_query), shell=True)
 
 
-def get_fields_from_csv_line(line, sep='|'):
+def get_fields_from_csv_line(line, delimiter='|'):
     # get rid of invisible space characters (\xc2) if present
     line = line.strip().replace('\xc2', '')
-    # split using delimiter special character \xa5
-    fields = [encoding_util.sanitize_string(f) for f in line.split(sep)]
+    fields = [encoding_util.sanitize_string(f) for f in line.split(delimiter)]
     return fields
 
 
@@ -265,7 +264,10 @@ def parse_dpae_line(line):
 
     siret = fields[0]
     hiring_date_raw = fields[7]
-    hiring_date = datetime.strptime(hiring_date_raw, "%Y-%m-%d %H:%M:%S")
+    try:
+        hiring_date = datetime.strptime(hiring_date_raw, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        hiring_date = datetime.strptime(hiring_date_raw, "%Y-%m-%d %H:%M:%S.0")
 
     try:
         zipcode = int(fields[3])

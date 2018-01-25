@@ -51,20 +51,14 @@ def prepare_flags_junior_and_senior():
         drop table if exists flag_tmp1;
         create table flag_tmp1 as
         (
-        select
-        siret,
-        tranche_age,
-        count(*) as contrats
-        from
-        dpae
-        group by
-        siret,
-        tranche_age
+        select siret, tranche_age, count(*) as contrats
+        from dpae
+        where hiring_date >= DATE_SUB(NOW(),INTERVAL 1 YEAR)
+        group by siret, tranche_age
         );
 
         drop table if exists flag_tmp2;
-        create table flag_tmp2
-        as
+        create table flag_tmp2 as
         (
         select
             siret,
@@ -75,21 +69,17 @@ def prepare_flags_junior_and_senior():
         );
 
         drop table if exists flag_junior;
-        create table flag_junior
-        as
+        create table flag_junior as
         (
-        select
-            siret
+        select siret
         from flag_tmp2
         where ratio_junior >= 80
         );
 
         drop table if exists flag_senior;
-        create table flag_senior
-        as
+        create table flag_senior as
         (
-        select
-            siret
+        select siret
         from flag_tmp2
         where ratio_senior >= 16
         );
@@ -111,7 +101,9 @@ def prepare_flag_handicap():
         create table flag_handicap as
         (
         select distinct(siret) from dpae
-        where handicap_label = 'RQTH-MDT'
+        where
+            handicap_label = 'RQTH-MDT'
+            and hiring_date >= DATE_SUB(NOW(),INTERVAL 1 YEAR)
         );
     """
 
