@@ -494,7 +494,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         # Other scores should not be boosted.
         for rome in romes_for_office:
-            if rome not in [u"D1507"]:
+            if rome != u"D1507":
                 self.assertNotIn(rome, res['_source']['boosted_romes'])
 
     def test_update_office_removed_romes(self):
@@ -527,7 +527,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         # Other scores should not be boosted.
         for rome in romes_for_office:
-            if rome not in [u"D1507"]:
+            if rome != u"D1507":
                 self.assertNotIn(rome, res['_source']['boosted_romes'])
 
     def test_update_office_add_email_alternance(self):
