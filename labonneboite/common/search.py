@@ -238,7 +238,14 @@ class Fetcher(object):
 
         current_page_size = self.to_number - self.from_number + 1
 
-        # adjustement needed when the last page is requested and does not have exactly page_size items
+        # Needed in rare case when an old page is accessed (via user bookmark and/or crawling bot)
+        # which no longer exists due to newer company dataset having less result pages than before
+        # for this search.
+        if self.from_number > self.company_count:
+            self.from_number = 1
+            self.to_number = current_page_size
+
+        # Adjustement needed when the last page is requested and does not have exactly page_size items.
         if self.to_number > self.company_count + 1:
             self.to_number = self.company_count + 1
 
