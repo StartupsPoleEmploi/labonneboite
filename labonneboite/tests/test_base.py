@@ -31,7 +31,7 @@ class AppTest(unittest.TestCase):
     """
 
     # https://kronosapiens.github.io/blog/2014/08/14/understanding-contexts-in-flask.html
-    HOME_URL = settings.STAGING_SERVER_URL
+    HOME_URL = settings.SERVER_NAME
 
     def setUp(self):
         # Disable CSRF validation in unit tests.

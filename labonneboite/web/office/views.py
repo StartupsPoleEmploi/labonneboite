@@ -124,36 +124,27 @@ def make_save_suggestion(form):
     # Save informations
     company = Office.query.filter_by(siret=form.siret.data).first()
 
-    def dirty_fix_url(url):
-        from labonneboite.common.env import get_current_env, ENV_STAGING, ENV_PRODUCTION
-        if get_current_env() == ENV_STAGING:
-            return 'http://labonneboite.beta.pole-emploi.fr' + url
-        elif get_current_env() == ENV_PRODUCTION:
-            return 'https://labonneboite.pole-emploi.fr' + url
-        else:
-            return url
-
     if not company:
         # OfficeAdminRemove already exits ?
         office_admin_remove = OfficeAdminRemove.query.filter_by(siret=form.siret.data).first()
         if office_admin_remove:
-            url = url_for("officeadminremove.edit_view", id=office_admin_remove.id)
-            return u"Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % dirty_fix_url(url)
+            url = url_for("officeadminremove.edit_view", id=office_admin_remove.id, _external=True)
+            return u"Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % url
         else:
             return u'Aucune entreprise trouvée avec le siret %s' % form.siret.data
 
     # OfficeAdminAdd already exits ?
     office_admin_add = OfficeAdminAdd.query.filter_by(siret=form.siret.data).first()
     if office_admin_add:
-        url = url_for("officeadminadd.edit_view", id=office_admin_add.id)
-        return u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % dirty_fix_url(url)
+        url = url_for("officeadminadd.edit_view", id=office_admin_add.id, _external=True)
+        return u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % url
 
     # OfficeAdminUpdate already exits ?
     office_admin_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets.like("%{}%".format(form.siret.data))).first()
 
     if office_admin_update:
-        url = url_for("officeadminupdate.edit_view", id=office_admin_update.id)
-        return u"Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % dirty_fix_url(url)
+        url = url_for("officeadminupdate.edit_view", id=office_admin_update.id, _external=True)
+        return u"Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % url
 
 
     # No office AdminOffice found : suggest to create an OfficeAdminRemove and OfficeRemoveUpdate
@@ -167,11 +158,11 @@ def make_save_suggestion(form):
         'reason': form.comment.data,
     }
     if form.action.data == "enlever":
-        url = '%s?%s' % (url_for("officeadminremove.create_view"), urlencode(params))
-        status_save = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>" % dirty_fix_url(url)
+        url = '%s?%s' % (url_for("officeadminremove.create_view", _external=True), urlencode(params))
+        status_save = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>" % url
     else:
-        url = '%s?%s' % (url_for("officeadminupdate.create_view"), urlencode(params))
-        status_save = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>" % dirty_fix_url(url)
+        url = '%s?%s' % (url_for("officeadminupdate.create_view", _external=True), urlencode(params))
+        status_save = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>" % url
 
     return status_save
 
