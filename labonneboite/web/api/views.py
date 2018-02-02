@@ -22,7 +22,7 @@ OGR_ROME_CODES = load_ogr_rome_mapping()
 ROME_CODES = OGR_ROME_CODES.values()
 
 # Some internal services of Pôle emploi can sometimes have access to sensitive information.
-API_INTERNAL_CONSUMERS = ['labonneboite', 'memo']
+API_INTERNAL_CONSUMERS = ['labonneboite', 'memo', 'labonnealternance']
 
 
 class InvalidFetcherArgument(Exception):
