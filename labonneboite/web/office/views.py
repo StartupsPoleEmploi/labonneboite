@@ -44,6 +44,30 @@ def details(siret=None):
     return render_template('office/details.html', **context)
 
 
+@officeBlueprint.route('/verification-informations-entreprise/<siret>', methods=['GET'])
+def change_info_or_apply_for_job(siret):
+    """
+    Ask user if he wants to change company information or apply for a job,
+    in order to avoid the change_info page to be spammed so much by
+    people thinking they are actually applying for a job.
+    """
+    context = {
+        'siret': siret,
+    }
+    return render_template('office/change_info_or_apply_for_job.html', **context)
+
+
+@officeBlueprint.route('/postuler/<siret>', methods=['GET'])
+def apply_for_job(siret):
+    """
+    If user arrives here, it means we successfully avoided having him spam the
+    company modification form. Now we just have to explain him what is wrong.
+    """
+    context = {
+        'siret': siret,
+    }
+    return render_template('office/apply_for_job.html', **context)
+
 @officeBlueprint.route('/informations-entreprise', methods=['GET', 'POST'])
 def change_info():
     """
