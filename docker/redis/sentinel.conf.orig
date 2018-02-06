@@ -1,0 +1,6 @@
+port 26379
+
+sentinel monitor redis-lbb redis 6379 2
+sentinel down-after-milliseconds redis-lbb 60000
+sentinel failover-timeout redis-lbb 180000
+sentinel parallel-syncs redis-lbb 1

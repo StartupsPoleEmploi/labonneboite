@@ -155,7 +155,6 @@ def backend_info(func_name, mode):
     if mode not in TRAVEL_MODES:
         raise ValueError('Invalid travel mode: {}'.format(mode))
     backend_name = vendors.backend_name(func_name, mode)
-
     return backend_name, mode
 
 

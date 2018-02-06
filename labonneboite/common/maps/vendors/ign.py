@@ -9,7 +9,7 @@ from labonneboite.conf import settings
 from ..exceptions import BackendUnreachable
 
 
-TIMEOUT_SECONDS = 20
+TIMEOUT_SECONDS = 8
 
 
 def isochrone(origin, duration):
