@@ -28,7 +28,7 @@ officeBlueprint = Blueprint('office', __name__)
 
 
 @officeBlueprint.route('/<siret>/details', methods=['GET'])
-def details(siret=None):
+def details(siret):
     """
     Display the details of an office.
     In case the context of a rome_code is given, display appropriate score value for this rome_code
@@ -206,7 +206,7 @@ def fetch_resources(uri, rel):
 
 
 @officeBlueprint.route('/<siret>/download')
-def download(siret=None):
+def download(siret):
     """
     Download the PDF of an office.
     """
