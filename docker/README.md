@@ -50,13 +50,8 @@ For other, exotic OS, follow the [Docker manual](https://docs.docker.com/engine/
 
 ### Redis
 
-First, create a sentinel.conf file:
-
-    cd redis/
-    cp sentinel.conf.orig sentinel.conf
-
-This config file will be modified at runtime. Then, to run a [Redis](http://redis.io/) instance with [Sentinel](https://redis.io/topics/sentinel) support, run:
+This config file will be modified at runtime. Then, to run a [Redis](http://redis.io/) instance, run:
 
     docker-compose up
 
-A Redis instance will be running on port 6379 and will be monitored by a Sentinel on port 26379.
+A Redis instance will be running on port 6379. Note that in production, the redis instance should be monitored by a [Sentinel](https://redis.io/topics/sentinel).
