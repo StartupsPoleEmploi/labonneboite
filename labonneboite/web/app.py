@@ -8,7 +8,7 @@ import logging
 # External packages.
 from opbeat.contrib.flask import Opbeat
 from opbeat.handlers.logging import OpbeatHandler
-from social_core.exceptions import AuthCanceled, AuthException, AuthFailed, AuthStateMissing
+from social_core import exceptions as social_exceptions
 from social_flask_sqlalchemy.models import init_social
 from werkzeug.contrib.fixers import ProxyFix
 import logstash
@@ -329,16 +329,14 @@ def log_extra_context():
     return extra_msg
 
 
-@app.errorhandler(AuthFailed)
-@app.errorhandler(AuthCanceled)
-@app.errorhandler(AuthStateMissing)
+@app.errorhandler(social_exceptions.AuthException)
 def social_auth_error(error):
     """
     Handle the situation where a user clicks the `cancel` button on a third party auth provider website.
     """
     flash(u"Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
-    if isinstance(error, (AuthFailed, AuthStateMissing)):
-        # AuthCanceled is a user action and does not deserve a warning
+    if not isinstance(error, (social_exceptions.AuthCanceled, social_exceptions.AuthUnreachableProvider)):
+        # Don't log errors that are not our responsibility
         app.logger.warn("PEAM error: %s", error)
 
     # If there us a next url in session and it's safe, redirect to it.
