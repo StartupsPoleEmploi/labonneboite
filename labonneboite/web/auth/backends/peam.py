@@ -2,6 +2,7 @@
 """
 Provides user registration and login using PEAM (Pôle Emploi Access Management).
 """
+import requests
 
 from social_core.exceptions import AuthUnreachableProvider
 from social_core.backends.oauth import BaseOAuth2
@@ -38,18 +39,20 @@ class PEAMOpenIdConnect(PEAMOAuth2, OpenIdConnectAuth):
 
     def user_data(self, access_token, *args, **kwargs):
         url = self.userinfo_url()
-        response = self.get_json(
-            url,
-            params={'realm': '/individu'},
-            headers={'Authorization': 'Bearer {0}'.format(access_token)}
-        )
-        if response.status_code == 502: # Bad Gateway
-            # 502 errors are not properly handled by social_core (see
-            # handle_http_errors decorator in social_core.utils)
-            # If we don't raise an exception, the user sees a spinning wheel.
-            # This exception must be caught by an error handler of the app.
-            raise AuthUnreachableProvider(url)
-        return response
+        try:
+            return self.get_json(
+                url,
+                params={'realm': '/individu'},
+                headers={'Authorization': 'Bearer {0}'.format(access_token)}
+            )
+        except requests.HTTPError as e:
+            if e.response.status_code == 502: # Bad Gateway
+                # 502 errors are not properly handled by social_core (see
+                # handle_http_errors decorator in social_core.utils)
+                # If we don't raise an exception, the user sees a spinning wheel.
+                # This exception must be caught by an error handler of the app.
+                raise AuthUnreachableProvider(url)
+            raise
 
     def get_user_details(self, response):
         return {
