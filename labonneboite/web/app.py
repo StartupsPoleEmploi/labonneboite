@@ -4,7 +4,6 @@
 from urlparse import urlparse
 import locale
 import logging
-import traceback
 
 # External packages.
 from opbeat.contrib.flask import Opbeat
@@ -26,7 +25,6 @@ from flask_wtf.csrf import CSRFProtect
 # labonneboite.
 from labonneboite.common import hotjar
 from labonneboite.common import pro
-from labonneboite.common import encoding as encoding_util
 from labonneboite.common.database import db_session, engine  # This is how we talk to the database.
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
@@ -338,8 +336,9 @@ def social_auth_error(error):
     """
     Handle the situation where a user clicks the `cancel` button on a third party auth provider website.
     """
-    if isinstance(error, (AuthException, AuthFailed, AuthStateMissing)):
-        flash(u"Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
+    flash(u"Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
+    if isinstance(error, (AuthFailed, AuthStateMissing)):
+        # AuthCanceled is a user action and does not deserve a warning
         app.logger.warn("PEAM error: %s", error)
 
     # If there us a next url in session and it's safe, redirect to it.
