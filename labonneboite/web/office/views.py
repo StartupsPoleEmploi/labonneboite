@@ -28,7 +28,7 @@ officeBlueprint = Blueprint('office', __name__)
 
 
 @officeBlueprint.route('/<siret>/details', methods=['GET'])
-def details(siret=None):
+def details(siret):
     """
     Display the details of an office.
     In case the context of a rome_code is given, display appropriate score value for this rome_code
@@ -43,6 +43,24 @@ def details(siret=None):
     }
     return render_template('office/details.html', **context)
 
+
+@officeBlueprint.route('/verification-informations-entreprise/<siret>', methods=['GET'])
+def change_info_or_apply_for_job(siret):
+    """
+    Ask user if he wants to change company information or apply for a job,
+    in order to avoid the change_info page to be spammed so much by
+    people thinking they are actually applying for a job.
+    """
+    return render_template('office/change_info_or_apply_for_job.html', siret=siret)
+
+
+@officeBlueprint.route('/postuler/<siret>', methods=['GET'])
+def apply_for_job(siret):
+    """
+    If user arrives here, it means we successfully avoided having him spam the
+    company modification form. Now we just have to explain him what is wrong.
+    """
+    return render_template('office/apply_for_job.html', siret=siret)
 
 @officeBlueprint.route('/informations-entreprise', methods=['GET', 'POST'])
 def change_info():
@@ -182,7 +200,7 @@ def fetch_resources(uri, rel):
 
 
 @officeBlueprint.route('/<siret>/download')
-def download(siret=None):
+def download(siret):
     """
     Download the PDF of an office.
     """

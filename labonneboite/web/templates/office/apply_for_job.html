@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Postuler dans cette entreprise pour y travailler{% endblock %}
+
+{% block content %}
+<div class="lbb-content">
+  <div class="lbb-single-column-content">
+
+    <h2>Postuler dans cette entreprise pour y travailler</h2>
+
+    <p>Vous souhaitez postuler auprès de cette entreprise.</p>
+
+    <p>Nous ne proposons pas encore cette fonctionnalité.</p>
+
+    <p>Vous devez donc contacter directement l’entreprise en vous aidant des informations présentes sur <a href="{{ url_for('office.details', siret=siret) }}" target="_blank">cette page</a>.</p>
+
+  </div>
+</div>
+{% endblock %}

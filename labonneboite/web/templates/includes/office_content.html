@@ -50,7 +50,7 @@
         {% endif %}
 
         <h3 class="lbb-purple">C'est mon entreprise !</h3>
-        <p><a href="{{ url_for('office.change_info') }}" target="_blank">Modifier ces informations</a></p>
+        <p><a href="{{ url_for('office.change_info_or_apply_for_job', siret=company.siret) }}" target="_blank">Modifier ces informations</a></p>
 
       </div>
       <div class="grid-col-4">
