@@ -253,8 +253,6 @@ def results_by_commune_and_rome(commune_id, rome_id):
     city = geocoding.get_city_by_commune_id(commune_id)
 
     if not city or not rome_description:
-        msg = '[404] /entreprises/commune/%s/rome/%s : rome_description=%s' % (commune_id, rome_id, rome_description)
-        current_app.logger.error(msg)
         abort(404)
 
     url = url_for('search.results', city=city['slug'], zipcode=city['zipcode'], occupation=slugified_rome_description)
