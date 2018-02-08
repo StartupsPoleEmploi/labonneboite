@@ -99,9 +99,10 @@ def change_info():
             msg = u"Merci pour votre message, nous reviendrons vers vous dès que possible."
             flash(msg, 'success')
 
-        except Exception as e:  # pylint: disable=W0703
-            current_app.logger.error(
-                u"/informations-entreprise - An error occurred while sending an email: %s", repr(e))
+        except UnicodeEncodeError as e:
+            # Here, we catch the exception, but we should really fix it. I
+            # suspect this is due to the fact that the form comment is unicode.
+            current_app.logger.exception(e)
             msg = u"Erreur dans l'envoi du mail, vous pouvez envoyer un email directement à %s" % settings.CONTACT_EMAIL
             flash(msg, 'error')
 
