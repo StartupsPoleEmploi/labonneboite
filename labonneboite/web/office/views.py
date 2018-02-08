@@ -2,12 +2,10 @@
 
 from datetime import date
 import os
-import StringIO
+from urllib import urlencode
 
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
-from xhtml2pdf import pisa
-from urllib import urlencode
 
 from flask import abort, redirect, render_template, flash
 from flask import Blueprint, current_app
@@ -168,7 +166,9 @@ def make_save_suggestion(form):
         return u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % dirty_fix_url(url)
 
     # OfficeAdminUpdate already exits ?
-    office_admin_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets.like("%{}%".format(form.siret.data))).first()
+    office_admin_update = OfficeAdminUpdate.query.filter(
+        OfficeAdminUpdate.sirets.like("%{}%".format(form.siret.data))
+    ).first()
 
     if office_admin_update:
         url = url_for("officeadminupdate.edit_view", id=office_admin_update.id)
@@ -195,11 +195,6 @@ def make_save_suggestion(form):
     return status_save
 
 
-def fetch_resources(uri, rel):
-    url = "https://%s%s" % (settings.HOST, uri)
-    return url
-
-
 @officeBlueprint.route('/<siret>/download')
 def download(siret):
     """
@@ -209,6 +204,7 @@ def download(siret):
         office = Office.query.filter(Office.siret == siret).one()
     except NoResultFound:
         abort(404)
+
     attachment_name = 'fiche_entreprise_%s.pdf' % slugify(office.name, separator='_')
     full_path = pdf_util.get_file_path(office)
     if os.path.exists(full_path):
@@ -216,14 +212,17 @@ def download(siret):
     else:
         dic = detail(siret)
         office = dic['company']
-        pdf_target = StringIO.StringIO()
         dic['stages'] = CONTACT_MODE_STAGES[dic['contact_mode']]
         dic['date'] = date.today()
+
+        # Render pdf file
         pdf_data = render_template('office/pdf_detail.html', **dic)
-        pisa.CreatePDF(StringIO.StringIO(pdf_data), pdf_target, link_callback=fetch_resources)
+        pdf_target = pdf_util.convert_to_pdf(pdf_data)
         data_to_write = pdf_target.getvalue()
-        response = make_response(data_to_write)
         pdf_util.write_file(office, data_to_write)
+
+        # Return pdf
+        response = make_response(data_to_write)
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
         return response
