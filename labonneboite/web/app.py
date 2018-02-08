@@ -364,14 +364,7 @@ def error_404(error):
 
 @app.errorhandler(500)
 def internal_error(error):
-    stack_trace = traceback.format_exc(error)
-    msg = "%s - type: %s - message: %s - %s" % (
-        log_extra_context(),
-        error.__class__,
-        error,
-        encoding_util.sanitize_string(stack_trace),
-    )
-    app.logger.error(msg)
+    # Exception was already logged by flask somewhere, no need to process it
     return render_template('error/500.html'), 500
 
 
