@@ -335,7 +335,11 @@ def social_auth_error(error):
     Handle the situation where a user clicks the `cancel` button on a third party auth provider website.
     """
     flash(u"Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
-    if not isinstance(error, (social_exceptions.AuthCanceled, social_exceptions.AuthUnreachableProvider)):
+    if not isinstance(error, (
+            social_exceptions.AuthCanceled,
+            social_exceptions.AuthUnreachableProvider,
+            social_exceptions.AuthStateForbidden,
+    )):
         # Don't log errors that are not our responsibility
         app.logger.warn("PEAM error: %s", error)
 
