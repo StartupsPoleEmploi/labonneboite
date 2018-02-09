@@ -23,7 +23,9 @@ def upgrade():
         'user_favorite_offices',
         sa.Column('id', mysql.INTEGER(display_width=11), nullable=False),
         sa.Column('user_id', mysql.INTEGER(display_width=11), autoincrement=False, nullable=False),
-        sa.Column('office_siret', mysql.VARCHAR(length=255), nullable=False),
+        # temporary fix attempt while installing staging1 from scratch
+        sa.Column('office_siret', mysql.VARCHAR(collation=u'utf8mb4_unicode_ci', length=191), nullable=False),
+        #sa.Column('office_siret', mysql.VARCHAR(length=255), nullable=False),
         sa.Column('date_created', mysql.DATETIME(), nullable=False),
         sa.ForeignKeyConstraint(['office_siret'], [u'etablissements.siret'], name=u'user_favorite_offices_ibfk_2',
             ondelete='CASCADE'),
