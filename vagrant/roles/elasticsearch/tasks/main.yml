@@ -1,18 +1,18 @@
 ---
 
-- include: prequesites.yml
+- include_tasks: prequesites.yml
   tags: [elasticsearch, elasticsearch-prequesites]
 
-- include: install.yml
+- include_tasks: install.yml
   tags: [elasticsearch, elasticsearch-install]
 
-- include: configuration.yml
+- include_tasks: configuration.yml
   tags: [elasticsearch, elasticsearch-configuration]
 
-- include: plugins.yml
+- include_tasks: plugins.yml
   when: es_install_plugins
   tags: [elasticsearch, elasticsearch-plugins]
 
-- include: curator.yml
+- include_tasks: curator.yml
   when: es_install_curator
   tags: [elasticsearch, elasticsearch-curator]
