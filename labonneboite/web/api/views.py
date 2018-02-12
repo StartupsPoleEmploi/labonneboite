@@ -212,7 +212,7 @@ def create_fetcher(location, request_args):
 
     # Page and page_size
     page = check_positive_integer_argument(request_args, 'page', 1)
-    page_size = check_positive_integer_argument(request_args, pagination.OFFICES_PER_PAGE, 'page_size')
+    page_size = check_positive_integer_argument(request_args, 'page_size', pagination.OFFICES_PER_PAGE)
     if page_size > pagination.OFFICES_MAXIMUM_PAGE_SIZE:
         raise InvalidFetcherArgument(
             u'page_size is too large. Maximum value is %s' % pagination.OFFICES_MAXIMUM_PAGE_SIZE
