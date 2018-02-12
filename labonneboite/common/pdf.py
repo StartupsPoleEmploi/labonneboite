@@ -2,10 +2,14 @@
 import errno
 import logging
 import os
+import StringIO
 
 from slugify import slugify
+from xhtml2pdf import pisa
 
 from labonneboite.conf import settings
+from labonneboite.web import WEB_DIR
+
 
 logger = logging.getLogger('main')
 
@@ -35,3 +39,21 @@ def delete_file(office):
     filename = get_file_path(office)
     if os.path.exists(filename):
         os.remove(filename)
+
+
+def convert_to_pdf(pdf_data):
+    """
+    Convert a str to pdf
+    Return: a file-like object
+    """
+    pdf_target = StringIO.StringIO()
+    # The link callback is a function that is used to determine the path of
+    # local static assets required to generate the pdf. This should not point
+    # to http://labonneboite.
+    link_callback = lambda uri, rel: os.path.join(WEB_DIR, uri.strip("/"))
+    pisa.CreatePDF(
+        StringIO.StringIO(pdf_data), pdf_target,
+        link_callback=link_callback
+    )
+    pdf_target.seek(0)
+    return pdf_target
