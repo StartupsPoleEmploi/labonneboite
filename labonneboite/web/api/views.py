@@ -210,17 +210,9 @@ def create_fetcher(location, request_args):
         raise InvalidFetcherArgument(u'Multi ROME search is no longer supported, please use single ROME search only.')
     kwargs['rome'] = rome_code_list[0]
 
-
     # Page and page_size
-    try:
-        page = int(request_args.get('page'))
-    except TypeError:
-        page = 1
-    try:
-        page_size = int(request_args.get('page_size'))
-    except TypeError:
-        page_size = pagination.OFFICES_PER_PAGE
-
+    page = check_positive_integer_argument(request_args, 'page', 1)
+    page_size = check_positive_integer_argument(request_args, pagination.OFFICES_PER_PAGE, 'page_size')
     if page_size > pagination.OFFICES_MAXIMUM_PAGE_SIZE:
         raise InvalidFetcherArgument(
             u'page_size is too large. Maximum value is %s' % pagination.OFFICES_MAXIMUM_PAGE_SIZE
@@ -230,10 +222,7 @@ def create_fetcher(location, request_args):
     kwargs['from_number'] = kwargs['to_number'] - page_size + 1
 
     # Distance
-    try:
-        distance = int(request_args.get('distance'))
-    except (TypeError, ValueError):
-        distance = settings.DISTANCE_FILTER_DEFAULT
+    distance = check_positive_integer_argument(request_args, settings.DISTANCE_FILTER_DEFAULT, 'distance')
     kwargs['distance'] = distance
 
     # Naf
@@ -291,6 +280,26 @@ def create_fetcher(location, request_args):
     kwargs['departments'] = departments
 
     return search.Fetcher(location, **kwargs)
+
+
+def check_positive_integer_argument(args, name, default_value):
+    """
+    Return value from arguments, check that value is integer and positive.
+
+    Args:
+        args (dict)
+        name (str)
+        default_value (int)
+    """
+    value = args.get(name, default_value)
+    try:
+        value = int(value)
+    except TypeError:
+        raise InvalidFetcherArgument(u'{} must be integer'.format(name))
+    if value <= 0:
+        raise InvalidFetcherArgument(u'{} must be positive'.format(name))
+    return value
+
 
 @apiBlueprint.route('/office/<siret>/details', methods=['GET'])
 @api_auth_required
