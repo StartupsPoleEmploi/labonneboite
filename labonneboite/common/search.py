@@ -249,8 +249,8 @@ class Fetcher(object):
         if self.to_number > self.company_count + 1:
             self.to_number = self.company_count + 1
 
-        result = []
-        aggregations = []
+        result = {}
+        aggregations = {}
         if self.company_count:
             result, _, aggregations = fetch_companies(
                 self.naf_codes,
@@ -527,7 +527,7 @@ def build_json_body_elastic_search(
                             "modifier": "none",
                             # Fallback value used in case the field score_for_rome_field_name is absent.
                             # Never happens in practice since we require it to be present in "exists" filter above.
-                            # However this is required in case no company at all matches this rome, as an 
+                            # However this is required in case no company at all matches this rome, as an
                             # attempt to fix the following issue:
                             # ElasticsearchException[Unable to find a field mapper for field [scores_by_rome.A0000]]
                             # For full information about this issue see common/search.py/get_companies_from_es_and_db.
