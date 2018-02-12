@@ -24,6 +24,9 @@ class CreateIndexBaseTest(DatabaseTest):
     def setUp(self, *args, **kwargs):
         super(CreateIndexBaseTest, self).setUp(*args, **kwargs)
 
+        # Mute script logging
+        script.logger.setLevel(script.logging.CRITICAL)
+
         # use custom ES index for tests
         script.INDEX_NAME = self.ES_TEST_INDEX
         # FIXME ideally we should point to ES test index

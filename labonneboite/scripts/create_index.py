@@ -28,6 +28,7 @@ from labonneboite.conf import settings
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 # use this instead if you wish to investigate from which logger exactly comes each line of log
 # logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main', 'elasticsearch.trace']
 
@@ -320,7 +321,7 @@ request_body = {
 
 @timeit
 def drop_and_create_index():
-    logging.info("drop and create index...")
+    logger.info("drop and create index...")
     es = Elasticsearch(timeout=ES_TIMEOUT)
     es.indices.delete(index=INDEX_NAME, params={'ignore': [400, 404]})
     es.indices.create(index=INDEX_NAME, body=request_body)
@@ -338,7 +339,7 @@ def create_job_codes():
     """
     Create the `ogr` type in ElasticSearch.
     """
-    logging.info("create job codes...")
+    logger.info("create job codes...")
     # libelles des appelations pour les codes ROME
     ogr_labels = load_ogr_labels()
     # correspondance appellation vers rome
@@ -533,7 +534,7 @@ def create_offices_for_departement(departement):
     """
     actions = []
 
-    logging.info("STARTED indexing offices for departement=%s ...", departement)
+    logger.info("STARTED indexing offices for departement=%s ...", departement)
 
     for _, office in enumerate(db_session.query(Office).filter_by(departement=departement).all()):
 
@@ -557,7 +558,7 @@ def create_offices_for_departement(departement):
 
     completed_jobs_counter.increment()
 
-    logging.info(
+    logger.info(
         "COMPLETED indexing offices for departement=%s (%s of %s jobs completed)",
         departement,
         completed_jobs_counter.value,
@@ -765,7 +766,7 @@ def sanity_check_rome_codes():
             # CSV style output for easier manipulation afterwards
             "".join(["\n%s|%s" % (r, rome_labels[r]) for r in subset4]),
         )
-    logging.info(msg)
+    logger.info(msg)
 
     city = geocoding.get_city_by_commune_id('75056')
     latitude = city['coords']['lat']
@@ -773,7 +774,7 @@ def sanity_check_rome_codes():
     distance = 1000
 
     # CSV style output for easier manipulation afterwards
-    logging.info("rome_id|rome_label|offices_in_france")
+    logger.info("rome_id|rome_label|offices_in_france")
     for rome_id in romes_from_rome_naf_mapping:
         naf_code_list = mapping_util.map_romes_to_nafs([rome_id])
         disable_verbose_loggers()
@@ -788,7 +789,7 @@ def sanity_check_rome_codes():
         )
         enable_verbose_loggers()
         if len(offices) < 5:
-            logging.info("%s|%s|%s", rome_id, rome_labels[rome_id], len(offices))
+            logger.info("%s|%s|%s", rome_id, rome_labels[rome_id], len(offices))
 
 
 def display_performance_stats(departement):
@@ -798,9 +799,9 @@ def display_performance_stats(departement):
                'get_score_adjusted_to_rome_code_and_naf_code',
               ]
     for method in methods:
-        logging.info("[DPT%s] %s : %s", departement, method, getattr(scoring_util, method).cache_info())
+        logger.info("[DPT%s] %s : %s", departement, method, getattr(scoring_util, method).cache_info())
 
-    logging.info("[DPT%s] indexed %s of %s offices and %s score_for_rome",
+    logger.info("[DPT%s] indexed %s of %s offices and %s score_for_rome",
         departement,
         st.indexed_office_count,
         st.office_count,
@@ -836,7 +837,7 @@ def update_data(drop_indexes, enable_profiling, single_job, disable_parallel_com
 
 def update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job, disable_parallel_computing=False):
     if enable_profiling:
-        logging.info("STARTED run with profiling")
+        logger.info("STARTED run with profiling")
         profiler = Profile()
         profiler.runctx(
             "update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)",
@@ -846,11 +847,11 @@ def update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job, di
         relative_filename = 'profiling_results/create_index_run.kgrind'
         filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), relative_filename)
         convert(profiler.getstats(), filename)
-        logging.info("COMPLETED run with profiling: exported profiling result as %s", filename)
+        logger.info("COMPLETED run with profiling: exported profiling result as %s", filename)
     else:
-        logging.info("STARTED run without profiling")
+        logger.info("STARTED run without profiling")
         update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)
-        logging.info("COMPLETED run without profiling")
+        logger.info("COMPLETED run without profiling")
 
 
 def run():

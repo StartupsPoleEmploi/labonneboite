@@ -107,6 +107,7 @@ class DatabaseTest(AppTest):
     def setUp(self):
         # Disable elasticsearch logging
         logging.getLogger('elasticsearch').setLevel(logging.CRITICAL)
+        logging.getLogger('main').setLevel(logging.CRITICAL)
 
         # Create MySQL tables.
         delete_db()
