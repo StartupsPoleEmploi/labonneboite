@@ -4,7 +4,6 @@ from urllib import urlencode
 
 from flask import Blueprint, redirect, session, url_for
 from flask_login import current_user, logout_user
-from social_core.exceptions import AuthException
 
 from labonneboite.common.models import get_user_social_auth
 from labonneboite.conf import settings
@@ -24,7 +23,7 @@ def logout(user_social_auth=None):
     is called directly as a Python function, i.e. not with a `redirect()`.
     """
     if not current_user.is_authenticated:
-        raise AuthException('An anonymous user cannot log out.')
+        return redirect(url_for('root.home'))
 
     logged_with_peam = session.get('social_auth_last_login_backend') == PEAMOpenIdConnect.name
     if logged_with_peam and not user_social_auth:
