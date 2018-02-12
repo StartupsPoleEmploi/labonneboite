@@ -222,7 +222,7 @@ def create_fetcher(location, request_args):
     kwargs['from_number'] = kwargs['to_number'] - page_size + 1
 
     # Distance
-    distance = check_positive_integer_argument(request_args, settings.DISTANCE_FILTER_DEFAULT, 'distance')
+    distance = check_positive_integer_argument(request_args, 'distance', settings.DISTANCE_FILTER_DEFAULT)
     kwargs['distance'] = distance
 
     # Naf
