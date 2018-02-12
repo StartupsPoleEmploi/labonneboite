@@ -222,7 +222,12 @@ def create_fetcher(location, request_args):
     kwargs['from_number'] = kwargs['to_number'] - page_size + 1
 
     # Distance
-    distance = check_positive_integer_argument(request_args, 'distance', settings.DISTANCE_FILTER_DEFAULT)
+    # WARNING: MAP uses distance=0 in their use of the API.
+    distance = request_args.get('distance', settings.DISTANCE_FILTER_DEFAULT)
+    try:
+        distance = int(distance)
+    except TypeError:
+        raise InvalidFetcherArgument(u'distance must be integer')
     kwargs['distance'] = distance
 
     # Naf
