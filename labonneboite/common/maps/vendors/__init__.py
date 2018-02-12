@@ -6,12 +6,6 @@ def backend_name(function_name, mode):
 def backend(name):
     if name == 'dummy':
         from . import dummy as back
-    elif name == 'datagouv':
-        from . import datagouv as back
-    elif name == 'google':
-        from . import google as back
-    elif name == 'graphhopper':
-        from . import graphhopper as back
     elif name == 'ign':
         from . import ign as back
     elif name == 'navitia':

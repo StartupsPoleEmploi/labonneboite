@@ -162,7 +162,7 @@ GOOGLE_SITE_VERIFICATION_CODE = None
 
 SCAM_EMAILS_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'scripts', 'scam_emails')
 
-# Available backends: dummy, datagouv, google, graphhopper, ign, navitia
+# Available backends: dummy, ign, navitia
 TRAVEL_VENDOR_BACKENDS = {
     'isochrone': {
         'car': 'ign',
