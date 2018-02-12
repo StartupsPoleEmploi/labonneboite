@@ -134,6 +134,14 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
 
             self.assertEquals(expected_text, make_save_suggestion(form))
 
+    def test_unicode_reason_does_not_raise_error(self):
+        with self.test_request_context:
+            office = self.create_office()
+            office.save()
+            form = self.create_form()
+            form.comment.data = u'I❤️ unicode'
+
+            make_save_suggestion(form)
 
     # Create a valid
     def create_form(self, action=u''):

@@ -67,42 +67,34 @@ def change_info():
     """
     form = OfficeRemovalForm()
     if form.validate_on_submit():
-        try:
-            client = MandrillClient(current_app.extensions['mandrill'])
-            client.send(
-                u"""Un email a été envoyé par le formulaire de contact de la Bonne Boite :<br>
-                - Action : %s<br>
-                - Siret : %s,<br>
-                - Prénom : %s,<br>
-                - Nom : %s, <br>
-                - E-mail : %s,<br>
-                - Tél. : %s,<br>
-                - Commentaire : %s<br>
-                <hr>
-                - Status SAVE : %s
-                <hr>
+        client = MandrillClient(current_app.extensions['mandrill'])
+        client.send(
+            u"""Un email a été envoyé par le formulaire de contact de la Bonne Boite :<br>
+            - Action : %s<br>
+            - Siret : %s,<br>
+            - Prénom : %s,<br>
+            - Nom : %s, <br>
+            - E-mail : %s,<br>
+            - Tél. : %s,<br>
+            - Commentaire : %s<br>
+            <hr>
+            - Status SAVE : %s
+            <hr>
 
-                Cordialement,<br>
-                La Bonne Boite""" % (
-                    form.action.data,
-                    form.siret.data,
-                    form.first_name.data,
-                    form.last_name.data,
-                    form.email.data,
-                    form.phone.data,
-                    form.comment.data,
-                    make_save_suggestion(form)
-                )
+            Cordialement,<br>
+            La Bonne Boite""" % (
+                form.action.data,
+                form.siret.data,
+                form.first_name.data,
+                form.last_name.data,
+                form.email.data,
+                form.phone.data,
+                form.comment.data,
+                make_save_suggestion(form)
             )
-            msg = u"Merci pour votre message, nous reviendrons vers vous dès que possible."
-            flash(msg, 'success')
-
-        except UnicodeEncodeError as e:
-            # Here, we catch the exception, but we should really fix it. I
-            # suspect this is due to the fact that the form comment is unicode.
-            current_app.logger.exception(e)
-            msg = u"Erreur dans l'envoi du mail, vous pouvez envoyer un email directement à %s" % settings.CONTACT_EMAIL
-            flash(msg, 'error')
+        )
+        msg = u"Merci pour votre message, nous reviendrons vers vous dès que possible."
+        flash(msg, 'success')
 
         return redirect(url_for('office.change_info'))
     return render_template('office/change_info.html', form=form)
@@ -185,13 +177,14 @@ def make_save_suggestion(form):
         'requested_by_phone': form.phone.data,
         'reason': form.comment.data,
     }
+    params = {key: value.encode('utf8') for key, value in params.iteritems()}
     if form.action.data == "enlever":
-        url = '%s?%s' % (url_for("officeadminremove.create_view"), urlencode(params))
-        status_save = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>" % dirty_fix_url(url)
+        status_save = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>"
     else:
-        url = '%s?%s' % (url_for("officeadminupdate.create_view"), urlencode(params))
-        status_save = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>" % dirty_fix_url(url)
+        status_save = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>"
 
+    url = '%s?%s' % (url_for("officeadminremove.create_view"), urlencode(params))
+    status_save = status_save % dirty_fix_url(url)
     return status_save
 
 
