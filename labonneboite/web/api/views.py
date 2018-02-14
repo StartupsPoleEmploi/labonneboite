@@ -200,6 +200,13 @@ def get_location(request_args):
     elif 'latitude' in request_args and 'longitude' in request_args:
         if not request_args.get('latitude') or not request_args.get('longitude'):
             raise InvalidFetcherArgument(u'latitude or longitude (or both) have no value')
+
+        try:
+            float(request_args.get('latitude'))
+            float(request_args.get('longitude'))
+        except ValueError:
+            raise InvalidFetcherArgument(u'latitude or longitude (or both) are no float values')
+
         location = search.Location(request_args.get('latitude'), request_args.get('longitude'))
 
     else:

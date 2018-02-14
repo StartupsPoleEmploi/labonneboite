@@ -371,7 +371,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['rome_code'], rome)
             self.assertEqual(data['rome_label'], u'Animation de vente')
 
-    def test_wrong_latitude_or_longitude_values(self):
+    def test_error_when_latitude_or_longitude_are_empty(self):
         """
         If latitude or longitude are empty, throw a Bad Request Error
         """
@@ -379,6 +379,21 @@ class ApiCompanyListTest(ApiBaseTest):
             params = self.add_security_params({
                 'latitude': '',
                 'longitude': '',
+                'rome_codes': u'D1405',
+                'distance': u'10',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 400)
+
+    def test_error_when_latitude_or_longitude_are_strings(self):
+        """
+        If latitude or longitude are empty, throw a Bad Request Error
+        """
+        with self.test_request_context:
+            params = self.add_security_params({
+                'latitude': 'xxx',
+                'longitude': 'xxx',
                 'rome_codes': u'D1405',
                 'distance': u'10',
                 'user': u'labonneboite',
