@@ -953,6 +953,34 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['filters']['distance']['less_100_km'], 6)
             self.assertEqual(data['filters']['distance']['france'], 7)
 
+    def test_labonneboite_url(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['toulon']['commune_id'],
+                'rome_codes': u'N4403',
+                'user': u'labonneboite',
+            })
+
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            expect = '/commune/{}/rome/{}'.format(self.positions['toulon']['commune_id'], 'N4403')
+            self.assertIn(expect, data['url'])
+
+    def test_no_labonneboite_url_with_coordinates(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'latitude': self.positions['toulon']['coords'][0]['lat'],
+                'longitude': self.positions['toulon']['coords'][0]['lon'],
+                'rome_codes': u'N4403',
+                'user': u'labonneboite',
+            })
+
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['url'], '')
+
 class ApiCompanyListTrackingCodesTest(ApiBaseTest):
 
     def assertTrackingCodesEqual(self, company_url, utm_medium, utm_source, utm_campaign):
@@ -995,4 +1023,20 @@ class ApiCompanyListTrackingCodesTest(ApiBaseTest):
             data = json.loads(rv.data)
 
             company_url = data['companies'][0]['url']
+            self.assertTrackingCodesEqual(company_url, 'web', 'api__labonneboite', 'api__labonneboite__someuser')
+
+    def test_google_analytics_for_labonneboite_search_url(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['pau']['commune_id'],
+                'distance': 10,
+                'rome_codes': u'B1603',
+                'user': u'labonneboite',
+                'origin_user': 'someuser',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+
+            company_url = data['url']
             self.assertTrackingCodesEqual(company_url, 'web', 'api__labonneboite', 'api__labonneboite__someuser')

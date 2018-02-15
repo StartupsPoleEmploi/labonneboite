@@ -238,7 +238,7 @@ def results(city, zipcode, occupation):
 @searchBlueprint.route('/entreprises/commune/<commune_id>/rome/<rome_id>', methods=['GET'])
 def results_by_commune_and_rome(commune_id, rome_id):
     """
-    Convenience function to be used by Bob Emploi and other partners
+    Convenience function to be used by Pôle Emploi, Bob Emploi and other partners
     Redirects internally to our real user-facing url displaying
     results for his search.
 

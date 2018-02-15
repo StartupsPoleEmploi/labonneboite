@@ -5,6 +5,7 @@ import collections
 import logging
 import unidecode
 
+from flask import url_for
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import RequestError
 from slugify import slugify
@@ -40,12 +41,13 @@ DISTANCE_FILTER_MAX = 3000
 
 
 class Location(object):
-    def __init__(self, latitude, longitude):
+    def __init__(self, latitude, longitude, commune_id=None):
         self.latitude = latitude
         self.longitude = longitude
+        self.commune_id = commune_id
 
     def __repr__(self):
-        return "lon: {} - lat: {}".format(self.longitude, self.latitude)
+        return "lon: {} - lat: {} - commune_id: {}".format(self.longitude, self.latitude, self.commune_id)
 
 
 class CityLocation(object):
@@ -133,6 +135,13 @@ class Fetcher(object):
     @property
     def flag_senior(self):
         return self.public == PUBLIC_SENIOR
+
+    def compute_url(self, query_string):
+        if not self.location.commune_id or not self.rome:
+            return ""
+
+        return url_for('search.results_by_commune_and_rome', commune_id=self.location.commune_id, rome_id=self.rome, _external=True, **query_string)
+
 
     def update_aggregations(self, aggregations):
         if self.headcount and 'headcount' in aggregations:
