@@ -965,7 +965,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
             expect = '/commune/{}/rome/{}'.format(self.positions['toulon']['commune_id'], 'N4403')
-            self.assertEqual(expect, data['url'], '')
+            self.assertIn(expect, data['url'])
 
     def test_no_labonneboite_url_with_coordinates(self):
         with self.test_request_context:
@@ -979,7 +979,7 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
-            self.assertFalse(data['url'])
+            self.assertEqual(data['url'], '')
 
 class ApiCompanyListTrackingCodesTest(ApiBaseTest):
 
