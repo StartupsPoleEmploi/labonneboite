@@ -72,10 +72,7 @@ def company_list():
         message = 'Invalid request argument: {}'.format(e.message)
         return message, 400
 
-    companies, _ = fetcher.get_companies(add_suggestions=False)
-    companies_count = fetcher.company_count
-
-    # Define additional query string to add to office urls
+    # Define additional query string to add to office urls and global url
     office_query_string = {
         "utm_medium": "web"
     }
@@ -84,6 +81,10 @@ def company_list():
         office_query_string['utm_campaign'] = u'api__{}'.format(request.args['user'])
         if 'origin_user' in request.args:
             office_query_string['utm_campaign'] += u'__{}'.format(request.args['origin_user'])
+
+    companies, _ = fetcher.get_companies(add_suggestions=False)
+    companies_count = fetcher.company_count
+    url = fetcher.compute_url(office_query_string)
 
     result = {
         'companies': [
@@ -94,6 +95,7 @@ def company_list():
             for company in companies
         ],
         'companies_count': companies_count,
+        'url': url,
     }
 
     return jsonify(result)
@@ -152,7 +154,7 @@ def get_location(request_args):
         city = geocoding.get_city_by_commune_id(request_args.get('commune_id'))
         if not city:
             raise InvalidFetcherArgument(u'could not resolve latitude and longitude from given commune_id')
-        location = search.Location(city['coords']['lat'], city['coords']['lon'])
+        location = search.Location(city['coords']['lat'], city['coords']['lon'], request_args.get('commune_id'))
         zipcode = city['zipcode']
     elif 'latitude' in request_args and 'longitude' in request_args:
         location = search.Location(request_args.get('latitude'), request_args.get('longitude'))
