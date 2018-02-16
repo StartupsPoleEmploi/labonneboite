@@ -39,6 +39,30 @@ def suggest_locations():
     suggestions = search_util.build_location_suggestions(term)
     return make_response(json.dumps(suggestions))
 
+@searchBlueprint.route('/get_slug_details', methods=['GET'])
+def get_slug_details():
+    result = {}
+
+    job_slug = request.args.get('job-slug', '')
+    if job_slug:
+        rome = mapping_util.SLUGIFIED_ROME_LABELS.get(job_slug)
+        result['job'] = {
+            'rome_code': rome,
+            'label': settings.ROME_DESCRIPTIONS.get(rome, ''),
+        }
+
+    city_slug = request.args.get('city-slug', '')
+    if city_slug:
+        city = city_slug.split('-')
+        city_temp = search_util.CityLocation(city[0], city[1])
+
+        result['city'] = {
+            'name': city_temp.name,
+            'longitude': city_temp.location.longitude,
+            'latitude': city_temp.location.latitude,
+        }
+
+    return make_response(json.dumps(result))
 
 @searchBlueprint.route('/recherche')
 def search():
