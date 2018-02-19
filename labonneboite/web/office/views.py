@@ -179,11 +179,13 @@ def make_save_suggestion(form):
     }
     params = {key: value.encode('utf8') for key, value in params.iteritems()}
     if form.action.data == "enlever":
+        url = url_for('officeadminremove.create_view')
         status_save = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>"
     else:
+        url = url_for('officeadminupdate.create_view')
         status_save = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>"
 
-    url = '%s?%s' % (url_for("officeadminremove.create_view"), urlencode(params))
+    url = "%s?%s" % (url, urlencode(params))
     status_save = status_save % dirty_fix_url(url)
     return status_save
 

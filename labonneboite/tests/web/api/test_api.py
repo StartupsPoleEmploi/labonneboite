@@ -237,9 +237,23 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
 
-    def test_wrong_distance_value(self):
+    def test_zero_distance_value(self):
         """
-        A wrong value for `distance` should not trigger an error.
+        A 0 value for `distance` should not trigger an error.
+        """
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['caen']['commune_id'],
+                'rome_codes': u'D1405',
+                'distance': u'0',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+
+    def test_string_distance_value(self):
+        """
+        A non-integer value for `distance` should trigger a 400 error.
         """
         with self.test_request_context:
             params = self.add_security_params({
@@ -249,7 +263,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 'user': u'labonneboite',
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            self.assertEqual(rv.status_code, 200)
+            self.assertEqual(rv.status_code, 400)
 
     def test_rome_without_any_naf_should_not_trigger_any_error(self):
         with self.test_request_context:
