@@ -205,6 +205,25 @@
     content: '-';
 }
 
+
+@media print {
+    .lbb-result {
+        border-bottom: solid 1px lightgray;
+    }
+
+    .lbb-result__details {
+        display: block !important;
+    }
+    .js-map-container, .lbb-result__content__actions, .lbb-result__actions {
+        display: none;
+    }
+    .lbb-result__header .grid-col-4, .lbb-result__content .grid-col-4 {
+        display: inline-block;
+        width: 30% !important;
+        vertical-align: top;
+    }
+}
+
 /* Map.
 =========================================================================== */
 
