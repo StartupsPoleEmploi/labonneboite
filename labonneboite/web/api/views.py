@@ -202,12 +202,12 @@ def get_location(request_args):
             raise InvalidFetcherArgument(u'latitude or longitude (or both) have no value')
 
         try:
-            float(request_args.get('latitude'))
-            float(request_args.get('longitude'))
+            latitude = float(request_args['latitude'])
+            longitude = float(request_args['longitude'])
         except ValueError:
-            raise InvalidFetcherArgument(u'latitude or longitude (or both) are no float values')
+            raise InvalidFetcherArgument(u'latitude or longitude (or both) must be float')
 
-        location = search.Location(request_args.get('latitude'), request_args.get('longitude'))
+        location = search.Location(latitude, longitude)
 
     else:
         raise InvalidFetcherArgument(u'missing arguments: either commune_id or latitude and longitude')
