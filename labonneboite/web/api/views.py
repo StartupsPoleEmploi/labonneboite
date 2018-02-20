@@ -324,6 +324,7 @@ def office_details(siret):
         'naf': office.naf,
         'naf_text': office.naf_text,
         'name': office.name,
+        'raison_sociale': office.company_name,
         'siret': office.siret,
         'stars': office.stars,
         'url': office.url,
