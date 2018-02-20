@@ -57,6 +57,24 @@ class ApiGenericTest(ApiBaseTest):
         self.assertNotIn(u'00000000000002', sirets)
         self.assertEqual(len(companies), 1)
 
+    def test_office_distance_has_one_digit(self):
+        rome_code = u'D1408'
+        naf_codes = [u'7320Z']
+        latitude = 49.305658  # 15 Avenue François Mitterrand, 57290 Fameck, France.
+        latitude += 0.1 # original coordinates will unfortunately give a distance with 0 digit
+        longitude = 6.116853
+        distance = 100
+        companies, _, _ = fetch_companies(
+            naf_codes,
+            rome_code,
+            latitude,
+            longitude,
+            distance,
+        )
+        self.assertEqual(len(companies), 3)
+        # what is important here is that there is one digit
+        self.assertEqual(companies[0].distance, 45.9)
+
     def test_naf_and_rome(self):
         """
         Ensure that those ROME codes can be used accurately in other tests.
