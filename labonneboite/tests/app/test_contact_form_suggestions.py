@@ -1,10 +1,12 @@
 # coding: utf8
+import re
+import urllib
+import urlparse
 
 from flask import url_for
 
 from wtforms import StringField, SelectField, TextAreaField
 from wtforms.fields.html5 import EmailField, TelField
-from urllib import urlencode
 
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.tests.scripts.test_create_index import CreateIndexBaseTest
@@ -113,12 +115,17 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             office.save()
 
             form = self.create_form(u'enlever')
-            params = self.create_params(form)
+            expected_parameters = self.create_params(form)
+            expected_text = r" Une suppression a été demandée : <a href='(?P<url>.*)'>Créer une fiche de suppression</a>"
+            suggestion = make_save_suggestion(form).encode('utf8')
 
-            url = '%s?%s' % (url_for("officeadminremove.create_view"), urlencode(params))
-            expected_text = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>" % url
+            self.assertRegexpMatches(suggestion, expected_text)
+            match = re.match(expected_text, suggestion)
+            url, querystring = urllib.splitquery(match.groupdict()['url'])
+            parameters = dict(urlparse.parse_qsl(querystring))
 
-            self.assertEquals(expected_text, make_save_suggestion(form))
+            self.assertEqual(url_for("officeadminremove.create_view"), url)
+            self.assertEqual(expected_parameters, parameters)
 
     # Company exists and no OfficeAdmin found : suggest officeAdminAdd
     def test_company_and_no_office_admin(self):
@@ -127,12 +134,18 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             office.save()
 
             form = self.create_form()
-            params = self.create_params(form)
+            expected_parameters = self.create_params(form)
+            expected_text = r"Entreprise non modifiée via Save : <a href='(?P<url>.*)'>Créer une fiche de modification</a>"
+            suggestion = make_save_suggestion(form).encode('utf8')
 
-            url = '%s?%s' % (url_for("officeadminupdate.create_view"), urlencode(params))
-            expected_text = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>" % url
+            self.assertRegexpMatches(suggestion, expected_text)
+            match = re.match(expected_text, suggestion)
+            url, querystring = urllib.splitquery(match.groupdict()['url'])
+            parameters = dict(urlparse.parse_qsl(querystring))
 
-            self.assertEquals(expected_text, make_save_suggestion(form))
+            self.assertEqual(url_for("officeadminupdate.create_view"), url)
+            self.assertEqual(expected_parameters, parameters)
+
 
     def test_unicode_reason_does_not_raise_error(self):
         with self.test_request_context:

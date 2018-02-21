@@ -225,12 +225,7 @@ def create_fetcher(location, request_args):
 
     # Distance
     # WARNING: MAP uses distance=0 in their use of the API.
-    distance = request_args.get('distance', settings.DISTANCE_FILTER_DEFAULT)
-    try:
-        distance = int(distance)
-    except TypeError:
-        raise InvalidFetcherArgument(u'distance must be integer')
-    kwargs['distance'] = distance
+    kwargs['distance'] = check_integer_argument(request_args, 'distance', settings.DISTANCE_FILTER_DEFAULT)
 
     # Naf
     naf_codes_list = {}
@@ -298,13 +293,26 @@ def check_positive_integer_argument(args, name, default_value):
         name (str)
         default_value (int)
     """
+    value = check_integer_argument(args, name, default_value)
+    if value <= 0:
+        raise InvalidFetcherArgument(u'{} must be positive'.format(name))
+    return value
+
+
+def check_integer_argument(args, name, default_value):
+    """
+    Return value from arguments, check that value is integer.
+
+    Args:
+        args (dict)
+        name (str)
+        default_value (int)
+    """
     value = args.get(name, default_value)
     try:
         value = int(value)
-    except TypeError:
+    except (TypeError, ValueError):
         raise InvalidFetcherArgument(u'{} must be integer'.format(name))
-    if value <= 0:
-        raise InvalidFetcherArgument(u'{} must be positive'.format(name))
     return value
 
 
