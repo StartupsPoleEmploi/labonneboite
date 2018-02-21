@@ -74,7 +74,8 @@ def compute_signature(args, api_key):
 def check_signature(request, requested_signature, api_key):
     args = {}
     for k, v in request.args.iteritems():
-        args[k] = v
+        # unicode parameters (e.g. rome_codes_keyword_search) need to be properly encoded
+        args[k] = v.encode('utf8')
     computed_signature = compute_signature(args, api_key)
     if not computed_signature == requested_signature:
         raise InvalidSignatureException

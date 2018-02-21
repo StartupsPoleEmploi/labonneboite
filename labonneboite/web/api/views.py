@@ -56,6 +56,19 @@ def api_auth_required(function):
     return decorated
 
 
+def get_ga_query_string():
+    """
+    Define additional Google Analytics query string to add to office urls and global url
+    """
+    ga_query_string = {"utm_medium": "web"}
+    if 'user' in request.args:
+        ga_query_string['utm_source'] = u'api__{}'.format(request.args['user'])
+        ga_query_string['utm_campaign'] = u'api__{}'.format(request.args['user'])
+        if 'origin_user' in request.args:
+            ga_query_string['utm_campaign'] += u'__{}'.format(request.args['origin_user'])
+    return ga_query_string
+
+
 # Note: `company` should be renamed to `office` wherever possible.
 # Unfortunately old routes cannot change.
 
@@ -72,30 +85,53 @@ def company_list():
         message = 'Invalid request argument: {}'.format(e.message)
         return message, 400
 
-    # Define additional query string to add to office urls and global url
-    office_query_string = {
-        "utm_medium": "web"
-    }
-    if 'user' in request.args:
-        office_query_string['utm_source'] = u'api__{}'.format(request.args['user'])
-        office_query_string['utm_campaign'] = u'api__{}'.format(request.args['user'])
-        if 'origin_user' in request.args:
-            office_query_string['utm_campaign'] += u'__{}'.format(request.args['origin_user'])
+    ga_query_string = get_ga_query_string()
 
     companies, _ = fetcher.get_companies(add_suggestions=False)
     companies_count = fetcher.company_count
-    url = fetcher.compute_url(office_query_string)
+    url = fetcher.compute_url(ga_query_string)
 
     result = {
         'companies': [
             company.as_json(
                 rome_code=fetcher.rome, distance=fetcher.distance, zipcode=zipcode,
-                extra_query_string=office_query_string
+                extra_query_string=ga_query_string,
             )
             for company in companies
         ],
         'companies_count': companies_count,
         'url': url,
+        'rome_code': fetcher.rome,
+        'rome_label': settings.ROME_DESCRIPTIONS[fetcher.rome],
+    }
+
+    return jsonify(result)
+
+
+@apiBlueprint.route('/company/count/', methods=['GET'])
+@api_auth_required
+def company_count():
+
+    current_app.logger.debug("API request received: %s", request.full_path)
+
+    try:
+        location, _ = get_location(request.args)
+        fetcher = create_fetcher(location, request.args)
+    except InvalidFetcherArgument as e:
+        message = 'Invalid request argument: {}'.format(e.message)
+        return message, 400
+
+    ga_query_string = get_ga_query_string()
+
+    fetcher.compute_company_count()
+    companies_count = fetcher.company_count
+    url = fetcher.compute_url(ga_query_string)
+
+    result = {
+        'companies_count': companies_count,
+        'url': url,
+        'rome_code': fetcher.rome,
+        'rome_label': settings.ROME_DESCRIPTIONS[fetcher.rome],
     }
 
     return jsonify(result)
@@ -132,6 +168,11 @@ def company_filter_list():
             result['filters']['contract'] = fetcher.get_contract_aggregations()
         if 'distance' in fetcher.aggregate_by and fetcher.distance != search.DISTANCE_FILTER_MAX:
             result['filters']['distance'] = fetcher.get_distance_aggregations()
+
+    result.update({
+        'rome_code': fetcher.rome,
+        'rome_label': settings.ROME_DESCRIPTIONS[fetcher.rome],
+    })
 
     return jsonify(result)
 
@@ -191,8 +232,23 @@ def create_fetcher(location, request_args):
 
     # Rome_code
     rome_codes = request_args.get('rome_codes')
-    if not rome_codes:
-        raise InvalidFetcherArgument(u'missing rome_codes')
+    rome_codes_keyword_search = request_args.get('rome_codes_keyword_search')
+
+    if not rome_codes_keyword_search:
+        if not rome_codes:
+            raise InvalidFetcherArgument(u'you must use rome_codes or rome_codes_keyword_search')
+    else:
+        if rome_codes:
+            raise InvalidFetcherArgument(u'you must either use rome_codes or rome_codes_keyword_search but not both')
+        else:
+            # ROME keyword search : select first match of what the autocomplete result would be
+            suggestions = search.build_job_label_suggestions(rome_codes_keyword_search, size=1)
+            if len(suggestions) >= 1:
+                rome_codes = suggestions[0]['id']
+            else:
+                msg = u'No match found for rome_codes_keyword_search.'
+                raise InvalidFetcherArgument(msg)
+
     rome_code_list = [code.upper() for code in rome_codes.split(',')]
 
     for rome in rome_code_list:
@@ -209,7 +265,8 @@ def create_fetcher(location, request_args):
 
     if len(rome_code_list) > 1:
         # Reasons why we only support single-rome search are detailed in README.md
-        raise InvalidFetcherArgument(u'Multi ROME search is no longer supported, please use single ROME search only.')
+        raise InvalidFetcherArgument(
+            u'Multi ROME search is not supported at the moment, please use single ROME search only.')
     kwargs['rome'] = rome_code_list[0]
 
     # Page and page_size
