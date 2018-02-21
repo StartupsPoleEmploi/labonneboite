@@ -340,6 +340,8 @@ def social_auth_error(error):
             social_exceptions.AuthCanceled,
             social_exceptions.AuthUnreachableProvider,
             social_exceptions.AuthStateForbidden,
+            social_exceptions.AuthStateMissing,
+            social_exceptions.AuthMissingParameter,
     )):
         app.logger.exception(error)
 
