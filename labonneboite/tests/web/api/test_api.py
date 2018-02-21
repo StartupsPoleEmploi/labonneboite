@@ -267,9 +267,13 @@ class ApiCompanyListTest(ApiBaseTest):
 
     def test_rome_without_any_naf_should_not_trigger_any_error(self):
         with self.test_request_context:
+            rome_with_naf_mapping = u'K1706'
+            rome_without_naf_mapping = u'L1510'
+            self.assertIn(rome_with_naf_mapping, mapping_util.MANUAL_ROME_NAF_MAPPING)
+            self.assertNotIn(rome_without_naf_mapping, mapping_util.MANUAL_ROME_NAF_MAPPING)
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
-                'rome_codes': u'K1701',
+                'rome_codes': rome_without_naf_mapping,
                 'user': u'labonneboite',
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
