@@ -54,7 +54,7 @@ def get_slug_details():
     city_slug = request.args.get('city-slug', '')
     if city_slug:
         city = city_slug.split('-')
-        city_temp = search_util.CityLocation(city[0], city[1])
+        city_temp = search_util.CityLocation('-'.join(city[0:-1]), ''.join(city[-1:]))
 
         result['city'] = {
             'name': city_temp.name,
