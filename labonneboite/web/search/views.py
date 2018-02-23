@@ -33,36 +33,60 @@ def suggest_job_labels():
     return make_response(json.dumps(suggestions))
 
 
-@searchBlueprint.route('/suggest_locations', methods=['GET'])
+@searchBlueprint.route('/', methods=['GET'])
 def suggest_locations():
     term = request.args.get('term', '')
     suggestions = search_util.build_location_suggestions(term)
     return make_response(json.dumps(suggestions))
 
-@searchBlueprint.route('/get_slug_details', methods=['GET'])
-def get_slug_details():
+@searchBlueprint.route('/job_slug_details')
+def job_slug_details():
     result = {}
 
     job_slug = request.args.get('job-slug', '')
+    if not job_slug:
+        return u'no job-slug given', 400
+
     if job_slug:
         rome = mapping_util.SLUGIFIED_ROME_LABELS.get(job_slug)
+        if not rome:
+            return u'no rome found associated to the slug {}'.format(job_slug), 400
+
         result['job'] = {
             'rome_code': rome,
             'label': settings.ROME_DESCRIPTIONS.get(rome, ''),
         }
 
+    return make_response(json.dumps(result))
+
+
+@searchBlueprint.route('/city_slug_details')
+def city_slug_details():
+    result = {}
+
     city_slug = request.args.get('city-slug', '')
+    if not city_slug:
+        return u'no city-slug given', 400
+
     if city_slug:
         city = city_slug.split('-')
-        city_temp = search_util.CityLocation('-'.join(city[0:-1]), ''.join(city[-1:]))
+        zipcode = ''.join(city[-1:])
+        city_temp = search_util.CityLocation(city_slug, zipcode)
+
+        if not city_temp or not city_temp.location:
+            return u'no city found associated to the slug {}'.format(city_slug), 400
+
+        # Name without zipcode
+        name = city_temp.name.replace(zipcode, '').strip()
 
         result['city'] = {
-            'name': city_temp.name,
+            'name': name,
             'longitude': city_temp.location.longitude,
             'latitude': city_temp.location.latitude,
         }
 
     return make_response(json.dumps(result))
+
 
 @searchBlueprint.route('/recherche')
 def search():
