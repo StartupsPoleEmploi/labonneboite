@@ -1,0 +1,1 @@
+MEMO_JS_URL = 'http://memo.beta.pole-emploi.fr/recette/js/importButton/memoButton-min.js'
