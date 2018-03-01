@@ -82,6 +82,8 @@ GOOGLE_TAG_MANAGER_ID = 'AAA-AAAAAAA'
 ENABLE_ADBLOCK_TRACKING = False
 ENABLE_GOOGLE_OPTIMIZE = False
 
+MEMO_JS_URL = 'https://memo.pole-emploi.fr/js/importButton/memoButton-min.js'
+
 if get_current_env() == ENV_LBBDEV:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.lbbdev import *
