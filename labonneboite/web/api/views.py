@@ -3,6 +3,7 @@
 from functools import wraps
 
 from flask import abort, Blueprint, current_app, jsonify, request
+from flasgger import swag_from
 
 from labonneboite.common import geocoding
 from labonneboite.common import search
@@ -71,8 +72,8 @@ def get_ga_query_string():
 
 # Note: `company` should be renamed to `office` wherever possible.
 # Unfortunately old routes cannot change.
-
 @apiBlueprint.route('/company/', methods=['GET'])
+@swag_from('./swagger/company.yml')
 @api_auth_required
 def company_list():
 
@@ -138,6 +139,7 @@ def company_count():
 
 
 @apiBlueprint.route('/filter/', methods=['GET'])
+@swag_from('./swagger/filter.yml')
 @api_auth_required
 def company_filter_list():
     current_app.logger.debug("API request received: %s", request.full_path)
@@ -374,6 +376,7 @@ def check_integer_argument(args, name, default_value):
 
 
 @apiBlueprint.route('/office/<siret>/details', methods=['GET'])
+@swag_from('./swagger/office_siret_detail.yml')
 @api_auth_required
 def office_details(siret):
     """

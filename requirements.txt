@@ -75,6 +75,8 @@ gnureadline==6.3.3
 python-slugify==1.2.4
 requests==2.18.1
 validators==0.11.2
+flasgger==0.8.0
+
 
 # Pillow
 # For now, stick to Pillow 2.9 because later releases for Ubuntu 14.04 requires extra packages.

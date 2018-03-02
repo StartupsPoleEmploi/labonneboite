@@ -1,0 +1,90 @@
+Test
+---
+definitions:
+  Etablissement:
+    type: object
+    properties:
+      siret:
+        type: string
+      name:
+        type: string
+      city:
+        type: string
+      phone:
+        type: string
+      email:
+        type: string
+      lat:
+        type: double
+      lon:
+        type: double
+      distance:
+        type: integer
+      headcount_text:
+        type: string
+
+summary: établissements à fort potentiel d'embauche
+description: |
+  COMPANIES renvoie des informations sur les établissements à fort potentiel d'embauche. La réponse inclut le nom des entreprises ainsi que des informations générales (code NAF, effectif salarié) et des informations de contact (email, télphone lorsqu'elles sont présentes). Les établissements sont classés par score de potentiel d'embauche décroissant (les premiers résultats sont donc les plus prometteurs en terme de potentiel d'embauche).
+parameters:
+  - name: latitude
+    in: query
+    description: Latitude du point géographique de recherche.
+    required: true
+    type: number
+    format: double
+  - name: longitude
+    in: query
+    description: Longitude du point géographique de recherche.
+    required: true
+    type: number
+    format: double
+  - name: rome_codes
+    in: query
+    description: Liste de codes métier "ROME" (ex. "D1101,A1501") ou simplement un seul code métier (ex. "A1501")
+    required: false
+    type: string
+    format: string
+  - name: naf_codes
+    in: query
+    description: Liste de codes de secteur d'activités "NAF" (ex. "1013B,4711B") ou simplement un seul code NAF (ex. "4711B")
+    required: false
+    type: string
+    format: string
+  - name: distance
+    in: query
+    description: Périmètre du rayon de recherche (en km) autour du point géographique défini par le couple (longitude, latitude)
+    required: false
+    type: integer
+    format: integer
+  - name: user
+    in: query
+    description: Nom du compte utilisateur API (ex. "labonneformation")
+    required: true
+    type: string
+    format: string
+  - name: timestamp
+    in: query
+    description: date et heure UTC (méridien de Greenwich) au format %Y-%m-%dT%H:%M:%S (ex. "2016-01-05T11:00:22"). Pour être autorisé la différence entre le timestamp serveur et le timestamp fourni par ce paramètre doit être inférieure à 10 minutes.
+    required: true
+    type: string
+    format: string
+  - name: signature
+    in: query
+    description: signature authentifiant l'utilisateur comme étant authorisé à faire des requêtes à l'API (voir "calcul de la signature" pour plus d'informations sur le comment du calcul).
+    required: true
+    type: string
+    format: string
+tags:
+  - Companies
+responses:
+  '200':
+    description: Un tableau d'établissements
+    schema:
+      type: array
+      items:
+        $ref:
+          '#/definitions/Etablissement'
+  '400':
+    description: bad api request
+
