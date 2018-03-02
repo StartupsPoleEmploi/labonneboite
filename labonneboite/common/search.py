@@ -9,6 +9,7 @@ from flask import url_for
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import RequestError
 from slugify import slugify
+from backports.functools_lru_cache import lru_cache
 
 from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
@@ -137,10 +138,36 @@ class Fetcher(object):
         return self.public == PUBLIC_SENIOR
 
     def compute_url(self, query_string):
-        if not self.location.commune_id or not self.rome:
-            return ""
+        if not self.company_count >= 1:
+            # Always return home URL if zero results
+            # (requested by PE.fr)
+            return url_for('root.home', _external=True, **query_string)
+        elif self.location.commune_id and self.rome:
+            # preserve parameters from original API request
+            if self.naf_codes:
+                query_string['naf'] = self.naf_codes[0]
+            query_string.update({
+                'from': self.from_number,
+                'to': self.to_number,
+                'sort': self.sort,
+                'd': self.distance,
+                'h': self.headcount,
+                'p': self.public,
+                'f_a': self.flag_alternance,
+            })
 
-        return url_for('search.results_by_commune_and_rome', commune_id=self.location.commune_id, rome_id=self.rome, _external=True, **query_string)
+            return url_for(
+                'search.results_by_commune_and_rome',
+                commune_id=self.location.commune_id,
+                rome_id=self.rome,
+                _external=True,
+                **query_string
+            )
+        else:
+            # In case of search by longitude+latitude,
+            # return home URL since we do not have a URL ready yet.
+            # FIXME implement this URL at some point.
+            return url_for('root.home', _external=True, **query_string)
 
 
     def update_aggregations(self, aggregations):
@@ -240,10 +267,13 @@ class Fetcher(object):
         return aggregations['distance']
 
 
-    def get_companies(self, add_suggestions=False):
-
+    def compute_company_count(self):
         self.company_count = self._get_company_count(self.rome, self.distance)
-        logger.debug("set company_count to %s from fetch_companies", self.company_count)
+        logger.debug("set company_count to %s", self.company_count)
+
+
+    def get_companies(self, add_suggestions=False):
+        self.compute_company_count()
 
         current_page_size = self.to_number - self.from_number + 1
 
@@ -422,11 +452,13 @@ def build_json_body_elastic_search(
     # Build filters.
     filters = []
     if naf_codes:
-        filters = [{
-            "terms": {
-                "naf": naf_codes,
+        filters = [
+            {
+                "terms": {
+                    "naf": naf_codes,
+                },
             }
-        }]
+        ]
 
     # in some cases, a string is given as input, let's ensure it is an int from now on
     try:
@@ -727,6 +759,7 @@ def get_companies_from_es_and_db(json_body, sort):
     return companies, companies_count, aggregations
 
 
+@lru_cache(maxsize=8*1024)
 def build_location_suggestions(term):
     term = term.title()
     es = Elasticsearch()
@@ -739,18 +772,18 @@ def build_location_suggestions(term):
     city_match = [{
         "match": {
             "city_name.autocomplete": {
-                "query": term
+                "query": term,
             }
         }}, {
         "match": {
             "city_name.stemmed": {
                 "query": term,
-                "boost": 1
+                "boost": 1,
             }
         }}, {
         "match_phrase_prefix": {
             "city_name.stemmed": {
-                "query": term
+                "query": term,
             }
         }}]
 
@@ -767,17 +800,17 @@ def build_location_suggestions(term):
             "function_score": {
                 "query": {
                     "bool": {
-                        "should": filters
+                        "should": filters,
                     },
                 },
                 # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-field-value-factor
                 "field_value_factor": {
                     "field": "population",
-                    "modifier": "log1p"
+                    "modifier": "log1p",
                 }
             },
         },
-        "size": autocomplete.MAX_LOCATIONS
+        "size": autocomplete.MAX_LOCATIONS,
     }
     # FIXME ugly : in tests we use dev ES index instead of test ES index
     # we should use index=settings.ES_INDEX instead of index='labonneboite'
@@ -799,13 +832,14 @@ def build_location_suggestions(term):
                 'zipcode': source['zipcode'],
                 'label': label,
                 'latitude': source['location']['lat'],
-                'longitude': source['location']['lon']
+                'longitude': source['location']['lon'],
             }
             suggestions.append(city)
     return suggestions
 
 
-def build_job_label_suggestions(term):
+@lru_cache(maxsize=8*1024)
+def build_job_label_suggestions(term, size=autocomplete.MAX_JOBS):
 
     es = Elasticsearch()
 
@@ -815,7 +849,7 @@ def build_job_label_suggestions(term):
             "match": {
                 # Query for multiple words or multiple parts of words across multiple fields.
                 # Based on https://qbox.io/blog/an-introduction-to-ngrams-in-elasticsearch
-                "_all": unidecode.unidecode(term)
+                "_all": unidecode.unidecode(term),
             }
         },
         "aggs":{
@@ -825,19 +859,24 @@ def build_job_label_suggestions(term):
                     "size": 0,
                     # Note: a maximum of 550 buckets will be fetched, as we have 550 unique ROME codes
 
-                    # TOFIX: `order` cannot work without a computed `max_score`, see the `max_score` comment below.
+                    # FIXME `order` cannot work without a computed `max_score`, see the `max_score` comment below.
                     # Order results by sub-aggregation named 'max_score'
                     # "order": {"max_score": "desc"},
                 },
                 "aggs": {
                     # Only 1 result per rome code: include only 1 top hit on each bucket in the results.
+                    # Another way of saying this is that for all OGR matching a given ROME, we only
+                    # keep the most relevant OGR.
                     "by_top_hit": {"top_hits": {"size": 1}},
 
-                    # TOFIX: `max_score` below does not work with Elasticsearch 1.7.
+                    # FIXME `max_score` below does not work with Elasticsearch 1.7.
                     # Fixed in elasticsearch 2.0+:
                     # https://github.com/elastic/elasticsearch/issues/10091#issuecomment-193676966
 
-                    # Count of the max score of any member of this bucket
+                    # FTR @vermeer made another try to find a workaround as of Feb 2018, and failed.
+                    # The only way out is to upgrade to elasticsearch 2.0+
+
+                    # Set max score among all members of this bucket
                     # "max_score": {"max": {"lang": "expression", "script": "_score"}},
                 },
             },
@@ -858,7 +897,7 @@ def build_job_label_suggestions(term):
     results.sort(key=lambda e: e['by_top_hit']['hits']['max_score'], reverse=True)
 
     for hit in results:
-        if len(suggestions) < autocomplete.MAX_JOBS:
+        if len(suggestions) < size:
             hit = hit[u'by_top_hit'][u'hits'][u'hits'][0]
             source = hit['_source']
             highlight = hit.get('highlight', {})
