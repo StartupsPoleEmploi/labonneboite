@@ -67,9 +67,6 @@ CONTRACT_VALUES = {'all': 0, 'alternance': 1}
 
 ES_INDEX = 'labonneboite'
 
-LOGSTASH_HOST = "localhost"
-LOGSTASH_PORT = 5959
-
 TILE_SERVER_URL = "http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}"
 
 ROME_NAF_PROBABILITY_CUTOFF = 0.05
@@ -101,4 +98,3 @@ elif get_current_env() == ENV_PRODUCTION:
     from .overrides.production import *
 else:
     raise Exception("unknown environment")
-
