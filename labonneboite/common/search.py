@@ -6,8 +6,8 @@ import logging
 import unidecode
 
 from flask import url_for
-from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import RequestError
+import elasticsearch
+import elasticsearch.exceptions
 from slugify import slugify
 from backports.functools_lru_cache import lru_cache
 
@@ -17,6 +17,7 @@ from labonneboite.common import sorting
 from labonneboite.common import autocomplete
 from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.models import Office
+from labonneboite.common.pools import Elasticsearch
 from labonneboite.conf import settings
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
 
@@ -39,6 +40,7 @@ KEY_TO_LABEL_DISTANCES = {
 
 FILTERS = ['naf', 'headcount', 'flag_alternance', 'distance']
 DISTANCE_FILTER_MAX = 3000
+
 
 
 class Location(object):
@@ -681,7 +683,7 @@ def get_companies_from_es_and_db(json_body, sort):
     logger.info("Elastic Search request : %s", json_body)
     try:
         res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
-    except RequestError as e:
+    except elasticsearch.exceptions.RequestError as e:
         # The following ES bug is known and has been fixed in ES 2.1.0
         # https://github.com/elastic/elasticsearch/pull/13060
         # however as of Jan 2018 we are using Elasticsearch 1.7 so we have to live with it.
