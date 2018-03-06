@@ -26,7 +26,6 @@ ipython==3.1.0
 opbeat==3.5.2
 mock==2.0.0
 pylint==1.6.4
-python-logstash==0.4.5
 # profiling tools used in create_index.py
 pycallgraph==1.0.1
 pyprof2calltree==1.4.3

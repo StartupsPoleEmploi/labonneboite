@@ -11,7 +11,6 @@ from opbeat.handlers.logging import OpbeatHandler
 from social_core import exceptions as social_exceptions
 from social_flask_sqlalchemy.models import init_social
 from werkzeug.contrib.fixers import ProxyFix
-import logstash
 
 # Flask.
 from flask import g, flash, Flask, redirect, render_template, request, session, url_for
@@ -61,11 +60,6 @@ def activate_logging(flask_app):
     http://flask.pocoo.org/docs/0.12/errorhandling/
     """
     formatter = logging.Formatter("%(levelname)s - %(module)s - [%(pathname)s]\n%(message)s")
-
-    # Logstash.
-    logstash_handler = logstash.LogstashHandler(settings.LOGSTASH_HOST, settings.LOGSTASH_PORT)
-    logstash_handler.setFormatter(formatter)
-    flask_app.logger.addHandler(logstash_handler)
 
     # Output logs to stdout (development mode only).
     if settings.DEBUG:
