@@ -733,8 +733,8 @@ def get_companies_from_es_and_db(json_body, sort):
         for obj in company_objects:
             # Get the corresponding item from the Elasticsearch results.
             es_company = es_companies_by_siret[obj.siret]
-            # Add an extra `distance` attribute.
-            obj.distance = int(round(es_company["sort"][distance_sort_index]))
+            # Add an extra `distance` attribute with one digit.
+            obj.distance = round(es_company["sort"][distance_sort_index], 1)
             company_dict[obj.siret] = obj
 
         for siret in siret_list:
