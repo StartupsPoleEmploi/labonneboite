@@ -97,12 +97,12 @@ class DatabaseTest(AppTest):
     script.
     """
 
-    ES_TEST_INDEX = 'labonneboite_unit_test'
     ES_OFFICE_TYPE = 'office'
 
     def drop_and_create_es_index(self):
-        self.es.indices.delete(index=self.ES_TEST_INDEX, params={'ignore': [400, 404]})
-        self.es.indices.create(index=self.ES_TEST_INDEX, body=request_body)
+        self.assertIn('test', settings.ES_INDEX)
+        self.es.indices.delete(index=settings.ES_INDEX, params={'ignore': [400, 404]})
+        self.es.indices.create(index=settings.ES_INDEX, body=request_body)
 
     def setUp(self):
         # Disable elasticsearch logging
@@ -114,7 +114,6 @@ class DatabaseTest(AppTest):
         init_db()
 
         # Create ES index.
-        settings.ES_INDEX = self.ES_TEST_INDEX  # Override the setting value.
         self.es = Elasticsearch(timeout=30)
         self.drop_and_create_es_index()
 

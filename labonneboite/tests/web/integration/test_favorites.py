@@ -5,6 +5,7 @@ import time
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
 from labonneboite.common.models import UserFavoriteOffice
+from labonneboite.conf import settings
 from labonneboite.tests.test_base import DatabaseTest
 
 
@@ -39,7 +40,7 @@ class FavoriteBaseTest(DatabaseTest):
         self.user = User.create(email=u'j@test.com', gender=u'male', first_name=u'John', last_name=u'Doe')
 
         # Delete index.
-        self.es.indices.delete(index=self.ES_TEST_INDEX)
+        self.es.indices.delete(index=settings.ES_INDEX)
 
         # Create new index.
         request_body = {
@@ -73,7 +74,7 @@ class FavoriteBaseTest(DatabaseTest):
                 }
             }
         }
-        self.es.indices.create(index=self.ES_TEST_INDEX, body=request_body)
+        self.es.indices.create(index=settings.ES_INDEX, body=request_body)
 
         # Insert test data into Elasticsearch.
         docs = [
@@ -111,7 +112,7 @@ class FavoriteBaseTest(DatabaseTest):
             },
         ]
         for i, doc in enumerate(docs, start=1):
-            self.es.index(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
+            self.es.index(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
 
         # Sleep required by ES to register new documents, flaky test here otherwise.
         time.sleep(1)

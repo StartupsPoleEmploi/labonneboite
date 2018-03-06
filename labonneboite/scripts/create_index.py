@@ -51,10 +51,6 @@ def enable_verbose_loggers():
     for logger in get_verbose_loggers():
         logger.disabled = False
 
-# FIXME shouldn't create_index script also be used to populate test ES index as well?
-# we should use settings.ES_INDEX here instead
-INDEX_NAME = 'labonneboite'
-
 OFFICE_TYPE = 'office'
 OGR_TYPE = 'ogr'
 LOCATION_TYPE = 'location'
@@ -323,8 +319,8 @@ request_body = {
 def drop_and_create_index():
     logger.info("drop and create index...")
     es = Elasticsearch(timeout=ES_TIMEOUT)
-    es.indices.delete(index=INDEX_NAME, params={'ignore': [400, 404]})
-    es.indices.create(index=INDEX_NAME, body=request_body)
+    es.indices.delete(index=settings.ES_INDEX, params={'ignore': [400, 404]})
+    es.indices.create(index=settings.ES_INDEX, body=request_body)
 
 
 def bulk_actions(actions):
@@ -358,7 +354,7 @@ def create_job_codes():
             }
             action = {
                 '_op_type': 'index',
-                '_index': INDEX_NAME,
+                '_index': settings.ES_INDEX,
                 '_type': OGR_TYPE,
                 '_source': doc
             }
@@ -382,7 +378,7 @@ def create_locations():
         }
         action = {
             '_op_type': 'index',
-            '_index': INDEX_NAME,
+            '_index': settings.ES_INDEX,
             '_type': LOCATION_TYPE,
             '_source': doc
         }
@@ -548,7 +544,7 @@ def create_offices_for_departement(departement):
             st.increment_indexed_office_count()
             actions.append({
                 '_op_type': 'index',
-                '_index': INDEX_NAME,
+                '_index': settings.ES_INDEX,
                 '_type': OFFICE_TYPE,
                 '_id': office.siret,
                 '_source': es_doc,
@@ -618,7 +614,7 @@ def add_offices():
 
             # Create the new office in ES.
             doc = get_office_as_es_doc(office_to_add)
-            es.create(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_add.siret, body=doc)
+            es.create(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=office_to_add.siret, body=doc)
 
 
 @timeit
@@ -635,7 +631,7 @@ def remove_offices():
     for siret in offices_to_remove:
         # Apply changes in ElasticSearch.
         try:
-            es.delete(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret)
+            es.delete(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=siret)
         except TransportError as e:
             if e.status_code != 404:
                 raise
@@ -692,9 +688,9 @@ def update_offices():
                 # Unfortunately these cannot easily be bulked :-(
                 # The reason is there is no way to tell bulk to ignore missing documents (404)
                 # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
-                es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret, body=delete_body,
+                es.update(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=siret, body=delete_body,
                         params={'ignore': 404})
-                es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret, body=body,
+                es.update(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=siret, body=body,
                         params={'ignore': 404})
 
                 # Delete the current PDF thus it will be regenerated at the next download attempt.
@@ -724,7 +720,7 @@ def update_offices_geolocations():
             office.save()
             # Apply changes in ElasticSearch.
             body = {'doc': {'locations': locations}}
-            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
+            es.update(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
 
 
 @timeit

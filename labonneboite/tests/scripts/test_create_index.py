@@ -10,6 +10,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.common.models import OfficeAdminExtraGeoLocation, User
 from labonneboite.common.database import db_session
+from labonneboite.conf import settings
 from labonneboite.scripts import create_index as script
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
@@ -26,11 +27,6 @@ class CreateIndexBaseTest(DatabaseTest):
 
         # Mute script logging
         script.logger.setLevel(script.logging.CRITICAL)
-
-        # use custom ES index for tests
-        script.INDEX_NAME = self.ES_TEST_INDEX
-        # FIXME ideally we should point to ES test index
-        # settings.ES_INDEX = self.ES_TEST_INDEX
 
         self.office1 = Office(
             siret=u"78548035101646",
@@ -89,12 +85,12 @@ class CreateIndexBaseTest(DatabaseTest):
         time.sleep(1)  # Sleep required by ES to register new documents.
 
         # We should have 2 offices in the ES.
-        count = self.es.count(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, body={'query': {'match_all': {}}})
+        count = self.es.count(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, body={'query': {'match_all': {}}})
         self.assertEquals(count['count'], 2)
         # Ensure that the office is the one that has been indexed in ES.
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office1.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office1.siret)
         self.assertEquals(res['_source']['email'], self.office1.email)
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office2.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office2.siret)
         self.assertEquals(res['_source']['email'], self.office2.email)
 
 class DeleteOfficeAdminTest(CreateIndexBaseTest):
@@ -325,7 +321,7 @@ class AddOfficesTest(CreateIndexBaseTest):
         self.assertEquals(office.tel, u"")
         self.assertEquals(office.website, u"")
 
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office_to_add.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office_to_add.siret)
         self.assertEquals(res['_source']['siret'], office.siret)
         self.assertEquals(res['_source']['score'], office.score)
 
@@ -362,7 +358,7 @@ class RemoveOfficesTest(CreateIndexBaseTest):
         self.assertEquals(Office.query.count(), 0)
 
         # The offices should have been removed from ES.
-        count = self.es.count(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, body={'query': {'match_all': {}}})
+        count = self.es.count(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, body={'query': {'match_all': {}}})
         self.assertEquals(count['count'], 0)
 
 
@@ -396,7 +392,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEquals(office.tel, self.office1.tel)  # This value should not be modified.
         self.assertEquals(office.website, office_to_update.new_website)
 
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
         self.assertEquals(res['_source']['email'], office.email)
         self.assertEquals(res['_source']['phone'], office.tel)
         self.assertEquals(res['_source']['website'], office.website)
@@ -431,7 +427,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEquals(office.tel, u'')
         self.assertEquals(office.website, u'')
 
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
         self.assertEquals(res['_source']['email'], u'')
         self.assertEquals(res['_source']['phone'], u'')
         self.assertEquals(res['_source']['website'], u'')
@@ -457,7 +453,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         script.update_offices()
 
         office = Office.get(self.office1.siret)
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
         self.assertTrue(res['_source']['boosted_romes']['D1507'])
@@ -489,7 +485,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         script.update_offices()
 
         office = Office.get(self.office1.siret)
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
         self.assertTrue(res['_source']['boosted_romes']['D1506'])
@@ -521,7 +517,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         script.update_offices()
 
         office = Office.get(self.office1.siret)
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=office.siret)
 
         # Check rome scores.
         keys = res['_source']['scores_by_rome'].keys()
@@ -598,7 +594,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0):
             script.update_offices()
 
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office1.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office1.siret)
         self.assertEquals(len(set(romes_for_office)), len(res['_source']['scores_by_rome']))
 
 
@@ -622,7 +618,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             self.assertEquals(office.tel, u'')
             self.assertEquals(office.website, u'')
 
-            res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
+            res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
             self.assertEquals(res['_source']['email'], u'')
             self.assertEquals(res['_source']['phone'], u'')
             self.assertEquals(res['_source']['website'], u'')
@@ -657,7 +653,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         for siret in sirets:
             office = Office.get(siret)
-            res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
+            res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
 
             # Since `romes_to_boost` is empty, all `scores_by_rome` should be boosted.
             self.assertEquals(office_to_update.romes_to_boost, u"")
@@ -687,7 +683,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             self.assertEquals(office.tel, office_to_update.new_phone)
             self.assertEquals(office.website, office_to_update.new_website)
 
-            res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
+            res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
             self.assertEquals(res['_source']['email'], office_to_update.new_email)
             self.assertEquals(res['_source']['phone'], office_to_update.new_phone)
             self.assertEquals(res['_source']['website'], office_to_update.new_website)
@@ -712,7 +708,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             script.update_offices()
 
         for siret in sirets:
-            res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
+            res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
             self.assertEquals(len(set(romes_for_office)), len(res['_source']['scores_by_rome']))
 
 
@@ -737,7 +733,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         for siret in sirets:
             office = Office.get(siret)
-            res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
+            res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
 
             # Check boosted scores.
             self.assertTrue(res['_source']['boosted_romes']['D1507'])
@@ -765,7 +761,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         script.update_offices()
 
         for siret in sirets:
-            res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
+            res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=siret)
 
             # Check romes
             keys = res['_source']['scores_by_rome'].keys()
@@ -792,7 +788,7 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         script.update_offices_geolocations()
 
         # The office should now have 3 geolocations in ES (the original one + Paris 10 + Marseille).
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office1.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office1.siret)
         expected_locations = [
             {u'lat': 49.1044, u'lon': 6.17952},
             {u'lat': 43.25996690043557, u'lon': 5.370740865779022},
@@ -811,7 +807,7 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         script.update_offices_geolocations()
 
         # The office extra geolocations should now be reset.
-        res = self.es.get(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office1.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=self.office1.siret)
         expected_locations = [
             {u'lat': 49.1044, u'lon': 6.17952},
         ]
