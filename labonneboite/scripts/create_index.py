@@ -18,6 +18,7 @@ from labonneboite.common import departements as dpt
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
+from labonneboite.common import es as lbb_es
 from labonneboite.common.search import fetch_companies
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
@@ -94,187 +95,6 @@ class StatTracker:
 st = StatTracker()
 
 
-filters = {
-    "stop_francais": {
-        "type": "stop",
-        "stopwords": ["_french_"],
-    },
-    "fr_stemmer": {
-        "type": "stemmer",
-        "name": "light_french",
-    },
-    "elision": {
-        "type": "elision",
-        "articles": ["c", "l", "m", "t", "qu", "n", "s", "j", "d"],
-    },
-    "ngram_filter": {
-        "type": "ngram",
-        "min_gram": 2,
-        "max_gram": 20,
-    },
-    "edge_ngram_filter": {
-        "type": "edge_ngram",
-        "min_gram": 1,
-        "max_gram": 20,
-    },
-}
-
-analyzers = {
-    "stemmed": {
-        "type": "custom",
-        "tokenizer": "standard",
-        "filter": [
-            "asciifolding",
-            "lowercase",
-            "stop_francais",
-            "elision",
-            "fr_stemmer",
-        ],
-    },
-    "autocomplete": {
-        "type": "custom",
-        "tokenizer": "standard",
-        "filter": [
-            "lowercase",
-            "edge_ngram_filter",
-        ],
-    },
-    "ngram_analyzer": {
-        "type": "custom",
-        "tokenizer": "standard",
-        "filter": [
-            "asciifolding",
-            "lowercase",
-            "stop_francais",
-            "elision",
-            "ngram_filter",
-        ],
-    },
-}
-
-mapping_ogr = {
-    # https://www.elastic.co/guide/en/elasticsearch/reference/1.7/mapping-all-field.html
-    "_all": {
-        "type": "string",
-        "index_analyzer": "ngram_analyzer",
-        "search_analyzer": "standard",
-    },
-    "properties": {
-        "ogr_code": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "ogr_description": {
-            "type": "string",
-            "include_in_all": True,
-            "term_vector": "yes",
-            "index_analyzer": "ngram_analyzer",
-            "search_analyzer": "standard",
-        },
-        "rome_code": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "rome_description": {
-            "type": "string",
-            "include_in_all": True,
-            "term_vector": "yes",
-            "index_analyzer": "ngram_analyzer",
-            "search_analyzer": "standard",
-        },
-    },
-}
-
-mapping_location = {
-    "properties": {
-        "city_name": {
-            "type": "multi_field",
-            "fields": {
-                "raw": {
-                    "type": "string",
-                    "index": "not_analyzed",
-                },
-                "autocomplete" : {
-                    "type": "string",
-                    "analyzer": "autocomplete",
-                },
-                "stemmed": {
-                    "type": "string",
-                    "analyzer": "stemmed",
-                    "store": "yes",
-                    "term_vector": "yes",
-                },
-            },
-        },
-        "coordinates": {
-            "type": "geo_point",
-        },
-        "population": {
-            "type": "integer",
-        },
-        "slug": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "zipcode": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-    },
-}
-
-mapping_office = {
-    "properties": {
-        "naf": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "siret": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "name": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "email": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "tel": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "website": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "score": {
-            "type": "integer",
-            "index": "not_analyzed",
-        },
-        "scores_by_rome": {
-            "type": "object",
-            "index": "not_analyzed",
-        },
-        "boosted_romes": {
-            "type": "object",
-            "index": "not_analyzed",
-        },
-        "headcount": {
-            "type": "integer",
-            "index": "not_analyzed",
-        },
-        "department": {
-            "type": "string",
-            "index": "not_analyzed"
-        },
-        "locations": {
-            "type": "geo_point",
-        },
-    },
-}
-
 # Below was an attempt at fixing the following issue:
 # ElasticsearchException[Unable to find a field mapper for field [scores_by_rome.A0000]]
 # which happens when a rome is orphaned (no company has a score for this rome).
@@ -287,7 +107,7 @@ mapping_office = {
 # which is tricky to investigate.
 #
 # For full information about this issue see common/search.py/get_companies_from_es_and_db.
-# 
+#
 # for rome in mapping_util.MANUAL_ROME_NAF_MAPPING:
 #     mapping_office["properties"]["scores_by_rome.%s" % rome] = {
 #         "type": "integer",
@@ -298,29 +118,11 @@ mapping_office = {
 #         "index": "not_analyzed",
 #     }
 
-request_body = {
-    "settings": {
-        "index": {
-            "analysis": {
-                "filter": filters,
-                "analyzer": analyzers,
-            },
-        },
-    },
-    "mappings":  {
-        "ogr": mapping_ogr,
-        "location": mapping_location,
-        "office": mapping_office,
-    },
-}
-
 
 @timeit
 def drop_and_create_index():
     logger.info("drop and create index...")
-    es = Elasticsearch(timeout=ES_TIMEOUT)
-    es.indices.delete(index=settings.ES_INDEX, params={'ignore': [400, 404]})
-    es.indices.create(index=settings.ES_INDEX, body=request_body)
+    lbb_es.drop_and_create_index()
 
 
 def bulk_actions(actions):
@@ -668,7 +470,7 @@ def update_offices():
                 # Apply changes in ElasticSearch.
                 body = {'doc':
                     {'email': office.email, 'phone': office.tel, 'website': office.website,
-                    'flag_alternance': 1 if office.flag_alternance else 0 }
+                    'flag_alternance': 1 if office.flag_alternance else 0}
                 }
 
                 scores_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)

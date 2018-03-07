@@ -8,7 +8,6 @@ from labonneboite.web.api import util
 from labonneboite.conf import settings
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import scoring as scoring_util
-from labonneboite.scripts.create_index import mapping_office
 
 
 class ApiBaseTest(DatabaseTest):
@@ -153,18 +152,6 @@ class ApiBaseTest(DatabaseTest):
 
     def setUp(self, *args, **kwargs):
         super(ApiBaseTest, self).setUp(*args, **kwargs)
-
-        # Delete index.
-        self.es.indices.delete(index=settings.ES_INDEX, params={'ignore': [404]})
-
-        # Create new index.
-        request_body = {
-            "mappings": {
-                "office": mapping_office
-            }
-        }
-
-        self.es.indices.create(index=settings.ES_INDEX, body=request_body)
 
         # Insert test data into Elasticsearch.
         docs = [

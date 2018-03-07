@@ -39,43 +39,6 @@ class FavoriteBaseTest(DatabaseTest):
         # Create a user.
         self.user = User.create(email=u'j@test.com', gender=u'male', first_name=u'John', last_name=u'Doe')
 
-        # Delete index.
-        self.es.indices.delete(index=settings.ES_INDEX)
-
-        # Create new index.
-        request_body = {
-            "mappings": {
-                "office": {
-                    "properties": {
-                        "naf": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "siret": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "name": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "score": {
-                            "type": "integer",
-                            "index": "not_analyzed"
-                        },
-                        "headcount": {
-                            "type": "integer",
-                            "index": "not_analyzed"
-                        },
-                        "locations": {
-                            "type": "geo_point",
-                        }
-                    }
-                }
-            }
-        }
-        self.es.indices.create(index=settings.ES_INDEX, body=request_body)
-
         # Insert test data into Elasticsearch.
         docs = [
             {

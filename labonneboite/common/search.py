@@ -17,7 +17,7 @@ from labonneboite.common import sorting
 from labonneboite.common import autocomplete
 from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.models import Office
-from labonneboite.common.pools import Elasticsearch
+from labonneboite.common.es import Elasticsearch
 from labonneboite.conf import settings
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
 

@@ -2,13 +2,12 @@
 import logging
 import unittest
 
-from elasticsearch import Elasticsearch
 from flask import url_for as flask_url_for
 from flask import _request_ctx_stack
 
 from labonneboite.common.database import db_session, delete_db, engine, init_db
+from labonneboite.common import es
 from labonneboite.conf import settings
-from labonneboite.scripts.create_index import request_body
 from labonneboite.web.app import app
 
 
@@ -99,11 +98,6 @@ class DatabaseTest(AppTest):
 
     ES_OFFICE_TYPE = 'office'
 
-    def drop_and_create_es_index(self):
-        self.assertIn('test', settings.ES_INDEX)
-        self.es.indices.delete(index=settings.ES_INDEX, params={'ignore': [400, 404]})
-        self.es.indices.create(index=settings.ES_INDEX, body=request_body)
-
     def setUp(self):
         # Disable elasticsearch logging
         logging.getLogger('elasticsearch').setLevel(logging.CRITICAL)
@@ -114,8 +108,9 @@ class DatabaseTest(AppTest):
         init_db()
 
         # Create ES index.
-        self.es = Elasticsearch(timeout=30)
-        self.drop_and_create_es_index()
+        self.assertIn('test', settings.ES_INDEX)
+        self.es = es.Elasticsearch()
+        es.drop_and_create_index()
 
         return super(DatabaseTest, self).setUp()
 
@@ -126,6 +121,6 @@ class DatabaseTest(AppTest):
         delete_db()
 
         # Empty ES index.
-        self.drop_and_create_es_index()
+        es.drop_and_create_index()
 
         return super(DatabaseTest, self).tearDown()

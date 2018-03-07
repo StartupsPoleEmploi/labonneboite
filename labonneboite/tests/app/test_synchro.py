@@ -5,7 +5,7 @@ import unittest
 
 from sqlalchemy import create_engine
 
-from labonneboite.common.pools import Elasticsearch
+from labonneboite.common.es import Elasticsearch
 from labonneboite.common.database import db_session, get_db_string
 from labonneboite.common.database import ENGINE_PARAMS, REAL_DATABASE
 from labonneboite.common.models import Office

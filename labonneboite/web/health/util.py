@@ -1,5 +1,5 @@
 from labonneboite.common.database import db_session  # This is how we talk to the database.
-from labonneboite.common.pools import Elasticsearch
+from labonneboite.common.es import Elasticsearch
 
 
 def is_db_alive():
