@@ -82,7 +82,7 @@ class CreateIndexBaseTest(DatabaseTest):
         # Put offices into ES.
         # Disable parallel computing because it does not play well with test environment (it hangs).
         script.create_offices(disable_parallel_computing=True)
-        time.sleep(1)  # Sleep required by ES to register new documents.
+        self.es.indices.flush(index=settings.ES_INDEX) # required by ES to register new documents.
 
         # We should have 2 offices in the ES.
         count = self.es.count(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, body={'query': {'match_all': {}}})
@@ -352,7 +352,7 @@ class RemoveOfficesTest(CreateIndexBaseTest):
         office_to_remove2.save()
 
         script.remove_offices()
-        time.sleep(1)  # Sleep required by ES to register new documents.
+        self.es.indices.flush(index=settings.ES_INDEX) # Required by ES to register new documents.
 
         # The offices should have been removed from the DB.
         self.assertEquals(Office.query.count(), 0)

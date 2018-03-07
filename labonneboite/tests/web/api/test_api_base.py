@@ -1,7 +1,5 @@
 # coding: utf8
 
-import time
-
 from labonneboite.common.models import Office
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.api import util
@@ -437,7 +435,7 @@ class ApiBaseTest(DatabaseTest):
             self.es.index(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
 
         # need for ES to register our new documents, flaky test here otherwise
-        time.sleep(1)
+        self.es.indices.flush(index=settings.ES_INDEX)
 
         # Create related Office instances into MariaDB/MySQL.
         for doc in docs:

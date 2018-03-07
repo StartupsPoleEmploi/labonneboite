@@ -1,7 +1,5 @@
 # coding: utf8
 
-import time
-
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
 from labonneboite.common.models import UserFavoriteOffice
@@ -77,8 +75,8 @@ class FavoriteBaseTest(DatabaseTest):
         for i, doc in enumerate(docs, start=1):
             self.es.index(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
 
-        # Sleep required by ES to register new documents, flaky test here otherwise.
-        time.sleep(1)
+        # Required by ES to register new documents, flaky test here otherwise.
+        self.es.indices.flush(index=settings.ES_INDEX)
 
         # Create related Office instances into MariaDB/MySQL.
         for doc in docs:
