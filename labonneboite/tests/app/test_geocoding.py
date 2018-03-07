@@ -10,8 +10,6 @@ class GeocodingTest(unittest.TestCase):
         all_cities = geocoding.get_cities()
         found = False
         for city in all_cities:
-            if city['name'].lower().startswith("paris"):
-                print city['name']
             if city['name'] == u"Paris":
                 found = True
                 break

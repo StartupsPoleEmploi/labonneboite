@@ -29,6 +29,9 @@ def timeit(func):
         if ENABLE_TIMEIT_TIMERS and duration >= 1.0:
             msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
               (func.__name__, duration, args, kw)
+            # TODO do we really need to print messages in test mode? I'd rather
+            # just disable timeit (ENABLE_TIMEIT_TIMERS==False) in the test
+            # settings to avoid bloating console output.
             # logger messages are displayed immediately in jenkins console output
             logger.info(msg)
             # print messages are displayed all at once when the job ends in jenkins console output
