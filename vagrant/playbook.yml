@@ -97,7 +97,7 @@
       shell: "cd {{project_dir}}; {{ virtual_env }}/bin/alembic upgrade head"
 
     - name: create elastic search indexes.
-      shell: "{{ virtual_env }}/bin/create_index -d 1"
+      shell: "{{ virtual_env }}/bin/create_index --full"
 
     - name: Link chromedriver so that it is in PATH.
       file:

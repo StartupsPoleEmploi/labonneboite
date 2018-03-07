@@ -1,6 +1,5 @@
 # coding: utf8
 import datetime
-import time
 import mock
 
 from flask import url_for
@@ -200,43 +199,41 @@ class VariousModesTest(CreateIndexBaseTest):
 
     def test_create_index(self):
         script.update_data_profiling_wrapper(
-            drop_indexes=False,
-            enable_profiling=False,
-            single_job=False,
+            create_full=False,
+            create_partial=False,
             disable_parallel_computing=True,
         )
 
     def test_create_index_from_scratch(self):
         script.update_data_profiling_wrapper(
-            drop_indexes=True,
-            enable_profiling=False,
-            single_job=False,
+            create_full=True,
+            create_partial=False,
             disable_parallel_computing=True,
         )
 
     def test_create_index_from_scratch_with_profiling(self):
-        script.update_data_profiling_wrapper(
-            drop_indexes=True,
-            enable_profiling=True,
-            single_job=False,
-            disable_parallel_computing=True,
-        )
+        with mock.patch.object(script.Profiling, 'ACTIVATED', True):
+            script.update_data_profiling_wrapper(
+                create_full=True,
+                create_partial=False,
+                disable_parallel_computing=True,
+            )
 
-    def test_create_index_from_scratch_with_profiling_single_job(self):
-        script.update_data_profiling_wrapper(
-            drop_indexes=True,
-            enable_profiling=True,
-            single_job=True,
-            disable_parallel_computing=True,
-        )
-        # single_job version of the script left ES data in an inconsistent state:
+    def test_create_index_from_scratch_with_profiling_create_partial(self):
+        with mock.patch.object(script.Profiling, 'ACTIVATED', True):
+            script.update_data_profiling_wrapper(
+                create_full=False,
+                create_partial=True,
+                disable_parallel_computing=True,
+            )
+
+        # create_partial version of the script left ES data in an inconsistent state:
         # office data for only one departement
         # no ogr data nor location data
         # thus we need to rebuild normal data now:
         script.update_data_profiling_wrapper(
-            drop_indexes=True,
-            enable_profiling=False,
-            single_job=False,
+            create_full=True,
+            create_partial=False,
             disable_parallel_computing=True,
         )
 

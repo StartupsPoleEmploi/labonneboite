@@ -1,5 +1,6 @@
 # coding: utf8
 import argparse
+import contextlib
 import logging
 import os
 
@@ -33,13 +34,68 @@ logger = logging.getLogger(__name__)
 
 VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main', 'elasticsearch.trace']
 
+
+class Profiling(object):
+    ACTIVATED = False
+
+
+@contextlib.contextmanager
+def switch_es_index():
+    """
+    Context manager that will ensure that some code will operate on a new ES
+    index. This new index will then be associated to the reference alias and
+    the old index(es) will be dropped.
+
+    Usage:
+
+        with switch_es_index():
+            # Here, all code will run on the new index
+            run_some_code()
+
+        # Here, the old indexes no longer exist and the reference alias points
+        # to the new index
+    """
+    es = Elasticsearch()
+
+    # Find current index names (there may be one, zero or more)
+    alias_name = settings.ES_INDEX
+    old_index_names = es.indices.get_alias(settings.ES_INDEX).keys()
+
+    # Activate new index
+    new_index_name = lbb_es.get_new_index_name()
+    settings.ES_INDEX = new_index_name
+
+    # Create new index
+    lbb_es.create_index(new_index_name)
+
+    try:
+        yield
+    except:
+        # Delete newly created index
+        lbb_es.drop_index(new_index_name)
+        raise
+    finally:
+        # Set back alias name
+        settings.ES_INDEX = alias_name
+
+    # Switch alias
+    # TODO this should be done in one shot with a function in es.py module
+    lbb_es.add_alias_to_index(new_index_name)
+    for old_index_name in old_index_names:
+        es.indices.delete_alias(index=old_index_name, name=alias_name)
+
+    # Delete old index
+    for old_index_name in old_index_names:
+        lbb_es.drop_index(old_index_name)
+
+
 def get_verbose_loggers():
     return [logging.getLogger(logger_name) for logger_name in VERBOSE_LOGGER_NAMES]
 
 def disable_verbose_loggers():
     """
     We disable some loggers at specific points of this script in order to have a clean output
-    (especially of the sanity_check_rome_codes part) and avoit it being polluted by useless
+    (especially of the sanity_check_rome_codes part) and avoid it being polluted by useless
     unwanted logs detailing every MysQL and ES request.
     """
     for logger in get_verbose_loggers():
@@ -118,11 +174,6 @@ st = StatTracker()
 #         "index": "not_analyzed",
 #     }
 
-
-@timeit
-def drop_and_create_index():
-    logger.info("drop and create index...")
-    lbb_es.drop_and_create_index()
 
 
 def bulk_actions(actions):
@@ -299,12 +350,12 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
 
 
 
-def create_offices(enable_profiling=False, disable_parallel_computing=False):
+def create_offices(disable_parallel_computing=False):
     """
     Populate the `office` type in ElasticSearch.
     Run it as a parallel computation based on departements.
     """
-    if enable_profiling:
+    if Profiling.ACTIVATED:
         func = profile_create_offices_for_departement
     else:
         func = create_offices_for_departement
@@ -607,20 +658,17 @@ def display_performance_stats(departement):
     )
 
 
-def update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing):
-    if single_job and not drop_indexes:
-        raise Exception("This combination does not make sense.")
-
-    if single_job:
-        drop_and_create_index()
-        create_offices_for_departement('57')
+def update_data(create_full, create_partial, disable_parallel_computing):
+    if create_partial:
+        with switch_es_index():
+            create_offices_for_departement('57')
         return
 
-    if drop_indexes:
-        drop_and_create_index()
-        create_offices(enable_profiling, disable_parallel_computing)
-        create_job_codes()
-        create_locations()
+    if create_full:
+        with switch_es_index():
+            create_offices(disable_parallel_computing)
+            create_job_codes()
+            create_locations()
 
     # Upon requests received from employers we can add, remove or update offices.
     # This permits us to complete or overload the data provided by the importer.
@@ -629,16 +677,16 @@ def update_data(drop_indexes, enable_profiling, single_job, disable_parallel_com
     update_offices()
     update_offices_geolocations()
 
-    if drop_indexes:
+    if create_full:
         sanity_check_rome_codes()
 
 
-def update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job, disable_parallel_computing=False):
-    if enable_profiling:
+def update_data_profiling_wrapper(create_full, create_partial, disable_parallel_computing=False):
+    if Profiling.ACTIVATED:
         logger.info("STARTED run with profiling")
         profiler = Profile()
         profiler.runctx(
-            "update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)",
+            "update_data(create_full, create_partial, disable_parallel_computing)",
             locals(),
             globals()
         )
@@ -648,26 +696,29 @@ def update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job, di
         logger.info("COMPLETED run with profiling: exported profiling result as %s", filename)
     else:
         logger.info("STARTED run without profiling")
-        update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)
+        update_data(create_full, create_partial, disable_parallel_computing)
         logger.info("COMPLETED run without profiling")
 
 
 def run():
     parser = argparse.ArgumentParser(
         description="Update elasticsearch data: offices, ogr_codes and locations.")
-    parser.add_argument('-d', '--drop-indexes', dest='drop_indexes',
-        help="Drop and recreate index from scratch.")
-    parser.add_argument('-p', '--profile', dest='profile',
+    parser.add_argument('-f', '--full', action='store_true',
+        help="Create full index from scratch.")
+    parser.add_argument('-a', '--partial', action='store_true',
+        help=("Disable parallel computing and run only a single office indexing"
+              " job (departement 57) instead. This is required in order"
+              " to do a profiling from inside a job."))
+    parser.add_argument('-p', '--profile', action='store_true',
         help="Enable code performance profiling for later visualization with Q/KCacheGrind.")
-    parser.add_argument('-s', '--single-job', dest='single_job',
-        help="Disable parallel computing and run a single office indexing job (departement 57) and nothing else.")
     args = parser.parse_args()
 
-    drop_indexes = (args.drop_indexes is not None)
-    enable_profiling = (args.profile is not None)
-    single_job = (args.single_job is not None)
+    if args.full and args.partial:
+        raise ValueError('Cannot create both partial and full index at the same time')
+    if args.profile:
+        Profiling.ACTIVATED = True
 
-    update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job)
+    update_data_profiling_wrapper(args.full, args.partial)
 
 
 if __name__ == '__main__':

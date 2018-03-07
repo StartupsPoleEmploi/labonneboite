@@ -817,6 +817,13 @@ def build_location_suggestions(term):
     # FIXME ugly : in tests we use dev ES index instead of test ES index
     # we should use index=settings.ES_INDEX instead of index='labonneboite'
     # however we cannot yet since location+ogr data is not yet in ES test index data
+
+    # HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA !!!!!!
+    # _____ _____  ____  __ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _ _ _ _ _ _ _ _ _ _ 
+    #|  ___|_ _\ \/ /  \/  | ____| ____| ____| ____| ____| ____| ____| ____| ____| ____| ____| ____| ____| ____| ____| | | | | | | | | | |
+    #| |_   | | \  /| |\/| |  _| |  _| |  _| |  _| |  _| |  _| |  _| |  _| |  _| |  _| |  _| |  _| |  _| |  _| |  _| | | | | | | | | | | |
+    #|  _|  | | /  \| |  | | |___| |___| |___| |___| |___| |___| |___| |___| |___| |___| |___| |___| |___| |___| |___|_|_|_|_|_|_|_|_|_|_|
+    #|_|   |___/_/\_\_|  |_|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____(_|_|_|_|_|_|_|_|_|_)
     res = es.search(index='labonneboite', doc_type="location", body=body)
 
     suggestions = []
@@ -889,6 +896,11 @@ def build_job_label_suggestions(term, size=autocomplete.MAX_JOBS):
     # FIXME ugly : in tests we use dev ES index instead of test ES index
     # we should use index=settings.ES_INDEX instead of index='labonneboite'
     # however we cannot yet since location+ogr data is not yet in ES test index data
+    # ____  _   _    _        _        _        _        _        _        _        _        _        _        _        _        _        _        _        _        _ 
+    #|  _ \| | | |  / \      / \      / \      / \      / \      / \      / \      / \      / \      / \      / \      / \      / \      / \      / \      / \      / \   
+    #| |_) | |_| | / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \    / _ \  
+    #|  _ <|  _  |/ ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \  / ___ \ 
+    #|_| \_\_| |_/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\/_/   \_\
     res = es.search(index='labonneboite', doc_type="ogr", body=body)
 
     suggestions = []

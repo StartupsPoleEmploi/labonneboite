@@ -1,3 +1,7 @@
+from datetime import datetime
+import random
+import string
+
 import elasticsearch
 
 from labonneboite.conf import settings
@@ -19,6 +23,53 @@ def Elasticsearch():
 
 
 def drop_and_create_index():
+    """
+    Delete all indexes associated to reference alias and create a new index
+    that points to the alias.
+
+    WARNING: this will create downtime for Elasticsearch. You should probably
+    not use this function to recreate the ES database in production.
+    """
+    drop_indexes_of_alias()
+
+    new_index_name = get_new_index_name()
+    create_index(new_index_name)
+    add_alias_to_index(new_index_name)
+
+
+def drop_indexes_of_alias(name=settings.ES_INDEX):
+    """
+    Drop indexes associated to alias.
+    """
+    es = Elasticsearch()
+    for index in es.indices.get_alias(name).keys():
+        drop_index(index=index)
+
+
+def drop_index(index):
+    es = Elasticsearch()
+    es.indices.delete(index=index, params={'ignore': [400, 404]})
+
+
+def get_new_index_name():
+    """
+    Create an index name based on the current date and time. A random string is
+    appended to avoid collisions for indexes created at the same second (it
+    happens in tests).
+    """
+    suffix = ''.join([random.choice(string.ascii_lowercase) for _ in range(5)])
+    return datetime.now().strftime(settings.ES_INDEX + "-%Y%m%d%H%M%S-" + suffix)
+
+
+def add_alias_to_index(index, name=settings.ES_INDEX):
+    es = Elasticsearch()
+    es.indices.put_alias(index=index, name=name)
+
+
+def create_index(index):
+    """
+    Create index with the right settings.
+    """
     filters = {
         "stop_francais": {
             "type": "stop",
@@ -216,5 +267,4 @@ def drop_and_create_index():
     }
 
     es = Elasticsearch()
-    es.indices.delete(index=settings.ES_INDEX, params={'ignore': [400, 404]})
-    es.indices.create(index=settings.ES_INDEX, body=create_body)
+    es.indices.create(index=index, body=create_body)
