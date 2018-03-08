@@ -15,6 +15,8 @@ overrides/production.py
 from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST, ENV_STAGING, ENV_PRODUCTION
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 
+GLOBAL_STATIC_PATH = '/tmp'
+
 ROME_DESCRIPTIONS = load_rome_labels()
 
 NAF_CODES = load_naf_labels()
