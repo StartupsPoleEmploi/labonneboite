@@ -9,6 +9,7 @@ from social_core.backends.oauth import BaseOAuth2
 from social_core.backends.open_id_connect import OpenIdConnectAuth
 
 from labonneboite.conf import settings
+from .exceptions import AuthFailedMissingReturnValues
 
 
 # We don't need to override some abstract methods in parent classes.
@@ -55,14 +56,18 @@ class PEAMOpenIdConnect(PEAMOAuth2, OpenIdConnectAuth):
             raise
 
     def get_user_details(self, response):
-        return {
-            # Optional fields.
-            'email': response.get('email', ''),  # Explicitly fallback to an empty string when there is no email.
-            # Mandatory fields.
-            'external_id': response['sub'],
-            'gender': response['gender'],
-            'first_name': response['given_name'],
-            'last_name': response['family_name'],
-        }
+        try:
+            return {
+                # Optional fields.
+                'email': response.get('email', ''),  # Explicitly fallback to an empty string when there is no email.
+                # Mandatory fields.
+                'external_id': response['sub'],
+                'gender': response['gender'],
+                'first_name': response['given_name'],
+                'last_name': response['family_name'],
+            }
+        except KeyError:
+            # Sometimes PEAM responds without the user details.
+            raise AuthFailedMissingReturnValues(response)
 
 # pylint:enable=abstract-method
