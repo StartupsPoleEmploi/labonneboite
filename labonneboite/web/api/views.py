@@ -198,7 +198,17 @@ def get_location(request_args):
         location = search.Location(city['coords']['lat'], city['coords']['lon'], request_args.get('commune_id'))
         zipcode = city['zipcode']
     elif 'latitude' in request_args and 'longitude' in request_args:
-        location = search.Location(request_args.get('latitude'), request_args.get('longitude'))
+        if not request_args.get('latitude') or not request_args.get('longitude'):
+            raise InvalidFetcherArgument(u'latitude or longitude (or both) have no value')
+
+        try:
+            latitude = float(request_args['latitude'])
+            longitude = float(request_args['longitude'])
+        except ValueError:
+            raise InvalidFetcherArgument(u'latitude or longitude (or both) must be float')
+
+        location = search.Location(latitude, longitude)
+
     else:
         raise InvalidFetcherArgument(u'missing arguments: either commune_id or latitude and longitude')
 

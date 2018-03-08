@@ -263,7 +263,7 @@ class ApiCompanyListTest(ApiBaseTest):
 
     def test_string_distance_value(self):
         """
-        A non-integer value for `distance` should trigger a 400 error.
+        A wrong value for `distance` should trigger an error.
         """
         with self.test_request_context:
             params = self.add_security_params({
@@ -353,12 +353,70 @@ class ApiCompanyListTest(ApiBaseTest):
                 'rome_codes': rome,
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
             self.assertEqual(data['rome_code'], rome)
             self.assertEqual(data['rome_label'], u'Animation de vente')
 
-    def test_rome_not_mapped_to_any_naf_should_not_trigger_any_error(self):
+    def test_ok_if_distance_value_is_zero(self):
+        """
+        A wrong value for `distance` should trigger an error.
+        """
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['caen']['commune_id'],
+                'rome_codes': u'D1405',
+                'distance': u'0',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+
+    def test_error_when_latitude_or_longitude_are_empty(self):
+        """
+        If latitude or longitude are empty, throw a Bad Request Error
+        """
+        with self.test_request_context:
+            params = self.add_security_params({
+                'latitude': '',
+                'longitude': '',
+                'rome_codes': u'D1405',
+                'distance': u'10',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 400)
+
+    def test_ok_when_latitude_or_longitude_equal_zero(self):
+        """
+        If latitude and longitude equal, throw No Error
+        """
+        with self.test_request_context:
+            params = self.add_security_params({
+                'latitude': '0',
+                'longitude': '0',
+                'rome_codes': u'D1405',
+                'distance': u'10',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+
+    def test_error_when_latitude_or_longitude_are_strings(self):
+        """
+        If latitude or longitude are empty, throw a Bad Request Error
+        """
+        with self.test_request_context:
+            params = self.add_security_params({
+                'latitude': 'xxx',
+                'longitude': 'xxx',
+                'rome_codes': u'D1405',
+                'distance': u'10',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 400)
+
+    def test_rome_without_any_naf_should_not_trigger_any_error(self):
         with self.test_request_context:
             rome_with_naf_mapping = u'K1706'
             rome_without_naf_mapping = u'L1510'
