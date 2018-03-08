@@ -14,18 +14,18 @@ from labonneboite.conf.common import settings_common
 # Specific and default settings will be merged, and values found in specific settings will take precedence.
 # When no specific settings are found, `labonneboite/conf/local_settings.py` is used.
 
-# The name of the environment variable that contains the path to the specific settings of an environment.
-ENVIRONMENT_VARIABLE = 'LBB_SETTINGS'
+# Dynamically import LBB_SETTINGS environment variable as the `settings`
+# module, or import `local_settings.py` as the `settings` module if it does not
+# exist.
+settings = settings_common
+if settings_common.get_current_env() != settings_common.ENV_TEST:
+    # Don't override settings in tests
+    settings_module = os.path.join(os.path.dirname(__file__), 'local_settings.py')
+    settings_module = os.environ.get('LBB_SETTINGS', settings_module)
+    settings = imp.load_source('settings', settings_module)
 
-# Dynamically import ENVIRONMENT_VARIABLE as the `settings` module, or import `local_settings.py`
-# as the `settings` module if ENVIRONMENT_VARIABLE does not exist.
-settings = imp.load_source(
-    'settings',
-    os.environ.get(ENVIRONMENT_VARIABLE, os.path.join(os.path.dirname(__file__), 'local_settings.py'))
-)
-
-# Iterate over each setting defined in the `settings_common` module and add them to the dynamically
-# imported `settings` module if they don't already exist.
-for setting in dir(settings_common):
-    if not hasattr(settings, setting):
-        setattr(settings, setting, getattr(settings_common, setting))
+    # Iterate over each setting defined in the `settings_common` module and add them to the dynamically
+    # imported `settings` module if they don't already exist.
+    for setting in dir(settings_common):
+        if not hasattr(settings, setting):
+            setattr(settings, setting, getattr(settings_common, setting))

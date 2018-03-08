@@ -16,25 +16,18 @@ CURRENT_ENV = get_current_env()
 # Engine
 # -----------------------------------------------------------------------------
 
-TEST_DATABASE = {
-    'NAME': 'lbb_test2',
-    'PASSWORD': 'lbb_test',
-    'USER': 'lbb_test',
+DATABASE = {
+    'NAME': settings.DB_NAME,
+    'PASSWORD': settings.DB_PASSWORD,
+    'USER': settings.DB_USER,
 }
 
-REAL_DATABASE = {
-    'NAME': settings.DB,
-    'PASSWORD': settings.PASSWORD,
-    'USER': settings.USER,
-}
-
-DATABASE = TEST_DATABASE if CURRENT_ENV == ENV_TEST else REAL_DATABASE
-
-def get_db_string(db_params=DATABASE):
+def get_db_string(db_params=None):
     """
     Returns the database URI that should be used for the connection.
     It can be overriden (e.g. in tests) by hardcoding the value of `db_params`.
     """
+    db_params = db_params or DATABASE
     return "mysql://%s:%s@localhost/%s?charset=utf8mb4" % (db_params['USER'], db_params['PASSWORD'], db_params['NAME'])
 
 ENGINE_PARAMS = {

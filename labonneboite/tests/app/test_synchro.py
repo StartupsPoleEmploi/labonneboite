@@ -7,7 +7,9 @@ from sqlalchemy import create_engine
 
 from labonneboite.common.es import Elasticsearch
 from labonneboite.common.database import db_session, get_db_string
-from labonneboite.common.database import ENGINE_PARAMS, REAL_DATABASE
+from labonneboite.common.database import ENGINE_PARAMS
+from labonneboite.conf import settings
+from labonneboite.conf.common import settings_common
 from labonneboite.common.models import Office
 from labonneboite.common import departements as dpt
 from labonneboite.conf import settings
@@ -35,7 +37,13 @@ class SynchronizationIndexAndDatabaseTest(unittest.TestCase):
         # Cache the previous engine used by `db_session`.
         self.cached_engine = db_session.bind
         # Make `db_session` use the "real" database, not the "test" one.
-        real_engine = create_engine(get_db_string(db_params=REAL_DATABASE), **ENGINE_PARAMS)
+        # FIXME this is horrible
+        database = {
+            'NAME': 'labonneboite',
+            'USER': 'labonneboite',
+            'PASSWORD': 'labonneboite',
+        }
+        real_engine = create_engine(get_db_string(db_params=database), **ENGINE_PARAMS)
         db_session.bind = real_engine
         return super(SynchronizationIndexAndDatabaseTest, self).setUp()
 
