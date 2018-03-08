@@ -353,6 +353,9 @@ class ApiCompanyListTest(ApiBaseTest):
                 'rome_codes': rome,
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            data = json.loads(rv.data)
+            self.assertEqual(data['rome_code'], rome)
+            self.assertEqual(data['rome_label'], u'Animation de vente')
 
     def test_ok_if_distance_value_is_zero(self):
         """
@@ -367,9 +370,6 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
-            self.assertEqual(data['rome_code'], rome)
-            self.assertEqual(data['rome_label'], u'Animation de vente')
 
     def test_error_when_latitude_or_longitude_are_empty(self):
         """
