@@ -386,6 +386,21 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
 
+    def test_ok_when_latitude_or_longitude_equal_zero(self):
+        """
+        If latitude and longitude equal, throw No Error
+        """
+        with self.test_request_context:
+            params = self.add_security_params({
+                'latitude': '0',
+                'longitude': '0',
+                'rome_codes': u'D1405',
+                'distance': u'10',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+
     def test_error_when_latitude_or_longitude_are_strings(self):
         """
         If latitude or longitude are empty, throw a Bad Request Error
