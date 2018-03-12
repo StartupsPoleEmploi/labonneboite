@@ -287,6 +287,14 @@ class ApiCompanyListTest(ApiBaseTest):
                 u'Invalid request argument: you must use rome_codes or rome_codes_keyword_search')
 
     def test_rome_codes_search_by_keyword_normal_case(self):
+        self.es.index(index=settings.ES_INDEX, doc_type='ogr', id=1, body={
+            'ogr_code': '10974',
+            'ogr_description': 'Animateur commercial / Animatrice commerciale',
+            'rome_code': 'D1501',
+            'rome_description': 'Animation de vente'
+        })
+        self.es.indices.flush(index=settings.ES_INDEX)
+
         with self.test_request_context:
             rome_codes = u'D1501'
             rome_codes_keyword_search = u'animateur vente'
@@ -316,6 +324,14 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data_direct_search, data_keyword_search)
 
     def test_rome_codes_search_by_keyword_when_accented_unicode_character(self):
+        self.es.index(index=settings.ES_INDEX, doc_type='ogr', id=1, body={
+            'ogr_code': 'OGRCODE',
+            'ogr_description': 'Secrétaire de l\'enfer',
+            'rome_code': 'M1607',
+            'rome_description': 'Secrétariat'
+        })
+        self.es.indices.flush(index=settings.ES_INDEX)
+
         with self.test_request_context:
             rome_codes_keyword_search = u'secrétaire'
             params = self.add_security_params({
