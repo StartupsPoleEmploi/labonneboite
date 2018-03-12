@@ -29,6 +29,8 @@ HOST = 'labonneboite.pole-emploi.fr'
 
 DISTANCE_FILTER_DEFAULT = 10
 
+ENABLE_TIMEIT_TIMERS = True
+
 # Headcount
 HEADCOUNT_INSEE = {
     u'00': u'0 salarié',

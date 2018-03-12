@@ -11,11 +11,9 @@ from flask import request
 
 from labonneboite.common.contact_mode import CONTACT_MODE_DEFAULT
 from labonneboite.common.load_data import load_contact_modes
+from labonneboite.conf import settings
 
 logger = logging.getLogger('main')
-
-# performance profiling timer used on many importer + create_index methods (@timeit decorator)
-ENABLE_TIMEIT_TIMERS = True
 
 
 def timeit(func):
@@ -26,13 +24,9 @@ def timeit(func):
         te = time()
         duration = te-ts
         # anything under 1sec is not worth polluting the logs
-        if ENABLE_TIMEIT_TIMERS and duration >= 1.0:
+        if settings.ENABLE_TIMEIT_TIMERS and duration >= 1.0:
             msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
               (func.__name__, duration, args, kw)
-            # TODO do we really need to print messages in test mode? I'd rather
-            # just disable timeit (ENABLE_TIMEIT_TIMERS==False) in the test
-            # settings to avoid bloating console output.
-            # logger messages are displayed immediately in jenkins console output
             logger.info(msg)
             # print messages are displayed all at once when the job ends in jenkins console output
             print(msg)
@@ -129,4 +123,3 @@ def get_contact_mode_for_rome_and_naf(rome, naf):
         return naf_prefix_to_rome_to_contact_mode[naf_prefix].values()[0]
     except (KeyError, IndexError):
         return CONTACT_MODE_DEFAULT
-
