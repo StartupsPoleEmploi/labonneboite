@@ -4,7 +4,7 @@ import random
 from labonneboite.importer import compute_score
 from labonneboite.importer import settings
 from labonneboite.importer.models.computing import Dpae, RawOffice
-from labonneboite.importer.tests.test_base import DatabaseTest
+from .test_base import DatabaseTest
 
 
 def make_office():

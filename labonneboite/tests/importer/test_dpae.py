@@ -1,8 +1,8 @@
 from labonneboite.importer.jobs import check_dpae
 from labonneboite.importer.jobs import extract_dpae
 from labonneboite.importer.models.computing import Dpae
-from labonneboite.importer.tests.test_base import DatabaseTest
 from labonneboite.importer.util import get_departement_from_zipcode
+from .test_base import DatabaseTest
 
 
 class TestDpae(DatabaseTest):
