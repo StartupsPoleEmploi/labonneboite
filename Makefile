@@ -104,24 +104,24 @@ create_index_from_scratch:
 
 create_index_from_scratch_with_profiling:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_index.py --full -p'
+	cd /srv/lbb/labonneboite && python scripts/create_index.py --full --profile'
 
 create_index_from_scratch_with_profiling_on_staging:
 	ssh deploy@lbbstaging -t 'bash -c "\
         cd && source /home/deploy/config/labonneboite/bin/activate && \
         export LBB_ENV=staging && export LBB_SETTINGS=/home/deploy/config/lbb_staging_settings.py && \
         cd /home/deploy/code/current/labonneboite/labonneboite && \
-        time python scripts/create_index.py --full -p"' && \
+        time python scripts/create_index.py --full --profile"' && \
     scp deploy@lbbstaging:/home/deploy/code/current/labonneboite/labonneboite/scripts/profiling_results/*.kgrind \
     	labonneboite/scripts/profiling_results/staging/
 
 create_index_from_scratch_with_profiling_single_job:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_index.py --partial -p'
+	cd /srv/lbb/labonneboite && python scripts/create_index.py --partial --profile'
 
 create_index_from_scratch_with_profiling_line_by_line:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && kernprof -v -l scripts/create_index.py --partial -p'
+	cd /srv/lbb/labonneboite && kernprof -v -l scripts/create_index.py --partial --profile'
 
 mysql_local_shell:
 	cd vagrant && vagrant ssh --command 'mysql -u root -D labonneboite --host 127.0.0.1'
