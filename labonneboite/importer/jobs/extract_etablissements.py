@@ -8,6 +8,7 @@ from labonneboite.importer.models.computing import ImportTask
 from labonneboite.importer.models.computing import RawOffice
 from labonneboite.common import departements as dpt
 from labonneboite.common import encoding as encoding_util
+from labonneboite.common import siret as siret_util
 from labonneboite.common.database import db_session
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
@@ -79,12 +80,12 @@ class EtablissementExtractJob(Job):
 
     @timeit
     def get_sirets_from_database(self):
-        query = "select siret from %s where siret != ''" % settings.RAW_OFFICE_TABLE
+        query = "select siret from %s" % settings.RAW_OFFICE_TABLE
         logger.info("get offices from database")
         _, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
-        return [row[0] for row in rows]
+        return [row[0] for row in rows if siret_util.is_siret(row[0])]
 
     @timeit
     def update_updatable_offices(self):
@@ -206,7 +207,7 @@ class EtablissementExtractJob(Job):
             header_line = myfile.readline().strip()  # FIXME detect column positions from header
             if "siret" not in header_line:
                 logger.debug(header_line)
-                raise "wrong header line"
+                raise ValueError("wrong header line")
             for line in myfile:
                 count += 1
                 if not count % 100000:
@@ -222,6 +223,11 @@ class EtablissementExtractJob(Job):
                         libellerue, codecommune, codepostal, email, tel, \
                         trancheeffectif_etablissement, _, _, _, \
                         website1, website2 = fields
+
+                    if not siret_util.is_siret(siret):
+                        logger.exception("wrong siret : %s", siret)
+                        raise ValueError
+
                 except ValueError:
                     logger.exception("exception in line %s", line)
                     format_errors += 1

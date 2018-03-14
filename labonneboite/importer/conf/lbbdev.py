@@ -21,7 +21,7 @@ MAXIMUM_INVALID_ROWS = 100
 
 # --- job 5/8 : compute_scores
 SCORE_COEFFICIENT_OF_VARIATION_MAX = 0.40
-RMSE_MAX = 500
+RMSE_MAX = 1500  # On 2017.03.15 departement 52 reached RMSE=1141
 HIGH_SCORE_COMPANIES_DIFF_MAX = 70
 
 # --- job 6/8 : validate_scores

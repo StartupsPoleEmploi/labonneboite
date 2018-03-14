@@ -5,7 +5,7 @@ from labonneboite.importer.tests.test_base import DatabaseTest
 
 def make_raw_office():
     office = RawOffice(
-        siret=1234,
+        siret="12345678901234",
         company_name="SNCF",
         street_number="30",
         street_name="rue Edouard Poisson",
@@ -28,7 +28,7 @@ class TestEtablissements(DatabaseTest):
         make_raw_office()
         etabs = task.get_sirets_from_database()
         self.assertEquals(len(etabs), 1)
-        self.assertEquals(etabs[0], '1234')
+        self.assertEquals(etabs[0], "12345678901234")
 
     def test_get_offices_from_file(self):
         filename = self.get_data_file_path("LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv")
