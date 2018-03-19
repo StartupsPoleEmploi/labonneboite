@@ -10,20 +10,38 @@ from labonneboite.common.models.base import CRUDMixin
 from labonneboite.common.models import PrimitiveOfficeMixin, FinalOfficeMixin
 
 
-class Dpae(CRUDMixin, Base):
+class Hiring(CRUDMixin, Base):
     """
-    DPAE = Déclaration préalable à l'embauche.
     Each entry details a single hiring of a single office.
+
+    Various types of hirings are stored:
+    
+    DPAE : Déclaration préalable à l'embauche. (Pre-hiring declaration) has 3 subtypes:
+    1) CDD  == Contrat à durée déterminée. (Fixed duration contract)
+    2) CDI  == Contrat à durée indéterminée. (Regular contract)
+    3) CTT  == Contrat de travail temporaire. (Seasonal contract) - never stored nor used (yet) in practise
+    
+    Alternance (another category of work contracts) has 2 subtypes:
+    1) APR  == Apprentissage.
+    2) CP   == Contrat professionnel.
     """
-    __tablename__ = importer_settings.DPAE_TABLE
+    __tablename__ = importer_settings.HIRING_TABLE
     __table_args__ = (
         Index('dept_i', 'departement'),
     )
 
+    CONTRACT_TYPE_CDD = 1
+    CONTRACT_TYPE_CDI = 2
+    CONTRACT_TYPE_CTT = 3
+    CONTRACT_TYPE_APR = 11
+    CONTRACT_TYPE_CP = 12
+    CONTRACT_TYPES_DPAE = [CONTRACT_TYPE_CDD, CONTRACT_TYPE_CDI, CONTRACT_TYPE_CTT]
+    CONTRACT_TYPES_ALTERNANCE = [CONTRACT_TYPE_APR, CONTRACT_TYPE_CP]
+    CONTRACT_TYPES_ALL = CONTRACT_TYPES_DPAE + CONTRACT_TYPES_ALTERNANCE
+
     _id = Column('id', BigInteger, primary_key=True)
     siret = Column(String(191))
     hiring_date = Column(DateTime, default=datetime.datetime.utcnow)
-    zipcode = Column(String(8))
     contract_type = Column(Integer)
     departement = Column(String(8))
     contract_duration = Column(Integer)
@@ -120,10 +138,10 @@ class DpaeStatistics(CRUDMixin, Base):
     most_recent_data_date = Column(DateTime, default=datetime.datetime.utcnow)
 
     @classmethod
-    def get_most_recent_data_date(cls):
+    def get_last_historical_data_date(cls):
         try:
             return cls.query.order_by(cls.most_recent_data_date.desc()).first().most_recent_data_date
         except AttributeError:
             # if there was no import of dpae thus far, return the date for which
             # we don't want to import dpae before that date
-            return importer_settings.MOST_RECENT_DPAE_DATE
+            return importer_settings.OLDEST_POSSIBLE_DPAE_DATE

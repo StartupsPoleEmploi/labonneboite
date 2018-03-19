@@ -17,7 +17,6 @@ from labonneboite.importer import settings
 from labonneboite.importer import compute_score
 from labonneboite.importer import util as import_util
 from labonneboite.common.util import timeit
-from labonneboite.importer.models.computing import DpaeStatistics
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
@@ -33,17 +32,20 @@ COMPUTE_SCORES_DEBUG_DEPARTEMENTS = ["90"]
 DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING = False
 
 
-def abortable_worker(func, etab_table, dpae_table, departement, dpae_date):
+def abortable_worker(func, departement):
     p = ThreadPool(1)
-    res = p.apply_async(func, args=(etab_table, dpae_table, departement, dpae_date))
+    # note: it is very important to use `(departement,)` which is a 1-tuple,
+    # since `(departement)` is actually not a tuple, and apply_async
+    # will parse the departement as two values e.g. 57 becomes (5, 7) o_O
+    res = p.apply_async(func, args=(departement,))
     result = res.get()
     logger.info("got result for departement %s", departement)
     return result
 
 
 @timeit
-def compute(etab, dpae, departement, dpae_date):
-    result = compute_score.run(etab, dpae, departement, dpae_date)
+def compute(departement):
+    result = compute_score.run(departement)
     logger.info("finished compute_score.run (%s)", departement)
     return result
 
@@ -60,7 +62,6 @@ class ScoreComputingJob(Job):
         # maxtasksperchild=1 ensures memory is freed up after every departement computation.
         pool = mp.Pool(processes=mp.cpu_count(), maxtasksperchild=1)
         compute_results = {}
-        most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
 
         departements = dpt.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST
 
@@ -71,8 +72,7 @@ class ScoreComputingJob(Job):
         if DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING:  # single thread computing
             logger.info("starting single thread computing pool...")
             for departement in departements:
-                compute_result = compute(settings.RAW_OFFICE_TABLE,
-                    settings.DPAE_TABLE, departement, most_recent_data_date)
+                compute_result = compute(departement)
                 compute_results[departement] = compute_result
         else:  # parallel computing
             logger.info("starting parallel computing pool (%s jobs in parallel)...", mp.cpu_count())
@@ -81,7 +81,10 @@ class ScoreComputingJob(Job):
                 # apply_async returns immediately
                 compute_results[departement] = pool.apply_async(
                     abortable_func,
-                    args=(settings.RAW_OFFICE_TABLE, settings.DPAE_TABLE, departement, most_recent_data_date)
+                    # note: it is very important to use `(departement,)` which is a 1-tuple,
+                    # since `(departement)` is actually not a tuple, and apply_async
+                    # will parse the departement as two values e.g. 57 becomes (5, 7) o_O
+                    args=(departement,),
                 )
 
             logger.info("going to close process pool...")
@@ -105,9 +108,9 @@ class ScoreComputingJob(Job):
                 raise Exception('At least one departement failed. See above for details.')
                     
         for departement, compute_result in compute_results.iteritems():
-            if not bool(compute_result):
+            if not compute_result:
                 logger.info("departement with error : %s", departement)
-            results.append([departement, bool(compute_result)])
+            results.append([departement, compute_result])
 
         logger.info("compute_scores FINISHED")
         return results
@@ -136,10 +139,10 @@ def run_main():
         sys.exit(-1)
 
     import_util.reduce_scores_for_backoffice(departements)
+    import_util.reduce_scores_for_main_db(departements)
     if COMPUTE_SCORES_DEBUG_MODE:
         logger.warning("debug mode enabled, failing on purpose for debugging of temporary tables")
         sys.exit(-1)
-    import_util.reduce_scores_for_main_db(departements)
     import_util.clean_temporary_tables()
     logger.info("compute_scores task: FINISHED")
 

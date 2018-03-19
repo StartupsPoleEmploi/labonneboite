@@ -27,6 +27,7 @@ def timeit(func):
         if settings.ENABLE_TIMEIT_TIMERS and duration >= 1.0:
             msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
               (func.__name__, duration, args, kw)
+            msg = msg[:200]  # cut if msg too long
             logger.info(msg)
             # print messages are displayed all at once when the job ends in jenkins console output
             print(msg)

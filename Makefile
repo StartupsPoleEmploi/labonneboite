@@ -132,13 +132,16 @@ start_locust_against_localhost:
 
 test_unit: clean_pyc test_app test_web test_scripts test_importer
 
-test_all: test_unit test_selenium
+test_all: test_unit test_selenium test_integration run_importer_jobs
 
 test_app:
 	LBB_ENV=test nosetests -s labonneboite/tests/app
 
 test_importer:
 	LBB_ENV=test nosetests -s labonneboite/tests/importer
+
+# convenient shortcut when working on the importer
+test_importer_all: test_importer run_importer_jobs
 
 test_api:
 	LBB_ENV=test nosetests -s labonneboite/tests/web/api
@@ -183,12 +186,7 @@ alembic_migrate:
 alembic_rollback:
 	LBB_ENV=development alembic downgrade -1
 
-# FIXME something is still wrong with this one
-# upgrade and downgrade methods should be swapped in resulting migration
-alembic_autogenerate_migration_for_all_existing_tables:
-	LBB_ENV=development alembic revision --autogenerate
-
-alembic_generate_single_migration:
+alembic_generate_migration:
 	@echo "Run for example:"
 	@echo 
 	@echo "    $$ alembic revision -m 'create account table'"
@@ -202,6 +200,7 @@ run_importer_jobs:
 	make run_importer_job_02_extract_etablissements && \
 	make run_importer_job_03_check_dpae && \
 	make run_importer_job_04_extract_dpae && \
+	make run_importer_job_04hack_create_fake_alternance_hirings && \
 	make run_importer_job_05_compute_scores && \
 	make run_importer_job_06_validate_scores && \
 	make run_importer_job_07_geocode && \
@@ -211,6 +210,7 @@ run_importer_jobs:
 run_importer_job_00_prepare_all:  # FIXME DNRY table names
 	export LBB_ENV=development && \
 		cd labonneboite/importer && \
+		echo delete from hirings                   | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from import_tasks              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from etablissements_raw        | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from etablissements_backoffice | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
@@ -233,6 +233,11 @@ run_importer_job_03_check_dpae:
 
 run_importer_job_04_extract_dpae:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/extract_dpae.py
+
+run_importer_job_04hack_create_fake_alternance_hirings:
+	export LBB_ENV=development && \
+		cd labonneboite/importer && \
+		cat scripts/create_fake_alternance_hirings.sql | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307
 
 run_importer_job_05_compute_scores:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/compute_scores.py

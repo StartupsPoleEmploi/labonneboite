@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import and_
 
-from labonneboite.importer.models.computing import Dpae
+from labonneboite.importer.models.computing import Hiring
 from labonneboite.common.models import Office
 
 from .test_base import DatabaseTest
@@ -30,8 +30,8 @@ class ScoringTest(DatabaseTest):
             last_year = datetime.now() - timedelta(days=FIFTEEN_MONTHS)
 
             for office in offices:
-                dpae = Dpae.query.filter(and_(Dpae.siret == office.siret, Dpae.hiring_date > last_year)).all()
-                dpae_all = Dpae.query.filter(Dpae.siret == office.siret).all()
+                dpae = Hiring.query.filter(and_(Hiring.siret == office.siret, Hiring.hiring_date > last_year)).all()
+                dpae_all = Hiring.query.filter(Hiring.siret == office.siret).all()
                 try:
                     self.assertTrue(len(dpae) > 0)
                 except:

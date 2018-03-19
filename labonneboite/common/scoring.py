@@ -53,19 +53,23 @@ def _get_score_from_hirings(hirings, as_float=False):
     if hirings <= settings.SCORE_50_HIRINGS:
         # this way about 500K offices will be selected to be deployed in production
         # and all others (score below 50) will be automatically filtered out
-        score = 0 + 50 * (hirings - 0.0) / (settings.SCORE_50_HIRINGS - 0.0)
+        score = 0.0 + 50 * (hirings - 0.0) / (settings.SCORE_50_HIRINGS - 0.0)
     elif hirings >= settings.SCORE_100_HIRINGS:
-        score = 100
+        score = 100.0
     elif hirings <= settings.SCORE_60_HIRINGS:
-        score = (50 + 10 * (hirings - settings.SCORE_50_HIRINGS) /
+        score = (50.0 + 10 * (hirings - settings.SCORE_50_HIRINGS) /
             (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS))
     elif hirings <= settings.SCORE_80_HIRINGS:
-        score = (60 + 20 * (hirings - settings.SCORE_60_HIRINGS) /
+        score = (60.0 + 20 * (hirings - settings.SCORE_60_HIRINGS) /
             (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS))
     elif hirings <= settings.SCORE_100_HIRINGS:
-        score = 80 + 20.0/math.log10(settings.SCORE_100_HIRINGS) * math.log10(1 + hirings - settings.SCORE_80_HIRINGS)
+        score = 80.0 + 20.0/math.log10(settings.SCORE_100_HIRINGS) * math.log10(1 + hirings - settings.SCORE_80_HIRINGS)
     else:
         raise Exception("unexpected value of hirings : %s" % hirings)
+
+    # score should always be positive
+    score = max(0.0, score)
+
     if as_float:
         return score
     return int(round(score))

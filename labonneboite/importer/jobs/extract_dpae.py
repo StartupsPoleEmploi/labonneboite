@@ -17,7 +17,7 @@ from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
 from labonneboite.common.util import timeit
 from labonneboite.importer.util import parse_dpae_line, DepartementException, InvalidRowException
-from labonneboite.importer.models.computing import DpaeStatistics, ImportTask
+from labonneboite.importer.models.computing import DpaeStatistics, ImportTask, Hiring
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
@@ -25,11 +25,11 @@ from labonneboite.importer.jobs.common import logger
 class DpaeExtractJob(Job):
     file_type = "dpae"
     import_type = ImportTask.DPAE
-    table_name = settings.DPAE_TABLE
+    table_name = settings.HIRING_TABLE
 
     def __init__(self, filename):
         self.input_filename = filename
-        self.most_recent_data_date = None
+        self.last_historical_data_date_in_file = None
         self.zipcode_errors = 0
         self.invalid_row_errors = 0
 
@@ -43,8 +43,8 @@ class DpaeExtractJob(Job):
         date_match = re.match(date_pattern, self.input_filename)
         if date_match:
             date_part = date_match.groups()[-1]
-            self.most_recent_data_date = datetime.strptime(date_part, "%Y%m%d")
-            logger.debug("identified most_recent_data_date=%s", self.most_recent_data_date)
+            self.last_historical_data_date_in_file = datetime.strptime(date_part, "%Y%m%d")
+            logger.debug("identified last_historical_data_date_in_file=%s", self.last_historical_data_date_in_file)
         else:
             raise Exception("couldn't find a date pattern in filename. filename should be \
                 LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv or similar")
@@ -56,7 +56,6 @@ class DpaeExtractJob(Job):
             INSERT into %s(
                 siret,
                 hiring_date,
-                zipcode,
                 contract_type,
                 departement,
                 contract_duration,
@@ -65,15 +64,15 @@ class DpaeExtractJob(Job):
                 handicap_label,
                 duree_pec
                 )
-            values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
-        """ % settings.DPAE_TABLE
+            values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
+        """ % settings.HIRING_TABLE
         imported_dpae = 0
         imported_dpae_distribution = {}
         not_imported_dpae = 0
-        initial_most_recent_data_date = DpaeStatistics.get_most_recent_data_date()
+        last_historical_data_date_in_db = DpaeStatistics.get_last_historical_data_date()
 
         logger.info("will now extract all dpae with hiring_date between %s and %s",
-                    initial_most_recent_data_date, self.most_recent_data_date)
+                    last_historical_data_date_in_db, self.last_historical_data_date_in_file)
 
         with import_util.get_reader(self.input_filename) as myfile:
             con, cur = import_util.create_cursor()
@@ -99,7 +98,7 @@ class DpaeExtractJob(Job):
                         statements = []
                         raise
                 try:
-                    siret, hiring_date, zipcode, contract_type, departement, contract_duration, \
+                    siret, hiring_date, _, contract_type, departement, contract_duration, \
                     iiann, tranche_age, handicap_label, duree_pec = parse_dpae_line(line)
                 except (ValueError, DepartementException):
                     self.zipcode_errors += 1
@@ -110,19 +109,20 @@ class DpaeExtractJob(Job):
                     continue
 
                 dpae_should_be_imported = (
-                    hiring_date > initial_most_recent_data_date 
-                    and hiring_date <= self.most_recent_data_date
-                    # in DPAE we only keep contract_type == 2 (CDI)
-                    # and contract_type == 1 (CDD which last at least one month)
-                    # we ignore contract_type == 3 (Seasonal contracts)
-                    and (contract_type == 2 or (contract_type == 1 and contract_duration > 31))
+                    hiring_date > last_historical_data_date_in_db 
+                    and hiring_date <= self.last_historical_data_date_in_file
+                    # For DPAE contracts we only keep all CDI, only long enough CDD (at least 31 days)
+                    # and we ignore CTT.
+                    and (
+                        contract_type == Hiring.CONTRACT_TYPE_CDI
+                        or (contract_type == Hiring.CONTRACT_TYPE_CDD and contract_duration > 31)
+                    )
                 )
 
                 if dpae_should_be_imported:
                     statement = (
                         siret,
                         hiring_date,
-                        zipcode,
                         contract_type,
                         departement,
                         contract_duration,
@@ -161,7 +161,10 @@ class DpaeExtractJob(Job):
             raise IOError('too many zipcode errors')
         if self.invalid_row_errors > settings.MAXIMUM_INVALID_ROWS:
             raise IOError('too many invalid_row errors')
-        statistics = DpaeStatistics(last_import=datetime.now(), most_recent_data_date=self.most_recent_data_date)
+        statistics = DpaeStatistics(
+            last_import=datetime.now(),
+            most_recent_data_date=self.last_historical_data_date_in_file,
+        )
         statistics.save()
         con.commit()
         logger.info("finished importing dpae...")
