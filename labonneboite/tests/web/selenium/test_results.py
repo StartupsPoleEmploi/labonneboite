@@ -25,6 +25,12 @@ class TestResults(LbbSeleniumTestCase):
         toggle_details = self.driver.find_elements_by_class_name('js-result-toggle-details')[0]
         time.sleep(0.5)
 
+        # Hide Memo tooltip (show only the first time)
+        memo_button_close_button = self.driver.find_elements_by_class_name('introjs-donebutton')
+        if memo_button_close_button:
+            memo_button_close_button[0].click()
+            time.sleep(0.5)
+
         # Display company details.
         toggle_details.click()
         time.sleep(0.5)
