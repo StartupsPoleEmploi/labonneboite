@@ -5,11 +5,12 @@ import unittest
 
 from sqlalchemy import create_engine
 
-from labonneboite.common.pools import Elasticsearch
+from labonneboite.common.es import Elasticsearch
 from labonneboite.common.database import db_session, get_db_string
 from labonneboite.common.database import ENGINE_PARAMS, REAL_DATABASE
 from labonneboite.common.models import Office
 from labonneboite.common import departements as dpt
+from labonneboite.conf import settings
 
 
 class SynchronizationIndexAndDatabaseTest(unittest.TestCase):
@@ -62,7 +63,7 @@ class SynchronizationIndexAndDatabaseTest(unittest.TestCase):
         es = Elasticsearch()
         scores = {office.siret: office.score for office in offices}
         body = {"query": {"filtered": {"filter": {"terms": {"siret": scores.keys()}}}}}
-        res = es.search(index="labonneboite", doc_type="office", body=body)
+        res = es.search(index=settings.ES_INDEX, doc_type="office", body=body)
         for office in res['hits']['hits']:
             index_score = office["_source"]["score"]
             siret = office["_source"]["siret"]

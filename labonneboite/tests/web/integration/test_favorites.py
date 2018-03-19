@@ -1,10 +1,9 @@
 # coding: utf8
 
-import time
-
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
 from labonneboite.common.models import UserFavoriteOffice
+from labonneboite.conf import settings
 from labonneboite.tests.test_base import DatabaseTest
 
 
@@ -37,43 +36,6 @@ class FavoriteBaseTest(DatabaseTest):
 
         # Create a user.
         self.user = User.create(email=u'j@test.com', gender=u'male', first_name=u'John', last_name=u'Doe')
-
-        # Delete index.
-        self.es.indices.delete(index=self.ES_TEST_INDEX)
-
-        # Create new index.
-        request_body = {
-            "mappings": {
-                "office": {
-                    "properties": {
-                        "naf": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "siret": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "name": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "score": {
-                            "type": "integer",
-                            "index": "not_analyzed"
-                        },
-                        "headcount": {
-                            "type": "integer",
-                            "index": "not_analyzed"
-                        },
-                        "locations": {
-                            "type": "geo_point",
-                        }
-                    }
-                }
-            }
-        }
-        self.es.indices.create(index=self.ES_TEST_INDEX, body=request_body)
 
         # Insert test data into Elasticsearch.
         docs = [
@@ -111,10 +73,10 @@ class FavoriteBaseTest(DatabaseTest):
             },
         ]
         for i, doc in enumerate(docs, start=1):
-            self.es.index(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
+            self.es.index(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
 
-        # Sleep required by ES to register new documents, flaky test here otherwise.
-        time.sleep(1)
+        # Required by ES to register new documents, flaky test here otherwise.
+        self.es.indices.flush(index=settings.ES_INDEX)
 
         # Create related Office instances into MariaDB/MySQL.
         for doc in docs:

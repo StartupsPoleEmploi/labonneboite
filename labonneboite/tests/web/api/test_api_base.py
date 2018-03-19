@@ -1,14 +1,11 @@
 # coding: utf8
 
-import time
-
 from labonneboite.common.models import Office
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.api import util
 from labonneboite.conf import settings
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import scoring as scoring_util
-from labonneboite.scripts.create_index import mapping_office
 
 
 class ApiBaseTest(DatabaseTest):
@@ -153,20 +150,6 @@ class ApiBaseTest(DatabaseTest):
 
     def setUp(self, *args, **kwargs):
         super(ApiBaseTest, self).setUp(*args, **kwargs)
-
-        settings.ES_INDEX = self.ES_TEST_INDEX  # Override the setting value.
-
-        # Delete index.
-        self.es.indices.delete(index=self.ES_TEST_INDEX, params={'ignore': [404]})
-
-        # Create new index.
-        request_body = {
-            "mappings": {
-                "office": mapping_office
-            }
-        }
-
-        self.es.indices.create(index=self.ES_TEST_INDEX, body=request_body)
 
         # Insert test data into Elasticsearch.
         docs = [
@@ -449,10 +432,10 @@ class ApiBaseTest(DatabaseTest):
             if scores_by_rome:
                 doc['scores_by_rome'] = scores_by_rome
 
-            self.es.index(index=self.ES_TEST_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
+            self.es.index(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
 
         # need for ES to register our new documents, flaky test here otherwise
-        time.sleep(1)
+        self.es.indices.flush(index=settings.ES_INDEX)
 
         # Create related Office instances into MariaDB/MySQL.
         for doc in docs:

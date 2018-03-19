@@ -17,7 +17,7 @@ from labonneboite.common import sorting
 from labonneboite.common import autocomplete
 from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.models import Office
-from labonneboite.common.pools import Elasticsearch
+from labonneboite.common.es import Elasticsearch
 from labonneboite.conf import settings
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
 
@@ -814,10 +814,7 @@ def build_location_suggestions(term):
         },
         "size": autocomplete.MAX_LOCATIONS,
     }
-    # FIXME ugly : in tests we use dev ES index instead of test ES index
-    # we should use index=settings.ES_INDEX instead of index='labonneboite'
-    # however we cannot yet since location+ogr data is not yet in ES test index data
-    res = es.search(index='labonneboite', doc_type="location", body=body)
+    res = es.search(index=settings.ES_INDEX, doc_type="location", body=body)
 
     suggestions = []
     first_score = None
@@ -886,10 +883,7 @@ def build_job_label_suggestions(term, size=autocomplete.MAX_JOBS):
         "size": 0,
     }
 
-    # FIXME ugly : in tests we use dev ES index instead of test ES index
-    # we should use index=settings.ES_INDEX instead of index='labonneboite'
-    # however we cannot yet since location+ogr data is not yet in ES test index data
-    res = es.search(index='labonneboite', doc_type="ogr", body=body)
+    res = es.search(index=settings.ES_INDEX, doc_type="ogr", body=body)
 
     suggestions = []
 

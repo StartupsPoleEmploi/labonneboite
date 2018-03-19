@@ -1,10 +1,17 @@
 # coding: utf8
-import unittest
-
 from labonneboite.common import search
+from labonneboite.conf import settings
+from labonneboite.scripts import create_index
+from labonneboite.tests.test_base import DatabaseTest
 
 
-class SuggestLocationTest(unittest.TestCase):
+class SuggestLocationTest(DatabaseTest):
+
+    def setUp(self):
+        super(SuggestLocationTest, self).setUp()
+
+        create_index.create_locations()
+        self.es.indices.flush(index=settings.ES_INDEX)
 
     def test_suggest_locations_paris_1_findable(self):
         term = u"paris 1er"

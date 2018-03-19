@@ -1,5 +1,6 @@
 # coding: utf8
 import argparse
+import contextlib
 import logging
 import os
 
@@ -18,6 +19,7 @@ from labonneboite.common import departements as dpt
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
+from labonneboite.common import es as lbb_es
 from labonneboite.common.search import fetch_companies
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
@@ -32,13 +34,68 @@ logger = logging.getLogger(__name__)
 
 VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main', 'elasticsearch.trace']
 
+
+class Profiling(object):
+    ACTIVATED = False
+
+
+@contextlib.contextmanager
+def switch_es_index():
+    """
+    Context manager that will ensure that some code will operate on a new ES
+    index. This new index will then be associated to the reference alias and
+    the old index(es) will be dropped.
+
+    Usage:
+
+        with switch_es_index():
+            # Here, all code will run on the new index
+            run_some_code()
+
+        # Here, the old indexes no longer exist and the reference alias points
+        # to the new index
+    """
+    es = Elasticsearch()
+
+    # Find current index names (there may be one, zero or more)
+    alias_name = settings.ES_INDEX
+    old_index_names = es.indices.get_alias(settings.ES_INDEX).keys()
+
+    # Activate new index
+    new_index_name = lbb_es.get_new_index_name()
+    settings.ES_INDEX = new_index_name
+
+    # Create new index
+    lbb_es.create_index(new_index_name)
+
+    try:
+        yield
+    except:
+        # Delete newly created index
+        lbb_es.drop_index(new_index_name)
+        raise
+    finally:
+        # Set back alias name
+        settings.ES_INDEX = alias_name
+
+    # Switch alias
+    # TODO this should be done in one shot with a function in es.py module
+    lbb_es.add_alias_to_index(new_index_name)
+    for old_index_name in old_index_names:
+        es.indices.delete_alias(index=old_index_name, name=alias_name)
+
+    # Delete old index
+    for old_index_name in old_index_names:
+        lbb_es.drop_index(old_index_name)
+
+
 def get_verbose_loggers():
     return [logging.getLogger(logger_name) for logger_name in VERBOSE_LOGGER_NAMES]
 
 def disable_verbose_loggers():
     """
     We disable some loggers at specific points of this script in order to have a clean output
-    (especially of the sanity_check_rome_codes part) and avoit it being polluted by useless
+    (especially of the sanity_check_rome_codes part) and avoid it being polluted by useless
     unwanted logs detailing every MysQL and ES request.
     """
     for logger in get_verbose_loggers():
@@ -50,10 +107,6 @@ def disable_verbose_loggers():
 def enable_verbose_loggers():
     for logger in get_verbose_loggers():
         logger.disabled = False
-
-# FIXME shouldn't create_index script also be used to populate test ES index as well?
-# we should use settings.ES_INDEX here instead
-INDEX_NAME = 'labonneboite'
 
 OFFICE_TYPE = 'office'
 OGR_TYPE = 'ogr'
@@ -98,187 +151,6 @@ class StatTracker:
 st = StatTracker()
 
 
-filters = {
-    "stop_francais": {
-        "type": "stop",
-        "stopwords": ["_french_"],
-    },
-    "fr_stemmer": {
-        "type": "stemmer",
-        "name": "light_french",
-    },
-    "elision": {
-        "type": "elision",
-        "articles": ["c", "l", "m", "t", "qu", "n", "s", "j", "d"],
-    },
-    "ngram_filter": {
-        "type": "ngram",
-        "min_gram": 2,
-        "max_gram": 20,
-    },
-    "edge_ngram_filter": {
-        "type": "edge_ngram",
-        "min_gram": 1,
-        "max_gram": 20,
-    },
-}
-
-analyzers = {
-    "stemmed": {
-        "type": "custom",
-        "tokenizer": "standard",
-        "filter": [
-            "asciifolding",
-            "lowercase",
-            "stop_francais",
-            "elision",
-            "fr_stemmer",
-        ],
-    },
-    "autocomplete": {
-        "type": "custom",
-        "tokenizer": "standard",
-        "filter": [
-            "lowercase",
-            "edge_ngram_filter",
-        ],
-    },
-    "ngram_analyzer": {
-        "type": "custom",
-        "tokenizer": "standard",
-        "filter": [
-            "asciifolding",
-            "lowercase",
-            "stop_francais",
-            "elision",
-            "ngram_filter",
-        ],
-    },
-}
-
-mapping_ogr = {
-    # https://www.elastic.co/guide/en/elasticsearch/reference/1.7/mapping-all-field.html
-    "_all": {
-        "type": "string",
-        "index_analyzer": "ngram_analyzer",
-        "search_analyzer": "standard",
-    },
-    "properties": {
-        "ogr_code": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "ogr_description": {
-            "type": "string",
-            "include_in_all": True,
-            "term_vector": "yes",
-            "index_analyzer": "ngram_analyzer",
-            "search_analyzer": "standard",
-        },
-        "rome_code": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "rome_description": {
-            "type": "string",
-            "include_in_all": True,
-            "term_vector": "yes",
-            "index_analyzer": "ngram_analyzer",
-            "search_analyzer": "standard",
-        },
-    },
-}
-
-mapping_location = {
-    "properties": {
-        "city_name": {
-            "type": "multi_field",
-            "fields": {
-                "raw": {
-                    "type": "string",
-                    "index": "not_analyzed",
-                },
-                "autocomplete" : {
-                    "type": "string",
-                    "analyzer": "autocomplete",
-                },
-                "stemmed": {
-                    "type": "string",
-                    "analyzer": "stemmed",
-                    "store": "yes",
-                    "term_vector": "yes",
-                },
-            },
-        },
-        "coordinates": {
-            "type": "geo_point",
-        },
-        "population": {
-            "type": "integer",
-        },
-        "slug": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "zipcode": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-    },
-}
-
-mapping_office = {
-    "properties": {
-        "naf": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "siret": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "name": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "email": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "tel": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "website": {
-            "type": "string",
-            "index": "not_analyzed",
-        },
-        "score": {
-            "type": "integer",
-            "index": "not_analyzed",
-        },
-        "scores_by_rome": {
-            "type": "object",
-            "index": "not_analyzed",
-        },
-        "boosted_romes": {
-            "type": "object",
-            "index": "not_analyzed",
-        },
-        "headcount": {
-            "type": "integer",
-            "index": "not_analyzed",
-        },
-        "department": {
-            "type": "string",
-            "index": "not_analyzed"
-        },
-        "locations": {
-            "type": "geo_point",
-        },
-    },
-}
-
 # Below was an attempt at fixing the following issue:
 # ElasticsearchException[Unable to find a field mapper for field [scores_by_rome.A0000]]
 # which happens when a rome is orphaned (no company has a score for this rome).
@@ -291,7 +163,7 @@ mapping_office = {
 # which is tricky to investigate.
 #
 # For full information about this issue see common/search.py/get_companies_from_es_and_db.
-# 
+#
 # for rome in mapping_util.MANUAL_ROME_NAF_MAPPING:
 #     mapping_office["properties"]["scores_by_rome.%s" % rome] = {
 #         "type": "integer",
@@ -302,29 +174,6 @@ mapping_office = {
 #         "index": "not_analyzed",
 #     }
 
-request_body = {
-    "settings": {
-        "index": {
-            "analysis": {
-                "filter": filters,
-                "analyzer": analyzers,
-            },
-        },
-    },
-    "mappings":  {
-        "ogr": mapping_ogr,
-        "location": mapping_location,
-        "office": mapping_office,
-    },
-}
-
-
-@timeit
-def drop_and_create_index():
-    logger.info("drop and create index...")
-    es = Elasticsearch(timeout=ES_TIMEOUT)
-    es.indices.delete(index=INDEX_NAME, params={'ignore': [400, 404]})
-    es.indices.create(index=INDEX_NAME, body=request_body)
 
 
 def bulk_actions(actions):
@@ -358,7 +207,7 @@ def create_job_codes():
             }
             action = {
                 '_op_type': 'index',
-                '_index': INDEX_NAME,
+                '_index': settings.ES_INDEX,
                 '_type': OGR_TYPE,
                 '_source': doc
             }
@@ -382,7 +231,7 @@ def create_locations():
         }
         action = {
             '_op_type': 'index',
-            '_index': INDEX_NAME,
+            '_index': settings.ES_INDEX,
             '_type': LOCATION_TYPE,
             '_source': doc
         }
@@ -501,12 +350,12 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
 
 
 
-def create_offices(enable_profiling=False, disable_parallel_computing=False):
+def create_offices(disable_parallel_computing=False):
     """
     Populate the `office` type in ElasticSearch.
     Run it as a parallel computation based on departements.
     """
-    if enable_profiling:
+    if Profiling.ACTIVATED:
         func = profile_create_offices_for_departement
     else:
         func = create_offices_for_departement
@@ -548,7 +397,7 @@ def create_offices_for_departement(departement):
             st.increment_indexed_office_count()
             actions.append({
                 '_op_type': 'index',
-                '_index': INDEX_NAME,
+                '_index': settings.ES_INDEX,
                 '_type': OFFICE_TYPE,
                 '_id': office.siret,
                 '_source': es_doc,
@@ -618,7 +467,7 @@ def add_offices():
 
             # Create the new office in ES.
             doc = get_office_as_es_doc(office_to_add)
-            es.create(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office_to_add.siret, body=doc)
+            es.create(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=office_to_add.siret, body=doc)
 
 
 @timeit
@@ -635,7 +484,7 @@ def remove_offices():
     for siret in offices_to_remove:
         # Apply changes in ElasticSearch.
         try:
-            es.delete(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret)
+            es.delete(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=siret)
         except TransportError as e:
             if e.status_code != 404:
                 raise
@@ -672,7 +521,7 @@ def update_offices():
                 # Apply changes in ElasticSearch.
                 body = {'doc':
                     {'email': office.email, 'phone': office.tel, 'website': office.website,
-                    'flag_alternance': 1 if office.flag_alternance else 0 }
+                    'flag_alternance': 1 if office.flag_alternance else 0}
                 }
 
                 scores_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)
@@ -692,9 +541,9 @@ def update_offices():
                 # Unfortunately these cannot easily be bulked :-(
                 # The reason is there is no way to tell bulk to ignore missing documents (404)
                 # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
-                es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret, body=delete_body,
+                es.update(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=siret, body=delete_body,
                         params={'ignore': 404})
-                es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=siret, body=body,
+                es.update(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=siret, body=body,
                         params={'ignore': 404})
 
                 # Delete the current PDF thus it will be regenerated at the next download attempt.
@@ -724,7 +573,7 @@ def update_offices_geolocations():
             office.save()
             # Apply changes in ElasticSearch.
             body = {'doc': {'locations': locations}}
-            es.update(index=INDEX_NAME, doc_type=OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
+            es.update(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
 
 
 @timeit
@@ -809,20 +658,17 @@ def display_performance_stats(departement):
     )
 
 
-def update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing):
-    if single_job and not drop_indexes:
-        raise Exception("This combination does not make sense.")
-
-    if single_job:
-        drop_and_create_index()
-        create_offices_for_departement('57')
+def update_data(create_full, create_partial, disable_parallel_computing):
+    if create_partial:
+        with switch_es_index():
+            create_offices_for_departement('57')
         return
 
-    if drop_indexes:
-        drop_and_create_index()
-        create_offices(enable_profiling, disable_parallel_computing)
-        create_job_codes()
-        create_locations()
+    if create_full:
+        with switch_es_index():
+            create_offices(disable_parallel_computing)
+            create_job_codes()
+            create_locations()
 
     # Upon requests received from employers we can add, remove or update offices.
     # This permits us to complete or overload the data provided by the importer.
@@ -831,16 +677,16 @@ def update_data(drop_indexes, enable_profiling, single_job, disable_parallel_com
     update_offices()
     update_offices_geolocations()
 
-    if drop_indexes:
+    if create_full:
         sanity_check_rome_codes()
 
 
-def update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job, disable_parallel_computing=False):
-    if enable_profiling:
+def update_data_profiling_wrapper(create_full, create_partial, disable_parallel_computing=False):
+    if Profiling.ACTIVATED:
         logger.info("STARTED run with profiling")
         profiler = Profile()
         profiler.runctx(
-            "update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)",
+            "update_data(create_full, create_partial, disable_parallel_computing)",
             locals(),
             globals()
         )
@@ -850,26 +696,29 @@ def update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job, di
         logger.info("COMPLETED run with profiling: exported profiling result as %s", filename)
     else:
         logger.info("STARTED run without profiling")
-        update_data(drop_indexes, enable_profiling, single_job, disable_parallel_computing)
+        update_data(create_full, create_partial, disable_parallel_computing)
         logger.info("COMPLETED run without profiling")
 
 
 def run():
     parser = argparse.ArgumentParser(
         description="Update elasticsearch data: offices, ogr_codes and locations.")
-    parser.add_argument('-d', '--drop-indexes', dest='drop_indexes',
-        help="Drop and recreate index from scratch.")
-    parser.add_argument('-p', '--profile', dest='profile',
+    parser.add_argument('-f', '--full', action='store_true',
+        help="Create full index from scratch.")
+    parser.add_argument('-a', '--partial', action='store_true',
+        help=("Disable parallel computing and run only a single office indexing"
+              " job (departement 57) instead. This is required in order"
+              " to do a profiling from inside a job."))
+    parser.add_argument('-p', '--profile', action='store_true',
         help="Enable code performance profiling for later visualization with Q/KCacheGrind.")
-    parser.add_argument('-s', '--single-job', dest='single_job',
-        help="Disable parallel computing and run a single office indexing job (departement 57) and nothing else.")
     args = parser.parse_args()
 
-    drop_indexes = (args.drop_indexes is not None)
-    enable_profiling = (args.profile is not None)
-    single_job = (args.single_job is not None)
+    if args.full and args.partial:
+        raise ValueError('Cannot create both partial and full index at the same time')
+    if args.profile:
+        Profiling.ACTIVATED = True
 
-    update_data_profiling_wrapper(drop_indexes, enable_profiling, single_job)
+    update_data_profiling_wrapper(args.full, args.partial)
 
 
 if __name__ == '__main__':
