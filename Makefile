@@ -7,10 +7,14 @@ LOCUST_HOST = http://localhost:5000
 services:
 	cd docker/ && docker-compose up -d
 
-database: services
+database: database-dev database-test
+
+database-dev: services
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS labonneboite DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
-	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'GRANT ALL ON labonneboite.* TO "labonneboite"@"%" IDENTIFIED BY "labonneboite";'
+
+database-test: services
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'GRANT ALL ON lbb_test.* TO "lbb_test"@"%" IDENTIFIED BY "";'
 
 data: database
@@ -18,8 +22,12 @@ data: database
 	mysql -u root --host 127.0.0.1 --port 3307 labonneboite < ./labonneboite/alembic/sql/etablissements.sql
 	LBB_ENV=development python ./labonneboite/scripts/create_index.py --full
 
-clear-data:
+clear-data: clear-data-dev clear-data-test
+
+clear-data-dev: services
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'DROP DATABASE IF EXISTS labonneboite;'
+
+clear-data-test: services
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'DROP DATABASE IF EXISTS lbb_test;'
 
 stop-services:
@@ -148,8 +156,11 @@ test_scripts:
 # test one) as of now: we use LBB_ENV=development.
 test_integration:
 	LBB_ENV=development nosetests -s labonneboite/tests/integration
-test_selenium:
-	LBB_ENV=development nosetests -s labonneboite/tests/selenium
+test_selenium: clear-data-test database-test
+	LBB_ENV=test alembic upgrade head
+	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
+	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
+	LBB_ENV=test nosetests -s labonneboite/tests/selenium
 
 # Convenient reminder about how to run a specific test manually.
 test_custom:

@@ -62,7 +62,7 @@ def activate_logging(flask_app):
     formatter = logging.Formatter("%(levelname)s - %(module)s - [%(pathname)s]\n%(message)s")
 
     # Output logs to stdout (development mode only).
-    if settings.DEBUG:
+    if get_config().DEBUG:
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
         flask_app.logger.addHandler(console_handler)
@@ -235,8 +235,7 @@ def create_app():
     # http://flask.pocoo.org/docs/0.12/deploying/wsgi-standalone/#proxy-setups
     flask_app.wsgi_app = ProxyFix(flask_app.wsgi_app)
 
-    if settings.DEBUG:
-        flask_app.config['ASSETS_DEBUG'] = True
+    if get_config().DEBUG:
         try:
             from flask_debugtoolbar import DebugToolbarExtension
             flask_app.config['DEBUG_TB_PROFILER_ENABLED'] = True
@@ -255,8 +254,7 @@ def create_app():
     register_after_request(flask_app)
 
     # Assets.
-    assets = Environment()
-    assets.init_app(flask_app)
+    assets = Environment(app=flask_app)
     js = Bundle(
         # Vendor.
         'js/vendor/jquery.min.js',  # Order is important.

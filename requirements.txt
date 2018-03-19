@@ -57,6 +57,7 @@ nose==1.3.7
 selenium==2.53.0
 PyVirtualDisplay==0.2.1
 Werkzeug==0.11.10
+Flask-Testing==0.7.1
 
 # Data and Importer.
 numpy==1.11.2

@@ -8,6 +8,7 @@ from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT, ENV_PRODUC
 
 class BaseConfig(object):
     DEBUG = False
+    ASSETS_DEBUG = False
 
     SECRET_KEY = settings.FLASK_SECRET_KEY
 
@@ -55,10 +56,12 @@ class StagingConfig(BaseConfig):
 
 class DevConfig(BaseConfig):
     DEBUG = True
+    ASSETS_DEBUG = True
 
 
 class TestConfig(BaseConfig):
     TESTING = True
+    WTF_CSRF_ENABLED = False
 
 
 configs = {
