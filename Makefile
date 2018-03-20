@@ -159,7 +159,7 @@ start_locust_against_localhost:
 
 .PHONY: test_all test_unit test_app test_importer test_api test_front test_scripts test_selenium
 
-test_unit: clean_pyc test_app test_web test_front test_scripts
+test_unit: clean_pyc test_app test_web test_scripts test_importer
 
 test_all: test_unit test_selenium
 
