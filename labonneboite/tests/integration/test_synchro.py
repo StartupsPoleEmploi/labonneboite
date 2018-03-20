@@ -3,11 +3,7 @@
 import random
 import unittest
 
-from sqlalchemy import create_engine
-
 from labonneboite.common.es import Elasticsearch
-from labonneboite.common.database import db_session, get_db_string
-from labonneboite.common.database import ENGINE_PARAMS, REAL_DATABASE
 from labonneboite.common.models import Office
 from labonneboite.common import departements as dpt
 from labonneboite.conf import settings
@@ -15,34 +11,9 @@ from labonneboite.conf import settings
 
 class SynchronizationIndexAndDatabaseTest(unittest.TestCase):
     """
-    WARNING: this test class talks to the "real" database, not the "test" one.
-
-    Tests that require a database will usually not use the "real" database.
-    Separate, blank databases are usually created for the tests.
-
-    However, this test is written so that it requires to talk to the "real" database.
-    Plus this test seems to @vermeer to be vital:
-    http://git.beta.pole-emploi.fr/labonneboite/labonneboite/merge_requests/54#note_1186
-
-    That's why we override the `db_session`'s binding in this test.
-
-    Note: the "real" database could be either the dev database or the staging database,
-    depending on the value of `REAL_DATABASE`, see `labonneboite.common.database.py`
-    for how its value is defined.
+    WARNING: this test class should probably talk to the "real" database, not
+    the "test" one.
     """
-
-    def setUp(self):
-        # Cache the previous engine used by `db_session`.
-        self.cached_engine = db_session.bind
-        # Make `db_session` use the "real" database, not the "test" one.
-        real_engine = create_engine(get_db_string(db_params=REAL_DATABASE), **ENGINE_PARAMS)
-        db_session.bind = real_engine
-        return super(SynchronizationIndexAndDatabaseTest, self).setUp()
-
-    def tearDown(self):
-        # Restore the cached engine.
-        db_session.bind = self.cached_engine
-        return super(SynchronizationIndexAndDatabaseTest, self).tearDown()
 
     def test_synchro(self):
         """

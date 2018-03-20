@@ -1,0 +1,26 @@
+dist: trusty
+language: python
+python:
+  - 2.7.6
+env:
+  - LBB_ENV=test DB_USER=travis DB_PASSWORD=""
+cache: pip
+services:
+  - mysql
+  - elasticsearch
+before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS lbb_test2;'
+  - sudo apt-get install language-pack-fr
+  - sudo locale-gen fr_FR
+  - sudo update-locale
+  - curl -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.7.4.deb && sudo dpkg -i --force-confnew elasticsearch-1.7.4.deb && sudo service elasticsearch restart
+install:
+  - sudo apt-get install -y libblas-dev liblapack-dev gfortran
+  - pip install -r requirements.txt
+  - python setup.py develop
+script:
+  # Note that we could speed-up the build process by running different env values
+  - nosetests labonneboite/tests/app
+  - nosetests labonneboite/tests/web
+  - nosetests labonneboite/tests/scripts
+  - nosetests labonneboite/tests/importer

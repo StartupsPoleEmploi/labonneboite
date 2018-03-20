@@ -15,6 +15,8 @@ overrides/production.py
 from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST, ENV_STAGING, ENV_PRODUCTION
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 
+DEBUG = True
+
 GLOBAL_STATIC_PATH = '/tmp'
 
 ROME_DESCRIPTIONS = load_rome_labels()
@@ -30,6 +32,36 @@ HOST = 'labonneboite.pole-emploi.fr'
 DISTANCE_FILTER_DEFAULT = 10
 
 ENABLE_TIMEIT_TIMERS = True
+
+
+######### TODO Settings added to make tests work without local_settings.py
+# Maybe we should remove some entirely, or set default values in the code?
+ADMIN_EMAIL = 'no-reply@labonneboite.pole-emploi.fr'
+FLASK_SECRET_KEY = '<set it>'
+# Settings that need to be overwritten
+# FIXME there should be a default value for these settings in the code whenever the setting is not defined.
+PEAM_CLIENT_ID = '<set it>'
+PEAM_CLIENT_SECRET = '<set it>'
+PEAM_AUTH_BASE_URL = '<set it>'
+PEAM_API_BASE_URL = '<set it>'
+PEAM_USERINFO_URL = '<set it>'
+MANDRILL_API_KEY = '<set it>'
+FORM_EMAIL = '<set it>'
+LOG_LEVEL = 'DEBUG'
+STAGING_SERVER_URL = 'http://localhost:5000'
+# Values below are *fake* and should be used in development and test environments only.
+# The real values are confidential, stored outside of github repository
+# and are only used in production+staging.
+# Note that tests don't pass for all values..
+SCORE_50_HIRINGS = 10.0
+SCORE_60_HIRINGS = 50.0
+SCORE_80_HIRINGS = 100.0
+SCORE_100_HIRINGS = 500.0
+API_KEYS = {}
+VERSION_PRO_ALLOWED_IPS = []
+VERSION_PRO_ALLOWED_EMAILS = []
+VERSION_PRO_ALLOWED_EMAIL_SUFFIXES = []
+VERSION_PRO_ALLOWED_EMAIL_REGEXPS = []
 
 # Headcount
 HEADCOUNT_INSEE = {
@@ -69,11 +101,28 @@ HEADCOUNT_VALUES = {
 # Contract Value
 CONTRACT_VALUES = {'all': 0, 'alternance': 1}
 
+# Databases
 ES_INDEX = 'labonneboite'
+DB_USER = 'labonneboite'
+DB_PASSWORD = 'labonneboite'
+DB_NAME = 'labonneboite'
+OFFICE_TABLE = 'etablissements'
 
 TILE_SERVER_URL = "http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}"
 
 ROME_NAF_PROBABILITY_CUTOFF = 0.05
+
+FLASK_SECRET_KEY = '<set it>'
+
+# Settings that need to be overwritten
+# FIXME there should be a default value for these settings in the code whenever the setting is not defined.
+PEAM_CLIENT_ID = '<set it>'
+PEAM_CLIENT_SECRET = '<set it>'
+PEAM_AUTH_BASE_URL = '<set it>'
+PEAM_API_BASE_URL = '<set it>'
+PEAM_USERINFO_URL = '<set it>'
+MANDRILL_API_KEY = '<set it>'
+FORM_EMAIL = '<set it>'
 
 # GA/GO snippets are only useful in production and staging,
 # we use dummy values everywhere else

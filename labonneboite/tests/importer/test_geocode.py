@@ -1,7 +1,7 @@
 from labonneboite.importer.models.computing import ExportableOffice
 from labonneboite.importer.jobs.geocode import GeocodeJob
 from labonneboite.importer.jobs.geocode import GeocodeUnit
-from labonneboite.importer.tests.test_base import DatabaseTest
+from .test_base import DatabaseTest
 
 
 def make_geocoded_office():

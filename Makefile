@@ -127,7 +127,7 @@ mysql_local_shell:
 	cd vagrant && vagrant ssh --command 'mysql -u root -D labonneboite --host 127.0.0.1'
 
 rebuild_importer_tests_compressed_files:
-	cd labonneboite/importer/tests/data && \
+	cd labonneboite/tests/importer/data && \
 	rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.gz && \
 	gzip --keep LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv && \
 	rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.bz2 && \
@@ -157,9 +157,9 @@ start_locust_against_localhost:
 # Tests
 # -----
 
-.PHONY: test_all test_unit test_app test_importer test_api test_integration test_scripts test_selenium
+.PHONY: test_all test_unit test_app test_importer test_api test_front test_scripts test_selenium
 
-test_unit: clean_pyc test_app test_importer test_api test_integration test_scripts
+test_unit: clean_pyc test_app test_web test_front test_scripts
 
 test_all: test_unit test_selenium
 
@@ -173,7 +173,7 @@ test_importer:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/importer/tests'
+	&& nosetests -s /srv/lbb/labonneboite/tests/importer'
 
 test_api:
 	cd vagrant; \
@@ -181,11 +181,13 @@ test_api:
 	&& export LBB_ENV=test \
 	&& nosetests -s /srv/lbb/labonneboite/tests/web/api'
 
-test_integration:
+test_front:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/tests/web/integration'
+	&& nosetests -s /srv/lbb/labonneboite/tests/web/front'
+
+test_web: test_api test_front
 
 test_scripts:
 	cd vagrant; \
@@ -193,13 +195,18 @@ test_scripts:
 	&& export LBB_ENV=test \
 	&& nosetests -s /srv/lbb/labonneboite/tests/scripts'
 
-# Selenium tests are run against the full database (not the test one)
-# as of now: we use LBB_ENV=development.
+# Selenium and integration tests are run against the full database (not the
+# test one) as of now: we use LBB_ENV=development.
+test_integration:
+	cd vagrant; \
+	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
+	&& export LBB_ENV=development \
+	&& nosetests -s /srv/lbb/labonneboite/tests/integration'
 test_selenium:
 	cd vagrant; \
 	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
 	&& export LBB_ENV=development \
-	&& nosetests -s /srv/lbb/labonneboite/tests/web/selenium'
+	&& nosetests -s /srv/lbb/labonneboite/tests/selenium'
 
 # Convenient reminder about how to run a specific test manually.
 test_custom:
@@ -250,7 +257,7 @@ run_importer_jobs:
 
 run_importer_job_00_prepare_all:  # FIXME DNRY table names
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite && cd importer && \
+		cd /srv/lbb/labonneboite/importer && \
 		echo delete from import_tasks              | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		echo delete from etablissements_raw        | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		echo delete from etablissements_backoffice | mysql -u root -D labonneboite --host 127.0.0.1 && \
@@ -258,46 +265,46 @@ run_importer_job_00_prepare_all:  # FIXME DNRY table names
 		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 && \
 		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
-		cp tests/data/LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv data/ && \
-		cp tests/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
+		cp ../tests/importer/data/LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv data/ && \
+		cp ../tests/importer/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
 		echo "completed importer run preparation."'
 
 run_importer_job_01_check_etablissements:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite && cd importer && \
+		cd /srv/lbb/labonneboite/importer && \
 		python jobs/check_etablissements.py'
 
 run_importer_job_02_extract_etablissements:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite && cd importer && \
+		cd /srv/lbb/labonneboite/importer && \
 		python jobs/extract_etablissements.py'
 
 run_importer_job_03_check_dpae:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite && cd importer && \
+		cd /srv/lbb/labonneboite/importer && \
 		python jobs/check_dpae.py'
 
 run_importer_job_04_extract_dpae:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite && cd importer && \
+		cd /srv/lbb/labonneboite/importer && \
 		python jobs/extract_dpae.py'
 
 run_importer_job_05_compute_scores:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite && cd importer && \
+		cd /srv/lbb/labonneboite/importer && \
 		python jobs/compute_scores.py'
 
 run_importer_job_06_validate_scores:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite && cd importer && \
+		cd /srv/lbb/labonneboite/importer && \
 		python jobs/validate_scores.py'
 
 run_importer_job_07_geocode:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite && cd importer && \
+		cd /srv/lbb/labonneboite/importer && \
 		python jobs/geocode.py'
 
 run_importer_job_08_populate_flags:
 	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite && cd importer && \
+		cd /srv/lbb/labonneboite/importer && \
 		python jobs/populate_flags.py'

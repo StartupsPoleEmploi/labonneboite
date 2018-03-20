@@ -1,6 +1,6 @@
 from labonneboite.importer.models.computing import RawOffice
 from labonneboite.importer.jobs.extract_etablissements import EtablissementExtractJob
-from labonneboite.importer.tests.test_base import DatabaseTest
+from .test_base import DatabaseTest
 
 
 def make_raw_office():

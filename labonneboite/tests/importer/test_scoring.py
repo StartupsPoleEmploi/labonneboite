@@ -8,7 +8,7 @@ from sqlalchemy import and_
 from labonneboite.importer.models.computing import Dpae
 from labonneboite.common.models import Office
 
-from labonneboite.importer.tests.test_base import DatabaseTest
+from .test_base import DatabaseTest
 
 from labonneboite.common import scoring as scoring_util
 from labonneboite.conf import settings

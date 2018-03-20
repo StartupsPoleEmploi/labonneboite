@@ -215,10 +215,10 @@ Tests which can run in development:
     $ make test_importer
     $ make test_app
     $ make test_api
-    $ make test_integration
-    $ make test_selenium
+    $ make test_front
     $ make test_scripts
     $ make test_integration
+    $ make test_selenium
 
 You can run all tests with:
 
