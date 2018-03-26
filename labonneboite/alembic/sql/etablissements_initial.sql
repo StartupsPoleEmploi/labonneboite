@@ -67,7 +67,10 @@ SET @collation = (
 SET @encoding = (SELECT IFNULL(@user_favorite_offices_encoding, (SELECT IFNULL(@encoding, 'utf8'))));
 SET @collation = (SELECT IFNULL(@user_favorite_offices_collation, (SELECT IFNULL(@collation, 'utf8_general_ci'))));
 
-
+# WIP 2018.04 risky simplification : attempt at always starting directly with the right encoding and collation
+# FIXME delete and simplify old code only once absolutely sure no scenario fails
+SET @encoding = 'utf8mb4';
+SET @collation = 'utf8mb4_unicode_ci';
 
 DROP TABLE IF EXISTS `etablissements`;
 
@@ -17205,8 +17208,4 @@ UNLOCK TABLES;
 
 SET FOREIGN_KEY_CHECKS = @PREVIOUS_FOREIGN_KEY_CHECKS;
 
-# all offices are supposed to have score>=50, this is normally enforced by the importer
-UPDATE etablissements SET score=50 WHERE score < 50;
 
-# avoid score 100 as it has a special meaning (boosted office)
-UPDATE etablissements SET score=99 WHERE score = 100;
