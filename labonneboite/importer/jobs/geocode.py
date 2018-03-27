@@ -122,8 +122,8 @@ class GeocodeJob(Job):
         if len(statements) >= 1:
             logger.info("geocoding with ban... %i of %i done", count, len(coordinates_updates))
             cur.executemany(update_query, statements)
-            con.commit()   
-            
+            con.commit()
+
 
     @timeit
     def validate_coordinates(self):
@@ -197,6 +197,8 @@ class GeocodeUnit(object):
         an online governmental service.
         """
         coordinates = None
+        # FIXME refer to settings.API_ADRESS_BASE_URL and make sure we don't
+        # make real requests in unit tests
         BASE = "http://api-adresse.data.gouv.fr/search/?q="
         geocoding_request = "%s%s" % (BASE, self.full_address)
         geolocation = Geolocation.get(self.full_address)

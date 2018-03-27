@@ -1,8 +1,11 @@
 # coding: utf8
 from urlparse import parse_qsl, urlparse
+
 from flask import url_for
+import mock
 
 from labonneboite.tests.test_base import AppTest
+from labonneboite.web.search.views import get_canonical_results_url, get_location
 
 
 class RechercheTest(AppTest):
@@ -21,9 +24,83 @@ class RechercheTest(AppTest):
         self.assertIn('Entreprises qui recrutent | La Bonne Boite', rv.data)
 
 
-class SearchResultsTest(AppTest):
+class SearchEntreprisesTest(AppTest):
 
-    def test_zicodes_mistakenly_used_as_commune_ids(self):
+    def test_search_by_coordinates(self):
+        url = self.url_for('search.entreprises', lat=42, lon=6, occupation='strategie-commerciale')
+
+        addresses = [{
+            'label': 'Gotham City 19100',
+            'zipcode': '19100',
+            'city': 'Gotham'
+        }]
+        with mock.patch('labonneboite.common.geocoding.get_address', return_value=addresses) as get_address:
+            response = self.app.get(url)
+
+            get_address.assert_called_once_with(42, 6, limit=1)
+            self.assertEqual(200, response.status_code)
+
+        self.assertIn("Gotham City 19100", response.data)
+
+
+    def test_canonical_url(self):
+        with self.app_context:
+            url_no_alternance = get_canonical_results_url('05100', u'Cervières', 'Boucherie')
+            url_alternance = get_canonical_results_url('05100', u'Cervières', 'Boucherie', alternance=True)
+        response_no_alternance = self.app.get(url_no_alternance)
+        response_alternance = self.app.get(url_alternance)
+
+        self.assertEqual(
+            'http://' + self.TEST_SERVER_NAME + '/entreprises?city=cervieres&zipcode=05100&occupation=boucherie',
+            url_no_alternance
+        )
+        self.assertEqual(
+            'http://' + self.TEST_SERVER_NAME + '/entreprises?city=cervieres&zipcode=05100&occupation=boucherie&f_a=1',
+            url_alternance
+        )
+        self.assertEqual(200, response_alternance.status_code)
+        self.assertEqual(200, response_no_alternance.status_code)
+
+
+    def test_get_location_no_arguments(self):
+        location, named_location = get_location({})
+        self.assertIsNone(location, named_location)
+
+
+    def test_get_location_incorrect_coordinates(self):
+        with mock.patch('labonneboite.common.geocoding.get_address', return_value=[]):
+            location, named_location = get_location({
+                'lat': 0,
+                'lon': 0
+            })
+        self.assertIsNotNone(location)
+        self.assertEqual(0, location.latitude)
+        self.assertEqual(0, location.longitude)
+        self.assertIsNone(named_location)
+
+    def test_get_location_correct_coordinates(self):
+        addresses = [{
+            'label': 'Copacabana',
+            'city': 'Rio',
+            'zipcode': '666',
+        }]
+        with mock.patch('labonneboite.common.geocoding.get_address', return_value=addresses):
+            location, named_location = get_location({
+                'lat': -2,
+                'lon': -15
+            })
+        self.assertIsNotNone(location)
+        self.assertEqual(-2, location.latitude)
+        self.assertEqual(-15, location.longitude)
+        self.assertIsNotNone(named_location)
+        self.assertEqual('Rio', named_location.city)
+        self.assertEqual('666', named_location.zipcode)
+        self.assertEqual('Copacabana', named_location.name)
+
+
+class SearchLegacyResultsTest(AppTest):
+
+    def test_zipcodes_mistakenly_used_as_commune_ids(self):
         # 14118 is a commune_id, normal behavior
         rv = self.app.get("/entreprises/commune/14118/rome/D1101")
         self.assertEqual(rv.status_code, 302)
@@ -46,7 +123,8 @@ class SearchResultsTest(AppTest):
         this type of URL without any parameter is never used by humans
         and only by bots crawling our sitemap.xml
         """
-        rv = self.app.get("/entreprises/grenoble-38000/strategie-commerciale")
+        url = self.url_for('search.results', city='grenoble', zipcode='38000', occupation='strategie-commerciale')
+        rv = self.app.get(url, follow_redirects=True)
         self.assertEqual(rv.status_code, 200)
 
     def test_search_url_with_wrong_zipcode_does_not_break(self):
@@ -55,7 +133,8 @@ class SearchResultsTest(AppTest):
         However some bots happened to call this URL which was broken.
         https://github.com/StartupsPoleEmploi/labonneboite/pull/61
         """
-        rv = self.app.get("/entreprises/nancy-54100/strategie-commerciale")
+        url = self.url_for('search.results', city='nancy', zipcode='54100', occupation='strategie-commerciale')
+        rv = self.app.get(url, follow_redirects=True)
         self.assertEqual(rv.status_code, 200)
         self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data)
 
@@ -65,7 +144,7 @@ class SearchResultsTest(AppTest):
         with self.test_request_context:
             url = url_for('search.results', city='nancy', zipcode='54100', occupation='strategie-commerciale')
             url += '?naf=8610Z'
-            rv = self.app.get(url)
+            rv = self.app.get(url, follow_redirects=True)
             self.assertEqual(rv.status_code, 200)
             self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data)
 

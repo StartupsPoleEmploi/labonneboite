@@ -1,0 +1,36 @@
+{
+  "attribution": "BAN", 
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          2.38728, 
+          48.884085
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "city": "Paris", 
+        "citycode": "75119", 
+        "context": "75, Paris, \u00cele-de-France", 
+        "housenumber": "22", 
+        "id": "ADRNIVX_0000000270723371", 
+        "importance": 0.3633, 
+        "label": "22 All\u00e9e Darius Milhaud 75019 Paris", 
+        "name": "22 All\u00e9e Darius Milhaud", 
+        "postcode": "75019", 
+        "score": 0.9421181818181817, 
+        "street": "All\u00e9e Darius Milhaud", 
+        "type": "housenumber", 
+        "x": 655066.6, 
+        "y": 6865070.9
+      }, 
+      "type": "Feature"
+    }
+  ], 
+  "licence": "ODbL 1.0", 
+  "limit": 10, 
+  "query": "22 All\u00e9e Darius Milhaud, 75019 Paris", 
+  "type": "FeatureCollection", 
+  "version": "draft"
+}

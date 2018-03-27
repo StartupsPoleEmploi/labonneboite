@@ -1,6 +1,9 @@
 # coding: utf8
+import json
+import os
 import unittest
 
+import mock
 from labonneboite.common import geocoding
 
 
@@ -59,3 +62,51 @@ class GeocodingTest(unittest.TestCase):
         saint_julien_les_metz = geocoding.get_city_by_zipcode(u"57070", u"saint-julien-les-metz")
         self.assertEquals(vantoux['commune_id'], u'57693')
         self.assertEquals(saint_julien_les_metz['commune_id'], u'57616')
+
+
+class AdresseApiTest(unittest.TestCase):
+
+
+    def setUp(self):
+        geocoding.datagouv.get_features.cache_clear()
+
+    def mock_get(self, fixture):
+        """
+        Load a fixture from the fixtures/ folder and mock the request.get function.
+        """
+        fixture_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'adresse.data.gouv.fr', fixture)
+        mock_response = json.load(open(fixture_path))
+        mock_get = mock.Mock(json=mock.Mock(return_value=mock_response), status_code=200)
+        return mock_get
+
+    def test_get_coordinates(self):
+        mock_get = self.mock_get('search-lelab.json')
+
+        with mock.patch.object(geocoding.datagouv.requests, 'get', return_value=mock_get):
+            coordinates = geocoding.get_coordinates(u'22 Allée Darius Milhaud, 75019 Paris')
+
+        self.assertEqual([{
+            'latitude': 48.884085,
+            'longitude': 2.38728,
+            'label': u'22 Allée Darius Milhaud 75019 Paris',
+        }], coordinates)
+
+
+    def test_400_error(self):
+        mock_get = mock.Mock(status_code=400, json=mock.Mock(side_effect=ValueError))
+        with mock.patch.object(geocoding.datagouv.requests, 'get', return_value=mock_get):
+            coordinates = geocoding.get_coordinates(u'22 Allée Darius Milhaud, 75019 Paris')
+
+        self.assertEqual([], coordinates)
+
+
+    def test_get_address(self):
+        mock_get = self.mock_get('reverse-lelab.json')
+        with mock.patch.object(geocoding.datagouv.requests, 'get', return_value=mock_get):
+            coordinates = geocoding.get_address(48.884085, 2.38728)
+
+        self.assertEqual([{
+            'city': 'Paris',
+            'zipcode': '75019',
+            'label': u'22 Allée Darius Milhaud 75019 Paris',
+        }], coordinates)

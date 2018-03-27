@@ -1,5 +1,8 @@
 # coding: utf8
+from collections import namedtuple
 import logging
+
+from slugify import slugify
 
 from labonneboite.common import geocoding
 
@@ -18,15 +21,15 @@ class Location(object):
 
 class CityLocation(object):
 
-    def __init__(self, zipcode, slug=''):
+    def __init__(self, zipcode, name=''):
         self.zipcode = zipcode
 
         # Location attribute may be None if slug/zipcode combination is incorrect
         self.location = None
-        self.slug = slug
-        self.name = slug.replace('-', ' ').capitalize()
+        self.slug = slugify(name)
+        self.name = name
 
-        city = geocoding.get_city_by_zipcode(self.zipcode, slug=slug)
+        city = geocoding.get_city_by_zipcode(self.zipcode, slug=self.slug)
         if not city:
             logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.slug)
         else:
@@ -42,3 +45,10 @@ class CityLocation(object):
     @property
     def is_location_correct(self):
         return self.location is not None
+
+
+NamedLocation = namedtuple('NamedLocation', [
+    'zipcode',
+    'city',
+    'name'
+])

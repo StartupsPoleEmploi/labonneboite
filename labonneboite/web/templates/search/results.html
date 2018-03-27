@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Entreprises qui recrutent{% if location_name %} à {{ location_name }}{% endif %}{% if rome_description %} dans {{ rome_description }}{% endif %}{% endblock %}
+{% block title %}Entreprises qui recrutent{% if city_name %} à {{ city_name }}{% endif %}{% if rome_description %} dans {{ rome_description }}{% endif %}{% endblock %}
 
 {% block extrahead %}
   {{ super() }}
-  {% if location_name and rome_description %}
-  <meta name="title" content="Entreprises qui recrutent à {{ location_name }} dans {{ rome_description }} | La Bonne Boite">
+  {% if city_name and rome_description %}
+  <meta name="title" content="Entreprises qui recrutent à {{ city_name }} dans {{ rome_description }} | La Bonne Boite">
   {% endif %}
   <link href="{{ mapbox_css_url }}" rel="stylesheet" type="text/css">
-  <link rel="canonical" href="{{ canonical }}">
+  {% if canonical_url %}
+  <link rel="canonical" href="{{ canonical_url }}">
+  {% endif %}
 {% endblock %}
 
 {% block scripts %}
@@ -18,7 +20,7 @@
 {% endblock %}
 {% block footer_scripts %}
   <script>
-    ga('set', 'dimension3', "{{ location_name }}");
+    ga('set', 'dimension3', "{{ city_name }}");
     ga('set', 'dimension4', "{{ rome_description }}");
     ga('set', 'dimension5', "{{ distance }}");
   </script>
@@ -41,14 +43,15 @@
           {% endif %}
           de recruter en
           <b>{{ rome_description }}</b>
-          {% if location_full_name %}
+          {% if location_name %}
           autour de
-          <b>{{ location_full_name }}</b>
+          <b>{{ location_name }}</b>
           {% endif %}
         </h1>
       {% endif %}
 
 
+      <!-- TODO <form action="{{ url_for('search.entreprises') }}" class="js-search-form" method="get">-->
       <form action="{{ url_for('search.recherche') }}" class="js-search-form" method="get">
 
         <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">

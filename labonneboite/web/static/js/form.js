@@ -33,31 +33,31 @@
   var inputJob = $("input[name='job']");
   var inputOccupation = $('#occupation');
   var inputLocation = $("input[name='location']");
-  var inputZipcode = $("#zipcode");
-  var inputCity = $("#city");
+  var inputLatitude = $("#latitude");
+  var inputLongitude = $("#longitude");
 
-  var initialOccupation = inputOccupation.val()
+  var initialOccupation = inputOccupation.val();
 
   // Job.
   var setJob = function (item) {
     if (item) {
       inputOccupation.val(item.occupation);
     }
-  }
+  };
 
   // Location.
   var setLocation = function (item) {
     if (item) {
-      inputZipcode.val(item.zipcode);
-      inputCity.val(item.city);
+      inputLatitude.val(item.latitude);
+      inputLongitude.val(item.longitude);
     }
-  }
+  };
 
   var getLocationsFromLBB = function (request, responseCB) {
-    $.getJSON('/suggest_locations?term=' + request.term, function (lbb_response) {
+    $.getJSON('/autocomplete/locations?term=' + request.term, function (lbb_response) {
       responseCB(lbb_response);
     });
-  }
+  };
 
   $(document).ready(function () {
 
@@ -118,7 +118,7 @@
       searchForm.on('submit', function () {
         // Reset the "naf" (business sector) filter when a new search is performed.
         if (initialOccupation && initialOccupation !== inputOccupation.val()) {
-          $("#naf").val('')
+          $("#naf").val('');
         }
         // Disable the submit button and display a spinner.
         searchForm.find('button:submit').prop('disabled', true);

@@ -5,7 +5,9 @@ import json
 import os
 
 from slugify import slugify
-from . import departements
+
+from labonneboite.common import departements
+from . import datagouv
 
 
 CACHE = {}
@@ -166,3 +168,39 @@ def is_departement(value):
     Note: this requires searching in a list of 96 elements, but it's not that bad.
     """
     return value in departements.DEPARTEMENTS
+
+
+def get_coordinates(address, limit=10):
+    """
+    Returns a list of dict with keys:
+
+        label (str)
+        latitude (float)
+        longitude (float)
+    """
+    features = datagouv.search(address, limit=limit)
+    return [
+        {
+            'latitude': result['geometry']['coordinates'][1],
+            'longitude': result['geometry']['coordinates'][0],
+            'label': result['properties']['label'],
+        } for result in features
+    ]
+
+
+def get_address(latitude, longitude, limit=10):
+    """
+    Returns a list of dict with keys:
+
+        label (str)
+        zipcode (str)
+        city (str)
+    """
+    features = datagouv.reverse(latitude, longitude, limit=limit)
+    return [
+        {
+            'label': result['properties']['label'],
+            'zipcode': result['properties']['postcode'],
+            'city': result['properties']['city']
+        } for result in features
+    ]
