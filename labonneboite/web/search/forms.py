@@ -2,8 +2,9 @@
 
 from flask import redirect, url_for
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, HiddenField, RadioField
-from wtforms.validators import DataRequired, Optional
+from wtforms import StringField, SelectField, HiddenField, RadioField, DecimalField
+from wtforms.validators import DataRequired, Optional, NumberRange
+from wtforms.widgets import HiddenInput
 
 from labonneboite.conf import settings
 from labonneboite.common import pro
@@ -12,6 +13,9 @@ from labonneboite.common import sorting
 
 
 class CompanySearchForm(FlaskForm):
+    """
+    This form is used only for rendering, not for validation.
+    """
 
     HEADCOUNT_CHOICES = (
         (u'1', u'Toutes tailles'),
@@ -58,8 +62,9 @@ class CompanySearchForm(FlaskForm):
     job = StringField(u'', validators=[DataRequired()])
     location = StringField(u'', validators=[DataRequired()])
 
-    city = HiddenField(u'', validators=[DataRequired()])
-    zipcode = HiddenField(u'', validators=[DataRequired()])
+    latitude = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-90, 90)])
+    longitude = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-180, 180)])
+
     occupation = HiddenField(u'', validators=[DataRequired()])
 
     headcount = RadioField(
@@ -99,14 +104,16 @@ class CompanySearchForm(FlaskForm):
         validators=[Optional()])
 
     def redirect(self, endpoint):
-        city_slug = self.city.data
-        zipcode = self.zipcode.data
-        occupation = self.occupation.data
+        # TODO remove this method, which will be useless once we got rid of the search.recherche endpoint
         values = {
-            'city': city_slug,
-            'zipcode': zipcode,
-            'occupation': occupation,
+            # 'city': city_slug,
+            # 'zipcode': zipcode,
+            'lat': self.latitude.data,
+            'lon': self.longitude.data,
+            'occupation': self.occupation.data,
         }
+        if self.location.data:
+            values['l'] = self.location.data
         if self.naf.data:
             values['naf'] = self.naf.data
         if self.sort.data:
