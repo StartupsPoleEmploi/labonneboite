@@ -88,7 +88,7 @@ def city_slug_details():
 
 
 @searchBlueprint.route('/recherche')
-def search():
+def recherche():
     form = CompanySearchForm(request.args)
     if request.args and form.validate():
         return form.redirect('search.results')
