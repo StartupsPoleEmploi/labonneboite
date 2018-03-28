@@ -150,7 +150,7 @@ def get_parameters(args):
         kwargs['to_number'] = kwargs['from_number'] + pagination.OFFICES_MAXIMUM_PAGE_SIZE - 1
 
     # Fallback to default sorting.
-    if kwargs.get('sort') not in sorting.SORTING_VALUES:
+    if kwargs.get('sort') not in sorting.SORT_FILTERS:
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
     for flag_name in ['flag_alternance', 'public']:
