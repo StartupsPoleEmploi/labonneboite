@@ -124,7 +124,7 @@ def get_city_by_commune_id(commune_id):
 
 
 @cities_cache_required
-def get_city_by_zipcode(zipcode, city_name_slug):
+def get_city_by_zipcode(zipcode, slug=''):
     """
     Returns the city corresponding to the given `zipcode` string and `city_name_slug`.
     `city_name_slug` is required to deal with situations where a zipcode is not unique for a city.
@@ -134,7 +134,7 @@ def get_city_by_zipcode(zipcode, city_name_slug):
         return None
     if len(cities) > 1:
         for city in cities:
-            if city['slug'] == city_name_slug:
+            if not slug or city['slug'] == slug:
                 return city
     return cities[0]
 

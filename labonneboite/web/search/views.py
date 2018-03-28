@@ -61,6 +61,15 @@ def job_slug_details():
 
 @searchBlueprint.route('/city_slug_details')
 def city_slug_details():
+    """
+    Endpoint used by La Bonne Alternance only.
+
+    Required parameter:
+
+        city-slug (str): must take the form "slug-zipcode"
+
+    Note that if the slug does not match the zipcode, the returned result will be incorrect.
+    """
     result = {}
 
     city_slug = request.args.get('city-slug', '')
@@ -69,9 +78,9 @@ def city_slug_details():
 
     city = city_slug.split('-')
     zipcode = ''.join(city[-1:])
-    city_temp = search_util.CityLocation(city_slug, zipcode)
+    city_temp = search_util.CityLocation(zipcode, city_slug)
 
-    if not city_temp or not city_temp.location:
+    if not city_temp.is_location_correct:
         return u'no city found associated to the slug {}'.format(city_slug), 400
 
     # Name without zipcode
@@ -174,7 +183,7 @@ def get_parameters(args):
 def results(city, zipcode, occupation):
 
     canonical = url_for('search.results', city=city, zipcode=zipcode, occupation=occupation)
-    city = search_util.CityLocation(city, zipcode)
+    city = search_util.CityLocation(zipcode, city)
     session['search_args'] = request.args
     parameters = get_parameters(request.args)
     rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
