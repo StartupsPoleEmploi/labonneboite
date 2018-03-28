@@ -296,21 +296,20 @@ def create_fetcher(location, request_args):
     kwargs['distance'] = check_integer_argument(request_args, 'distance', settings.DISTANCE_FILTER_DEFAULT)
 
     # Naf
-    naf_codes_list = {}
-    naf_codes = request_args.get('naf_codes')
-    if naf_codes:
-        naf_codes_list = [naf.upper() for naf in naf_codes.split(',')]
-        invalid_nafs = [naf for naf in naf_codes_list if naf not in NAF_CODES]
+    naf_codes = {}
+    if request_args.get('naf_codes'):
+        naf_codes = [naf.upper() for naf in request_args['naf_codes'].split(',')]
+        invalid_nafs = [naf for naf in naf_codes if naf not in NAF_CODES]
         if invalid_nafs:
             raise InvalidFetcherArgument(u'NAF code(s): %s' % ' '.join(invalid_nafs))
 
         expected_naf_codes = mapping_util.map_romes_to_nafs([kwargs['rome'], ])
-        invalid_nafs = [naf for naf in naf_codes_list if naf not in expected_naf_codes]
+        invalid_nafs = [naf for naf in naf_codes if naf not in expected_naf_codes]
         if invalid_nafs:
             raise InvalidFetcherArgument(u'NAF code(s): %s. Possible values : %s ' % (
                 ' '.join(invalid_nafs), ', '.join(expected_naf_codes)
             ))
-    kwargs['naf_codes'] = naf_codes_list
+    kwargs['naf_codes'] = naf_codes
 
     # Sort
     sort = sorting.SORT_FILTER_DEFAULT
