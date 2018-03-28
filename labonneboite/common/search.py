@@ -5,7 +5,6 @@ import collections
 import logging
 import unidecode
 
-from flask import url_for
 import elasticsearch
 import elasticsearch.exceptions
 from slugify import slugify
@@ -46,13 +45,12 @@ DISTANCE_FILTER_MAX = 3000
 
 
 class Location(object):
-    def __init__(self, latitude, longitude, commune_id=None):
+    def __init__(self, latitude, longitude):
         self.latitude = latitude
         self.longitude = longitude
-        self.commune_id = commune_id
 
     def __repr__(self):
-        return "lon: {} - lat: {} - commune_id: {}".format(self.longitude, self.latitude, self.commune_id)
+        return "lon: {} - lat: {}".format(self.longitude, self.latitude)
 
 
 class CityLocation(object):
@@ -154,39 +152,6 @@ class Fetcher(object):
     @property
     def flag_senior(self):
         return self.public == PUBLIC_SENIOR
-
-    def compute_url(self, query_string):
-        if not self.company_count >= 1:
-            # Always return home URL if zero results
-            # (requested by PE.fr)
-            return url_for('root.home', _external=True, **query_string)
-        elif self.location.commune_id and self.rome:
-            # preserve parameters from original API request
-            if self.naf_codes:
-                query_string['naf'] = self.naf_codes[0]
-            query_string.update({
-                'from': self.from_number,
-                'to': self.to_number,
-                'sort': self.sort,
-                'd': self.distance,
-                'h': self.headcount,
-                'p': self.public,
-                'f_a': self.flag_alternance,
-            })
-
-            return url_for(
-                'search.results_by_commune_and_rome',
-                commune_id=self.location.commune_id,
-                rome_id=self.rome,
-                _external=True,
-                **query_string
-            )
-        else:
-            # In case of search by longitude+latitude,
-            # return home URL since we do not have a URL ready yet.
-            # FIXME implement this URL at some point.
-            return url_for('root.home', _external=True, **query_string)
-
 
     def update_aggregations(self, aggregations):
         if self.headcount and 'headcount' in aggregations:
