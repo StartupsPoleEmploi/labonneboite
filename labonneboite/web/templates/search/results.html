@@ -18,7 +18,7 @@
 {% endblock %}
 {% block footer_scripts %}
   <script>
-    ga('set', 'dimension3', "{{ city }}");
+    ga('set', 'dimension3', "{{ city.name if city else '' }}");
     ga('set', 'dimension4', "{{ rome_description }}");
     ga('set', 'dimension5', "{{ distance }}");
   </script>
