@@ -182,6 +182,9 @@ def results(city, zipcode, occupation):
 
     canonical = url_for('search.results', city=city, zipcode=zipcode, occupation=occupation)
     city = CityLocation(zipcode, city)
+    location = city.location
+    location_name = city.name
+    location_full_name = city.full_name
     session['search_args'] = request.args
     parameters = get_parameters(request.args)
     rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
@@ -189,7 +192,7 @@ def results(city, zipcode, occupation):
     # Remove keys with empty values to build form
     form_kwargs = {key: val for key, val in parameters.items() if val}
     form_kwargs['occupation'] = occupation
-    form_kwargs['location'] = city.full_name
+    form_kwargs['location'] = location_full_name
     form_kwargs['city'] = city.slug
     form_kwargs['zipcode'] = city.zipcode
     form_kwargs['job'] = settings.ROME_DESCRIPTIONS.get(rome, occupation)
@@ -202,7 +205,7 @@ def results(city, zipcode, occupation):
 
     # Fetch companies and alternatives
     fetcher = search_util.Fetcher(
-        city.location,
+        location,
         rome=rome,
         distance=parameters['distance'],
         sort=parameters['sort'],
@@ -256,7 +259,6 @@ def results(city, zipcode, occupation):
         'alternative_distances': alternative_distances,
         'alternative_rome_descriptions': alternative_rome_descriptions,
         'canonical': canonical,
-        'city': city,
         'companies': list(companies),
         'companies_per_page': pagination.OFFICES_PER_PAGE,
         'company_count': company_count,
@@ -266,6 +268,9 @@ def results(city, zipcode, occupation):
         'headcount': fetcher.headcount,
         'job_doesnt_exist': False,
         'naf': fetcher.naf,
+        'location': location,
+        'location_name': location_name,
+        'location_full_name': location_full_name,
         'page': current_page,
         'pagination': pagination_manager,
         'rome_code': fetcher.rome,

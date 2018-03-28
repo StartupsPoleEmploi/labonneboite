@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Entreprises qui recrutent{% if city %} à {{ city.name }}{% endif %}{% if rome_description %} dans {{ rome_description }}{% endif %}{% endblock %}
+{% block title %}Entreprises qui recrutent{% if location_name %} à {{ location_name }}{% endif %}{% if rome_description %} dans {{ rome_description }}{% endif %}{% endblock %}
 
 {% block extrahead %}
   {{ super() }}
-  {% if city and rome_description %}
-  <meta name="title" content="Entreprises qui recrutent à {{ city.name }} dans {{ rome_description }} | La Bonne Boite">
+  {% if location_name and rome_description %}
+  <meta name="title" content="Entreprises qui recrutent à {{ location_name }} dans {{ rome_description }} | La Bonne Boite">
   {% endif %}
   <link href="{{ mapbox_css_url }}" rel="stylesheet" type="text/css">
   <link rel="canonical" href="{{ canonical }}">
@@ -18,7 +18,7 @@
 {% endblock %}
 {% block footer_scripts %}
   <script>
-    ga('set', 'dimension3', "{{ city.name if city else '' }}");
+    ga('set', 'dimension3', "{{ location_name }}");
     ga('set', 'dimension4', "{{ rome_description }}");
     ga('set', 'dimension5', "{{ distance }}");
   </script>
@@ -41,8 +41,10 @@
           {% endif %}
           de recruter en
           <b>{{ rome_description }}</b>
+          {% if location_full_name %}
           autour de
-          <b>{{ city.full_name }}</b>
+          <b>{{ location_full_name }}</b>
+          {% endif %}
         </h1>
       {% endif %}
 
@@ -108,13 +110,13 @@
         <div class="lbb-bright-container ga-no-results">
           {% if job_doesnt_exist %}
             <p>Le métier que vous avez choisi n'est pas valide. Veuillez réessayer.</p>
-          {% elif city and not city.is_location_correct %}
+          {% elif not location %}
             <p>La ville que vous avez choisie n'est pas valide. Veuillez réessayer.</p>
           {% elif alternative_rome_descriptions or alternative_distances %}
             <p>
               Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour
               <b>{{ rome_description }}</b>
-              {% if city %} à {{ distance }} km de {{ city.name }}{% endif %}.
+              {% if location_name %} à {{ distance }} km de {{ location_name }}{% endif %}.
             </p>
             {% if alternative_rome_descriptions and alternative_distances %}
                 <div class="grid-row grid-spacing">
