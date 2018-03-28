@@ -114,7 +114,7 @@
             <p>
               Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour
               <b>{{ rome_description }}</b>
-              à {{ distance }} km de {{ location }}.
+              {% if city %} à {{ distance }} km de {{ city.name }}{% endif %}.
             </p>
             {% if alternative_rome_descriptions and alternative_distances %}
                 <div class="grid-row grid-spacing">
