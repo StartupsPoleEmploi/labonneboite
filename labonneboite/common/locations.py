@@ -36,9 +36,9 @@ class CityLocation(object):
             self.name = city['name']
 
     @property
-    def is_location_correct(self):
-        return self.location is not None
-
-    @property
     def full_name(self):
         return '%s (%s)' % (self.name, self.zipcode)
+
+    @property
+    def is_location_correct(self):
+        return self.location is not None
