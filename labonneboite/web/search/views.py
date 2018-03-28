@@ -83,11 +83,8 @@ def city_slug_details():
     if not city_temp.is_location_correct:
         return u'no city found associated to the slug {}'.format(city_slug), 400
 
-    # Name without zipcode
-    name = city_temp.name.replace(zipcode, '').strip()
-
     result['city'] = {
-        'name': name,
+        'name': city_temp.name,
         'longitude': city_temp.location.longitude,
         'latitude': city_temp.location.latitude,
     }
