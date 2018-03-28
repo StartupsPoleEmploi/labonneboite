@@ -174,7 +174,7 @@ def get_parameters(args):
 @searchBlueprint.route('/entreprises/<city>-<zipcode>/<occupation>')
 def results(city, zipcode, occupation):
 
-    canonical = '/entreprises/%s-%s/%s' % (city, zipcode, occupation)
+    canonical = url_for('search.results', city=city, zipcode=zipcode, occupation=occupation)
     city = search_util.CityLocation(city, zipcode)
 
     kwargs = get_parameters(request.args)
