@@ -10,6 +10,7 @@ from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common import hiring_type_util
+from labonneboite.common.locations import Location
 from labonneboite.common.load_data import load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
@@ -251,7 +252,7 @@ def get_location(request_args):
     else:
         raise InvalidFetcherArgument(u'missing arguments: either commune_id or latitude and longitude')
 
-    location = search.Location(latitude, longitude)
+    location = Location(latitude, longitude)
     return location, zipcode, commune_id
 
 

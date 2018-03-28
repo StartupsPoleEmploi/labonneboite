@@ -16,6 +16,7 @@ from labonneboite.common import sorting
 from labonneboite.common import search as search_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
+from labonneboite.common.locations import CityLocation
 from labonneboite.common.models import UserFavoriteOffice
 
 from labonneboite.conf import settings
@@ -78,15 +79,15 @@ def city_slug_details():
 
     city = city_slug.split('-')
     zipcode = ''.join(city[-1:])
-    city_temp = search_util.CityLocation(zipcode, city_slug)
+    city_location = CityLocation(zipcode, city_slug)
 
-    if not city_temp.is_location_correct:
+    if not city_location.is_location_correct:
         return u'no city found associated to the slug {}'.format(city_slug), 400
 
     result['city'] = {
-        'name': city_temp.name,
-        'longitude': city_temp.location.longitude,
-        'latitude': city_temp.location.latitude,
+        'name': city_location.name,
+        'longitude': city_location.location.longitude,
+        'latitude': city_location.location.latitude,
     }
 
     return make_response(json.dumps(result))
@@ -180,7 +181,7 @@ def get_parameters(args):
 def results(city, zipcode, occupation):
 
     canonical = url_for('search.results', city=city, zipcode=zipcode, occupation=occupation)
-    city = search_util.CityLocation(zipcode, city)
+    city = CityLocation(zipcode, city)
     session['search_args'] = request.args
     parameters = get_parameters(request.args)
     rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
