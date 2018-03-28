@@ -259,7 +259,6 @@ def results(city, zipcode, occupation):
         'headcount': fetcher.headcount,
         'job_doesnt_exist': False,
         'naf': fetcher.naf,
-        'naf_codes': naf_codes_with_descriptions,
         'page': current_page,
         'pagination': pagination_manager,
         'rome_code': fetcher.rome,
