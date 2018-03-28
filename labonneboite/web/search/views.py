@@ -6,13 +6,12 @@ import json
 from slugify import slugify
 
 from flask import abort, make_response, redirect, render_template, request, session, url_for
-from flask import Blueprint, current_app
+from flask import Blueprint
 from flask_login import current_user
 
 from labonneboite.common import geocoding
 from labonneboite.common import doorbell
 from labonneboite.common import pro
-from labonneboite.common import util
 from labonneboite.common import sorting
 from labonneboite.common import search as search_util
 from labonneboite.common import mapping as mapping_util
@@ -176,64 +175,63 @@ def results(city, zipcode, occupation):
 
     canonical = url_for('search.results', city=city, zipcode=zipcode, occupation=occupation)
     city = search_util.CityLocation(city, zipcode)
+    session['search_args'] = request.args
+    parameters = get_parameters(request.args)
+    rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
 
-    kwargs = get_parameters(request.args)
-    kwargs['occupation'] = occupation
-
-    # Remove keys with empty values.
-    form_kwargs = {key: val for key, val in kwargs.items() if val}
+    # Remove keys with empty values to build form
+    form_kwargs = {key: val for key, val in parameters.items() if val}
+    form_kwargs['occupation'] = occupation
     form_kwargs['location'] = city.full_name
     form_kwargs['city'] = city.slug
     form_kwargs['zipcode'] = city.zipcode
+    form_kwargs['job'] = settings.ROME_DESCRIPTIONS.get(rome, occupation)
+    form = CompanySearchForm(**form_kwargs)
 
     # Get ROME code (Répertoire Opérationnel des Métiers et des Emplois).
-    rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
-
-    # Stop here if the ROME code does not exists.
+    # and stop here if the ROME code does not exists.
     if not rome:
-        form_kwargs['job'] = occupation
-        form = CompanySearchForm(**form_kwargs)
         return render_template('search/results.html', job_doesnt_exist=True, form=form)
 
-    session['search_args'] = request.args
-
     # Fetch companies and alternatives
-    kwargs['rome'] = rome
-    kwargs['aggregate_by'] = ['naf']
-
-    fetcher = search_util.Fetcher(city.location, **kwargs)
+    fetcher = search_util.Fetcher(
+        city.location,
+        rome=rome,
+        distance=parameters['distance'],
+        sort=parameters['sort'],
+        from_number=parameters['from_number'],
+        to_number=parameters['to_number'],
+        flag_alternance=parameters['flag_alternance'],
+        public=parameters.get('public'),
+        headcount=parameters['headcount'],
+        naf=parameters['naf'],
+        naf_codes=None,
+        aggregate_by=['naf'],
+        departments=None,
+    )
     alternative_rome_descriptions = []
     naf_codes_with_descriptions = []
+    companies = []
+    company_count = 0
+    alternative_distances = {}
 
-    if not city.is_location_correct:
-        companies = []
-        aggregations = []
-        company_count = 0
-        alternative_distances = {}
-    else:
-        current_app.logger.debug("fetching companies and company_count")
-
+    if city.is_location_correct:
         companies, aggregations = fetcher.get_companies(add_suggestions=True)
-        for alternative, count in fetcher.alternative_rome_codes.iteritems():
-            if settings.ROME_DESCRIPTIONS.get(alternative) and count:
-                desc = settings.ROME_DESCRIPTIONS.get(alternative)
-                slug = slugify(desc)
-                alternative_rome_descriptions.append([alternative, desc, slug, count])
         company_count = fetcher.company_count
         alternative_distances = fetcher.alternative_distances
+        alternative_rome_descriptions = fetcher.get_alternative_rome_descriptions()
 
         # If a filter or more are selected, the aggregations returned by fetcher.get_companies()
         # will be filtered too... To avoid that, we are doing additionnal calls (one by filter activated)
         if aggregations:
             fetcher.update_aggregations(aggregations)
 
-    # Generates values for the NAF filter
-    # aggregations could be empty if errors or empty results
-    if aggregations:
-        for naf_aggregate in aggregations['naf']:
-            naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["code"]), naf_aggregate["count"])
-            naf_codes_with_descriptions.append((naf_aggregate["code"], naf_description))
-
+        # Generates values for the NAF filter
+        # aggregations could be empty if errors or empty results
+        if aggregations:
+            for naf_aggregate in aggregations['naf']:
+                naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["code"]), naf_aggregate["count"])
+                naf_codes_with_descriptions.append((naf_aggregate["code"], naf_description))
 
     # Pagination.
     pagination_manager = pagination.PaginationManager(
@@ -244,14 +242,6 @@ def results(city, zipcode, occupation):
     )
     current_page = pagination_manager.get_current_page()
 
-    # Get contact mode and position.
-    for position, company in enumerate(companies, start=1):
-        company.contact_mode = util.get_contact_mode_for_rome_and_naf(fetcher.rome, company.naf)
-        # position is later used in labonneboite/web/static/js/results.js
-        company.position = position
-
-    form_kwargs['job'] = settings.ROME_DESCRIPTIONS[rome]
-    form = CompanySearchForm(**form_kwargs)
     form.naf.choices = [('', u'Tous les secteurs')] + sorted(naf_codes_with_descriptions, key=lambda t: t[1])
     form.validate()
 
