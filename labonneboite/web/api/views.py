@@ -316,8 +316,8 @@ def create_fetcher(location, request_args):
     sort = sorting.SORT_FILTER_DEFAULT
     if 'sort' in request_args:
         sort = request_args.get('sort')
-        if sort not in sorting.SORTING_VALUES:
-            raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(sorting.SORTING_VALUES))
+        if sort not in sorting.SORT_FILTERS:
+            raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(sorting.SORT_FILTERS))
     kwargs['sort'] = sort
 
     # Hiring type (DPAE/LBB or Alternance/LBA)
