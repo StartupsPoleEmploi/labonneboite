@@ -9,6 +9,26 @@ VAGRANT_PACKAGE_SRC_DIR = $(VAGRANT_PACKAGE_SRC_PATH)$(PACKAGE)
 
 LOCUST_HOST = http://localhost:5000
 
+# Services and data
+# -----------------
+
+services:
+	cd docker/ && docker-compose up -d
+
+database: services
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS labonneboite;'
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'GRANT ALL ON labonneboite.* TO "labonneboite"@"%" IDENTIFIED BY "labonneboite";'
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS lbb_test;'
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'GRANT ALL ON lbb_test.* TO "lbb_test"@"%" IDENTIFIED BY "";'
+
+data: database
+	mysql -u root --host 127.0.0.1 --port 3307 labonneboite < ./vagrant/labonneboite_dev_etablissements.sql
+	LBB_ENV=development alembic upgrade head
+	LBB_ENV=development python ./labonneboite/scripts/create_index.py --full
+
+clear-data:
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'DROP DATABASE IF EXISTS labonneboite;'
+
 # Cleanup
 # -------
 
