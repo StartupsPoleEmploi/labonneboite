@@ -92,7 +92,7 @@ class DatabaseTest(AppTest):
     This will allow SQLAlchemy to use the right database.
 
     Also note that the MySQL test DB must exists before before using this class.
-    On your local machine, it should've been created by the `vagrant/labonneboite_test.sql`
+    On your local machine, it should've been created by the `alembic/sql/test.sql`
     script.
     """
 

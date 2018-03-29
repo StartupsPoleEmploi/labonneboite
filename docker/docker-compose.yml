@@ -4,7 +4,6 @@ services:
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
   # https://www.elastic.co/blog/how-to-make-a-dockerfile-for-elasticsearch
   elasticsearch:
-    # TODO downgrade to 1.7.2?
     image: elasticsearch:1.7.2
     environment:
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"

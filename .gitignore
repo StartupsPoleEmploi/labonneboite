@@ -3,7 +3,6 @@
 local_settings.py
 build/
 dist/
-.vagrant
 ####
 # ansible secrets for mysql_user and mysql_password
 ####
