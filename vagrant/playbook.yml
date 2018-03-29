@@ -86,13 +86,13 @@
       mysql_db: state=import name=labonneboite target={{ db_dir }}/labonneboite_dev_etablissements.sql
 
     - name: create mysql test user
-      mysql_user: name=lbb_test password=lbb_test priv=*.*:ALL state=present
+      mysql_user: name=lbb_test password="" priv=*.*:ALL state=present
 
     - name: create mysql test database
-      mysql_db: name=lbb_test2 state=present encoding=utf8mb4 collation=utf8mb4_unicode_ci
+      mysql_db: name=lbb_test state=present encoding=utf8mb4 collation=utf8mb4_unicode_ci
 
     - name: import labonneboite_test.sql
-      mysql_db: state=import name=lbb_test2 target={{ db_dir }}/labonneboite_test.sql
+      mysql_db: state=import name=lbb_test target={{ db_dir }}/labonneboite_test.sql
 
     - name: Run database migrations against development database
       shell: "cd {{project_dir}}; {{ virtual_env }}/bin/alembic upgrade head"

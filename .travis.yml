@@ -9,7 +9,7 @@ services:
   - mysql
   - elasticsearch
 before_install:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS lbb_test2;'
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS lbb_test;'
   - sudo apt-get install language-pack-fr
   - sudo locale-gen fr_FR
   - sudo update-locale
