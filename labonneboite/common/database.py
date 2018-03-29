@@ -17,9 +17,11 @@ CURRENT_ENV = get_current_env()
 # -----------------------------------------------------------------------------
 
 DATABASE = {
+    'HOST': settings.DB_HOST,
+    'PORT': settings.DB_PORT,
     'NAME': settings.DB_NAME,
-    'PASSWORD': settings.DB_PASSWORD,
     'USER': settings.DB_USER,
+    'PASSWORD': settings.DB_PASSWORD,
 }
 
 def get_db_string(db_params=None):
@@ -28,7 +30,7 @@ def get_db_string(db_params=None):
     It can be overriden (e.g. in tests) by hardcoding the value of `db_params`.
     """
     db_params = db_params or DATABASE
-    return "mysql://%s:%s@localhost/%s?charset=utf8mb4" % (db_params['USER'], db_params['PASSWORD'], db_params['NAME'])
+    return "mysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}?charset=utf8mb4".format(**db_params)
 
 ENGINE_PARAMS = {
     'convert_unicode': True,

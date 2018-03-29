@@ -103,9 +103,11 @@ CONTRACT_VALUES = {'all': 0, 'alternance': 1}
 
 # Databases
 ES_INDEX = 'labonneboite'
+DB_HOST = 'localhost'
+DB_PORT = 3306
+DB_NAME = 'labonneboite'
 DB_USER = 'labonneboite'
 DB_PASSWORD = 'labonneboite'
-DB_NAME = 'labonneboite'
 OFFICE_TABLE = 'etablissements'
 
 TILE_SERVER_URL = "http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}"

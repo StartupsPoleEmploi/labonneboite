@@ -35,8 +35,9 @@ class InvalidRowException(Exception):
 
 
 def create_cursor():
-    con = mdb.connect('localhost', DATABASE['USER'], DATABASE['PASSWORD'], DATABASE['NAME'],
-        use_unicode=True, charset="utf8")
+    con = mdb.connect(host=DATABASE['HOST'], port=DATABASE['PORT'],
+                      user=DATABASE['USER'], passwd=DATABASE['PASSWORD'],
+                      db=DATABASE['NAME'], use_unicode=True, charset="utf8")
     cur = con.cursor()
     return con, cur
 
@@ -163,7 +164,7 @@ def reduce_scores_into_table(
                     password_statement,
                     DATABASE['NAME'],
                     query
-                ), 
+                ),
                 shell=True
             )
             successes += 1
@@ -350,8 +351,7 @@ def get_departement_from_zipcode(zipcode):
         departement = zipcode[:2]
     else:
         departement = None
-    
+
     if departement in ["2A", "2B"]:  # special case of Corsica
         departement = "20"
     return departement
-
