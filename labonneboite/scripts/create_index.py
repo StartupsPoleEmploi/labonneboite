@@ -8,7 +8,7 @@ import multiprocessing as mp
 from cProfile import Profile
 from pyprof2calltree import convert
 from elasticsearch import Elasticsearch
-from elasticsearch import TransportError
+from elasticsearch.exceptions import TransportError, NotFoundError
 from elasticsearch.helpers import bulk
 from sqlalchemy import inspect
 
@@ -59,7 +59,10 @@ def switch_es_index():
 
     # Find current index names (there may be one, zero or more)
     alias_name = settings.ES_INDEX
-    old_index_names = es.indices.get_alias(settings.ES_INDEX).keys()
+    try:
+        old_index_names = es.indices.get_alias(settings.ES_INDEX).keys()
+    except NotFoundError:
+        old_index_name = []
 
     # Activate new index
     new_index_name = lbb_es.get_new_index_name()
