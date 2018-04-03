@@ -62,7 +62,7 @@ def switch_es_index():
     try:
         old_index_names = es.indices.get_alias(settings.ES_INDEX).keys()
     except NotFoundError:
-        old_index_name = []
+        old_index_names = []
 
     # Activate new index
     new_index_name = lbb_es.get_new_index_name()
