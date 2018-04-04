@@ -7,6 +7,7 @@ import os
 from slugify import slugify
 
 from labonneboite.common import departements
+from labonneboite.common.util import unique_elements
 from . import datagouv
 
 
@@ -178,14 +179,15 @@ def get_coordinates(address, limit=10):
         latitude (float)
         longitude (float)
     """
-    features = datagouv.search(address, limit=limit)
-    return [
+    features = [
         {
             'latitude': result['geometry']['coordinates'][1],
             'longitude': result['geometry']['coordinates'][0],
             'label': result['properties']['label'],
-        } for result in features
+        } for result in datagouv.search(address, limit=limit)
     ]
+
+    return unique_elements(features)
 
 
 def get_address(latitude, longitude, limit=10):
@@ -196,11 +198,11 @@ def get_address(latitude, longitude, limit=10):
         zipcode (str)
         city (str)
     """
-    features = datagouv.reverse(latitude, longitude, limit=limit)
-    return [
+    features = [
         {
             'label': result['properties']['label'],
             'zipcode': result['properties']['postcode'],
             'city': result['properties']['city']
-        } for result in features
+        } for result in datagouv.reverse(latitude, longitude, limit=limit)
     ]
+    return unique_elements(features)

@@ -56,8 +56,4 @@ def get_features(endpoint, **params):
         logger.log(log_level, error)
         return []
 
-    # TODO this returns duplicate features: locations that differ only by their
-    # ID. Try for instance: https://api-adresse.data.gouv.fr/search/?q=metz
-    # We should make sure to return only unique features.
-    features = response.json()['features']
-    return features
+    return response.json()['features']
