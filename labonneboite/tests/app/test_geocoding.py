@@ -110,3 +110,12 @@ class AdresseApiTest(unittest.TestCase):
             'zipcode': '75019',
             'label': u'22 Allée Darius Milhaud 75019 Paris',
         }], coordinates)
+
+
+    def test_duplicate_features(self):
+        mock_get = self.mock_get('search-metz.json')
+
+        with mock.patch.object(geocoding.datagouv.requests, 'get', return_value=mock_get):
+            coordinates = geocoding.get_coordinates(u'metz', limit=10)
+
+        self.assertNotEqual(coordinates[0], coordinates[1])
