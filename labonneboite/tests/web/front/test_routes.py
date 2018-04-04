@@ -8,32 +8,22 @@ from labonneboite.tests.test_base import AppTest
 from labonneboite.web.search.views import get_canonical_results_url, get_location
 
 
-class RechercheTest(AppTest):
-
-    def test_search_missing_location(self):
-        with self.test_request_context:
-            rv = self.app.get(url_for('search.recherche') + '?job=ramoufleur')
-
-        self.assertEqual(rv.status_code, 200)
-        self.assertIn('Veuillez préciser le lieu de votre recherche.', rv.data)
-
-    def test_search_incorrect_city(self):
-        with self.test_request_context:
-            rv = self.app.get(url_for('search.recherche') + '?job=ramoufleur&location=gotham')
-        self.assertEqual(rv.status_code, 200)
-        self.assertIn('Entreprises qui recrutent | La Bonne Boite', rv.data)
-
 
 class SearchEntreprisesTest(AppTest):
+
+    def setUp(self):
+        super(SearchEntreprisesTest, self).setUp()
+        self.gotham_city = {
+            'label': 'Gotham City 19100',
+            'zipcode': '19100',
+            'city': 'Gotham'
+        }
+
 
     def test_search_by_coordinates(self):
         url = self.url_for('search.entreprises', lat=42, lon=6, occupation='strategie-commerciale')
 
-        addresses = [{
-            'label': 'Gotham City 19100',
-            'zipcode': '19100',
-            'city': 'Gotham'
-        }]
+        addresses = [self.gotham_city]
         with mock.patch('labonneboite.common.geocoding.get_address', return_value=addresses) as get_address:
             response = self.app.get(url)
 
@@ -41,6 +31,23 @@ class SearchEntreprisesTest(AppTest):
             self.assertEqual(200, response.status_code)
 
         self.assertIn("Gotham City 19100", response.data)
+
+
+    def test_search_by_coordinates_with_no_associated_address(self):
+        url = self.url_for('search.entreprises', lat=42, lon=6, occupation='strategie-commerciale')
+        with mock.patch('labonneboite.common.geocoding.get_address', return_value=[]) as get_address:
+            response = self.app.get(url)
+
+            get_address.assert_called_once_with(42, 6, limit=1)
+            self.assertEqual(200, response.status_code)
+
+
+    def test_search_by_invalid_coordinates(self):
+        url = self.url_for('search.entreprises', lat=91, lon=181, occupation='strategie-commerciale')
+        addresses = [self.gotham_city]
+        with mock.patch('labonneboite.common.geocoding.get_address', return_value=addresses):
+            response = self.app.get(url)
+        self.assertEqual(200, response.status_code)
 
 
     def test_canonical_url(self):
