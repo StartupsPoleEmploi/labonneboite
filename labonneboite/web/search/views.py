@@ -21,7 +21,7 @@ from labonneboite.common.locations import CityLocation, Location, NamedLocation
 from labonneboite.common.models import UserFavoriteOffice
 
 from labonneboite.conf import settings
-from labonneboite.web.search.forms import CompanySearchForm
+from labonneboite.web.search.forms import make_company_search_form
 
 
 searchBlueprint = Blueprint('search', __name__)
@@ -109,20 +109,6 @@ def city_slug_details():
     }
 
     return make_response(json.dumps(result))
-
-
-# TODO get rid of this view that only redirects to search.results in case of success
-# That means that we have to move the form validation to the new view.
-# Also, we need to convert shortened parameter names to longer ones?
-@searchBlueprint.route('/recherche')
-def recherche():
-    form = CompanySearchForm(request.args)
-
-    if request.args and form.validate():
-        return form.redirect('search.entreprises')
-
-    # Invalid form
-    return render_template('search/results.html', form=form)
 
 
 PARAMETER_FIELD_MAPPING = {
@@ -221,37 +207,34 @@ def entreprises():
     """
     This view takes arguments as a query string.
 
-    Expected arguments:
-
-        Those returned by get_parameters
-        lat (float)
-        lon (float)
-        zipcode (str)
-        city (str): city slug
-        occupation (str)
+    Expected arguments are those returned by get_parameters and expected by the
+    selected company search form.
     """
-    parameters = get_parameters(request.args)
-    location, named_location = get_location(request.args)
-
     session['search_args'] = request.args
+
+    location, named_location = get_location(request.args)
     occupation = request.args.get('occupation', '')
     rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
+    job_doesnt_exist = not rome
 
-    # Remove keys with empty values to build form
-    form_kwargs = {key: val for key, val in parameters.items() if val}
-    form_kwargs['job'] = settings.ROME_DESCRIPTIONS.get(rome, occupation)
-    if 'location' not in form_kwargs and named_location:
-        form_kwargs['location'] = named_location.name
+    # Build form
+    form_kwargs = {key: val for key, val in request.args.items() if val}
+    form_kwargs['j'] = settings.ROME_DESCRIPTIONS.get(rome, occupation)
+    if 'l' not in form_kwargs and named_location:
+        # Override form location only if it is not available (e.g when user has
+        # removed it from the url)
+        form_kwargs['l'] = named_location.name
     if location:
-        form_kwargs['latitude'] = location.latitude
-        form_kwargs['longitude'] = location.longitude
-    form_kwargs['occupation'] = occupation
-    form = CompanySearchForm(**form_kwargs)
+        form_kwargs['lat'] = location.latitude
+        form_kwargs['lon'] = location.longitude
+    form = make_company_search_form(**form_kwargs)
 
-    # Get ROME code (Répertoire Opérationnel des Métiers et des Emplois).
-    # and stop here if the ROME code does not exists.
-    if not rome:
-        return render_template('search/results.html', job_doesnt_exist=True, form=form)
+    # Stop here in case of invalid arguments
+    if not form.validate() or job_doesnt_exist:
+        return render_template('search/results.html', job_doesnt_exist=job_doesnt_exist, form=form)
+
+    # Convert request arguments to fetcher parameters
+    parameters = get_parameters(request.args)
 
     # Fetch companies and alternatives
     fetcher = search_util.Fetcher(
@@ -275,24 +258,23 @@ def entreprises():
     company_count = 0
     alternative_distances = {}
 
-    # TODO this 'if' will no longer be necessary once we perform form validation inside this view
-    if location is not None:
-        companies, aggregations = fetcher.get_companies(add_suggestions=True)
-        company_count = fetcher.company_count
-        alternative_distances = fetcher.alternative_distances
-        alternative_rome_descriptions = fetcher.get_alternative_rome_descriptions()
+    # Aggregations
+    companies, aggregations = fetcher.get_companies(add_suggestions=True)
+    company_count = fetcher.company_count
+    alternative_distances = fetcher.alternative_distances
+    alternative_rome_descriptions = fetcher.get_alternative_rome_descriptions()
 
-        # If a filter or more are selected, the aggregations returned by fetcher.get_companies()
-        # will be filtered too... To avoid that, we are doing additionnal calls (one by filter activated)
-        if aggregations:
-            fetcher.update_aggregations(aggregations)
+    # If a filter or more are selected, the aggregations returned by fetcher.get_companies()
+    # will be filtered too... To avoid that, we are doing additionnal calls (one by filter activated)
+    if aggregations:
+        fetcher.update_aggregations(aggregations)
 
-        # Generates values for the NAF filter
-        # aggregations could be empty if errors or empty results
-        if aggregations:
-            for naf_aggregate in aggregations['naf']:
-                naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["code"]), naf_aggregate["count"])
-                naf_codes_with_descriptions.append((naf_aggregate["code"], naf_description))
+    # Generates values for the NAF filter
+    # aggregations could be empty if errors or empty results
+    if aggregations:
+        for naf_aggregate in aggregations['naf']:
+            naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["code"]), naf_aggregate["count"])
+            naf_codes_with_descriptions.append((naf_aggregate["code"], naf_description))
 
     # Pagination.
     pagination_manager = pagination.PaginationManager(

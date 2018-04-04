@@ -1,6 +1,5 @@
 # coding: utf8
 
-from flask import redirect, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, HiddenField, RadioField, DecimalField
 from wtforms.validators import DataRequired, Optional, NumberRange
@@ -44,13 +43,6 @@ class CompanySearchForm(FlaskForm):
         (u'1', u'<span class="badge badge-large badge-alternance">Alternance</span>'),
     )
 
-    PUBLIC_CHOICES = (
-        (unicode(search.PUBLIC_ALL), u'Tout'),
-        (unicode(search.PUBLIC_JUNIOR), u'<span class="badge badge-large badge-info" data-toggle="tooltip" title="moins de 26 ans">Junior</span>'),
-        (unicode(search.PUBLIC_SENIOR), u'<span class="badge badge-large badge-info" data-toggle="tooltip" title="plus de 50 ans">Senior</span>'),
-        (unicode(search.PUBLIC_HANDICAP), u'<span class="badge badge-large badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">BOE</span>'),
-    )
-
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
         # to be included in this form.
@@ -59,15 +51,19 @@ class CompanySearchForm(FlaskForm):
         # that have state changing affect should only respond to POST requests.
         csrf = False
 
-    job = StringField(u'', validators=[DataRequired()])
-    location = StringField(u'', validators=[DataRequired()])
-
-    latitude = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-90, 90)])
-    longitude = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-180, 180)])
-
+    # Typed job
+    j = StringField(u'Job', validators=[DataRequired()])
+    # Corresponding occupation found by autocomplete
     occupation = HiddenField(u'', validators=[DataRequired()])
 
-    headcount = RadioField(
+    # Typed location
+    l = StringField(u'Location', validators=[DataRequired()])
+    # Corresponding coordinates found by autocomplete
+    lat = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-90, 90)])
+    lon = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-180, 180)])
+
+    # Headcount
+    h = RadioField(
         u'Taille d\'entreprise',
         default=1,
         choices=HEADCOUNT_CHOICES,
@@ -85,46 +81,38 @@ class CompanySearchForm(FlaskForm):
         default='',
         validators=[Optional()])
 
-    distance = RadioField(
+    # TODO form will not validate for distance=5... (this concerns many requests/day)
+    d = RadioField(
         u'Distance',
         choices=DISTANCE_CHOICES,
         default=settings.DISTANCE_FILTER_DEFAULT,
         validators=[Optional()])
 
-    flag_alternance = RadioField(
+    f_a = RadioField(
         u'Type de contrat',
         choices=FLAG_ALTERNANCE_CHOICES,
         default=0,
         validators=[Optional()])
 
-    public = RadioField(
+
+class ProCompanySearchForm(CompanySearchForm):
+
+    PUBLIC_CHOICES = (
+        (unicode(search.PUBLIC_ALL), u'Tout'),
+        (unicode(search.PUBLIC_JUNIOR), u'<span class="badge badge-large badge-info" data-toggle="tooltip" title="moins de 26 ans">Junior</span>'),
+        (unicode(search.PUBLIC_SENIOR), u'<span class="badge badge-large badge-info" data-toggle="tooltip" title="plus de 50 ans">Senior</span>'),
+        (unicode(search.PUBLIC_HANDICAP), u'<span class="badge badge-large badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">BOE</span>'),
+    )
+
+    # this field is activated only in pro mode
+    p = RadioField(
         u'Public',
         choices=PUBLIC_CHOICES,
         default=0,
         validators=[Optional()])
 
-    def redirect(self, endpoint):
-        # TODO remove this method, which will be useless once we got rid of the search.recherche endpoint
-        values = {
-            # 'city': city_slug,
-            # 'zipcode': zipcode,
-            'lat': self.latitude.data,
-            'lon': self.longitude.data,
-            'occupation': self.occupation.data,
-        }
-        if self.location.data:
-            values['l'] = self.location.data
-        if self.naf.data:
-            values['naf'] = self.naf.data
-        if self.sort.data:
-            values['sort'] = self.sort.data
-        if self.distance.data:
-            values['d'] = self.distance.data
-        if self.headcount.data:
-            values['h'] = self.headcount.data
-        if self.flag_alternance.data:
-            values['f_a'] = self.flag_alternance.data
-        if pro.pro_version_enabled():
-            if self.public.data:
-                values['p'] = self.public.data
-        return redirect(url_for(endpoint, **values))
+
+def make_company_search_form(**kwargs):
+    if pro.pro_version_enabled():
+        return ProCompanySearchForm(**kwargs)
+    return CompanySearchForm(**kwargs)

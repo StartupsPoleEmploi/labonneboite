@@ -30,11 +30,11 @@
   var searchForm = $('.js-search-form');
 
   // Inputs.
-  var inputJob = $("input[name='job']");
+  var inputJob = $("input[name='j']");
   var inputOccupation = $('#occupation');
-  var inputLocation = $("input[name='location']");
-  var inputLatitude = $("#latitude");
-  var inputLongitude = $("#longitude");
+  var inputLocation = $("input[name='l']");
+  var inputLatitude = $("#lat");
+  var inputLongitude = $("#lon");
 
   var initialOccupation = inputOccupation.val();
 
@@ -141,7 +141,7 @@
       // Auto-submit the search form when a link to expand the search results by distance is clicked.
       $('.js-extend-search-distance').click(function (e) {
         e.preventDefault();
-        $(':radio[name=distance][value=' + this.dataset.distance + ']').prop('checked', true);
+        $(':radio[name=d][value=' + this.dataset.distance + ']').prop('checked', true);
         searchForm.submit();
       });
 
