@@ -22,6 +22,10 @@ clear-data:
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'DROP DATABASE IF EXISTS labonneboite;'
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'DROP DATABASE IF EXISTS lbb_test;'
 
+stop-services:
+	cd docker/ && docker-compose stop
+
+
 # Cleanup
 # -------
 
