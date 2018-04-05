@@ -127,7 +127,7 @@
     color: #5d5d5d;
 }
 
-.lbb-result * + * {
+.lbb-result * + *, #lbb-result-map * + * {
     margin-top: 0;  /* Cancel default spacing across block-level elements inside. */
 }
 

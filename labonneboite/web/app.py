@@ -266,6 +266,7 @@ def create_app():
         'js/cookies-banner.js',
         'js/dropdowns.js',
         'js/form.js',
+        'js/map.js',
         'js/prevent-double-form-submit.js',
         'js/results-toggle-sidebar.js',
         'js/results.js',

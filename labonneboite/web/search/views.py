@@ -227,9 +227,12 @@ def entreprises():
         form_kwargs['lon'] = location.longitude
     form = make_company_search_form(**form_kwargs)
 
+    # Render different template if it's an ajax call
+    template = 'search/results.html' if not request.is_xhr else 'search/results_content.html'
+
     # Stop here in case of invalid arguments
     if not form.validate() or job_doesnt_exist:
-        return render_template('search/results.html', job_doesnt_exist=job_doesnt_exist, form=form)
+        return render_template(template, job_doesnt_exist=job_doesnt_exist, form=form)
 
     # Convert request arguments to fetcher parameters
     parameters = get_parameters(request.args)
@@ -316,7 +319,7 @@ def entreprises():
         'tile_server_url': settings.TILE_SERVER_URL,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
     }
-    return render_template('search/results.html', **context)
+    return render_template(template, **context)
 
 
 def get_canonical_results_url(zipcode, city, occupation, alternance=False):
