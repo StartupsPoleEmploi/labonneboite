@@ -1,5 +1,6 @@
 # coding: utf8
-from urlparse import parse_qsl, urlparse
+import urllib
+from urlparse import parse_qsl
 
 from flask import url_for
 import mock
@@ -162,8 +163,17 @@ class GenericUrlSearchRedirectionTest(AppTest):
     def test_generic_url_search_by_commune_and_rome(self):
         rv = self.app.get("/entreprises/commune/75056/rome/D1104")
         self.assertEqual(rv.status_code, 302)
-        expected_relative_url = "/entreprises/paris-75000/patisserie-confiserie-chocolaterie-et-glacerie"
-        self.assertTrue(rv.location.endswith(expected_relative_url))
+
+        url, querystring = urllib.splitquery(rv.location)
+        parameters = dict(parse_qsl(querystring))
+        expected_url = self.url_for('search.entreprises')
+        expected_parameters = {
+            'city': 'paris',
+            'zipcode': '75000',
+            'occupation': 'patisserie-confiserie-chocolaterie-et-glacerie'
+        }
+        self.assertEqual(expected_url, url)
+        self.assertEqual(expected_parameters, parameters)
 
     def test_generic_url_search_by_commune_and_rome_with_distance(self):
         """
@@ -171,8 +181,18 @@ class GenericUrlSearchRedirectionTest(AppTest):
         """
         rv = self.app.get("/entreprises/commune/75056/rome/D1104?d=100")
         self.assertEqual(rv.status_code, 302)
-        expected_relative_url = ("/entreprises/paris-75000/patisserie-confiserie-chocolaterie-et-glacerie?d=100")
-        self.assertTrue(rv.location.endswith(expected_relative_url))
+
+        url, querystring = urllib.splitquery(rv.location)
+        parameters = dict(parse_qsl(querystring))
+        expected_url = self.url_for('search.entreprises')
+        expected_parameters = {
+            'city': 'paris',
+            'zipcode': '75000',
+            'occupation': 'patisserie-confiserie-chocolaterie-et-glacerie',
+            'd': '100'
+        }
+        self.assertEqual(expected_url, url)
+        self.assertEqual(expected_parameters, parameters)
 
     def test_generic_url_search_by_commune_and_rome_with_utm_campaign(self):
         """
@@ -182,9 +202,16 @@ class GenericUrlSearchRedirectionTest(AppTest):
         rv = self.app.get(url)
         self.assertEqual(rv.status_code, 302)
 
-        expected_path = '/entreprises/paris-75000/patisserie-confiserie-chocolaterie-et-glacerie'
-        expected_query = {'utm_medium': 'web', 'utm_source': 'test', 'utm_campaign': 'test'}
-        redirection_path = urlparse(rv.location).path
-        redirection_query = dict(parse_qsl(urlparse(rv.location).query))
-        self.assertEqual(redirection_path, expected_path)
-        self.assertEqual(redirection_query, expected_query)
+        expected_url = self.url_for('search.entreprises')
+        expected_parameters = {
+            'city': 'paris',
+            'zipcode': '75000',
+            'occupation': 'patisserie-confiserie-chocolaterie-et-glacerie',
+            'utm_medium': 'web',
+            'utm_source': 'test',
+            'utm_campaign': 'test'
+        }
+        url, querystring = urllib.splitquery(rv.location)
+        parameters = dict(parse_qsl(querystring))
+        self.assertEqual(expected_url, url)
+        self.assertEqual(expected_parameters, parameters)

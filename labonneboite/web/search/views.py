@@ -394,7 +394,11 @@ def results_by_commune_and_rome(commune_id, rome_id):
     if not city or not rome_description:
         abort(404)
 
-    url = url_for('search.results', city=city['slug'], zipcode=city['zipcode'], occupation=slugified_rome_description)
+    params = request.args.copy()
+    params['city'] = city['slug']
+    params['zipcode'] = city['zipcode']
+    params['occupation'] = slugified_rome_description
+    url = url_for('search.entreprises', **params)
     # Pass all GET params to the redirect URL: this will allow users of the API to build web links
     # roughly equivalent to the result of an API call - see Trello #971.
-    return redirect('%s?%s' % (url, urlencode(request.args)))
+    return redirect(url)
