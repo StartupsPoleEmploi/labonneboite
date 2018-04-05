@@ -114,11 +114,9 @@ def city_slug_details():
 PARAMETER_FIELD_MAPPING = {
     'r': 'rome',
     'j': 'job',
-    'q': 'job',# TODO why duplicate job?
     'd': 'distance',
     'l': 'location',
     'h': 'headcount',
-    'mode': 'mode',# TODO useless argument?
     'naf': 'naf',
     'sort': 'sort',
     'from': 'from_number',
