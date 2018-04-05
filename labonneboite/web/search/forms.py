@@ -24,19 +24,15 @@ class CompanySearchForm(FlaskForm):
 
     NAF_CHOICES = [('', u'Tous les secteurs')] + [(k, v) for k, v in settings.NAF_CODES.items()]
 
-    DISTANCE_XS = u'10'
-    DISTANCE_S = u'30'
-    DISTANCE_M = u'50'
-    DISTANCE_L = u'100'
-    DISTANCE_XL = u'3000'
-
     DISTANCE_CHOICES = (
-        (DISTANCE_XS, u'Moins de 10 km'),
-        (DISTANCE_S, u'Moins de 30 km'),
-        (DISTANCE_M, u'Moins de 50 km'),
-        (DISTANCE_L, u'Moins de 100km'),
-        (DISTANCE_XL, u'France entière')
+        (u'5', u'Moins de 5 km'),
+        (u'10', u'Moins de 10 km'),
+        (u'30', u'Moins de 30 km'),
+        (u'50', u'Moins de 50 km'),
+        (u'100', u'Moins de 100km'),
+        (u'3000', u'France entière')
     )
+    DISTANCE_S = DISTANCE_CHOICES[2][0]
 
     FLAG_ALTERNANCE_CHOICES = (
         (u'0', u'Tous types'),
@@ -81,7 +77,6 @@ class CompanySearchForm(FlaskForm):
         default='',
         validators=[Optional()])
 
-    # TODO form will not validate for distance=5... (this concerns many requests/day)
     d = RadioField(
         u'Distance',
         choices=DISTANCE_CHOICES,
