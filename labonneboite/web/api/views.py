@@ -21,9 +21,6 @@ apiBlueprint = Blueprint('api', __name__)
 OGR_ROME_CODES = load_ogr_rome_mapping()
 ROME_CODES = OGR_ROME_CODES.values()
 
-# Some internal services of Pôle emploi can sometimes have access to sensitive information.
-API_INTERNAL_CONSUMERS = ['labonneboite', 'memo', 'labonnealternance']
-
 
 class InvalidFetcherArgument(Exception):
     pass
@@ -410,7 +407,8 @@ def office_details(siret):
             'zipcode': office.zipcode,
         },
     }
-    if request.args['user'] in API_INTERNAL_CONSUMERS:
+    # Some internal services of Pôle emploi can sometimes have access to sensitive information.
+    if request.args['user'] in settings.API_INTERNAL_CONSUMERS:
         result['email'] = office.email
         result['phone'] = office.tel
         result['website'] = office.website
