@@ -1,7 +1,9 @@
 # coding: utf8
 
-from urllib import urlencode
 import json
+from urllib import urlencode
+
+import mock
 
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest
 
@@ -13,7 +15,6 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         Test the `office_details` API route.
         """
         expected_result = {
-            u'website': u'',
             u'siret': u'00000000000001',
             u'naf': u'7320Z',
             u'name': u'OFFICE 1',
@@ -21,7 +22,6 @@ class ApiOfficeDetailsTest(ApiBaseTest):
             u'url': u'%s/00000000000001/details' % self.HOME_URL,
             u'lon': 6.0,
             u'headcount_text': u'10 à 19 salariés',
-            u'phone': u'',
             u'stars': 4.0,
             u'address': {
                 u'city': u'BAYONVILLE-SUR-MAD',
@@ -31,7 +31,6 @@ class ApiOfficeDetailsTest(ApiBaseTest):
                 u'zipcode': u'54890'
             },
             u'lat': 49.0,
-            u'email': u'foo@bar.com',
         }
         params = self.add_security_params({'user': u'labonneboite'})
         rv = self.app.get('/api/v1/office/%s/details?%s' % (expected_result[u'siret'], urlencode(params)))
@@ -39,6 +38,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         data = json.loads(rv.data)
         self.assertDictEqual(data, expected_result)
 
+    @mock.patch('labonneboite.conf.settings.API_INTERNAL_CONSUMERS', ['labonneboite'])
     def test_query_office_with_internal_user(self):
         """
         Test that internal services of Pôle emploi can have access to sensitive information.
