@@ -73,6 +73,7 @@ You will also need to install docker and docker-compose. Follow the instructions
 Install python requirements:
 
     $ pip install -r requirements.txt
+    $ python setup.py develop
 
 Start required services (MySQL and Elasticsearch):
 
