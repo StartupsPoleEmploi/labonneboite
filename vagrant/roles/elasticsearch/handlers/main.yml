@@ -1,9 +1,0 @@
----
-
-- name: init elasticsearch
-  command: update-rc.d elasticsearch defaults 95 10
-
-- name: restart elasticsearch
-  command: echo
-  #service: name=elasticsearch state=restarted
-  #when: es_manage_service

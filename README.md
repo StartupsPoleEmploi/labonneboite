@@ -46,136 +46,89 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 
 [Press Coverage on La Bonne Boite](https://labonneboite.pole-emploi.fr/espace-presse)
 
-# Install a new development environment
+# Development
 
-- Install Ansible:
+## Install
 
-    - create an [isolated Python environment](https://virtualenv.pypa.io/) using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
 
-      ```
-      $ mkvirtualenv --python=`which python2.7` lbb
-      $ workon lbb
-      $ pip install ansible
-      ```
+Clone labonneboite repository:
 
-- Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+    $ git clone https://github.com/StartupsPoleEmploi/labonneboite.git
 
-- Install [Vagrant](https://www.vagrantup.com/downloads.html)
+Create an [isolated Python environment](https://virtualenv.pypa.io/) using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
 
-- Fetch labonneboite repository `git clone https://github.com/StartupsPoleEmploi/labonneboite.git`
+    $ mkvirtualenv --python=`which python2.7` lbb
+    $ workon lbb
 
-    - ensure your ssh public key has been properly setup
+Install OS requirements:
 
-    - note that you'll be using the user `git`, unlike other services which use nominative usernames
+    # On Debian-based OS
+    $ sudo apt-get install -y language-pack-fr git python python-dev python-virtualenv python-pip mysql-server libmysqlclient-dev libncurses5-dev build-essential python-numpy python-scipy python-mysqldb chromium-chromedriver xvfb graphviz htop libblas-dev liblapack-dev libatlas-base-dev gfortran
 
-- Create a settings file (see below)
+    # On other exotic OS:
+    TODO
 
-- `make vagrant_start`
+You will also need to install docker and docker-compose. Follow the instructions related to your particular OS from the [official Docker documentation](https://docs.docker.com/install/).
 
-Go get coffee and look into the LBB code in the meantime, it's going to take a while.
+Install python requirements:
 
-Most likely, `vagrant up` **will throw some error and not finish the first time**, we need to finish the provisioning process by running:
+    $ pip install -r requirements.txt
+    $ python setup.py develop
 
-- `make vagrant_provision`
+Start required services (MySQL and Elasticsearch):
 
-until it does.
+    $ make services
 
-# Create a settings file
+Create databases and import data:
 
-Create a `labonneboite/labonneboite/conf/local_settings.py` file with the following values (ask your colleagues for some sensitive values):
+    $ make data
 
-```
-USER = 'labonneboite'
-PASSWORD = 'labonneboite'
-DB = 'labonneboite'
-DEBUG = True
-
-OFFICE_TABLE = 'etablissements'
-MANDRILL_API_KEY = '<set it>'
-LOCALE = 'fr_FR'
-
-GLOBAL_STATIC_PATH = '/tmp'
-
-FLASK_SECRET_KEY = 'bbbbbbbbbbbbbbbbbccccccccccccc'
-ADMIN_EMAIL = '<set it>'
-CONTACT_EMAIL = '<set it>'
-FORM_EMAIL = '<set it>'
-GMAIL_USER = '<set it>'
-GMAIL_PASSWORD = '<set it>'
-STAGING_SERVER_URL = 'http://localhost:5000'
-
-API_KEYS = {
-    'labonneboite': '1234567890abcdef',
-    'emploi_store_dev': '1234567890abcdef',
-}
-
-LOG_LEVEL = 'DEBUG'
-
-PEAM_CLIENT_ID = '<set it>'
-PEAM_CLIENT_SECRET = '<set it>'
-PEAM_AUTH_BASE_URL = '<set it>'
-PEAM_API_BASE_URL = '<set it>'
-PEAM_USERINFO_URL = '<set it>'
-
-VERSION_PRO_ALLOWED_IPS = ['<set it>', '<set it>', '<set it>']
-VERSION_PRO_ALLOWED_EMAILS = ['<set it>', '<set it>', '<set it>']
-VERSION_PRO_ALLOWED_EMAIL_SUFFIXES = ['<set it>', '<set it>', '<set it>']
-VERSION_PRO_ALLOWED_EMAIL_REGEXPS = ['<set it>', '<set it>', '<set it>']
-
-# Values below are *fake* and should be used in development and test environments only.
-# The real values are confidential, stored outside of github repository
-# and are only used in production+staging.
-SCORE_50_HIRINGS = 10.0
-SCORE_60_HIRINGS = 50.0
-SCORE_80_HIRINGS = 100.0
-SCORE_100_HIRINGS = 500.0
-```
-
-# Launch LBB web app
-
-If your vagrant environment is not running, run:
-
-    make vagrant_start
-
-Then run:
+## Launch web app
 
     make serve_web_app
 
-The app is available on port `8090` on host machine. Open a web browser,
-load http://localhost:8090 and start browsing.
+The app is available on port `5000` on host machine. Open a web browser, load
+http://localhost:5000 and start browsing.
 
-# Accessing your local MySQL
+## Running tests
+
+We are using [Nose](https://nose.readthedocs.io/):
+
+    $ make test_unit
+
+About selenium tests: note that your local server must be running for them to pass.
+
+
+# Debugging
+
+## Accessing your local MySQL
 
 To access your local MySQL in your MySQL GUI, for example using Sequel Pro:
 
 - new connection / select "SSH" tab
-- MySQL host: `127.0.0.1`
+- MySQL host: `127.0.0.1:3037`
 - Username: `root`
 - Password: leave empty
 - Database: `labonneboite`
-- SSH Host: `127.0.0.1`
-- SSH User: `vagrant`
-- SSH Password: `vagrant`
-- SSH Port: `2222`
 
 You can also access staging and production DBs using a similar way,
 however with great power comes great responsiblity...
 
-# Elasticsearch
+## Elasticsearch
 
 - Version used: `1.7.x`
 - Doc: https://www.elastic.co/guide/en/elasticsearch/reference/1.7/index.html
 - Python binding: http://elasticsearch-py.readthedocs.io/en/1.6.0/
 
-## Accessing your local Elasticsearch
+### Accessing your local Elasticsearch
 
-Vagrant already forward port 9200 from your host to your guest VM.
+Docker forwards port 9200 from your host to your guest VM.
 
 Simply open http://localhost:9200 in your web browser, or, better, install the chrome extension "Sense".
 
 You can also use `curl` to explore your cluster.
 
-## Examples:
+### Examples:
 
 Locally:
 
@@ -200,40 +153,25 @@ Locally:
     curl 'http://localhost:9200/labonneboite/ogr/_search?pretty'
     curl 'http://localhost:9200/labonneboite/location/_search?pretty'
 
-# DB content in the development environment
+## DB content in the development environment
 
 Note that we only have data in Metz region.
 
 Any search on another region than Metz will give zero results.
 
-# Running tests
+## Profiling
 
-We are using [Nose](https://nose.readthedocs.io/).
+You will need to install a kgrind file visualizer for profiling. Kgrind files store the detailed results of a profiling.
+- For Mac OS install and use QCacheGrind: `brew update && brew install qcachegrind`
+- For other OSes: install and use [KCacheGrind](https://kcachegrind.github.io/html/Home.html)
 
-Tests which can run in development:
-
-    $ make test_importer
-    $ make test_app
-    $ make test_api
-    $ make test_front
-    $ make test_scripts
-    $ make test_integration
-    $ make test_selenium
-
-You can run all tests with:
-
-    $ make test_all
-
-About selenium tests: note that your local server must be running for them to pass.
-
-# Running scripts
+## Running scripts
 
 For example `create_index`:
 
-    $ make vagrant_ssh
-    $ python /srv/lbb/labonneboite/scripts/create_index.py
+    $ python labonneboite/scripts/create_index.py
 
-# Running pylint
+## Running pylint
 
 You can run [pylint](https://www.pylint.org) on the whole project:
 
@@ -241,7 +179,7 @@ You can run [pylint](https://www.pylint.org) on the whole project:
 
 Or on a specific python file:
 
-    $ make pylint ARGS=labonneboite/web/app.py
+    $ make pylint FILE=labonneboite/web/app.py
 
 We recommend you use a pylint git pre-commit hook:
 
@@ -252,7 +190,7 @@ We recommend you use a pylint git pre-commit hook:
     # add the following line at the end of your pre-commit hook file
     git-pylint-commit-hook
 
-# Debugging
+## Debugging
 
     # anywhere in the code
     logger.info("message")
@@ -272,7 +210,7 @@ We recommend you use a pylint git pre-commit hook:
     # and/or
     import ipdb; ipdb.set_trace()
 
-# Importer
+## Importer
 
 The importer jobs are designed to recreate from scratch a complete dataset of offices.
 
@@ -282,14 +220,14 @@ Here is their normal workflow:
 
 Use `make run_importer_jobs` to run all these jobs in local environment.
 
-# Single-ROME vs Multi-ROME search
+## Single-ROME vs Multi-ROME search
 
 The company search on the frontend only allows searching for a single ROME (a.k.a. rome_code). However, historically the API allowed for multi-ROME search. This is no longer the case as of mid-2017, and the three reasons why we dropped support for multi-ROME search are:
 - so that frontend and API behaviors are as similar as possible.
 - tailoring search results to the requested rome_code adds some complexity and would be quite difficult to generalize to a multi-ROME search.
 - nobody was actually using API multi-ROME search anyway.
 
-# Load testing (API+Frontend)
+## Load testing (API+Frontend)
 
 We use the Locust framework (http://locust.io/). Here is how to run load testing against your local environment only. For instructions about how to run load testing against production, please see `README.md` in our private repository.
 
@@ -303,21 +241,15 @@ The load testing is designed to run directly from your vagrant VM using 4 cores 
 - Start your swarm with for example 1 user then increase slowly and observe what happens.
 - As long as your observed RPS stays coherent with your number of users, it means the app behaves correctly. As soon as the RPS is less than it shoud be and/or you get many 500 errors (check your logs) it means the load is too high or that your available bandwidth is too low.
 
-# Profiling
+## `create_index.py`
 
 Here is how to profile the `create_index.py` script and its (long) reindexing of all elasticsearch data. This script is the first we had to do some profiling on, but the idea is that all techniques below should be easily reusable for future profilings of other parts of the code.
 
-## Requirements
-
-Most libraries needed are already in `requirements.txt`, however you need to install a kgrind file visualizer. Kgrind files store the detailed results of a profiling.
-- For Mac OS install and use QCacheGrind: `brew update && brew install qcachegrind`
-- For other OSes: install and use [KCacheGrind](https://kcachegrind.github.io/html/Home.html)
-
-## Notes
+### Notes
 
 - Part of this script heavily relies on parallel computing (using `multiprocessing` library). However profiling and parallel computing do not go very well together. Profiling the main process will give zero information about what happens inside each parallel job. This is why we also profile from within each job.
 
-## Profiling the full script in local
+### Profiling the full script in local
 
 Reminder: the local database has only a small part of the data .i.e data of only 1 of 96 departements, namely the departement 57. Thus profiling on this dataset is not exactly relevant. Let's still explain the details though.
 - `make create_index_from_scratch_with_profiling`
@@ -333,7 +265,7 @@ Visualize the results (for Mac OS):
   
 ![](https://www.evernote.com/l/ABLptykQ5cNP7LzMtHOsC9wMVPdnK-wYErYB/image.png)
 
-## Profiling the full script in staging
+### Profiling the full script in staging
 
 *Warning: in order to do this, you need to have ssh access to our staging server.*
 
@@ -351,7 +283,7 @@ Visualize the results (for Mac OS):
 
 ![](https://www.evernote.com/l/ABKoq_-DZw1GlqbPyISsH_-MbQbxVyy9WoAB/image.png)
 
-## Profiling a single job in local
+### Profiling a single job in local
 
 Former profiling methods are good to get a big picture however they take quite some time to compute, and sometimes you want a quick profiling in local in order to quickly see the result of some changes. Here is how to do that:
 - `make create_index_from_scratch_with_profiling_single_job`
@@ -361,7 +293,7 @@ This variant disables parallel computation, skips all tasks but office reindexin
 
 ![](https://www.evernote.com/l/ABJT1VAV0_xI26HSnAHBP5a7JRSar7CnMjcB/image.png)
 
-## Surgical profiling line by line
+### Surgical profiling line by line
 
 Profiling techniques above can give you a good idea of the performance big picture, but sometimes you really want to dig deeper into very specific and critical methods. For example above we really want to investigate what happens within the `get_scores_by_rome` method which seems critical for performance.
 
@@ -379,8 +311,3 @@ You can perfectly profile methods in other parts of the code than `create_index.
 Here is an example of output:
 
 ![](https://www.evernote.com/l/ABJdN3iVDEJFgLeH2HgHyYOVMjOYK0a30e4B/image.png)
-
-
-
-
-

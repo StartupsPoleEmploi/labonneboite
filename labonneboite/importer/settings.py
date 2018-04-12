@@ -14,6 +14,10 @@ from datetime import datetime
 from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
 from labonneboite.common import departements as dpt
 
+# Folder that contains the repo
+LBB_ROOT_FOLDER = os.path.join(os.path.dirname(__file__), '..', '..', '..')
+IMPORTER_ROOT_FOLDER = os.path.dirname(__file__)
+
 # --- importer tables (names and schema)
 BACKOFFICE_ETABLISSEMENT_TABLE = 'etablissements_backoffice'
 RAW_OFFICE_TABLE = 'etablissements_raw'
@@ -24,10 +28,10 @@ BACKOFFICE_ETABLISSEMENT_TABLE_CREATE_FILE = "importer/db/etablissements_backoff
 
 # --- importer table backuping process
 BACKUP_FIRST = False
-BACKUP_INPUT_FOLDER = '/srv/lbb/backups/inputs'
+BACKUP_INPUT_FOLDER = os.path.join(LBB_ROOT_FOLDER, 'backups', 'inputs')
 
 # --- importer input directory of DPAE and ETABLISSEMENT exports
-INPUT_SOURCE_FOLDER = '/srv/lbb/labonneboite/importer/data'
+INPUT_SOURCE_FOLDER = os.path.join(IMPORTER_ROOT_FOLDER, 'data')
 
 # --- job 1/8 & 2/8 : check_etablissements & extract_etablissements
 dirname = os.path.dirname(os.path.realpath(__file__))
@@ -61,8 +65,8 @@ DEPARTEMENTS_TO_BE_SANITY_CHECKED = dpt.DEPARTEMENTS
 MINIMUM_GEOCODING_RATIO = 0.75
 
 # --- job 8/8 : populate_flags
-BACKUP_OUTPUT_FOLDER = '/srv/lbb/labonneboite/importer/output'
-BACKUP_FOLDER = '/srv/lbb/labonneboite/importer/output'
+BACKUP_OUTPUT_FOLDER = os.path.join(IMPORTER_ROOT_FOLDER, 'output')
+BACKUP_FOLDER = os.path.join(IMPORTER_ROOT_FOLDER, 'output')
 
 if get_current_env() == ENV_LBBDEV:
     # pylint: disable=wildcard-import,unused-wildcard-import

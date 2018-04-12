@@ -11,17 +11,14 @@ We use Alembic which is a lightweight database migration tool for usage with the
 
 To create a new migration file:
 
-1. Connect to your Vagrant machine: `make vagrant_ssh_dev`
-2. Create an empty migration file: `alembic revision -m "your message, e.g. Add users table"`
-3. Edit the generated migration file `upgrade` and `downgrade` methods according to the alembic API
+1. Create an empty migration file: `alembic revision -m "your message, e.g. Add users table"`
+2. Edit the generated migration file `upgrade` and `downgrade` methods according to the alembic API
 
 ## Using `autogenerate`
 
 You can ease this process by running `alembic revision --autogenerate` and then perform a copy and paste of the code of interest.
 
 For this method to work, however, the table must exists before running `alembic revision --autogenerate`:
-
-    make vagrant_ssh_dev
 
     ipython
 

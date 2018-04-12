@@ -1,13 +1,30 @@
-PACKAGE = labonneboite
-PACKAGE_SRC_DIR = $(PACKAGE)
-
-VAGRANT_ACTIVATE_VENV = source /home/vagrant/venvs/labonneboite/bin/activate
-VAGRANT_PYLINT_RC = /srv/lbb/.pylintrc
-
-VAGRANT_PACKAGE_SRC_PATH = /srv/lbb/
-VAGRANT_PACKAGE_SRC_DIR = $(VAGRANT_PACKAGE_SRC_PATH)$(PACKAGE)
-
+PACKAGE_DIR = labonneboite
 LOCUST_HOST = http://localhost:5000
+
+# Services and data
+# -----------------
+
+services:
+	cd docker/ && docker-compose up -d
+
+database: services
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS labonneboite DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'GRANT ALL ON labonneboite.* TO "labonneboite"@"%" IDENTIFIED BY "labonneboite";'
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'GRANT ALL ON lbb_test.* TO "lbb_test"@"%" IDENTIFIED BY "";'
+
+data: database
+	mysql -u root --host 127.0.0.1 --port 3307 labonneboite < ./labonneboite/alembic/sql/etablissements.sql
+	LBB_ENV=development alembic upgrade head
+	LBB_ENV=development python ./labonneboite/scripts/create_index.py --full
+
+clear-data:
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'DROP DATABASE IF EXISTS labonneboite;'
+	mysql -u root --host 127.0.0.1 --port 3307 -e 'DROP DATABASE IF EXISTS lbb_test;'
+
+stop-services:
+	cd docker/ && docker-compose stop
+
 
 # Cleanup
 # -------
@@ -15,12 +32,12 @@ LOCUST_HOST = http://localhost:5000
 .PHONY: clean clean_pyc
 
 clean:
-	find $(PACKAGE_SRC_DIR) "(" -name "*.pyc" -or -name "*.pyo" -or -name "*.mo" -or -name "*.so" ")" -delete
-	find $(PACKAGE_SRC_DIR) -type d -empty -delete
-	find $(PACKAGE_SRC_DIR) -name __pycache__ -delete
+	find $(PACKAGE_DIR) "(" -name "*.pyc" -or -name "*.pyo" -or -name "*.mo" -or -name "*.so" ")" -delete
+	find $(PACKAGE_DIR) -type d -empty -delete
+	find $(PACKAGE_DIR) -name __pycache__ -delete
 
 clean_pyc:
-	find $(PACKAGE_SRC_DIR) "(" -name "*.pyc" ")" -delete
+	find $(PACKAGE_DIR) "(" -name "*.pyc" ")" -delete
 
 # Code quality
 # ------------
@@ -29,49 +46,13 @@ clean_pyc:
 
 # Run pylint on the whole project.
 pylint_all:
-	cd vagrant; \
-	vagrant ssh -c '$(VAGRANT_ACTIVATE_VENV) && \
-	pylint --rcfile=$(VAGRANT_PYLINT_RC) --reports=no \
-		--output-format=colorized $(VAGRANT_PACKAGE_SRC_DIR) || \
-	true'
+	pylint --rcfile=.pylintrc --reports=no --output-format=colorized $(PACKAGE_DIR) || true
 
 # Run pylint on a specific file, e.g.:
 # make pylint FILE=labonneboite/web/app.py
 pylint:
-	cd vagrant; \
-	vagrant ssh -c '$(VAGRANT_ACTIVATE_VENV) && \
-	pylint --rcfile=$(VAGRANT_PYLINT_RC) --reports=no \
-		--output-format=colorized $(VAGRANT_PACKAGE_SRC_PATH)$(FILE) || \
-	true'
+	pylint --rcfile=.pylintrc --reports=no --output-format=colorized $(FILE) || true
 
-
-# Vagrant
-# -------
-
-.PHONY: vagrant_start vagrant_stop vagrant_ssh_dev vagrant_ssh_test vagrant_reload
-
-vagrant_up:
-	cd vagrant && vagrant up
-
-vagrant_provision:
-	cd vagrant && vagrant provision
-
-vagrant_start: vagrant_up vagrant_provision
-
-vagrant_stop:
-	cd vagrant && vagrant halt
-
-vagrant_ssh_dev:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb && bash'
-
-vagrant_ssh_test:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=test && \
-	cd /srv/lbb && bash'
-
-# Reload Vagrant and Vagrantfile quickly.
-vagrant_reload:
-	cd vagrant && vagrant reload
 
 # Local dev
 # ---------
@@ -82,29 +63,22 @@ vagrant_reload:
 .PHONY: mysql_local_shell rebuild_importer_tests_compressed_files
 
 serve_web_app:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	python /srv/lbb/labonneboite/web/app.py'
+	LBB_ENV=development python labonneboite/web/app.py
 
 create_sitemap:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_sitemap.py sitemap'
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_sitemap.py sitemap
 
 prepare_mailing_data:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && \
-	python scripts/prepare_mailing_data.py';
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/prepare_mailing_data.py
 
 create_index:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_index.py'
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_index.py
 
 create_index_from_scratch:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_index.py --full'
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_index.py --full
 
 create_index_from_scratch_with_profiling:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_index.py --full --profile'
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_index.py --full --profile
 
 create_index_from_scratch_with_profiling_on_staging:
 	ssh deploy@lbbstaging -t 'bash -c "\
@@ -116,15 +90,13 @@ create_index_from_scratch_with_profiling_on_staging:
     	labonneboite/scripts/profiling_results/staging/
 
 create_index_from_scratch_with_profiling_single_job:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && python scripts/create_index.py --partial --profile'
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_index.py --partial --profile
 
 create_index_from_scratch_with_profiling_line_by_line:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb/labonneboite && kernprof -v -l scripts/create_index.py --partial --profile'
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && kernprof -v -l scripts/create_index.py --partial --profile
 
 mysql_local_shell:
-	cd vagrant && vagrant ssh --command 'mysql -u root -D labonneboite --host 127.0.0.1'
+	mysql -u root --host 127.0.0.1 --port 3307 labonneboite
 
 rebuild_importer_tests_compressed_files:
 	cd labonneboite/tests/importer/data && \
@@ -139,20 +111,12 @@ rebuild_importer_tests_compressed_files:
 .PHONY: start_locust_against_localhost
 
 start_locust_against_localhost:
-	cd vagrant && vagrant ssh --command '\
-	echo -e && echo -e \
-	&& echo "Please open locust web interface at http://localhost:8089" \
-	&& echo -e && echo -e && \
-		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
-	&& locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave & \
-		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
-	&& locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave & \
-		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
-	&& locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave & \
-		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
-	&& locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave & \
-		$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && cd /srv/lbb/labonneboite \
-	&& locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --master'
+	echo "Please open locust web interface at http://localhost:8089"
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave &
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave &
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave &
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave &
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --master
 
 # Tests
 # -----
@@ -164,81 +128,57 @@ test_unit: clean_pyc test_app test_web test_scripts test_importer
 test_all: test_unit test_selenium
 
 test_app:
-	cd vagrant; \
-	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
-	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/tests/app'
+	LBB_ENV=test nosetests -s labonneboite/tests/app
 
 test_importer:
-	cd vagrant; \
-	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
-	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/tests/importer'
+	LBB_ENV=test nosetests -s labonneboite/tests/importer
 
 test_api:
-	cd vagrant; \
-	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
-	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/tests/web/api'
+	LBB_ENV=test nosetests -s labonneboite/tests/web/api
 
 test_front:
-	cd vagrant; \
-	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
-	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/tests/web/front'
+	LBB_ENV=test nosetests -s labonneboite/tests/web/front
 
 test_web: test_api test_front
 
 test_scripts:
-	cd vagrant; \
-	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
-	&& export LBB_ENV=test \
-	&& nosetests -s /srv/lbb/labonneboite/tests/scripts'
+	LBB_ENV=test nosetests -s labonneboite/tests/scripts
 
 # Selenium and integration tests are run against the full database (not the
 # test one) as of now: we use LBB_ENV=development.
 test_integration:
-	cd vagrant; \
-	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
-	&& export LBB_ENV=development \
-	&& nosetests -s /srv/lbb/labonneboite/tests/integration'
+	LBB_ENV=development nosetests -s labonneboite/tests/integration
 test_selenium:
-	cd vagrant; \
-	vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) \
-	&& export LBB_ENV=development \
-	&& nosetests -s /srv/lbb/labonneboite/tests/selenium'
+	LBB_ENV=development nosetests -s labonneboite/tests/selenium
 
 # Convenient reminder about how to run a specific test manually.
 test_custom:
-	echo "to run a specific test, first run:\
-		\n$ make vagrant_ssh_test\
-		\nthen for example:\
-		\n$ nosetests -s labonneboite/tests/web/api/test_api.py\
-		\nand you can even run a specific method:\
-		\n$ nosetests -s labonneboite/tests/web/api/test_api.py:ApiCompanyListTest.test_query_returns_scores_adjusted_to_rome_code_context"
+	@echo "To run a specific test, run for example:"
+	@echo
+	@echo "    $$ nosetests -s labonneboite/tests/web/api/test_api.py"
+	@echo
+	@echo "and you can even run a specific method:"
+	@echo
+	@echo "    $$ nosetests -s labonneboite/tests/web/api/test_api.py:ApiCompanyListTest.test_query_returns_scores_adjusted_to_rome_code_context"
 
 # Alembic migrations
 # ------------------
 
 alembic_migrate:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb && alembic upgrade head'
+	LBB_ENV=development alembic upgrade head
 
 alembic_rollback:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb && alembic downgrade -1'
+	LBB_ENV=development alembic downgrade -1
 
 # FIXME something is still wrong with this one
 # upgrade and downgrade methods should be swapped in resulting migration
 alembic_autogenerate_migration_for_all_existing_tables:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-	cd /srv/lbb && alembic revision --autogenerate'
+	LBB_ENV=development alembic revision --autogenerate
 
 alembic_generate_single_migration:
-	echo "run:\
-		\n$ make vagrant_ssh_dev\
-		\nthen for example:\
-		\n$ alembic revision -m 'create account table'"
+	@echo "Run for example:"
+	@echo 
+	@echo "    $$ alembic revision -m 'create account table'"
 
 # Importer jobs
 # -------------
@@ -256,55 +196,39 @@ run_importer_jobs:
 	echo "all importer jobs completed successfully."
 
 run_importer_job_00_prepare_all:  # FIXME DNRY table names
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite/importer && \
-		echo delete from import_tasks              | mysql -u root -D labonneboite --host 127.0.0.1 && \
-		echo delete from etablissements_raw        | mysql -u root -D labonneboite --host 127.0.0.1 && \
-		echo delete from etablissements_backoffice | mysql -u root -D labonneboite --host 127.0.0.1 && \
-		echo delete from etablissements_exportable | mysql -u root -D labonneboite --host 127.0.0.1 && \
-		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 && \
-		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 && \
+	export LBB_ENV=development && \
+		cd labonneboite/importer && \
+		echo delete from import_tasks              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from etablissements_raw        | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from etablissements_backoffice | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from etablissements_exportable | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
 		cp ../tests/importer/data/LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv data/ && \
 		cp ../tests/importer/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
-		echo "completed importer run preparation."'
+		echo "completed importer run preparation."
 
 run_importer_job_01_check_etablissements:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite/importer && \
-		python jobs/check_etablissements.py'
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/check_etablissements.py
 
 run_importer_job_02_extract_etablissements:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite/importer && \
-		python jobs/extract_etablissements.py'
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/extract_etablissements.py
 
 run_importer_job_03_check_dpae:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite/importer && \
-		python jobs/check_dpae.py'
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/check_dpae.py
 
 run_importer_job_04_extract_dpae:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite/importer && \
-		python jobs/extract_dpae.py'
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/extract_dpae.py
 
 run_importer_job_05_compute_scores:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite/importer && \
-		python jobs/compute_scores.py'
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/compute_scores.py
 
 run_importer_job_06_validate_scores:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite/importer && \
-		python jobs/validate_scores.py'
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/validate_scores.py
 
 run_importer_job_07_geocode:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite/importer && \
-		python jobs/geocode.py'
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/geocode.py
 
 run_importer_job_08_populate_flags:
-	cd vagrant && vagrant ssh --command '$(VAGRANT_ACTIVATE_VENV) && export LBB_ENV=development && \
-		cd /srv/lbb/labonneboite/importer && \
-		python jobs/populate_flags.py'
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/populate_flags.py

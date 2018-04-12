@@ -1,7 +1,0 @@
----
-
-- name: install python pip
-  apt: name=python-pip state=present
-
-- name: install curator
-  pip: name=elasticsearch-curator

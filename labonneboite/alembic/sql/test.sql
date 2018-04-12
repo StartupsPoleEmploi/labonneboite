@@ -1,0 +1,9 @@
+ Create the test DB which will later be automatically be populated by each model.
+
+# SQL Export
+# Created by Querious (1068)
+# Encoding: Unicode (UTF-8)
+
+DROP DATABASE IF EXISTS `lbb_test`;
+CREATE DATABASE `lbb_test` DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
+USE `lbb_test`;

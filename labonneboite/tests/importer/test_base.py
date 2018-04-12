@@ -3,14 +3,13 @@ import unittest
 
 from labonneboite.common.database import db_session, init_db, delete_db, engine
 
-from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 
 
 class DatabaseTest(unittest.TestCase):
     """
     User and db need to be created before using this class.
-    User 'lbb_test' with password 'lbb_test' need to have all privileges on db 'lbb_test2'.
+    User DB_USER with password DB_PASSWORD need to have all privileges on DB_NAME.
     """
 
     def setUp(self):
@@ -27,7 +26,6 @@ class DatabaseTest(unittest.TestCase):
 
         # Mute jobs logger
         logger.setLevel('CRITICAL')
-
 
         return super(DatabaseTest, self).setUp()
 

@@ -35,8 +35,9 @@ class InvalidRowException(Exception):
 
 
 def create_cursor():
-    con = mdb.connect('localhost', DATABASE['USER'], DATABASE['PASSWORD'], DATABASE['NAME'],
-        use_unicode=True, charset="utf8")
+    con = mdb.connect(host=DATABASE['HOST'], port=DATABASE['PORT'],
+                      user=DATABASE['USER'], passwd=DATABASE['PASSWORD'],
+                      db=DATABASE['NAME'], use_unicode=True, charset="utf8")
     cur = con.cursor()
     return con, cur
 
@@ -71,9 +72,10 @@ def back_up(backup_folder, table, filename, timestamp, copy_to_remote_server=Tru
     # to rename table name on the fly,
     # useful in the case of deploy_data to allow zero downtime atomic table swap of table etablissements
     subprocess.check_call(
-        """mysqldump -u %s %s %s %s | sed 's/`%s`/`%s`/g' | gzip > %s""" % (
+        """mysqldump -u %s %s --host %s --port %d %s %s | sed 's/`%s`/`%s`/g' | gzip > %s""" % (
             DATABASE['USER'],
             password_statement,
+            DATABASE['HOST'], DATABASE['PORT'],
             DATABASE['NAME'],
             table,
             table,
@@ -145,10 +147,8 @@ def reduce_scores_into_table(
     sql_filepath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", create_table_filename)
     init_query = open(sql_filepath, "r").read()
     errors = successes = 0
-    password_statement = "-p'%s'" % DATABASE['PASSWORD']
 
-    subprocess.check_call("""mysql -u %s %s %s -e'%s'""" % (
-        DATABASE['USER'], password_statement, DATABASE['NAME'], init_query), shell=True)
+    run_raw_mysql_query(init_query)
 
     for departement in departements:
         departement_table = "etablissements_%s" % departement
@@ -157,15 +157,7 @@ def reduce_scores_into_table(
         if drop_low_scores:
             query += " where score >= %s" % importer_settings.SCORE_REDUCING_MINIMUM_THRESHOLD
         try:
-            subprocess.check_call(
-                """mysql -u %s %s %s -e'%s'""" % (
-                    DATABASE['USER'],
-                    password_statement,
-                    DATABASE['NAME'],
-                    query
-                ), 
-                shell=True
-            )
+            run_raw_mysql_query(query)
             successes += 1
         except subprocess.CalledProcessError:
             logger.error("an error happened while reducing departement=%s description=%s using query [%s]",
@@ -234,15 +226,12 @@ def reduce_scores_for_backoffice(departements):
 
 @timeit
 def clean_temporary_tables():
-    password_statement = "-p'%s'" % DATABASE['PASSWORD']
-
     logger.info("clean all departement database tables...")
     departements = dpt.DEPARTEMENTS
     for departement in departements:
         departement_table = "etablissements_%s" % departement
         drop_table_query = "drop table if exists %s" % departement_table
-        subprocess.check_call("""mysql -u %s %s %s -e'%s'""" % (
-            DATABASE['USER'], password_statement, DATABASE['NAME'], drop_table_query), shell=True)
+        run_raw_mysql_query(drop_table_query)
 
 
 def get_fields_from_csv_line(line, delimiter='|'):
@@ -350,8 +339,13 @@ def get_departement_from_zipcode(zipcode):
         departement = zipcode[:2]
     else:
         departement = None
-    
+
     if departement in ["2A", "2B"]:  # special case of Corsica
         departement = "20"
     return departement
 
+
+def run_raw_mysql_query(query):
+    password_statement = "-p'%s'" % DATABASE['PASSWORD']
+    subprocess.check_call("""mysql -u %s %s --host %s --port %d %s -e'%s'""" % (
+            DATABASE['USER'], password_statement, DATABASE['HOST'], DATABASE['PORT'], DATABASE['NAME'], query), shell=True)

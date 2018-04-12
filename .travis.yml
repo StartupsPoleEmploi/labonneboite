@@ -3,13 +3,13 @@ language: python
 python:
   - 2.7.6
 env:
-  - LBB_ENV=test DB_USER=travis DB_PASSWORD=""
+  - LBB_ENV=test DB_HOST=localhost DB_PORT=3036 DB_USER=travis DB_PASSWORD=""
 cache: pip
 services:
   - mysql
   - elasticsearch
 before_install:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS lbb_test2;'
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS lbb_test;'
   - sudo apt-get install language-pack-fr
   - sudo locale-gen fr_FR
   - sudo update-locale
