@@ -41,20 +41,21 @@ def suggest_locations():
 
 @searchBlueprint.route('/job_slug_details')
 def job_slug_details():
-    result = {}
+    result = []
 
     job_slug = request.args.get('job-slug', '')
     if not job_slug:
         return u'no job-slug given', 400
 
-    rome = mapping_util.SLUGIFIED_ROME_LABELS.get(job_slug)
-    if not rome:
-        return u'no rome found associated to the slug {}'.format(job_slug), 400
-
-    result['job'] = {
-        'rome_code': rome,
-        'label': settings.ROME_DESCRIPTIONS.get(rome, ''),
-    }
+    slugs = job_slug.split(',')
+    for slug in slugs:
+        rome = mapping_util.SLUGIFIED_ROME_LABELS.get(slug)
+        # Ignored unknown job slugs
+        if rome:
+            result.append({
+                'rome_code': rome,
+                'label': settings.ROME_DESCRIPTIONS.get(rome, ''),
+            })
 
     return make_response(json.dumps(result))
 
