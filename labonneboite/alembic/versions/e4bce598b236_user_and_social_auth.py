@@ -3,18 +3,16 @@
 Add User and Social Auth tables.
 
 Revision ID: e4bce598b236
-Revises:
+Revises: d0c07945abc1
 Create Date: 2017-03-15 14:05:53.077840
 """
 from alembic import op
 from sqlalchemy.dialects import mysql
 import sqlalchemy as sa
 
-# initial migration
-
 # Revision identifiers, used by Alembic.
 revision = 'e4bce598b236'
-down_revision = None
+down_revision = 'd0c07945abc1'
 branch_labels = None
 depends_on = None
 

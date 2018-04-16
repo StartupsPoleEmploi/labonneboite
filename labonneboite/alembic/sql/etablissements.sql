@@ -1,5 +1,7 @@
 # this script should only run in local development and AFTER all migrations have completed
 
+# this only injects data in existing table etablissements
+
 #
 # SQL Export
 # Created by Querious (201026)
