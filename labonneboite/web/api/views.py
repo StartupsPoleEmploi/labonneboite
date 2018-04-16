@@ -88,14 +88,16 @@ def company_list():
     companies_count = fetcher.company_count
     url = fetcher.compute_url(ga_query_string)
 
+    companies = [
+        patch_company_result(request.args['user'], company, company.as_json(
+            rome_code=fetcher.rome, distance=fetcher.distance, zipcode=zipcode,
+            extra_query_string=ga_query_string,
+        ))
+        for company in companies
+    ]
+
     result = {
-        'companies': [
-            company.as_json(
-                rome_code=fetcher.rome, distance=fetcher.distance, zipcode=zipcode,
-                extra_query_string=ga_query_string,
-            )
-            for company in companies
-        ],
+        'companies': companies,
         'companies_count': companies_count,
         'url': url,
         'rome_code': fetcher.rome,
@@ -172,6 +174,7 @@ def company_filter_list():
     })
 
     return jsonify(result)
+
 
 def get_location(request_args):
     """
@@ -407,9 +410,15 @@ def office_details(siret):
             'zipcode': office.zipcode,
         },
     }
-    # Some internal services of Pôle emploi can sometimes have access to sensitive information.
-    if request.args['user'] in settings.API_INTERNAL_CONSUMERS:
+    patch_company_result(request.args['user'], office, result)
+    return jsonify(result)
+
+
+def patch_company_result(api_username, office, result):
+    # Some internal services of Pôle emploi can sometimes have access to
+    # sensitive information.
+    if api_username in settings.API_INTERNAL_CONSUMERS:
         result['email'] = office.email
         result['phone'] = office.tel
         result['website'] = office.website
-    return jsonify(result)
+    return result
