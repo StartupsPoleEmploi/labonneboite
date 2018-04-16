@@ -15,6 +15,7 @@ from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import sorting
 from labonneboite.common import autocomplete
+from labonneboite.common import hiring_type_util
 from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.models import Office
 from labonneboite.common.es import Elasticsearch
@@ -83,7 +84,7 @@ class CityLocation(object):
 
 class Fetcher(object):
 
-    def __init__(self, search_location, rome=None, distance=None, sort=None,
+    def __init__(self, search_location, rome=None, distance=None, sort=None, hiring_type=None,
                  from_number=1, to_number=OFFICES_PER_PAGE, flag_alternance=None,
                  public=None, headcount=None, naf=None, naf_codes=None,
                  aggregate_by=None, departments=None, **kwargs):
@@ -99,6 +100,7 @@ class Fetcher(object):
         self.rome = rome
         self.distance = distance
         self.sort = sort
+        self.hiring_type = hiring_type
 
         # Pagination.
         self.from_number = from_number
@@ -307,6 +309,7 @@ class Fetcher(object):
                 flag_handicap=self.flag_handicap,
                 headcount=self.headcount,
                 sort=self.sort,
+                hiring_type=self.hiring_type,
                 departments=self.departments,
                 aggregate_by=self.aggregate_by,
             )
@@ -440,6 +443,7 @@ def build_json_body_elastic_search(
         to_number=None,
         headcount=settings.HEADCOUNT_WHATEVER,
         sort=sorting.SORT_FILTER_DEFAULT,
+        hiring_type=None,
         flag_alternance=0,
         flag_junior=0,
         flag_senior=0,
@@ -448,7 +452,12 @@ def build_json_body_elastic_search(
         departments=None,
     ):
 
-    score_for_rome_field_name = "scores_by_rome.%s" % rome_code
+    hiring_type = hiring_type or hiring_type_util.DEFAULT
+    score_for_rome_field_name = {
+        hiring_type_util.DPAE: "scores_by_rome.%s" % rome_code,
+        hiring_type_util.ALTERNANCE: "scores_alternance_by_rome.%s" % rome_code
+    }[hiring_type]
+
     boosted_rome_field_name = "boosted_romes.%s" % rome_code
 
     # Build filters.
@@ -641,7 +650,7 @@ def build_json_body_elastic_search(
 
         json_body['aggs'] = {}
         for aggregate in aggregate_by:
-            # Distance if not an ES field, so we have to do a specefic aggregations
+            # Distance is not an ES field, so we have to do a specific aggregation.
             if aggregate == 'distance':
                 json_body['aggs']['distance'] = {
                     'geo_distance' : {
@@ -694,7 +703,11 @@ def get_companies_from_es_and_db(json_body, sort):
         # with a 'Unable to find a field mapper for field' error. This is fixed in ES 2.1.0.
         orphan_rome_known_bug = (
             e[0] == 400
-            and u'ElasticsearchException[Unable to find a field mapper for field [scores_by_rome' in e[1]
+            and (
+                u'ElasticsearchException[Unable to find a field mapper for field [scores_by_rome' in e[1]
+                or
+                u'ElasticsearchException[Unable to find a field mapper for field [scores_alternance_by_rome' in e[1]
+            )
         )
         if orphan_rome_known_bug:
             # Drop the problematic "field_value_factor" clause and run again.

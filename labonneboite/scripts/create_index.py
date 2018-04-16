@@ -95,6 +95,7 @@ def switch_es_index():
 def get_verbose_loggers():
     return [logging.getLogger(logger_name) for logger_name in VERBOSE_LOGGER_NAMES]
 
+
 def disable_verbose_loggers():
     """
     We disable some loggers at specific points of this script in order to have a clean output
@@ -107,9 +108,11 @@ def disable_verbose_loggers():
         # FIXME try again to increase logger level instead of disabling it.
         logger.disabled = True
 
+
 def enable_verbose_loggers():
     for logger in get_verbose_loggers():
         logger.disabled = False
+
 
 OFFICE_TYPE = 'office'
 OGR_TYPE = 'ogr'
@@ -144,12 +147,15 @@ class StatTracker:
         self.office_count = 0
         self.indexed_office_count = 0
         self.office_score_for_rome_count = 0
+        self.office_score_alternance_for_rome_count = 0
     def increment_office_count(self):
         self.office_count += 1
     def increment_indexed_office_count(self):
         self.indexed_office_count += 1
     def increment_office_score_for_rome_count(self):
         self.office_score_for_rome_count += 1
+    def increment_office_score_alternance_for_rome_count(self):
+        self.office_score_alternance_for_rome_count += 1
 
 st = StatTracker()
 
@@ -268,6 +274,7 @@ def get_office_as_es_doc(office):
         'naf': office.naf,
         'siret': office.siret,
         'score': office.score,
+        'score_alternance': office.score_alternance,
         'headcount': headcount,
         'name': sanitized_name,
         'email': sanitized_email,
@@ -287,16 +294,19 @@ def get_office_as_es_doc(office):
             {'lat': office.y, 'lon': office.x},
         ]
 
-    scores_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office)
+    scores_by_rome, scores_alternance_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office)
     if scores_by_rome:
         doc['scores_by_rome'] = scores_by_rome
         doc['boosted_romes'] = boosted_romes
+    if scores_alternance_by_rome:
+        doc['scores_alternance_by_rome'] = scores_alternance_by_rome
 
     return doc
 
 
 def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
     scores_by_rome = {}
+    scores_alternance_by_rome = {}
     boosted_romes = {}  # elasticsearch does not understand sets, so we use a dict of 'key => True' instead
 
     # fetch all rome_codes mapped to the naf of this office
@@ -323,8 +333,6 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
         rome_codes = set(rome_codes).union(set(romes_to_boost)) - set(romes_to_remove)
 
         for rome_code in rome_codes:
-            score = 0
-
             # Manage office boosting
             if office_to_update and office_to_update.boost:
                 if not office_to_update.romes_to_boost:
@@ -334,23 +342,41 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                     # Boost the score for some ROME codes only.
                     boosted_romes[rome_code] = True
 
-            score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+            # 1) DPAE scoring part
+
+            score_dpae = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
                 score=office.score,
                 rome_code=rome_code,
                 naf_code=naf)
 
-            if score >= scoring_util.SCORE_FOR_ROME_MINIMUM or rome_code in boosted_romes:
+            if score_dpae >= scoring_util.SCORE_FOR_ROME_MINIMUM or rome_code in boosted_romes:
                 if rome_code in scores_by_rome:
-                    if score > scores_by_rome[rome_code]:
-                        scores_by_rome[rome_code] = score
+                    # this ROME was already computed before for another NAF
+                    if score_dpae > scores_by_rome[rome_code]:
+                        # keep highest score for this rome among all possible NAF codes
+                        scores_by_rome[rome_code] = score_dpae
                 else:
-                    scores_by_rome[rome_code] = score
+                    scores_by_rome[rome_code] = score_dpae
                     st.increment_office_score_for_rome_count()
 
-    return scores_by_rome, boosted_romes
+            # 2) Alternance scoring part - boosting is not applied for alternance
 
+            score_alternance = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                score=office.score_alternance,
+                rome_code=rome_code,
+                naf_code=naf)
 
+            if score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM:
+                if rome_code in scores_alternance_by_rome:
+                    # this ROME was already computed before for another NAF
+                    if score_alternance > scores_alternance_by_rome[rome_code]:
+                        # keep highest score for this rome among all possible NAF codes
+                        scores_alternance_by_rome[rome_code] = score_alternance
+                else:
+                    scores_alternance_by_rome[rome_code] = score_alternance
+                    st.increment_office_score_alternance_for_rome_count()
 
+    return scores_by_rome, scores_alternance_by_rome, boosted_romes
 
 
 def create_offices(disable_parallel_computing=False):
@@ -394,7 +420,7 @@ def create_offices_for_departement(departement):
 
         es_doc = get_office_as_es_doc(office)
 
-        office_is_reachable = 'scores_by_rome' in es_doc
+        office_is_reachable = ('scores_by_rome' in es_doc) or ('scores_alternance_by_rome' in es_doc)
 
         if office_is_reachable:
             st.increment_indexed_office_count()
@@ -527,10 +553,12 @@ def update_offices():
                     'flag_alternance': 1 if office.flag_alternance else 0}
                 }
 
-                scores_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)
+                scores_by_rome, scores_alternance_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)
                 if scores_by_rome:
                     body['doc']['scores_by_rome'] = scores_by_rome
                     body['doc']['boosted_romes'] = boosted_romes
+                if scores_alternance_by_rome:
+                    body['doc']['scores_alternance_by_rome'] = scores_alternance_by_rome
 
                 # The update API makes partial updates: existing `scalar` fields are overwritten,
                 # but `objects` fields are merged together.
@@ -653,11 +681,12 @@ def display_performance_stats(departement):
     for method in methods:
         logger.info("[DPT%s] %s : %s", departement, method, getattr(scoring_util, method).cache_info())
 
-    logger.info("[DPT%s] indexed %s of %s offices and %s score_for_rome",
+    logger.info("[DPT%s] indexed %s of %s offices and %s score_for_rome and %s scores_alternance_by_rome",
         departement,
         st.indexed_office_count,
         st.office_count,
-        st.office_score_for_rome_count
+        st.office_score_for_rome_count,
+        st.office_score_alternance_for_rome_count,
     )
 
 

@@ -1,32 +1,22 @@
 """
-Create geolocations and etablissements_backoffice importer tables.
+initial migration create etablissements
 
-Revision ID: 0592646101eb
-Revises: 240900fabe59
-Create Date: 2017-11-13 13:52:23.414532
+Revision ID: d0c07945abc1
+Revises: None
+Create Date: 2018-04-16 17:45:37.243833
 """
 from alembic import op
 from sqlalchemy.dialects import mysql
 import sqlalchemy as sa
 
 # Revision identifiers, used by Alembic.
-revision = '0592646101eb'
-down_revision = '240900fabe59'
+revision = 'd0c07945abc1'
+down_revision = None
 branch_labels = None
 depends_on = None
 
-
 def upgrade():
-    op.create_table('geolocations',
-        sa.Column('full_address', mysql.VARCHAR(collation=u'utf8mb4_unicode_ci', length=191), nullable=False),
-        sa.Column('coordinates_x', mysql.FLOAT(), nullable=True),
-        sa.Column('coordinates_y', mysql.FLOAT(), nullable=True),
-        sa.PrimaryKeyConstraint('full_address'),
-        mysql_collate=u'utf8mb4_unicode_ci',
-        mysql_default_charset=u'utf8mb4',
-        mysql_engine=u'InnoDB'
-    )
-    op.create_table('etablissements_backoffice',
+    op.create_table('etablissements',
         sa.Column('siret', mysql.VARCHAR(collation=u'utf8mb4_unicode_ci', length=191), nullable=False),
         sa.Column('raisonsociale', mysql.VARCHAR(collation=u'utf8mb4_unicode_ci', length=191), nullable=True),
         sa.Column('enseigne', mysql.VARCHAR(collation=u'utf8mb4_unicode_ci', length=191), nullable=True),
@@ -48,15 +38,6 @@ def upgrade():
         sa.Column('coordinates_y', mysql.FLOAT(), nullable=True),
         sa.Column('departement', mysql.VARCHAR(collation=u'utf8mb4_unicode_ci', length=11), nullable=True),
         sa.Column('score', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
-        sa.Column('semester-1', mysql.DOUBLE(asdecimal=True), nullable=True),
-        sa.Column('semester-2', mysql.DOUBLE(asdecimal=True), nullable=True),
-        sa.Column('semester-3', mysql.DOUBLE(asdecimal=True), nullable=True),
-        sa.Column('semester-4', mysql.DOUBLE(asdecimal=True), nullable=True),
-        sa.Column('semester-5', mysql.DOUBLE(asdecimal=True), nullable=True),
-        sa.Column('semester-6', mysql.DOUBLE(asdecimal=True), nullable=True),
-        sa.Column('semester-7', mysql.DOUBLE(asdecimal=True), nullable=True),
-        sa.Column('effectif', mysql.DOUBLE(asdecimal=True), nullable=True),
-        sa.Column('score_regr', mysql.FLOAT(), nullable=True),
         sa.PrimaryKeyConstraint('siret'),
         mysql_collate=u'utf8mb4_unicode_ci',
         mysql_default_charset=u'utf8mb4',
@@ -65,7 +46,4 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_table('geolocations')
-    op.drop_table('etablissements_backoffice')
-
-
+    op.drop_table('etablissements')

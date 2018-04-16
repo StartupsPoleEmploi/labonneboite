@@ -60,6 +60,7 @@ class OfficeMixin(PrimitiveOfficeMixin):
     flag_senior = Column(Boolean, default=False, nullable=False)
     flag_handicap = Column(Boolean, default=False, nullable=False)
     score = Column(Integer, default=0, nullable=False)
+    score_alternance = Column(Integer, default=0, nullable=False)
     x = Column('coordinates_x', Float)  # Longitude.
     y = Column('coordinates_y', Float)  # Latitude.
 

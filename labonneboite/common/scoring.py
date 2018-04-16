@@ -6,7 +6,11 @@ from backports.functools_lru_cache import lru_cache
 from labonneboite.common import mapping as mapping_util
 from labonneboite.conf import settings
 
-SCORE_FOR_ROME_MINIMUM = 20  # at least 20 over 100
+# scores between 0 and 100
+SCORE_FOR_ROME_MINIMUM = 20
+SCORE_ALTERNANCE_FOR_ROME_MINIMUM = 20
+
+# stars between 0.0 and 5.0
 STARS_MINIMUM = 2.5
 STARS_MAXIMUM = 5.0
 

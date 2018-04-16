@@ -80,6 +80,7 @@ labonneboite/*.lprof
 
 # Importer #
 ############
+pickle_exports/*.pickle
 labonneboite/importer/data/*.csv
 labonneboite/importer/jenkins/*.jenkins
 labonneboite/importer/output/*.bz2

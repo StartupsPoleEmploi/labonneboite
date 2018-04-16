@@ -233,6 +233,14 @@ def create_index(index):
                 "type": "object",
                 "index": "not_analyzed",
             },
+            "score_alternance": {
+                "type": "integer",
+                "index": "not_analyzed",
+            },
+            "scores_alternance_by_rome": {
+                "type": "object",
+                "index": "not_analyzed",
+            },
             "boosted_romes": {
                 "type": "object",
                 "index": "not_analyzed",

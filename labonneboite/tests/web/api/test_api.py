@@ -159,6 +159,38 @@ class ApiCompanyListTest(ApiBaseTest):
     Test the main API route: `company_list`.
     """
 
+    def test_happy_path(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['caen']['commune_id'],
+                'rome_codes': u'D1405',
+                'user': u'labonneboite',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+
+    def test_alternance_scoring(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['caen']['commune_id'],
+                'rome_codes': u'D1405',
+                'user': u'labonneboite',
+                'hiring_type': u'alt',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+
+    def test_unknown_hiring_type(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['caen']['commune_id'],
+                'rome_codes': u'D1405',
+                'user': u'labonneboite',
+                'hiring_type': u'unicorn',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 400)
+
     def test_missing_communeid_or_latitudelongitude(self):
         with self.test_request_context:
             params = self.add_security_params({

@@ -9,6 +9,7 @@ from labonneboite.common import search
 from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
+from labonneboite.common import hiring_type_util
 from labonneboite.common.load_data import load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
@@ -308,7 +309,6 @@ def create_fetcher(location, request_args):
             ))
     kwargs['naf_codes'] = naf_codes_list
 
-
     # Sort
     sort = sorting.SORT_FILTER_DEFAULT
     if 'sort' in request_args:
@@ -317,6 +317,11 @@ def create_fetcher(location, request_args):
             raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(sorting.SORTING_VALUES))
     kwargs['sort'] = sort
 
+    # Hiring type (DPAE/LBB or Alternance/LBA)
+    hiring_type = request_args.get('hiring_type', hiring_type_util.DEFAULT)
+    if hiring_type not in hiring_type_util.VALUES:
+        raise InvalidFetcherArgument(u'hiring_type. Possible values : %s' % ', '.join(hiring_type_util.VALUES))
+    kwargs['hiring_type'] = hiring_type
 
     # Flag_alternance
     flag_alternance = CONTRACT_VALUES['all']
