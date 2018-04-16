@@ -197,6 +197,7 @@ class Fetcher(object):
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount=self.headcount,
+            hiring_type=self.hiring_type,
             departments=self.departments,
             aggregate_by=None,
         )
@@ -214,6 +215,7 @@ class Fetcher(object):
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount=self.headcount,
+            hiring_type=self.hiring_type,
             departments=self.departments,
         )
         return aggregations['naf']
@@ -231,6 +233,7 @@ class Fetcher(object):
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount=settings.HEADCOUNT_WHATEVER, # No headcount filter
+            hiring_type=self.hiring_type,
             departments=self.departments,
         )
         return aggregations['headcount']
@@ -248,6 +251,7 @@ class Fetcher(object):
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount=self.headcount,
+            hiring_type=self.hiring_type,
             departments=self.departments,
         )
         return aggregations['contract']
@@ -266,6 +270,7 @@ class Fetcher(object):
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount=self.headcount,
+            hiring_type=self.hiring_type,
             departments=self.departments,
         )
         return aggregations['distance']
