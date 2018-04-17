@@ -37,7 +37,9 @@ class TestResetNaf(LbbSeleniumTestCase):
         job_input.send_keys(Keys.RETURN)
 
         # Hide the debug toolbar, otherwise it would overlap the submit button of the form.
-        self.driver.find_element_by_id('flHideToolBarButton').click()
+        # Actually, no. This is only necessary in development mode.
+        # self.driver.find_element_by_id('flHideToolBarButton').click()
+
         # Submit the search form.
         self.driver.find_element_by_css_selector('form.js-search-form div.form-search button').click()
 

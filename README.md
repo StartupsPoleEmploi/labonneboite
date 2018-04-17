@@ -6,6 +6,8 @@
 |_|\__,_|_.__/ \___/|_| |_|_| |_|\___|_.__/ \___/|_|\__\___|
 ```
 
+[![Build Status](https://travis-ci.org/StartupsPoleEmploi/labonneboite.svg?branch=master)](https://travis-ci.org/StartupsPoleEmploi/labonneboite)
+
 # Présentation du projet
 
 Quel est le canal le plus utilisé par les chercheurs d'emploi pour rechercher un emploi ?

@@ -30,13 +30,11 @@ class AppTest(unittest.TestCase):
     """
 
     # https://kronosapiens.github.io/blog/2014/08/14/understanding-contexts-in-flask.html
-    HOME_URL = settings.STAGING_SERVER_URL
+    TEST_SERVER_NAME = 'test.labonneboite.fr'
 
     def setUp(self):
-        # Disable CSRF validation in unit tests.
-        app.config['WTF_CSRF_ENABLED'] = False
         # Setting a SERVER_NAME enables URL generation without a request context but with an application context.
-        app.config['SERVER_NAME'] = self.HOME_URL.replace('http://', '')
+        app.config['SERVER_NAME'] = self.TEST_SERVER_NAME
         self.app = app.test_client()
         self.app_context = app.app_context()
         self.test_request_context = app.test_request_context()

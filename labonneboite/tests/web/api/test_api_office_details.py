@@ -19,7 +19,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
             u'naf': u'7320Z',
             u'name': u'OFFICE 1',
             u'naf_text': u'\xc9tudes de march\xe9 et sondages',
-            u'url': u'%s/00000000000001/details' % self.HOME_URL,
+            u'url': u'http://%s/00000000000001/details' % self.TEST_SERVER_NAME,
             u'lon': 6.0,
             u'headcount_text': u'10 à 19 salariés',
             u'stars': 4.0,

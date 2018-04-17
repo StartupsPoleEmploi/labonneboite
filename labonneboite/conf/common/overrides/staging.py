@@ -1,4 +1,3 @@
-DEBUG = False
 LOG_LEVEL = 'WARNING'
 
 GLOBAL_STATIC_PATH = '/var/www/static'

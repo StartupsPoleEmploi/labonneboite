@@ -15,8 +15,6 @@ overrides/production.py
 from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST, ENV_STAGING, ENV_PRODUCTION
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 
-DEBUG = True
-
 GLOBAL_STATIC_PATH = '/tmp'
 
 ROME_DESCRIPTIONS = load_rome_labels()
@@ -48,7 +46,6 @@ PEAM_USERINFO_URL = '<set it>'
 MANDRILL_API_KEY = '<set it>'
 FORM_EMAIL = '<set it>'
 LOG_LEVEL = 'DEBUG'
-STAGING_SERVER_URL = 'http://localhost:5000'
 # Values below are *fake* and should be used in development and test environments only.
 # The real values are confidential, stored outside of github repository
 # and are only used in production+staging.
