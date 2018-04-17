@@ -17,8 +17,7 @@ database-test: services
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'GRANT ALL ON lbb_test.* TO "lbb_test"@"%" IDENTIFIED BY "";'
 
-data: database
-	LBB_ENV=development alembic upgrade head
+data: database alembic_migrate
 	mysql -u root --host 127.0.0.1 --port 3307 labonneboite < ./labonneboite/alembic/sql/etablissements.sql
 	LBB_ENV=development python ./labonneboite/scripts/create_index.py --full
 
@@ -154,8 +153,11 @@ test_scripts:
 
 # Selenium and integration tests are run against the full database (not the
 # test one) as of now: we use LBB_ENV=development.
-test_integration:
-	LBB_ENV=development nosetests -s labonneboite/tests/integration
+test_integration: clear-data-test database-test
+	LBB_ENV=test alembic upgrade head
+	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
+	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
+	LBB_ENV=test nosetests -s labonneboite/tests/integration
 test_selenium: clear-data-test database-test
 	LBB_ENV=test alembic upgrade head
 	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
