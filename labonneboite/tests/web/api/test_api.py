@@ -1273,6 +1273,31 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data_list['companies_count'], data_count['companies_count'])
             self.assertIn('companies', data_list)
 
+    @mock.patch.object(settings, 'API_INTERNAL_CONSUMERS', ['labonneboite'])
+    def test_internal_user_call(self):
+        params = self.add_security_params({
+            'commune_id': self.positions['caen']['commune_id'],
+            'rome_codes': u'D1405',
+            'distance': u'10',
+            'user': u'labonneboite',
+        })
+
+        with mock.patch.object(settings, 'API_INTERNAL_CONSUMERS', []):
+            response_unprivileged = self.app.get(self.url_for("api.company_list", **params))
+        with mock.patch.object(settings, 'API_INTERNAL_CONSUMERS', ['labonneboite']):
+            response_privileged = self.app.get(self.url_for("api.company_list", **params))
+
+        company_without_info = json.loads(response_unprivileged.data)['companies'][0]
+        company_with_info= json.loads(response_privileged.data)['companies'][0]
+
+        self.assertNotIn("email", company_without_info)
+        self.assertNotIn("phone", company_without_info)
+        self.assertNotIn("website", company_without_info)
+        self.assertIn("email", company_with_info)
+        self.assertIn("phone", company_with_info)
+        self.assertIn("website", company_with_info)
+
+
 class ApiCompanyListTrackingCodesTest(ApiBaseTest):
 
     def assertTrackingCodesEqual(self, company_url, utm_medium, utm_source, utm_campaign):
