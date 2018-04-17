@@ -21,8 +21,6 @@ ROME_DESCRIPTIONS = load_rome_labels()
 
 NAF_CODES = load_naf_labels()
 
-LOCALE = 'fr_FR.UTF-8'
-
 SEARCHING_TIME = 10000
 
 HOST = 'labonneboite.pole-emploi.fr'
