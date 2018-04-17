@@ -1,11 +1,10 @@
 # coding: utf8
 import distutils.spawn
 import logging
-import os
 
+import easyprocess
 from flask import url_for as flask_url_for
 from flask_testing import LiveServerTestCase
-from pyvirtualdisplay import Display
 from selenium import webdriver
 
 from labonneboite.web.app import app
@@ -35,8 +34,17 @@ class LbbSeleniumTestCase(LiveServerTestCase):
     def setUp(self):
         super(LbbSeleniumTestCase, self).setUp()
 
-        self.display = Display(visible=0, size=(800, 600))
-        self.display.start()
+        self.display = None
+        try:
+            from pyvirtualdisplay import Display
+            display = Display(visible=0, size=(800, 600))
+            display.start()
+        except easyprocess.EasyProcessCheckInstalledError:
+            # On some unreliable and exotic OS (such as Mac OS) installing a
+            # headless display server such as Xvfb is highly non-trivial. In
+            # those cases, we just run Chrome. It's fun and allows the user to
+            # view the tests running in real time.
+            print "Xvfb is not available. Running selenium tests in non-virtual display."
 
         # Chromedriver is often in /usr/lib/chromium-browser/chromedriver
         chromedriver_path = distutils.spawn.find_executable('chromedriver')
@@ -48,12 +56,13 @@ class LbbSeleniumTestCase(LiveServerTestCase):
 
         # Ensure that the window size is large enough so that HTML elements won't overlap.
         self.driver.set_window_size(1600, 1200)
-        self.addCleanup(self.display.stop)
-        self.addCleanup(self.driver.quit)
+
 
     def tearDown(self):
         super(LbbSeleniumTestCase, self).tearDown()
         self.driver.quit()
+        if self.display:
+            self.addCleanup(self.display.stop)
 
     def url_for(self, endpoint, **kwargs):
         """
