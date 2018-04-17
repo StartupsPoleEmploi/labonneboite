@@ -35,7 +35,7 @@ from labonneboite.web.config import get_config
 
 # Fix a bug with Python 2, strftime and Unicode.
 # http://www.regisblog.fr/2015/01/08/python-strftime-unicode/
-locale.setlocale(locale.LC_ALL, settings.LOCALE)
+locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
 
 
 # The login manager contains the code that lets the application and Flask-Login
