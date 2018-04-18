@@ -18,6 +18,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
             u'siret': u'00000000000001',
             u'naf': u'7320Z',
             u'name': u'OFFICE 1',
+            u'raison_sociale': u'Raison sociale 1',
             u'naf_text': u'\xc9tudes de march\xe9 et sondages',
             u'url': u'http://%s/00000000000001/details' % self.TEST_SERVER_NAME,
             u'lon': 6.0,
