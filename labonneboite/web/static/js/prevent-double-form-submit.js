@@ -1,6 +1,6 @@
 (function($) {
 
-  $(document).ready(function () {
+  $(document).on('lbbready', function () {
 
     // Prevent form double submit system wide.
     $('form').on('submit', function () {

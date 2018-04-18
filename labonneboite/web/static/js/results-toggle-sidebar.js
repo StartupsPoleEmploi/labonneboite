@@ -1,6 +1,6 @@
 (function($) {
 
-  $(document).ready(function () {
+  $(document).on('lbbready', function () {
     $('.lbb-sidebar-toggle').enableSlidingSidebar();
   });
 

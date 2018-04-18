@@ -11,7 +11,7 @@ var trackOutboundLink = function(url) {
 
 (function ($) {
 
-  $(document).ready(function () {
+  $(document).on('lbbready', function () {
 
     // Only init a map if its container is visible because Leaflet
     // has a hard time initializing maps in hidden elements.

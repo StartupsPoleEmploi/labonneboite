@@ -214,6 +214,14 @@
   </footer>
 
   {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+  <script>
+      // Trigger our own ready event
+      (function($){
+          $(document).ready(function() {
+            $(document).trigger('lbbready');
+          });
+      })(jQuery);
+  </script>
 
   {% block scripts %}{% endblock %}
 
