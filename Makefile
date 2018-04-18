@@ -132,7 +132,9 @@ start_locust_against_localhost:
 
 test_unit: clean_pyc test_app test_web test_scripts test_importer
 
-test_all: test_unit test_selenium test_integration run_importer_jobs
+test_all: test_unit test_selenium test_integration
+
+check_all: test_all run_importer_jobs
 
 test_app:
 	LBB_ENV=test nosetests -s labonneboite/tests/app
@@ -141,7 +143,7 @@ test_importer:
 	LBB_ENV=test nosetests -s labonneboite/tests/importer
 
 # convenient shortcut when working on the importer
-test_importer_all: test_importer run_importer_jobs
+check_importer: test_importer run_importer_jobs
 
 test_api:
 	LBB_ENV=test nosetests -s labonneboite/tests/web/api
