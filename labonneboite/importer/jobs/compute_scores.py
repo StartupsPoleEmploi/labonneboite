@@ -32,12 +32,16 @@ COMPUTE_SCORES_DEBUG_DEPARTEMENTS = ["90"]
 DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING = False
 
 
-def abortable_worker(func, departement):
-    p = ThreadPool(1)
+def apply_async(pool, func, departement):
     # note: it is very important to use `(departement,)` which is a 1-tuple,
     # since `(departement)` is actually not a tuple, and apply_async
     # will parse the departement as two values e.g. 57 becomes (5, 7) o_O
-    res = p.apply_async(func, args=(departement,))
+    return pool.apply_async(func, args=(departement,))
+
+
+def abortable_worker(func, departement):
+    pool = ThreadPool(1)
+    res = apply_async(pool, func, departement)
     result = res.get()
     logger.info("got result for departement %s", departement)
     return result
@@ -79,13 +83,7 @@ class ScoreComputingJob(Job):
             for departement in departements:
                 abortable_func = partial(abortable_worker, compute)
                 # apply_async returns immediately
-                compute_results[departement] = pool.apply_async(
-                    abortable_func,
-                    # note: it is very important to use `(departement,)` which is a 1-tuple,
-                    # since `(departement)` is actually not a tuple, and apply_async
-                    # will parse the departement as two values e.g. 57 becomes (5, 7) o_O
-                    args=(departement,),
-                )
+                compute_results[departement] = apply_async(pool, abortable_func, departement)
 
             logger.info("going to close process pool...")
             pool.close()
