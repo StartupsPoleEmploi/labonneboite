@@ -156,6 +156,7 @@ class ApiBaseTest(DatabaseTest):
             {
                 'naf': u'7320Z',  # Map to ROME D1405.
                 'siret': u'00000000000001',
+                'company_name': u'Raison sociale 1',
                 'score': 68,
                 'score_alternance': 18,
                 'headcount': 11,
@@ -489,7 +490,7 @@ class ApiBaseTest(DatabaseTest):
                 raise ValueError("Cannot create an entry in Office with a city absent from self.positions.")
 
             office = Office(
-                company_name=doc['name'],
+                office_name=doc['name'],
                 siret=doc['siret'],
                 score=doc['score'],
                 naf=doc['naf'],
@@ -497,6 +498,7 @@ class ApiBaseTest(DatabaseTest):
                 zipcode=zip_code,
                 email=u'foo@bar.com',
                 departement=zip_code[:2],
+                company_name=doc['company_name'] if 'company_name' in doc else '',
                 flag_alternance=doc['flag_alternance'],
                 headcount=doc['headcount'],
                 x=doc['locations'][0]['lon'],
