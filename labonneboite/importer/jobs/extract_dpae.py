@@ -16,7 +16,7 @@ from labonneboite.importer import settings
 from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
 from labonneboite.common.util import timeit
-from labonneboite.importer.util import parse_dpae_line, DepartementException, InvalidRowException
+from labonneboite.importer.util import parse_dpae_line, InvalidRowException
 from labonneboite.importer.models.computing import DpaeStatistics, ImportTask, Hiring
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
@@ -100,7 +100,7 @@ class DpaeExtractJob(Job):
                 try:
                     siret, hiring_date, _, contract_type, departement, contract_duration, \
                     iiann, tranche_age, handicap_label, duree_pec = parse_dpae_line(line)
-                except (ValueError, DepartementException):
+                except ValueError:
                     self.zipcode_errors += 1
                     continue
                 except InvalidRowException:

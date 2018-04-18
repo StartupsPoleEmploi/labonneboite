@@ -26,10 +26,6 @@ TRANCHE_AGE_MIDDLE = "26-50"
 OFFICE_FLAGS = ['flag_alternance', 'flag_junior', 'flag_senior', 'flag_handicap']
 
 
-class DepartementException(Exception):
-    pass
-
-
 class InvalidRowException(Exception):
     pass
 
