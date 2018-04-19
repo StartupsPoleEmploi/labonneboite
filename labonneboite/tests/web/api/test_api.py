@@ -10,6 +10,7 @@ from flask import url_for
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import search as search_util
+from labonneboite.common import hiring_type_util
 from labonneboite.common.models import Office
 from labonneboite.common.search import fetch_companies
 from labonneboite.common import pagination
@@ -27,10 +28,11 @@ class ApiGenericTest(ApiBaseTest):
         distance = 100
         companies, _, _ = fetch_companies(
             naf_codes,
-            rome_code,
+            [rome_code],
             latitude,
             longitude,
             distance,
+            hiring_type=hiring_type_util.DPAE,
         )
         sirets = [company.siret for company in companies]
         self.assertIn(u'00000000000001', sirets)
@@ -46,11 +48,12 @@ class ApiGenericTest(ApiBaseTest):
         headcount = settings.HEADCOUNT_SMALL_ONLY
         companies, _, _ = fetch_companies(
             naf_codes,
-            rome_code,
+            [rome_code],
             latitude,
             longitude,
             distance,
             headcount=headcount,
+            hiring_type=hiring_type_util.DPAE,
         )
         sirets = [company.siret for company in companies]
         self.assertIn(u'00000000000001', sirets)  # this is the only office with small headcount
@@ -66,10 +69,11 @@ class ApiGenericTest(ApiBaseTest):
         distance = 100
         companies, _, _ = fetch_companies(
             naf_codes,
-            rome_code,
+            [rome_code],
             latitude,
             longitude,
             distance,
+            hiring_type=hiring_type_util.DPAE,
         )
         self.assertEqual(len(companies), 3)
         # what is important here is that there is one digit
@@ -169,27 +173,61 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
 
-    def test_alternance_scoring(self):
+    def test_unknown_contract(self):
         with self.test_request_context:
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': u'D1405',
                 'user': u'labonneboite',
-                'hiring_type': u'alt',
-            })
-            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            self.assertEqual(rv.status_code, 200)
-
-    def test_unknown_hiring_type(self):
-        with self.test_request_context:
-            params = self.add_security_params({
-                'commune_id': self.positions['caen']['commune_id'],
-                'rome_codes': u'D1405',
-                'user': u'labonneboite',
-                'hiring_type': u'unicorn',
+                'contract': u'unicorn',
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
+
+    def test_contract_all(self):
+        """
+        Deprecated parameter value is no longer supported. Only 'dpae' and 'alternance' are.
+        """
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['lille']['commune_id'],
+                'rome_codes': u'D1213',
+                'user': u'labonneboite',
+                'contract': u'all'
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 400)
+
+    def test_contract_dpae(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['lille']['commune_id'],
+                'rome_codes': u'D1213',
+                'user': u'labonneboite',
+                'contract': u'dpae'
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['companies_count'], 2)
+            self.assertEqual(len(data['companies']), 2)
+
+    def test_contract_alternance(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['lille']['commune_id'],
+                'rome_codes': u'D1213',
+                'user': u'labonneboite',
+                'contract': u'alternance',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+
+            self.assertEqual(data['companies_count'], 1)
+            self.assertEqual(len(data['companies']), 1)
+            self.assertEqual(data['companies'][0]['siret'], u'00000000000011')
+            self.assertTrue(data['companies'][0]['alternance'])
 
     def test_missing_communeid_or_latitudelongitude(self):
         with self.test_request_context:
@@ -654,7 +692,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             self.assertEquals(rv.headers['Content-Type'], 'application/json')
 
-    def test_multi_romes_search_is_not_supported(self):
+    def test_multi_romes_search_is_supported_for_both_sort_by_score_and_by_distance(self):
         with self.test_request_context:
             # 1) Search for `D1405` ROME code only. We should get 1 result.
             params = self.add_security_params({
@@ -681,17 +719,51 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], u'00000000000005')
+            # matched_rome feature is useless for single rome searches and should be hidden
+            self.assertNotIn(u'matched_rome_code', data['companies'][0])
+            self.assertNotIn(u'matched_rome_label', data['companies'][0])
+            self.assertNotIn(u'matched_rome_slug', data['companies'][0])
 
-            # 3) Search for both `D1405` and `M1801` ROME codes. We should get a 400 response
-            # since multi ROME search is not supported.
-            # Reasons why we only support single-rome search are detailed in README.md
+            # 3) Multi rome search for both `D1405` and `M1801` ROME codes, sorting by distance.
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': u'D1405,M1801',
-                'user': u'labonneboite'
+                'user': u'labonneboite',
+                'sort': u'distance',
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            self.assertEqual(rv.status_code, 400)
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['companies_count'], 2)
+            self.assertEqual(len(data['companies']), 2)
+            self.assertIn(u'matched_rome_code', data['companies'][0])
+            self.assertIn(u'matched_rome_label', data['companies'][0])
+            self.assertIn(u'matched_rome_slug', data['companies'][0])
+            self.assertIn(u'matched_rome_code', data['companies'][1])
+            self.assertIn(u'matched_rome_label', data['companies'][1])
+            self.assertIn(u'matched_rome_slug', data['companies'][1])
+            self.assertEqual(set([c[u'siret'] for c in data['companies']]),
+                set([u'00000000000004', u'00000000000005']))
+
+            # 4) Multi rome search for both `D1405` and `M1801` ROME codes, sorting by score.
+            params = self.add_security_params({
+                'commune_id': self.positions['caen']['commune_id'],
+                'rome_codes': u'D1405,M1801',
+                'user': u'labonneboite',
+                'sort': u'score',
+            })
+            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            self.assertEqual(rv.status_code, 200)
+            self.assertEqual(data['companies_count'], 2)
+            self.assertEqual(len(data['companies']), 2)
+            self.assertIn(u'matched_rome_code', data['companies'][0])
+            self.assertIn(u'matched_rome_label', data['companies'][0])
+            self.assertIn(u'matched_rome_slug', data['companies'][0])
+            self.assertIn(u'matched_rome_code', data['companies'][1])
+            self.assertIn(u'matched_rome_label', data['companies'][1])
+            self.assertIn(u'matched_rome_slug', data['companies'][1])
+            self.assertEqual(set([c[u'siret'] for c in data['companies']]),
+                set([u'00000000000004', u'00000000000005']))
 
     def test_wrong_naf_value(self):
         with self.test_request_context:
@@ -703,7 +775,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'Invalid request argument: NAF code(s): INVALID INVALID_TOO')
+            self.assertTrue(rv.data.startswith(u'Invalid request argument: NAF code(s): INVALID INVALID_TOO'))
 
     def test_same_rome_with_no_naf_filters(self):
         with self.test_request_context:
@@ -835,37 +907,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, u'Invalid request argument: contract. Possible values : all, alternance')
-
-    def test_contract_all(self):
-        with self.test_request_context:
-            params = self.add_security_params({
-                'commune_id': self.positions['lille']['commune_id'],
-                'rome_codes': u'D1213',
-                'user': u'labonneboite',
-                'contract': u'all'
-            })
-            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
-            self.assertEqual(data['companies_count'], 2)
-            self.assertEqual(len(data['companies']), 2)
-
-    def test_contract_alternance_only(self):
-        with self.test_request_context:
-            params = self.add_security_params({
-                'commune_id': self.positions['lille']['commune_id'],
-                'rome_codes': u'D1213',
-                'user': u'labonneboite',
-                'contract': u'alternance'
-            })
-            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
-            self.assertEqual(data['companies_count'], 1)
-            self.assertEqual(len(data['companies']), 1)
-            self.assertEqual(data['companies'][0]['siret'], u'00000000000011')
-            self.assertTrue(data['companies'][0]['alternance'])
+            self.assertEqual(rv.data, u'Invalid request argument: contract. Possible values : alternance, dpae')
 
     def test_wrong_headcount_value(self):
         with self.test_request_context:
@@ -1057,7 +1099,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['filters']['headcount']['big'], 1)
 
             # Check contract filter
-            self.assertEqual(data['filters']['contract']['all'], 3)
+            self.assertEqual(data['filters']['contract']['dpae'], 3)
             self.assertEqual(data['filters']['contract']['alternance'], 1)
 
 
@@ -1114,13 +1156,13 @@ class ApiCompanyListTest(ApiBaseTest):
             params = self.add_security_params({
                 'commune_id': self.positions['toulon']['commune_id'],
                 'rome_codes': u'N4403',
-                'contract': u'all',
+                'contract': u'dpae',
                 'user': u'labonneboite',
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
-            self.assertEqual(data['filters']['contract']['all'], 3)
+            self.assertEqual(data['filters']['contract']['dpae'], 3)
             self.assertEqual(data['filters']['contract']['alternance'], 1)
 
             params = self.add_security_params({
@@ -1132,7 +1174,7 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
-            self.assertEqual(data['filters']['contract']['all'], 3)
+            self.assertEqual(data['filters']['contract']['dpae'], 3)
             self.assertEqual(data['filters']['contract']['alternance'], 1)
 
     def test_filters_when_filtering_by_distance(self):

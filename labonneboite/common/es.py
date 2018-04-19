@@ -6,20 +6,30 @@ import elasticsearch
 
 from labonneboite.conf import settings
 
+OFFICE_TYPE = 'office'
+OGR_TYPE = 'ogr'
+LOCATION_TYPE = 'location'
+
 
 class ConnectionPool(object):
-    ELASTICSEARCH_INSTANCE = None
+    # Store one singleton per timeout value.
+    ELASTICSEARCH_INSTANCE = {}
 
 
-def Elasticsearch():
+def Elasticsearch(timeout=None, use_dedicated_es_connection=False):
     """
     Elasticsearch client singleton. All connections to ES should go through
     this client, so that we can reuse ES connections and not flood ES with new
     connections.
+
+    Different timeout values do coexist in practise, e.g. when running create_index script.
+    FIXME investigate why.
     """
-    if ConnectionPool.ELASTICSEARCH_INSTANCE is None:
-        ConnectionPool.ELASTICSEARCH_INSTANCE = elasticsearch.Elasticsearch()
-    return ConnectionPool.ELASTICSEARCH_INSTANCE
+    if use_dedicated_es_connection:
+        return elasticsearch.Elasticsearch(timeout=timeout)
+    if timeout not in ConnectionPool.ELASTICSEARCH_INSTANCE:
+        ConnectionPool.ELASTICSEARCH_INSTANCE[timeout] = elasticsearch.Elasticsearch(timeout=timeout)
+    return ConnectionPool.ELASTICSEARCH_INSTANCE[timeout]
 
 
 def drop_and_create_index():
@@ -276,3 +286,46 @@ def create_index(index):
 
     es = Elasticsearch()
     es.indices.create(index=index, body=create_body)
+
+# This fake office having a zero but existing score for each rome is designed
+# as a workaround of the following bug:
+#
+# ElasticsearchException[Unable to find a field mapper for field [scores_by_rome.A0000]]
+# which happens when a rome is orphaned (no company has a score for this rome).
+#
+# The following ES bug is known and has been fixed in ES 2.1.0
+# https://github.com/elastic/elasticsearch/pull/13060
+# however as of Jan 2018 we are using Elasticsearch 1.7 so we have to live with it.
+#
+# When the field_value_factor clause is applied to a non existing field (this is
+# the case for an orphaned rome i.e. no company has a score_for_rome.A0000 field for it),
+# even if the field_value_factor clause has a 'missing' value, the ES request will still fail
+# with a 'Unable to find a field mapper for field' error. This is fixed in ES 2.1.0.
+#
+# When this happens in a single rome search, the bug can silently be ignored as this means
+# the search result will be empty anyway, but this is no longer possible with a multi rome search.
+#
+# This fake office ensures no rome will ever be orphaned.
+def get_fake_office_having_all_score_fields_as_es_doc():
+    doc = {
+        'siret': "0",
+        # fields required even if not used by function_score
+        'score': 0,
+        'score_alternance': 0,
+    }
+
+    # all fields used by function_score which could potentially be orphaned and thus cause the bug
+    doc['scores_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
+    doc['scores_alternance_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
+
+    return doc
+
+
+def initialize_indexes():
+    """
+    This method should always be called once after creating the indexes from scratch.
+    """
+    fake_doc = get_fake_office_having_all_score_fields_as_es_doc()
+    Elasticsearch().index(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=fake_doc['siret'], body=fake_doc)
+
+

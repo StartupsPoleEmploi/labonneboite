@@ -17,7 +17,9 @@ database-test: services
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'GRANT ALL ON lbb_test.* TO "lbb_test"@"%" IDENTIFIED BY "";'
 
-data: database alembic_migrate
+data: database alembic-migrate populate-data-dev
+
+populate-data-dev:
 	mysql -u root --host 127.0.0.1 --port 3307 labonneboite < ./labonneboite/alembic/sql/etablissements.sql
 	LBB_ENV=development python ./labonneboite/scripts/create_index.py --full
 
@@ -28,6 +30,8 @@ clear-data-dev: services
 
 clear-data-test: services
 	mysql -u root --host 127.0.0.1 --port 3307 -e 'DROP DATABASE IF EXISTS lbb_test;'
+
+rebuild-data-dev : clear-data-dev database-dev alembic-migrate populate-data-dev
 
 stop-services:
 	cd docker/ && docker-compose stop
@@ -173,11 +177,14 @@ test_selenium: clear-data-test database-test
 test_custom:
 	@echo "To run a specific test, run for example:"
 	@echo
-	@echo "    $$ nosetests -s labonneboite/tests/web/api/test_api.py"
+	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/api/test_api.py"
 	@echo
-	@echo "and you can even run a specific method:"
+	@echo "and you can even run a specific method, here are several examples:"
 	@echo
-	@echo "    $$ nosetests -s labonneboite/tests/web/api/test_api.py:ApiCompanyListTest.test_query_returns_scores_adjusted_to_rome_code_context"
+	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/api/test_api.py:ApiCompanyListTest.test_query_returns_scores_adjusted_to_rome_code_context"
+	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/front/test_routes.py"
+	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/app/test_suggest_locations.py"
+	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/scripts/test_create_index.py:DeleteOfficeAdminTest.test_office_admin_add"
 
 # Alembic migrations
 # ------------------

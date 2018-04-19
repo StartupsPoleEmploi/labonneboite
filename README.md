@@ -231,10 +231,7 @@ Use `make run_importer_jobs` to run all these jobs in local development environm
 
 ## Single-ROME vs Multi-ROME search
 
-The company search on the frontend only allows searching for a single ROME (a.k.a. rome_code). However, historically the API allowed for multi-ROME search. This is no longer the case as of mid-2017, and the three reasons why we dropped support for multi-ROME search are:
-- so that frontend and API behaviors are as similar as possible.
-- tailoring search results to the requested rome_code adds some complexity and would be quite difficult to generalize to a multi-ROME search.
-- nobody was actually using API multi-ROME search anyway.
+The company search on the frontend only allows searching for a single ROME (a.k.a. rome_code). However, the API allows for multi-ROME search, both when sorting by distance and by score.
 
 ## Load testing (API+Frontend)
 

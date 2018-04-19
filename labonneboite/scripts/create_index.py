@@ -7,7 +7,6 @@ import os
 import multiprocessing as mp
 from cProfile import Profile
 from pyprof2calltree import convert
-from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import TransportError, NotFoundError
 from elasticsearch.helpers import bulk
 from sqlalchemy import inspect
@@ -19,7 +18,8 @@ from labonneboite.common import departements as dpt
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
-from labonneboite.common import es as lbb_es
+from labonneboite.common import hiring_type_util
+from labonneboite.common import es
 from labonneboite.common.search import fetch_companies
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
@@ -33,6 +33,14 @@ logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
 
 VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main', 'elasticsearch.trace']
+
+# custom (long) timeout used in this script
+ES_TIMEOUT = 900
+ES_BULK_CHUNK_SIZE = 10000  # default value is 500
+
+
+def Elasticsearch(use_dedicated_es_connection=False):
+    return es.Elasticsearch(timeout=ES_TIMEOUT, use_dedicated_es_connection=use_dedicated_es_connection)
 
 
 class Profiling(object):
@@ -55,27 +63,25 @@ def switch_es_index():
         # Here, the old indexes no longer exist and the reference alias points
         # to the new index
     """
-    es = Elasticsearch()
-
     # Find current index names (there may be one, zero or more)
     alias_name = settings.ES_INDEX
     try:
-        old_index_names = es.indices.get_alias(settings.ES_INDEX).keys()
+        old_index_names = Elasticsearch().indices.get_alias(settings.ES_INDEX).keys()
     except NotFoundError:
         old_index_names = []
 
     # Activate new index
-    new_index_name = lbb_es.get_new_index_name()
+    new_index_name = es.get_new_index_name()
     settings.ES_INDEX = new_index_name
 
     # Create new index
-    lbb_es.create_index(new_index_name)
+    es.create_index(new_index_name)
 
     try:
         yield
     except:
         # Delete newly created index
-        lbb_es.drop_index(new_index_name)
+        es.drop_index(new_index_name)
         raise
     finally:
         # Set back alias name
@@ -83,13 +89,13 @@ def switch_es_index():
 
     # Switch alias
     # TODO this should be done in one shot with a function in es.py module
-    lbb_es.add_alias_to_index(new_index_name)
+    es.add_alias_to_index(new_index_name)
     for old_index_name in old_index_names:
-        es.indices.delete_alias(index=old_index_name, name=alias_name)
+        Elasticsearch().indices.delete_alias(index=old_index_name, name=alias_name)
 
     # Delete old index
     for old_index_name in old_index_names:
-        lbb_es.drop_index(old_index_name)
+        es.drop_index(old_index_name)
 
 
 def get_verbose_loggers():
@@ -112,13 +118,6 @@ def disable_verbose_loggers():
 def enable_verbose_loggers():
     for logger in get_verbose_loggers():
         logger.disabled = False
-
-
-OFFICE_TYPE = 'office'
-OGR_TYPE = 'ogr'
-LOCATION_TYPE = 'location'
-ES_TIMEOUT = 300
-ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 
 
 class Counter(object):
@@ -160,36 +159,12 @@ class StatTracker:
 st = StatTracker()
 
 
-# Below was an attempt at fixing the following issue:
-# ElasticsearchException[Unable to find a field mapper for field [scores_by_rome.A0000]]
-# which happens when a rome is orphaned (no company has a score for this rome).
-#
-# This attempt was unsuccessful but may be retried at some point. The idea was to ensure
-# that scores_by_rome.%s fields were present in at least one office for every rome even orphaned ones.
-#
-# This raises a new issue:
-# java.lang.NumberFormatException: Invalid shift value in prefixCoded bytes (is encoded value really an INT?)
-# which is tricky to investigate.
-#
-# For full information about this issue see common/search.py/get_companies_from_es_and_db.
-#
-# for rome in mapping_util.MANUAL_ROME_NAF_MAPPING:
-#     mapping_office["properties"]["scores_by_rome.%s" % rome] = {
-#         "type": "integer",
-#         "index": "not_analyzed",
-#     }
-#     mapping_office["properties"]["boosted_romes.%s" % rome] = {
-#         "type": "integer",
-#         "index": "not_analyzed",
-#     }
-
-
-
-def bulk_actions(actions):
-    es = Elasticsearch(timeout=ES_TIMEOUT)
+def bulk_actions(actions, use_dedicated_es_connection=False):
     # unfortunately parallel_bulk is not available in the current elasticsearch version
     # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
-    bulk(es, actions, chunk_size=ES_BULK_CHUNK_SIZE)
+    logger.info("started bulk of %s actions...", len(actions))
+    bulk(Elasticsearch(use_dedicated_es_connection=use_dedicated_es_connection), actions, chunk_size=ES_BULK_CHUNK_SIZE)
+    logger.info("completed bulk of %s actions!", len(actions))
 
 
 @timeit
@@ -217,7 +192,7 @@ def create_job_codes():
             action = {
                 '_op_type': 'index',
                 '_index': settings.ES_INDEX,
-                '_type': OGR_TYPE,
+                '_type': es.OGR_TYPE,
                 '_source': doc
             }
             actions.append(action)
@@ -241,7 +216,7 @@ def create_locations():
         action = {
             '_op_type': 'index',
             '_index': settings.ES_INDEX,
-            '_type': LOCATION_TYPE,
+            '_type': es.LOCATION_TYPE,
             '_source': doc
         }
         actions.append(action)
@@ -392,17 +367,16 @@ def create_offices(disable_parallel_computing=False):
     if disable_parallel_computing:
         for departement in dpt.DEPARTEMENTS:
             func(departement)
-        return
-
-    # Use parallel computing on all available CPU cores.
-    # Use even slightly more than avaible CPUs because in practise a job does not always
-    # use 100% of a cpu.
-    # maxtasksperchild default is infinite, which means memory is never freed up, and grows indefinitely :-/
-    # maxtasksperchild=1 ensures memory is freed up after every departement computation.
-    pool = mp.Pool(processes=int(1.25*mp.cpu_count()), maxtasksperchild=1)
-    pool.map(func, dpt.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
-    pool.close()
-    pool.join()
+    else:
+        # Use parallel computing on all available CPU cores.
+        # Use even slightly more than avaible CPUs because in practise a job does not always
+        # use 100% of a cpu.
+        # maxtasksperchild default is infinite, which means memory is never freed up, and grows indefinitely :-/
+        # maxtasksperchild=1 ensures memory is freed up after every departement computation.
+        pool = mp.Pool(processes=int(1.25*mp.cpu_count()), maxtasksperchild=1)
+        pool.map(func, dpt.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
+        pool.close()
+        pool.join()
 
 
 @timeit
@@ -427,12 +401,15 @@ def create_offices_for_departement(departement):
             actions.append({
                 '_op_type': 'index',
                 '_index': settings.ES_INDEX,
-                '_type': OFFICE_TYPE,
+                '_type': es.OFFICE_TYPE,
                 '_id': office.siret,
                 '_source': es_doc,
             })
 
-    bulk_actions(actions)
+    # Each parallel indexing job should use its own dedicated ES connection.
+    # Otherwise the indexing will last ten times longer (!) in production,
+    # even there is no visible difference in local dev.
+    bulk_actions(actions, use_dedicated_es_connection=True)
 
     completed_jobs_counter.increment()
 
@@ -463,8 +440,6 @@ def add_offices():
     """
     Add offices (complete the data provided by the importer).
     """
-    es = Elasticsearch(timeout=ES_TIMEOUT)
-
     for office_to_add in db_session.query(OfficeAdminAdd).all():
 
         office = Office.query.filter_by(siret=office_to_add.siret).first()
@@ -496,7 +471,8 @@ def add_offices():
 
             # Create the new office in ES.
             doc = get_office_as_es_doc(office_to_add)
-            es.create(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=office_to_add.siret, body=doc)
+            Elasticsearch().create(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE,
+                id=office_to_add.siret, body=doc)
 
 
 @timeit
@@ -504,8 +480,6 @@ def remove_offices():
     """
     Remove offices (overload the data provided by the importer).
     """
-    es = Elasticsearch(timeout=ES_TIMEOUT)
-
     # When returning multiple rows, the SQLAlchemy Query class can only give them out as tuples.
     # We need to unpack them explicitly.
     offices_to_remove = [siret for (siret,) in db_session.query(OfficeAdminRemove.siret).all()]
@@ -513,7 +487,7 @@ def remove_offices():
     for siret in offices_to_remove:
         # Apply changes in ElasticSearch.
         try:
-            es.delete(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=siret)
+            Elasticsearch().delete(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
         except TransportError as e:
             if e.status_code != 404:
                 raise
@@ -530,8 +504,6 @@ def update_offices():
     """
     Update offices (overload the data provided by the importer).
     """
-    es = Elasticsearch(timeout=ES_TIMEOUT)
-
     for office_to_update in db_session.query(OfficeAdminUpdate).all():
 
         for siret in OfficeAdminUpdate.as_list(office_to_update.sirets):
@@ -572,9 +544,9 @@ def update_offices():
                 # Unfortunately these cannot easily be bulked :-(
                 # The reason is there is no way to tell bulk to ignore missing documents (404)
                 # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
-                es.update(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=siret, body=delete_body,
+                Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=delete_body,
                         params={'ignore': 404})
-                es.update(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=siret, body=body,
+                Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=body,
                         params={'ignore': 404})
 
                 # Delete the current PDF thus it will be regenerated at the next download attempt.
@@ -587,8 +559,6 @@ def update_offices_geolocations():
     Remove or add extra geolocations to offices.
     New geolocations are entered into the system through the `OfficeAdminExtraGeoLocation` table.
     """
-    es = Elasticsearch(timeout=ES_TIMEOUT)
-
     for extra_geolocation in db_session.query(OfficeAdminExtraGeoLocation).all():
         office = Office.query.filter_by(siret=extra_geolocation.siret).first()
         if office:
@@ -604,7 +574,7 @@ def update_offices_geolocations():
             office.save()
             # Apply changes in ElasticSearch.
             body = {'doc': {'locations': locations}}
-            es.update(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
+            Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
 
 
 @timeit
@@ -660,12 +630,13 @@ def sanity_check_rome_codes():
         disable_verbose_loggers()
         offices, _, _ = fetch_companies(
             naf_codes=naf_code_list,
-            rome_code=rome_id,
+            rome_codes=[rome_id],
             latitude=latitude,
             longitude=longitude,
             distance=distance,
             from_number=1,
             to_number=10,
+            hiring_type=hiring_type_util.DPAE,
         )
         enable_verbose_loggers()
         if len(offices) < 5:
@@ -693,11 +664,13 @@ def display_performance_stats(departement):
 def update_data(create_full, create_partial, disable_parallel_computing):
     if create_partial:
         with switch_es_index():
+            es.initialize_indexes()
             create_offices_for_departement('57')
         return
 
     if create_full:
         with switch_es_index():
+            es.initialize_indexes()
             create_offices(disable_parallel_computing)
             create_job_codes()
             create_locations()

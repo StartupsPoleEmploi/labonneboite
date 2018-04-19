@@ -40,6 +40,11 @@ class AppTest(unittest.TestCase):
         self.test_request_context = app.test_request_context()
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
+
+        # ugly but needed for tests like labonneboite/tests/web/front/test_routes.py
+        # which inherit AppTest but not DatabaseTest
+        es.initialize_indexes()
+
         return super(AppTest, self).setUp()
 
     def url_for(self, endpoint, **kwargs):
@@ -94,8 +99,6 @@ class DatabaseTest(AppTest):
     script.
     """
 
-    ES_OFFICE_TYPE = 'office'
-
     def setUp(self):
         # Disable elasticsearch logging
         logging.getLogger('elasticsearch').setLevel(logging.CRITICAL)
@@ -109,6 +112,7 @@ class DatabaseTest(AppTest):
         self.assertIn('test', settings.ES_INDEX)
         self.es = es.Elasticsearch()
         es.drop_and_create_index()
+        es.initialize_indexes()
 
         return super(DatabaseTest, self).setUp()
 

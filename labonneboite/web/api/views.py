@@ -15,7 +15,7 @@ from labonneboite.common.load_data import load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
-from labonneboite.conf.common.settings_common import CONTRACT_VALUES, HEADCOUNT_VALUES, NAF_CODES
+from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES, NAF_CODES
 
 
 apiBlueprint = Blueprint('api', __name__)
@@ -84,28 +84,21 @@ def company_list():
         message = 'Invalid request argument: {}'.format(e.message)
         return message, 400
 
-    ga_query_string = get_ga_query_string()
-
     companies, _ = fetcher.get_companies(add_suggestions=False)
-    companies_count = fetcher.company_count
-    url = compute_frontend_url(fetcher, ga_query_string, commune_id)
 
     companies = [
-        patch_company_result(request.args['user'], company, company.as_json(
-            rome_code=fetcher.rome, distance=fetcher.distance, zipcode=zipcode,
-            extra_query_string=ga_query_string,
+        patch_company_result_with_sensitive_information(request.args['user'], company, company.as_json(
+            rome_codes=fetcher.romes,
+            distance=fetcher.distance,
+            zipcode=zipcode,
+            extra_query_string=get_ga_query_string(),
+            hiring_type=fetcher.hiring_type,
         ))
         for company in companies
     ]
 
-    result = {
-        'companies': companies,
-        'companies_count': companies_count,
-        'url': url,
-        'rome_code': fetcher.rome,
-        'rome_label': settings.ROME_DESCRIPTIONS[fetcher.rome],
-    }
-
+    result = get_result(fetcher, commune_id)
+    result['companies'] = companies
     return jsonify(result)
 
 
@@ -122,20 +115,25 @@ def company_count():
         message = 'Invalid request argument: {}'.format(e.message)
         return message, 400
 
-    ga_query_string = get_ga_query_string()
-
     fetcher.compute_company_count()
-    companies_count = fetcher.company_count
-    url = compute_frontend_url(fetcher, ga_query_string, commune_id)
-
-    result = {
-        'companies_count': companies_count,
-        'url': url,
-        'rome_code': fetcher.rome,
-        'rome_label': settings.ROME_DESCRIPTIONS[fetcher.rome],
-    }
-
+    result = get_result(fetcher, commune_id)
     return jsonify(result)
+
+
+def get_result(fetcher, commune_id=None, add_url=True, add_count=True):
+    result = {}
+    if len(fetcher.romes) == 1:
+        # Showing which rome_code matched at the result level and not the company level
+        # only makes sense for single rome search. For multi rome search, the rome_code
+        # which matched is added at the company level in office.py:as_json()
+        rome_code = fetcher.romes[0]
+        result['rome_code'] = rome_code
+        result['rome_label'] = settings.ROME_DESCRIPTIONS[rome_code]
+    if add_count:
+        result['companies_count'] = fetcher.company_count
+    if add_url:
+        result['url'] = compute_frontend_url(fetcher, get_ga_query_string(), commune_id)
+    return result
 
 
 def compute_frontend_url(fetcher, query_string, commune_id):
@@ -148,7 +146,7 @@ def compute_frontend_url(fetcher, query_string, commune_id):
         # (requested by PE.fr)
         return url_for('root.home', _external=True, **query_string)
 
-    if commune_id and fetcher.rome:
+    if commune_id and fetcher.romes:
         # preserve parameters from original API request
         if fetcher.naf_codes:
             query_string['naf'] = fetcher.naf_codes[0]
@@ -159,13 +157,14 @@ def compute_frontend_url(fetcher, query_string, commune_id):
             'd': fetcher.distance,
             'h': fetcher.headcount,
             'p': fetcher.public,
-            'f_a': fetcher.flag_alternance,
         })
 
         return url_for(
             'search.results_by_commune_and_rome',
             commune_id=commune_id,
-            rome_id=fetcher.rome,
+            # FIXME One day frontend will support multi rome, one day...
+            # In the meantime we just provide the URL for the first rome in the list. 
+            rome_id=fetcher.romes[0],
             _external=True,
             **query_string
         )
@@ -193,25 +192,27 @@ def company_filter_list():
 
     _, aggregations = fetcher.get_companies(add_suggestions=False)
 
+    if 'contract' in aggregations:
+        raise ValueError("Error, contract aggregation should only be computed at a later step.")
+
     result = {}
     if fetcher.aggregate_by:
         result['filters'] = aggregations
 
         # If a filter or more are selected, the aggregations returned by fetcher.get_companies()
-        # will be filtered too... To avoid that, we are doing additionnal calls (one by filter activated)
+        # will be filtered too... To avoid that, we are doing additionnal ES calls (one by filter activated).
         if 'naf_codes' in request.args and 'naf' in fetcher.aggregate_by:
             result['filters']['naf'] = fetcher.get_naf_aggregations()
         if 'headcount' in request.args and 'headcount' in fetcher.aggregate_by:
             result['filters']['headcount'] = fetcher.get_headcount_aggregations()
-        if 'contract' in request.args and 'flag_alternance' in fetcher.aggregate_by:
-            result['filters']['contract'] = fetcher.get_contract_aggregations()
         if 'distance' in fetcher.aggregate_by and fetcher.distance != search.DISTANCE_FILTER_MAX:
             result['filters']['distance'] = fetcher.get_distance_aggregations()
+        # We make an exception with contract/hiring_type which is technically not a real filter, and thus we
+        # will do two ES calls everytime (one for dpae and one for alternance).
+        if 'hiring_type' in fetcher.aggregate_by:
+            result['filters']['contract'] = fetcher.get_contract_aggregations()
 
-    result.update({
-        'rome_code': fetcher.rome,
-        'rome_label': settings.ROME_DESCRIPTIONS[fetcher.rome],
-    })
+    result.update(get_result(fetcher, commune_id=None, add_url=False, add_count=False))
 
     return jsonify(result)
 
@@ -281,6 +282,14 @@ def create_fetcher(location, request_args):
     # Arguments to build the Fetcher object
     kwargs = {}
 
+    # Sort
+    sort = sorting.SORT_FILTER_DEFAULT
+    if 'sort' in request_args:
+        sort = request_args.get('sort')
+        if sort not in sorting.SORT_FILTERS:
+            raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(sorting.SORT_FILTERS))
+    kwargs['sort'] = sort
+
     # Rome_code
     rome_codes = request_args.get('rome_codes')
     rome_codes_keyword_search = request_args.get('rome_codes_keyword_search')
@@ -314,11 +323,7 @@ def create_fetcher(location, request_args):
             )
             raise InvalidFetcherArgument(msg)
 
-    if len(rome_code_list) > 1:
-        # Reasons why we only support single-rome search are detailed in README.md
-        raise InvalidFetcherArgument(
-            u'Multi ROME search is not supported at the moment, please use single ROME search only.')
-    kwargs['rome'] = rome_code_list[0]
+    kwargs['romes'] = rome_code_list
 
     # Page and page_size
     page = check_positive_integer_argument(request_args, 'page', 1)
@@ -339,11 +344,7 @@ def create_fetcher(location, request_args):
     naf_codes = {}
     if request_args.get('naf_codes'):
         naf_codes = [naf.upper() for naf in request_args['naf_codes'].split(',')]
-        invalid_nafs = [naf for naf in naf_codes if naf not in NAF_CODES]
-        if invalid_nafs:
-            raise InvalidFetcherArgument(u'NAF code(s): %s' % ' '.join(invalid_nafs))
-
-        expected_naf_codes = mapping_util.map_romes_to_nafs([kwargs['rome'], ])
+        expected_naf_codes = mapping_util.map_romes_to_nafs(kwargs['romes'])
         invalid_nafs = [naf for naf in naf_codes if naf not in expected_naf_codes]
         if invalid_nafs:
             raise InvalidFetcherArgument(u'NAF code(s): %s. Possible values : %s ' % (
@@ -351,29 +352,11 @@ def create_fetcher(location, request_args):
             ))
     kwargs['naf_codes'] = naf_codes
 
-    # Sort
-    sort = sorting.SORT_FILTER_DEFAULT
-    if 'sort' in request_args:
-        sort = request_args.get('sort')
-        if sort not in sorting.SORT_FILTERS:
-            raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(sorting.SORT_FILTERS))
-    kwargs['sort'] = sort
-
-    # Hiring type (DPAE/LBB or Alternance/LBA)
-    hiring_type = request_args.get('hiring_type', hiring_type_util.DEFAULT)
-    if hiring_type not in hiring_type_util.VALUES:
-        raise InvalidFetcherArgument(u'hiring_type. Possible values : %s' % ', '.join(hiring_type_util.VALUES))
-    kwargs['hiring_type'] = hiring_type
-
-    # Flag_alternance
-    flag_alternance = CONTRACT_VALUES['all']
-    if 'contract' in request_args:
-        contract = request_args.get('contract')
-        if contract not in CONTRACT_VALUES:
-            raise InvalidFetcherArgument(u'contract. Possible values : %s' % ', '.join(CONTRACT_VALUES))
-        else:
-            flag_alternance = CONTRACT_VALUES[contract]
-    kwargs['flag_alternance'] = flag_alternance
+    # Convert contract to hiring type (DPAE/LBB or Alternance/LBA)
+    contract = request_args.get('contract', hiring_type_util.CONTRACT_DEFAULT)
+    if contract not in hiring_type_util.CONTRACT_VALUES:
+        raise InvalidFetcherArgument(u'contract. Possible values : %s' % ', '.join(hiring_type_util.CONTRACT_VALUES))
+    kwargs['hiring_type'] = hiring_type_util.CONTRACT_TO_HIRING_TYPE[contract]
 
     # Headcount
     headcount = settings.HEADCOUNT_WHATEVER
@@ -455,11 +438,11 @@ def office_details(siret):
             'zipcode': office.zipcode,
         },
     }
-    patch_company_result(request.args['user'], office, result)
+    patch_company_result_with_sensitive_information(request.args['user'], office, result)
     return jsonify(result)
 
 
-def patch_company_result(api_username, office, result):
+def patch_company_result_with_sensitive_information(api_username, office, result):
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
     if api_username in settings.API_INTERNAL_CONSUMERS:
