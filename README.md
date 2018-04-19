@@ -52,7 +52,6 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 
 ## Install
 
-
 Clone labonneboite repository:
 
     $ git clone https://github.com/StartupsPoleEmploi/labonneboite.git
@@ -64,11 +63,20 @@ Create an [isolated Python environment](https://virtualenv.pypa.io/) using [virt
 
 Install OS requirements:
 
-    # On Debian-based OS
+    # On Debian-based OS:
+    
     $ sudo apt-get install -y language-pack-fr git python python-dev python-virtualenv python-pip mysql-server libmysqlclient-dev libncurses5-dev build-essential python-numpy python-scipy python-mysqldb chromium-chromedriver xvfb graphviz htop libblas-dev liblapack-dev libatlas-base-dev gfortran
 
-    # On other exotic OS:
-    TODO
+    # On Mac OS:
+    
+    # important: you need to install this older version of mysql
+    # in order to get older library /usr/local/lib/libmysqlclient.18.dylib
+    # which is required by latest pip MySQL-python-1.2.5
+    $ brew install mysql@5.5
+    
+    # dependencies required for selenium tests
+    $ brew install selenium-server-standalone
+    $ brew tap caskroom/cask && brew install caskroom/cask/chromedriver
 
 You will also need to install docker and docker-compose. Follow the instructions related to your particular OS from the [official Docker documentation](https://docs.docker.com/install/).
 
@@ -85,6 +93,8 @@ Create databases and import data:
 
     $ make data
 
+If needed, run `make clear-data` to clear any old/partial data you might already have.
+
 ## Launch web app
 
     make serve_web_app
@@ -96,10 +106,7 @@ http://localhost:5000 and start browsing.
 
 We are using [Nose](https://nose.readthedocs.io/):
 
-    $ make test_unit
-
-About selenium tests: note that your local server must be running for them to pass.
-
+    $ make test_all
 
 # Debugging
 
@@ -220,7 +227,7 @@ Here is their normal workflow:
 
 `check_etab` => `extract_etab` => `check_dpae` => `extract_dpae` => `compute_scores` => `validate_scores` => `geocode` => `populate_flags`
 
-Use `make run_importer_jobs` to run all these jobs in local environment.
+Use `make run_importer_jobs` to run all these jobs in local development environment.
 
 ## Single-ROME vs Multi-ROME search
 
@@ -313,3 +320,4 @@ You can perfectly profile methods in other parts of the code than `create_index.
 Here is an example of output:
 
 ![](https://www.evernote.com/l/ABJdN3iVDEJFgLeH2HgHyYOVMjOYK0a30e4B/image.png)
+
