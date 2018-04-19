@@ -113,7 +113,7 @@
 
 
     // When the search form is submitted.
-    var currentRequest = null;
+    var currentRequestUrl = null;
     searchForm.on('submit', function (event, options) {
       // Reset the "naf" (business sector) filter when a new search is performed.
       if (initialOccupation && initialOccupation !== inputOccupation.val()) {
@@ -130,23 +130,19 @@
         event.preventDefault();
         var url = "/entreprises?" + $(this).serialize();
 
-        // Prevent simultaneous requests
-        if(currentRequest !== null) {
-            currentRequest.abort();
-        }
-        var request = $.get(url,
+        currentRequestUrl = url;
+        $.get(url,
           function(response) {
-            if (request !== currentRequest) {
+            // Prevent simultaneous requests
+            if (url !== currentRequestUrl) {
               return;
             }
             $("#content").html(response);
             window.history.pushState(null, "", url);
-            currentRequest = null;
             // trigger ready event on the whole document
             $(document).trigger('lbbready');
           }
         );
-        currentRequest = request;
       }
     });
 

@@ -12,13 +12,14 @@
 
     // TODO deduplicate this from results.js
     L.mapbox.accessToken = 'pk.eyJ1IjoibGFib25uZWJvaXRlIiwiYSI6ImNpaDNoN3A0cDAwcmdybGx5aXF1Z21lOGIifQ.znyUeU7KoIY9Ns_AQPquAg';
-
-    let map = L.mapbox.map($mapContainer[0], 'mapbox.streets');
-    let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-    let companyCount = 0;
-
+    let map = L.mapbox.map($mapContainer[0], 'mapbox.streets', {
+        attributionControl: false
+    });
     // TODO: this is also duplicated code
     map.scrollWheelZoom.disable();
+
+    let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+    let companyCount = 0;
 
     $(".lbb-result__content__map").each(function() {
       let companyName = $(this).find('input[name="company-name"]').val();
@@ -50,12 +51,12 @@
       ]);
     } else {
       // TODO duplicate code from results.js
-      var inputLatitude = $("#lat");
-      var inputLongitude = $("#lon");
+      let inputLatitude = $("#lat");
+      let inputLongitude = $("#lon");
       map.setView([inputLatitude.val(), inputLongitude.val()], 13);
     }
 
-    map.on('moveend', function() {
+    let updateMap = function() {
       center = this.getCenter();
       zoom = this.getZoom();
 
@@ -82,7 +83,9 @@
           async: true,
         }
       );
-    });
+    };
+    map.on('dragend', updateMap);
+    map.on('zoom', updateMap);
   }
 
   $(document).on('lbbready', function () {
