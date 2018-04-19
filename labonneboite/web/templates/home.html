@@ -25,8 +25,8 @@
       {% include "includes/search_form.html" %}
 
       <div class="form-search-additional-fields">
-        <input type="checkbox" class="custom-checkbox" id="id_flag_alternance" name="flag_alternance" value="1"{% if is_alternance %} checked{% endif %}>
-        <label for="id_flag_alternance">Limiter la recherche aux entreprises recrutant notamment des <b>contrats en alternance</b></label>
+        Vous recherchez un contrat en alternance ? Les entreprises susceptibles de vous recruter sont sur
+        <a href="http://labonnealternance.pole-emploi.fr">La Bonne Alternance</a>.
       </div>
 
       {{ form.hidden_tag() }}

@@ -159,8 +159,8 @@ def get_parameters(args):
         except (ValueError, TypeError):
             kwargs[flag_name] = 0
 
-    if kwargs['flag_alternance'] not in [0, 1]:
-        kwargs['flag_alternance'] = 0
+    kwargs['flag_alternance'] = 0  # FIXME drop flag_alternance forever
+    
     if kwargs['public'] not in search_util.PUBLIC_CHOICES:
         kwargs['public'] = search_util.PUBLIC_ALL
 

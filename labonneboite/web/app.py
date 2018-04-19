@@ -177,7 +177,7 @@ def register_context_processors(flask_app):
     def inject_dict_for_all_templates():
         return {
             'hotjar_tag': hotjar.get_hotjar_tag(),
-            'is_alternance': session.get('search_args', {}).get('f_a') == u'1',
+            'is_alternance': False,  # FIXME drop
             'mapbox_css_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css',
             'mapbox_js_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js',
             'memo_js_url': settings.MEMO_JS_URL,
