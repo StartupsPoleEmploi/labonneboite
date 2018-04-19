@@ -224,7 +224,34 @@
     }
 }
 
-/* Map.
+/* Map of all results
+=========================================================================== */
+
+#map-auto-refresh {
+    position: absolute;
+    top: 20px;
+    left: 50px;
+    border-radius: 4px;
+    background-color: #FFF;
+}
+
+#map-auto-refresh-checkbox {
+    padding: 8px;
+}
+
+#map-auto-refresh-checkbox input {
+    float: left;
+    margin-right: 6px;
+}
+
+#map-auto-refresh a {
+    /* Info blue */
+    background-color: #1c86f2;
+    color: #FFF;
+    margin: 0;
+}
+
+/* Individual result map.
 =========================================================================== */
 
 .lbb-result .js-map-container {

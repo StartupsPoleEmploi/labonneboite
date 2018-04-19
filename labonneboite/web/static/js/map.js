@@ -2,6 +2,7 @@
 (function($) {
   let center = null;
   let zoom = null;
+  let autoRefreshActivated = false;
 
   function initResultsMap() {
     "use strict";
@@ -56,9 +57,31 @@
       map.setView([inputLatitude.val(), inputLongitude.val()], 13);
     }
 
+    // Add auto-refresh check
+    $mapContainer.append("<div id='map-auto-refresh'><div id='map-auto-refresh-checkbox'><input type='checkbox'></input><span>Rechercher quand je déplace la carte<span></div></div>");
+    $("#map-auto-refresh input").prop('checked', autoRefreshActivated);
+    $("#map-auto-refresh input").change(function() {
+        autoRefreshActivated = $(this).is(':checked');
+        console.log("auto refresh:", autoRefreshActivated);
+    });
+
+
+    let onMapMove = function() {
+      if(autoRefreshActivated) {
+        updateMap();
+      }
+      else {
+          $("#map-auto-refresh").html("<a class='btn btn-small btn-info' href='#''>Relancer la recherche ici</a>").addClass();
+          $("#map-auto-refresh a").click(function(e) {
+              e.preventDefault();
+              updateMap();
+          });
+      }
+    };
+
     let updateMap = function() {
-      center = this.getCenter();
-      zoom = this.getZoom();
+      center = map.getCenter();
+      zoom = map.getZoom();
 
       // TODO this is pretty much duplicated from form.js
       $("#lat").val(center.lat);
@@ -67,7 +90,7 @@
       // Adjust search radius
       let distances = [5, 10, 30, 50, 100, 3000];
       let distancePerPixel = 2 * 3.14159 * 6371 * Math.cos(center.lat) / (256 * Math.pow(2, zoom)); // TODO this requires an explanation
-      let windowHeightKm = distancePerPixel * this.getSize().y * 2;// 2 is an arbitrary scaling factor to include results just ouside the bounding box
+      let windowHeightKm = distancePerPixel * map.getSize().y * 2;// 2 is an arbitrary scaling factor to include results just ouside the bounding box
       let newDistance = distances[distances.length - 1];
       for(let d=0; d < distances.length; d++) {
           if(windowHeightKm < distances[d]) {
@@ -84,8 +107,8 @@
         }
       );
     };
-    map.on('dragend', updateMap);
-    map.on('zoom', updateMap);
+    map.on('dragend', onMapMove);
+    map.on('zoom', onMapMove);
   }
 
   $(document).on('lbbready', function () {
