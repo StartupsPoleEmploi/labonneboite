@@ -26,10 +26,6 @@ TRANCHE_AGE_MIDDLE = "26-50"
 OFFICE_FLAGS = ['flag_alternance', 'flag_junior', 'flag_senior', 'flag_handicap']
 
 
-class DepartementException(Exception):
-    pass
-
-
 class InvalidRowException(Exception):
     pass
 
@@ -128,7 +124,6 @@ def detect_runnable_file(file_type):
 @timeit
 def reduce_scores_into_table(
         description,
-        create_table_filename,
         departements,
         target_table,
         select_fields,
@@ -144,18 +139,20 @@ def reduce_scores_into_table(
     FIXME parallelize and optimize performance
     """
     logger.info("reducing scores %s ...", description)
-    sql_filepath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", create_table_filename)
-    init_query = open(sql_filepath, "r").read()
     errors = successes = 0
 
-    run_raw_mysql_query(init_query)
+    # empty existing table before filling it again
+    run_raw_mysql_query("delete from %s" % target_table)
 
     for departement in departements:
         departement_table = "etablissements_%s" % departement
         query = """insert into %s select %s from %s""" % (
             target_table, select_fields, departement_table)
         if drop_low_scores:
-            query += " where score >= %s" % importer_settings.SCORE_REDUCING_MINIMUM_THRESHOLD
+            query += " where score >= %s or score_alternance >= %s" % (
+                importer_settings.SCORE_REDUCING_MINIMUM_THRESHOLD,
+                importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD,
+            )
         try:
             run_raw_mysql_query(query)
             successes += 1
@@ -171,32 +168,38 @@ def reduce_scores_into_table(
                 description, target_table)
 
 
-
-def get_select_fields_for_main_db():
-    """
-    These fields should exactly match (and in the same order)
-    the fields in labonneboite/importer/db/etablissements_exportable.sql
-    """
+def get_shared_select_fields():
     return (
         """siret, raisonsociale, enseigne, codenaf,
         trancheeffectif, numerorue, libellerue, codepostal,
-        tel, email, email_alternance, website, """
+        tel, email, website, """
         + "0, 0, 0, 0, " # stand for flag_alternance, flag_junior, flag_senior, flag_handicap
         + "0, " # stands for has_multi_geolocation
         + "codecommune, "
         + "0, 0, " # stands for coordinates_x, coordinates_y
-        + "departement, score "
+        + "departement, score"
         )
+
+def get_select_fields_for_main_db():
+    """
+    These fields should exactly match (and in the same order)
+    the fields in "DESC etablissements_exportable;" (using MySQL CLI)
+    """
+    return get_shared_select_fields() + ", email_alternance, score_alternance "
 
 
 def get_select_fields_for_backoffice():
     """
     These fields should exactly match (and in the same order)
-    the fields in labonneboite/importer/db/etablissements_backoffice.sql
+    the fields in "DESC etablissements_backoffice;" (using MySQL CLI)
     """
-    fields = get_select_fields_for_main_db()
-    fields += ", `semester-1`, `semester-2`, `semester-3`, `semester-4`, `semester-5`, `semester-6`, `semester-7`"
+    fields = get_shared_select_fields()
     fields += ", effectif, score_regr"
+    for i in range(7, 0, -1):  # [7, 6, 5, 4, 3, 2, 1]
+        fields += ", `dpae-period-%s`" % i
+    fields += ", score_alternance, score_alternance_regr"
+    for i in range(7, 0, -1):  # [7, 6, 5, 4, 3, 2, 1]
+        fields += ", `alt-period-%s`" % i
     return fields
 
 
@@ -204,7 +207,6 @@ def get_select_fields_for_backoffice():
 def reduce_scores_for_main_db(departements):
     reduce_scores_into_table(
         description="[main_db]",
-        create_table_filename=importer_settings.SCORE_REDUCING_TARGET_TABLE_CREATE_FILE,
         departements=departements,
         target_table=importer_settings.SCORE_REDUCING_TARGET_TABLE,
         select_fields=get_select_fields_for_main_db(),
@@ -216,7 +218,6 @@ def reduce_scores_for_main_db(departements):
 def reduce_scores_for_backoffice(departements):
     reduce_scores_into_table(
         description="[backoffice]",
-        create_table_filename=importer_settings.BACKOFFICE_ETABLISSEMENT_TABLE_CREATE_FILE,
         departements=departements,
         target_table=importer_settings.BACKOFFICE_ETABLISSEMENT_TABLE,
         select_fields=get_select_fields_for_backoffice(),
@@ -348,4 +349,10 @@ def get_departement_from_zipcode(zipcode):
 def run_raw_mysql_query(query):
     password_statement = "-p'%s'" % DATABASE['PASSWORD']
     subprocess.check_call("""mysql -u %s %s --host %s --port %d %s -e'%s'""" % (
-            DATABASE['USER'], password_statement, DATABASE['HOST'], DATABASE['PORT'], DATABASE['NAME'], query), shell=True)
+            DATABASE['USER'],
+            password_statement,
+            DATABASE['HOST'],
+            DATABASE['PORT'],
+            DATABASE['NAME'],
+            query),
+        shell=True)

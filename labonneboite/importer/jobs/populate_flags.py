@@ -52,7 +52,7 @@ def prepare_flags_junior_and_senior():
         create table flag_tmp1 as
         (
         select siret, tranche_age, count(*) as contrats
-        from dpae
+        from %s
         where hiring_date >= DATE_SUB(NOW(),INTERVAL 1 YEAR)
         group by siret, tranche_age
         );
@@ -86,7 +86,7 @@ def prepare_flags_junior_and_senior():
 
         drop table if exists flag_tmp1;
         drop table if exists flag_tmp2;
-    """
+    """ % settings.HIRING_TABLE
 
     run_sql_script(sql_script)
     logger.info("completed preparing flags_junior_and_senior.")
@@ -100,12 +100,12 @@ def prepare_flag_handicap():
         drop table if exists flag_handicap;
         create table flag_handicap as
         (
-        select distinct(siret) from dpae
+        select distinct(siret) from %s
         where
             handicap_label = 'RQTH-MDT'
             and hiring_date >= DATE_SUB(NOW(),INTERVAL 1 YEAR)
         );
-    """
+    """ % settings.HIRING_TABLE
 
     run_sql_script(sql_script)
     logger.info("completed preparing flag_handicap.")
