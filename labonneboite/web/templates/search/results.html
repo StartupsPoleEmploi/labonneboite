@@ -75,10 +75,6 @@
               <p>{{ form.headcount.label.text }}</p>
               {{ form.headcount }}
             </div>
-            <div class="lbb-sidebar-item">
-              <p>{{ form.flag_alternance.label.text }}</p>
-              {{ form.flag_alternance }}
-            </div>
             {% if pro_version_enabled %}
               <div class="lbb-sidebar-item">
                 <p>
@@ -91,6 +87,9 @@
                 {{ form.public }}
               </div>
             {% endif %}
+            <div class="lbb-sidebar-item">
+              Pour l’alternance <a href="http://labonnealternance.pole-emploi.fr">c'est ici</a>.
+            </div>
           </div>
         </div>
 

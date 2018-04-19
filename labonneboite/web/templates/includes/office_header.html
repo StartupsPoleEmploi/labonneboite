@@ -3,9 +3,6 @@
   <h2>
     <span>{{ company.name }}</span>
     - <small>{{ company.city }}</small>
-    {% if company.flag_alternance %}
-      - <span class="badge badge-alternance" data-toggle="tooltip" title="Cette entreprise recrute notamment des contrats en alternance">Alternance</span>
-    {% endif %}
     {% if pro_version_enabled %}
       {% if company.flag_junior %}
         - <small class="badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute une proportion élevée de juniors (moins de 26 ans) - indicateur exclusif version PRO">
