@@ -925,11 +925,13 @@ def build_job_label_suggestions(term, size=autocomplete.MAX_JOBS):
                 ogr_description = source['ogr_description']
             label = "%s (%s, ...)" % (rome_description, ogr_description)
             value = "%s (%s, ...)" % (source["rome_description"], source["ogr_description"])
+            score = round(hit['_score'], 1)
             suggestions.append({
                 'id': source['rome_code'],
                 'label': label,
                 'value': value,
                 'occupation': slugify(source['rome_description'].lower()),
+                'score': score,
             })
         else:
             break
