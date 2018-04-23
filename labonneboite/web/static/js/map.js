@@ -92,8 +92,12 @@ function createMap(element) {
 
       // Adjust search radius
       let distances = [5, 10, 30, 50, 100, 3000];
-      let distancePerPixel = 2 * 3.14159 * 6371 * Math.cos(center.lat) / (256 * Math.pow(2, zoom)); // TODO this requires an explanation
-      let windowHeightKm = distancePerPixel * map.getSize().y * 2;// 2 is an arbitrary scaling factor to include results just ouside the bounding box
+      let earthPerimeterKm = 2 * 3.14159 * 6371;
+      let earthPerimeterAtCompanyLocationKm = earthPerimeterKm * Math.cos(center.lat);
+      // See leaflet.js zoom definition https://wiki.openstreetmap.org/wiki/Zoom_levels
+      let pixelSizeKm = earthPerimeterAtCompanyLocationKm / (256 * Math.pow(2, zoom));
+      let mapHeightPixels = map.getSize().y;
+      let windowHeightKm = pixelSizeKm * mapHeightPixels * 2;// 2 is an arbitrary scaling factor to include results just ouside the bounding box
       let newDistance = distances[distances.length - 1];
       for(let d=0; d < distances.length; d++) {
           if(windowHeightKm < distances[d]) {

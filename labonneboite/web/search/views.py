@@ -172,7 +172,7 @@ def get_parameters(args):
             kwargs[flag_name] = 0
 
     kwargs['flag_alternance'] = 0  # FIXME drop flag_alternance forever
-    
+
     if kwargs['public'] not in search_util.PUBLIC_CHOICES:
         kwargs['public'] = search_util.PUBLIC_ALL
 
@@ -369,6 +369,18 @@ def get_location(request_args):
         zipcode = city.zipcode
         city_name = city.name
         location_name = city.full_name
+
+    # Autocompletion has probably not worked: do autocompletion here
+    if location is None and 'l' in request_args:
+        try:
+            result = geocoding.get_coordinates(request_args['l'], limit=1)[0]
+        except KeyError:
+            pass
+        else:
+            location = Location(result['latitude'], result['longitude'])
+            zipcode = result['zipcode']
+            city_name = result['city']
+            location_name = result['label']
 
     named_location = None
     if zipcode and city_name and location_name:
