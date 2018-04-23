@@ -7,7 +7,9 @@ from flask import url_for as flask_url_for
 from flask_testing import LiveServerTestCase
 from selenium import webdriver
 
+from labonneboite.conf import settings
 from labonneboite.web.app import app
+
 
 
 class LbbSeleniumTestCase(LiveServerTestCase):
@@ -23,6 +25,9 @@ class LbbSeleniumTestCase(LiveServerTestCase):
     # Note that this test case expects a working SQL and Elasticsearch database
 
     def create_app(self):
+        # Override settings
+        settings.API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
+
         # Random port generation
         app.config['LIVESERVER_PORT'] = 0
         # Disable logging
