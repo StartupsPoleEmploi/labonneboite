@@ -1,4 +1,13 @@
 /* jshint esversion: 6 */
+function createMap(element) {
+  L.mapbox.accessToken = 'pk.eyJ1IjoibGFib25uZWJvaXRlIiwiYSI6ImNpaDNoN3A0cDAwcmdybGx5aXF1Z21lOGIifQ.znyUeU7KoIY9Ns_AQPquAg';
+  let map = L.mapbox.map(element, 'mapbox.streets', {
+      attributionControl: false
+  });
+  map.scrollWheelZoom.disable();
+  return map;
+}
+
 (function($) {
   let center = null;
   let zoom = null;
@@ -11,18 +20,12 @@
       return;
     }
 
-    // TODO deduplicate this from results.js
-    L.mapbox.accessToken = 'pk.eyJ1IjoibGFib25uZWJvaXRlIiwiYSI6ImNpaDNoN3A0cDAwcmdybGx5aXF1Z21lOGIifQ.znyUeU7KoIY9Ns_AQPquAg';
-    let map = L.mapbox.map($mapContainer[0], 'mapbox.streets', {
-        attributionControl: false
-    });
-    // TODO: this is also duplicated code
-    map.scrollWheelZoom.disable();
-
+    let map = createMap($mapContainer[0]);
     let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
     let companyCount = 0;
 
     $(".lbb-result__content__map").each(function() {
+      // TODO duplicated code from results.js
       let companyName = $(this).find('input[name="company-name"]').val();
       let lat = $(this).find('input[name="company-latitude"]').val();
       let lng = $(this).find('input[name="company-longitude"]').val();

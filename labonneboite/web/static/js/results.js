@@ -72,10 +72,8 @@ var trackOutboundLink = function(url) {
       var lng = $mapContainer.find('input[name="company-longitude"]').val();
 
       var coords = [lat, lng];
-      var map = L.mapbox.map($mapContainer.find('.map')[0], 'mapbox.streets').setView(coords, 13);
-
+      var map = createMap($mapContainer.find('.map')[0]).setView(coords, 13);
       L.marker(coords).addTo(map).bindPopup(companyName).openPopup();
-      map.scrollWheelZoom.disable();
 
       $mapContainer.find('.map').click(function (e) {
         e.stopPropagation();
