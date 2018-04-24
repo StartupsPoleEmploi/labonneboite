@@ -227,6 +227,13 @@
 /* Map of all results
 =========================================================================== */
 
+#lbb-result-map {
+    width: 100%;
+    height: 250px;
+    margin: 0;
+    padding: 0;
+}
+
 #map-auto-refresh {
     position: absolute;
     top: 20px;

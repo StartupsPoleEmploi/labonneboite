@@ -15,17 +15,18 @@ function createMap(element) {
 
   function initResultsMap() {
     "use strict";
-    let $mapContainer = $('#lbb-result-map');
-    if (!$mapContainer.length) {
+    let $map = $('#lbb-result-map');
+    let $latitude = $("#lat");
+    let $longitude = $("#lon");
+    if (!$map.length) {
       return;
     }
 
-    let map = createMap($mapContainer[0]);
+    let map = createMap($map[0]);
     let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
     let companyCount = 0;
 
     $(".lbb-result__content__map").each(function() {
-      // TODO duplicated code from results.js
       let companyName = $(this).find('input[name="company-name"]').val();
       let lat = $(this).find('input[name="company-latitude"]').val();
       let lng = $(this).find('input[name="company-longitude"]').val();
@@ -54,14 +55,11 @@ function createMap(element) {
         [maxLat, maxLng]
       ]);
     } else {
-      // TODO duplicate code from results.js
-      let inputLatitude = $("#lat");
-      let inputLongitude = $("#lon");
-      map.setView([inputLatitude.val(), inputLongitude.val()], 13);
+      map.setView([$latitude.val(), $longitude.val()], 13);
     }
 
     // Add auto-refresh check
-    $mapContainer.append("<div id='map-auto-refresh'><div id='map-auto-refresh-checkbox'><input type='checkbox'></input><span>Rechercher quand je déplace la carte<span></div></div>");
+    $map.append("<div id='map-auto-refresh'><div id='map-auto-refresh-checkbox'><input type='checkbox'></input><span>Rechercher quand je déplace la carte<span></div></div>");
     $("#map-auto-refresh input").prop('checked', autoRefreshActivated);
     $("#map-auto-refresh input").change(function() {
         autoRefreshActivated = $(this).is(':checked');
@@ -86,9 +84,8 @@ function createMap(element) {
       center = map.getCenter();
       zoom = map.getZoom();
 
-      // TODO this is pretty much duplicated from form.js
-      $("#lat").val(center.lat);
-      $("#lon").val(center.lng);
+      $latitude.val(center.lat);
+      $longitude.val(center.lng);
 
       // Adjust search radius
       let distances = [5, 10, 30, 50, 100, 3000];
@@ -107,12 +104,7 @@ function createMap(element) {
       }
       $("input[name='d']").val(newDistance);
 
-      $('.js-search-form').trigger('submit',
-        // these options will be caught by the onsubmit function
-        {
-          async: true,
-        }
-      );
+      $('.js-search-form').trigger('submit', {async: true});
     };
     map.on('dragend', onMapMove);
     map.on('zoom', onMapMove);
