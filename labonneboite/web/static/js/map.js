@@ -26,14 +26,15 @@ function createMap(element) {
     let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
     let companyCount = 0;
 
-    $(".lbb-result__content__map").each(function() {
+    $(".lbb-result").each(function() {
       let companyName = $(this).find('input[name="company-name"]').val();
       let lat = $(this).find('input[name="company-latitude"]').val();
       let lng = $(this).find('input[name="company-longitude"]').val();
       let siret = $(this).find('input[name="company-siret"]').val();
+      let description = $(this).find('.company-naf-text').html();
 
       let coords = [lat, lng];
-      let link = "<a class='map-marker' href='#company-" + siret + "'>" + companyName + "</a>";
+      let link = "<a class='map-marker' href='#company-" + siret + "'>" + companyName + "</a><br>" + description;
       L.marker(coords).addTo(map).bindPopup(link);
 
       companyCount += 1;
