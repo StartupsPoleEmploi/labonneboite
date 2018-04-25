@@ -33,14 +33,19 @@ function createMap(element) {
       let siret = $(this).find('input[name="company-siret"]').val();
 
       let coords = [lat, lng];
-      let link = "<a href='#company-" + siret + "'>" + companyName + "</a>";
-      L.marker(coords).addTo(map).bindPopup(link).openPopup();
+      let link = "<a class='map-marker' href='#company-" + siret + "'>" + companyName + "</a>";
+      L.marker(coords).addTo(map).bindPopup(link);
 
       companyCount += 1;
       minLat = Math.min(minLat, lat);
       maxLat = Math.max(maxLat, lat);
       minLng = Math.min(minLng, lng);
       maxLng = Math.max(maxLng, lng);
+    });
+
+    $map.on("click", "a.map-marker", function(e) {
+        // Toggle company details on click on link
+        $(this.attributes.href.value).find(".js-result-toggle-details").click();
     });
 
     // Focus either on the companies or the requested coordinates
