@@ -171,6 +171,12 @@
     background: #fff;
 }
 
+@media (min-width: 800px) {
+    .tilkee-button {
+        float: right;
+    }
+}
+
 /* Actions (after the content): download PDF etc.
 =========================================================================== */
 

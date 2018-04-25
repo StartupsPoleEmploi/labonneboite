@@ -188,7 +188,7 @@
                    placeholder="Autour de : (Paris, Bd Voltaire, 33000...)">
           </div>
           <button class="btn" type="submit">
-            <img src="{{ url_for('static', filename='images/input-icons/magnifier-white.svg') }}" alt="Chercher">
+            <img src="{{ url_for('static', filename='images/icons/magnifier-white.svg') }}" alt="Chercher">
           </button>
         </div>
         <ul class="form-errorlist">
@@ -937,6 +937,12 @@
           <div class="cookbook-title">Progress</div>
           <div><progress>progress</progress></div>
 
+          <div class="cookbook-title">Spinners</div>
+          <div>
+              <p style="background-color: black; color: white;">Dark background: <span class="spinner"></span></p>
+              <p>Light background: <span class="spinner spinner-dark"></span></p>
+          </div>
+
           <div class="cookbook-title">Inline SVG</div>
           <div><svg width="100px" height="100px"><circle cx="100" cy="100" r="100" fill="#1fa3ec"></circle></svg></div>
 
@@ -1088,6 +1094,9 @@
               <hr>
               <p>
                 <a class="btn" href="#">&lt;a class=btn&gt;</a>
+              </p>
+              <p>
+                <a class="btn btn-hollow" href="#">&lt;a class=btn-hollow&gt;</a>
               </p>
             </fieldset>
           </form>
@@ -1342,7 +1351,7 @@
                        placeholder="Autour de : (Paris, Bd Voltaire, 33000...)">
               </div>
               <button class="btn" type="submit">
-                <img src="{{ url_for('static', filename='images/input-icons/magnifier-white.svg') }}" alt="Chercher">
+                <img src="{{ url_for('static', filename='images/icons/magnifier-white.svg') }}" alt="Chercher">
               </button>
             </div>
             <div class="lbb-sidebar-toggle-wrapper">

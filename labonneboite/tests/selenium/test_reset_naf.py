@@ -19,6 +19,8 @@ class TestResetNaf(LbbSeleniumTestCase):
         url = self.url_for('search.results', city='metz', zipcode='57000', occupation='comptabilite')
         self.driver.get(url)
 
+        self.driver.find_element_by_css_selector('#tilkee-modal a.modal-close-button').click()
+
         current_url = self.driver.current_url
         url = urlparse.urlparse(current_url)
         parameters = dict(urlparse.parse_qsl(url.query))

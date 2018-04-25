@@ -1,0 +1,20 @@
+<div class="modal-content-inner text-center">
+    <div class="progressbar hidden"><span></span></div>
+    <p class="upload-progress-message hidden"></p>
+
+    <h6>Sélectionnez vos documents de candidature</h6>
+    <p>(CV et/ou lettre de motivation)</p>
+
+    <p class="tilkee-files"></p>
+
+    <form action="{{ url_for('tilkee.upload', siret=company.siret) }}" class="form-inline tilkee-upload-form">
+        <input type='file' name='files' class="hidden" multiple accept="video/*,image/*,application/pdf,application/msword,application/vnd.ms-excel,application/vnd.ms-powerpoint,
+application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div>
+            <a class="btn btn-hollow tilkee-file-select">Sélectionner une pièce jointe</a>
+            <button class="btn hidden" type="submit">Créer mon dossier</button>
+        </div>
+    </form>
+</div>

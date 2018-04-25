@@ -272,6 +272,17 @@
     </div>
   </footer>
 
+    <div id="modal-overlay" class="modal-overlay modal-closed"></div>
+    <div id="tilkee-modal" class="modal modal-closed">
+        <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
+        <div class="modal-content">
+            <div class="modal-content-inner text-left text-bold" style="font-size: 140%;">
+                <p><img class="tilkee-cv" src="{{ url_for('static', filename='images/cv.png')}}">Envie de savoir si votre candidature a intéressé l'entreprise ? <br /><br />La Bonne Boite vous propose de suivre la consultation de votre CV par le recruteur.</p>
+              <p><a class="btn modal-close-button">C'est parti !</a></p>
+          </div>
+      </div>
+  </div>
+
   {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
   <script>
       // Trigger our own ready event
@@ -328,9 +339,10 @@
     }
   </script>
 
-  {# Memo button code https://memo.pole-emploi.fr/jsp/testButton.jsp #}
+  {# Memo button code #}
   <script type="text/javascript">
     (function(d,s,id) {
+        localStorage.setItem("lastMemoIntroJs", new Date().getTime() - 13*24*60*60*1000);// FIXME Temporarily disable memo intro to display tilkee intro
         var js, fjs = d.getElementsByTagName(s)[0];
         if(!d.getElementById(id)) {
             js = d.createElement(s);

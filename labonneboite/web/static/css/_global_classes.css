@@ -21,6 +21,10 @@
     text-align: right !important;
 }
 
+.text-bold {
+    font-weight: bold;
+}
+
 .lbb-green {
     color: #19c158 !important;
 }
@@ -109,6 +113,9 @@ https://github.com/tobiasahlin/SpinKit
     border-radius: 100%;
     -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
     animation: sk-pulseScaleOut 1s infinite ease-in-out;
+}
+.spinner-dark {
+    background: #000;
 }
 
 @-webkit-keyframes sk-pulseScaleOut {

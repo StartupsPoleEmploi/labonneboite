@@ -98,6 +98,7 @@ def register_blueprints(flask_app):
     from labonneboite.web.office.views import officeBlueprint
     from labonneboite.web.root.views import rootBlueprint
     from labonneboite.web.search.views import searchBlueprint
+    from labonneboite.web.tilkee.views import tilkeeBlueprint
     from labonneboite.web.user.views import userBlueprint
     from social_flask.routes import social_auth
     flask_app.register_blueprint(apiBlueprint, url_prefix='/api/v1')
@@ -107,6 +108,7 @@ def register_blueprints(flask_app):
     flask_app.register_blueprint(officeBlueprint)
     flask_app.register_blueprint(rootBlueprint)
     flask_app.register_blueprint(searchBlueprint)
+    flask_app.register_blueprint(tilkeeBlueprint, url_prefix='/candidature')
     flask_app.register_blueprint(userBlueprint, url_prefix='/user')
     flask_app.register_blueprint(social_auth, url_prefix='/authorize')
 
@@ -254,6 +256,7 @@ def create_app():
         # LBB.
         'js/alerts.js',
         'js/rgpd.js',
+        'js/clipboard.js',
         'js/dropdowns.js',
         'js/form.js',
         'js/map.js',
@@ -261,6 +264,7 @@ def create_app():
         'js/prevent-double-form-submit.js',
         'js/results-toggle-sidebar.js',
         'js/results.js',
+        'js/tilkee.js',
         'js/tooltip.js',  # Depends on 'js/vendor/bootstrap-tooltip.js'.
         'js/unobfuscate.js',
         filters='jsmin',
@@ -285,12 +289,16 @@ def create_app():
         'css/home.css',
         'css/modal.css',
         'css/pagination.css',
+        'css/progressbar.css',
         'css/ratings.css',
         'css/search_results.css',
         'css/switch.css',
+        'css/tilkee.css',
         # Vendor.
         'css/vendor/bootstrap-tooltip.css',
         'css/vendor/jquery-ui.css',
+        # Vendor overrides
+        'css/tooltip.css',
         filters='cssmin',
         output='gen/packed.%(version)s.css',
     )
