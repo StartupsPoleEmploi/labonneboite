@@ -51,6 +51,7 @@ def upgrade():
             ondelete=u'SET NULL'),
         sa.ForeignKeyConstraint(['updated_by_id'], [u'users.id'], name=u'etablissements_admin_add_ibfk_2',
             ondelete=u'SET NULL'),
+        # this is a mistake, fixed by a later migration - primary key should be ID only
         sa.PrimaryKeyConstraint('siret', 'id'),
         mysql_collate=u'utf8mb4_unicode_ci',
         mysql_default_charset=u'utf8mb4',
