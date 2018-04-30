@@ -4,8 +4,9 @@ import urlparse
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
 
-from .base import LbbSeleniumTestCase
+from .base import LbbSeleniumTestCase, url_has_changed
 
 
 class TestResetNaf(LbbSeleniumTestCase):
@@ -18,7 +19,8 @@ class TestResetNaf(LbbSeleniumTestCase):
         url = self.url_for('search.results', city='metz', zipcode='57000', occupation='comptabilite')
         self.driver.get(url)
 
-        url = urlparse.urlparse(self.driver.current_url)
+        current_url = self.driver.current_url
+        url = urlparse.urlparse(current_url)
         parameters = dict(urlparse.parse_qsl(url.query))
         self.assertEqual('/entreprises', url.path)
         self.assertEqual('comptabilite', parameters['occupation'])
@@ -29,20 +31,22 @@ class TestResetNaf(LbbSeleniumTestCase):
         # Filter by NAF `Activités comptables` (`6920Z`).
         select = Select(self.driver.find_element_by_id('naf'))
         select.select_by_value(u'6920Z')
+        WebDriverWait(self.driver, 10).until(url_has_changed(current_url))
 
         # The form should be auto-submitted after an option has been selected.
-        url = urlparse.urlparse(self.driver.current_url)
+        current_url = self.driver.current_url
+        url = urlparse.urlparse(current_url)
         parameters = dict(urlparse.parse_qsl(url.query))
         self.assertEqual('/entreprises', url.path)
         self.assertEqual('comptabilite', parameters['occupation'])
-        self.assertEqual('Metz (57000)', parameters['l']) # form value is now full city name
+        self.assertEqual('Metz (57000)', parameters['l'])
         self.assertEqual('6920Z', parameters['naf'])
 
         # Perform another search on `boucher`.
         job_input = self.driver.find_element_by_name('j')
         job_input.clear()  # Reset the previous `comptabilite` search term.
         job_input.send_keys('boucher')
-        time.sleep(3)  # The `staging` is really slow and can take a long time to show results.
+        time.sleep(3)
         job_input.send_keys(Keys.DOWN)
         job_input.send_keys(Keys.RETURN)
 
@@ -54,7 +58,9 @@ class TestResetNaf(LbbSeleniumTestCase):
         self.driver.find_element_by_css_selector('form.js-search-form div.form-search button').click()
 
         # The NAF filter should be reset.
-        url = urlparse.urlparse(self.driver.current_url)
+        WebDriverWait(self.driver, 10).until(url_has_changed(current_url))
+        current_url = self.driver.current_url
+        url = urlparse.urlparse(current_url)
         parameters = dict(urlparse.parse_qsl(url.query))
         self.assertEqual('/entreprises', url.path)
         self.assertEqual('boucherie', parameters['occupation'])
