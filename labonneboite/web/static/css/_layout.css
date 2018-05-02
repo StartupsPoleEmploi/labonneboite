@@ -146,6 +146,50 @@ ul.lbb-header {
 /* Footer.
 =========================================================================== */
 
+.lbb-footer {
+    display: grid;
+    grid-template-columns: auto 210px 20%;
+    grid-template-rows: auto;
+    grid-template-areas: 
+      "footer-links footer-logos footer-text"
+      "footer-update footer-update footer-update";
+}
+@media (max-width: 800px) {
+    .lbb-footer {
+        grid-template-columns: auto;
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-areas: 
+          "footer-links"
+          "footer-logos"
+          "footer-text"
+          "footer-update";
+    }
+}
+
+.lbb-footer ul {
+    grid-area: footer-links;
+}
+
+.lbb-footer .lbb-sponsor-logos {
+    grid-area: footer-logos;
+    margin-top: 0;
+}
+.lbb-footer .lbb-sponsor-logos img {
+    width: 100px;
+    vertical-align: top;
+}
+
+.lbb-footer .lbb-sponsor-text {
+    grid-area: footer-text;
+    margin-top: 0;
+    text-align: justify;
+}
+.lbb-footer center {
+    grid-area: footer-update;
+    margin-top: 0;
+    padding-left: 10px;
+}
+
 .lbb-footer-wrapper {
     margin: 0;
     border-top: 1px solid #cbcbcb;
@@ -179,6 +223,10 @@ ul.lbb-header {
     width: 33%;
     padding-left: 10%;
     margin: 0;
+}
+
+.lbb-footer img {
+  margin-top: 0;
 }
 
 @media (max-width: 800px) {  /* Only for browsers <= 800px. */
