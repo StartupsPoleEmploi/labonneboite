@@ -5,7 +5,10 @@ import json
 import os
 
 from slugify import slugify
-from . import departements
+
+from labonneboite.common import departements
+from labonneboite.common.util import unique_elements
+from . import datagouv
 
 
 CACHE = {}
@@ -124,7 +127,7 @@ def get_city_by_commune_id(commune_id):
 
 
 @cities_cache_required
-def get_city_by_zipcode(zipcode, city_name_slug):
+def get_city_by_zipcode(zipcode, slug=''):
     """
     Returns the city corresponding to the given `zipcode` string and `city_name_slug`.
     `city_name_slug` is required to deal with situations where a zipcode is not unique for a city.
@@ -134,7 +137,7 @@ def get_city_by_zipcode(zipcode, city_name_slug):
         return None
     if len(cities) > 1:
         for city in cities:
-            if city['slug'] == city_name_slug:
+            if not slug or city['slug'] == slug:
                 return city
     return cities[0]
 
@@ -166,3 +169,40 @@ def is_departement(value):
     Note: this requires searching in a list of 96 elements, but it's not that bad.
     """
     return value in departements.DEPARTEMENTS
+
+
+def get_coordinates(address, limit=10):
+    """
+    Returns a list of dict with keys:
+
+        label (str)
+        latitude (float)
+        longitude (float)
+    """
+    features = [
+        {
+            'latitude': result['geometry']['coordinates'][1],
+            'longitude': result['geometry']['coordinates'][0],
+            'label': result['properties']['label'],
+        } for result in datagouv.search(address, limit=limit)
+    ]
+
+    return unique_elements(features)
+
+
+def get_address(latitude, longitude, limit=10):
+    """
+    Returns a list of dict with keys:
+
+        label (str)
+        zipcode (str)
+        city (str)
+    """
+    features = [
+        {
+            'label': result['properties']['label'],
+            'zipcode': result['properties']['postcode'],
+            'city': result['properties']['city']
+        } for result in datagouv.reverse(latitude, longitude, limit=limit)
+    ]
+    return unique_elements(features)

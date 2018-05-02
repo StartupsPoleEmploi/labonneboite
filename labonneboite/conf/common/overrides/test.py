@@ -12,3 +12,5 @@ API_KEYS = {
     'labonneboite': 'dummykey',
     'emploi_store_dev': 'anotherdummykey',
 }
+
+API_ADRESSE_BASE_URL = 'http://urlintrouvablepourlbb.fr'

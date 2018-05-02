@@ -124,3 +124,22 @@ def get_contact_mode_for_rome_and_naf(rome, naf):
         return naf_prefix_to_rome_to_contact_mode[naf_prefix].values()[0]
     except (KeyError, IndexError):
         return CONTACT_MODE_DEFAULT
+
+
+def unique_elements(iterable):
+    """
+    Filter elements from an iterable so that only unique items are preserved.
+    This supports some non-hashable values, such as dict or lists.
+    """
+    seen = set()
+    result = []
+    for element in iterable:
+        hashed = element
+        if isinstance(element, dict):
+            hashed = tuple(sorted(element.iteritems()))
+        elif isinstance(element, list):
+            hashed = tuple(element)
+        if hashed not in seen:
+            result.append(element)
+            seen.add(hashed)
+    return result

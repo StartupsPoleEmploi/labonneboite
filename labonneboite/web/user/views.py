@@ -164,7 +164,7 @@ def pro_version():
     """
     Enable or disable "Version PRO" which is only visible to "PRO users".
     """
-    if not pro.user_is_pro:
+    if not pro.user_is_pro():
         abort(401)
 
     pro.toggle_pro_version()

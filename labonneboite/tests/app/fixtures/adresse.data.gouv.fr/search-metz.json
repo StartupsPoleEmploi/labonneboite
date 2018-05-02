@@ -1,0 +1,138 @@
+{
+  "attribution": "BAN", 
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          6.176026, 
+          49.119146
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "adm_weight": 5, 
+        "city": "Metz", 
+        "citycode": "57463", 
+        "context": "57, Moselle, Grand-Est (Lorraine)", 
+        "id": "57463_57050", 
+        "importance": 0.7556, 
+        "label": "Metz", 
+        "name": "Metz", 
+        "population": 121.8, 
+        "postcode": "57050", 
+        "score": 0.9777818181818182, 
+        "type": "municipality", 
+        "x": 931800, 
+        "y": 6895700
+      }, 
+      "type": "Feature"
+    }, 
+    {
+      "geometry": {
+        "coordinates": [
+          6.176026, 
+          49.119146
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "adm_weight": 5, 
+        "city": "Metz", 
+        "citycode": "57463", 
+        "context": "57, Moselle, Grand-Est (Lorraine)", 
+        "id": "57463_57070", 
+        "importance": 0.7556, 
+        "label": "Metz", 
+        "name": "Metz", 
+        "population": 121.8, 
+        "postcode": "57070", 
+        "score": 0.9777818181818182, 
+        "type": "municipality", 
+        "x": 931800, 
+        "y": 6895700
+      }, 
+      "type": "Feature"
+    }, 
+    {
+      "geometry": {
+        "coordinates": [
+          6.176026, 
+          49.119146
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "adm_weight": 5, 
+        "city": "Metz", 
+        "citycode": "57463", 
+        "context": "57, Moselle, Grand-Est (Lorraine)", 
+        "id": "57463", 
+        "importance": 0.7556, 
+        "label": "Metz", 
+        "name": "Metz", 
+        "population": 121.8, 
+        "postcode": "57000", 
+        "score": 0.9777818181818182, 
+        "type": "municipality", 
+        "x": 931800, 
+        "y": 6895700
+      }, 
+      "type": "Feature"
+    }, 
+    {
+      "geometry": {
+        "coordinates": [
+          4.109159, 
+          48.075556
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "adm_weight": 1, 
+        "city": "Metz-Robert", 
+        "citycode": "10241", 
+        "context": "10, Aube, Grand-Est (Champagne-Ardenne)", 
+        "id": "10241", 
+        "importance": 0.075, 
+        "label": "Metz-Robert", 
+        "name": "Metz-Robert", 
+        "population": 0.1, 
+        "postcode": "10210", 
+        "score": 0.825, 
+        "type": "municipality", 
+        "x": 782600, 
+        "y": 6775600
+      }, 
+      "type": "Feature"
+    }, 
+    {
+      "geometry": {
+        "coordinates": [
+          4.074616, 
+          47.237171
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "city": "Gouloux", 
+        "citycode": "58129", 
+        "context": "58, Ni\u00e8vre, Bourgogne-Franche-Comt\u00e9 (Bourgogne)", 
+        "id": "58129_B043_92f410", 
+        "importance": 0.0046, 
+        "label": "Metz Garnier 58230 Gouloux", 
+        "name": "Metz Garnier", 
+        "postcode": "58230", 
+        "score": 0.8186, 
+        "type": "street", 
+        "x": 781295.3, 
+        "y": 6682427.5
+      }, 
+      "type": "Feature"
+    }
+  ], 
+  "licence": "ODbL 1.0", 
+  "limit": 5, 
+  "query": "metz", 
+  "type": "FeatureCollection", 
+  "version": "draft"
+}

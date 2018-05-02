@@ -6,21 +6,22 @@ import json
 from slugify import slugify
 
 from flask import abort, make_response, redirect, render_template, request, session, url_for
-from flask import Blueprint, current_app
+from flask import Blueprint
 from flask_login import current_user
 
+from labonneboite.common import autocomplete
 from labonneboite.common import geocoding
 from labonneboite.common import doorbell
 from labonneboite.common import pro
-from labonneboite.common import util
 from labonneboite.common import sorting
 from labonneboite.common import search as search_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
+from labonneboite.common.locations import CityLocation, Location, NamedLocation
 from labonneboite.common.models import UserFavoriteOffice
 
 from labonneboite.conf import settings
-from labonneboite.web.search.forms import CompanySearchForm
+from labonneboite.web.search.forms import make_company_search_form
 
 
 searchBlueprint = Blueprint('search', __name__)
@@ -38,6 +39,23 @@ def suggest_locations():
     term = request.args.get('term', '')
     suggestions = search_util.build_location_suggestions(term)
     return make_response(json.dumps(suggestions))
+
+
+@searchBlueprint.route('/autocomplete/locations')
+def autocomplete_locations():
+    """
+    Query string arguments:
+
+        term (str)
+    """
+    term = request.args.get('term', '').strip()
+    suggestions = []
+    if term:
+        suggestions = geocoding.get_coordinates(term, limit=autocomplete.MAX_LOCATIONS)
+    for suggestion in suggestions:
+        suggestion['value'] = suggestion['label']
+    return make_response(json.dumps(suggestions))
+
 
 @searchBlueprint.route('/job_slug_details')
 def job_slug_details():
@@ -62,6 +80,15 @@ def job_slug_details():
 
 @searchBlueprint.route('/city_slug_details')
 def city_slug_details():
+    """
+    Endpoint used by La Bonne Alternance only.
+
+    Required parameter:
+
+        city-slug (str): must take the form "slug-zipcode"
+
+    Note that if the slug does not match the zipcode, the returned result will be incorrect.
+    """
     result = {}
 
     city_slug = request.args.get('city-slug', '')
@@ -70,41 +97,26 @@ def city_slug_details():
 
     city = city_slug.split('-')
     zipcode = ''.join(city[-1:])
-    city_temp = search_util.CityLocation(city_slug, zipcode)
+    city_location = CityLocation(zipcode, city_slug)
 
-    if not city_temp or not city_temp.location:
+    if not city_location.is_location_correct:
         return u'no city found associated to the slug {}'.format(city_slug), 400
 
-    # Name without zipcode
-    name = city_temp.name.replace(zipcode, '').strip()
-
     result['city'] = {
-        'name': name,
-        'longitude': city_temp.location.longitude,
-        'latitude': city_temp.location.latitude,
+        'name': city_location.name,
+        'longitude': city_location.location.longitude,
+        'latitude': city_location.location.latitude,
     }
 
     return make_response(json.dumps(result))
 
 
-@searchBlueprint.route('/recherche')
-def search():
-    form = CompanySearchForm(request.args)
-    if request.args and form.validate():
-        return form.redirect('search.results')
-    return render_template('search/results.html', form=form)
-
-
 PARAMETER_FIELD_MAPPING = {
-    'j': 'job',
     'r': 'rome',
-    'q': 'job',
-    'lat': 'latitude',
-    'lon': 'longitude',
+    'j': 'job',
     'd': 'distance',
     'l': 'location',
     'h': 'headcount',
-    'mode': 'mode',
     'naf': 'naf',
     'sort': 'sort',
     'from': 'from_number',
@@ -150,7 +162,7 @@ def get_parameters(args):
         kwargs['to_number'] = kwargs['from_number'] + pagination.OFFICES_MAXIMUM_PAGE_SIZE - 1
 
     # Fallback to default sorting.
-    if kwargs.get('sort') not in sorting.SORTING_VALUES:
+    if kwargs.get('sort') not in sorting.SORT_FILTERS:
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
     for flag_name in ['flag_alternance', 'public']:
@@ -173,59 +185,87 @@ def get_parameters(args):
 
 @searchBlueprint.route('/entreprises/<city>-<zipcode>/<occupation>')
 def results(city, zipcode, occupation):
+    """
+    All this does is a redirect to the 'search.entreprises' view with
+    city-related location parameters. This view is preserved so that older urls
+    still work.
+    """
+    params = request.args.copy()
+    params['city'] = city
+    params['zipcode'] = zipcode
+    params['occupation'] = occupation
 
-    canonical = '/entreprises/%s-%s/%s' % (city, zipcode, occupation)
-    city = search_util.CityLocation(city, zipcode)
+    redirect_url = url_for('search.entreprises')
+    redirect_url += '?' + urlencode(params)
+    return redirect(redirect_url)
 
-    kwargs = get_parameters(request.args)
-    kwargs['occupation'] = occupation
 
-    # Remove keys with empty values.
-    form_kwargs = {key: val for key, val in kwargs.items() if val}
-    form_kwargs['location'] = city.full_name
-    form_kwargs['city'] = city.slug
-    form_kwargs['zipcode'] = city.zipcode
+@searchBlueprint.route('/entreprises')
+def entreprises():
+    """
+    This view takes arguments as a query string.
 
-    # Get ROME code (Répertoire Opérationnel des Métiers et des Emplois).
-    rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
-
-    # Stop here if the ROME code does not exists.
-    if not rome:
-        form_kwargs['job'] = occupation
-        form = CompanySearchForm(**form_kwargs)
-        return render_template('search/results.html', job_doesnt_exist=True, form=form)
-
+    Expected arguments are those returned by get_parameters and expected by the
+    selected company search form.
+    """
     session['search_args'] = request.args
 
-    # Fetch companies and alternatives
-    kwargs['rome'] = rome
-    kwargs['aggregate_by'] = ['naf']
+    location, named_location = get_location(request.args)
+    occupation = request.args.get('occupation', '')
+    rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
+    job_doesnt_exist = not rome
 
-    fetcher = search_util.Fetcher(city.location, **kwargs)
+    # Build form
+    form_kwargs = {key: val for key, val in request.args.items() if val}
+    form_kwargs['j'] = settings.ROME_DESCRIPTIONS.get(rome, occupation)
+    if 'l' not in form_kwargs and named_location:
+        # Override form location only if it is not available (e.g when user has
+        # removed it from the url)
+        form_kwargs['l'] = named_location.name
+    if location:
+        form_kwargs['lat'] = location.latitude
+        form_kwargs['lon'] = location.longitude
+    form = make_company_search_form(**form_kwargs)
+
+    # Stop here in case of invalid arguments
+    if not form.validate() or job_doesnt_exist:
+        return render_template('search/results.html', job_doesnt_exist=job_doesnt_exist, form=form)
+
+    # Convert request arguments to fetcher parameters
+    parameters = get_parameters(request.args)
+
+    # Fetch companies and alternatives
+    fetcher = search_util.Fetcher(
+        location,
+        rome=rome,
+        distance=parameters['distance'],
+        sort=parameters['sort'],
+        from_number=parameters['from_number'],
+        to_number=parameters['to_number'],
+        flag_alternance=parameters['flag_alternance'],
+        public=parameters.get('public'),
+        headcount=parameters['headcount'],
+        naf=parameters['naf'],
+        naf_codes=None,
+        aggregate_by=['naf'],
+        departments=None,
+    )
     alternative_rome_descriptions = []
     naf_codes_with_descriptions = []
+    companies = []
+    company_count = 0
+    alternative_distances = {}
 
-    if not city.is_location_correct:
-        companies = []
-        aggregations = []
-        company_count = 0
-        alternative_distances = {}
-    else:
-        current_app.logger.debug("fetching companies and company_count")
+    # Aggregations
+    companies, aggregations = fetcher.get_companies(add_suggestions=True)
+    company_count = fetcher.company_count
+    alternative_distances = fetcher.alternative_distances
+    alternative_rome_descriptions = fetcher.get_alternative_rome_descriptions()
 
-        companies, aggregations = fetcher.get_companies(add_suggestions=True)
-        for alternative, count in fetcher.alternative_rome_codes.iteritems():
-            if settings.ROME_DESCRIPTIONS.get(alternative) and count:
-                desc = settings.ROME_DESCRIPTIONS.get(alternative)
-                slug = slugify(desc)
-                alternative_rome_descriptions.append([alternative, desc, slug, count])
-        company_count = fetcher.company_count
-        alternative_distances = fetcher.alternative_distances
-
-        # If a filter or more are selected, the aggregations returned by fetcher.get_companies()
-        # will be filtered too... To avoid that, we are doing additionnal calls (one by filter activated)
-        if aggregations:
-            fetcher.update_aggregations(aggregations)
+    # If a filter or more are selected, the aggregations returned by fetcher.get_companies()
+    # will be filtered too... To avoid that, we are doing additionnal calls (one by filter activated)
+    if aggregations:
+        fetcher.update_aggregations(aggregations)
 
     # Generates values for the NAF filter
     # aggregations could be empty if errors or empty results
@@ -233,7 +273,6 @@ def results(city, zipcode, occupation):
         for naf_aggregate in aggregations['naf']:
             naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["code"]), naf_aggregate["count"])
             naf_codes_with_descriptions.append((naf_aggregate["code"], naf_description))
-
 
     # Pagination.
     pagination_manager = pagination.PaginationManager(
@@ -244,22 +283,18 @@ def results(city, zipcode, occupation):
     )
     current_page = pagination_manager.get_current_page()
 
-    # Get contact mode and position.
-    for position, company in enumerate(companies, start=1):
-        company.contact_mode = util.get_contact_mode_for_rome_and_naf(fetcher.rome, company.naf)
-        # position is later used in labonneboite/web/static/js/results.js
-        company.position = position
-
-    form_kwargs['job'] = settings.ROME_DESCRIPTIONS[rome]
-    form = CompanySearchForm(**form_kwargs)
     form.naf.choices = [('', u'Tous les secteurs')] + sorted(naf_codes_with_descriptions, key=lambda t: t[1])
     form.validate()
+
+    canonical_url = get_canonical_results_url(
+        named_location.zipcode, named_location.city,
+        occupation, parameters['flag_alternance']
+    ) if named_location else ''
 
     context = {
         'alternative_distances': alternative_distances,
         'alternative_rome_descriptions': alternative_rome_descriptions,
-        'canonical': canonical,
-        'city': city,
+        'canonical_url': canonical_url,
         'companies': list(companies),
         'companies_per_page': pagination.OFFICES_PER_PAGE,
         'company_count': company_count,
@@ -269,7 +304,9 @@ def results(city, zipcode, occupation):
         'headcount': fetcher.headcount,
         'job_doesnt_exist': False,
         'naf': fetcher.naf,
-        'naf_codes': naf_codes_with_descriptions,
+        'location': location,
+        'city_name': named_location.city if named_location else '',
+        'location_name': named_location.name if named_location else '',
         'page': current_page,
         'pagination': pagination_manager,
         'rome_code': fetcher.rome,
@@ -280,6 +317,61 @@ def results(city, zipcode, occupation):
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
     }
     return render_template('search/results.html', **context)
+
+
+def get_canonical_results_url(zipcode, city, occupation, alternance=False):
+    """
+    The canonical url for each result page should have very few querystring arguments.
+    """
+    url = url_for('search.entreprises', city=slugify(city), zipcode=zipcode, occupation=slugify(occupation))
+    if alternance:
+        url += '&f_a=1'
+    return url
+
+
+def get_location(request_args):
+    """
+    Parse request parameters to extract a desired location and location names.
+
+    Returns:
+
+        location (Location) or None
+        named_location (NamedLocation) or None
+    """
+
+    # Parse location from latitude/longitude
+    location = None
+    zipcode = city_name = location_name = ''
+    if 'lat' in request_args and 'lon' in request_args:
+        try:
+            latitude = float(request_args['lat'])
+            longitude = float(request_args['lon'])
+        except ValueError:
+            pass
+        else:
+            location = Location(latitude, longitude)
+            addresses = geocoding.get_address(latitude, longitude, limit=1)
+            if addresses:
+                zipcode = addresses[0]['zipcode']
+                city_name = addresses[0]['city']
+                location_name = addresses[0]['label']
+
+    # Parse location from zipcode/city slug (slug is optional)
+    if location is None and 'zipcode' in request_args:
+        zipcode = request_args['zipcode']
+        city_slug = request_args.get('city', '')
+        city = CityLocation(zipcode, city_slug)
+
+        location = city.location
+        zipcode = city.zipcode
+        city_name = city.name
+        location_name = city.full_name
+
+    named_location = None
+    if zipcode and city_name and location_name:
+        named_location = NamedLocation(zipcode, city_name, location_name)
+
+    return location, named_location
 
 
 @searchBlueprint.route('/entreprises/commune/<commune_id>/rome/<rome_id>', methods=['GET'])
@@ -302,7 +394,11 @@ def results_by_commune_and_rome(commune_id, rome_id):
     if not city or not rome_description:
         abort(404)
 
-    url = url_for('search.results', city=city['slug'], zipcode=city['zipcode'], occupation=slugified_rome_description)
+    params = request.args.copy()
+    params['city'] = city['slug']
+    params['zipcode'] = city['zipcode']
+    params['occupation'] = slugified_rome_description
+    url = url_for('search.entreprises', **params)
     # Pass all GET params to the redirect URL: this will allow users of the API to build web links
     # roughly equivalent to the result of an API call - see Trello #971.
-    return redirect('%s?%s' % (url, urlencode(request.args)))
+    return redirect(url)

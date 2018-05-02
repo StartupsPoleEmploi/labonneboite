@@ -5,17 +5,16 @@ import collections
 import logging
 import unidecode
 
-from flask import url_for
 import elasticsearch
 import elasticsearch.exceptions
 from slugify import slugify
 from backports.functools_lru_cache import lru_cache
 
-from labonneboite.common import geocoding
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import sorting
 from labonneboite.common import autocomplete
 from labonneboite.common import hiring_type_util
+from labonneboite.common import util
 from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.models import Office
 from labonneboite.common.es import Elasticsearch
@@ -44,50 +43,25 @@ DISTANCE_FILTER_MAX = 3000
 
 
 
-class Location(object):
-    def __init__(self, latitude, longitude, commune_id=None):
-        self.latitude = latitude
-        self.longitude = longitude
-        self.commune_id = commune_id
-
-    def __repr__(self):
-        return "lon: {} - lat: {} - commune_id: {}".format(self.longitude, self.latitude, self.commune_id)
-
-
-class CityLocation(object):
-
-    def __init__(self, slug, zipcode):
-        self.slug = slug
-        self.zipcode = zipcode
-        # Location attribute may be None if slug/zipcode combination is incorrect
-        self.location = None
-
-        city = geocoding.get_city_by_zipcode(self.zipcode, self.slug)
-        if not city:
-            logger.debug("unable to retrieve a city for zipcode `%s` and slug `%s`", self.zipcode, self.slug)
-        else:
-            coordinates = city['coords']
-            self.location = Location(coordinates['lat'], coordinates['lon'])
-
-    @property
-    def is_location_correct(self):
-        return self.location is not None
-
-    @property
-    def name(self):
-        return self.slug.replace('-', ' ').capitalize()
-
-    @property
-    def full_name(self):
-        return '%s (%s)' % (self.name, self.zipcode)
-
-
 class Fetcher(object):
 
-    def __init__(self, search_location, rome=None, distance=None, sort=None, hiring_type=None,
-                 from_number=1, to_number=OFFICES_PER_PAGE, flag_alternance=None,
-                 public=None, headcount=None, naf=None, naf_codes=None,
-                 aggregate_by=None, departments=None, **kwargs):
+    def __init__(
+            self, search_location,
+            rome=None,
+            distance=None,
+            sort=None,
+            hiring_type=None,
+            from_number=1,
+            to_number=OFFICES_PER_PAGE,
+            flag_alternance=None,
+            public=None,
+            headcount=None,
+            naf=None,
+            naf_codes=None,
+            aggregate_by=None,
+            departments=None,
+            **kwargs
+    ):
         """
         This constructor takes many arguments; the goal is to reduce this list
         and to never rely on kwargs.
@@ -140,39 +114,6 @@ class Fetcher(object):
     @property
     def flag_senior(self):
         return self.public == PUBLIC_SENIOR
-
-    def compute_url(self, query_string):
-        if not self.company_count >= 1:
-            # Always return home URL if zero results
-            # (requested by PE.fr)
-            return url_for('root.home', _external=True, **query_string)
-        elif self.location.commune_id and self.rome:
-            # preserve parameters from original API request
-            if self.naf_codes:
-                query_string['naf'] = self.naf_codes[0]
-            query_string.update({
-                'from': self.from_number,
-                'to': self.to_number,
-                'sort': self.sort,
-                'd': self.distance,
-                'h': self.headcount,
-                'p': self.public,
-                'f_a': self.flag_alternance,
-            })
-
-            return url_for(
-                'search.results_by_commune_and_rome',
-                commune_id=self.location.commune_id,
-                rome_id=self.rome,
-                _external=True,
-                **query_string
-            )
-        else:
-            # In case of search by longitude+latitude,
-            # return home URL since we do not have a URL ready yet.
-            # FIXME implement this URL at some point.
-            return url_for('root.home', _external=True, **query_string)
-
 
     def update_aggregations(self, aggregations):
         if self.headcount and 'headcount' in aggregations:
@@ -339,6 +280,16 @@ class Fetcher(object):
         return result, aggregations
 
 
+    def get_alternative_rome_descriptions(self):
+        alternative_rome_descriptions = []
+        for alternative, count in self.alternative_rome_codes.iteritems():
+            if settings.ROME_DESCRIPTIONS.get(alternative) and count:
+                desc = settings.ROME_DESCRIPTIONS.get(alternative)
+                slug = slugify(desc)
+                alternative_rome_descriptions.append([alternative, desc, slug, count])
+        return alternative_rome_descriptions
+
+
 def count_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
     json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
     # Drop the sorting clause as it is not needed anyway for a simple count.
@@ -370,7 +321,7 @@ def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, aggrega
     except KeyError:
         sort = sorting.SORT_FILTER_DEFAULT
 
-    companies, companies_count, aggregations_raw = get_companies_from_es_and_db(json_body, sort=sort)
+    companies, companies_count, aggregations_raw = get_companies_from_es_and_db(json_body, sort, rome_code)
 
     # Extract aggregations
     aggregations = {}
@@ -685,7 +636,7 @@ def build_json_body_elastic_search(
     return json_body
 
 
-def get_companies_from_es_and_db(json_body, sort):
+def get_companies_from_es_and_db(json_body, sort, rome_code):
     """
     Fetch companies first from Elasticsearch, then from the database.
 
@@ -693,6 +644,12 @@ def get_companies_from_es_and_db(json_body, sort):
     list of results as Office instances (with some extra attributes only available
     in Elasticsearch) and `companies_count` an integer of the results number.
     """
+    if sort not in sorting.SORT_FILTERS:
+        # This should never happen.
+        # An API request would have already raised a InvalidFetcherArgument exception,
+        # and a Frontend request would have fallbacked to default sorting.
+        raise ValueError("unknown sorting : %s" % sort)
+
     es = Elasticsearch()
     logger.info("Elastic Search request : %s", json_body)
     try:
@@ -723,39 +680,14 @@ def get_companies_from_es_and_db(json_body, sort):
         else:
             raise e
 
+    companies_count = res['hits']['total']
     companies = []
     siret_list = [office["_source"]["siret"] for office in res['hits']['hits']]
 
     if siret_list:
 
-        # FIXME These hardcoded values are soooooo ugly, unfortunately it is not so
-        # easy to make it DNRY.
-        if sort == sorting.SORT_FILTER_DISTANCE:
-            distance_sort_index = 0
-        elif sort == sorting.SORT_FILTER_SCORE:
-            distance_sort_index = 2
-        else:
-            # This should never happen.
-            # An API request would have already raised a InvalidFetcherArgument exception,
-            # and a Frontend request would have fallbacked to default sorting.
-            raise ValueError("unknown sorting : %s" % sort)
-
         company_objects = Office.query.filter(Office.siret.in_(siret_list))
-        company_dict = {}
-
-        es_companies_by_siret = {
-            item['_source']['siret']: item for item in res['hits']['hits']
-        }
-
-        # FIXME it's not great to add new properties to an existing object. It
-        # would be better to wrap the office objects in a new OfficeResult
-        # class that would add new properties related to the query.
-        for obj in company_objects:
-            # Get the corresponding item from the Elasticsearch results.
-            es_company = es_companies_by_siret[obj.siret]
-            # Add an extra `distance` attribute with one digit.
-            obj.distance = round(es_company["sort"][distance_sort_index], 1)
-            company_dict[obj.siret] = obj
+        company_dict = {obj.siret: obj for obj in company_objects}
 
         for siret in siret_list:
             try:
@@ -769,7 +701,27 @@ def get_companies_from_es_and_db(json_body, sort):
             else:
                 logging.info("company siret %s does not have city, ignoring...", siret)
 
-    companies_count = res['hits']['total']
+    # FIXME it's not great to add new properties to an existing object. It
+    # would be better to wrap the office objects in a new OfficeResult
+    # class that would add new properties related to the query.
+    es_companies_by_siret = {
+        item['_source']['siret']: item for item in res['hits']['hits']
+    }
+    # FIXME These hardcoded values are soooooo ugly, unfortunately it is not so
+    # easy to make it DNRY.
+    distance_sort_index = {
+        sorting.SORT_FILTER_DISTANCE: 0,
+        sorting.SORT_FILTER_SCORE: 2
+    }[sort]
+    for position, company in enumerate(companies, start=1):
+        # Get the corresponding item from the Elasticsearch results.
+        es_company = es_companies_by_siret[company.siret]
+        # Add an extra `distance` attribute with one digit.
+        company.distance = round(es_company["sort"][distance_sort_index], 1)
+        # Set contact mode and position
+        company.contact_mode = util.get_contact_mode_for_rome_and_naf(rome_code, company.naf)
+        # position is later used in labonneboite/web/static/js/results.js
+        company.position = position
 
     try:
         aggregations = res['aggregations']

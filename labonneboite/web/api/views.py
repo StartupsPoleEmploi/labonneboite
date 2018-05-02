@@ -2,7 +2,7 @@
 
 from functools import wraps
 
-from flask import abort, Blueprint, current_app, jsonify, request
+from flask import abort, Blueprint, current_app, jsonify, request, url_for
 
 from labonneboite.common import geocoding
 from labonneboite.common import search
@@ -10,6 +10,7 @@ from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common import hiring_type_util
+from labonneboite.common.locations import Location
 from labonneboite.common.load_data import load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
@@ -77,7 +78,7 @@ def company_list():
     current_app.logger.debug("API request received: %s", request.full_path)
 
     try:
-        location, zipcode = get_location(request.args)
+        location, zipcode, commune_id = get_location(request.args)
         fetcher = create_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
         message = 'Invalid request argument: {}'.format(e.message)
@@ -87,7 +88,7 @@ def company_list():
 
     companies, _ = fetcher.get_companies(add_suggestions=False)
     companies_count = fetcher.company_count
-    url = fetcher.compute_url(ga_query_string)
+    url = compute_frontend_url(fetcher, ga_query_string, commune_id)
 
     companies = [
         patch_company_result(request.args['user'], company, company.as_json(
@@ -115,7 +116,7 @@ def company_count():
     current_app.logger.debug("API request received: %s", request.full_path)
 
     try:
-        location, _ = get_location(request.args)
+        location, _, commune_id = get_location(request.args)
         fetcher = create_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
         message = 'Invalid request argument: {}'.format(e.message)
@@ -125,7 +126,7 @@ def company_count():
 
     fetcher.compute_company_count()
     companies_count = fetcher.company_count
-    url = fetcher.compute_url(ga_query_string)
+    url = compute_frontend_url(fetcher, ga_query_string, commune_id)
 
     result = {
         'companies_count': companies_count,
@@ -137,13 +138,51 @@ def company_count():
     return jsonify(result)
 
 
+def compute_frontend_url(fetcher, query_string, commune_id):
+    """
+    Compute web page URL that corresponds to the API request.
+    """
+
+    if not fetcher.company_count >= 1:
+        # Always return home URL if zero results
+        # (requested by PE.fr)
+        return url_for('root.home', _external=True, **query_string)
+
+    if commune_id and fetcher.rome:
+        # preserve parameters from original API request
+        if fetcher.naf_codes:
+            query_string['naf'] = fetcher.naf_codes[0]
+        query_string.update({
+            'from': fetcher.from_number,
+            'to': fetcher.to_number,
+            'sort': fetcher.sort,
+            'd': fetcher.distance,
+            'h': fetcher.headcount,
+            'p': fetcher.public,
+            'f_a': fetcher.flag_alternance,
+        })
+
+        return url_for(
+            'search.results_by_commune_and_rome',
+            commune_id=commune_id,
+            rome_id=fetcher.rome,
+            _external=True,
+            **query_string
+        )
+
+    # In case of search by longitude+latitude,
+    # return home URL since we do not have a URL ready yet.
+    # FIXME implement this URL at some point.
+    return url_for('root.home', _external=True, **query_string)
+
+
 @apiBlueprint.route('/filter/', methods=['GET'])
 @api_auth_required
 def company_filter_list():
     current_app.logger.debug("API request received: %s", request.full_path)
 
     try:
-        location, _ = get_location(request.args)
+        location, _, _ = get_location(request.args)
         fetcher = create_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
         message = 'Invalid request argument: {}'.format(e.message)
@@ -190,13 +229,16 @@ def get_location(request_args):
     """
     location = None
     zipcode = None
+    commune_id = None
 
     # Commune_id or longitude/latitude
     if 'commune_id' in request_args:
-        city = geocoding.get_city_by_commune_id(request_args.get('commune_id'))
+        commune_id = request_args['commune_id']
+        city = geocoding.get_city_by_commune_id(commune_id)
         if not city:
             raise InvalidFetcherArgument(u'could not resolve latitude and longitude from given commune_id')
-        location = search.Location(city['coords']['lat'], city['coords']['lon'], request_args.get('commune_id'))
+        latitude = city['coords']['lat']
+        longitude = city['coords']['lon']
         zipcode = city['zipcode']
     elif 'latitude' in request_args and 'longitude' in request_args:
         if not request_args.get('latitude') or not request_args.get('longitude'):
@@ -206,14 +248,12 @@ def get_location(request_args):
             latitude = float(request_args['latitude'])
             longitude = float(request_args['longitude'])
         except ValueError:
-            raise InvalidFetcherArgument(u'latitude or longitude (or both) must be float')
-
-        location = search.Location(latitude, longitude)
-
+            raise InvalidFetcherArgument(u'latitude and longitude must be float')
     else:
         raise InvalidFetcherArgument(u'missing arguments: either commune_id or latitude and longitude')
 
-    return location, zipcode
+    location = Location(latitude, longitude)
+    return location, zipcode, commune_id
 
 
 def create_fetcher(location, request_args):
@@ -296,28 +336,27 @@ def create_fetcher(location, request_args):
     kwargs['distance'] = check_integer_argument(request_args, 'distance', settings.DISTANCE_FILTER_DEFAULT)
 
     # Naf
-    naf_codes_list = {}
-    naf_codes = request_args.get('naf_codes')
-    if naf_codes:
-        naf_codes_list = [naf.upper() for naf in naf_codes.split(',')]
-        invalid_nafs = [naf for naf in naf_codes_list if naf not in NAF_CODES]
+    naf_codes = {}
+    if request_args.get('naf_codes'):
+        naf_codes = [naf.upper() for naf in request_args['naf_codes'].split(',')]
+        invalid_nafs = [naf for naf in naf_codes if naf not in NAF_CODES]
         if invalid_nafs:
             raise InvalidFetcherArgument(u'NAF code(s): %s' % ' '.join(invalid_nafs))
 
         expected_naf_codes = mapping_util.map_romes_to_nafs([kwargs['rome'], ])
-        invalid_nafs = [naf for naf in naf_codes_list if naf not in expected_naf_codes]
+        invalid_nafs = [naf for naf in naf_codes if naf not in expected_naf_codes]
         if invalid_nafs:
             raise InvalidFetcherArgument(u'NAF code(s): %s. Possible values : %s ' % (
                 ' '.join(invalid_nafs), ', '.join(expected_naf_codes)
             ))
-    kwargs['naf_codes'] = naf_codes_list
+    kwargs['naf_codes'] = naf_codes
 
     # Sort
     sort = sorting.SORT_FILTER_DEFAULT
     if 'sort' in request_args:
         sort = request_args.get('sort')
-        if sort not in sorting.SORTING_VALUES:
-            raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(sorting.SORTING_VALUES))
+        if sort not in sorting.SORT_FILTERS:
+            raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(sorting.SORT_FILTERS))
     kwargs['sort'] = sort
 
     # Hiring type (DPAE/LBB or Alternance/LBA)

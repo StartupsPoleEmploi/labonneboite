@@ -4,17 +4,17 @@
 
     {% set css_class = "input-icon input-icon-suitcase" %}
     {% set placeholder = "Métier recherché : (boucher, cariste, secrétaire, ...)" %}
-    {% if form.job.errors %}
+    {% if form.j.errors %}
       {% set css_class = "input-icon input-icon-suitcase form-error" %}
     {% endif %}
-    {{ form.job(class=css_class, required="required", placeholder=placeholder) }}
+    {{ form.j(class=css_class, required="required", placeholder=placeholder) }}
 
     {% set css_class = "input-icon input-icon-location" %}
-    {% set placeholder = "Autour de : (Paris, Pau, ...)" %}
-    {% if form.location.errors %}
+    {% set placeholder = "Autour de : (Paris, Bd Voltaire, 33000...)" %}
+    {% if form.l.errors %}
       {% set css_class = "input-icon input-icon-location form-error" %}
     {% endif %}
-    {{ form.location(class=css_class, required="required", placeholder=placeholder) }}
+    {{ form.l(class=css_class, required="required", placeholder=placeholder) }}
 
   </div>
 
@@ -25,9 +25,9 @@
 
 </div>
 
-{% if form.job.errors or form.location.errors %}
+{% if form.j.errors or form.l.errors %}
   <ul class="form-errorlist">
-    {% if form.job.errors %}<li>Veuillez préciser le métier recherché.</li>{% endif %}
-    {% if form.location.errors %}<li>Veuillez préciser le lieu de votre recherche.</li>{% endif %}
+    {% if form.j.errors %}<li>Veuillez préciser le métier recherché.</li>{% endif %}
+    {% if form.l.errors %}<li>Veuillez préciser le lieu de votre recherche.</li>{% endif %}
   </ul>
 {% endif %}

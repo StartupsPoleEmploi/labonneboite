@@ -320,6 +320,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     def get_date_of_last_data_deploy(cls):
         """
         Get date of when the 'etablissements' table was (re)created by the deploy_data process.
+
+        Returns None if the information is not available.
         """
         query = """
             SELECT CREATE_TIME
@@ -327,7 +329,14 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
                 WHERE TABLE_SCHEMA = '%s'
                     AND TABLE_NAME = '%s';
         """ % (DATABASE['NAME'], settings.OFFICE_TABLE)
-        last_data_deploy_date = db_session.execute(query).first()[0]
+
+        last_data_deploy_date = db_session.execute(query).first()
+
+        if last_data_deploy_date is None:
+            return None
+
+        last_data_deploy_date = last_data_deploy_date[0]
+
         # Formatting date in french format using locale.setlocale is strongly discouraged.
         # Using babel instead is the recommended way.
         # See https://stackoverflow.com/questions/985505/locale-date-formatting-in-python
