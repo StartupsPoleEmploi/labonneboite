@@ -374,7 +374,7 @@ def get_location(request_args):
     if location is None and 'l' in request_args:
         try:
             result = geocoding.get_coordinates(request_args['l'], limit=1)[0]
-        except KeyError:
+        except IndexError:
             pass
         else:
             location = Location(result['latitude'], result['longitude'])

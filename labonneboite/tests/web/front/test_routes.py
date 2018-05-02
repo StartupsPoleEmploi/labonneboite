@@ -129,6 +129,15 @@ class SearchEntreprisesTest(AppTest):
         self.assertEqual('Copacabana', named_location.name)
 
 
+    def test_get_location_location_not_found(self):
+        with mock.patch('labonneboite.common.geocoding.get_coordinates', return_value=[]):
+            location, named_location = get_location({
+                'l': 42, # I swear, this happened in production
+            })
+        self.assertIsNone(location)
+        self.assertIsNone(named_location)
+
+
 class SearchLegacyResultsTest(AppTest):
 
     def test_zipcodes_mistakenly_used_as_commune_ids(self):
