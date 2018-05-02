@@ -167,6 +167,13 @@ class SearchLegacyResultsTest(AppTest):
         rv = self.app.get(url, follow_redirects=True)
         self.assertEqual(rv.status_code, 200)
 
+
+    def test_search_results_with_unicode_city(self):
+        url = self.url_for('search.results', city='nîmes', zipcode='30000', occupation='strategie-commerciale')
+        rv = self.app.get(url, follow_redirects=True)
+        self.assertEqual(rv.status_code, 200)
+
+
     def test_search_url_with_wrong_zipcode_does_not_break(self):
         """
         Nancy has zipcode 54000 and not 54100.
