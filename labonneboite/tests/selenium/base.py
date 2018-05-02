@@ -74,6 +74,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
 
 
     def tearDown(self):
+        self.print_js_logs()
         super(LbbSeleniumTestCase, self).tearDown()
         self.driver.quit()
         if self.display:
