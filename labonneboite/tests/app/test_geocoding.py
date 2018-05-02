@@ -121,4 +121,4 @@ class AdresseApiTest(unittest.TestCase):
         with mock.patch.object(geocoding.datagouv.requests, 'get', return_value=mock_get):
             coordinates = geocoding.get_coordinates(u'metz', limit=10)
 
-        self.assertNotEqual(coordinates[0], coordinates[1])
+        self.assertNotEqual(coordinates[0]['label'], coordinates[1]['label'])

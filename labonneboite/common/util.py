@@ -126,19 +126,24 @@ def get_contact_mode_for_rome_and_naf(rome, naf):
         return CONTACT_MODE_DEFAULT
 
 
-def unique_elements(iterable):
+def unique_elements(iterable, key=None):
     """
     Filter elements from an iterable so that only unique items are preserved.
     This supports some non-hashable values, such as dict or lists.
+
+    Args:
+        iterable
+        key (func): function to be applied to each element to determine
+        unicity. If undefined, it is the identity function.
     """
     seen = set()
     result = []
     for element in iterable:
-        hashed = element
-        if isinstance(element, dict):
-            hashed = tuple(sorted(element.iteritems()))
-        elif isinstance(element, list):
-            hashed = tuple(element)
+        hashed = element if key is None else key(element)
+        if isinstance(hashed, dict):
+            hashed = tuple(sorted(hashed.iteritems()))
+        elif isinstance(hashed, list):
+            hashed = tuple(hashed)
         if hashed not in seen:
             result.append(element)
             seen.add(hashed)

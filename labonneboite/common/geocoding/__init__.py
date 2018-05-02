@@ -189,7 +189,7 @@ def get_coordinates(address, limit=10):
         } for result in datagouv.search(address, limit=limit)
     ]
 
-    return unique_elements(features)
+    return unique_elements(features, key=lambda x: (x['latitude'], x['longitude']))
 
 
 def get_address(latitude, longitude, limit=10):
