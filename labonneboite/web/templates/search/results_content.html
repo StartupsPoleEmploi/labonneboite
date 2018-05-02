@@ -1,0 +1,185 @@
+<div class="{% if is_alternance %}lbb-content-alternance-wrapper{% else %}lbb-content-purple-wrapper{% endif %}">
+  <div class="lbb-content">
+    <div class="lbb-content-with-sidebar">
+
+
+      {% if companies %}
+        <h1 class="lbb-result-info">
+          {% if page and page != 1 %}<b>Page {{ page }}</b> de{% endif %}
+          {% if company_count == 1 %}
+            <b>{{ company_count }} entreprise</b> susceptible
+          {% else %}
+            <b>{{ company_count }} entreprises</b> susceptibles
+          {% endif %}
+          de recruter en
+          <b>{{ rome_description }}</b>
+          {% if location_name %}
+          autour de
+          <b>{{ location_name }}</b>
+          {% endif %}
+        </h1>
+      {% endif %}
+
+
+      <form action="{{ url_for('search.entreprises') }}" class="js-search-form" method="get">
+
+        <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
+          <div class="lbb-sidebar js-form-search-filters">
+            <div class="lbb-sidebar-toggle-wrapper">
+              <a class="lbb-sidebar-toggle" href="#">« Retour</a>
+              <hr>
+            </div>
+            <h2>Trier par</h2>
+            <div class="lbb-sidebar-item">
+              {{ form.sort }}
+            </div>
+            <hr>
+            <h2>Filtrer par</h2>
+            <div class="lbb-sidebar-item">
+              <p>
+                {{ form.naf.label }}
+              </p>
+              {{ form.naf }}
+            </div>
+            <div class="lbb-sidebar-item">
+              <p>{{ form.d.label.text }}</p>
+              {{ form.d }}
+            </div>
+            <div class="lbb-sidebar-item">
+              <p>{{ form.h.label.text }}</p>
+              {{ form.h }}
+            </div>
+            <div class="lbb-sidebar-item">
+              <p>{{ form.f_a.label.text }}</p>
+              {{ form.f_a}}
+            </div>
+            {% if pro_version_enabled %}
+              <div class="lbb-sidebar-item">
+                <p>
+                  {{ form.p.label }}
+                  <small class="badge badge-info" data-toggle="tooltip" data-placement="top" title="Entreprises recrutant une proportion élevée de juniors (- de 26 ans)
+                  / seniors (+ de 50 ans)
+                  / BOE (Bénéficiaire de l'Obligation d'Emploi)
+                  - indicateurs exclusifs version PRO">PRO</small>
+                </p>
+                {{ form.p }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="lbb-bright-container">
+          {% include "includes/search_form.html" %}
+          {{ form.hidden_tag() }}
+          <div class="lbb-sidebar-toggle-wrapper">
+            <a class="lbb-sidebar-toggle" href="#lbb-sidebar-wrapper">Trier / Filtrer »</a>
+          </div>
+        </div>
+
+      </form>
+
+      <div id="lbb-result-map" class="lbb-bright-container"></div>
+
+      {% if not companies %}
+        <div class="lbb-bright-container ga-no-results">
+          {% if job_doesnt_exist %}
+            <p>Le métier que vous avez choisi n'est pas valide. Veuillez réessayer.</p>
+          {% elif not location %}
+            <p>La ville que vous avez choisie n'est pas valide. Veuillez réessayer.</p>
+          {% elif alternative_rome_descriptions or alternative_distances %}
+            <p>
+              Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour
+              <b>{{ rome_description }}</b>
+              {% if location_name %} à {{ distance }} km de {{ location_name }}{% endif %}.
+            </p>
+            {% if alternative_rome_descriptions and alternative_distances %}
+                <div class="grid-row grid-spacing">
+                  <div class="grid-col-6">
+                    <h3>Elargir aux métiers suivants :</h3>
+                    {% include "includes/alternative_rome_descriptions.html" %}
+                  </div>
+                  <div class="grid-col-3">
+                    <h3>Elargir aux alentours :</h3>
+                    {% include "includes/alternative_distances.html" %}
+                  </div>
+                </div>
+            {% elif alternative_rome_descriptions %}
+              <h3>Elargir aux métiers suivants :</h3>
+              {% include "includes/alternative_rome_descriptions.html" %}
+            {% elif alternative_distances %}
+              <h3>Elargir aux alentours :</h3>
+              {% include "includes/alternative_distances.html" %}
+            {% endif %}
+          {% else %}
+            Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour votre recherche.
+          {% endif %}
+        </div>
+      {% endif %}
+
+
+      {% for company in companies %}
+      <div id="company-{{ company.siret }}" class="lbb-bright-container lbb-result">
+          {% with show_more_info=1 %}
+            {% include "includes/office_header.html" %}
+            {% include "includes/office_content.html" %}
+          {% endwith %}
+        </div>
+      {% endfor %}
+
+      
+      {% if companies and companies|length < companies_per_page and (alternative_rome_descriptions or alternative_distances) %}
+        <div class="lbb-bright-container">
+          <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
+          {% if alternative_rome_descriptions %}
+            <p>...dans d'autres métiers :</p>
+            {% include "includes/alternative_rome_descriptions.html" %}
+          {% endif %}
+          {% if alternative_distances %}
+            <p>...plus loin :</p>
+            {% include "includes/alternative_distances.html" %}
+          {% endif %}
+        </div>
+      {% endif %}
+
+
+      {% if pagination and pagination.should_show() %}
+        <nav class="pagination-wrapper" aria-label="Page navigation">
+          <b>Plus d'entreprises</b>
+          <ul class="pagination">
+            {% if pagination.show_first_page() %}
+              {% set first_page = pagination.get_first_page() %}
+              <li class="page-item">
+                <a class="page-link" href="{{ first_page.get_url() }}">{{ first_page.ranking + 1 }}</a>
+              </li>
+              <li class="page-item">
+                <span class="page-link">...</span>
+              </li>
+            {% endif %}
+            {% for page in pagination.get_pages() %}
+              {% if page.is_active() %}
+                <li class="page-item active">
+                  <span class="page-link">{{ page.ranking + 1 }}</span>
+                </li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link" href="{{ page.get_url() }}">{{ page.ranking + 1 }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+            {% if pagination.show_last_page() %}
+              {% set last_page = pagination.get_last_page() %}
+              <li class="page-item">
+                <span class="page-link">...</span>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="{{ last_page.get_url() }}">{{ last_page.ranking + 1 }}</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+
+
+    </div>{# END .lbb-content-with-sidebar #}
+  </div>{# END .lbb-content #}
+</div>{# END .lbb-content-purple-wrapper #}

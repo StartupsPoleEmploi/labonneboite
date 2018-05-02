@@ -86,6 +86,29 @@ class SearchEntreprisesTest(AppTest):
         self.assertEqual(0, location.longitude)
         self.assertIsNone(named_location)
 
+
+    def test_get_location_invalid_coordinates_valid_name(self):
+        metz = {
+            'latitude': 45,
+            'longitude': 8,
+            'label': 'Metz',
+            'zipcode': '01000',
+            'city': 'Wurst City'
+        }
+        with mock.patch('labonneboite.common.geocoding.get_coordinates', return_value=[metz]):
+            location, named_location = get_location({
+                'lat': '',
+                'lon': '',
+                'l': 'metz'
+            })
+        self.assertIsNotNone(location)
+        self.assertEqual(45, location.latitude)
+        self.assertEqual(8, location.longitude)
+        self.assertEqual('Metz', named_location.name)
+        self.assertEqual('Wurst City', named_location.city)
+        self.assertEqual('01000', named_location.zipcode)
+
+
     def test_get_location_correct_coordinates(self):
         addresses = [{
             'label': 'Copacabana',

@@ -27,21 +27,21 @@ install:
   - python setup.py develop
 script:
   # Note that we could speed-up the build process by running different env values
-  - nosetests labonneboite/tests/app
-  - nosetests labonneboite/tests/web
-  - nosetests labonneboite/tests/scripts
-  - nosetests labonneboite/tests/importer
+  - nosetests --nologcapture labonneboite/tests/app
+  - nosetests --nologcapture labonneboite/tests/web
+  - nosetests --nologcapture labonneboite/tests/scripts
+  - nosetests --nologcapture labonneboite/tests/importer
   # Integration
   - mysql -u travis -e 'DROP DATABASE IF EXISTS lbb_test;'
   - mysql -u travis -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
   - alembic upgrade head
   - mysql -u travis lbb_test < ./labonneboite/alembic/sql/etablissements.sql
-  - python ./labonneboite/scripts/create_index.py --full
-  - nosetests labonneboite/tests/integration
+  - create_index --full
+  - nosetests --nologcapture labonneboite/tests/integration
   # Selenium
   - mysql -u travis -e 'DROP DATABASE IF EXISTS lbb_test;'
   - mysql -u travis -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
   - alembic upgrade head
   - mysql -u travis lbb_test < ./labonneboite/alembic/sql/etablissements.sql
-  - python ./labonneboite/scripts/create_index.py --full
-  - nosetests labonneboite/tests/selenium
+  - create_index --full
+  - nosetests --nologcapture labonneboite/tests/selenium

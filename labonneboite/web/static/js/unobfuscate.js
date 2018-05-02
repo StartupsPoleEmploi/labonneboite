@@ -2,7 +2,7 @@
 
 (function ($) {
 
-  $(document).ready(function () {
+  $(document).on('lbbready', function () {
     $('.js-obfuscated-email').unobfuscate();
   });
 

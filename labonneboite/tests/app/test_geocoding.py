@@ -79,6 +79,7 @@ class AdresseApiTest(unittest.TestCase):
         mock_get = mock.Mock(json=mock.Mock(return_value=mock_response), status_code=200)
         return mock_get
 
+
     def test_get_coordinates(self):
         mock_get = self.mock_get('search-lelab.json')
 
@@ -89,6 +90,8 @@ class AdresseApiTest(unittest.TestCase):
             'latitude': 48.884085,
             'longitude': 2.38728,
             'label': u'22 Allée Darius Milhaud 75019 Paris',
+            'city': 'Paris',
+            'zipcode': '75019',
         }], coordinates)
 
 

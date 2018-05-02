@@ -184,6 +184,8 @@ def get_coordinates(address, limit=10):
             'latitude': result['geometry']['coordinates'][1],
             'longitude': result['geometry']['coordinates'][0],
             'label': result['properties']['label'],
+            'zipcode': result['properties']['postcode'],
+            'city': result['properties']['city']
         } for result in datagouv.search(address, limit=limit)
     ]
 

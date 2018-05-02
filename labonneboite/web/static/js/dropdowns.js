@@ -1,6 +1,6 @@
 (function($) {
 
-  $(document).ready(function () {
+  $(document).on('lbbready', function () {
 
     // Handle cases where there is a click outside of a dropdown.
     $(document).on('click', function (e) {

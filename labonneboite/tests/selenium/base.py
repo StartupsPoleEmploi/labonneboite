@@ -6,6 +6,7 @@ import easyprocess
 from flask import url_for as flask_url_for
 from flask_testing import LiveServerTestCase
 from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from labonneboite.conf import settings
 from labonneboite.web.app import app
@@ -57,10 +58,19 @@ class LbbSeleniumTestCase(LiveServerTestCase):
             chromedriver_path = distutils.spawn.find_executable('chromedriver', path='/usr/lib/chromium-browser/')
         if not chromedriver_path:
             raise RuntimeError('Missing chromedriver executable. Did you install the chromium-chromedriver package?')
-        self.driver = webdriver.Chrome(executable_path=chromedriver_path)
+
+        # Configure logging
+        capabilities = DesiredCapabilities.CHROME
+        capabilities['loggingPrefs'] = {'browser':'ALL'}
+
+        self.driver = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_path)
 
         # Ensure that the window size is large enough so that HTML elements won't overlap.
         self.driver.set_window_size(1600, 1200)
+
+        # Implicitely wait at most 10 seconds when trying to select an element
+        # that does not exist yet.
+        self.driver.implicitly_wait(10)
 
 
     def tearDown(self):
@@ -76,3 +86,13 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         with app.app_context():
             url = flask_url_for(endpoint, **kwargs)
             return self.get_server_url() + url
+
+    def print_js_logs(self):
+        # Convenient utility to print client-side logs
+        for entry in self.driver.get_log('browser'):
+            print entry
+
+def url_has_changed(current_url):
+    def check(driver):
+        return driver.current_url != current_url
+    return check
