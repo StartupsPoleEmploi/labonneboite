@@ -121,7 +121,6 @@ PARAMETER_FIELD_MAPPING = {
     'sort': 'sort',
     'from': 'from_number',
     'to': 'to_number',
-    'f_a': 'flag_alternance',
     'p': 'public',
 }
 
@@ -165,13 +164,10 @@ def get_parameters(args):
     if kwargs.get('sort') not in sorting.SORT_FILTERS:
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
-    for flag_name in ['flag_alternance', 'public']:
-        try:
-            kwargs[flag_name] = int(kwargs.get(flag_name))
-        except (ValueError, TypeError):
-            kwargs[flag_name] = 0
-
-    kwargs['flag_alternance'] = 0  # FIXME drop flag_alternance forever
+    try:
+        kwargs['public'] = int(kwargs.get('public'))
+    except (ValueError, TypeError):
+        kwargs['public'] = 0
 
     if kwargs['public'] not in search_util.PUBLIC_CHOICES:
         kwargs['public'] = search_util.PUBLIC_ALL
@@ -248,7 +244,6 @@ def entreprises():
         sort=parameters['sort'],
         from_number=parameters['from_number'],
         to_number=parameters['to_number'],
-        flag_alternance=parameters['flag_alternance'],
         public=parameters.get('public'),
         headcount=parameters['headcount'],
         naf=parameters['naf'],
@@ -294,7 +289,7 @@ def entreprises():
 
     canonical_url = get_canonical_results_url(
         named_location.zipcode, named_location.city,
-        occupation, parameters['flag_alternance']
+        occupation
     ) if named_location else ''
 
     context = {
@@ -325,14 +320,11 @@ def entreprises():
     return render_template(template, **context)
 
 
-def get_canonical_results_url(zipcode, city, occupation, alternance=False):
+def get_canonical_results_url(zipcode, city, occupation):
     """
     The canonical url for each result page should have very few querystring arguments.
     """
-    url = url_for('search.entreprises', city=slugify(city), zipcode=zipcode, occupation=slugify(occupation))
-    if alternance:
-        url += '&f_a=1'
-    return url
+    return url_for('search.entreprises', city=slugify(city), zipcode=zipcode, occupation=slugify(occupation))
 
 
 def get_location(request_args):
