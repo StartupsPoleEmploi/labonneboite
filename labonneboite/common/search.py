@@ -41,6 +41,8 @@ KEY_TO_LABEL_DISTANCES = {
 FILTERS = ['naf', 'headcount', 'flag_alternance', 'distance']
 DISTANCE_FILTER_MAX = 3000
 
+# easy on/off switch to display scores directly in autocomplete - never commit a True value!
+SHOW_AUTOCOMPLETE_SCORE = False
 
 
 class Fetcher(object):
@@ -787,21 +789,24 @@ def build_location_suggestions(term):
     res = es.search(index=settings.ES_INDEX, doc_type="location", body=body)
 
     suggestions = []
-    first_score = None
 
     for hit in res['hits']['hits']:
-        if not first_score:
-            first_score = hit['_score']
         source = hit['_source']
-        if source['zipcode']:  # and hit['_score'] > 0.1 * first_score:
+        if source['zipcode']:
             city_name = source['city_name'].replace('"', '')
             label = u'%s (%s)' % (city_name, source['zipcode'])
+            score = round(hit['_score'], 1)
+
+            if SHOW_AUTOCOMPLETE_SCORE:
+                label = "[score=%s] %s" % (score, label)
+
             city = {
                 'city': source['slug'],
                 'zipcode': source['zipcode'],
                 'label': label,
                 'latitude': source['location']['lat'],
                 'longitude': source['location']['lon'],
+                'score': score,
             }
             suggestions.append(city)
     return suggestions
@@ -878,6 +883,10 @@ def build_job_label_suggestions(term, size=autocomplete.MAX_JOBS):
             label = "%s (%s, ...)" % (rome_description, ogr_description)
             value = "%s (%s, ...)" % (source["rome_description"], source["ogr_description"])
             score = round(hit['_score'], 1)
+
+            if SHOW_AUTOCOMPLETE_SCORE:
+                label = "[score=%s] %s" % (score, label)
+
             suggestions.append({
                 'id': source['rome_code'],
                 'label': label,
