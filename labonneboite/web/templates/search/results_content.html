@@ -1,4 +1,4 @@
-<div class="{% if is_alternance %}lbb-content-alternance-wrapper{% else %}lbb-content-purple-wrapper{% endif %}">
+<div class="lbb-content-purple-wrapper">
   <div class="lbb-content">
     <div class="lbb-content-with-sidebar">
 
@@ -49,10 +49,6 @@
               <p>{{ form.h.label.text }}</p>
               {{ form.h }}
             </div>
-            <div class="lbb-sidebar-item">
-              <p>{{ form.f_a.label.text }}</p>
-              {{ form.f_a}}
-            </div>
             {% if pro_version_enabled %}
               <div class="lbb-sidebar-item">
                 <p>
@@ -65,6 +61,9 @@
                 {{ form.p }}
               </div>
             {% endif %}
+            <div class="lbb-sidebar-item">
+              Pour l’alternance <a href="http://labonnealternance.pole-emploi.fr">c'est ici</a>.
+            </div>
           </div>
         </div>
 

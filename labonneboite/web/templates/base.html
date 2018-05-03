@@ -63,12 +63,6 @@
           <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite" width="74">
         </a>
       </li>
-      <li class="text-left">
-        {% if is_alternance %}
-          <small class="badge badge-alternance" data-placement="bottom" data-toggle="tooltip" data-placement="bottom" title="La recherche est limitée aux entreprises recrutant notamment des contrats en alternance">Alternance</small>
-        {% endif %}
-      </li>
-
       
       <li class="float-right lbb-header-logo-pole-emploi">
         {# The hardcoded width attribute is required by IE 11. #}

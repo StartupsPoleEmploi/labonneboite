@@ -22,18 +22,12 @@
       </div>
       <div class="grid-col-4">
 
-        {% if company.email or company.phone or company.website or company.email_alternance %}
+        {% if company.email or company.phone or company.website %}
         <h3>Contact</h3>
         <ul>
           {% if company.email %}
           <li>
             <a href="mailto:{{ company.email }}" class="break-word">{{ company.email }}</a>
-          </li>
-          {% endif %}
-          {% if company.email_alternance %}
-          <li>
-            <a href="mailto:{{ company.email_alternance }}" class="break-word">{{ company.email_alternance }}</a>
-            <span class="badge badge-large badge-alternance">Alternance</span>
           </li>
           {% endif %}
           {% if company.phone %}

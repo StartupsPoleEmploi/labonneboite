@@ -34,10 +34,6 @@ class CompanySearchForm(FlaskForm):
     )
     DISTANCE_S = DISTANCE_CHOICES[2][0]
 
-    FLAG_ALTERNANCE_CHOICES = (
-        (u'0', u'Tous types'),
-        (u'1', u'<span class="badge badge-large badge-alternance">Alternance</span>'),
-    )
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -81,12 +77,6 @@ class CompanySearchForm(FlaskForm):
         u'Distance',
         choices=DISTANCE_CHOICES,
         default=settings.DISTANCE_FILTER_DEFAULT,
-        validators=[Optional()])
-
-    f_a = RadioField(
-        u'Type de contrat',
-        choices=FLAG_ALTERNANCE_CHOICES,
-        default=0,
         validators=[Optional()])
 
 

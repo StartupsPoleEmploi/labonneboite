@@ -53,21 +53,14 @@ class SearchEntreprisesTest(AppTest):
 
     def test_canonical_url(self):
         with self.app_context:
-            url_no_alternance = get_canonical_results_url('05100', u'Cervières', 'Boucherie')
-            url_alternance = get_canonical_results_url('05100', u'Cervières', 'Boucherie', alternance=True)
-        response_no_alternance = self.app.get(url_no_alternance)
-        response_alternance = self.app.get(url_alternance)
+            url = get_canonical_results_url('05100', u'Cervières', 'Boucherie')
+        response = self.app.get(url)
 
         self.assertEqual(
             'http://' + self.TEST_SERVER_NAME + '/entreprises?city=cervieres&zipcode=05100&occupation=boucherie',
-            url_no_alternance
+            url
         )
-        self.assertEqual(
-            'http://' + self.TEST_SERVER_NAME + '/entreprises?city=cervieres&zipcode=05100&occupation=boucherie&f_a=1',
-            url_alternance
-        )
-        self.assertEqual(200, response_alternance.status_code)
-        self.assertEqual(200, response_no_alternance.status_code)
+        self.assertEqual(200, response.status_code)
 
 
     def test_get_location_no_arguments(self):
