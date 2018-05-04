@@ -121,16 +121,22 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     new_phone = Column(String(191), default='', nullable=False)
     new_website = Column(String(191), default='', nullable=False)
 
-    # Set `boost` to True to promote the offfice.
+    # Set `boost` to True to promote the office for LBB.
+    # Set `boost_alternance` to True to promote the office for alternance.
     boost = Column(Boolean, default=False, nullable=False)
+    boost_alternance = Column(Boolean, default=False, nullable=False)
 
     # Stores a list of ROME codes as a string separated by `SEPARATORS`.
-    # If `romes_to_boost` is populated, boosting will be set only for specified ROME codes.
+    # If `romes_to_boost` is populated, boosting will be set only for specified ROME codes for LBB.
+    # If `romes_alternance_to_boost` is populated, boosting will be set only for specified ROME codes for alternance.
     romes_to_boost = Column(Text, default='', nullable=False)
+    romes_alternance_to_boost = Column(Text, default='', nullable=False)
 
     # Stores a list of ROME codes as a string separated by `SEPARATORS`.
-    # If `romes_to_remove` is populated, these ROME codes will not be indexed
+    # If `romes_to_remove` is populated, these ROME codes will not be indexed for LBB
+    # If `romes_alternance_to_remove` is populated, these ROME codes will not be indexed for alternance
     romes_to_remove = Column(Text, default='', nullable=False)
+    romes_alternance_to_remove = Column(Text, default='', nullable=False)
 
     # Stores a list of NAF codes as a string separated by `SEPARATORS`.
     # If `nafs_to_add` is populated, all the romes associated to this NAF will be added.

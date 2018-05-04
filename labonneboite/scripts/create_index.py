@@ -264,20 +264,21 @@ def get_office_as_es_doc(office):
             {'lat': office.y, 'lon': office.x},
         ]
 
-    scores_by_rome, scores_alternance_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office)
+    scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes  = get_scores_by_rome_and_boosted_romes(office)
     if scores_by_rome:
         doc['scores_by_rome'] = scores_by_rome
         doc['boosted_romes'] = boosted_romes
     if scores_alternance_by_rome:
         doc['scores_alternance_by_rome'] = scores_alternance_by_rome
+        doc['boosted_alternance_romes'] = boosted_alternance_romes
+
 
     return doc
 
 
 def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
-    scores_by_rome = {}
-    scores_alternance_by_rome = {}
-    boosted_romes = {}  # elasticsearch does not understand sets, so we use a dict of 'key => True' instead
+
+    ## 0 - Get all romes related to the company
 
     # fetch all rome_codes mapped to the naf of this office
     # as we will compute a score adjusted for each of them
@@ -286,24 +287,34 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
     if office_to_update:
         office_nafs += office_to_update.as_list(office_to_update.nafs_to_add)
 
-    romes_to_boost = []
-    romes_to_remove = []
-    if office_to_update:
-        romes_to_boost = office_to_update.as_list(office_to_update.romes_to_boost)
-        romes_to_remove = office_to_update.as_list(office_to_update.romes_to_remove)
+
+    scores_by_rome = {}
+    scores_alternance_by_rome = {}
+    # elasticsearch does not understand sets, so we use a dict of 'key => True' instead
+    boosted_romes = {}
+    boosted_alternance_romes = {}
+
 
     for naf in office_nafs:
         try:
-            rome_codes = mapping_util.get_romes_for_naf(naf)
+            naf_rome_codes = mapping_util.get_romes_for_naf(naf)
         except KeyError:
             # unfortunately some NAF codes have no matching ROME at all
             continue
 
+        ## 1- DPAE
+
+        romes_to_boost = []
+        romes_to_remove = []
+        if office_to_update:
+            romes_to_boost = office_to_update.as_list(office_to_update.romes_to_boost)
+            romes_to_remove = office_to_update.as_list(office_to_update.romes_to_remove)
+
         # Add unrelated rome for indexing (with boost) and remove unwanted romes
-        rome_codes = set(rome_codes).union(set(romes_to_boost)) - set(romes_to_remove)
+        rome_codes = set(naf_rome_codes).union(set(romes_to_boost)) - set(romes_to_remove)
 
         for rome_code in rome_codes:
-            # Manage office boosting
+            # Manage office boosting - DPAE
             if office_to_update and office_to_update.boost:
                 if not office_to_update.romes_to_boost:
                     # Boost the score for all ROME codes.
@@ -312,8 +323,7 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                     # Boost the score for some ROME codes only.
                     boosted_romes[rome_code] = True
 
-            # 1) DPAE scoring part
-
+            # Scoring part
             score_dpae = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
                 score=office.score,
                 rome_code=rome_code,
@@ -329,24 +339,45 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                     scores_by_rome[rome_code] = score_dpae
                     st.increment_office_score_for_rome_count()
 
-            # 2) Alternance scoring part - boosting is not applied for alternance
 
-            score_alternance = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                score=office.score_alternance,
-                rome_code=rome_code,
-                naf_code=naf)
+        ## 2 - Alternance
 
-            if score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM:
-                if rome_code in scores_alternance_by_rome:
-                    # this ROME was already computed before for another NAF
-                    if score_alternance > scores_alternance_by_rome[rome_code]:
-                        # keep highest score for this rome among all possible NAF codes
+        romes_alternance_to_boost = []
+        romes_alternance_to_remove = []
+        if office_to_update:
+            romes_alternance_to_boost = office_to_update.as_list(office_to_update.romes_alternance_to_boost)
+            romes_alternance_to_remove = office_to_update.as_list(office_to_update.romes_alternance_to_remove)
+
+            rome_codes_alternance = set(naf_rome_codes).union(set(romes_alternance_to_boost)) - set(romes_alternance_to_remove)
+
+            for rome_code in rome_codes_alternance:
+                # Manage office boosting - Alternance
+                if office_to_update.boost_alternance:
+                    if not office_to_update.romes_alternance_to_boost:
+                        # Boost the score for all ROME codes.
+                        boosted_alternance_romes[rome_code] = True
+                    elif rome_code in romes_alternance_to_boost:
+                        # Boost the score for some ROME codes only.
+                        boosted_alternance_romes[rome_code] = True
+
+                # Scoring part
+
+                score_alternance = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                    score=office.score_alternance,
+                    rome_code=rome_code,
+                    naf_code=naf)
+
+                if score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM or rome_code in boosted_alternance_romes:
+                    if rome_code in scores_alternance_by_rome:
+                        # this ROME was already computed before for another NAF
+                        if score_alternance > scores_alternance_by_rome[rome_code]:
+                            # keep highest score for this rome among all possible NAF codes
+                            scores_alternance_by_rome[rome_code] = score_alternance
+                    else:
                         scores_alternance_by_rome[rome_code] = score_alternance
-                else:
-                    scores_alternance_by_rome[rome_code] = score_alternance
-                    st.increment_office_score_alternance_for_rome_count()
+                        st.increment_office_score_alternance_for_rome_count()
 
-    return scores_by_rome, scores_alternance_by_rome, boosted_romes
+    return scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes
 
 
 def create_offices(disable_parallel_computing=False):
@@ -520,12 +551,13 @@ def update_offices():
                     'flag_alternance': 1 if office.flag_alternance else 0}
                 }
 
-                scores_by_rome, scores_alternance_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)
+                scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)
                 if scores_by_rome:
                     body['doc']['scores_by_rome'] = scores_by_rome
                     body['doc']['boosted_romes'] = boosted_romes
                 if scores_alternance_by_rome:
                     body['doc']['scores_alternance_by_rome'] = scores_alternance_by_rome
+                    body['doc']['boosted_alternance_romes'] = boosted_alternance_romes
 
                 # The update API makes partial updates: existing `scalar` fields are overwritten,
                 # but `objects` fields are merged together.
@@ -534,7 +566,15 @@ def update_offices():
                 # may change over time.
                 # To do this, we perform 2 requests: the first one resets `scores_by_rome` and
                 # `boosted_romes` and the second one populates them.
-                delete_body = {'doc': {'scores_by_rome': None, 'boosted_romes': None}}
+                delete_body = {'doc': {}}
+                delete_body = {
+                    'doc': {
+                        'scores_by_rome': None,
+                        'boosted_romes': None,
+                        'scores_alternance_by_rome': None,
+                        'boosted_alternance_romes': None
+                    }
+                }
 
                 # Unfortunately these cannot easily be bulked :-(
                 # The reason is there is no way to tell bulk to ignore missing documents (404)
