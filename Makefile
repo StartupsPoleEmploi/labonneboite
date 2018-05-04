@@ -40,8 +40,6 @@ stop-services:
 # Cleanup
 # -------
 
-.PHONY: clean clean_pyc
-
 clean:
 	find $(PACKAGE_DIR) "(" -name "*.pyc" -or -name "*.pyo" -or -name "*.mo" -or -name "*.so" ")" -delete
 	find $(PACKAGE_DIR) -type d -empty -delete
@@ -52,8 +50,6 @@ clean_pyc:
 
 # Code quality
 # ------------
-
-.PHONY: pylint_all pylint
 
 # Run pylint on the whole project.
 pylint_all:
@@ -67,11 +63,6 @@ pylint:
 
 # Local dev
 # ---------
-
-.PHONY: serve_web_app create_sitemap prepare_mailing_data create_index create_index_from_scratch
-.PHONY: create_index_from_scratch_with_profiling create_index_from_scratch_with_profiling_on_staging
-.PHONY: create_index_from_scratch_with_profiling_line_by_line
-.PHONY: mysql_local_shell rebuild_importer_tests_compressed_files
 
 serve_web_app:
 	LBB_ENV=development python labonneboite/web/app.py
@@ -119,8 +110,6 @@ rebuild_importer_tests_compressed_files:
 # Load testing
 # ------------
 
-.PHONY: start_locust_against_localhost
-
 start_locust_against_localhost:
 	echo "Please open locust web interface at http://localhost:8089"
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave &
@@ -131,8 +120,6 @@ start_locust_against_localhost:
 
 # Tests
 # -----
-
-.PHONY: test_all test_unit test_app test_importer test_api test_front test_scripts test_selenium
 
 test_unit: clean_pyc test_app test_web test_scripts test_importer
 
