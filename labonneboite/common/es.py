@@ -51,14 +51,12 @@ def drop_indexes_of_alias(name=settings.ES_INDEX):
     """
     Drop indexes associated to alias.
     """
-    es = Elasticsearch()
-    for index in es.indices.get_alias(name).keys():
+    for index in Elasticsearch().indices.get_alias(name).keys():
         drop_index(index=index)
 
 
 def drop_index(index):
-    es = Elasticsearch()
-    es.indices.delete(index=index, params={'ignore': [400, 404]})
+    Elasticsearch().indices.delete(index=index, params={'ignore': [400, 404]})
 
 
 def get_new_index_name():
@@ -72,8 +70,7 @@ def get_new_index_name():
 
 
 def add_alias_to_index(index, name=settings.ES_INDEX):
-    es = Elasticsearch()
-    es.indices.put_alias(index=index, name=name)
+    Elasticsearch().indices.put_alias(index=index, name=name)
 
 
 def create_index(index):
@@ -284,8 +281,7 @@ def create_index(index):
         },
     }
 
-    es = Elasticsearch()
-    es.indices.create(index=index, body=create_body)
+    Elasticsearch().indices.create(index=index, body=create_body)
 
 # This fake office having a zero but existing score for each rome is designed
 # as a workaround of the following bug:
