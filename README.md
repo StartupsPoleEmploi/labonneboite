@@ -97,7 +97,7 @@ If needed, run `make clear-data` to clear any old/partial data you might already
 
 ## Launch web app
 
-    make serve_web_app
+    make serve-web-app
 
 The app is available on port `5000` on host machine. Open a web browser, load
 http://localhost:5000 and start browsing.
@@ -106,7 +106,7 @@ http://localhost:5000 and start browsing.
 
 We are using [Nose](https://nose.readthedocs.io/):
 
-    $ make test_all
+    $ make test-all
 
 # Debugging
 
@@ -184,7 +184,7 @@ For example `create_index`:
 
 You can run [pylint](https://www.pylint.org) on the whole project:
 
-    $ make pylint_all
+    $ make pylint-all
 
 Or on a specific python file:
 
@@ -227,7 +227,7 @@ Here is their normal workflow:
 
 `check_etab` => `extract_etab` => `check_dpae` => `extract_dpae` => `compute_scores` => `validate_scores` => `geocode` => `populate_flags`
 
-Use `make run_importer_jobs` to run all these jobs in local development environment.
+Use `make run-importer-jobs` to run all these jobs in local development environment.
 
 ## Single-ROME vs Multi-ROME search
 
@@ -241,8 +241,8 @@ The load testing is designed to run directly from your vagrant VM using 4 cores 
 
 - First double check your vagrant VM settings directly in VirtualBox interface. You should ensure that your VM uses 4 CPUs and not the default 1 CPU only. You have to make this change once, and you'll most likely need to reboot the VM to do it. Without this change, your VM CPU usage might quickly become the bottleneck of the load testing.
 - Read `labonneboite/scripts/loadtesting.py` script and adjust values to your load testing scenario.
-- Start your local server `make serve_web_app`
-- Start your locust instance `make start_locust_against_localhost`. By default, this will load-test http://localhost:5000. To test a different server, run e.g: `make start_locust_against_localhost LOCUST_HOST=https://labonneboite.pole-emploi.fr` (please don't do this, though).
+- Start your local server `make serve-web-app`
+- Start your locust instance `make start-locust-against-localhost`. By default, this will load-test http://localhost:5000. To test a different server, run e.g: `make start-locust-against-localhost LOCUST_HOST=https://labonneboite.pole-emploi.fr` (please don't do this, though).
 - Load the locust web interface in your browser: http://localhost:8089
 - Start your swarm with for example 1 user then increase slowly and observe what happens.
 - As long as your observed RPS stays coherent with your number of users, it means the app behaves correctly. As soon as the RPS is less than it shoud be and/or you get many 500 errors (check your logs) it means the load is too high or that your available bandwidth is too low.
@@ -258,7 +258,7 @@ Here is how to profile the `create_index.py` script and its (long) reindexing of
 ### Profiling the full script in local
 
 Reminder: the local database has only a small part of the data .i.e data of only 1 of 96 departements, namely the departement 57. Thus profiling on this dataset is not exactly relevant. Let's still explain the details though.
-- `make create_index_from_scratch_with_profiling`
+- `make create-index-from-scratch-with-profiling`
 
 Visualize the results (for Mac OS):
 - `qcachegrind labonneboite/scripts/profiling_results/create_index_run.kgrind`
@@ -276,7 +276,7 @@ Visualize the results (for Mac OS):
 *Warning: in order to do this, you need to have ssh access to our staging server.*
 
 The full dataset (all 96 departements) is in staging which makes it a very good environment to run the full profiling to get a big picture.
-- `make create_index_from_scratch_with_profiling_on_staging`
+- `make create-index-from-scratch-with-profiling-on-staging`
 
 Visualize the results (for Mac OS):
 - `qcachegrind labonneboite/scripts/profiling_results/staging/create_index_run.kgrind`
@@ -292,7 +292,7 @@ Visualize the results (for Mac OS):
 ### Profiling a single job in local
 
 Former profiling methods are good to get a big picture however they take quite some time to compute, and sometimes you want a quick profiling in local in order to quickly see the result of some changes. Here is how to do that:
-- `make create_index_from_scratch_with_profiling_single_job`
+- `make create-index-from-scratch-with-profiling-single-job`
 
 This variant disables parallel computation, skips all tasks but office reindexing, and runs only a single job (departement 57). This makes the result very fast and easy to profile:
 - `qcachegrind labonneboite/scripts/profiling_results/create_index_run.kgrind`

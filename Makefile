@@ -45,14 +45,14 @@ clean:
 	find $(PACKAGE_DIR) -type d -empty -delete
 	find $(PACKAGE_DIR) -name __pycache__ -delete
 
-clean_pyc:
+clean-pyc:
 	find $(PACKAGE_DIR) "(" -name "*.pyc" ")" -delete
 
 # Code quality
 # ------------
 
 # Run pylint on the whole project.
-pylint_all:
+pylint-all:
 	pylint --rcfile=.pylintrc --reports=no --output-format=colorized $(PACKAGE_DIR) || true
 
 # Run pylint on a specific file, e.g.:
@@ -64,25 +64,25 @@ pylint:
 # Local dev
 # ---------
 
-serve_web_app:
+serve-web-app:
 	LBB_ENV=development python labonneboite/web/app.py
 
-create_sitemap:
+create-sitemap:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_sitemap.py sitemap
 
-prepare_mailing_data:
+prepare-mailing-data:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/prepare_mailing_data.py
 
-create_index:
+create-index:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_index.py
 
-create_index_from_scratch:
+create-index-from-scratch:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_index.py --full
 
-create_index_from_scratch_with_profiling:
+create-index-from-scratch-with-profiling:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_index.py --full --profile
 
-create_index_from_scratch_with_profiling_on_staging:
+create-index-from-scratch-with-profiling-on-staging:
 	ssh deploy@lbbstaging -t 'bash -c "\
         cd && source /home/deploy/config/labonneboite/bin/activate && \
         export LBB_ENV=staging && export LBB_SETTINGS=/home/deploy/config/lbb_staging_settings.py && \
@@ -91,16 +91,16 @@ create_index_from_scratch_with_profiling_on_staging:
     scp deploy@lbbstaging:/home/deploy/code/current/labonneboite/labonneboite/scripts/profiling_results/*.kgrind \
     	labonneboite/scripts/profiling_results/staging/
 
-create_index_from_scratch_with_profiling_single_job:
+create-index-from-scratch-with-profiling-single-job:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_index.py --partial --profile
 
-create_index_from_scratch_with_profiling_line_by_line:
+create-index-from-scratch-with-profiling-line-by-line:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && kernprof -v -l scripts/create_index.py --partial --profile
 
-mysql_local_shell:
+mysql-local-shell:
 	mysql -u root --host 127.0.0.1 --port 3307 labonneboite
 
-rebuild_importer_tests_compressed_files:
+rebuild-importer-tests-compressed-files:
 	cd labonneboite/tests/importer/data && \
 	rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.gz && \
 	gzip --keep LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv && \
@@ -110,7 +110,7 @@ rebuild_importer_tests_compressed_files:
 # Load testing
 # ------------
 
-start_locust_against_localhost:
+start-locust-against-localhost:
 	echo "Please open locust web interface at http://localhost:8089"
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave &
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && locust --locustfile=scripts/loadtesting.py --host=$(LOCUST_HOST) --loglevel=WARNING --slave &
@@ -121,47 +121,47 @@ start_locust_against_localhost:
 # Tests
 # -----
 
-test_unit: clean_pyc test_app test_web test_scripts test_importer
+test-unit: clean-pyc test-app test-web test-scripts test-importer
 
-test_all: test_unit test_selenium test_integration
+test-all: test-unit test-selenium test-integration
 
-check_all: test_all run_importer_jobs
+check-all: test-all run-importer-jobs
 
-test_app:
+test-app:
 	LBB_ENV=test nosetests -s labonneboite/tests/app
 
-test_importer:
+test-importer:
 	LBB_ENV=test nosetests -s labonneboite/tests/importer
 
 # convenient shortcut when working on the importer
-check_importer: test_importer run_importer_jobs
+check-importer: test-importer run-importer-jobs
 
-test_api:
+test-api:
 	LBB_ENV=test nosetests -s labonneboite/tests/web/api
 
-test_front:
+test-front:
 	LBB_ENV=test nosetests -s labonneboite/tests/web/front
 
-test_web: test_api test_front
+test-web: test-api test-front
 
-test_scripts:
+test-scripts:
 	LBB_ENV=test nosetests -s labonneboite/tests/scripts
 
 # Selenium and integration tests are run against the full database (not the
 # test one) as of now: we use LBB_ENV=development.
-test_integration: clear-data-test database-test
+test-integration: clear-data-test database-test
 	LBB_ENV=test alembic upgrade head
 	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
 	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
 	LBB_ENV=test nosetests -s labonneboite/tests/integration
-test_selenium: clear-data-test database-test
+test-selenium: clear-data-test database-test
 	LBB_ENV=test alembic upgrade head
 	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
 	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
 	LBB_ENV=test nosetests -s labonneboite/tests/selenium
 
 # Convenient reminder about how to run a specific test manually.
-test_custom:
+test-custom:
 	@echo "To run a specific test, run for example:"
 	@echo
 	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/api/test_api.py"
@@ -176,13 +176,13 @@ test_custom:
 # Alembic migrations
 # ------------------
 
-alembic_migrate:
+alembic-migrate:
 	LBB_ENV=development alembic upgrade head
 
-alembic_rollback:
+alembic-rollback:
 	LBB_ENV=development alembic downgrade -1
 
-alembic_generate_migration:
+alembic-generate-migration:
 	@echo "Run for example:"
 	@echo 
 	@echo "    $$ alembic revision -m 'create account table'"
@@ -190,20 +190,20 @@ alembic_generate_migration:
 # Importer jobs
 # -------------
 
-run_importer_jobs:
-	make run_importer_job_00_prepare_all && \
-	make run_importer_job_01_check_etablissements && \
-	make run_importer_job_02_extract_etablissements && \
-	make run_importer_job_03_check_dpae && \
-	make run_importer_job_04_extract_dpae && \
-	make run_importer_job_04hack_create_fake_alternance_hirings && \
-	make run_importer_job_05_compute_scores && \
-	make run_importer_job_06_validate_scores && \
-	make run_importer_job_07_geocode && \
-	make run_importer_job_08_populate_flags && \
+run-importer-jobs:
+	make run-importer-job-00-prepare-all && \
+	make run-importer-job-01-check-etablissements && \
+	make run-importer-job-02-extract-etablissements && \
+	make run-importer-job-03-check-dpae && \
+	make run-importer-job-04-extract-dpae && \
+	make run-importer-job-04hack-create-fake-alternance-hirings && \
+	make run-importer-job-05-compute-scores && \
+	make run-importer-job-06-validate-scores && \
+	make run-importer-job-07-geocode && \
+	make run-importer-job-08-populate-flags && \
 	echo "all importer jobs completed successfully."
 
-run_importer_job_00_prepare_all:  # FIXME DNRY table names
+run-importer-job-00-prepare-all:  # FIXME DNRY table names
 	export LBB_ENV=development && \
 		cd labonneboite/importer && \
 		echo delete from hirings                   | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
@@ -218,31 +218,31 @@ run_importer_job_00_prepare_all:  # FIXME DNRY table names
 		cp ../tests/importer/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
 		echo "completed importer run preparation."
 
-run_importer_job_01_check_etablissements:
+run-importer-job-01-check-etablissements:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/check_etablissements.py
 
-run_importer_job_02_extract_etablissements:
+run-importer-job-02-extract-etablissements:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/extract_etablissements.py
 
-run_importer_job_03_check_dpae:
+run-importer-job-03-check-dpae:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/check_dpae.py
 
-run_importer_job_04_extract_dpae:
+run-importer-job-04-extract-dpae:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/extract_dpae.py
 
-run_importer_job_04hack_create_fake_alternance_hirings:
+run-importer-job-04hack-create-fake-alternance-hirings:
 	export LBB_ENV=development && \
 		cd labonneboite/importer && \
 		cat scripts/create_fake_alternance_hirings.sql | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307
 
-run_importer_job_05_compute_scores:
+run-importer-job-05-compute-scores:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/compute_scores.py
 
-run_importer_job_06_validate_scores:
+run-importer-job-06-validate-scores:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/validate_scores.py
 
-run_importer_job_07_geocode:
+run-importer-job-07-geocode:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/geocode.py
 
-run_importer_job_08_populate_flags:
+run-importer-job-08-populate-flags:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/populate_flags.py
