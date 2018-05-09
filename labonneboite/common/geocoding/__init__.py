@@ -200,11 +200,14 @@ def get_address(latitude, longitude, limit=10):
         zipcode (str)
         city (str)
     """
-    features = [
-        {
-            'label': result['properties']['label'],
-            'zipcode': result['properties']['postcode'],
-            'city': result['properties']['city']
-        } for result in datagouv.reverse(latitude, longitude, limit=limit)
-    ]
+    features = []
+    for result in datagouv.reverse(latitude, longitude, limit=limit):
+        try:
+            features.append({
+                'label': result['properties']['label'],
+                'zipcode': result['properties']['postcode'],
+                'city': result['properties']['city']
+            })
+        except KeyError:
+            pass
     return unique_elements(features)

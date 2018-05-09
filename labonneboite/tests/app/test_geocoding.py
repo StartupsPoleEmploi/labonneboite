@@ -70,6 +70,7 @@ class AdresseApiTest(unittest.TestCase):
     def setUp(self):
         geocoding.datagouv.get_features.cache_clear()
 
+
     def mock_get(self, fixture):
         """
         Load a fixture from the fixtures/ folder and mock the request.get function.
@@ -106,13 +107,13 @@ class AdresseApiTest(unittest.TestCase):
     def test_get_address(self):
         mock_get = self.mock_get('reverse-lelab.json')
         with mock.patch.object(geocoding.datagouv.requests, 'get', return_value=mock_get):
-            coordinates = geocoding.get_address(48.884085, 2.38728)
+            address = geocoding.get_address(48.884085, 2.38728)
 
         self.assertEqual([{
             'city': 'Paris',
             'zipcode': '75019',
             'label': u'22 Allée Darius Milhaud 75019 Paris',
-        }], coordinates)
+        }], address)
 
 
     def test_duplicate_features(self):
@@ -122,3 +123,11 @@ class AdresseApiTest(unittest.TestCase):
             coordinates = geocoding.get_coordinates(u'metz', limit=10)
 
         self.assertNotEqual(coordinates[0]['label'], coordinates[1]['label'])
+
+
+    def test_get_address_of_unknown_location(self):
+        mock_get = self.mock_get('reverse-middleearth.json')
+        with mock.patch.object(geocoding.datagouv.requests, 'get', return_value=mock_get):
+            address = geocoding.get_address(0, 0)
+
+        self.assertEqual([], address)
