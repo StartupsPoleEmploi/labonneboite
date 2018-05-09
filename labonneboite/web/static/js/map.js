@@ -45,8 +45,10 @@ function createMap(element) {
     });
 
     $map.on("click", "a.map-marker", function(e) {
+        let href = this.attributes.href.value;
+        ga('send', 'event', 'Carte', 'click entreprise', href);
         // Toggle company details on click on link
-        $(this.attributes.href.value).find(".js-result-toggle-details").click();
+        $(href).find(".js-result-toggle-details").click();
     });
 
     // Focus either on the companies or the requested coordinates
@@ -69,7 +71,7 @@ function createMap(element) {
     $("#map-auto-refresh input").prop('checked', autoRefreshActivated);
     $("#map-auto-refresh input").change(function() {
         autoRefreshActivated = $(this).is(':checked');
-        console.log("auto refresh:", autoRefreshActivated);
+        ga('send', 'event', 'Carte', 'toggle autorefresh', autoRefreshActivated ? 1 : 0);
     });
 
 
@@ -80,13 +82,23 @@ function createMap(element) {
       else {
           $("#map-auto-refresh").html("<a class='btn btn-small btn-info' href='#''>Relancer la recherche ici</a>").addClass();
           $("#map-auto-refresh a").click(function(e) {
+              ga('send', 'event', 'Carte', 'refresh');
               e.preventDefault();
               updateMap();
           });
       }
     };
+    let onMapDrag = function() {
+      ga('send', 'event', 'Carte', 'drag');
+      onMapMove();
+    };
+    let onMapZoom = function() {
+        ga('send', 'event', 'Carte', 'zoom');
+        onMapMove();
+    };
 
     let updateMap = function() {
+      ga('send', 'event', 'Carte', 'update');
       center = map.getCenter();
       zoom = map.getZoom();
 
@@ -112,8 +124,8 @@ function createMap(element) {
 
       $('.js-search-form').trigger('submit', {async: true});
     };
-    map.on('dragend', onMapMove);
-    map.on('zoom', onMapMove);
+    map.on('dragend', onMapDrag);
+    map.on('zoom', onMapZoom);
   }
 
   $(document).on('lbbready', function () {
