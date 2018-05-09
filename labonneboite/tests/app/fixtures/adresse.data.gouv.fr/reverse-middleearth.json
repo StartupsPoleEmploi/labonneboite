@@ -1,0 +1,28 @@
+{
+  "attribution": "BAN", 
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          0.0, 
+          0.0
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "context": "20180429T203402", 
+        "distance": 0, 
+        "id": "db", 
+        "label": "baninfo", 
+        "name": "baninfo", 
+        "score": 1.0, 
+        "type": "info"
+      }, 
+      "type": "Feature"
+    }
+  ], 
+  "licence": "ODbL 1.0", 
+  "limit": 1, 
+  "type": "FeatureCollection", 
+  "version": "draft"
+}
