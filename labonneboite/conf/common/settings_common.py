@@ -96,6 +96,7 @@ HEADCOUNT_VALUES = {
 
 # Databases
 ES_INDEX = 'labonneboite'
+ES_TIMEOUT = 10
 DB_HOST = 'localhost'
 DB_PORT = 3306
 DB_NAME = 'labonneboite'

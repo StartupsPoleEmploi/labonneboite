@@ -207,8 +207,6 @@ def company_filter_list():
             result['filters']['headcount'] = fetcher.get_headcount_aggregations()
         if 'distance' in fetcher.aggregate_by and fetcher.distance != search.DISTANCE_FILTER_MAX:
             result['filters']['distance'] = fetcher.get_distance_aggregations()
-        # We make an exception with contract/hiring_type which is technically not a real filter, and thus we
-        # will do two ES calls everytime (one for dpae and one for alternance).
         if 'hiring_type' in fetcher.aggregate_by:
             result['filters']['contract'] = fetcher.get_contract_aggregations()
 

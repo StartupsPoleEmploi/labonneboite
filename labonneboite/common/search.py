@@ -70,9 +70,6 @@ class Fetcher(object):
         """
         self.location = search_location
 
-        if not isinstance(romes, list):
-            raise ValueError("romes should be a list and not a string")
-
         self.romes = romes
         self.distance = distance
         self.sort = sort
@@ -125,10 +122,6 @@ class Fetcher(object):
             aggregations['naf'] = self.get_naf_aggregations()
 
     def _get_company_count(self, rome_codes, distance):
-
-        if not isinstance(rome_codes, list):
-            raise ValueError("romes should be a list and not a string")
-
         return count_companies(
             self.naf_codes,
             rome_codes,
@@ -213,8 +206,7 @@ class Fetcher(object):
             departments=self.departments,
         )
 
-        aggregations = {'contract': {'alternance': total_alternance, 'dpae': total_dpae}}
-        return aggregations['contract']
+        return {'alternance': total_alternance, 'dpae': total_dpae}
 
 
     def get_distance_aggregations(self):
@@ -280,7 +272,7 @@ class Fetcher(object):
         if self.company_count <= current_page_size and add_suggestions:
 
             # Suggest other jobs.
-            # https://stackoverflow.com/questions/952914/making-a-flat-list-out-of-list-of-lists-in-python
+            # Build a flat list of all the alternative romes of all searched romes.
             alternative_rome_codes = [alt_rome for rome in self.romes for alt_rome in ROME_MOBILITIES[rome]]
             for rome in set(alternative_rome_codes) - set(self.romes):
                 company_count = self._get_company_count([rome], self.distance)
@@ -308,8 +300,6 @@ class Fetcher(object):
 
 
 def count_companies(naf_codes, rome_codes, latitude, longitude, distance, **kwargs):
-    if not isinstance(rome_codes, list):
-        raise ValueError("rome_codes should be a list and not a string")
     json_body = build_json_body_elastic_search(naf_codes, rome_codes, latitude, longitude, distance, **kwargs)
     # Drop the sorting clause as it is not needed anyway for a simple count.
     del json_body["sort"]
@@ -425,8 +415,6 @@ def build_json_body_elastic_search(
         get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes
     ]
 
-    if not isinstance(rome_codes, list):
-        raise ValueError("rome_codes should be a list and not a string")
     is_multi_rome = len(rome_codes) > 1
 
     # FIXME one day make boosted_rome logic compatible with multi rome, right now it only

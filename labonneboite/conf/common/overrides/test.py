@@ -1,6 +1,9 @@
 import os
 
 ES_INDEX = 'labonneboite_unit_test'
+# longer ES timeout needed for slow docker performance in local dev on Mac OS when running `make test-scripts`
+ES_TIMEOUT = 30
+
 DB_HOST = os.environ.get('DB_HOST', '127.0.0.1')
 DB_PORT = int(os.environ.get('DB_PORT', 3307))
 DB_NAME = os.environ.get('DB_NAME', 'lbb_test')

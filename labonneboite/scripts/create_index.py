@@ -34,13 +34,7 @@ logger = logging.getLogger(__name__)
 
 VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main', 'elasticsearch.trace']
 
-# custom (long) timeout used in this script
-ES_TIMEOUT = 900
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
-
-
-def Elasticsearch(use_dedicated_es_connection=False):
-    return es.Elasticsearch(timeout=ES_TIMEOUT, use_dedicated_es_connection=use_dedicated_es_connection)
 
 
 class Profiling(object):
@@ -66,7 +60,7 @@ def switch_es_index():
     # Find current index names (there may be one, zero or more)
     alias_name = settings.ES_INDEX
     try:
-        old_index_names = Elasticsearch().indices.get_alias(settings.ES_INDEX).keys()
+        old_index_names = es.Elasticsearch().indices.get_alias(settings.ES_INDEX).keys()
     except NotFoundError:
         old_index_names = []
 
@@ -91,7 +85,7 @@ def switch_es_index():
     # TODO this should be done in one shot with a function in es.py module
     es.add_alias_to_index(new_index_name)
     for old_index_name in old_index_names:
-        Elasticsearch().indices.delete_alias(index=old_index_name, name=alias_name)
+        es.Elasticsearch().indices.delete_alias(index=old_index_name, name=alias_name)
 
     # Delete old index
     for old_index_name in old_index_names:
@@ -163,7 +157,8 @@ def bulk_actions(actions, use_dedicated_es_connection=False):
     # unfortunately parallel_bulk is not available in the current elasticsearch version
     # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
     logger.info("started bulk of %s actions...", len(actions))
-    bulk(Elasticsearch(use_dedicated_es_connection=use_dedicated_es_connection), actions, chunk_size=ES_BULK_CHUNK_SIZE)
+    # each parallel job needs to use its own ES connection for maximum performance
+    bulk(es.Elasticsearch_with_dedicated_connection(), actions, chunk_size=ES_BULK_CHUNK_SIZE)
     logger.info("completed bulk of %s actions!", len(actions))
 
 
@@ -471,7 +466,7 @@ def add_offices():
 
             # Create the new office in ES.
             doc = get_office_as_es_doc(office_to_add)
-            Elasticsearch().create(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE,
+            es.Elasticsearch().create(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE,
                 id=office_to_add.siret, body=doc)
 
 
@@ -487,7 +482,7 @@ def remove_offices():
     for siret in offices_to_remove:
         # Apply changes in ElasticSearch.
         try:
-            Elasticsearch().delete(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
+            es.Elasticsearch().delete(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
         except TransportError as e:
             if e.status_code != 404:
                 raise
@@ -544,9 +539,9 @@ def update_offices():
                 # Unfortunately these cannot easily be bulked :-(
                 # The reason is there is no way to tell bulk to ignore missing documents (404)
                 # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
-                Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=delete_body,
+                es.Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=delete_body,
                         params={'ignore': 404})
-                Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=body,
+                es.Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=body,
                         params={'ignore': 404})
 
                 # Delete the current PDF thus it will be regenerated at the next download attempt.
@@ -574,7 +569,7 @@ def update_offices_geolocations():
             office.save()
             # Apply changes in ElasticSearch.
             body = {'doc': {'locations': locations}}
-            Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
+            es.Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
 
 
 @timeit
@@ -664,13 +659,11 @@ def display_performance_stats(departement):
 def update_data(create_full, create_partial, disable_parallel_computing):
     if create_partial:
         with switch_es_index():
-            es.initialize_indexes()
             create_offices_for_departement('57')
         return
 
     if create_full:
         with switch_es_index():
-            es.initialize_indexes()
             create_offices(disable_parallel_computing)
             create_job_codes()
             create_locations()

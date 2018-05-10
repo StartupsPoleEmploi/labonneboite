@@ -41,10 +41,6 @@ class AppTest(unittest.TestCase):
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
 
-        # ugly but needed for tests like labonneboite/tests/web/front/test_routes.py
-        # which inherit AppTest but not DatabaseTest
-        es.initialize_indexes()
-
         return super(AppTest, self).setUp()
 
     def url_for(self, endpoint, **kwargs):
@@ -112,7 +108,6 @@ class DatabaseTest(AppTest):
         self.assertIn('test', settings.ES_INDEX)
         self.es = es.Elasticsearch()
         es.drop_and_create_index()
-        es.initialize_indexes()
 
         return super(DatabaseTest, self).setUp()
 

@@ -12,24 +12,26 @@ LOCATION_TYPE = 'location'
 
 
 class ConnectionPool(object):
-    # Store one singleton per timeout value.
-    ELASTICSEARCH_INSTANCE = {}
+    ELASTICSEARCH_INSTANCE = None
 
 
-def Elasticsearch(timeout=None, use_dedicated_es_connection=False):
+def Elasticsearch():
     """
     Elasticsearch client singleton. All connections to ES should go through
     this client, so that we can reuse ES connections and not flood ES with new
     connections.
-
-    Different timeout values do coexist in practise, e.g. when running create_index script.
-    FIXME investigate why.
     """
-    if use_dedicated_es_connection:
-        return elasticsearch.Elasticsearch(timeout=timeout)
-    if timeout not in ConnectionPool.ELASTICSEARCH_INSTANCE:
-        ConnectionPool.ELASTICSEARCH_INSTANCE[timeout] = elasticsearch.Elasticsearch(timeout=timeout)
-    return ConnectionPool.ELASTICSEARCH_INSTANCE[timeout]
+    if not ConnectionPool.ELASTICSEARCH_INSTANCE:
+        ConnectionPool.ELASTICSEARCH_INSTANCE = elasticsearch.Elasticsearch(timeout=settings.ES_TIMEOUT)
+    return ConnectionPool.ELASTICSEARCH_INSTANCE
+
+
+def Elasticsearch_with_dedicated_connection():
+    """
+    In some cases e.g. parallel jobs you may need a dedicated es connection for each
+    of your threads.
+    """
+    return elasticsearch.Elasticsearch()
 
 
 def drop_and_create_index():
@@ -283,6 +285,9 @@ def create_index(index):
 
     Elasticsearch().indices.create(index=index, body=create_body)
 
+    fake_doc = fake_office()
+    Elasticsearch().index(index=index, doc_type=OFFICE_TYPE, id=fake_doc['siret'], body=fake_doc)
+
 # This fake office having a zero but existing score for each rome is designed
 # as a workaround of the following bug:
 #
@@ -302,7 +307,7 @@ def create_index(index):
 # the search result will be empty anyway, but this is no longer possible with a multi rome search.
 #
 # This fake office ensures no rome will ever be orphaned.
-def get_fake_office_having_all_score_fields_as_es_doc():
+def fake_office():
     doc = {
         'siret': "0",
         # fields required even if not used by function_score
@@ -315,13 +320,3 @@ def get_fake_office_having_all_score_fields_as_es_doc():
     doc['scores_alternance_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
 
     return doc
-
-
-def initialize_indexes():
-    """
-    This method should always be called once after creating the indexes from scratch.
-    """
-    fake_doc = get_fake_office_having_all_score_fields_as_es_doc()
-    Elasticsearch().index(index=settings.ES_INDEX, doc_type=OFFICE_TYPE, id=fake_doc['siret'], body=fake_doc)
-
-

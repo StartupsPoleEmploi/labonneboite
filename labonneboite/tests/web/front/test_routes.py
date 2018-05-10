@@ -5,12 +5,11 @@ from urlparse import parse_qsl
 from flask import url_for
 import mock
 
-from labonneboite.tests.test_base import AppTest
+from labonneboite.tests.test_base import AppTest, DatabaseTest
 from labonneboite.web.search.views import get_canonical_results_url, get_location
 
 
-
-class SearchEntreprisesTest(AppTest):
+class SearchEntreprisesTest(DatabaseTest):
 
     def setUp(self):
         super(SearchEntreprisesTest, self).setUp()
@@ -62,6 +61,8 @@ class SearchEntreprisesTest(AppTest):
         )
         self.assertEqual(200, response.status_code)
 
+
+class EntreprisesLocationTest(AppTest):
 
     def test_get_location_no_arguments(self):
         location, named_location = get_location({})
@@ -131,7 +132,7 @@ class SearchEntreprisesTest(AppTest):
         self.assertIsNone(named_location)
 
 
-class SearchLegacyResultsTest(AppTest):
+class SearchLegacyResultsTest(DatabaseTest):
 
     def test_zipcodes_mistakenly_used_as_commune_ids(self):
         # 14118 is a commune_id, normal behavior

@@ -33,6 +33,10 @@ clear-data-test: services
 
 rebuild-data-dev : clear-data-dev database-dev alembic-migrate populate-data-dev
 
+rebuild-data-test : clear-data-test database-test
+
+rebuild-data: rebuild-data-test rebuild-data-dev
+
 stop-services:
 	cd docker/ && docker-compose stop
 

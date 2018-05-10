@@ -120,7 +120,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     def as_json(self,
             rome_codes=None,
-            hiring_type=hiring_type_util.DEFAULT,
+            hiring_type=None,
             distance=None,
             zipcode=None,
             extra_query_string=None,
@@ -135,16 +135,14 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         Main case is results returned by an API search. The scores and URLs embedded
         in the company objects should be adjusted to the ROME code context.
 
-        `hiring_type`: is needed along rome_codes to compute the right corresponding score.
+        `hiring_type`: is needed along rome_codes to compute the right corresponding score,
+        possible values are hiring_type_util.VALUES
 
         `distance` and `zipcode`: needed for potential multi geolocation logic.
 
         `extra_query_string` (dict): extra query string to be added to the API
         urls for each office. Typically some Google Analytics trackers.
         """
-        if not isinstance(rome_codes, list) and rome_codes is not None:
-            raise ValueError("rome_codes should be a list and not a string")
-
         if rome_codes is None:        # no rome search context
             rome_code = None
         elif len(rome_codes) == 1:    # single rome search context
@@ -166,7 +164,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'stars': self.get_stars_for_rome_code(rome_code, hiring_type),
             'url': self.get_url_for_rome_code(rome_code, **extra_query_string),
             'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
-            'alternance': self.has_good_enough_alternance_score(),
+            'alternance': self.qualifies_for_alternance(),
             # Warning: the `distance` and `matched_rome` fields are added by `get_companies_from_es_and_db`,
             # they are NOT model fields or properties!
             'distance': self.distance,
@@ -270,13 +268,11 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     def stars(self):
         return self.get_stars_for_rome_code(None)
 
-    def get_stars_for_rome_code(self, rome_code, hiring_type=hiring_type_util.DEFAULT):
-        if hiring_type == hiring_type_util.DPAE:
-            raw_score = self.score
-        elif hiring_type == hiring_type_util.ALTERNANCE:
-            raw_score = self.score_alternance
-        else:
-            raise ValueError("Unknown hiring_type.")
+    def get_stars_for_rome_code(self, rome_code, hiring_type=None):
+        hiring_type = hiring_type or hiring_type_util.DEFAULT
+        if hiring_type not in hiring_type_util.VALUES:
+            raise ValueError("Unknown hiring_type")
+        raw_score = self.score if hiring_type == hiring_type_util.DPAE else self.score_alternance
         score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
             score=raw_score,
             rome_code=rome_code,
@@ -291,7 +287,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         return (100 * self.get_stars_for_rome_code(rome_code)) / 5
 
-    def has_good_enough_alternance_score(self):
+    def qualifies_for_alternance(self):
         # Avoid importing importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
         # to avoid mixing importer stuff and production.
         return self.score_alternance >= 50
