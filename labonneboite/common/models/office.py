@@ -169,7 +169,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             # they are NOT model fields or properties!
             'distance': self.distance,
         }
-        if rome_codes is not None and len(rome_codes) > 1:  # only makes sense for multi rome searches
+        if rome_code:
             json['matched_rome_code'] = rome_code
             json['matched_rome_label'] = settings.ROME_DESCRIPTIONS[rome_code]
             json['matched_rome_slug'] = slugify(settings.ROME_DESCRIPTIONS[rome_code])
