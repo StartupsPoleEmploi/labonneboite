@@ -8,6 +8,7 @@ from slugify import slugify
 
 from labonneboite.conf import settings
 from labonneboite.common import mapping as mapping_util
+from labonneboite.common import hiring_type_util
 from labonneboite.common import geocoding
 from labonneboite.common.search import fetch_companies
 
@@ -90,12 +91,13 @@ def get_results(commune_id, rome_1_id, rome_2_id):
             # FIXME randomize per user to avoid spamming companies
             offices, _, _ = fetch_companies(
                 naf_codes=naf_code_list,
-                rome_code=rome_id,
+                rome_codes=[rome_id],
                 latitude=latitude,
                 longitude=longitude,
                 distance=distance,
                 from_number=1,
                 to_number=OFFICES_PER_USER,
+                hiring_type=hiring_type_util.DPAE,
             )
             if len(offices) >= 1:
                 used_rome_id = rome_id

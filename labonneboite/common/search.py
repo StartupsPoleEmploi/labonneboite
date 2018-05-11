@@ -38,7 +38,7 @@ KEY_TO_LABEL_DISTANCES = {
     u'*-3000.0': u'france',
 }
 
-FILTERS = ['naf', 'headcount', 'flag_alternance', 'distance']
+FILTERS = ['naf', 'headcount', 'hiring_type', 'distance']
 DISTANCE_FILTER_MAX = 3000
 
 
@@ -47,13 +47,12 @@ class Fetcher(object):
 
     def __init__(
             self, search_location,
-            rome=None,
+            romes=None,
             distance=None,
             sort=None,
             hiring_type=None,
             from_number=1,
             to_number=OFFICES_PER_PAGE,
-            flag_alternance=None,
             public=None,
             headcount=None,
             naf=None,
@@ -71,7 +70,7 @@ class Fetcher(object):
         """
         self.location = search_location
 
-        self.rome = rome
+        self.romes = romes
         self.distance = distance
         self.sort = sort
         self.hiring_type = hiring_type
@@ -81,7 +80,6 @@ class Fetcher(object):
         self.to_number = to_number
 
         # Flags.
-        self.flag_alternance = flag_alternance
         self.public = public
 
         # Headcount.
@@ -94,7 +92,7 @@ class Fetcher(object):
         self.naf = naf
         self.naf_codes = naf_codes or {}
         if self.naf and not self.naf_codes:
-            self.naf_codes = mapping_util.map_romes_to_nafs([self.rome], [self.naf])
+            self.naf_codes = mapping_util.map_romes_to_nafs(self.romes, [self.naf])
 
         # Aggregate_by
         self.aggregate_by = aggregate_by
@@ -118,22 +116,18 @@ class Fetcher(object):
     def update_aggregations(self, aggregations):
         if self.headcount and 'headcount' in aggregations:
             aggregations['headcount'] = self.get_headcount_aggregations()
-        if self.flag_alternance and 'flag_alternance' in aggregations:
-            aggregations['contract'] = self.get_headcount_aggregations()
         if self.distance != DISTANCE_FILTER_MAX and 'distance' in aggregations:
             aggregations['distance'] = self.get_distance_aggregations()
         if self.naf and 'naf' in aggregations:
             aggregations['naf'] = self.get_naf_aggregations()
 
-    def _get_company_count(self, rome_code, distance):
-
+    def _get_company_count(self, rome_codes, distance):
         return count_companies(
             self.naf_codes,
-            rome_code,
+            rome_codes,
             self.location.latitude,
             self.location.longitude,
             distance,
-            flag_alternance=self.flag_alternance,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
@@ -141,17 +135,17 @@ class Fetcher(object):
             hiring_type=self.hiring_type,
             departments=self.departments,
             aggregate_by=None,
+            sort=self.sort,
         )
 
     def get_naf_aggregations(self):
         _, _, aggregations = fetch_companies(
             {}, # No naf filter
-            self.rome,
+            self.romes,
             self.location.latitude,
             self.location.longitude,
             self.distance,
             aggregate_by=["naf"], # Only naf aggregate
-            flag_alternance=self.flag_alternance,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
@@ -164,12 +158,11 @@ class Fetcher(object):
     def get_headcount_aggregations(self):
         _, _, aggregations = fetch_companies(
             self.naf_codes,
-            self.rome,
+            self.romes,
             self.location.latitude,
             self.location.longitude,
             self.distance,
             aggregate_by=["headcount"], # Only headcount aggregate
-            flag_alternance=self.flag_alternance,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
@@ -180,33 +173,50 @@ class Fetcher(object):
         return aggregations['headcount']
 
     def get_contract_aggregations(self):
-        _, _, aggregations = fetch_companies(
+        """
+        As contract/hiring_type (dpae/alternance) is not technically a filter,
+        we cannot do a regular aggregation about it. Instead we manually
+        do two ES calls everytime.
+        """
+        total_dpae = count_companies(
             self.naf_codes,
-            self.rome,
+            self.romes,
             self.location.latitude,
             self.location.longitude,
             self.distance,
-            aggregate_by=['flag_alternance'], # Only flag_alternance aggregate
-            flag_alternance=None, # No flag_alternance filter
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount=self.headcount,
-            hiring_type=self.hiring_type,
+            hiring_type=hiring_type_util.DPAE,
             departments=self.departments,
         )
-        return aggregations['contract']
+
+        total_alternance = count_companies(
+            self.naf_codes,
+            self.romes,
+            self.location.latitude,
+            self.location.longitude,
+            self.distance,
+            flag_junior=self.flag_junior,
+            flag_senior=self.flag_senior,
+            flag_handicap=self.flag_handicap,
+            headcount=self.headcount,
+            hiring_type=hiring_type_util.ALTERNANCE,
+            departments=self.departments,
+        )
+
+        return {'alternance': total_alternance, 'dpae': total_dpae}
 
 
     def get_distance_aggregations(self):
         _, _, aggregations = fetch_companies(
             self.naf_codes,
-            self.rome,
+            self.romes,
             self.location.latitude,
             self.location.longitude,
             DISTANCE_FILTER_MAX, # France
             aggregate_by=["distance"],
-            flag_alternance=self.flag_alternance,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
@@ -218,7 +228,7 @@ class Fetcher(object):
 
 
     def compute_company_count(self):
-        self.company_count = self._get_company_count(self.rome, self.distance)
+        self.company_count = self._get_company_count(self.romes, self.distance)
         logger.debug("set company_count to %s", self.company_count)
 
 
@@ -243,13 +253,12 @@ class Fetcher(object):
         if self.company_count:
             result, _, aggregations = fetch_companies(
                 self.naf_codes,
-                self.rome,
+                self.romes,
                 self.location.latitude,
                 self.location.longitude,
                 self.distance,
                 from_number=self.from_number,
                 to_number=self.to_number,
-                flag_alternance=self.flag_alternance,
                 flag_junior=self.flag_junior,
                 flag_senior=self.flag_senior,
                 flag_handicap=self.flag_handicap,
@@ -263,16 +272,16 @@ class Fetcher(object):
         if self.company_count <= current_page_size and add_suggestions:
 
             # Suggest other jobs.
-            alternative_rome_codes = ROME_MOBILITIES[self.rome]
-            for rome in alternative_rome_codes:
-                if not rome == self.rome:
-                    company_count = self._get_company_count(rome, self.distance)
-                    self.alternative_rome_codes[rome] = company_count
+            # Build a flat list of all the alternative romes of all searched romes.
+            alternative_rome_codes = [alt_rome for rome in self.romes for alt_rome in ROME_MOBILITIES[rome]]
+            for rome in set(alternative_rome_codes) - set(self.romes):
+                company_count = self._get_company_count([rome], self.distance)
+                self.alternative_rome_codes[rome] = company_count
 
             # Suggest other distances.
             last_count = 0
             for distance, distance_label in [(30, u'30 km'), (50, u'50 km'), (3000, u'France entière')]:
-                company_count = self._get_company_count(self.rome, distance)
+                company_count = self._get_company_count(self.romes, distance)
                 if company_count > last_count:
                     last_count = company_count
                     self.alternative_distances[distance] = (distance_label, last_count)
@@ -290,14 +299,10 @@ class Fetcher(object):
         return alternative_rome_descriptions
 
 
-def count_companies(naf_codes, rome_code, latitude, longitude, distance, **kwargs):
-    json_body = build_json_body_elastic_search(naf_codes, rome_code, latitude, longitude, distance, **kwargs)
+def count_companies(naf_codes, rome_codes, latitude, longitude, distance, **kwargs):
+    json_body = build_json_body_elastic_search(naf_codes, rome_codes, latitude, longitude, distance, **kwargs)
     # Drop the sorting clause as it is not needed anyway for a simple count.
     del json_body["sort"]
-    # Drop the potentially problematic "field_value_factor" clause, in case of orphaned rome,
-    # as it is not needed anyway for a simple count.
-    # For full information about this issue see common/search.py/get_companies_from_es_and_db.
-    json_body['query']['function_score']['functions'] = [{'random_score': {}}]
     return count_companies_from_es(json_body)
 
 def count_companies_from_es(json_body):
@@ -305,10 +310,10 @@ def count_companies_from_es(json_body):
     res = es.count(index=settings.ES_INDEX, doc_type="office", body=json_body)
     return res["count"]
 
-def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, aggregate_by=None, **kwargs):
+def fetch_companies(naf_codes, rome_codes, latitude, longitude, distance, aggregate_by=None, **kwargs):
     json_body = build_json_body_elastic_search(
         naf_codes,
-        rome_code,
+        rome_codes,
         latitude,
         longitude,
         distance,
@@ -321,15 +326,20 @@ def fetch_companies(naf_codes, rome_code, latitude, longitude, distance, aggrega
     except KeyError:
         sort = sorting.SORT_FILTER_DEFAULT
 
-    companies, companies_count, aggregations_raw = get_companies_from_es_and_db(json_body, sort, rome_code)
+    companies, companies_count, aggregations_raw = get_companies_from_es_and_db(
+        json_body,
+        sort=sort,
+        rome_codes=rome_codes,
+        hiring_type=kwargs['hiring_type'],
+    )
 
     # Extract aggregations
     aggregations = {}
     if aggregate_by:
-        if "naf" in aggregate_by:
+        if 'naf' in aggregate_by:
             aggregations['naf'] = aggregate_naf(aggregations_raw)
-        if "flag_alternance" in aggregate_by:
-            aggregations['contract'] = aggregate_contract(aggregations_raw)
+        if 'hiring_type' in aggregate_by:
+            pass  # hiring_type cannot technically be aggregated and is thus processed at a later step
         if 'headcount' in aggregate_by:
             aggregations['headcount'] = aggregate_headcount(aggregations_raw)
         if 'distance' in aggregate_by:
@@ -344,20 +354,6 @@ def aggregate_naf(aggregations_raw):
             "count": naf_aggregate['doc_count'],
             'label': settings.NAF_CODES.get(naf_aggregate['key']),
         } for naf_aggregate in aggregations_raw['naf']['buckets']]
-
-def aggregate_contract(aggregations_raw):
-    alternance_key = 1
-    alternance = 0
-    total = 0
-
-    for contract_aggregate in aggregations_raw["flag_alternance"]["buckets"]:
-        # key=1 means flag_alternance
-        if contract_aggregate['key'] == alternance_key:
-            alternance = contract_aggregate['doc_count']
-        # All contracts
-        total += contract_aggregate['doc_count']
-
-    return {'alternance': alternance, 'all': total}
 
 
 def aggregate_headcount(aggregations_raw):
@@ -389,9 +385,15 @@ def aggregate_distance(aggregations_raw):
 
     return distances_aggregations
 
+def get_score_for_rome_field_name(hiring_type, rome_code):
+    return {
+        hiring_type_util.DPAE: "scores_by_rome.%s" % rome_code,
+        hiring_type_util.ALTERNANCE: "scores_alternance_by_rome.%s" % rome_code
+    }[hiring_type]
+
 def build_json_body_elastic_search(
         naf_codes,
-        rome_code,
+        rome_codes,
         latitude,
         longitude,
         distance,
@@ -400,7 +402,6 @@ def build_json_body_elastic_search(
         headcount=settings.HEADCOUNT_WHATEVER,
         sort=sorting.SORT_FILTER_DEFAULT,
         hiring_type=None,
-        flag_alternance=0,
         flag_junior=0,
         flag_senior=0,
         flag_handicap=0,
@@ -409,11 +410,18 @@ def build_json_body_elastic_search(
     ):
 
     hiring_type = hiring_type or hiring_type_util.DEFAULT
-    score_for_rome_field_name = {
-        hiring_type_util.DPAE: "scores_by_rome.%s" % rome_code,
-        hiring_type_util.ALTERNANCE: "scores_alternance_by_rome.%s" % rome_code
-    }[hiring_type]
 
+    score_for_rome_field_names = [
+        get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes
+    ]
+
+    is_multi_rome = len(rome_codes) > 1
+
+    # FIXME one day make boosted_rome logic compatible with multi rome, right now it only
+    # works based on the first of the romes. Not urgent, as multi rome is API only,
+    # and also this would increase complexity of the ES sorting mechanism.
+    rome_code = rome_codes[0]
+    score_for_rome_field_name = score_for_rome_field_names[0]
     boosted_rome_field_name = "boosted_romes.%s" % rome_code
 
     # Build filters.
@@ -451,13 +459,6 @@ def build_json_body_elastic_search(
             }
         })
 
-    if flag_alternance == 1:
-        filters.append({
-            "term": {
-                "flag_alternance": 1,
-            }
-        })
-
     if flag_junior == 1:
         filters.append({
             "term": {
@@ -479,9 +480,14 @@ def build_json_body_elastic_search(
             }
         })
 
+    # at least one of these fields should exist
     filters.append({
-        "exists": {
-            "field": score_for_rome_field_name,
+        "bool": {
+            "should": [{
+                "exists": {
+                    "field": field_name,
+                }
+            } for field_name in score_for_rome_field_names]
         }
     })
 
@@ -515,7 +521,33 @@ def build_json_body_elastic_search(
     # Build sorting.
 
     if sort == sorting.SORT_FILTER_SCORE:
-        # overload main_query to add smart randomization
+
+        # 1) overload main_query to get maximum score amongst all rome_codes
+        main_query = {
+            # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
+            "function_score": {
+                "query": main_query,
+                "functions": [
+                    {
+                        # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-field-value-factor
+                        "field_value_factor": {
+                            "field": score_for_rome_field_name,
+                            "modifier": "none",
+                            # Fallback value used in case the field score_for_rome_field_name is absent.
+                            "missing": 0,
+                        }
+                    } for score_for_rome_field_name in score_for_rome_field_names
+                ],
+                # How to combine the result of the various functions 'field_value_factor' (1 per rome_code).
+                # We keep the maximum score amongst scores of all requested rome_codes.
+                "score_mode": "max",
+                # How to combine the result of function_score with the original _score from the query.
+                # We overwrite it as our combined _score == max(score_for_rome for rome in romes) is all we need.
+                "boost_mode": "replace",
+            }
+        }
+
+        # 2) overload main_query to add smart randomization
         main_query = {
             # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
             "function_score": {
@@ -528,29 +560,16 @@ def build_json_body_elastic_search(
                             "seed": datetime.today().strftime('%Y-%m-%d'),
                         },
                     },
-                    {
-                        # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-field-value-factor
-                        "field_value_factor": {
-                            "field": score_for_rome_field_name,
-                            "modifier": "none",
-                            # Fallback value used in case the field score_for_rome_field_name is absent.
-                            # Never happens in practice since we require it to be present in "exists" filter above.
-                            # However this is required in case no company at all matches this rome, as an
-                            # attempt to fix the following issue:
-                            # ElasticsearchException[Unable to find a field mapper for field [scores_by_rome.A0000]]
-                            # For full information about this issue see common/search.py/get_companies_from_es_and_db.
-                            "missing": 0,
-                        }
-                    }
                 ],
-                # How to combine the result of the two functions 'random_score' and 'field_value_factor'.
+                # How to combine the result of the various functions.
+                # Totally irrelevant here as we use only one function.
+                "score_mode": "multiply",
+                # How to combine the result of function_score with the original _score from the query.
+                # We multiply so that our final _score = (random x max(score_for_rome for rome in romes)).
                 # This way, on average the combined _score of a company having score 100 will be 5 times as much
                 # as the combined _score of a company having score 20, and thus will be 5 times more likely
                 # to appear on first page.
-                "score_mode": "multiply",
-                # How to combine the result of function_score with the original _score from the query.
-                # We overwrite it as our combined _score (random x score_for_rome) is all we need.
-                "boost_mode": "replace",
+                "boost_mode": "multiply",
             }
         }
 
@@ -616,6 +635,10 @@ def build_json_body_elastic_search(
                         'ranges': [{'to': 10}, {'to': 30}, {'to': 50}, {'to': 100}, {'to': 3000}],
                     }
                 }
+            # We cannot use aggregation for contract=dpae/alternance, as both kinds use different
+            # logics and are not simply two different values of the same field.
+            elif aggregate == 'contract':
+                pass
             else:
                 json_body['aggs'][aggregate] = {
                     "terms" : {
@@ -636,13 +659,19 @@ def build_json_body_elastic_search(
     return json_body
 
 
-def get_companies_from_es_and_db(json_body, sort, rome_code):
+def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
     """
     Fetch companies first from Elasticsearch, then from the database.
 
     Returns a tuple of (companies, companies_count), where `companies` is a
     list of results as Office instances (with some extra attributes only available
     in Elasticsearch) and `companies_count` an integer of the results number.
+
+    `sort` is needed to find back the distance between each company and the search location,
+    to store it and display it later on the frontend or in the API result.
+
+    `rome_codes` and `hiring_type` are needed in the case of multi rome search, to find
+    back for each company which rome_code actually did match.
     """
     if sort not in sorting.SORT_FILTERS:
         # This should never happen.
@@ -652,33 +681,7 @@ def get_companies_from_es_and_db(json_body, sort, rome_code):
 
     es = Elasticsearch()
     logger.info("Elastic Search request : %s", json_body)
-    try:
-        res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
-    except elasticsearch.exceptions.RequestError as e:
-        # The following ES bug is known and has been fixed in ES 2.1.0
-        # https://github.com/elastic/elasticsearch/pull/13060
-        # however as of Jan 2018 we are using Elasticsearch 1.7 so we have to live with it.
-        #
-        # When the field_value_factor clause is applied to a non existing field (this is
-        # the case for an orphaned rome i.e. no company has a score_for_rome.A0000 field for it),
-        # even if the field_value_factor clause has a 'missing' value, the ES request will still fail
-        # with a 'Unable to find a field mapper for field' error. This is fixed in ES 2.1.0.
-        orphan_rome_known_bug = (
-            e[0] == 400
-            and (
-                u'ElasticsearchException[Unable to find a field mapper for field [scores_by_rome' in e[1]
-                or
-                u'ElasticsearchException[Unable to find a field mapper for field [scores_alternance_by_rome' in e[1]
-            )
-        )
-        if orphan_rome_known_bug:
-            # Drop the problematic "field_value_factor" clause and run again.
-            # As the rome is orphaned, no company will match anyway.
-            json_body['query']['function_score']['functions'] = [{'random_score': {}}]
-            logger.info("Elastic Search request fixed : %s", json_body)
-            res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
-        else:
-            raise e
+    res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
 
     companies_count = res['hits']['total']
     companies = []
@@ -708,20 +711,42 @@ def get_companies_from_es_and_db(json_body, sort, rome_code):
         item['_source']['siret']: item for item in res['hits']['hits']
     }
     # FIXME These hardcoded values are soooooo ugly, unfortunately it is not so
-    # easy to make it DNRY.
+    # easy to make it DNRY. For the corresponding code see method build_json_body_elastic_search().
     distance_sort_index = {
         sorting.SORT_FILTER_DISTANCE: 0,
-        sorting.SORT_FILTER_SCORE: 2
+        sorting.SORT_FILTER_SCORE: 2,
+    }[sort]
+    sort_fields_total = {
+        sorting.SORT_FILTER_DISTANCE: 1,  # (distance_sort)
+        sorting.SORT_FILTER_SCORE: 3,  # (boosted_romes_sort, randomized_score_sort, distance_sort)
     }[sort]
     for position, company in enumerate(companies, start=1):
         # Get the corresponding item from the Elasticsearch results.
         es_company = es_companies_by_siret[company.siret]
+        if len(es_company["sort"]) != sort_fields_total:
+            raise ValueError("Incorrect number of sorting fields in ES response.")
         # Add an extra `distance` attribute with one digit.
         company.distance = round(es_company["sort"][distance_sort_index], 1)
-        # Set contact mode and position
-        company.contact_mode = util.get_contact_mode_for_rome_and_naf(rome_code, company.naf)
         # position is later used in labonneboite/web/static/js/results.js
         company.position = position
+
+        if len(rome_codes) > 1:
+            # Identify which rome_code actually matched this company.
+            keyname = get_score_for_rome_field_name(hiring_type, rome_codes[0]).split('.')[0]
+            all_scores = es_company[u'_source'][keyname]
+            scores_of_searched_romes = dict([
+                (rome, all_scores[rome]) for rome in rome_codes if rome in all_scores
+            ])
+            # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
+            rome_with_highest_score = max(scores_of_searched_romes, key=scores_of_searched_romes.get)
+            # Store it as an extra attribute.
+            company.matched_rome = rome_with_highest_score
+            rome_code_for_contact_mode = rome_with_highest_score
+        else:
+            rome_code_for_contact_mode = rome_codes[0]
+
+        # Set contact mode and position
+        company.contact_mode = util.get_contact_mode_for_rome_and_naf(rome_code_for_contact_mode, company.naf)
 
     try:
         aggregations = res['aggregations']

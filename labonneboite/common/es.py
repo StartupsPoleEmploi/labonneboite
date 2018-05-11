@@ -6,6 +6,10 @@ import elasticsearch
 
 from labonneboite.conf import settings
 
+OFFICE_TYPE = 'office'
+OGR_TYPE = 'ogr'
+LOCATION_TYPE = 'location'
+
 
 class ConnectionPool(object):
     ELASTICSEARCH_INSTANCE = None
@@ -17,9 +21,17 @@ def Elasticsearch():
     this client, so that we can reuse ES connections and not flood ES with new
     connections.
     """
-    if ConnectionPool.ELASTICSEARCH_INSTANCE is None:
-        ConnectionPool.ELASTICSEARCH_INSTANCE = elasticsearch.Elasticsearch()
+    if not ConnectionPool.ELASTICSEARCH_INSTANCE:
+        ConnectionPool.ELASTICSEARCH_INSTANCE = elasticsearch.Elasticsearch(timeout=settings.ES_TIMEOUT)
     return ConnectionPool.ELASTICSEARCH_INSTANCE
+
+
+def Elasticsearch_with_dedicated_connection():
+    """
+    In some cases e.g. parallel jobs you may need a dedicated es connection for each
+    of your threads.
+    """
+    return elasticsearch.Elasticsearch()
 
 
 def drop_and_create_index():
@@ -41,14 +53,12 @@ def drop_indexes_of_alias(name=settings.ES_INDEX):
     """
     Drop indexes associated to alias.
     """
-    es = Elasticsearch()
-    for index in es.indices.get_alias(name).keys():
+    for index in Elasticsearch().indices.get_alias(name).keys():
         drop_index(index=index)
 
 
 def drop_index(index):
-    es = Elasticsearch()
-    es.indices.delete(index=index, params={'ignore': [400, 404]})
+    Elasticsearch().indices.delete(index=index, params={'ignore': [400, 404]})
 
 
 def get_new_index_name():
@@ -62,8 +72,7 @@ def get_new_index_name():
 
 
 def add_alias_to_index(index, name=settings.ES_INDEX):
-    es = Elasticsearch()
-    es.indices.put_alias(index=index, name=name)
+    Elasticsearch().indices.put_alias(index=index, name=name)
 
 
 def create_index(index):
@@ -274,5 +283,40 @@ def create_index(index):
         },
     }
 
-    es = Elasticsearch()
-    es.indices.create(index=index, body=create_body)
+    Elasticsearch().indices.create(index=index, body=create_body)
+
+    fake_doc = fake_office()
+    Elasticsearch().index(index=index, doc_type=OFFICE_TYPE, id=fake_doc['siret'], body=fake_doc)
+
+# This fake office having a zero but existing score for each rome is designed
+# as a workaround of the following bug:
+#
+# ElasticsearchException[Unable to find a field mapper for field [scores_by_rome.A0000]]
+# which happens when a rome is orphaned (no company has a score for this rome).
+#
+# The following ES bug is known and has been fixed in ES 2.1.0
+# https://github.com/elastic/elasticsearch/pull/13060
+# however as of Jan 2018 we are using Elasticsearch 1.7 so we have to live with it.
+#
+# When the field_value_factor clause is applied to a non existing field (this is
+# the case for an orphaned rome i.e. no company has a score_for_rome.A0000 field for it),
+# even if the field_value_factor clause has a 'missing' value, the ES request will still fail
+# with a 'Unable to find a field mapper for field' error. This is fixed in ES 2.1.0.
+#
+# When this happens in a single rome search, the bug can silently be ignored as this means
+# the search result will be empty anyway, but this is no longer possible with a multi rome search.
+#
+# This fake office ensures no rome will ever be orphaned.
+def fake_office():
+    doc = {
+        'siret': "0",
+        # fields required even if not used by function_score
+        'score': 0,
+        'score_alternance': 0,
+    }
+
+    # all fields used by function_score which could potentially be orphaned and thus cause the bug
+    doc['scores_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
+    doc['scores_alternance_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
+
+    return doc

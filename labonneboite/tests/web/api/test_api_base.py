@@ -4,6 +4,7 @@ from labonneboite.common.models import Office
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.api import util
 from labonneboite.conf import settings
+from labonneboite.common import es
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import scoring as scoring_util
 
@@ -260,7 +261,7 @@ class ApiBaseTest(DatabaseTest):
                 'naf': u'4669A', # Map to Rome D1213
                 'siret': u'00000000000010',
                 'score': 78,
-                'score_alternance': 18,
+                'score_alternance': 0,
                 'headcount': 34,
                 'locations': self.positions['lille']['coords'],
                 'name': u'Office 10',
@@ -271,7 +272,7 @@ class ApiBaseTest(DatabaseTest):
                 'naf': u'4669A', # Map to Rome D1213
                 'siret': u'00000000000011',
                 'score': 82,
-                'score_alternance': 18,
+                'score_alternance': 80,
                 'headcount': 65,
                 'locations': self.positions['lille']['coords'],
                 'name': u'Office 11',
@@ -329,7 +330,7 @@ class ApiBaseTest(DatabaseTest):
                 'naf': u'4648Z',  # Map to Rome B1603
                 'siret': u'00000000000016',
                 'score': 70,
-                'score_alternance': 18,
+                'score_alternance': 80,
                 'headcount': 53,
                 'locations': self.positions['poitiers']['coords'],
                 'name': u'Office 16',
@@ -442,34 +443,41 @@ class ApiBaseTest(DatabaseTest):
                 'department': self.positions['limoges']['zip_code'][0:2],
             },
         ]
-        for i, doc in enumerate(docs, start=1):
+        for _, doc in enumerate(docs, start=1):
             # Build scores for relevant ROME codes.
             naf = doc['naf']
             rome_codes = mapping_util.MANUAL_NAF_ROME_MAPPING[naf].keys()
 
+            # FIXME this is some dangerous code duplication with create_index, we should someday
+            # make it more DNRY.
             score = doc['score']
             scores_by_rome = {}
             for rome_code in rome_codes:
                 scores_by_rome[rome_code] = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
                     score=score,
                     rome_code=rome_code,
-                    naf_code=naf
+                    naf_code=naf,
                 )
             if scores_by_rome:
                 doc['scores_by_rome'] = scores_by_rome
 
+            # FIXME this is some dangerous code duplication with create_index, we should someday
+            # make it more DNRY.
             score_alternance = doc['score_alternance']
             scores_alternance_by_rome = {}
             for rome_code in rome_codes:
-                scores_alternance_by_rome[rome_code] = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                raw_score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
                     score=score_alternance,
                     rome_code=rome_code,
-                    naf_code=naf
+                    naf_code=naf,
                 )
+                if raw_score > 0:  # dirty fix until proper DNRY with create_index
+                    scores_alternance_by_rome[rome_code] = raw_score
             if scores_alternance_by_rome:
                 doc['scores_alternance_by_rome'] = scores_alternance_by_rome
 
-            self.es.index(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
+            # just like in other environments, id should be the siret
+            self.es.index(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=doc['siret'], body=doc)
 
         # need for ES to register our new documents, flaky test here otherwise
         self.es.indices.flush(index=settings.ES_INDEX)
@@ -493,6 +501,7 @@ class ApiBaseTest(DatabaseTest):
                 office_name=doc['name'],
                 siret=doc['siret'],
                 score=doc['score'],
+                score_alternance=doc['score_alternance'],
                 naf=doc['naf'],
                 city_code=commune_id,
                 zipcode=zip_code,
@@ -506,8 +515,10 @@ class ApiBaseTest(DatabaseTest):
             )
             office.save()
 
-        # We should have as much entries in MariaDB/MySQL than in Elasticsearch.
-        self.assertEquals(Office.query.count(), len(docs))
+        # We should have as much entries in MariaDB/MySQL than in Elasticsearch, except
+        # one more in ES for the fake document actually.
+        es_count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={'query': {'match_all': {}}})
+        self.assertEquals(Office.query.count() + 1, es_count['count'])
 
     def add_security_params(self, params):
         """

@@ -239,7 +239,7 @@ def entreprises():
     # Fetch companies and alternatives
     fetcher = search_util.Fetcher(
         location,
-        rome=rome,
+        romes=[rome],
         distance=parameters['distance'],
         sort=parameters['sort'],
         from_number=parameters['from_number'],
@@ -310,8 +310,8 @@ def entreprises():
         'location_name': named_location.name if named_location else '',
         'page': current_page,
         'pagination': pagination_manager,
-        'rome_code': fetcher.rome,
-        'rome_description': settings.ROME_DESCRIPTIONS.get(fetcher.rome, ''),
+        'rome_code': rome,
+        'rome_description': settings.ROME_DESCRIPTIONS.get(rome, ''),
         'show_favorites': True,
         'sort': fetcher.sort,
         'tile_server_url': settings.TILE_SERVER_URL,

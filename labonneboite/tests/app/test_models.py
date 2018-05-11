@@ -114,7 +114,7 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
             score=90,
             x=6.166667,
             y=49.133333,
-            flag_alternance=1
+            score_alternance=80,
         )
         office.distance = 10
 
@@ -126,4 +126,4 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         self.assertEqual(office.y, office_json['lat'])
         self.assertEqual(office.naf, office_json['naf'])
         self.assertEqual(office.distance, office_json['distance'])
-        self.assertEqual(office.flag_alternance, office_json['alternance'])
+        self.assertTrue(office_json['alternance'])

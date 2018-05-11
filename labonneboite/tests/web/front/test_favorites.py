@@ -3,6 +3,7 @@
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
 from labonneboite.common.models import UserFavoriteOffice
+from labonneboite.common import es
 from labonneboite.conf import settings
 from labonneboite.tests.test_base import DatabaseTest
 
@@ -73,7 +74,7 @@ class FavoriteBaseTest(DatabaseTest):
             },
         ]
         for i, doc in enumerate(docs, start=1):
-            self.es.index(index=settings.ES_INDEX, doc_type=self.ES_OFFICE_TYPE, id=i, body=doc)
+            self.es.index(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=i, body=doc)
 
         # Required by ES to register new documents, flaky test here otherwise.
         self.es.indices.flush(index=settings.ES_INDEX)

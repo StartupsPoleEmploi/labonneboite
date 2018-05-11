@@ -4,6 +4,8 @@ from __future__ import division
 import logging
 from babel.dates import format_date
 
+from slugify import slugify
+
 from flask import url_for
 from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy import PrimaryKeyConstraint
@@ -11,6 +13,7 @@ from backports.functools_lru_cache import lru_cache
 
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import scoring as scoring_util
+from labonneboite.common import hiring_type_util
 from labonneboite.common.database import Base, db_session, DATABASE
 from labonneboite.common.load_data import load_city_codes
 from labonneboite.common import util
@@ -115,20 +118,37 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     def __unicode__(self):
         return u"%s - %s" % (self.siret, self.name)
 
-    def as_json(self, rome_code=None, distance=None, zipcode=None, extra_query_string=None):
+    def as_json(self,
+            rome_codes=None,
+            hiring_type=None,
+            distance=None,
+            zipcode=None,
+            extra_query_string=None,
+        ):
         """
-        `rome_code`: optional parameter, used only in case of being in the context
-        of a search by ROME code.
-        Without the context of a ROME code, the general purpose score of the office
+        `rome_codes`: optional parameter, used only in case of being in the context
+        of a search by ROME codes (single rome or multi rome).
+        Without the context of ROME codes, the general purpose score of the office
         is returned.
-        With the context of a ROME code, the score returned is adjusted to the ROME code,
+        With the context of ROME codes, the score returned is adjusted to the ROME code,
         and the URL of the company page is also adjusted to keep the same context.
         Main case is results returned by an API search. The scores and URLs embedded
         in the company objects should be adjusted to the ROME code context.
 
+        `hiring_type`: is needed along rome_codes to compute the right corresponding score,
+        possible values are hiring_type_util.VALUES
+
+        `distance` and `zipcode`: needed for potential multi geolocation logic.
+
         `extra_query_string` (dict): extra query string to be added to the API
-        urls for each office.
+        urls for each office. Typically some Google Analytics trackers.
         """
+        if rome_codes is None:        # no rome search context
+            rome_code = None
+        elif len(rome_codes) == 1:    # single rome search context
+            rome_code = rome_codes[0]
+        else:                         # multi rome search context
+            rome_code = self.matched_rome
 
         extra_query_string = extra_query_string or {}
         json = {
@@ -141,39 +161,24 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'naf_text': self.naf_text,
             'name': self.name,
             'siret': self.siret,
-            'stars': self.get_stars_for_rome_code(rome_code),
+            'stars': self.get_stars_for_rome_code(rome_code, hiring_type),
             'url': self.get_url_for_rome_code(rome_code, **extra_query_string),
             'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
-            'alternance': self.flag_alternance,
-            # Warning: the `distance` field is added by `get_companies_from_es_and_db`,
-            # this is NOT a model field or property!
+            'alternance': self.qualifies_for_alternance(),
+            # Warning: the `distance` and `matched_rome` fields are added by `get_companies_from_es_and_db`,
+            # they are NOT model fields or properties!
             'distance': self.distance,
         }
+        if rome_codes is not None and len(rome_codes) > 1:  # only makes sense for multi rome searches
+            json['matched_rome_code'] = rome_code
+            json['matched_rome_label'] = settings.ROME_DESCRIPTIONS[rome_code]
+            json['matched_rome_slug'] = slugify(settings.ROME_DESCRIPTIONS[rome_code])
+
         # This message should concern only a small number of companies who explicitly requested
         # to appear in extra geolocations.
         if any([distance, zipcode]) and json['address'] and self.show_multi_geolocations_msg(distance, zipcode):
             json['address'] += u", Cette entreprise recrute aussi dans votre région."
         return json
-
-    def serialize(self):
-        return {
-            'siret': self.siret,
-            'raisonsociale': self.company_name,
-            'enseigne': self.office_name,
-            'codenaf': self.naf,
-            'numerorue': self.street_number,
-            'libellerue': self.street_name,
-            'codecommune': self.city_code,
-            'codepostal': self.zipcode,
-            'email': self.email,
-            'email_alternance': self.email_alternance,
-            'tel': self.phone,
-            'departement': self.departement,
-            'trancheeffectif': self.headcount,
-            'score': self.score,
-            'coordinates_x': self.x,
-            'coordinates_y': self.y
-        }
 
     @property
     def address_fields(self):
@@ -263,9 +268,13 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     def stars(self):
         return self.get_stars_for_rome_code(None)
 
-    def get_stars_for_rome_code(self, rome_code):
+    def get_stars_for_rome_code(self, rome_code, hiring_type=None):
+        hiring_type = hiring_type or hiring_type_util.DEFAULT
+        if hiring_type not in hiring_type_util.VALUES:
+            raise ValueError("Unknown hiring_type")
+        raw_score = self.score if hiring_type == hiring_type_util.DPAE else self.score_alternance
         score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-            score=self.score,
+            score=raw_score,
             rome_code=rome_code,
             naf_code=self.naf
             )
@@ -277,6 +286,11 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         Converts the number of stars adjusted to given rome_code to a percentage.
         """
         return (100 * self.get_stars_for_rome_code(rome_code)) / 5
+
+    def qualifies_for_alternance(self):
+        # Avoid importing importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
+        # to avoid mixing importer stuff and production.
+        return self.score_alternance >= 50
 
     @property
     def url(self):

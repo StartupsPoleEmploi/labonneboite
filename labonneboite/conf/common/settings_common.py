@@ -94,11 +94,9 @@ HEADCOUNT_VALUES = {
     'small': HEADCOUNT_SMALL_ONLY
 }
 
-# Contract Value
-CONTRACT_VALUES = {'all': 0, 'alternance': 1}
-
 # Databases
 ES_INDEX = 'labonneboite'
+ES_TIMEOUT = 10
 DB_HOST = 'localhost'
 DB_PORT = 3306
 DB_NAME = 'labonneboite'

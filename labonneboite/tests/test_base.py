@@ -40,6 +40,7 @@ class AppTest(unittest.TestCase):
         self.test_request_context = app.test_request_context()
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
+
         return super(AppTest, self).setUp()
 
     def url_for(self, endpoint, **kwargs):
@@ -93,8 +94,6 @@ class DatabaseTest(AppTest):
     On your local machine, it should've been created by the `alembic/sql/test.sql`
     script.
     """
-
-    ES_OFFICE_TYPE = 'office'
 
     def setUp(self):
         # Disable elasticsearch logging
