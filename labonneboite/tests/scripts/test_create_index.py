@@ -206,11 +206,13 @@ class VariousModesTest(CreateIndexBaseTest):
         )
 
     def test_create_index_from_scratch(self):
-        script.update_data_profiling_wrapper(
-            create_full=True,
-            create_partial=False,
-            disable_parallel_computing=True,
-        )
+        # longer ES timeout needed for slow docker performance in local dev on Mac OS when running `make test-scripts`
+        with mock.patch.object(settings, 'ES_TIMEOUT', 30):
+            script.update_data_profiling_wrapper(
+                create_full=True,
+                create_partial=False,
+                disable_parallel_computing=True,
+            )
 
     def test_create_index_from_scratch_with_profiling(self):
         with mock.patch.object(script.Profiling, 'ACTIVATED', True):
