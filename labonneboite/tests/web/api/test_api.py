@@ -706,6 +706,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], u'00000000000004')
+            self.assertEqual(data['companies'][0]['matched_rome_code'], u'D1405')
 
             # 2) Search for `M1801` ROME code only. We should get 1 result.
             params = self.add_security_params({
@@ -719,10 +720,11 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], u'00000000000005')
-            # matched_rome feature is useless for single rome searches and should be hidden
-            self.assertNotIn(u'matched_rome_code', data['companies'][0])
-            self.assertNotIn(u'matched_rome_label', data['companies'][0])
-            self.assertNotIn(u'matched_rome_slug', data['companies'][0])
+            # matched_rome_* fields are useless for single rome searches but must still
+            # be present for consistency from the point of view of the API user.
+            self.assertEqual(data['companies'][0]['matched_rome_code'], u'M1801')
+            self.assertIn(u'matched_rome_label', data['companies'][0])
+            self.assertIn(u'matched_rome_slug', data['companies'][0])
 
             # 3) Multi rome search for both `D1405` and `M1801` ROME codes, sorting by distance.
             params = self.add_security_params({
