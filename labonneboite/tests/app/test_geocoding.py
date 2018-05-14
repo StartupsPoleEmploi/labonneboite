@@ -131,3 +131,10 @@ class AdresseApiTest(unittest.TestCase):
             address = geocoding.get_address(0, 0)
 
         self.assertEqual([], address)
+
+    def test_get_coordinates_of_location_with_no_city(self):
+        mock_get = self.mock_get('search-balltrapp.json')
+        with mock.patch.object(geocoding.datagouv.requests, 'get', return_value=mock_get):
+            coordinates = geocoding.get_coordinates("ball trapp")
+
+        self.assertIn("city", coordinates[0])

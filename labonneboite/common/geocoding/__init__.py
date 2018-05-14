@@ -179,15 +179,18 @@ def get_coordinates(address, limit=10):
         latitude (float)
         longitude (float)
     """
-    features = [
-        {
-            'latitude': result['geometry']['coordinates'][1],
-            'longitude': result['geometry']['coordinates'][0],
-            'label': result['properties']['label'],
-            'zipcode': result['properties']['postcode'],
-            'city': result['properties']['city']
-        } for result in datagouv.search(address, limit=limit)
-    ]
+    features = []
+    for result in datagouv.search(address, limit=limit):
+        try:
+            features.append({
+                'latitude': result['geometry']['coordinates'][1],
+                'longitude': result['geometry']['coordinates'][0],
+                'label': result['properties']['label'],
+                'zipcode': result['properties']['postcode'],
+                'city': result['properties']['city']
+            })
+        except KeyError:
+            continue
 
     return unique_elements(features, key=lambda x: (x['latitude'], x['longitude']))
 
