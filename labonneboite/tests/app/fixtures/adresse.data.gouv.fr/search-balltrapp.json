@@ -1,0 +1,130 @@
+{
+  "attribution": "BAN", 
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -0.817915, 
+          46.090449
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "citycode": "17272", 
+        "context": "17, Charente-Maritime, Nouvelle-Aquitaine (Poitou-Charentes)", 
+        "id": "17272_0005_5b3e78", 
+        "importance": 0.0058, 
+        "label": "Rue du Ball Trapp", 
+        "name": "Rue du Ball Trapp", 
+        "postcode": "17700", 
+        "score": 0.6368909090909091, 
+        "type": "street", 
+        "x": 405120.9, 
+        "y": 6561648.5
+      }, 
+      "type": "Feature"
+    }, 
+    {
+      "geometry": {
+        "coordinates": [
+          -1.097946, 
+          46.092384
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "city": "Ch\u00e2telaillon-Plage", 
+        "citycode": "17094", 
+        "context": "17, Charente-Maritime, Nouvelle-Aquitaine (Poitou-Charentes)", 
+        "id": "17094_XXXX_50674c", 
+        "importance": 0.0393, 
+        "label": "Rue du Ball-Trap 17340 Ch\u00e2telaillon-Plage", 
+        "name": "Rue du Ball-Trap", 
+        "postcode": "17340", 
+        "score": 0.41266363636363634, 
+        "type": "street", 
+        "x": 383522.4, 
+        "y": 6562947.2
+      }, 
+      "type": "Feature"
+    }, 
+    {
+      "geometry": {
+        "coordinates": [
+          0.454542, 
+          45.834427
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "alias": "les martini\u00e8res", 
+        "city": "Chasseneuil-sur-Bonnieure", 
+        "citycode": "16085", 
+        "context": "16, Charente, Nouvelle-Aquitaine (Poitou-Charentes)", 
+        "id": "16085_0021_229b50", 
+        "importance": 0.0342, 
+        "label": "Rue du Ball Trap 16260 Chasseneuil-sur-Bonnieure", 
+        "name": "Rue du Ball Trap", 
+        "postcode": "16260", 
+        "score": 0.41219999999999996, 
+        "type": "street", 
+        "x": 502422.2, 
+        "y": 6529290.5
+      }, 
+      "type": "Feature"
+    }, 
+    {
+      "geometry": {
+        "coordinates": [
+          9.219662, 
+          41.609545
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "city": "Porto-Vecchio", 
+        "citycode": "2A247", 
+        "context": "2A, Corse-du-Sud, Corse", 
+        "id": "2A247_XXXX_789573", 
+        "importance": 0.0426, 
+        "label": "Route du Ball Trap 20137 Porto-Vecchio", 
+        "name": "Route du Ball Trap", 
+        "postcode": "20137", 
+        "score": 0.36750909090909084, 
+        "type": "street", 
+        "x": 1219259.5, 
+        "y": 6076930.3
+      }, 
+      "type": "Feature"
+    }, 
+    {
+      "geometry": {
+        "coordinates": [
+          -0.767956, 
+          43.652201
+        ], 
+        "type": "Point"
+      }, 
+      "properties": {
+        "city": "Bastennes", 
+        "citycode": "40028", 
+        "context": "40, Landes, Nouvelle-Aquitaine (Aquitaine)", 
+        "id": "40028_XXXX_229812", 
+        "importance": 0.0027, 
+        "label": "Route du Ball Trap 40360 Bastennes", 
+        "name": "Route du Ball Trap", 
+        "postcode": "40360", 
+        "score": 0.36388181818181814, 
+        "type": "street", 
+        "x": 396057.7, 
+        "y": 6290937.5
+      }, 
+      "type": "Feature"
+    }
+  ], 
+  "licence": "ODbL 1.0", 
+  "limit": 5, 
+  "query": "ball trapp", 
+  "type": "FeatureCollection", 
+  "version": "draft"
+}
