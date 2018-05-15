@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 
 VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main', 'elasticsearch.trace']
 
+ES_BULK_TIMEOUT = 30
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 
 
@@ -153,12 +154,12 @@ class StatTracker:
 st = StatTracker()
 
 
-def bulk_actions(actions, use_dedicated_es_connection=False):
+def bulk_actions(actions):
     # unfortunately parallel_bulk is not available in the current elasticsearch version
     # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
     logger.info("started bulk of %s actions...", len(actions))
     # each parallel job needs to use its own ES connection for maximum performance
-    bulk(es.Elasticsearch_with_dedicated_connection(), actions, chunk_size=ES_BULK_CHUNK_SIZE)
+    bulk(es.Elasticsearch_with_dedicated_connection(timeout=ES_BULK_TIMEOUT), actions, chunk_size=ES_BULK_CHUNK_SIZE)
     logger.info("completed bulk of %s actions!", len(actions))
 
 
@@ -401,10 +402,7 @@ def create_offices_for_departement(departement):
                 '_source': es_doc,
             })
 
-    # Each parallel indexing job should use its own dedicated ES connection.
-    # Otherwise the indexing will last ten times longer (!) in production,
-    # even there is no visible difference in local dev.
-    bulk_actions(actions, use_dedicated_es_connection=True)
+    bulk_actions(actions)
 
     completed_jobs_counter.increment()
 
