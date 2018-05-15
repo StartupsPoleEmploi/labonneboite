@@ -97,10 +97,6 @@ labonneboite/common/data/ogr_rome_mapping_update/rome_labels.csv
 labonneboite/common/data/ogr_rome_mapping_update/ogr_labels.csv
 labonneboite/common/data/ogr_rome_mapping_update/ogr_rome_mapping.csv
 
-# Docker #
-##########
-docker/data/
-
 # Generated files and cache #
 #############################
 labonneboite/web/static/.webassets-cache
