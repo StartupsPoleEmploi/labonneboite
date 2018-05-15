@@ -59,11 +59,13 @@ def activate_logging(flask_app):
     http://flask.pocoo.org/docs/0.12/errorhandling/
     """
     formatter = logging.Formatter("%(levelname)s - %(module)s - [%(pathname)s]\n%(message)s")
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    main_logger = logging.getLogger('main')
+    main_logger.addHandler(console_handler)
 
     # Output logs to stdout (development mode only).
     if get_config().DEBUG:
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
         flask_app.logger.addHandler(console_handler)
 
     if settings.SENTRY_DSN:
@@ -73,6 +75,7 @@ def activate_logging(flask_app):
         flask_app.logger.debug("sentry is disabled")
 
     flask_app.logger.setLevel(settings.LOG_LEVEL)
+    main_logger.setLevel(settings.LOG_LEVEL)
 
 
 def register_extensions(flask_app):
