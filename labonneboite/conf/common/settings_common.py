@@ -29,6 +29,7 @@ DISTANCE_FILTER_DEFAULT = 10
 
 ENABLE_TIMEIT_TIMERS = True
 
+SENTRY_DSN = None
 
 ######### TODO Settings added to make tests work without local_settings.py
 # Maybe we should remove some entirely, or set default values in the code?

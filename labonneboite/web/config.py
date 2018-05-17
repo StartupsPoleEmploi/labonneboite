@@ -47,21 +47,23 @@ class BaseConfig(object):
 
 
 class ProdConfig(BaseConfig):
-    pass
+    SENTRY_ENVIRONMENT = "production"
 
 
 class StagingConfig(BaseConfig):
-    pass
+    SENTRY_ENVIRONMENT = "staging"
 
 
 class DevConfig(BaseConfig):
     DEBUG = True
     ASSETS_DEBUG = True
+    SENTRY_ENVIRONMENT = "development"
 
 
 class TestConfig(BaseConfig):
     TESTING = True
     WTF_CSRF_ENABLED = False
+    SENTRY_ENVIRONMENT = "test"
 
 
 configs = {

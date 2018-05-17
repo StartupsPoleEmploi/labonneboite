@@ -6,8 +6,7 @@ import locale
 import logging
 
 # External packages.
-from opbeat.contrib.flask import Opbeat
-from opbeat.handlers.logging import OpbeatHandler
+from raven.contrib.flask import Sentry
 from social_core import exceptions as social_exceptions
 from social_flask_sqlalchemy.models import init_social
 from werkzeug.contrib.fixers import ProxyFix
@@ -67,18 +66,11 @@ def activate_logging(flask_app):
         console_handler.setFormatter(formatter)
         flask_app.logger.addHandler(console_handler)
 
-    if hasattr(settings, 'OPBEAT_ORGANIZATION_ID'):
-        opbeat = Opbeat(
-            flask_app,
-            organization_id=settings.OPBEAT_ORGANIZATION_ID,
-            app_id=settings.OPBEAT_APP_ID,
-            secret_token=settings.OPBEAT_SECRET_TOKEN,
-        )
-        opbeat_handler = OpbeatHandler(client=opbeat.client)
-        flask_app.logger.addHandler(opbeat_handler)
-        flask_app.logger.debug("opbeat is enabled")
+    if settings.SENTRY_DSN:
+        Sentry(flask_app, dsn=settings.SENTRY_DSN, logging=True, level=logging.ERROR)
+        flask_app.logger.debug("sentry is enabled")
     else:
-        flask_app.logger.debug("opbeat is disabled")
+        flask_app.logger.debug("sentry is disabled")
 
     flask_app.logger.setLevel(settings.LOG_LEVEL)
 
