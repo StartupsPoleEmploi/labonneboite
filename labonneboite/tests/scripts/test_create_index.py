@@ -550,36 +550,52 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office = Office.get(self.office1.siret)
         self.assertEquals(office.email_alternance, "email_alternance@mail.com")
 
+
     def test_update_office_remove_alternance(self):
         """
-        Test `update_offices` to remove the flag_alternance and email_alternance
+        Test `update_offices` to hide it on lba
         """
-        self.office1.flag_alternance = 1
-        self.office1.save()
 
-        # Add flag_alternance and email_alternance
+        # Remove alternance for this company
         office_to_update = OfficeAdminUpdate(
             sirets=self.office1.siret,
             name=self.office1.company_name,
-            email_alternance=u"email_alternance@mail.com",
+            new_score_alternance=0,
         )
+
+        office = Office.get(self.office1.siret)
+        self.assertNotEquals(office.score_alternance, 0)
+
         office_to_update.save(commit=True)
         script.update_offices()
 
-        # Expected alternance infos
+        # Expected score alternance = 0
         office = Office.get(self.office1.siret)
-        self.assertEquals(office.flag_alternance, 1)
-        self.assertEquals(office.email_alternance, "email_alternance@mail.com")
+        self.assertEquals(office.score_alternance, 0)
 
-        # Remove alternance for this company
-        office_to_update.remove_flag_alternance = 1
+
+    def test_update_office_remove_on_lbb(self):
+        """
+        Test `update_offices` to hide on lbb
+        """
+
+        # Remove for this company
+        office_to_update = OfficeAdminUpdate(
+            sirets=self.office1.siret,
+            name=self.office1.company_name,
+            new_score=0,
+        )
+
+        office = Office.get(self.office1.siret)
+        self.assertNotEquals(office.score, 0)
+
         office_to_update.save(commit=True)
         script.update_offices()
 
-        # Expected no alternance infos
+        # Expected score_rome = 0
         office = Office.get(self.office1.siret)
-        self.assertEquals(office.flag_alternance, 0)
-        self.assertEquals(office.email_alternance, "")
+        self.assertEquals(office.score, 0)
+
 
     def test_update_office_add_naf(self):
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]

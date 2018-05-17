@@ -35,6 +35,11 @@ def details(siret):
     company = Office.query.filter_by(siret=siret).first()
     if not company:
         abort(404)
+
+    # Check if company is hidden by SAVE
+    if not company.score:
+        abort(404)
+
     context = {
         'company': company,
         'rome_code': rome_code,

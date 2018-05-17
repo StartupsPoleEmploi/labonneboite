@@ -410,13 +410,40 @@ def check_integer_argument(args, name, default_value):
 
 @apiBlueprint.route('/office/<siret>/details', methods=['GET'])
 @api_auth_required
-def office_details(siret):
+def office_details_lbb(siret):
     """
     Returns the details of an office for the given <siret> number.
     """
+    return get_office_details(siret)
+
+
+@apiBlueprint.route('/office/<siret>/details-alternance', methods=['GET'])
+@api_auth_required
+def office_details_alternance(siret):
+    """
+    Returns the details of an office for the given <siret> number (with alternance infos).
+    """
+    return get_office_details(siret, alternance=True)
+
+
+def get_office_details(siret, alternance=False):
     office = Office.query.filter_by(siret=siret).first()
     if not office:
         abort(404)
+
+    # Alternance
+    if alternance and not office.score_alternance:
+        abort(404)
+
+    # LBB
+    if not alternance and not office.score:
+        abort(404)
+
+    # If alternance flag, we use an other URL
+    url = office.url
+    if alternance:
+        url = '{}-alternance'.format(url)
+
     result = {
         'headcount_text': office.headcount_text,
         'lat': office.y,
@@ -427,7 +454,7 @@ def office_details(siret):
         'raison_sociale': office.company_name,
         'siret': office.siret,
         'stars': office.stars,
-        'url': office.url,
+        'url': url,
         'address': {
             'city': office.city,
             'city_code': office.city_code,
@@ -436,15 +463,15 @@ def office_details(siret):
             'zipcode': office.zipcode,
         },
     }
-    patch_company_result_with_sensitive_information(request.args['user'], office, result)
+    patch_company_result_with_sensitive_information(request.args['user'], office, result, alternance)
     return jsonify(result)
 
 
-def patch_company_result_with_sensitive_information(api_username, office, result):
+def patch_company_result_with_sensitive_information(api_username, office, result, alternance=False):
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
     if api_username in settings.API_INTERNAL_CONSUMERS:
-        result['email'] = office.email
+        result['email'] = office.email_alternance if alternance else office.email
         result['phone'] = office.tel
         result['website'] = office.website
     return result

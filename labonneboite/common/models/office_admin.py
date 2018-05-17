@@ -146,7 +146,10 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     remove_email = Column(Boolean, default=False, nullable=False)
     remove_phone = Column(Boolean, default=False, nullable=False)
     remove_website = Column(Boolean, default=False, nullable=False)
-    remove_flag_alternance = Column(Boolean, default=False, nullable=False)
+
+    # Hide company visibility depending of the hyring type
+    new_score = Column(Integer, default=False, nullable=False)
+    new_score_alternance = Column(Integer, default=False, nullable=False)
 
     # Update requested by.
     requested_by_email = Column(String(191), default='', nullable=False)
