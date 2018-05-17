@@ -58,15 +58,11 @@ def activate_logging(flask_app):
     Activate the logging system.
     http://flask.pocoo.org/docs/0.12/errorhandling/
     """
-    formatter = logging.Formatter("%(levelname)s - %(module)s - [%(pathname)s]\n%(message)s")
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
+    # We are happy with how the flask app logger is configured, so we just copy
+    # its configuration for the main logger
     main_logger = logging.getLogger('main')
-    main_logger.addHandler(console_handler)
-
-    # Output logs to stdout (development mode only).
-    if get_config().DEBUG:
-        flask_app.logger.addHandler(console_handler)
+    for handler in flask_app.logger.handlers:
+        main_logger.addHandler(handler)
 
     if settings.SENTRY_DSN:
         Sentry(flask_app, dsn=settings.SENTRY_DSN, logging=True, level=logging.ERROR)
