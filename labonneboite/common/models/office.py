@@ -168,6 +168,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             # Warning: the `distance` and `matched_rome` fields are added by `get_companies_from_es_and_db`,
             # they are NOT model fields or properties!
             'distance': self.distance,
+            'boosted': self.boost
         }
         if rome_code:
             json['matched_rome_code'] = rome_code
