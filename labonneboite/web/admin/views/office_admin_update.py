@@ -11,6 +11,16 @@ from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
 
+class RomeToRemoveException(Exception):
+    pass
+
+class RomeToBoostException(Exception):
+    pass
+
+class InvalidRome(Exception):
+    pass
+
+
 class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     """
     Admin interface for the `OfficeAdminUpdate` model.
@@ -35,6 +45,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'name',
         'boost',
         'romes_to_boost',
+        'boost_alternance',
+        'romes_alternance_to_boost',
         'romes_to_remove',
         'nafs_to_add',
         'new_email',
@@ -67,9 +79,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'sirets': u"Sirets",
         'name': u"Nom de l'entreprise",
         'reason': u"Raison",
-        'boost': u"Booster le score",
-        'romes_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement",
-        'romes_to_remove': u"Retirer des codes ROME associés à une entreprise",
+        'boost': u"Booster le score - LBB",
+        'romes_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement - LBB",
+        'romes_to_remove': u"Retirer des codes ROME associés à une entreprise - LBB",
+        'boost_alternance': u"Booster le score - Alternance",
+        'romes_alternance_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement - Alternance",
+        'romes_alternance_to_remove': u"Retirer des codes ROME associés à une entreprise - Alternance",
         'nafs_to_add': u"Ajouter un ou plusieurs NAF à une entreprise",
         'new_email': u"Nouvel email",
         'email_alternance': u"Email dédié à l'alternance",
@@ -113,7 +128,14 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_to_remove': Markup(
             u"Veuillez entrer un ROME par ligne."
             u"<br>"
-            u"Si ce champ est renseigné, le(s) ROME spécifié(s) ne seront plus associés à cette entreprise."
+            u"Si ce champ est renseigné, le(s) ROME spécifié(s) ne seront plus associés à cette entreprise sur LBB."
+            u"<br>"
+            u"<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
+        ),
+        'romes_to_remove': Markup(
+            u"Veuillez entrer un ROME par ligne."
+            u"<br>"
+            u"Si ce champ est renseigné, le(s) ROME spécifié(s) ne seront plus associés à cette entreprise - pour l'alternance."
             u"<br>"
             u"<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
         ),
@@ -133,6 +155,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'boost',
         'romes_to_boost',
         'romes_to_remove',
+        'boost_alternance',
+        'romes_alternance_to_boost',
+        'romes_alternance_to_remove',
         'nafs_to_add',
         'new_email',
         'email_alternance',
@@ -160,6 +185,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             'filters': [strip_filter],
         },
         'romes_to_remove': {
+            'filters': [strip_filter],
+        },
+        'romes_alternance_to_boost': {
+            'filters': [strip_filter],
+        },
+        'romes_alternance_to_remove': {
             'filters': [strip_filter],
         },
         'nafs_to_add': {
@@ -265,55 +296,47 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                     flash(message, 'error')
                     return False
 
+
+        # Get company
+        first_office = Office.query.filter_by(siret=sirets[0]).first()
+
         # Codes ROMES to boost or to add
         if is_valid and form.data.get('romes_to_boost'):
+            try:
+                self.validate_romes_to_boost(form, 'romes_to_boost', 'boost')
+            except (RomeToBoostException, InvalidRome) as e:
+                flash(e.message, 'error')
+                return False
 
-            romes_to_boost = form.data.get('romes_to_boost')
-
-            if not form.data.get('boost'):
-                msg = u"Vous devez cocher la case `Booster le score`."
-                flash(msg, 'error')
+        # Codes ROMES to boost or to add (for alternance)
+        if is_valid and form.data.get('romes_alternance_to_boost'):
+            try:
+                self.validate_romes_to_boost(form, 'romes_to_boost', 'boost_alternance')
+            except (RomeToBoostException, InvalidRome) as e:
+                flash(e.message, 'error')
                 return False
 
 
-            for rome in OfficeAdminUpdate.as_list(romes_to_boost):
-                if not mapping_util.rome_is_valid(rome):
-                    msg = (
-                        u"`%s` n'est pas un code ROME valide."
-                        u"<br>"
-                        u"Assurez-vous de ne saisir qu'un élément par ligne."
-                        % rome
-                    )
-                    flash(Markup(msg), 'error')
-                    return False
-
-        # Codes ROMES to remove
+        # Codes ROMES to remove for LBB
         if is_valid and form.data.get('romes_to_remove'):
-            office_to_update = Office.query.filter_by(siret=sirets[0]).first()
-            romes_to_remove = form.data.get('romes_to_remove')
+            try:
+                office_naf = first_office.naf if only_one_siret else None
+                self.validate_romes_to_remove(form, 'romes_to_remove', office_naf)
+            except (RomeToRemoveException, InvalidRome) as e:
+                flash(e.message, 'error')
+                return False
 
-            for rome in OfficeAdminUpdate.as_list(romes_to_remove):
-
-                if not mapping_util.rome_is_valid(rome):
-                    msg = (
-                        u"`%s` n'est pas un code ROME valide."
-                        u"<br>"
-                        u"Assurez-vous de ne saisir qu'un élément par ligne."
-                        % rome
-                    )
-                    flash(Markup(msg), 'error')
-                    return False
-
-                if only_one_siret:
-                    office_romes = [item.code for item in mapping_util.romes_for_naf(office_to_update.naf)]
-                    if rome not in office_romes:
-                        msg = u"`%s` n'est pas un code ROME lié au NAF de cette entreprise." % rome
-                        flash(msg, 'error')
-                        return False
+        # Codes ROMES to remove (for alternance)
+        if is_valid and form.data.get('romes_alternance_to_remove'):
+            try:
+                office_naf = first_office.naf if only_one_siret else None
+                self.validate_romes_to_remove(form, 'romes_alternance_to_remove', office_naf)
+            except (RomeToRemoveException, InvalidRome) as e:
+                flash(e.message, 'error')
+                return False
 
         # Codes NAF to add
         if is_valid and form.data.get('nafs_to_add'):
-            office_to_update = Office.query.filter_by(siret=sirets[0]).first()
             nafs_to_add = form.data.get('nafs_to_add')
 
             for naf in OfficeAdminUpdate.as_list(nafs_to_add):
@@ -321,9 +344,46 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                     msg = u"`%s` n'est pas un code NAF valide." % naf
                     flash(msg, 'error')
                     return False
-                if naf == office_to_update.naf and only_one_siret:
+                if naf == first_office.naf and only_one_siret:
                     msg = u"Le NAF `%s` est déjà associé à cette entreprise." % naf
                     flash(msg, 'error')
                     return False
 
         return is_valid
+
+
+    def validate_romes_to_remove(self, form, romes_to_remove_field, office_naf=None):
+        romes_to_remove = form.data.get(romes_to_remove_field)
+
+        for rome in OfficeAdminUpdate.as_list(romes_to_remove):
+            self.validate_rome(rome, romes_to_remove_field)
+
+            if office_naf:
+                office_romes = [item.code for item in mapping_util.romes_for_naf(office_naf)]
+                if rome not in office_romes:
+                    msg = u"`%s` n'est pas un code ROME lié au NAF de cette entreprise. Champ : '%s'" % (
+                            rome,
+                            self.column_labels[romes_to_remove_field]
+                        )
+                    raise RomeToRemoveException(msg)
+
+
+    def validate_romes_to_boost(self, form, romes_boost_field, boost_field):
+        romes_to_boost = form.data.get(romes_boost_field)
+
+        if not form.data.get(boost_field):
+            msg = u"Vous devez cocher la case `%s`. " % self.column_labels[boost_field]
+            raise RomeToBoostException(msg)
+
+
+        for rome in OfficeAdminUpdate.as_list(romes_to_boost):
+            self.validate_rome(rome, romes_boost_field)
+
+
+    def validate_rome(self, rome, field_name):
+        if not mapping_util.rome_is_valid(rome):
+            msg = u"`%s` n'est pas un code ROME valide. Assurez-vous de ne saisir qu'un élément par ligne. Champ : '%s'" % (
+                rome,
+                self.column_labels[field_name]
+            )
+            raise InvalidRome(msg)

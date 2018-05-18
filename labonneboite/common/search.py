@@ -387,9 +387,16 @@ def aggregate_distance(aggregations_raw):
 
 def get_score_for_rome_field_name(hiring_type, rome_code):
     return {
-        hiring_type_util.DPAE: "scores_by_rome.%s" % rome_code,
-        hiring_type_util.ALTERNANCE: "scores_alternance_by_rome.%s" % rome_code
-    }[hiring_type]
+        hiring_type_util.DPAE: "scores_by_rome.%s",
+        hiring_type_util.ALTERNANCE: "scores_alternance_by_rome.%s",
+    }[hiring_type] % rome_code
+
+def get_boosted_rome_field_name(hiring_type, rome_code):
+    return {
+        hiring_type_util.DPAE: "boosted_romes.%s",
+        hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s",
+    }[hiring_type] % rome_code
+
 
 def build_json_body_elastic_search(
         naf_codes,
@@ -422,7 +429,9 @@ def build_json_body_elastic_search(
     # and also this would increase complexity of the ES sorting mechanism.
     rome_code = rome_codes[0]
     score_for_rome_field_name = score_for_rome_field_names[0]
-    boosted_rome_field_name = "boosted_romes.%s" % rome_code
+    boosted_rome_field_name = get_boosted_rome_field_name(hiring_type, rome_code)
+
+
 
     # Build filters.
     filters = []

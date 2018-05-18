@@ -254,6 +254,10 @@ def create_index(index):
                 "type": "object",
                 "index": "not_analyzed",
             },
+            "boosted_alternance_romes": {
+                "type": "object",
+                "index": "not_analyzed",
+            },
             "headcount": {
                 "type": "integer",
                 "index": "not_analyzed",

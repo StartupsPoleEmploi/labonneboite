@@ -47,6 +47,7 @@ class CreateIndexBaseTest(DatabaseTest):
             departement=u"57",
             headcount=u"12",
             score=90,
+            score_alternance=90,
             x=6.17952,
             y=49.1044,
         )
@@ -71,6 +72,7 @@ class CreateIndexBaseTest(DatabaseTest):
             departement=u"44",
             headcount=u"21",
             score=77,
+            score_alternance=75,
             x=-1.68333,
             y=47.183331,
         )
@@ -460,13 +462,11 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
-        self.assertTrue(res['_source']['boosted_romes']['D1507'])
-        self.assertTrue(res['_source']['boosted_romes']['D1103'])
+        self.assertEqual({
+            'D1507': True,
+            'D1103': True,
+        }, res['_source']['boosted_romes'])
 
-        # Other scores should not be boosted.
-        for rome in romes_for_office:
-            if rome not in [u"D1507", u"D1103"]:
-                self.assertNotIn(rome, res['_source']['boosted_romes'])
 
     def test_update_office_boost_unrelated_romes(self):
         """
@@ -524,9 +524,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
 
         # Check rome scores.
-        keys = res['_source']['scores_by_rome'].keys()
-        self.assertTrue(u'D1101' in keys)
-        self.assertFalse(u'D1507' in keys)
+        self.assertIn(u'D1101', res['_source']['scores_by_rome'])
+        self.assertNotIn(u'D1507', res['_source']['scores_by_rome'])
 
         # Other scores should not be boosted.
         for rome in romes_for_office:
@@ -744,7 +743,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             self.assertTrue(res['_source']['boosted_romes']['D1103'])
 
 
-    def romes_to_remove_multi_siret(self):
+    def test_romes_to_remove_multi_siret(self):
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
 
         sirets = [self.office1.siret, self.office2.siret]
@@ -768,9 +767,94 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
 
             # Check romes
-            keys = res['_source']['scores_by_rome'].keys()
-            self.assertTrue(u'D1101' in keys)
-            self.assertFalse(u'D1507' in keys)
+            self.assertIn(u'D1101', res['_source']['scores_by_rome'])
+            self.assertNotIn(u'D1507', res['_source']['scores_by_rome'])
+
+
+    def test_romes_alternance_to_remove_single_siret(self):
+        romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
+
+        siret = self.office1.siret
+
+        self.assertIn(u"D1101", romes_for_office) # Rome related to the office
+        self.assertIn(u"D1507", romes_for_office) # Rome related to the office
+
+        office_to_update = OfficeAdminUpdate(
+            sirets=siret,
+            name="Supermarchés",
+            boost_alternance=False,
+            romes_alternance_to_boost='',
+            romes_alternance_to_remove=u"D1507",  # Remove score only for those ROME.
+        )
+        office_to_update.save()
+
+        script.update_offices()
+
+        res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
+
+        # Check romes
+        self.assertIn(u'D1101', res['_source']['scores_alternance_by_rome'])
+        self.assertNotIn(u'D1507', res['_source']['scores_alternance_by_rome'])
+
+
+    def test_romes_alternance_to_remove_multi_siret(self):
+        romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
+
+        sirets = [self.office1.siret, self.office2.siret]
+
+        self.assertIn(u"D1101", romes_for_office) # Rome related to the office
+        self.assertIn(u"D1507", romes_for_office) # Rome related to the office
+
+        office_to_update = OfficeAdminUpdate(
+            sirets='\n'.join(sirets),
+            name="Supermarchés",
+            boost_alternance=False,
+            romes_alternance_to_boost='',
+            romes_alternance_to_remove=u"D1507",  # Remove score only for those ROME.
+        )
+        office_to_update.save()
+
+        script.update_offices()
+
+        for siret in sirets:
+            res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
+
+            # Check romes
+            self.assertIn(u'D1101', res['_source']['scores_alternance_by_rome'])
+            self.assertNotIn(u'D1507', res['_source']['scores_alternance_by_rome'])
+
+
+    def test_update_office_boost_specific_romes_alternance(self):
+        """
+        Test `update_offices` to update an office: boost alternance score for specific ROME codes.
+        """
+        romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
+
+        # Ensure the following ROME codes are related to the office.
+        self.assertIn(u"D1507", romes_for_office)
+        self.assertIn(u"D1103", romes_for_office)
+
+        office_to_update = OfficeAdminUpdate(
+            sirets=self.office1.siret,
+            name=self.office1.company_name,
+            boost_alternance=True,
+            romes_alternance_to_boost=u"D1507\nD1103",  # Boost score only for those ROME.
+        )
+        office_to_update.save()
+
+        script.update_offices()
+
+        office = Office.get(self.office1.siret)
+        res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
+
+        # Check boosted scores.
+        self.assertEqual({
+            'D1507': True,
+            'D1103': True,
+        }, res['_source']['boosted_alternance_romes'])
+
+
+
 
 
 class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
