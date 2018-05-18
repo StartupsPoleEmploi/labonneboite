@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="20px" viewBox="0 0 22 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50 (54983) - http://www.bohemiancoding.com/sketch -->
+    <title>croix-fermer</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Tilkee" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="boutons-tilkee-fenetre2" transform="translate(-776.000000, -509.000000)" fill="#D8D8D8" stroke="#979797">
+            <g id="croix-fermer" transform="translate(777.000000, 509.000000)">
+                <path d="M0,20 L20,0" id="Path"></path>
+                <path d="M0,0 L20,20" id="Path"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,69 @@
+/*
+ * Sources of inspiration for styling and using a modal from scratch:
+ * https://css-tricks.com/considerations-styling-modal/
+ * https://github.com/gdkraus/accessible-modal-dialog
+ */
+
+.modal {
+    display: block;
+
+    width: 600px;
+    max-width: 100%;
+    height: 400px;
+    max-height: 100%;
+
+    position: fixed;
+
+    z-index: 100;
+
+    left: 50%;
+    top: 40%;
+
+    transform: translate(-50%, -50%);
+
+    background: white;
+    box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.9);
+}
+.modal-closed {
+    display: none;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    margin: 0;
+    background-color: #000;
+    opacity: 0.5;
+}
+
+img.modal-close-button {
+    position: absolute;
+    float: right;
+    top: 15px;
+    right: 15px;
+    width: 25px;
+    cursor: pointer;
+    z-index: 110;
+}
+
+.modal-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    margin: auto;
+    padding: 80px;
+    display: table;
+}
+
+.modal-content-inner {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: justify;
+}

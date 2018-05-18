@@ -1,7 +1,7 @@
-/* Cookies banner.
+/* RGPD banner.
 =========================================================================== */
 
-.cookies-banner {
+.rgpd-banner {
     text-align: center;
     background: #000;
     position: fixed;
@@ -17,17 +17,17 @@
     display: none;
 }
 
-.cookies-banner + * {
+.rgpd-banner + * {
     margin-top: 0;  /* Cancel default spacing for the next block-level element. */
 }
 
-.cookies-banner * + * {
+.rgpd-banner * + * {
     margin-top: 0;  /* Cancel default spacing across block-level elements inside. */
 }
 
-.cookies-banner a:link,
-.cookies-banner a:visited,
-.cookies-banner a:active,
-.cookies-banner a:hover {
+.rgpd-banner a:link,
+.rgpd-banner a:visited,
+.rgpd-banner a:active,
+.rgpd-banner a:hover {
     color: #fff;
 }
