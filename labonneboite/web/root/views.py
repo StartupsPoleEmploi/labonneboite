@@ -68,3 +68,8 @@ def cookbook():
 @rootBlueprint.route('/stats')
 def stats():
     return redirect('https://datastudio.google.com/open/0B0PPPCjOppNIdVNXVVM0QnJHNEE')
+
+
+@rootBlueprint.route('/trigger_error')
+def trigger_error():
+    raise ValueError("Error triggered by /trigger_error")
