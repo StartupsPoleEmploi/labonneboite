@@ -298,7 +298,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
 
         # Get company
-        first_office = Office.query.filter_by(siret=sirets[0]).first()
+        first_office = Office.query.filter_by(siret=sirets[0]).first() if sirets else None
 
         # Codes ROMES to boost or to add
         if is_valid and form.data.get('romes_to_boost'):
