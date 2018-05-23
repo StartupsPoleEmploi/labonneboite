@@ -537,10 +537,14 @@ def update_offices():
             if office:
                 # Apply changes in DB.
                 office.email = u'' if office_to_update.remove_email else (office_to_update.new_email or office.email)
-                office.email_alternance = u'' if office_to_update.remove_flag_alternance else (office_to_update.email_alternance or u'')
                 office.tel = u'' if office_to_update.remove_phone else (office_to_update.new_phone or office.tel)
                 office.website = u'' if office_to_update.remove_website else (office_to_update.new_website or office.website)
                 office.flag_alternance = False if office_to_update.remove_flag_alternance else office.flag_alternance
+
+                office.email_alternance = u'' if office_to_update.remove_flag_alternance else (office_to_update.email_alternance or u'')
+                office.phone_alternance = u'' if office_to_update.remove_flag_alternance else (office_to_update.phone_alternance or u'')
+                office.website_alternance = u'' if office_to_update.remove_flag_alternance else (office_to_update.website_alternance or u'')
+
                 office.save()
 
                 # Apply changes in ElasticSearch.

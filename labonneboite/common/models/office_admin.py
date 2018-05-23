@@ -117,9 +117,11 @@ class OfficeAdminUpdate(CRUDMixin, Base):
 
     # Info to update.
     new_email = Column(String(191), default='', nullable=False)
-    email_alternance = Column(String(191), default='', nullable=False)
     new_phone = Column(String(191), default='', nullable=False)
     new_website = Column(String(191), default='', nullable=False)
+    email_alternance = Column(String(191), default='', nullable=False)
+    phone_alternance = Column(String(191), default='', nullable=False)
+    website_alternance = Column(String(191), default='', nullable=False)
 
     # Set `boost` to True to promote the office for LBB.
     # Set `boost_alternance` to True to promote the office for alternance.

@@ -50,13 +50,17 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_to_remove',
         'nafs_to_add',
         'new_email',
-        'email_alternance',
         'new_phone',
         'new_website',
         'remove_email',
         'remove_phone',
         'remove_website',
         'remove_flag_alternance',
+
+        'email_alternance',
+        'phone_alternance',
+        'website_alternance',
+
         'requested_by_email',
         'requested_by_first_name',
         'requested_by_last_name',
@@ -79,20 +83,27 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'sirets': u"Sirets",
         'name': u"Nom de l'entreprise",
         'reason': u"Raison",
+
         'boost': u"Booster le score - LBB",
         'romes_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement - LBB",
         'romes_to_remove': u"Retirer des codes ROME associés à une entreprise - LBB",
+
         'boost_alternance': u"Booster le score - Alternance",
         'romes_alternance_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement - Alternance",
         'romes_alternance_to_remove': u"Retirer des codes ROME associés à une entreprise - Alternance",
         'nafs_to_add': u"Ajouter un ou plusieurs NAF à une entreprise",
+
         'new_email': u"Nouvel email",
-        'email_alternance': u"Email dédié à l'alternance",
         'new_phone': u"Nouveau téléphone",
         'new_website': u"Nouveau site web",
-        'remove_email': u"Ne pas afficher l'email",
-        'remove_phone': u"Ne pas afficher le téléphone",
-        'remove_website': u"Ne pas afficher le site web",
+        'remove_email': u"Ne pas afficher l'email (sur LBB et API LBB - l'alternance n'est pas concernée)",
+        'remove_phone': u"Ne pas afficher le téléphone (sur LBB et API LBB - l'alternance n'est pas concernée)",
+        'remove_website': u"Ne pas afficher le site web (sur LBB et API LBB - l'alternance n'est pas concernée)",
+
+        'email_alternance': u"Email dédié à l'alternance",
+        'phone_alternance': u"Téléphone dédié à l'alternance",
+        'website_alternance': u"Site web dédié à l'alternance",
+
         'remove_flag_alternance': u'Ne pas afficher le libellé "Alternance"',
         'requested_by_email': u"Email",
         'requested_by_first_name': u"Prénom",
@@ -160,13 +171,17 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_alternance_to_remove',
         'nafs_to_add',
         'new_email',
-        'email_alternance',
         'new_phone',
         'new_website',
         'remove_email',
         'remove_phone',
         'remove_website',
         'remove_flag_alternance',
+
+        'email_alternance',
+        'phone_alternance',
+        'webiste_alternance',
+
         'requested_by_email',
         'requested_by_first_name',
         'requested_by_last_name',
@@ -199,9 +214,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'new_email': {
             'validators': [validators.optional(), validators.Email()],
         },
-        'email_alternance': {
-            'validators': [validators.optional(), validators.Email()],
-        },
         'new_phone': {
             'filters': [strip_filter, nospace_filter],
             'validators': [validators.optional(), phone_validator],
@@ -210,6 +222,17 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             'filters': [strip_filter],
             'validators': [validators.optional(), validators.URL()],
         },
+
+        'email_alternance': {
+            'validators': [validators.optional(), validators.Email()],
+        },
+        'phone_alternance': {
+            'validators': [validators.optional(), phone_validator],
+        },
+        'webiste_alternance': {
+            'validators': [validators.optional(), validators.URL()],
+        },
+
         'requested_by_email': {
             'validators': [validators.optional(), validators.Email()],
         },
