@@ -349,34 +349,34 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
             romes_alternance_to_boost = office_to_update.as_list(office_to_update.romes_alternance_to_boost)
             romes_alternance_to_remove = office_to_update.as_list(office_to_update.romes_alternance_to_remove)
 
-            rome_codes_alternance = set(naf_rome_codes).union(set(romes_alternance_to_boost)) - set(romes_alternance_to_remove)
+        rome_codes_alternance = set(naf_rome_codes).union(set(romes_alternance_to_boost)) - set(romes_alternance_to_remove)
 
-            for rome_code in rome_codes_alternance:
-                # Manage office boosting - Alternance
-                if office_to_update.boost_alternance:
-                    if not office_to_update.romes_alternance_to_boost:
-                        # Boost the score for all ROME codes.
-                        boosted_alternance_romes[rome_code] = True
-                    elif rome_code in romes_alternance_to_boost:
-                        # Boost the score for some ROME codes only.
-                        boosted_alternance_romes[rome_code] = True
+        for rome_code in rome_codes_alternance:
+            # Manage office boosting - Alternance
+            if office_to_update.boost_alternance:
+                if not office_to_update.romes_alternance_to_boost:
+                    # Boost the score for all ROME codes.
+                    boosted_alternance_romes[rome_code] = True
+                elif rome_code in romes_alternance_to_boost:
+                    # Boost the score for some ROME codes only.
+                    boosted_alternance_romes[rome_code] = True
 
-                # Scoring part
+            # Scoring part
 
-                score_alternance = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                    score=office.score_alternance,
-                    rome_code=rome_code,
-                    naf_code=naf)
+            score_alternance = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                score=office.score_alternance,
+                rome_code=rome_code,
+                naf_code=naf)
 
-                if score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM or rome_code in boosted_alternance_romes:
-                    if rome_code in scores_alternance_by_rome:
-                        # this ROME was already computed before for another NAF
-                        if score_alternance > scores_alternance_by_rome[rome_code]:
-                            # keep highest score for this rome among all possible NAF codes
-                            scores_alternance_by_rome[rome_code] = score_alternance
-                    else:
+            if score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM or rome_code in boosted_alternance_romes:
+                if rome_code in scores_alternance_by_rome:
+                    # this ROME was already computed before for another NAF
+                    if score_alternance > scores_alternance_by_rome[rome_code]:
+                        # keep highest score for this rome among all possible NAF codes
                         scores_alternance_by_rome[rome_code] = score_alternance
-                        st.increment_office_score_alternance_for_rome_count()
+                else:
+                    scores_alternance_by_rome[rome_code] = score_alternance
+                    st.increment_office_score_alternance_for_rome_count()
 
     return scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes
 
