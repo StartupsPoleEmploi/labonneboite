@@ -57,11 +57,15 @@ class OfficeMixin(PrimitiveOfficeMixin):
     in sync.
     """
     website = Column(String(191), default='', nullable=False)
-    email_alternance = Column('email_alternance', String(191), default='', nullable=True)
     flag_alternance = Column(Boolean, default=False, nullable=False)
     flag_junior = Column(Boolean, default=False, nullable=False)
     flag_senior = Column(Boolean, default=False, nullable=False)
     flag_handicap = Column(Boolean, default=False, nullable=False)
+
+    email_alternance = Column('email_alternance', String(191), default='', nullable=True)
+    phone_alternance = Column('phone_alternance', String(191), default='', nullable=True)
+    website_alternance = Column('website_alternance', String(191), default='', nullable=True)
+
     score = Column(Integer, default=0, nullable=False)
     score_alternance = Column(Integer, default=0, nullable=False)
     x = Column('coordinates_x', Float)  # Longitude.
@@ -165,7 +169,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'url': self.get_url_for_rome_code(rome_code, **extra_query_string),
             'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
             'alternance': self.qualifies_for_alternance(),
-            # Warning: the `distance` and `matched_rome` fields are added by `get_companies_from_es_and_db`,
+            # Warning: the `distance`, `boosted` and `matched_rome` fields are added by `get_companies_from_es_and_db`,
             # they are NOT model fields or properties!
             'distance': self.distance,
         }
