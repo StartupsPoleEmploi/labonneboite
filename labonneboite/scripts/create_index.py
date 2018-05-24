@@ -353,7 +353,7 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
 
         for rome_code in rome_codes_alternance:
             # Manage office boosting - Alternance
-            if office_to_update.boost_alternance:
+            if office_to_update and office_to_update.boost_alternance:
                 if not office_to_update.romes_alternance_to_boost:
                     # Boost the score for all ROME codes.
                     boosted_alternance_romes[rome_code] = True
