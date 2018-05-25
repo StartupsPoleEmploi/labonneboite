@@ -40,12 +40,10 @@
     opacity: 0.5;
 }
 
-img.modal-close-button {
+.modal-close-button {
     position: absolute;
-    float: right;
     top: 15px;
     right: 15px;
-    width: 25px;
     cursor: pointer;
     z-index: 110;
 }
