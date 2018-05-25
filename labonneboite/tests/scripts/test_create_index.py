@@ -369,6 +369,27 @@ class RemoveOfficesTest(CreateIndexBaseTest):
 
 
 class UpdateOfficesTest(CreateIndexBaseTest):
+
+    def test_no_update_no_company_removal(self):
+        """
+        No updates done, scores_by_romes and scores_alternance_by_rome should not be impacted
+        Related to a previous bug where some scores where removed.
+        """
+        # No romes removed when computing scores
+        with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0), mock.patch.object(script.scoring_util, 'SCORE_ALTERNANCE_FOR_ROME_MINIMUM', 0):
+            script.update_offices()
+
+        for office in [self.office1, self.office2]:
+            romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(office.naf)]
+            res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
+
+            self.assertIn('scores_by_rome', res['_source'])
+            self.assertIn('scores_alternance_by_rome', res['_source'])
+
+            self.assertTrue(len(romes_for_office), len(res['_source']['scores_by_rome']))
+            self.assertTrue(len(romes_for_office), len(res['_source']['scores_alternance_by_rome']))
+
+
     """
     Test update_offices().
     """
