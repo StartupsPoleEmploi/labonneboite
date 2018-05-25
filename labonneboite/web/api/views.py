@@ -408,7 +408,7 @@ def check_integer_argument(args, name, default_value):
     return value
 
 
-@apiBlueprint.route('/office/<siret>/details', methods=['GET'])
+@apiBlueprint.route('/office/<siret>/details')
 @api_auth_required
 def office_details_lbb(siret):
     """
@@ -417,7 +417,7 @@ def office_details_lbb(siret):
     return get_office_details(siret)
 
 
-@apiBlueprint.route('/office/<siret>/details-alternance', methods=['GET'])
+@apiBlueprint.route('/office/<siret>/details-alternance')
 @api_auth_required
 def office_details_alternance(siret):
     """
@@ -431,18 +431,18 @@ def get_office_details(siret, alternance=False):
     if not office:
         abort(404)
 
-    # Alternance
+    # If a office.score_alternance=0 (meaning removed for alternance),
+    # it should not be accessible by siret on alternance context
     if alternance and not office.score_alternance:
         abort(404)
 
-    # LBB
+    # If a office.score=0 (meaning removed),
+    # it should not be accessible by siret
     if not alternance and not office.score:
         abort(404)
 
     # If alternance flag, we use an other URL
-    url = office.url
-    if alternance:
-        url = '{}-alternance'.format(url)
+    url = office.url_alternance if alternance else office.url
 
     result = {
         'headcount_text': office.headcount_text,
@@ -471,7 +471,7 @@ def patch_company_result_with_sensitive_information(api_username, office, result
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
     if api_username in settings.API_INTERNAL_CONSUMERS:
-        result['email'] = office.email_alternance if alternance else office.email
+        result['email'] = office.email_alternance if alternance and office.email_alternance else office.email
         result['phone'] = office.tel
         result['website'] = office.website
     return result

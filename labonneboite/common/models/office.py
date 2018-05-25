@@ -299,6 +299,13 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         return self.get_url_for_rome_code(None)
 
+    @property
+    def url_alternance(self):
+        """
+        Returns the URL of the `details-alternance` page or `None` if we are outside of a Flask's application context.
+        """
+        return '{}-alternance'.format(self.get_url_for_rome_code(None))
+
     def get_url_for_rome_code(self, rome_code, **query_string):
         try:
             if rome_code:
