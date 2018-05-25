@@ -414,7 +414,6 @@ def office_details(siret):
     """
     Returns the details of an office for the given <siret> number.
     """
-    import ipdb; ipdb.set_trace()
     alternance = 'contract' in request.args and request.args['contract'] == 'alternance'
     return get_office_details(siret, alternance)
 

@@ -72,7 +72,7 @@
     <a
       class="memo-import-button"
       data-intro-js="1"
-      data-url="{{ url_for('api.office_details_lbb', siret=company.siret, _external=True) }}"
+      data-url="{{ url_for('api.office_details', siret=company.siret, _external=True) }}"
       {% if rome_description %}data-job="{{ rome_description }}"{% endif %}
       data-height="31"
       data-width="180"><!-- Empty on purpose. -->
