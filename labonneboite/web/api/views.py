@@ -443,6 +443,7 @@ def office_details(siret):
 def patch_company_result_with_sensitive_information(api_username, office, result):
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
+    # TODO
     if api_username in settings.API_INTERNAL_CONSUMERS:
         result['email'] = office.email
         result['phone'] = office.tel
