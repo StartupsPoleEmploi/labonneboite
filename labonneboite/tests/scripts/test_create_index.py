@@ -560,7 +560,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office_to_update = OfficeAdminUpdate(
             sirets=self.office1.siret,
             name=self.office1.company_name,
-            new_score_alternance=0,
+            score_alternance=0,
         )
 
         office = Office.get(self.office1.siret)
@@ -583,7 +583,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office_to_update = OfficeAdminUpdate(
             sirets=self.office1.siret,
             name=self.office1.company_name,
-            new_score=0,
+            score=0,
         )
 
         office = Office.get(self.office1.siret)

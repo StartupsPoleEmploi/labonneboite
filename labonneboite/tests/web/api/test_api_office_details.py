@@ -77,7 +77,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         # Note : we use 00000000000011 because score>50 & score_alternance>50
         office_to_update = OfficeAdminUpdate(
             sirets=siret,
-            new_score_alternance=0,
+            score_alternance=0,
         )
 
         office_to_update.save(commit=True)
@@ -102,7 +102,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         # Note : we use 00000000000011 because score>50 & score_alternance>50
         office_to_update = OfficeAdminUpdate(
             sirets=siret,
-            new_score=0,
+            score=0,
         )
 
         office_to_update.save(commit=True)
