@@ -147,7 +147,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'remove_email': u"Cocher cette case pour supprimer l'email",
         'remove_phone': u"Cocher cette case pour supprimer le téléphone",
         'remove_website': u"Cocher cette case pour supprimer le site web",
-        'score': u"Nouveau score (si 0 : suppression de l'entreprise sur LBB : API et Front - mais l'API LBA !)",
+        'score': u"Nouveau score (si 0 : suppression de l'entreprise sur LBB mais pas LBA)",
         'score_aternance': u"Nouveau score alternance (si 0 : suppression de l'entreprise pour l'alternance)",
         'reason': u"Raison de la modification.",
     }

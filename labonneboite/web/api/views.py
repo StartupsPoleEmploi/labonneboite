@@ -163,7 +163,7 @@ def compute_frontend_url(fetcher, query_string, commune_id):
             'search.results_by_commune_and_rome',
             commune_id=commune_id,
             # FIXME One day frontend will support multi rome, one day...
-            # In the meantime we just provide the URL for the first rome in the list. 
+            # In the meantime we just provide the URL for the first rome in the list.
             rome_id=fetcher.romes[0],
             _external=True,
             **query_string
@@ -410,20 +410,13 @@ def check_integer_argument(args, name, default_value):
 
 @apiBlueprint.route('/office/<siret>/details')
 @api_auth_required
-def office_details_lbb(siret):
+def office_details(siret):
     """
     Returns the details of an office for the given <siret> number.
     """
-    return get_office_details(siret)
-
-
-@apiBlueprint.route('/office/<siret>/details-alternance')
-@api_auth_required
-def office_details_alternance(siret):
-    """
-    Returns the details of an office for the given <siret> number (with alternance infos).
-    """
-    return get_office_details(siret, alternance=True)
+    import ipdb; ipdb.set_trace()
+    alternance = 'contract' in request.args and request.args['contract'] == 'alternance'
+    return get_office_details(siret, alternance)
 
 
 def get_office_details(siret, alternance=False):

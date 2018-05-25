@@ -302,9 +302,9 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     @property
     def url_alternance(self):
         """
-        Returns the URL of the `details-alternance` page or `None` if we are outside of a Flask's application context.
+        Returns the URL of `La Bonne Alternance` page or `None` if we are outside of a Flask's application context.
         """
-        return '{}-alternance'.format(self.get_url_for_rome_code(None))
+        return 'https://labonnealternance.pole-emploi.fr/details-entreprises/{}'.format(self.siret)
 
     def get_url_for_rome_code(self, rome_code, **query_string):
         try:
