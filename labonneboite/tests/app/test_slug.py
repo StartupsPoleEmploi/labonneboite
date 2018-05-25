@@ -86,3 +86,29 @@ class SlugDetailsTest(AppTest):
             self.assertEqual(data['city']['name'], u'Nantes')
             self.assertEqual(data['city']['latitude'], 47.235456880128645)
             self.assertEqual(data['city']['longitude'], -1.5498348824858057)
+
+
+class CityCodeDetailsTest(AppTest):
+
+    def test_ok_city_code(self):
+        with self.test_request_context:
+            rv = self.app.get('{}?city-code={}'.format(
+                url_for("search.city_code_details"),
+                '44109',
+            ))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data)
+            self.assertEqual(data['city']['name'], u'Nantes')
+            self.assertEqual(data['city']['slug'], u'nantes-44000')
+            self.assertEqual(data['city']['latitude'], 47.235456880128645)
+            self.assertEqual(data['city']['longitude'], -1.5498348824858057)
+
+
+    def test_error_if_invalid_city_code(self):
+        with self.test_request_context:
+            rv = self.app.get('{}?city-code={}'.format(
+                url_for("search.city_code_details"),
+                'INVALID_CODE',
+            ))
+            self.assertEqual(rv.status_code, 400)
+            self.assertEqual(rv.data, 'no city found associated to the code INVALID_CODE')

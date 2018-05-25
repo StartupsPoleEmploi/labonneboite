@@ -84,7 +84,6 @@ def city_slug_details():
     Endpoint used by La Bonne Alternance only.
 
     Required parameter:
-
         city-slug (str): must take the form "slug-zipcode"
 
     Note that if the slug does not match the zipcode, the returned result will be incorrect.
@@ -106,6 +105,32 @@ def city_slug_details():
         'name': city_location.name,
         'longitude': city_location.location.longitude,
         'latitude': city_location.location.latitude,
+    }
+    return make_response(json.dumps(result))
+
+
+@searchBlueprint.route('/city_code_details')
+def city_code_details():
+    """
+    Endpoint used by La Bonne Alternance only.
+    Required parameter:
+        city-code (str)
+    """
+    result = {}
+
+    city_code = request.args.get('city-code', '')
+    if not city_code:
+        return u'no city-code given', 400
+
+    city = geocoding.get_city_by_commune_id(city_code)
+    if not city:
+        return u'no city found associated to the code {}'.format(city_code), 400
+
+    result['city'] = {
+        'name': city['name'],
+        'slug': '{}-{}'.format(city['slug'], city['zipcode']),
+        'longitude': city['coords']['lon'],
+        'latitude': city['coords']['lat'],
     }
 
     return make_response(json.dumps(result))
