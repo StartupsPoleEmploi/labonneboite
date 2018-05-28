@@ -392,6 +392,8 @@ def get_score_for_rome_field_name(hiring_type, rome_code):
     }[hiring_type] % rome_code
 
 def get_boosted_rome_field_name(hiring_type, rome_code):
+    hiring_type = hiring_type or hiring_type_util.DEFAULT
+
     return {
         hiring_type_util.DPAE: "boosted_romes.%s",
         hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s",
@@ -685,6 +687,8 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         # An API request would have already raised a InvalidFetcherArgument exception,
         # and a Frontend request would have fallbacked to default sorting.
         raise ValueError("unknown sorting : %s" % sort)
+
+
 
     es = Elasticsearch()
     logger.info("Elastic Search request : %s", json_body)
