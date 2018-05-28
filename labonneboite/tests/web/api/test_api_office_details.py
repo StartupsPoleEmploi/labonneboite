@@ -88,7 +88,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         rv = self.app.get('/api/v1/office/%s/details?%s' % (siret, urlencode(params)))
         self.assertEqual(rv.status_code, 200)
 
-        params.update({'contract':'alternance'})
+        params = self.add_security_params({'user': u'emploi_store_dev', 'contract':'alternance'})
         rv = self.app.get('/api/v1/office/%s/details?%s' % (siret, urlencode(params)))
         self.assertEqual(rv.status_code, 404)
 
@@ -114,6 +114,6 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         rv = self.app.get('/api/v1/office/%s/details?%s' % (siret, urlencode(params)))
         self.assertEqual(rv.status_code, 404)
 
-        params.update({'contract':'alternance'})
+        params = self.add_security_params({'user': u'emploi_store_dev', 'contract':'alternance'})
         rv = self.app.get('/api/v1/office/%s/details?%s' % (siret, urlencode(params)))
         self.assertEqual(rv.status_code, 200)
