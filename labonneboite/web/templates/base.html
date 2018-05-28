@@ -144,9 +144,12 @@
             </a>
             <div class="lbb-dropdown lbb-dropdown-right text-right">
               <p>
-                <a href="{{ url_for('user.account') }}"><b>{{ user.first_name | title }} {{ user.last_name }}</b></a>
+                <b>{{ user.first_name | title }} {{ user.last_name }}</b>
               </p>
               <ul>
+                <li>
+                  <a href="{{ url_for('user.account') }}">Mon compte</a>
+                </li>
                 <li>
                   <a href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
                 </li>

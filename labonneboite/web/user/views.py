@@ -3,7 +3,8 @@
 import urllib
 
 from flask import Blueprint, Markup
-from flask import abort, current_app, flash, redirect, render_template, request, url_for
+from flask import abort, current_app, flash, make_response
+from flask import redirect, render_template, request, url_for
 
 import flask_login
 from flask_login import current_user
@@ -74,11 +75,51 @@ def account_delete():
     return render_template('user/account_delete.html', **context)
 
 
+@userBlueprint.route('/account/download/csv', methods=['GET'])
+@flask_login.login_required
+def personal_data_as_csv():
+    """
+    Download as a CSV the personal data of a user.
+    """
+    attachment_name = u'mes_données_personnelles.csv'
+
+    header_row = u'prénom,nom,email'
+    values = [
+        current_user.first_name,
+        current_user.last_name,
+        current_user.email,
+    ]
+    content_row = ",".join(values)
+    csv_text = "%s\r\n%s" % (header_row, content_row)
+
+    # Return csv file
+    response = make_response(csv_text)
+    response.headers['Content-Type'] = 'application/csv'
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
+    return response
+
+
+@userBlueprint.route('/favorites/list/download/csv', methods=['GET'])
+@flask_login.login_required
+def favorites_list_as_csv():
+    """
+    Download as a CSV the list of the favorited offices of a user.
+    """
+    favorites_as_csv = UserFavoriteOffice.user_favs_as_csv(current_user)
+    attachment_name = u'mes_favoris.csv'
+
+    # Return csv file
+    response = make_response(favorites_as_csv)
+    response.headers['Content-Type'] = 'application/csv'
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
+    return response
+
+
 @userBlueprint.route('/favorites/list', methods=['GET'])
 @flask_login.login_required
 def favorites_list():
     """
-    List the favorites offices of a user.
+    List the favorited offices of a user.
     """
     try:
         page = int(request.args.get('page'))

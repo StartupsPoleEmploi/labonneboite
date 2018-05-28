@@ -11,13 +11,13 @@ from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
 
 
-class DeleteUserAccountTest(DatabaseTest):
+class UserAccountTest(DatabaseTest):
 
     def setUp(self, *args, **kwargs):
         """
-        Populate the DB with data required for this test to work.
+        Populate the DB with data required for these tests to work.
         """
-        super(DeleteUserAccountTest, self).setUp(*args, **kwargs)
+        super(UserAccountTest, self).setUp(*args, **kwargs)
 
         self.user = User(email=u'john@doe.com', gender=u'male', first_name=u'John', last_name=u'Doe')
         db_session.add(self.user)
@@ -66,6 +66,22 @@ class DeleteUserAccountTest(DatabaseTest):
         self.assertEquals(db_session.query(Office).count(), 2)
         self.assertEquals(db_session.query(UserFavoriteOffice).count(), 2)
         self.assertEquals(db_session.query(UserSocialAuth).count(), 1)
+
+    def test_download_user_personal_data(self):
+        """
+        Test the download of personal data.
+        """
+
+        url = self.url_for('user.personal_data_as_csv')
+
+        with self.test_request_context:
+
+            self.login(self.user)
+
+            # Display the account deletion confirmation page.
+            rv = self.app.get(url)
+            self.assertEqual(rv.status_code, 200)
+            self.assertIn(u'john@doe.com', rv.data.decode('utf-8'))
 
     @mock.patch.object(settings, 'PEAM_AUTH_BASE_URL', 'http://peamauthbaseurl.com')
     def test_delete_user_account(self):
