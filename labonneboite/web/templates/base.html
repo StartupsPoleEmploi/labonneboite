@@ -46,12 +46,64 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   {% endif %}
 
-  <div class="cookies-banner">
-    <p>Les cookies assurent le bon fonctionnement de nos services. En utilisant ces derniers, vous acceptez l'utilisation des cookies.</p>
+  <div id="modal-overlay" class="modal-overlay modal-closed"></div>
+  <div id="rgpd-modal" class="modal modal-closed">
+    <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
+    <div class="modal-content modal-content-inner">
+      <h4 class="text-center">
+        Politique de confidentialité et utilisation de vos données personnelles
+      </h4>
+
+      <p>
+        Pour utiliser le service La Bonne Boite, vous devez accepter la Politique de confidentialité de La Bonne Boite.
+      </p>
+
+      <p>
+        Sans ce consentement, vous ne serez pas en mesure d'utiliser le service La Bonne Boite.
+      </p>
+
+      <p>
+        La Bonne Boite dépose des cookies nécessaires au bon fonctionnement du site :<br>
+        <ul>
+          <li>des cookies de mesure d'audience via les sites Google Analytics et Hotjar</li>
+          <li>des cookies techniques pour permettre l'enregistrement de vos préférences ou de l'état de votre interface</li>
+        </ul>
+      </p>
+
+      <p>
+        Dans le cas où vous vous identifiez via PE Connect, voici les informations recueillies par le site La Bonne Boite :<br>
+        <ul>
+          <li>Données relatives à votre compte La Bonne Boite (dates de connexion, liste de vos entreprises favorites)</li>
+          <li>Données relatives à votre compte Pôle emploi connect (adresse postale, ROME d'inscription)</li>
+          <li>Données relatives à votre navigateur</li>
+          <li>Dans le cas où vous utilisez le service Tilkee d'upload de CV, vos fichiers seront uploadés sur le service de stockage S3 de la société Amazon Web Services</li>
+        </ul>
+      </p>
+
+      <p>
+        Toutes ces informations ont pour but d'assurer le bon fonctionnement du site et nous permettent également d'améliorer l'intérêt et l'ergonomie de nos services.
+      </p>
+
+      <p>
+        Pôle emploi et La Bonne Boite s'engagent à ne pas communiquer vos données personnelles à des organismes tiers.
+      </p>
+
+      <p class="text-center ">
+        <button type="button" class="btn rgpd-accept">Accepter</button>
+        <button type="button" class="btn rgpd-reject">Refuser</button>
+      </p>
+
+    </div>
+  </div>
+
+  <div class="rgpd-banner">
+    <p>En poursuivant votre navigation sur ce site, vous acceptez nos conditions d'utilisation de vos données personnelles (RGPD).</p>
     <p>
-      <a href="{{ url_for('root.cgu') }}">En savoir plus</a>
+      <a href="#" class="rgpd-accept"><b>Accepter</b></a>
       -
-      <a href="#" class="cookies-accept"><b>J'ai compris</b></a>
+      <a href="#" class="rgpd-info">En savoir plus</a>
+      -
+      <a href="#" class="rgpd-reject"><b>Refuser</b></a>
     </p>
   </div>
 
@@ -79,7 +131,7 @@
             </a>
             <div class="lbb-dropdown lbb-dropdown-right text-right">
               <p>
-                <a class="logo-pe-connect" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ request.url | urlencode }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Pôle emploi Connect"></a><br>
+                <a class="logo-pe-connect rgpd-consent-required" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ request.url | urlencode }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Pôle emploi Connect"></a><br>
                 <i>Connectez-vous à La Bonne Boite en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
               </p>
             </div>
@@ -188,6 +240,9 @@
           <a href="{{ url_for('root.press') }}" title="Contenu à destination de la presse">Espace Presse</a>
         </li>
         <li>
+          <a href="#" class="rgpd-info" title="Politique de confidentialité et utilisation de vos données personnelles (R.G.P.D)">R.G.P.D</a>
+        </li>
+        <li>
           <span class="js-obfuscated-email">rf.iolpme-elop@etiobennobal</span>
         </li>
         {% if pro_version_enabled %}
@@ -240,6 +295,13 @@
     {% if enable_google_optimize %}
       ga('require', '{{ google_optimize_id }}');  {# GO activation, see explanation above #}
     {% endif %}
+
+    // anonymize IP address in GA if RGPD consent is rejected
+    if (userHasOptOutRGPD() === true) {
+      // https://developers.google.com/analytics/devguides/collection/analyticsjs/ip-anonymization
+      ga('set', 'anonymizeIp', true);
+    }
+
     ga('send', 'pageview');
 
     ga('set', 'dimension1', {{ 1 if pro_version_enabled else 0 }});
@@ -249,15 +311,18 @@
 
   {# Hotjar Tracking Code for labonneboite.pole-emploi.fr #}
   <script type="text/javascript">
-    (function(h,o,t,j,a,r){
-        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-        h._hjSettings={hjid:381821,hjsv:5};
-        a=o.getElementsByTagName('head')[0];
-        r=o.createElement('script');r.async=1;
-        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-        a.appendChild(r);
-    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
-    hj('tagRecording', ['{{ hotjar_tag }}']);
+    // disable Hotjar if RGPD consent is rejected
+    if (userHasOptOutRGPD() === false) {
+      (function(h,o,t,j,a,r){
+          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+          h._hjSettings={hjid:381821,hjsv:5};
+          a=o.getElementsByTagName('head')[0];
+          r=o.createElement('script');r.async=1;
+          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+          a.appendChild(r);
+      })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+      hj('tagRecording', ['{{ hotjar_tag }}']);
+    }
   </script>
 
   {# Memo button code https://memo.pole-emploi.fr/jsp/testButton.jsp #}
