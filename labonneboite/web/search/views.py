@@ -208,15 +208,23 @@ def entreprises():
     selected company search form.
     """
     session['search_args'] = request.args
-
     location, named_location = get_location(request.args)
+
     occupation = request.args.get('occupation', '')
+    if not occupation and 'j' in request.args:
+        suggestion = search_util.build_job_label_suggestions(request.args['j'], size=1)
+        occupation = suggestion[0]['occupation'] if suggestion else None
+
     rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
     job_doesnt_exist = not rome
 
     # Build form
     form_kwargs = {key: val for key, val in request.args.items() if val}
     form_kwargs['j'] = settings.ROME_DESCRIPTIONS.get(rome, occupation)
+
+    if 'occupation' not in form_kwargs:
+        form_kwargs['occupation'] = occupation
+
     if 'l' not in form_kwargs and named_location:
         # Override form location only if it is not available (e.g when user has
         # removed it from the url)
