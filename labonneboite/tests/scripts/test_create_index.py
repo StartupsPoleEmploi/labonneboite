@@ -553,7 +553,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             if rome != u"D1507":
                 self.assertNotIn(rome, res['_source']['boosted_romes'])
 
-    def test_update_office_add_email_alternance(self):
+    def test_update_office_add_alternance_infos(self):
         """
         Test `update_offices` to add an email for alternance
         """
@@ -564,12 +564,16 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             sirets=self.office1.siret,
             name=self.office1.company_name,
             email_alternance=u"email_alternance@mail.com",
+            phone_alternance=u"0699999999",
+            website_alternance=u"http://example-alternance.com",
         )
         office_to_update.save(commit=True)
         script.update_offices()
 
         office = Office.get(self.office1.siret)
         self.assertEquals(office.email_alternance, "email_alternance@mail.com")
+        self.assertEquals(office.phone_alternance, "0699999999")
+        self.assertEquals(office.website_alternance, "http://example-alternance.com")
 
     def test_update_office_remove_alternance(self):
         """
@@ -655,6 +659,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             sirets='\n'.join(sirets),
             name="Supermarché",
             email_alternance=u"email_alternance@mail.com",
+            phone_alternance=u"0699999999",
+            website_alternance=u"http://example-alternance.com",
         )
         office_to_update.save(commit=True)
         script.update_offices()
@@ -662,6 +668,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         for siret in sirets:
             office = Office.get(siret)
             self.assertEquals(office.email_alternance, "email_alternance@mail.com")
+            self.assertEquals(office.phone_alternance, "0699999999")
+            self.assertEquals(office.website_alternance, "http://example-alternance.com")
 
 
     def test_boost_multi_siret(self):
