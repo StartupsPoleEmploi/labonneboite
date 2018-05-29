@@ -25,7 +25,7 @@ from labonneboite.web.office.forms import OfficeRemovalForm
 officeBlueprint = Blueprint('office', __name__)
 
 
-@officeBlueprint.route('/<siret>/details', methods=['GET'])
+@officeBlueprint.route('/<siret>/details')
 def details(siret):
     """
     Display the details of an office.
@@ -42,7 +42,7 @@ def details(siret):
     return render_template('office/details.html', **context)
 
 
-@officeBlueprint.route('/verification-informations-entreprise/<siret>', methods=['GET'])
+@officeBlueprint.route('/verification-informations-entreprise/<siret>')
 def change_info_or_apply_for_job(siret):
     """
     Ask user if he wants to change company information or apply for a job,
@@ -52,7 +52,7 @@ def change_info_or_apply_for_job(siret):
     return render_template('office/change_info_or_apply_for_job.html', siret=siret)
 
 
-@officeBlueprint.route('/postuler/<siret>', methods=['GET'])
+@officeBlueprint.route('/postuler/<siret>')
 def apply_for_job(siret):
     """
     If user arrives here, it means we successfully avoided having him spam the

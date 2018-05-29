@@ -60,6 +60,22 @@ function userHasNotYetDecidedRGPD() {
       }
     });
 
+    $('.rgpd-account-download-personal').on('click', function (e) {
+      ga('send', 'event', 'RGPD', 'account-download-personal');
+    });
+
+    $('.rgpd-account-download-favorites').on('click', function (e) {
+      ga('send', 'event', 'RGPD', 'account-download-favorites');
+    });
+
+    $('.rgpd-account-delete-attempt').on('click', function (e) {
+      ga('send', 'event', 'RGPD', 'account-delete-attempt');
+    });
+
+    $('.rgpd-account-delete-confirm').on('click', function (e) {
+      ga('send', 'event', 'RGPD', 'account-delete-confirm');
+    });
+
   });
 
 })(jQuery);

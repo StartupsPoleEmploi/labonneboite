@@ -23,9 +23,9 @@
 
     <p>
       Télécharger au format CSV
-      <a href="{{ url_for('user.personal_data_as_csv') }}" onClick="ga('send', 'event', 'RGPD', 'download-personal-data');">mes données personnelles</a>
+      <a href="{{ url_for('user.personal_data_as_csv') }}" class="rgpd-account-download-personal">mes données personnelles</a>
       et
-      <a href="{{ url_for('user.favorites_list_as_csv') }}" onClick="ga('send', 'event', 'RGPD', 'download-favorites');">mes favoris</a>
+      <a href="{{ url_for('user.favorites_list_as_csv') }}" class="rgpd-account-download-favorites">mes favoris</a>
     </p>
 
     <hr>
@@ -33,7 +33,7 @@
     <h3>Supprimer mon compte et mes données (droit à l'oubli)</h3>
 
     <p>
-      <a href="{{ url_for('user.account_delete') }}" onClick="ga('send', 'event', 'RGPD', 'delete-account-attempt');">Supprimer mon compte et mes données</a>
+      <a href="{{ url_for('user.account_delete') }}" class="rgpd-account-delete-attempt">Supprimer mon compte et mes données</a>
     </p>
 
   </div>

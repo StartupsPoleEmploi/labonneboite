@@ -13,7 +13,7 @@ from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
 authBlueprint = Blueprint('auth', __name__)
 
 
-@authBlueprint.route('/logout', methods=['GET'])
+@authBlueprint.route('/logout')
 def logout(user_social_auth=None):
     """
     Log a user out.
@@ -53,7 +53,7 @@ def logout(user_social_auth=None):
     return redirect(url_for('root.home'))
 
 
-@authBlueprint.route('/logout/peam/callback', methods=['GET'])
+@authBlueprint.route('/logout/peam/callback')
 def logout_from_peam_callback():
     """
     The route where a user is redirected after a log out through the PEAM website.

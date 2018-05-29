@@ -79,7 +79,7 @@ class UserFavoriteOffice(CRUDMixin, Base):
 
     @classmethod
     def as_csv_header_row(cls):
-        return u'siret,nom,adresse,ville,url'
+        return u'siret;nom;adresse;ville;url'
 
     def as_csv_row(self):
         values = [
@@ -90,5 +90,5 @@ class UserFavoriteOffice(CRUDMixin, Base):
             self.office.city,
             self.office.url,
         ]
-        return ",".join(values)
+        return ";".join(values)
 

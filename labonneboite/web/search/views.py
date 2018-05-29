@@ -27,14 +27,14 @@ from labonneboite.web.search.forms import make_company_search_form
 searchBlueprint = Blueprint('search', __name__)
 
 
-@searchBlueprint.route('/suggest_job_labels', methods=['GET'])
+@searchBlueprint.route('/suggest_job_labels')
 def suggest_job_labels():
     term = request.args.get('term', '')
     suggestions = search_util.build_job_label_suggestions(term)
     return make_response(json.dumps(suggestions))
 
 
-@searchBlueprint.route('/suggest_locations', methods=['GET'])
+@searchBlueprint.route('/suggest_locations')
 def suggest_locations():
     term = request.args.get('term', '')
     suggestions = search_util.build_location_suggestions(term)
@@ -384,7 +384,7 @@ def get_location(request_args):
     return location, named_location
 
 
-@searchBlueprint.route('/entreprises/commune/<commune_id>/rome/<rome_id>', methods=['GET'])
+@searchBlueprint.route('/entreprises/commune/<commune_id>/rome/<rome_id>')
 def results_by_commune_and_rome(commune_id, rome_id):
     """
     Convenience function to be used by Pôle Emploi, Bob Emploi and other partners

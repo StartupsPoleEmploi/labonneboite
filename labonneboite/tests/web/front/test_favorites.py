@@ -139,8 +139,8 @@ class FavoriteTest(FavoriteBaseTest):
             rv = self.app.get(url)
             self.assertEqual(rv.status_code, 200)
             self.assertEqual('application/csv', rv.mimetype)
-            self.assertTrue(u'siret' in rv.data.decode('utf-8'))
-            self.assertTrue(office.siret in rv.data.decode('utf-8'))
+            self.assertIn(u'siret', rv.data.decode('utf-8'))
+            self.assertIn(office.siret, rv.data.decode('utf-8'))
 
 
     def test_favorites_list(self):

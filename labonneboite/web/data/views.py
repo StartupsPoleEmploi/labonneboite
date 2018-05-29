@@ -13,7 +13,7 @@ from labonneboite.web.data.forms import NafForm, RomeForm, SiretForm
 dataBlueprint = Blueprint('data', __name__)
 
 
-@dataBlueprint.route('/', methods=['GET'])
+@dataBlueprint.route('/')
 def home():
     """
     A convenience route, so the user can just enter the URL `/data` to easily access underlying views.
@@ -21,7 +21,7 @@ def home():
     return redirect(url_for('data.romes_for_naf'))
 
 
-@dataBlueprint.route('/romes-for-naf', methods=['GET'])
+@dataBlueprint.route('/romes-for-naf')
 def romes_for_naf():
     """
     Find ROME codes associated with a given NAF code.
@@ -46,7 +46,7 @@ def romes_for_naf():
     return render_template('data/romes_for_naf.html', **context)
 
 
-@dataBlueprint.route('/nafs-for-rome', methods=['GET'])
+@dataBlueprint.route('/nafs-for-rome')
 def nafs_for_rome():
     """
     Find NAF codes associated with a given ROME code.
@@ -72,7 +72,7 @@ def nafs_for_rome():
     return render_template('data/nafs_for_rome.html', **context)
 
 
-@dataBlueprint.route('/romes-for-siret', methods=['GET'])
+@dataBlueprint.route('/romes-for-siret')
 def romes_for_siret():
     """
     Find ROME codes associated with a given SIRET.
