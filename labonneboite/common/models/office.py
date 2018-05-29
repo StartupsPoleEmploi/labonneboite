@@ -3,6 +3,8 @@
 from __future__ import division
 import logging
 from babel.dates import format_date
+from urllib import urlencode
+
 
 from slugify import slugify
 
@@ -150,6 +152,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         else:                         # multi rome search context
             rome_code = self.matched_rome
 
+        alternance = hiring_type == hiring_type_util.ALTERNANCE
+
         extra_query_string = extra_query_string or {}
         json = {
             'address': self.address_as_text,
@@ -162,7 +166,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'name': self.name,
             'siret': self.siret,
             'stars': self.get_stars_for_rome_code(rome_code, hiring_type),
-            'url': self.get_url_for_rome_code(rome_code, **extra_query_string),
+            'url':  self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
             'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
             'alternance': self.qualifies_for_alternance(),
             # Warning: the `distance` and `matched_rome` fields are added by `get_companies_from_es_and_db`,
@@ -299,7 +303,17 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         return self.get_url_for_rome_code(None)
 
-    def get_url_for_rome_code(self, rome_code, **query_string):
+    @property
+    def url_alternance(self):
+        """
+        Returns the URL of `La Bonne Alternance` page or `None` if we are outside of a Flask's application context.
+        """
+        return 'https://labonnealternance.pole-emploi.fr/details-entreprises/{}'.format(self.siret)
+
+    def get_url_for_rome_code(self, rome_code, alternance=False, **query_string):
+        if alternance:
+            return '{}?{}'.format(self.url_alternance, urlencode(query_string))
+
         try:
             if rome_code:
                 return url_for('office.details', siret=self.siret, rome_code=rome_code, _external=True, **query_string)

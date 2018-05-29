@@ -228,6 +228,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], u'00000000000011')
             self.assertTrue(data['companies'][0]['alternance'])
+            self.assertIn('https://labonnealternance.pole-emploi.fr/details-entreprises/', data['companies'][0]['url'])
 
     def test_missing_communeid_or_latitudelongitude(self):
         with self.test_request_context:
@@ -238,7 +239,7 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(
-                rv.data, 
+                rv.data,
                 u'Invalid request argument: missing arguments: either commune_id or latitude and longitude'
             )
 
