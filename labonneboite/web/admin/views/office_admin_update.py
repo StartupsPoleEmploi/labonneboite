@@ -180,7 +180,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
         'email_alternance',
         'phone_alternance',
-        'webiste_alternance',
+        'website_alternance',
 
         'requested_by_email',
         'requested_by_first_name',
@@ -229,7 +229,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'phone_alternance': {
             'validators': [validators.optional(), phone_validator],
         },
-        'webiste_alternance': {
+        'website_alternance': {
             'validators': [validators.optional(), validators.URL()],
         },
 
