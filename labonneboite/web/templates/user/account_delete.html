@@ -22,7 +22,7 @@
       </p>
     </div>
 
-    <form class="form-vertical" action="{{ url_for('user.account_delete') }}" method="post">
+    <form class="form-vertical" action="{{ url_for('user.account_delete') }}" method="post" onsubmit="ga('send', 'event', 'RGPD', 'delete-account-confirm');">
       {{ form.hidden_tag() }}
       <div class="lbb-dropdown-wrapper">
         <a class="btn btn-error" href="#">Supprimer définitivement mon compte ▴</a>
