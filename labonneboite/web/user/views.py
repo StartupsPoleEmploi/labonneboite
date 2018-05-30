@@ -3,7 +3,8 @@
 import urllib
 
 from flask import Blueprint, Markup
-from flask import abort, current_app, flash, redirect, render_template, request, url_for
+from flask import abort, current_app, flash, make_response
+from flask import redirect, render_template, request, url_for
 
 import flask_login
 from flask_login import current_user
@@ -25,7 +26,7 @@ from labonneboite.web.user.forms import UserAccountDeleteForm
 userBlueprint = Blueprint('user', __name__)
 
 
-@userBlueprint.route('/account', methods=['GET'])
+@userBlueprint.route('/account')
 @flask_login.login_required
 def account():
     """
@@ -74,11 +75,52 @@ def account_delete():
     return render_template('user/account_delete.html', **context)
 
 
-@userBlueprint.route('/favorites/list', methods=['GET'])
+@userBlueprint.route('/account/download/csv')
+@flask_login.login_required
+def personal_data_as_csv():
+    """
+    Download as a CSV the personal data of a user.
+    """
+    header_row = u'prénom;nom;email'
+    values = [
+        current_user.first_name,
+        current_user.last_name,
+        current_user.email,
+    ]
+    content_row = ";".join(values)
+    csv_text = "%s\r\n%s" % (header_row, content_row)
+
+    return make_csv_response(
+        csv_text=csv_text,
+        attachment_name=u'mes_données_personnelles.csv',
+    )
+
+
+@userBlueprint.route('/favorites/list/download/csv')
+@flask_login.login_required
+def favorites_list_as_csv():
+    """
+    Download as a CSV the list of the favorited offices of a user.
+    """
+    return make_csv_response(
+        csv_text=UserFavoriteOffice.user_favs_as_csv(current_user),
+        attachment_name=u'mes_favoris.csv',
+    )
+
+
+def make_csv_response(csv_text, attachment_name):
+    # Return csv file
+    response = make_response(csv_text)
+    response.headers['Content-Type'] = 'application/csv'
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
+    return response
+
+
+@userBlueprint.route('/favorites/list')
 @flask_login.login_required
 def favorites_list():
     """
-    List the favorites offices of a user.
+    List the favorited offices of a user.
     """
     try:
         page = int(request.args.get('page'))

@@ -59,3 +59,36 @@ class UserFavoriteOffice(CRUDMixin, Base):
             return []
         sirets = [fav.office_siret for fav in db_session.query(cls).filter_by(user_id=user.id)]
         return sirets
+
+    @classmethod
+    def user_favs_as_csv(cls, user):
+        """
+        Returns the favorites offices of a user as a CSV text.
+        """
+        header_row = cls.as_csv_header_row()
+
+        if user.is_anonymous:
+            return header_row
+
+        rows = [fav.as_csv_row() for fav in db_session.query(cls).filter_by(user_id=user.id)]
+        csv_text = "%s\r\n%s" % (
+            header_row,
+            "\r\n".join(rows),
+        )
+        return csv_text
+
+    @classmethod
+    def as_csv_header_row(cls):
+        return u'siret;nom;adresse;ville;url'
+
+    def as_csv_row(self):
+        values = [
+            self.office_siret,
+            self.office.name,
+            # add quotes to escape `,` frequently occuring in addresses
+            '"%s"' % self.office.address_as_text,
+            self.office.city,
+            self.office.url,
+        ]
+        return ";".join(values)
+

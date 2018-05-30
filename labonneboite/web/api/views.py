@@ -71,7 +71,7 @@ def get_ga_query_string():
 # Note: `company` should be renamed to `office` wherever possible.
 # Unfortunately old routes cannot change.
 
-@apiBlueprint.route('/company/', methods=['GET'])
+@apiBlueprint.route('/company/')
 @api_auth_required
 def company_list():
 
@@ -102,7 +102,7 @@ def company_list():
     return jsonify(result)
 
 
-@apiBlueprint.route('/company/count/', methods=['GET'])
+@apiBlueprint.route('/company/count/')
 @api_auth_required
 def company_count():
 
@@ -175,7 +175,7 @@ def compute_frontend_url(fetcher, query_string, commune_id):
     return url_for('root.home', _external=True, **query_string)
 
 
-@apiBlueprint.route('/filter/', methods=['GET'])
+@apiBlueprint.route('/filter/')
 @api_auth_required
 def company_filter_list():
     current_app.logger.debug("API request received: %s", request.full_path)

@@ -118,6 +118,31 @@ class FavoriteTest(FavoriteBaseTest):
     Test favorites.
     """
 
+    def test_favorites_download(self):
+        """
+        Test download favorites list as csv.
+        """
+        office = Office.query.filter(Office.siret == u'00000000000004').one()
+        url = self.url_for('user.favorites_list_as_csv')
+
+        # An anonymous user cannot download the favorites list.
+        rv = self.app.get(url)
+        self.assertEqual(rv.status_code, 401)
+
+        with self.test_request_context:
+
+            self.login(self.user)
+
+            # Create a favorite for the user.
+            UserFavoriteOffice.create(user_id=self.user.id, office_siret=office.siret)
+
+            rv = self.app.get(url)
+            self.assertEqual(rv.status_code, 200)
+            self.assertEqual('application/csv', rv.mimetype)
+            self.assertIn(u'siret', rv.data.decode('utf-8'))
+            self.assertIn(office.siret, rv.data.decode('utf-8'))
+
+
     def test_favorites_list(self):
         """
         Test favorites list.
