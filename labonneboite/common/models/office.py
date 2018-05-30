@@ -169,10 +169,16 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'url':  self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
             'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
             'alternance': self.qualifies_for_alternance(),
-            # Warning: the `distance` and `matched_rome` fields are added by `get_companies_from_es_and_db`,
-            # they are NOT model fields or properties!
-            'distance': self.distance,
         }
+
+        # Warning: the `distance`, `boost` and `matched_rome` fields are added by `get_companies_from_es_and_db`,
+        # they are NOT model fields or properties!
+        if hasattr(self, 'distance'):
+            json['distance'] = self.distance
+
+        if hasattr(self, 'boost'):
+            json['boosted'] = self.boost
+
         if rome_code:
             json['matched_rome_code'] = rome_code
             json['matched_rome_label'] = settings.ROME_DESCRIPTIONS[rome_code]

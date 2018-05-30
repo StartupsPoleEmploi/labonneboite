@@ -238,7 +238,7 @@ class ApiBaseTest(DatabaseTest):
                 'naf': u'9103Z', # Map to ROME D1211
                 'siret': u'00000000000008',
                 'score': 75,
-                'score_alternance': 18,
+                'score_alternance': 51,
                 'headcount': 50,
                 'locations': self.positions['nantes']['coords'],
                 'name': u'Office 8',
@@ -249,7 +249,7 @@ class ApiBaseTest(DatabaseTest):
                 'naf': u'7010Z', # Map to ROME D1211
                 'siret': u'00000000000009',
                 'score': 99,
-                'score_alternance': 18,
+                'score_alternance': 51,
                 'headcount': 50,
                 'locations': self.positions['reze']['coords'], # City close to Nantes
                 'name': u'Office 9',

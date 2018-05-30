@@ -392,6 +392,8 @@ def get_score_for_rome_field_name(hiring_type, rome_code):
     }[hiring_type] % rome_code
 
 def get_boosted_rome_field_name(hiring_type, rome_code):
+    hiring_type = hiring_type or hiring_type_util.DEFAULT
+
     return {
         hiring_type_util.DPAE: "boosted_romes.%s",
         hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s",
@@ -421,8 +423,6 @@ def build_json_body_elastic_search(
     score_for_rome_field_names = [
         get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes
     ]
-
-    is_multi_rome = len(rome_codes) > 1
 
     # FIXME one day make boosted_rome logic compatible with multi rome, right now it only
     # works based on the first of the romes. Not urgent, as multi rome is API only,
@@ -688,6 +688,8 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         # and a Frontend request would have fallbacked to default sorting.
         raise ValueError("unknown sorting : %s" % sort)
 
+
+
     es = Elasticsearch()
     logger.info("Elastic Search request : %s", json_body)
     res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
@@ -732,6 +734,7 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
     for position, company in enumerate(companies, start=1):
         # Get the corresponding item from the Elasticsearch results.
         es_company = es_companies_by_siret[company.siret]
+
         if len(es_company["sort"]) != sort_fields_total:
             raise ValueError("Incorrect number of sorting fields in ES response.")
         # Add an extra `distance` attribute with one digit.
@@ -753,6 +756,14 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
             rome_code_for_contact_mode = rome_with_highest_score
         else:
             rome_code_for_contact_mode = rome_codes[0]
+
+        # Set boost flag
+        company.boost = False
+        boosted_rome_keyname = get_boosted_rome_field_name(hiring_type, rome_codes[0]).split('.')[0]
+        if boosted_rome_keyname in es_company['_source']:
+            boost_romes = es_company['_source'][boosted_rome_keyname]
+            romes_intersection = set(rome_codes).intersection(boost_romes)
+            company.boost = bool(romes_intersection)
 
         # Set contact mode and position
         company.contact_mode = util.get_contact_mode_for_rome_and_naf(rome_code_for_contact_mode, company.naf)
