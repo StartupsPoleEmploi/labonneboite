@@ -29,7 +29,7 @@ class ApiScriptsTest(ApiBaseTest,CreateIndexBaseTest):
             boost_alternance=True,
             romes_alternance_to_boost=u"D1211",  # Boost score only for this ROME.
         )
-        office_to_update.save(commit=True)
+        office_to_update.save()
         script.update_offices()
 
         # We need to wait before continuing.
