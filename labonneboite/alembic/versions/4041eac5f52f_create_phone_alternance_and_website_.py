@@ -2,7 +2,7 @@
 Create phone_alternance and website alternance
 
 Revision ID: 4041eac5f52f
-Revises: 3a70adf06a8
+Revises: 80194630f4fe
 Create Date: 2018-05-22 17:59:15.718908
 """
 from alembic import op
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 # Revision identifiers, used by Alembic.
 revision = '4041eac5f52f'
-down_revision = '3a70adf06a8'
+down_revision = '80194630f4fe'
 branch_labels = None
 depends_on = None
 
