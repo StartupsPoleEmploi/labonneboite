@@ -52,8 +52,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_to_remove',
         'nafs_to_add',
         'new_email',
-        'email_alternance',
         'new_phone',
+
+        'email_alternance',
+        'phone_alternance',
+        'website_alternance',
+
         'new_website',
         'social_network',
         'remove_email',
@@ -89,15 +93,21 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_alternance_to_remove': u"Retirer des codes ROME associés à une entreprise - Alternance",
         'nafs_to_add': u"Ajouter un ou plusieurs NAF à une entreprise",
         'new_email': u"Nouvel email",
-        'email_alternance': u"Email dédié à l'alternance",
         'new_phone': u"Nouveau téléphone",
         'new_website': u"Nouveau site web",
+
         'social_network': u'Réseau social',
+
         'remove_email': u"Ne pas afficher l'email",
         'remove_phone': u"Ne pas afficher le téléphone",
         'remove_website': u"Ne pas afficher le site web",
+        'email_alternance': u"Email dédié à l'alternance",
+        'phone_alternance': u"Téléphone dédié à l'alternance",
+        'website_alternance': u"Site web dédié à l'alternance",
+
         'score': u'Modifier le score LBB',
         'score_alternance': u'Modifier le score LBA',
+
         'requested_by_email': u"Email",
         'requested_by_first_name': u"Prénom",
         'requested_by_last_name': u"Nom",
@@ -167,10 +177,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_alternance_to_remove',
         'nafs_to_add',
         'new_email',
-        'email_alternance',
         'new_phone',
         'new_website',
         'social_network',
+        'email_alternance',
+        'phone_alternance',
+        'website_alternance',
         'remove_email',
         'remove_phone',
         'remove_website',
@@ -209,6 +221,13 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'email_alternance': {
             'validators': [validators.optional(), validators.Email()],
         },
+        'phone_alternance': {
+            'validators': [validators.optional(), phone_validator],
+        },
+        'website_alternance': {
+            'validators': [validators.optional(), validators.URL()],
+        },
+
         'new_phone': {
             'filters': [strip_filter, nospace_filter],
             'validators': [validators.optional(), phone_validator],
