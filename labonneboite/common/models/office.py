@@ -3,8 +3,6 @@
 from __future__ import division
 import logging
 from babel.dates import format_date
-from urllib import urlencode
-
 
 from slugify import slugify
 
@@ -59,11 +57,15 @@ class OfficeMixin(PrimitiveOfficeMixin):
     in sync.
     """
     website = Column(String(191), default='', nullable=False)
-    email_alternance = Column('email_alternance', String(191), default='', nullable=True)
     flag_alternance = Column(Boolean, default=False, nullable=False)
     flag_junior = Column(Boolean, default=False, nullable=False)
     flag_senior = Column(Boolean, default=False, nullable=False)
     flag_handicap = Column(Boolean, default=False, nullable=False)
+
+    email_alternance = Column('email_alternance', String(191), default='', nullable=True)
+    phone_alternance = Column('phone_alternance', String(191), default='', nullable=True)
+    website_alternance = Column('website_alternance', String(191), default='', nullable=True)
+
     score = Column(Integer, default=0, nullable=False)
     score_alternance = Column(Integer, default=0, nullable=False)
     x = Column('coordinates_x', Float)  # Longitude.
@@ -152,8 +154,6 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         else:                         # multi rome search context
             rome_code = self.matched_rome
 
-        alternance = hiring_type == hiring_type_util.ALTERNANCE
-
         extra_query_string = extra_query_string or {}
         json = {
             'address': self.address_as_text,
@@ -166,7 +166,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'name': self.name,
             'siret': self.siret,
             'stars': self.get_stars_for_rome_code(rome_code, hiring_type),
-            'url':  self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
+            'url': self.get_url_for_rome_code(rome_code, **extra_query_string),
             'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
             'alternance': self.qualifies_for_alternance(),
         }
@@ -309,17 +309,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         return self.get_url_for_rome_code(None)
 
-    @property
-    def url_alternance(self):
-        """
-        Returns the URL of `La Bonne Alternance` page or `None` if we are outside of a Flask's application context.
-        """
-        return 'https://labonnealternance.pole-emploi.fr/details-entreprises/{}'.format(self.siret)
-
-    def get_url_for_rome_code(self, rome_code, alternance=False, **query_string):
-        if alternance:
-            return '{}?{}'.format(self.url_alternance, urlencode(query_string))
-
+    def get_url_for_rome_code(self, rome_code, **query_string):
         try:
             if rome_code:
                 return url_for('office.details', siret=self.siret, rome_code=rome_code, _external=True, **query_string)
