@@ -29,7 +29,7 @@ class ApiScriptsTest(ApiBaseTest,CreateIndexBaseTest):
             boost_alternance=True,
             romes_alternance_to_boost=u"D1211",  # Boost score only for this ROME.
         )
-        office_to_update.save()
+        office_to_update.save(commit=True)
         script.update_offices()
 
         # We need to wait before continuing.
@@ -55,6 +55,7 @@ class ApiScriptsTest(ApiBaseTest,CreateIndexBaseTest):
             self.assertTrue(data_list['companies'][0]['boosted'])
 
             # 00000000000009 should not be boosted and be the second result
+            self.assertEquals(data_list['companies'][1]['siret'], '00000000000009')
             self.assertFalse(data_list['companies'][1]['boosted'])
 
 
@@ -89,7 +90,9 @@ class ApiScriptsTest(ApiBaseTest,CreateIndexBaseTest):
             self.assertEquals(len(data_list['companies']), 2)
 
             # 00000000000009 is boosted and is the first result
+            self.assertEquals(data_list['companies'][0]['siret'], '00000000000009')
             self.assertTrue(data_list['companies'][0]['boosted'])
             # 00000000000008 is not boosted and is the second result
+            self.assertEquals(data_list['companies'][1]['siret'], '00000000000008')
             self.assertFalse(data_list['companies'][1]['boosted'])
 
