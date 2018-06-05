@@ -11,6 +11,7 @@ from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy.dialects import mysql
 from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.dialects import mysql
+
 from backports.functools_lru_cache import lru_cache
 
 from labonneboite.common import encoding as encoding_util
@@ -61,9 +62,11 @@ class OfficeMixin(PrimitiveOfficeMixin):
     website = Column(String(191), default='', nullable=False)
 
     social_network = Column(mysql.TINYTEXT, nullable=True)
+
     email_alternance = Column('email_alternance', mysql.TINYTEXT, nullable=True)
     phone_alternance = Column('phone_alternance', mysql.TINYTEXT, nullable=True)
     website_alternance = Column('website_alternance', mysql.TINYTEXT, nullable=True)
+    contact_mode = Column('contact_mode', mysql.TINYTEXT, nullable=True)
 
     flag_alternance = Column(Boolean, default=False, nullable=False)
     flag_junior = Column(Boolean, default=False, nullable=False)
@@ -172,7 +175,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'siret': self.siret,
             'stars': self.get_stars_for_rome_code(rome_code, hiring_type),
             'url':  self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
-            'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
+            'contact_mode': self.contact_mode or util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
             'social_network': self.social_network or '',
             'alternance': self.qualifies_for_alternance(),
         }

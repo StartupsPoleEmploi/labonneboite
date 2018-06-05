@@ -185,7 +185,7 @@ def get_select_fields_for_main_db():
     These fields should exactly match (and in the same order)
     the fields in "DESC etablissements_exportable;" (using MySQL CLI)
     """
-    return get_shared_select_fields() + ", email_alternance, phone_alternance, website_alternance, score_alternance "
+    return get_shared_select_fields() + ", email_alternance, phone_alternance, website_alternance, contact_mode, score_alternance "
 
 
 def get_select_fields_for_backoffice():

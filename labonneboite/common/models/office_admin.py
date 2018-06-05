@@ -122,6 +122,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     new_phone = Column(String(191), default='', nullable=False)
     new_website = Column(String(191), default='', nullable=False)
     social_network = Column(mysql.TINYTEXT, nullable=True)
+    contact_mode = Column(mysql.TINYTEXT, nullable=True)
 
     email_alternance = Column(mysql.TINYTEXT, nullable=True)
     phone_alternance = Column(mysql.TINYTEXT, nullable=True)
