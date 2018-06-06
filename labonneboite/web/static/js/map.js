@@ -1,40 +1,40 @@
 /* jshint esversion: 6 */
 function createMap(element) {
   L.mapbox.accessToken = 'pk.eyJ1IjoibGFib25uZWJvaXRlIiwiYSI6ImNpaDNoN3A0cDAwcmdybGx5aXF1Z21lOGIifQ.znyUeU7KoIY9Ns_AQPquAg';
-  let map = L.mapbox.map(element, 'mapbox.streets', {
+  var mapEl = L.mapbox.map(element, 'mapbox.streets', {
       attributionControl: false
   });
-  map.scrollWheelZoom.disable();
-  return map;
+  mapEl.scrollWheelZoom.disable();
+  return mapEl;
 }
 
 (function($) {
-  let center = null;
-  let zoom = null;
-  let autoRefreshActivated = false;
+  var center = null;
+  var zoom = null;
+  var autoRefreshActivated = false;
 
   function initResultsMap() {
     "use strict";
-    let $map = $('#lbb-result-map');
-    let $latitude = $("#lat");
-    let $longitude = $("#lon");
+    var $map = $('#lbb-result-map');
+    var $latitude = $("#lat");
+    var $longitude = $("#lon");
     if (!$map.length) {
       return;
     }
 
-    let map = createMap($map[0]);
-    let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-    let companyCount = 0;
+    var map = createMap($map[0]);
+    var minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+    var companyCount = 0;
 
     $(".lbb-result").each(function() {
-      let companyName = $(this).find('input[name="company-name"]').val();
-      let lat = $(this).find('input[name="company-latitude"]').val();
-      let lng = $(this).find('input[name="company-longitude"]').val();
-      let siret = $(this).find('input[name="company-siret"]').val();
-      let description = $(this).find('.company-naf-text').html();
+      var companyName = $(this).find('input[name="company-name"]').val();
+      var lat = $(this).find('input[name="company-latitude"]').val();
+      var lng = $(this).find('input[name="company-longitude"]').val();
+      var siret = $(this).find('input[name="company-siret"]').val();
+      var description = $(this).find('.company-naf-text').html();
 
-      let coords = [lat, lng];
-      let link = "<a class='map-marker' href='#company-" + siret + "'>" + companyName + "</a><br>" + description;
+      var coords = [lat, lng];
+      var link = "<a class='map-marker' href='#company-" + siret + "'>" + companyName + "</a><br>" + description;
       L.marker(coords).addTo(map).bindPopup(link);
 
       companyCount += 1;
@@ -45,7 +45,7 @@ function createMap(element) {
     });
 
     $map.on("click", "a.map-marker", function(e) {
-        let href = this.attributes.href.value;
+        var href = this.attributes.href.value;
         ga('send', 'event', 'Carte', 'click entreprise', href);
         // Toggle company details on click on link
         $(href).find(".js-result-toggle-details").click();
@@ -75,7 +75,7 @@ function createMap(element) {
     });
 
 
-    let onMapMove = function() {
+    var onMapMove = function() {
       if(autoRefreshActivated) {
         updateMap();
       }
@@ -88,16 +88,16 @@ function createMap(element) {
           });
       }
     };
-    let onMapDrag = function() {
+    var onMapDrag = function() {
       ga('send', 'event', 'Carte', 'drag');
       onMapMove();
     };
-    let onMapZoom = function() {
+    var onMapZoom = function() {
         ga('send', 'event', 'Carte', 'zoom');
         onMapMove();
     };
 
-    let updateMap = function() {
+    var updateMap = function() {
       ga('send', 'event', 'Carte', 'update');
       center = map.getCenter();
       zoom = map.getZoom();
@@ -106,15 +106,15 @@ function createMap(element) {
       $longitude.val(center.lng);
 
       // Adjust search radius
-      let distances = [5, 10, 30, 50, 100, 3000];
-      let earthPerimeterKm = 2 * 3.14159 * 6371;
-      let earthPerimeterAtCompanyLocationKm = earthPerimeterKm * Math.cos(center.lat);
+      var distances = [5, 10, 30, 50, 100, 3000];
+      var earthPerimeterKm = 2 * 3.14159 * 6371;
+      var earthPerimeterAtCompanyLocationKm = earthPerimeterKm * Math.cos(center.lat);
       // See leaflet.js zoom definition https://wiki.openstreetmap.org/wiki/Zoom_levels
-      let pixelSizeKm = earthPerimeterAtCompanyLocationKm / (256 * Math.pow(2, zoom));
-      let mapHeightPixels = map.getSize().y;
-      let windowHeightKm = pixelSizeKm * mapHeightPixels * 2;// 2 is an arbitrary scaling factor to include results just ouside the bounding box
-      let newDistance = distances[distances.length - 1];
-      for(let d=0; d < distances.length; d++) {
+      var pixelSizeKm = earthPerimeterAtCompanyLocationKm / (256 * Math.pow(2, zoom));
+      var mapHeightPixels = map.getSize().y;
+      var windowHeightKm = pixelSizeKm * mapHeightPixels * 2;// 2 is an arbitrary scaling factor to include results just ouside the bounding box
+      var newDistance = distances[distances.length - 1];
+      for(var d=0; d < distances.length; d++) {
           if(windowHeightKm < distances[d]) {
               newDistance = distances[d];
               break;
