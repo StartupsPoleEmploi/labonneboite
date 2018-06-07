@@ -96,6 +96,7 @@ def register_blueprints(flask_app):
     from labonneboite.web.data.views import dataBlueprint
     from labonneboite.web.health.views import healthBlueprint
     from labonneboite.web.office.views import officeBlueprint
+    from labonneboite.web.contact_form.views import contactFormBlueprint
     from labonneboite.web.root.views import rootBlueprint
     from labonneboite.web.search.views import searchBlueprint
     from labonneboite.web.user.views import userBlueprint
@@ -105,6 +106,7 @@ def register_blueprints(flask_app):
     flask_app.register_blueprint(dataBlueprint, url_prefix='/data')
     flask_app.register_blueprint(healthBlueprint, url_prefix='/health')
     flask_app.register_blueprint(officeBlueprint)
+    flask_app.register_blueprint(contactFormBlueprint)
     flask_app.register_blueprint(rootBlueprint)
     flask_app.register_blueprint(searchBlueprint)
     flask_app.register_blueprint(userBlueprint, url_prefix='/user')

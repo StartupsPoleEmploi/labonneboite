@@ -25,7 +25,7 @@ If you have multiple forms, you can use the `with` statement, e.g.:
 
     {{ field.label }}
     {{ field(**aria_required) if is_required else field() }}
-    
+
     {% if field.description %}<p class="form-help-text">{{ field.description }}</p>{% endif %}
     {% if field.errors %}
     <ul class="form-errorlist">
@@ -40,5 +40,5 @@ If you have multiple forms, you can use the `with` statement, e.g.:
 {{ form.hidden_tag() }}
 
 <p>
-  <input class="btn" type="submit" value="Envoyer votre demande">
+  <input class="btn" type="submit" value="{{ submit_text if submit_text else 'Envoyer votre demande' }}">
 </p>

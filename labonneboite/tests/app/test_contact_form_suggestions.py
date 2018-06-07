@@ -11,14 +11,14 @@ from wtforms.fields.html5 import EmailField, TelField
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.tests.scripts.test_create_index import CreateIndexBaseTest
 from labonneboite.web.office.views import make_save_suggestion
-from labonneboite.web.office.forms import OfficeRemovalForm
+from labonneboite.web.contact_form.forms import OfficeContactForm
 
 class SaveSuggestionsTest(CreateIndexBaseTest):
     # No company and no OfficeAdminRemove
     def test_no_company_found(self):
         with self.test_request_context:
             # Create form
-            form = OfficeRemovalForm()
+            form = OfficeContactForm()
             form.siret = StringField(u'Siret')
             form.siret.data = u"Invalid"
 
@@ -38,7 +38,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             office_to_remove.save(commit=True)
 
             # Create form
-            form = OfficeRemovalForm()
+            form = OfficeContactForm()
             form.siret = StringField(u'Siret')
             form.siret.data = u"12345678901234"
 
@@ -78,7 +78,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             office_admin_add.save(commit=True)
 
             # Create form
-            form = OfficeRemovalForm()
+            form = OfficeContactForm()
             form.siret = StringField(u'Siret')
             form.siret.data = u"78548035101646"
 
@@ -99,7 +99,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             office_to_update.save(commit=True)
 
             # Create form
-            form = OfficeRemovalForm()
+            form = OfficeContactForm()
             form.siret = StringField(u'Siret')
             form.siret.data = u"78548035101646"
 
@@ -158,7 +158,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
 
     # Create a valid
     def create_form(self, action=u''):
-        form = OfficeRemovalForm()
+        form = OfficeContactForm()
         form.siret = StringField(u'Siret')
         form.action = SelectField(u'Je souhaite *')
         form.name = StringField(u"Nom de l'entreprise")
