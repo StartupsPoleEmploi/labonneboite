@@ -182,13 +182,19 @@ def get_coordinates(address, limit=10):
     features = []
     for result in datagouv.search(address, limit=limit):
         try:
-            features.append({
+            feature = {
                 'latitude': result['geometry']['coordinates'][1],
                 'longitude': result['geometry']['coordinates'][0],
                 'label': result['properties']['label'],
                 'zipcode': result['properties']['postcode'],
                 'city': result['properties']['city']
-            })
+            }
+            # The zipcode is normally always present in the label,
+            # but sometimes is inconsistently absent from it (e.g. Saint-Paul)
+            # thus we add it if necessary.
+            if feature['zipcode'] not in feature['label']:
+                feature['label'] += " %s" % feature['zipcode']
+            features.append(feature)
         except KeyError:
             continue
 
