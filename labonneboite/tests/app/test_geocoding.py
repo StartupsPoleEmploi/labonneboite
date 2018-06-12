@@ -96,6 +96,20 @@ class AdresseApiTest(unittest.TestCase):
         }], coordinates)
 
 
+    def test_city_homonyms_can_be_distinguished_by_zipcode(self):
+        """
+        Five homonym cities "Saint-Paul" should have distinguishable labels.
+        """
+        mock_get = self.mock_get('search-saint-paul.json')
+
+        with mock.patch.object(geocoding.datagouv.requests, 'get', return_value=mock_get):
+            coordinates = geocoding.get_coordinates(u'Saint-Paul')
+
+        self.assertEqual(len(coordinates), 5)
+        for coordinate in coordinates:
+            self.assertIn(coordinate[u'zipcode'], coordinate[u'label'])
+
+
     def test_400_error(self):
         mock_get = mock.Mock(status_code=400, json=mock.Mock(side_effect=ValueError))
         with mock.patch.object(geocoding.datagouv.requests, 'get', return_value=mock_get):
