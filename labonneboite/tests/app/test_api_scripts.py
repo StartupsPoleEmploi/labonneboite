@@ -1,23 +1,21 @@
 
 import json
 from urllib import urlencode
-import time
 
 from flask import url_for
 
-from labonneboite.common.models import Office, OfficeAdminUpdate
+from labonneboite.common.models import OfficeAdminUpdate
 from labonneboite.common import es
 from labonneboite.scripts import create_index as script
-from labonneboite.conf import settings
-from labonneboite.common import mapping as mapping_util
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest
 from labonneboite.tests.scripts.test_create_index import CreateIndexBaseTest
 
 
-class ApiScriptsTest(ApiBaseTest,CreateIndexBaseTest):
+class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
 
     def setUp(self, *args, **kwargs):
         super(ApiScriptsTest, self).setUp(*args, **kwargs)
+
 
     def test_update_office_boost_flag_specific_romes_alternance(self):
         """
@@ -31,10 +29,7 @@ class ApiScriptsTest(ApiBaseTest,CreateIndexBaseTest):
         )
         office_to_update.save(commit=True)
         script.update_offices()
-
-        # We need to wait before continuing.
-        # If not, ES is not update and 00000000000008 is not consider as boosted...
-        time.sleep(0.5)
+        es.Elasticsearch().indices.flush()
 
         params = self.add_security_params({
             'commune_id': self.positions['nantes']['commune_id'],
@@ -69,10 +64,7 @@ class ApiScriptsTest(ApiBaseTest,CreateIndexBaseTest):
         )
         office_to_update.save()
         script.update_offices()
-
-        # We need to wait before continuing.
-        # If not, ES is not update and 00000000000008 is not consider as boosted...
-        time.sleep(0.5)
+        es.Elasticsearch().indices.flush()
 
         params = self.add_security_params({
             'commune_id': self.positions['nantes']['commune_id'],
@@ -92,4 +84,3 @@ class ApiScriptsTest(ApiBaseTest,CreateIndexBaseTest):
             self.assertTrue(data_list['companies'][0]['boosted'])
             # 00000000000008 is not boosted and is the second result
             self.assertFalse(data_list['companies'][1]['boosted'])
-
