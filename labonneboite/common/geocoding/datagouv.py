@@ -57,4 +57,7 @@ def get_features(endpoint, **params):
         logger.log(log_level, error)
         return []
 
+    # When you need to store a response and later use it as a mock in the tests,
+    # just run a breakpoint here in dev environnement then:
+    # $ json.dump(response.json(), open("mymock.json", "w"), indent=4, sort_keys=True)
     return response.json()['features']

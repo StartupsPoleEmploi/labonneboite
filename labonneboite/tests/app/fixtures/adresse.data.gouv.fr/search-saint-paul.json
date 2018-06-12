@@ -1,0 +1,270 @@
+{
+    "attribution": "BAN", 
+    "features": [
+        {
+            "geometry": {
+                "coordinates": [
+                    55.310167, 
+                    -21.036635
+                ], 
+                "type": "Point"
+            }, 
+            "properties": {
+                "adm_weight": 3, 
+                "city": "Saint-Paul", 
+                "citycode": "97415", 
+                "context": "974, La R\u00e9union", 
+                "id": "97415_97423", 
+                "importance": 0.565, 
+                "label": "Saint-Paul", 
+                "name": "Saint-Paul", 
+                "population": 103.5, 
+                "postcode": "97423", 
+                "score": 0.9604545454545453, 
+                "type": "municipality", 
+                "x": 320100, 
+                "y": 7675800
+            }, 
+            "type": "Feature"
+        }, 
+        {
+            "geometry": {
+                "coordinates": [
+                    55.310167, 
+                    -21.036635
+                ], 
+                "type": "Point"
+            }, 
+            "properties": {
+                "adm_weight": 3, 
+                "city": "Saint-Paul", 
+                "citycode": "97415", 
+                "context": "974, La R\u00e9union", 
+                "id": "97415_97435", 
+                "importance": 0.565, 
+                "label": "Saint-Paul", 
+                "name": "Saint-Paul", 
+                "population": 103.5, 
+                "postcode": "97435", 
+                "score": 0.9604545454545453, 
+                "type": "municipality", 
+                "x": 320100, 
+                "y": 7675800
+            }, 
+            "type": "Feature"
+        }, 
+        {
+            "geometry": {
+                "coordinates": [
+                    55.310167, 
+                    -21.036635
+                ], 
+                "type": "Point"
+            }, 
+            "properties": {
+                "adm_weight": 3, 
+                "city": "Saint-Paul", 
+                "citycode": "97415", 
+                "context": "974, La R\u00e9union", 
+                "id": "97415_97422", 
+                "importance": 0.565, 
+                "label": "Saint-Paul", 
+                "name": "Saint-Paul", 
+                "population": 103.5, 
+                "postcode": "97422", 
+                "score": 0.9604545454545453, 
+                "type": "municipality", 
+                "x": 320100, 
+                "y": 7675800
+            }, 
+            "type": "Feature"
+        }, 
+        {
+            "geometry": {
+                "coordinates": [
+                    55.310167, 
+                    -21.036635
+                ], 
+                "type": "Point"
+            }, 
+            "properties": {
+                "adm_weight": 3, 
+                "city": "Saint-Paul", 
+                "citycode": "97415", 
+                "context": "974, La R\u00e9union", 
+                "id": "97415_97460", 
+                "importance": 0.565, 
+                "label": "Saint-Paul", 
+                "name": "Saint-Paul", 
+                "population": 103.5, 
+                "postcode": "97460", 
+                "score": 0.9604545454545453, 
+                "type": "municipality", 
+                "x": 320100, 
+                "y": 7675800
+            }, 
+            "type": "Feature"
+        }, 
+        {
+            "geometry": {
+                "coordinates": [
+                    55.310167, 
+                    -21.036635
+                ], 
+                "type": "Point"
+            }, 
+            "properties": {
+                "adm_weight": 3, 
+                "city": "Saint-Paul", 
+                "citycode": "97415", 
+                "context": "974, La R\u00e9union", 
+                "id": "97415", 
+                "importance": 0.565, 
+                "label": "Saint-Paul", 
+                "name": "Saint-Paul", 
+                "population": 103.5, 
+                "postcode": "97411", 
+                "score": 0.9604545454545453, 
+                "type": "municipality", 
+                "x": 320100, 
+                "y": 7675800
+            }, 
+            "type": "Feature"
+        }, 
+        {
+            "geometry": {
+                "coordinates": [
+                    55.310167, 
+                    -21.036635
+                ], 
+                "type": "Point"
+            }, 
+            "properties": {
+                "adm_weight": 3, 
+                "city": "Saint-Paul", 
+                "citycode": "97415", 
+                "context": "974, La R\u00e9union", 
+                "id": "97415_97434", 
+                "importance": 0.565, 
+                "label": "Saint-Paul", 
+                "name": "Saint-Paul", 
+                "population": 103.5, 
+                "postcode": "97434", 
+                "score": 0.9604545454545453, 
+                "type": "municipality", 
+                "x": 320100, 
+                "y": 7675800
+            }, 
+            "type": "Feature"
+        }, 
+        {
+            "geometry": {
+                "coordinates": [
+                    -0.633595, 
+                    48.742498
+                ], 
+                "type": "Point"
+            }, 
+            "properties": {
+                "adm_weight": 1, 
+                "city": "Saint-Paul", 
+                "citycode": "61443", 
+                "context": "61, Orne, Normandie (Basse-Normandie)", 
+                "id": "61443", 
+                "importance": 0.075, 
+                "label": "Saint-Paul", 
+                "name": "Saint-Paul", 
+                "population": 0.7, 
+                "postcode": "61100", 
+                "score": 0.9159090909090909, 
+                "type": "municipality", 
+                "x": 432900, 
+                "y": 6855300
+            }, 
+            "type": "Feature"
+        }, 
+        {
+            "geometry": {
+                "coordinates": [
+                    -0.605967, 
+                    45.147765
+                ], 
+                "type": "Point"
+            }, 
+            "properties": {
+                "adm_weight": 1, 
+                "city": "Saint-Paul", 
+                "citycode": "33458", 
+                "context": "33, Gironde, Nouvelle-Aquitaine (Aquitaine)", 
+                "id": "33458", 
+                "importance": 0.075, 
+                "label": "Saint-Paul", 
+                "name": "Saint-Paul", 
+                "population": 0.9, 
+                "postcode": "33390", 
+                "score": 0.9159090909090909, 
+                "type": "municipality", 
+                "x": 416700, 
+                "y": 6456300
+            }, 
+            "type": "Feature"
+        }, 
+        {
+            "geometry": {
+                "coordinates": [
+                    2.006426, 
+                    49.428466
+                ], 
+                "type": "Point"
+            }, 
+            "properties": {
+                "adm_weight": 1, 
+                "city": "Saint-Paul", 
+                "citycode": "60591", 
+                "context": "60, Oise, Hauts-de-France (Picardie)", 
+                "id": "60591", 
+                "importance": 0.075, 
+                "label": "Saint-Paul", 
+                "name": "Saint-Paul", 
+                "population": 1.6, 
+                "postcode": "60650", 
+                "score": 0.9159090909090909, 
+                "type": "municipality", 
+                "x": 627900, 
+                "y": 6925900
+            }, 
+            "type": "Feature"
+        }, 
+        {
+            "geometry": {
+                "coordinates": [
+                    1.431947, 
+                    45.749805
+                ], 
+                "type": "Point"
+            }, 
+            "properties": {
+                "adm_weight": 1, 
+                "city": "Saint-Paul", 
+                "citycode": "87174", 
+                "context": "87, Haute-Vienne, Nouvelle-Aquitaine (Limousin)", 
+                "id": "87174", 
+                "importance": 0.075, 
+                "label": "Saint-Paul", 
+                "name": "Saint-Paul", 
+                "population": 1.2, 
+                "postcode": "87260", 
+                "score": 0.9159090909090909, 
+                "type": "municipality", 
+                "x": 578100, 
+                "y": 6517900
+            }, 
+            "type": "Feature"
+        }
+    ], 
+    "licence": "ODbL 1.0", 
+    "limit": 10, 
+    "query": "Saint-Paul", 
+    "type": "FeatureCollection", 
+    "version": "draft"
+}
