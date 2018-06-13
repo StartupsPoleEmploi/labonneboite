@@ -47,6 +47,13 @@
     opacity: .5;
 }
 
+.btn.btn-hollow,
+.btn.btn-hollow:link,
+.btn.btn-hollow:visited {
+    color: #7c408b;
+    background-color: #fff;
+}
+
 /* Sizes.
 =========================================================================== */
 

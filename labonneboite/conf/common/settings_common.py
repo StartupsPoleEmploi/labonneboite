@@ -15,6 +15,8 @@ overrides/production.py
 from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST, ENV_STAGING, ENV_PRODUCTION
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 
+LOG_LEVEL = 'DEBUG'
+
 GLOBAL_STATIC_PATH = '/tmp'
 
 ROME_DESCRIPTIONS = load_rome_labels()
@@ -31,20 +33,8 @@ ENABLE_TIMEIT_TIMERS = True
 
 SENTRY_DSN = None
 
-######### TODO Settings added to make tests work without local_settings.py
-# Maybe we should remove some entirely, or set default values in the code?
 ADMIN_EMAIL = 'no-reply@labonneboite.pole-emploi.fr'
-FLASK_SECRET_KEY = '<set it>'
-# Settings that need to be overwritten
-# FIXME there should be a default value for these settings in the code whenever the setting is not defined.
-PEAM_CLIENT_ID = '<set it>'
-PEAM_CLIENT_SECRET = '<set it>'
-PEAM_AUTH_BASE_URL = '<set it>'
-PEAM_API_BASE_URL = '<set it>'
-PEAM_USERINFO_URL = '<set it>'
-MANDRILL_API_KEY = '<set it>'
-FORM_EMAIL = '<set it>'
-LOG_LEVEL = 'DEBUG'
+
 # Values below are *fake* and should be used in development and test environments only.
 # The real values are confidential, stored outside of github repository
 # and are only used in production+staging.
@@ -53,8 +43,10 @@ SCORE_50_HIRINGS = 10.0
 SCORE_60_HIRINGS = 50.0
 SCORE_80_HIRINGS = 100.0
 SCORE_100_HIRINGS = 500.0
+
 API_KEYS = {}
 API_INTERNAL_CONSUMERS = []
+
 VERSION_PRO_ALLOWED_IPS = []
 VERSION_PRO_ALLOWED_EMAILS = []
 VERSION_PRO_ALLOWED_EMAIL_SUFFIXES = []
@@ -131,6 +123,13 @@ ENABLE_GOOGLE_OPTIMIZE = False
 
 MEMO_JS_URL = 'https://memo.pole-emploi.fr/js/importButton/memoButton-min.js'
 API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
+
+# Tilkee parameters: credentials are provided by the Tilkee tech team
+TILKEE_API_BASE_URL = 'https://api.tilkee.com'
+TILKEE_VERIFY_SSL = True
+TILKEE_ACCESS_TOKEN = '<set it>'
+TILKEE_X_REF = '<set it>'
+TILKEE_COMPANY_ID = '<set it>'
 
 if get_current_env() == ENV_LBBDEV:
     # pylint: disable=wildcard-import,unused-wildcard-import

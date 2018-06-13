@@ -2,16 +2,16 @@
 =========================================================================== */
 
 input.input-icon {
-    background: #fff url(../images/input-icons/suitcase.svg) no-repeat 8px 50%;
+    background: #fff url(../images/icons/suitcase.svg) no-repeat 8px 50%;
     padding-left: 30px;
 }
 
 input.input-icon-suitcase {
-    background-image: url(../images/input-icons/suitcase.svg);
+    background-image: url(../images/icons/suitcase.svg);
 }
 
 input.input-icon-location {
-    background-image: url(../images/input-icons/pinmap-location.svg);
+    background-image: url(../images/icons/pinmap-location.svg);
 }
 
 /* Form utils.

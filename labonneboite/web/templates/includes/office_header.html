@@ -92,6 +92,9 @@
     </div>
     {# END Memo button. #}
 
+    {# Tilkee #}
+    <a class="tilkee-button btn btn-small" href="{{ url_for('tilkee.upload', siret=company.siret) }}" data-toggle="tooltip" title="En postulant, vous pourrez suivre votre candidature ! Découvrez qui a ouvert votre CV et quand. Et relancez le recruteur au bon moment !" data-placement="bottom" data-siret="{{ company.siret }}" onclick="return false;">Créer ma candidature</a>
+
   </div>
 
 </div>

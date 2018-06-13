@@ -1,0 +1,41 @@
+.tooltip-inner {
+    padding: 10px 20px;
+    border : solid 1px #7c408b;
+    font-size: 120%;
+}
+
+/* Completely override bootstrap tooltip styling
+ * inspired by http://www.cssarrowplease.com/
+ */
+/*
+.tooltip-arrow {
+    display: none;
+}
+.tooltip {
+	background: #ffffff;
+	border: 2px solid #7c408b;
+}
+.lbb-tooltip:after, .lbb-tooltip:before {
+	bottom: 100%;
+	left: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.lbb-tooltip:after {
+	border-color: rgba(255, 255, 255, 0);
+	border-bottom-color: #ffffff;
+	border-width: 30px;
+	margin-left: -30px;
+}
+.lbb-tooltip:before {
+	border-color: rgba(124, 64, 139, 0);
+	border-bottom-color: #7c408b;
+	border-width: 33px;
+	margin-left: -33px;
+}
+*/
