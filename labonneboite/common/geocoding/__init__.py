@@ -179,6 +179,9 @@ def get_coordinates(address, limit=10):
         latitude (float)
         longitude (float)
     """
+    if not address:
+        return []
+
     features = []
     for result in datagouv.search(address, limit=limit):
         try:
