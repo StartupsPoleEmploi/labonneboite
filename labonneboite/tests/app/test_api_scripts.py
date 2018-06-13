@@ -3,6 +3,7 @@ import json
 from urllib import urlencode
 
 from flask import url_for
+import mock
 
 from labonneboite.common.models import OfficeAdminUpdate
 from labonneboite.common import es
@@ -15,7 +16,6 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
 
     def setUp(self, *args, **kwargs):
         super(ApiScriptsTest, self).setUp(*args, **kwargs)
-
 
     def test_update_office_boost_flag_specific_romes_alternance(self):
         """
@@ -53,6 +53,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             self.assertFalse(data_list['companies'][1]['boosted'])
 
 
+    @mock.patch.object(es.settings, 'ES_TIMEOUT', 20)
     def test_update_office_boost_flag_all_romes_alternance(self):
         """
         Test `update_offices` boosted flag is present when all romes are boosted
