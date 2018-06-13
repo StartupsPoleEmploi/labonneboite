@@ -19,7 +19,7 @@ def upload():
         return 'Cette entreprise n\'existe pas', 400
 
     if not current_user.is_authenticated:
-        next_url = request.referrer + u'#company-{}'.format(company.siret)
+        next_url = request.referrer + u'#company-{}'.format(company.siret) if request.referrer else ''
         login_url = url_for('social.auth', backend='peam-openidconnect', next=next_url)
         return render_template("tilkee/login.html", login_url=login_url)
 
