@@ -21,6 +21,9 @@ def search(address, limit=10):
     if not address:
         raise ValueError(address)
 
+    # Longer requests cause a 413 error
+    address = address[:200]
+
     return get_features('/search', **{
         'q': address,
         'limit': limit
