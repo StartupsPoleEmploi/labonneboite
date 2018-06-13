@@ -68,7 +68,7 @@ class TestComputeScore(DatabaseTest):
         prediction_beginning_date = get_prediction_beginning_date()
         df_etab = compute_score.run(departement, prediction_beginning_date, return_df_etab_if_successful=True)
         columns = df_etab.columns.values
-        
+
         self.assertEqual(len(df_etab), OFFICES_HAVING_HIRINGS)
 
         # The realistic (past) situation we simulate here is the following:
@@ -86,9 +86,9 @@ class TestComputeScore(DatabaseTest):
         # --- DPAE/LBB checks
 
         # we should have exactly 5 years of hirings including the last month (2011-12)
-        self.assertNotIn(u'dpae-2006-12', columns) 
+        self.assertNotIn(u'dpae-2006-12', columns)
         self.assertIn(u'dpae-2007-1', columns)
-        self.assertIn(u'dpae-2011-12', columns) 
+        self.assertIn(u'dpae-2011-12', columns)
         self.assertNotIn(u'dpae-2012-1', columns)
 
         # Reminder: for DPAE 1 period = 6 months.
@@ -98,9 +98,9 @@ class TestComputeScore(DatabaseTest):
         # and thus ignores last 2 periods and is based on 7 periods before that.
         # TRAIN set is like LIVE set slided 24 months earlier,
         # and thus ignores last 4 periods and is based on 7 periods before that.
-        self.assertNotIn(u'dpae-period-0', columns) 
+        self.assertNotIn(u'dpae-period-0', columns)
         self.assertIn(u'dpae-period-1', columns)
-        self.assertIn(u'dpae-period-11', columns) 
+        self.assertIn(u'dpae-period-11', columns)
         self.assertNotIn(u'dpae-period-12', columns)
 
         # final score columns
@@ -110,9 +110,9 @@ class TestComputeScore(DatabaseTest):
         # --- Alternance/LBA checks
 
         # we should have exactly 5 years of hirings including the last month (2011-12)
-        self.assertNotIn(u'alt-2006-12', columns) 
+        self.assertNotIn(u'alt-2006-12', columns)
         self.assertIn(u'alt-2007-1', columns)
-        self.assertIn(u'alt-2011-12', columns) 
+        self.assertIn(u'alt-2011-12', columns)
         self.assertNotIn(u'alt-2012-1', columns)
 
         # Reminder: for Alternance 1 period = 6 months.
@@ -126,7 +126,7 @@ class TestComputeScore(DatabaseTest):
         # TRAIN set is like LIVE set slided 24 months earlier,
         # and thus ignores 4 more periods and is based on 7 periods before that.
 
-        self.assertNotIn(u'alt-period-0', columns) 
+        self.assertNotIn(u'alt-period-0', columns)
         self.assertIn(u'alt-period-1', columns)
         self.assertIn(u'alt-period-12', columns)
         self.assertNotIn(u'alt-period-13', columns)

@@ -91,4 +91,3 @@ class UserFavoriteOffice(CRUDMixin, Base):
             self.office.url,
         ]
         return ";".join(values)
-

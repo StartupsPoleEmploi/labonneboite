@@ -1333,7 +1333,7 @@ class ApiCompanyListTest(ApiBaseTest):
             response_privileged = self.app.get(self.url_for("api.company_list", **params))
 
         company_without_info = json.loads(response_unprivileged.data)['companies'][0]
-        company_with_info= json.loads(response_privileged.data)['companies'][0]
+        company_with_info = json.loads(response_privileged.data)['companies'][0]
 
         self.assertNotIn("email", company_without_info)
         self.assertNotIn("phone", company_without_info)
