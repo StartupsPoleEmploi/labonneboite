@@ -103,16 +103,16 @@ def disable_verbose_loggers():
     (especially of the sanity_check_rome_codes part) and avoid it being polluted by useless
     unwanted logs detailing every MysQL and ES request.
     """
-    for logger in get_verbose_loggers():
+    for verbose_logger in get_verbose_loggers():
         # For some unknown reason, logger.setLevel(logging.ERROR) here does not work as expected as
         # 'INFO' level messages are still visible. Hence we brutally disable the logger instead.
         # FIXME try again to increase logger level instead of disabling it.
-        logger.disabled = True
+        verbose_logger.disabled = True
 
 
 def enable_verbose_loggers():
-    for logger in get_verbose_loggers():
-        logger.disabled = False
+    for verbose_logger in get_verbose_loggers():
+        verbose_logger.disabled = False
 
 
 class Counter(object):
@@ -265,7 +265,7 @@ def get_office_as_es_doc(office):
             {'lat': office.y, 'lon': office.x},
         ]
 
-    scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes  = get_scores_by_rome_and_boosted_romes(office)
+    scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes = get_scores_by_rome_and_boosted_romes(office)
     if scores_by_rome:
         doc['scores_by_rome'] = scores_by_rome
         doc['boosted_romes'] = boosted_romes

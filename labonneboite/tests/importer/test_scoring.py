@@ -5,13 +5,12 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import and_
 
-from labonneboite.importer.models.computing import Hiring
+from labonneboite.common import scoring as scoring_util
 from labonneboite.common.models import Office
-
+from labonneboite.conf import settings
+from labonneboite.importer.models.computing import Hiring
 from .test_base import DatabaseTest
 
-from labonneboite.common import scoring as scoring_util
-from labonneboite.conf import settings
 
 FIFTEEN_MONTHS = 15 * 30
 

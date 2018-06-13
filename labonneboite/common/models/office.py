@@ -2,12 +2,10 @@
 
 from __future__ import division
 import logging
-from babel.dates import format_date
 from urllib import urlencode
 
-
+from babel.dates import format_date
 from slugify import slugify
-
 from flask import url_for
 from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy import PrimaryKeyConstraint
