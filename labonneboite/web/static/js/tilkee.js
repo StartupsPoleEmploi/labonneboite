@@ -2,14 +2,14 @@
 (function($) {
     "use strict";
 
-    let $tilkeeModal = $("#tilkee-modal .modal-content");
+    var $tilkeeModal = $("#tilkee-modal .modal-content");
     function updateModal(html) {
         $tilkeeModal.html(html);
     }
 
     function showIntro() {
-        let lastDisplay = localStorage.getItem("lastTilkeeIntroDisplay");
-        let now = new Date().getTime();
+        var lastDisplay = localStorage.getItem("lastTilkeeIntroDisplay");
+        var now = new Date().getTime();
         // Display Tilkee intro once per user and per month
         if (!lastDisplay || now-parseFloat(lastDisplay) > 30*24*60*60*1000) {
             localStorage.setItem("lastTilkeeIntroDisplay", now);
@@ -26,15 +26,15 @@
 
     function initUploadForm(siret) {
         // Handle file selection
-        let files = [];
+        var files = [];
         $tilkeeModal.find('.tilkee-file-select').on("click", function(e){
             e.preventDefault();
             $tilkeeModal.find("[name='files']").click();
             ga('send', 'event', 'Tilkee', 'browse-files', siret);
         });
         $tilkeeModal.find("[name='files']").on("change", function(e){
-            let newfiles = $(this).prop("files");
-            for (let f = 0; f < newfiles.length; f++) {
+            var newfiles = $(this).prop("files");
+            for (var f = 0; f < newfiles.length; f++) {
                 files.push(newfiles[f]);
             }
             drawFileList(files, siret);
@@ -54,10 +54,10 @@
     }
 
     function drawFileList(files, siret) {
-        let $fileList = $tilkeeModal.find(".tilkee-files");
+        var $fileList = $tilkeeModal.find(".tilkee-files");
         $fileList.html("");
-        for (let f = 0; f < files.length; f++) {
-            let filename = files[f].name;
+        for (var f = 0; f < files.length; f++) {
+            var filename = files[f].name;
             $fileList.append("<span><b>" + filename + "</b> <img class='tilkee-remove-file' alt='Retirer le fichier' src='/static/images/icons/times.svg' data-file-index='" + f + "'><span><br />\n");
         }
         if (files.length) {
@@ -69,16 +69,16 @@
         }
         $fileList.find(".tilkee-remove-file").click(function(){
             ga('send', 'event', 'Tilkee', 'remove-file');
-            let f = $(this).attr("data-file-index");
+            var f = $(this).attr("data-file-index");
             files.splice(parseInt(f), 1);
             drawFileList(files, siret);
         });
     }
 
     function uploadDocuments($form, siret, files) {
-        let formData = new FormData();
+        var formData = new FormData();
         formData.set("csrf_token", $form.find("[name='csrf_token']")[0].value);
-        for (let f = 0; f < files.length; f++) {
+        for (var f = 0; f < files.length; f++) {
             formData.append('files', files[f], files[f].name);
         }
 
@@ -110,15 +110,15 @@
             },
             xhr: function() {
                 // Monitor upload progress
-                let $messageElt = $tilkeeModal.find(".upload-progress-message");
+                var $messageElt = $tilkeeModal.find(".upload-progress-message");
 
                 $tilkeeModal.find(".progressbar").removeClass("hidden");
                 $messageElt.removeClass("hidden");
-                let xhr = $.ajaxSettings.xhr();
+                var xhr = $.ajaxSettings.xhr();
                 if (xhr.upload) {
                     xhr.upload.addEventListener('progress', function(e) {
                         if (e.lengthComputable) {
-                            let percentage = e.loaded * 100/e.total;
+                            var percentage = e.loaded * 100/e.total;
                             $tilkeeModal.find(".progressbar span").css("width", String(percentage) + "%");
                             if (percentage < 100) {
                                 $messageElt.html("1/2 Envoi de vos fichiers...");
@@ -139,7 +139,7 @@
         $(".tilkee-button").on("click", function(e) {
             e.preventDefault();
             $(this).tooltip("hide");
-            let siret = $(this).attr("data-siret");
+            var siret = $(this).attr("data-siret");
             initTilkeeModal(siret);
 
             // Load modal content
