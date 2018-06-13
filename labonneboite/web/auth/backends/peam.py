@@ -68,6 +68,6 @@ class PEAMOpenIdConnect(PEAMOAuth2, OpenIdConnectAuth):
             }
         except KeyError:
             # Sometimes PEAM responds without the user details.
-            raise AuthFailedMissingReturnValues(response)
+            raise AuthFailedMissingReturnValues
 
 # pylint:enable=abstract-method

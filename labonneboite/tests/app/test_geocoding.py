@@ -117,6 +117,12 @@ class AdresseApiTest(unittest.TestCase):
 
         self.assertEqual([], coordinates)
 
+    def test_empty_query(self):
+        with mock.patch.object(geocoding.datagouv.requests, 'get', side_effect=ZeroDivisionError):
+            coordinates = geocoding.get_coordinates('')
+
+        self.assertEqual([], coordinates)
+
 
     def test_get_address(self):
         mock_get = self.mock_get('reverse-lelab.json')

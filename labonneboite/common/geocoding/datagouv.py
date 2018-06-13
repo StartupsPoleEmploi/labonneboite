@@ -18,6 +18,12 @@ def search(address, limit=10):
 
     Example: https://api-adresse.data.gouv.fr/search/?q=8%20bd%20du%20port
     """
+    if not address:
+        raise ValueError(address)
+
+    # Longer requests cause a 413 error
+    address = address[:200]
+
     return get_features('/search', **{
         'q': address,
         'limit': limit
