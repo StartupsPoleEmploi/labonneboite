@@ -16,5 +16,6 @@ application/vnd.openxmlformats-officedocument.wordprocessingml.document">
             <a class="btn btn-hollow tilkee-file-select">Sélectionner une pièce jointe</a>
             <button class="btn hidden" type="submit">Créer mon dossier</button>
         </div>
+        <p>Types de fichier supportés : {% for ext in file_extensions %}{{ ext }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
     </form>
 </div>
