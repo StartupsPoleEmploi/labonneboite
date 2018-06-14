@@ -157,7 +157,7 @@ def is_allowed(filename):
     """
     Check whether a filename is supported by Tilkee.
     """
-    return os.path.splitext(filename).lower() in ALLOWED_FILE_EXTENSIONS
+    return os.path.splitext(filename)[1].lower() in ALLOWED_FILE_EXTENSIONS
 
 
 class TilkeeError(Exception):
