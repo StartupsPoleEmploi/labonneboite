@@ -1,10 +1,24 @@
+import os
+
 import requests
 
 from labonneboite.conf import settings
 
 
-TILKEE_HTTP_TIMEOUT_SECONDS = 10
+TILKEE_HTTP_TIMEOUT_SECONDS = 20
 AWS_HTTP_TIMEOUT_SECONDS = 40
+
+# FIXME duplicate code from tilkee.js
+ALLOWED_FILE_EXTENSIONS = (
+    '.doc',
+    '.docx',
+    '.jpeg',
+    '.jpg',
+    '.mov',
+    '.mp4',
+    '.pdf',
+    '.png',
+)
 
 
 def process(files, company, user):
@@ -137,6 +151,13 @@ def request(endpoint, method, **kwargs):
         raise TilkeeError(message)
 
     return response
+
+
+def is_allowed(filename):
+    """
+    Check whether a filename is supported by Tilkee.
+    """
+    return os.path.splitext(filename).lower() in ALLOWED_FILE_EXTENSIONS
 
 
 class TilkeeError(Exception):

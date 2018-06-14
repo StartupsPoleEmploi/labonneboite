@@ -34,8 +34,17 @@
         });
         $tilkeeModal.find("[name='files']").on("change", function(e){
             var newfiles = $(this).prop("files");
+            // FIXME duplicate code from tilkee/utils.py
+            var allowedExtensions = ['.doc', '.docx', '.jpeg', '.jpg', '.mov', '.mp4', '.pdf', '.png'];
             for (var f = 0; f < newfiles.length; f++) {
-                files.push(newfiles[f]);
+                var filename = newfiles[f].name;
+                var fileExt = '.' + filename.split('.').pop().toLowerCase();
+                if (allowedExtensions.indexOf(fileExt) < 0) {
+                    // Yes, this is a js alert which is ugly
+                    alert("Format de document non autorisé pour le fichier " + filename);
+                } else {
+                    files.push(newfiles[f]);
+                }
             }
             drawFileList(files, siret);
         });

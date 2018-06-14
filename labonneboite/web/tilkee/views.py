@@ -29,11 +29,18 @@ def upload():
         return render_template(error_template, login_url=login_url)
 
     if request.method == 'GET':
-        return render_template("tilkee/upload.html", company=company)
+        return render_template("tilkee/upload.html", company=company, file_extensions=utils.ALLOWED_FILE_EXTENSIONS)
 
-    files = request.files.getlist('files')
+    return upload_files(company, request.files.getlist('files'))
+
+
+def upload_files(company, files):
     if not files:
         return u'Aucun fichier sélectionné', 400
+    for f in files:
+        filename = f.filename
+        if not utils.is_allowed(filename):
+            return u'Fichier non supporté: {}'.format(filename), 400
 
     try:
         project_url = utils.process(files, company, current_user)
