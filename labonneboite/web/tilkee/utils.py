@@ -5,7 +5,7 @@ import requests
 from labonneboite.conf import settings
 
 
-TILKEE_HTTP_TIMEOUT_SECONDS = 10
+TILKEE_HTTP_TIMEOUT_SECONDS = 20
 AWS_HTTP_TIMEOUT_SECONDS = 40
 
 # FIXME duplicate code from tilkee.js
