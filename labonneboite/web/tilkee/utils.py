@@ -1,4 +1,5 @@
 import os
+import xml.etree
 
 import requests
 
@@ -85,10 +86,13 @@ def upload_file(fobj):
         'AWSAccessKeyId': response['AWSAccessKeyId'],
         'success_action_status': '201',
     }
+    headers = {
+        "Accept": "application/json",
+    }
 
     # Upload file to S3
     try:
-        response = requests.post(upload_url, data=data, files={'file': fobj},
+        response = requests.post(upload_url, data=data, files={'file': fobj}, headers=headers,
                                  timeout=AWS_HTTP_TIMEOUT_SECONDS)
     except requests.ReadTimeout:
         fobj.seek(0, 2) # seek to end of file
@@ -102,7 +106,9 @@ def upload_file(fobj):
         )
         raise TilkeeError(message)
 
-    return upload_url + '/' + key
+    tree = xml.etree.ElementTree.fromstring(response.content)
+    upload_url = tree.find('Location').text
+    return upload_url
 
 
 def get(endpoint, **kwargs):
