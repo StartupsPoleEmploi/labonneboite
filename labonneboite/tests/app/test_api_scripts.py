@@ -14,6 +14,7 @@ from labonneboite.tests.scripts.test_create_index import CreateIndexBaseTest
 
 class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
 
+    @mock.patch.object(es.settings, 'ES_TIMEOUT', 20)
     def setUp(self, *args, **kwargs):
         super(ApiScriptsTest, self).setUp(*args, **kwargs)
 
@@ -53,7 +54,6 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             self.assertFalse(data_list['companies'][1]['boosted'])
 
 
-    @mock.patch.object(es.settings, 'ES_TIMEOUT', 20)
     def test_update_office_boost_flag_all_romes_alternance(self):
         """
         Test `update_offices` boosted flag is present when all romes are boosted
