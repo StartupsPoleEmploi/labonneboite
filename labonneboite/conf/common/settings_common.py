@@ -12,6 +12,8 @@ overrides/lbbdev.py
 overrides/staging.py
 overrides/production.py
 """
+import os
+
 from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST, ENV_STAGING, ENV_PRODUCTION
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 
@@ -89,7 +91,7 @@ HEADCOUNT_VALUES = {
 
 # Databases
 ES_INDEX = 'labonneboite'
-ES_TIMEOUT = 10
+ES_TIMEOUT = int(os.environ.get('ES_TIMEOUT', 10))
 DB_HOST = 'localhost'
 DB_PORT = 3306
 DB_NAME = 'labonneboite'
