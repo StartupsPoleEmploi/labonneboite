@@ -34,7 +34,6 @@ logger = logging.getLogger(__name__)
 
 VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main', 'elasticsearch.trace']
 
-ES_BULK_TIMEOUT = 30
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 
 
@@ -159,7 +158,7 @@ def bulk_actions(actions):
     # http://elasticsearch-py.readthedocs.io/en/master/helpers.html
     logger.info("started bulk of %s actions...", len(actions))
     # each parallel job needs to use its own ES connection for maximum performance
-    bulk(es.Elasticsearch_with_dedicated_connection(timeout=ES_BULK_TIMEOUT), actions, chunk_size=ES_BULK_CHUNK_SIZE)
+    bulk(es.new_elasticsearch_instance(), actions, chunk_size=ES_BULK_CHUNK_SIZE)
     logger.info("completed bulk of %s actions!", len(actions))
 
 

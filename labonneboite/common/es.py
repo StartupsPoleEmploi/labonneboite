@@ -22,16 +22,16 @@ def Elasticsearch():
     connections.
     """
     if not ConnectionPool.ELASTICSEARCH_INSTANCE:
-        ConnectionPool.ELASTICSEARCH_INSTANCE = elasticsearch.Elasticsearch(timeout=settings.ES_TIMEOUT)
+        ConnectionPool.ELASTICSEARCH_INSTANCE = new_elasticsearch_instance()
     return ConnectionPool.ELASTICSEARCH_INSTANCE
 
 
-def Elasticsearch_with_dedicated_connection(timeout=None):
+def new_elasticsearch_instance():
     """
     In some cases e.g. parallel jobs you may need a dedicated es connection for each
     of your threads.
     """
-    return elasticsearch.Elasticsearch(timeout=timeout)
+    return elasticsearch.Elasticsearch(timeout=settings.ES_TIMEOUT)
 
 
 def drop_and_create_index():
