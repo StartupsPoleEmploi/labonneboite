@@ -55,6 +55,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'email_alternance',
         'new_phone',
         'new_website',
+        'social_network',
         'remove_email',
         'remove_phone',
         'remove_website',
@@ -91,6 +92,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'email_alternance': u"Email dédié à l'alternance",
         'new_phone': u"Nouveau téléphone",
         'new_website': u"Nouveau site web",
+        'social_network': u'Réseau social',
         'remove_email': u"Ne pas afficher l'email",
         'remove_phone': u"Ne pas afficher le téléphone",
         'remove_website': u"Ne pas afficher le site web",
@@ -168,6 +170,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'email_alternance',
         'new_phone',
         'new_website',
+        'social_network',
         'remove_email',
         'remove_phone',
         'remove_website',
@@ -212,6 +215,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         },
         'new_website': {
             'filters': [strip_filter],
+            'validators': [validators.optional(), validators.URL()],
+        },
+        'social_network': {
             'validators': [validators.optional(), validators.URL()],
         },
         'requested_by_email': {

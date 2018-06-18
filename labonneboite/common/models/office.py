@@ -9,6 +9,7 @@ from slugify import slugify
 from flask import url_for
 from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy.dialects import mysql
 from backports.functools_lru_cache import lru_cache
 
 from labonneboite.common import encoding as encoding_util
@@ -57,6 +58,7 @@ class OfficeMixin(PrimitiveOfficeMixin):
     in sync.
     """
     website = Column(String(191), default='', nullable=False)
+    social_network = Column(mysql.TINYTEXT, nullable=True)
     email_alternance = Column('email_alternance', String(191), default='', nullable=True)
     flag_alternance = Column(Boolean, default=False, nullable=False)
     flag_junior = Column(Boolean, default=False, nullable=False)
@@ -166,6 +168,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'stars': self.get_stars_for_rome_code(rome_code, hiring_type),
             'url':  self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
             'contact_mode': util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
+            'social_network': self.social_network or '',
             'alternance': self.qualifies_for_alternance(),
         }
 

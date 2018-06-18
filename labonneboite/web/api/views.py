@@ -447,6 +447,7 @@ def get_office_details(siret, alternance=False):
         'siret': office.siret,
         'stars': office.stars,
         'url': url,
+        'social_network': office.social_network or '',
         'address': {
             'city': office.city,
             'city_code': office.city_code,

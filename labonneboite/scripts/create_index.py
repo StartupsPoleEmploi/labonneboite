@@ -543,6 +543,7 @@ def update_offices():
                 # Note : we need to handle when score and score_alternance = 0
                 office.score = office_to_update.score if office_to_update.score is not None else office.score
                 office.score_alternance = office_to_update.score_alternance if office_to_update.score_alternance is not None else office.score_alternance
+                office.social_network = office_to_update.social_network
                 office.save()
 
                 # Apply changes in ElasticSearch.
