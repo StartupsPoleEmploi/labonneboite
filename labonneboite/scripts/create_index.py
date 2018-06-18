@@ -232,7 +232,7 @@ def get_office_as_es_doc(office):
 
     try:
         headcount = int(headcount)
-    except ValueError:
+    except (ValueError, TypeError):
         headcount = 0
 
     # Cleanup exotic characters.
