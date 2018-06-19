@@ -86,7 +86,7 @@
 
     function uploadDocuments($form, siret, files) {
         var formData = new FormData();
-        formData.set("csrf_token", $form.find("[name='csrf_token']")[0].value);
+        formData.append("csrf_token", $form.find("[name='csrf_token']")[0].value);
         for (var f = 0; f < files.length; f++) {
             formData.append('files', files[f], files[f].name);
         }
