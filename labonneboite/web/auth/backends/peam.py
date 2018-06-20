@@ -66,8 +66,8 @@ class PEAMOpenIdConnect(PEAMOAuth2, OpenIdConnectAuth):
                 'first_name': response['given_name'],
                 'last_name': response['family_name'],
             }
-        except KeyError:
+        except KeyError as e:
             # Sometimes PEAM responds without the user details.
-            raise AuthFailedMissingReturnValues
+            raise AuthFailedMissingReturnValues(*e.args)
 
 # pylint:enable=abstract-method
