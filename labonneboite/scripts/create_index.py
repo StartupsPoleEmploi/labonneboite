@@ -536,9 +536,13 @@ def update_offices():
             if office:
                 # Apply changes in DB.
                 office.email = u'' if office_to_update.remove_email else (office_to_update.new_email or office.email)
-                office.email_alternance = office_to_update.email_alternance or ''
                 office.tel = u'' if office_to_update.remove_phone else (office_to_update.new_phone or office.tel)
                 office.website = u'' if office_to_update.remove_website else (office_to_update.new_website or office.website)
+
+                office.email_alternance = office_to_update.email_alternance
+                office.phone_alternance = office_to_update.phone_alternance
+                office.website_alternance = office_to_update.website_alternance
+
                 # Note : we need to handle when score and score_alternance = 0
                 office.score = office_to_update.score if office_to_update.score is not None else office.score
                 office.score_alternance = office_to_update.score_alternance if office_to_update.score_alternance is not None else office.score_alternance

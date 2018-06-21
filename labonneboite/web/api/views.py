@@ -465,6 +465,6 @@ def patch_company_result_with_sensitive_information(api_username, office, result
     # sensitive information.
     if api_username in settings.API_INTERNAL_CONSUMERS:
         result['email'] = office.email_alternance if alternance and office.email_alternance else office.email
-        result['phone'] = office.tel
-        result['website'] = office.website
+        result['phone'] = office.phone_alternance if alternance and office.phone_alternance else office.tel
+        result['website'] = office.website_alternance if alternance and office.website_alternance else office.website
     return result

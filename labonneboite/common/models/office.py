@@ -8,6 +8,7 @@ from babel.dates import format_date
 from slugify import slugify
 from flask import url_for
 from sqlalchemy import Column, Integer, String, Float, Boolean
+from sqlalchemy.dialects import mysql
 from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.dialects import mysql
 from backports.functools_lru_cache import lru_cache
@@ -58,8 +59,12 @@ class OfficeMixin(PrimitiveOfficeMixin):
     in sync.
     """
     website = Column(String(191), default='', nullable=False)
+
     social_network = Column(mysql.TINYTEXT, nullable=True)
-    email_alternance = Column('email_alternance', String(191), default='', nullable=True)
+    email_alternance = Column('email_alternance', mysql.TINYTEXT, nullable=True)
+    phone_alternance = Column('phone_alternance', mysql.TINYTEXT, nullable=True)
+    website_alternance = Column('website_alternance', mysql.TINYTEXT, nullable=True)
+
     flag_alternance = Column(Boolean, default=False, nullable=False)
     flag_junior = Column(Boolean, default=False, nullable=False)
     flag_senior = Column(Boolean, default=False, nullable=False)
