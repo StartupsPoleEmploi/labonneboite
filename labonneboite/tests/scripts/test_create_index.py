@@ -891,6 +891,20 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         }, res['_source']['boosted_alternance_romes'])
 
 
+    def test_update_office_contact_mode(self):
+        """
+        Test `update_offices` to update an office: boost alternance score for specific ROME codes.
+        """
+        office_to_update = OfficeAdminUpdate(
+            sirets=self.office1.siret,
+            name=self.office1.company_name,
+            social_network=u"https://www.facebook.com/poleemploi/",
+        )
+        office_to_update.save()
+        script.update_offices()
+        office = Office.get(self.office1.siret)
+        # Check contact mode
+        self.assertEquals("https://www.facebook.com/poleemploi/", office.social_network)
 
 
 

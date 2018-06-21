@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from sqlalchemy import Boolean, DateTime, Integer, String, Text
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import desc
+from sqlalchemy.dialects import mysql
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
@@ -120,6 +121,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     email_alternance = Column(String(191), default='', nullable=False)
     new_phone = Column(String(191), default='', nullable=False)
     new_website = Column(String(191), default='', nullable=False)
+    social_network = Column(mysql.TINYTEXT, nullable=True)
 
     # Set `boost` to True to promote the office for LBB.
     # Set `boost_alternance` to True to promote the office for alternance.
