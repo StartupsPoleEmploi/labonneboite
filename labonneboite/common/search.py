@@ -766,7 +766,7 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
             company.boost = bool(romes_intersection)
 
         # Set contact mode and position
-        company.contact_mode = util.get_contact_mode_for_rome_and_naf(rome_code_for_contact_mode, company.naf)
+        company.contact_mode = util.get_contact_mode_for_rome_and_office(rome_code_for_contact_mode, company)
 
     try:
         aggregations = res['aggregations']

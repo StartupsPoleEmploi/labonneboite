@@ -119,7 +119,7 @@ def detail(siret):
     else:
         rome_description = settings.ROME_DESCRIPTIONS[rome]
 
-    contact_mode = util.get_contact_mode_for_rome_and_naf(rome, company.naf)
+    contact_mode = util.get_contact_mode_for_rome_and_office(rome, company)
 
     google_search = "%s+%s" % (company.name.replace(' ', '+'), company.city.replace(' ', '+'))
     google_url = "https://www.google.fr/search?q=%s" % google_search
@@ -212,7 +212,9 @@ def download(siret):
     else:
         dic = detail(siret)
         office = dic['company']
-        dic['stages'] = CONTACT_MODE_STAGES[dic['contact_mode']]
+
+        contact_mode = dic['contact_mode']
+        dic['stages'] = CONTACT_MODE_STAGES.get(contact_mode, [contact_mode])
         dic['date'] = date.today()
 
         # Render pdf file

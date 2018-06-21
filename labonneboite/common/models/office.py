@@ -175,7 +175,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'siret': self.siret,
             'stars': self.get_stars_for_rome_code(rome_code, hiring_type),
             'url':  self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
-            'contact_mode': self.contact_mode or util.get_contact_mode_for_rome_and_naf(rome_code, self.naf),
+            'contact_mode': util.get_contact_mode_for_rome_and_office(rome_code, self),
             'social_network': self.social_network or '',
             'alternance': self.qualifies_for_alternance(),
         }
