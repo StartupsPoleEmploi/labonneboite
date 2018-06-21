@@ -779,7 +779,6 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         script.update_offices()
 
         for siret in sirets:
-            office = Office.get(siret)
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
 
             # Check boosted scores.
@@ -898,7 +897,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         }, res['_source']['boosted_alternance_romes'])
 
 
-    def test_update_office_contact_mode(self):
+    def test_update_office_social_network(self):
         """
         Test `update_offices` to update an office: boost alternance score for specific ROME codes.
         """
@@ -912,6 +911,25 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office = Office.get(self.office1.siret)
         # Check contact mode
         self.assertEquals("https://www.facebook.com/poleemploi/", office.social_network)
+
+
+    def test_update_office_contact_mode(self):
+        """
+        Test `update_offices` to update an office: boost alternance score for specific ROME codes.
+        """
+        office_to_update = OfficeAdminUpdate(
+            sirets=self.office1.siret,
+            name=self.office1.company_name,
+            contact_mode=u"Come with his driver license",
+        )
+
+        office_to_update.save()
+        script.update_offices()
+
+        office = Office.get(self.office1.siret)
+
+        # Check contact mode
+        self.assertEquals("Come with his driver license", office.contact_mode)
 
 
 

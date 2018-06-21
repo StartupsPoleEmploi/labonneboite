@@ -45,6 +45,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'name',
         'score',
         'score_alternance',
+        'contact_mode',
         'boost',
         'romes_to_boost',
         'boost_alternance',
@@ -85,6 +86,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'sirets': u"Sirets",
         'name': u"Nom de l'entreprise",
         'reason': u"Raison",
+        'contact_mode': u"Modifier le mode de contact",
         'boost': u"Booster le score - LBB",
         'romes_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement - LBB",
         'romes_to_remove': u"Retirer des codes ROME associés à une entreprise - LBB",
@@ -162,11 +164,13 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'score': u"Nouveau score (si 0 : suppression de l'entreprise sur LBB mais pas LBA)",
         'score_aternance': u"Nouveau score alternance (si 0 : suppression de l'entreprise pour l'alternance)",
         'reason': u"Raison de la modification.",
+        'contact_mode': u"Texte libre (maximum 255 caractères)",
     }
 
     form_columns = [
         'sirets',
         'name',
+        'contact_mode',
         'score',
         'score_alternance',
         'boost',
