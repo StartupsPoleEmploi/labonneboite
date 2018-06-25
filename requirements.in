@@ -91,7 +91,6 @@ pyzmq
 # Secondary dependencies.
 # Explicitly specify secondary dependencies to ensure consistent build behavior.
 argparse
-astroid
 backports.functools-lru-cache
 blinker
 certifi
