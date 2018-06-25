@@ -954,11 +954,11 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         # The office should now have 3 geolocations in ES (the original one + Paris 10 + Marseille).
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office1.siret)
         expected_locations = [
-            {'lat': 49.1044, 'lon': 6.17952},
             {'lat': 43.25996690043557, 'lon': 5.370740865779022},
             {'lat': 48.8815994262695, 'lon': 2.36229991912841},
+            {'lat': 49.1044, 'lon': 6.17952},
         ]
-        self.assertItemsEqual(res['_source']['locations'], expected_locations)
+        self.assertEqual(sorted(res['_source']['locations'], key=lambda x: (x['lat'], x['lon'])), expected_locations)
 
         office = Office.get(self.office1.siret)
         self.assertTrue(office.has_multi_geolocations)
@@ -975,7 +975,7 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         expected_locations = [
             {'lat': 49.1044, 'lon': 6.17952},
         ]
-        self.assertItemsEqual(res['_source']['locations'], expected_locations)
+        self.assertEqual(res['_source']['locations'], expected_locations)
 
         office = Office.get(self.office1.siret)
         self.assertFalse(office.has_multi_geolocations)

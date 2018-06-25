@@ -76,7 +76,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
 
         with self.test_request_context:
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            self.assertEqual(rv.status_code, 200)
+            self.assertEqual(rv.status_code, 200, msg=rv.data)
             data_list = json.loads(rv.data)
 
             self.assertEqual(len(data_list['companies']), 2)

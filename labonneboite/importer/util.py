@@ -323,7 +323,7 @@ def get_open_file(filename):
 
 def get_reader(filename):
     open_file = get_open_file(filename)
-    return open_file(filename, "r")
+    return open_file(filename, "rb")
 
 
 @lru_cache(maxsize=128*1024)

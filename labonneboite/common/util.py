@@ -71,7 +71,7 @@ def get_user_ip():
 
 
 def sanitize_string(s):
-    if isinstance(s, str):
+    if isinstance(s, bytes):
         return s.decode('utf-8')
     elif isinstance(s, str):
         return s

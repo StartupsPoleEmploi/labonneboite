@@ -24,9 +24,9 @@ class PageTest(unittest.TestCase):
     def test_unicode_query_parameter(self):
         original_url = '/pouac?h=1l%C3%A0' # h=1là (observed in production)
         page = Page(1, 1, 1, original_url)
-        self.assertEqual('/pouac?h=1l%C3%A0&from=21&to=1', page.get_url())
+        self.assertEqual('/pouac?from=21&h=1l%C3%A0&to=1', page.get_url())
 
     def test_page_url_is_unicode(self):
         original_url = '/nîmes' # (observed in production)
         page = Page(1, 1, 1, original_url)
-        self.assertEqual('/nîmes?to=1&from=21', page.get_url().encode('utf8'))
+        self.assertEqual('/nîmes?from=21&to=1', page.get_url())

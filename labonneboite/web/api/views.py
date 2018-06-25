@@ -81,7 +81,7 @@ def company_list():
         location, zipcode, commune_id = get_location(request.args)
         fetcher = create_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
-        message = 'Invalid request argument: {}'.format(e.message)
+        message = 'Invalid request argument: {}'.format(e.args[0])
         return message, 400
 
     companies, _ = fetcher.get_companies(add_suggestions=False)
@@ -310,7 +310,7 @@ def create_fetcher(location, request_args):
     rome_code_list = [code.upper() for code in rome_codes.split(',')]
 
     for rome in rome_code_list:
-        if rome.encode('ascii', 'ignore') not in ROME_CODES:  # ROME_CODES contains ascii data but rome is unicode.
+        if rome not in ROME_CODES:  # ROME_CODES contains ascii data but rome is unicode.
             msg = 'Unknown rome_code: %s - Possible reasons: 1) %s 2) %s' % (
                 rome,
                 'This rome_code does not exist.',
@@ -361,7 +361,7 @@ def create_fetcher(location, request_args):
     if 'headcount' in request_args:
         headcount = HEADCOUNT_VALUES.get(request_args.get('headcount'))
         if not headcount:
-            raise InvalidFetcherArgument('headcount. Possible values : %s' % ', '.join(list(HEADCOUNT_VALUES.keys())))
+            raise InvalidFetcherArgument('headcount. Possible values : %s' % ', '.join(sorted(HEADCOUNT_VALUES.keys())))
     kwargs['headcount'] = headcount
 
     # Departments

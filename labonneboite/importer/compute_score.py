@@ -465,7 +465,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
         if data_gap_in_periods <= 0:
             raise ValueError("alternance data should have at least one month of gap")
 
-    total_periods = training_periods + 24 / months_per_period + data_gap_in_periods
+    total_periods = training_periods + 24 // months_per_period + data_gap_in_periods
 
     # add in place hiring aggregates per period
     compute_hiring_aggregates(
@@ -480,7 +480,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     # We model the problem as a linear regression.
     regr = linear_model.LinearRegression()
 
-    y_train_period = '%s-period-%s' % (prefix_for_fields, 24 / months_per_period)
+    y_train_period = '%s-period-%s' % (prefix_for_fields, 24 // months_per_period)
     y_train_regr = df_etab.apply(total_hired_period(y_train_period), axis=1)
 
     X_train, X_train_feature_names = get_features_for_lag(
@@ -530,7 +530,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
 
     # --- compute regression metrics
     y_train_regr_pred = regr.predict(X_train)
-    y_test_period = '%s-period-%s' % (prefix_for_fields, 12 / months_per_period)
+    y_test_period = '%s-period-%s' % (prefix_for_fields, 12 // months_per_period)
     y_test_regr = df_etab.apply(total_hired_period(y_test_period), axis=1)
     y_test_regr_pred = regr.predict(X_test)
     rmse_train = mean_squared_error(y_train_regr, y_train_regr_pred)

@@ -13,7 +13,7 @@ def get_n_lines(path, n=5, ignore_header=True):
         if ignore_header:
             myfile.readline().strip()
         for line in myfile:
-            results.append(line)
+            results.append(line.decode())
             count += 1
             if count >= n:
                 break

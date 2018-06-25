@@ -110,7 +110,7 @@ class PaginationManager(object):
 
     def get_page_count(self):
         return 1 + \
-            (self.company_count - 1) / OFFICES_PER_PAGE
+            (self.company_count - 1) // OFFICES_PER_PAGE
 
     def get_pages(self):
         if not self.pages:
@@ -150,7 +150,7 @@ class Page(object):
         self._from_number = None
         self._to_number = None
         self.current_from_number = current_from_number
-        self.url_parts = list(urllib.parse.urlparse(original_url.encode('utf8')))
+        self.url_parts = list(urllib.parse.urlparse(original_url))
 
     def get_from_number(self):
         if not self._from_number:
@@ -173,6 +173,6 @@ class Page(object):
         params = {'from': self.get_from_number(), 'to': self.get_to_number()}
         url_query = dict(urllib.parse.parse_qsl(self.url_parts[4]))
         url_query.update(params)
-        self.url_parts[4] = urlencode(url_query)
+        self.url_parts[4] = urlencode(sorted(url_query.items()))
         page_url = urllib.parse.urlunparse(self.url_parts)
-        return page_url.decode('utf8')
+        return page_url

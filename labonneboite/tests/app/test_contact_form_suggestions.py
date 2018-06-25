@@ -117,7 +117,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form = self.create_form('enlever')
             expected_parameters = self.create_params(form)
             expected_text = r" Une suppression a été demandée : <a href='(?P<url>.*)'>Créer une fiche de suppression</a>"
-            suggestion = make_save_suggestion(form).encode('utf8')
+            suggestion = make_save_suggestion(form)
 
             self.assertRegex(suggestion, expected_text)
             match = re.match(expected_text, suggestion)
@@ -136,7 +136,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form = self.create_form()
             expected_parameters = self.create_params(form)
             expected_text = r"Entreprise non modifiée via Save : <a href='(?P<url>.*)'>Créer une fiche de modification</a>"
-            suggestion = make_save_suggestion(form).encode('utf8')
+            suggestion = make_save_suggestion(form)
 
             self.assertRegex(suggestion, expected_text)
             match = re.match(expected_text, suggestion)

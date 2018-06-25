@@ -54,10 +54,10 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         """
         codes = "   57616\n\n\n\n\n\n     75110  \n  54      "
         codes_as_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
-        self.assertItemsEqual(codes_as_list, ['54', '57616', '75110'])
+        self.assertEqual(sorted(codes_as_list), ['54', '57616', '75110'])
         codes = "75\r57\n13"
         codes_as_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
-        self.assertItemsEqual(codes_as_list, ['13', '57', '75'])
+        self.assertEqual(sorted(codes_as_list), ['13', '57', '75'])
 
     def test_codes_as_geolocations(self):
         """
@@ -91,7 +91,7 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
             # Found for 57616.
             (49.135208952059884, 6.207906756168173),
         ]
-        self.assertItemsEqual(expected, codes_as_geolocations)
+        self.assertEqual(sorted(expected), sorted(codes_as_geolocations))
 
     def test_codes_as_json_geolocations(self):
         """

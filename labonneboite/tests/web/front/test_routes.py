@@ -31,7 +31,7 @@ class SearchEntreprisesTest(DatabaseTest):
             get_address.assert_called_once_with(42, 6, limit=1)
             self.assertEqual(200, response.status_code)
 
-        self.assertIn("Gotham City 19100", response.data)
+        self.assertIn("Gotham City 19100", response.data.decode())
 
 
     def test_search_by_coordinates_with_no_associated_address(self):
@@ -178,7 +178,7 @@ class SearchLegacyResultsTest(DatabaseTest):
         url = self.url_for('search.results', city='nancy', zipcode='54100', occupation='strategie-commerciale')
         rv = self.app.get(url, follow_redirects=True)
         self.assertEqual(rv.status_code, 200)
-        self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data)
+        self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data.decode())
 
     def test_search_with_wrong_zipcode_and_naf_filter(self):
         # Because of a wrong zipcode, the naf filter should not be taken into
@@ -188,7 +188,7 @@ class SearchLegacyResultsTest(DatabaseTest):
             url += '?naf=8610Z'
             rv = self.app.get(url, follow_redirects=True)
             self.assertEqual(rv.status_code, 200)
-            self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data)
+            self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data.decode())
 
 
 

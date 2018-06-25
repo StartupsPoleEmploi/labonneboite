@@ -23,7 +23,7 @@ class SlugDetailsTest(AppTest):
                 'INVALID_SLUG',
             ))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'no city found associated to the slug INVALID_SLUG')
+            self.assertEqual(rv.data, b'no city found associated to the slug INVALID_SLUG')
 
     def test_ok_job_slug(self):
         with self.test_request_context:
@@ -111,4 +111,4 @@ class CityCodeDetailsTest(AppTest):
                 'INVALID_CODE',
             ))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'no city found associated to the code INVALID_CODE')
+            self.assertEqual(rv.data, b'no city found associated to the code INVALID_CODE')

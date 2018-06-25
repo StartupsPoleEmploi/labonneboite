@@ -108,7 +108,7 @@ class ApiSecurityTest(ApiBaseTest):
             params['timestamp'] = '2007'
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'timestamp format: %Y-%m-%dT%H:%M:%S')
+            self.assertEqual(rv.data, b'timestamp format: %Y-%m-%dT%H:%M:%S')
 
     def test_expired_timestamp(self):
         with self.test_request_context:
@@ -122,7 +122,7 @@ class ApiSecurityTest(ApiBaseTest):
             ).strftime('%Y-%m-%dT%H:%M:%S')
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'timestamp has expired')
+            self.assertEqual(rv.data, b'timestamp has expired')
 
     def test_invalid_signature(self):
         with self.test_request_context:
@@ -134,7 +134,7 @@ class ApiSecurityTest(ApiBaseTest):
             params['signature'] = 'x'
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'signature is invalid')
+            self.assertEqual(rv.data, b'signature is invalid')
 
     def test_missing_user_param(self):
         with self.test_request_context:
@@ -144,7 +144,7 @@ class ApiSecurityTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'missing argument: user')
+            self.assertEqual(rv.data, b'missing argument: user')
 
     def test_unknown_user(self):
         with self.test_request_context:
@@ -155,7 +155,7 @@ class ApiSecurityTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'user is unknown')
+            self.assertEqual(rv.data, b'user is unknown')
 
 
 class ApiCompanyListTest(ApiBaseTest):
@@ -240,7 +240,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(
                 rv.data,
-                'Invalid request argument: missing arguments: either commune_id or latitude and longitude'
+                b'Invalid request argument: missing arguments: either commune_id or latitude and longitude'
             )
 
     def test_unknown_commune_id(self):
@@ -257,7 +257,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(
                 rv.data,
-                'Invalid request argument: could not resolve latitude and longitude from given commune_id'
+                b'Invalid request argument: could not resolve latitude and longitude from given commune_id'
             )
 
     def test_correct_headcount_text(self):
@@ -287,7 +287,7 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(
-                rv.data,
+                rv.data.decode(),
                 'Invalid request argument: page_size is too large. Maximum value is %s' % (
                     pagination.OFFICES_MAXIMUM_PAGE_SIZE
                 )
@@ -355,7 +355,7 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(rv.data,
-                'Invalid request argument: you must use rome_codes or rome_codes_keyword_search')
+                b'Invalid request argument: you must use rome_codes or rome_codes_keyword_search')
 
     def test_rome_codes_search_by_keyword_normal_case(self):
         self.es.index(index=settings.ES_INDEX, doc_type='ogr', id=1, body={
@@ -429,7 +429,7 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(rv.data,
-                'Invalid request argument: No match found for rome_codes_keyword_search.')
+                b'Invalid request argument: No match found for rome_codes_keyword_search.')
 
     def test_rome_code_and_label_are_present_in_response(self):
         with self.test_request_context:
@@ -526,7 +526,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertTrue(rv.data.startswith('Invalid request argument: Unknown rome_code: INVALID'))
+            self.assertTrue(rv.data.decode().startswith('Invalid request argument: Unknown rome_code: INVALID'))
 
     def test_count_pagination(self):
         with self.test_request_context:
@@ -778,7 +778,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertTrue(rv.data.startswith('Invalid request argument: NAF code(s): INVALID INVALID_TOO'))
+            self.assertTrue(rv.data.decode().startswith('Invalid request argument: NAF code(s): INVALID INVALID_TOO'))
 
     def test_same_rome_with_no_naf_filters(self):
         with self.test_request_context:
@@ -851,7 +851,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertIn('Invalid request argument: NAF code(s): 9499Z. Possible values : ', rv.data)
+            self.assertIn('Invalid request argument: NAF code(s): 9499Z. Possible values : ', rv.data.decode())
 
     def test_wrong_value_in_sort(self):
         with self.test_request_context:
@@ -863,7 +863,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'Invalid request argument: sort. Possible values : score, distance')
+            self.assertEqual(rv.data, b'Invalid request argument: sort. Possible values : score, distance')
 
     def test_sort_by_distance(self):
         with self.test_request_context:
@@ -910,7 +910,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'Invalid request argument: contract. Possible values : alternance, dpae')
+            self.assertEqual(rv.data, b'Invalid request argument: contract. Possible values : alternance, dpae')
 
     def test_wrong_headcount_value(self):
         with self.test_request_context:
@@ -922,7 +922,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'Invalid request argument: headcount. Possible values : small, big, all')
+            self.assertEqual(rv.data, b'Invalid request argument: headcount. Possible values : all, big, small')
 
     def test_headcount_all(self):
         with self.test_request_context:
@@ -1013,7 +1013,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 400)
-            self.assertIn('Invalid request argument: departments : XX, YY', rv.data)
+            self.assertIn('Invalid request argument: departments : XX, YY', rv.data.decode())
 
             # no departments filter => Expected 2 results
             params = self.add_security_params({

@@ -272,7 +272,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     @property
     def city(self):
         try:
-            return CITY_NAMES[self.city_code].decode('utf-8')
+            return CITY_NAMES[self.city_code]
         except KeyError:
             if self.city_code.startswith('75'):
                 return 'Paris'

@@ -39,10 +39,7 @@ def get_ordered_argument_string(args):
 def make_signature(args, timestamp, user='labonneboite'):
     args['timestamp'] = timestamp
     api_key = settings.API_KEYS.get(user, '')
-    ordered_arg_string = get_ordered_argument_string(args)
-    digest = hmac.new(api_key, ordered_arg_string).hexdigest()
-    signature = digest.decode()
-    return signature
+    return compute_signature(args, api_key)
 
 
 def check_api_request(request):
@@ -67,8 +64,7 @@ def check_api_request(request):
 
 def compute_signature(args, api_key):
     ordered_arg_string = get_ordered_argument_string(args)
-    digest = hmac.new(api_key, ordered_arg_string).hexdigest()
-    return digest.decode()
+    return hmac.new(api_key.encode(), ordered_arg_string.encode()).hexdigest()
 
 
 def check_signature(request, requested_signature, api_key):

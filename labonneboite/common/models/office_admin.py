@@ -275,7 +275,10 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
             {"lat" : 48.86, "lon" : 2.35},
         ]
         """
-        return sorted([{'lat': coords[0], 'lon': coords[1]} for coords in json.loads(self.geolocations)])
+        return sorted(
+            [{'lat': coords[0], 'lon': coords[1]} for coords in json.loads(self.geolocations)],
+            key=lambda x: (x['lat'], x['lon'])
+        )
 
     def geolocations_as_html_links(self):
         """
