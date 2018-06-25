@@ -13,8 +13,6 @@ class TestResults(LbbSeleniumTestCase):
         url = self.url_for('search.results', city='metz', zipcode='57000', occupation='comptabilite')
         self.driver.get(url)
 
-        self.driver.find_element_by_css_selector('#tilkee-modal a.modal-close-button').click()
-
         # Get the HTML element that contains all company informations.
         company_container = self.driver.find_elements_by_class_name('lbb-result')[0]
         time.sleep(0.5)
