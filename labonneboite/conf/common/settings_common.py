@@ -128,6 +128,7 @@ MEMO_JS_URL = 'https://memo.pole-emploi.fr/js/importButton/memoButton-min.js'
 API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
 
 # Tilkee parameters: credentials are provided by the Tilkee tech team
+TILKEE_ENABLED = False
 TILKEE_API_BASE_URL = 'https://api.tilkee.com'
 TILKEE_VERIFY_SSL = True
 TILKEE_ACCESS_TOKEN = '<set it>'

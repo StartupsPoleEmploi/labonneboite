@@ -15,8 +15,6 @@ class TestSimple(LbbSeleniumTestCase):
         """
         self.driver.get(self.url_for('root.home'))
 
-        self.driver.find_element_by_css_selector('#tilkee-modal a.modal-close-button').click()
-
         self.driver.find_element_by_name('j').send_keys('boucher')
         time.sleep(3)
         self.driver.find_element_by_id('j').send_keys(Keys.DOWN)
