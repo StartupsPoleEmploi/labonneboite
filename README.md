@@ -108,6 +108,26 @@ We are using [Nose](https://nose.readthedocs.io/):
 
     $ make test-all
 
+## Upgrade requirements
+
+Our requirements are managed with [`pip-tools`](https://github.com/jazzband/pip-tools):
+
+    pip install pip-tools
+    make requirements-compile
+
+To upgrade a package DO NOT EDIT `requirements.txt` DIRECTLY! Instead, run:
+
+    pip-compile -o requirements.txt --upgrade-package mypackagename requirements.in
+
+This last command will upgrade `mypackagename` and its dependencies to the
+latest version. To update your virtualenv, you can then run:
+
+    pip-sync
+
+or:
+
+    pip install -r requirements
+
 # Debugging
 
 ## Accessing your local MySQL
