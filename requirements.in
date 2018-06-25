@@ -1,4 +1,4 @@
-Flask
+Flask<0.13
 Flask-Mandrill
 Flask-Script
 
@@ -33,7 +33,7 @@ line-profiler
 
 # Databases and migrations.
 alembic
-MySQL-python
+mysqlclient
 SQLAlchemy-Utils
 SQLAlchemy
 
@@ -117,7 +117,6 @@ python-dateutil
 python-editor
 python-openid
 pytz
-reportlab
 requests-oauthlib
 six
 social-auth-core
@@ -126,4 +125,3 @@ Unidecode
 urllib3
 webassets
 wrapt
-wsgiref
