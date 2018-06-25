@@ -181,6 +181,7 @@ def register_context_processors(flask_app):
             'enable_google_optimize': settings.ENABLE_GOOGLE_OPTIMIZE,
             'google_tag_manager_id': settings.GOOGLE_TAG_MANAGER_ID,
             'enable_adblock_tracking': settings.ENABLE_ADBLOCK_TRACKING,
+            'tilkee_enabled': settings.TILKEE_ENABLED,
         }
 
     def inject_user():

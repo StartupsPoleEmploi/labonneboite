@@ -7,7 +7,7 @@
         $tilkeeModal.html(html);
     }
 
-    function showIntro() {
+    function showTilkeeIntro() {
         var lastDisplay = localStorage.getItem("lastTilkeeIntroDisplay");
         var now = new Date().getTime();
         // Display Tilkee intro once per user and per month
@@ -143,8 +143,6 @@
     }
 
     $(document).on('lbbready', function() {
-        showIntro();
-
         $(".tilkee-button").on("click", function(e) {
             e.preventDefault();
             $(this).tooltip("hide");

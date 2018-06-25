@@ -2,8 +2,10 @@
 import logging
 
 from flask import Blueprint, render_template, request, url_for
+from flask.helpers import BadRequest
 from flask_login import current_user
 
+from labonneboite.conf import settings
 from labonneboite.common.models.office import Office
 from . import utils
 
@@ -14,6 +16,9 @@ tilkeeBlueprint = Blueprint('tilkee', __name__)
 
 @tilkeeBlueprint.route('/upload', methods=['GET', 'POST'])
 def upload():
+    if not settings.TILKEE_ENABLED:
+        raise BadRequest
+
     company = Office.query.filter_by(siret=request.args.get('siret')).first()
     if not company:
         return 'Cette entreprise n\'existe pas', 400
