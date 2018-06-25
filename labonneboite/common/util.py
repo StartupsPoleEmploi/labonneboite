@@ -113,8 +113,11 @@ def is_safe_url(url, allowed_hosts=None):
     return (not scheme or scheme in valid_schemes)
 
 
-def get_contact_mode_for_rome_and_naf(rome, naf):
-    naf_prefix = naf[:2]
+def get_contact_mode_for_rome_and_office(rome, office):
+    if office.contact_mode:
+        return office.contact_mode
+
+    naf_prefix = office.naf[:2]
     naf_prefix_to_rome_to_contact_mode = load_contact_modes()
     try:
         return naf_prefix_to_rome_to_contact_mode[naf_prefix][rome]

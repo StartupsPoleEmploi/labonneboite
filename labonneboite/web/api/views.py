@@ -93,7 +93,7 @@ def company_list():
             zipcode=zipcode,
             extra_query_string=get_ga_query_string(),
             hiring_type=fetcher.hiring_type,
-        ))
+        ), fetcher.hiring_type == hiring_type_util.ALTERNANCE)
         for company in companies
     ]
 
