@@ -25,6 +25,7 @@ class OfficeAdminRemoveModelView(AdminModelViewMixin, ModelView):
         'name',
         'reason',
         'date_created',
+        'date_updated',
         'date_follow_up_phone_call',
         'initiative',
     ]
