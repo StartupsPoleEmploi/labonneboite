@@ -63,7 +63,7 @@ class OfficeMixin(PrimitiveOfficeMixin):
 
     social_network = Column(mysql.TINYTEXT, nullable=True)
 
-    email_alternance = Column('email_alternance', mysql.TINYTEXT, nullable=True)
+    email_alternance = Column('email_alternance', mysql.TINYTEXT, default='', nullable=True)
     phone_alternance = Column('phone_alternance', mysql.TINYTEXT, nullable=True)
     website_alternance = Column('website_alternance', mysql.TINYTEXT, nullable=True)
     contact_mode = Column('contact_mode', mysql.TINYTEXT, nullable=True)
