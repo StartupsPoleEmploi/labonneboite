@@ -5,6 +5,7 @@ from urllib.parse import parse_qsl
 from flask import url_for
 import mock
 
+from labonneboite.conf import settings
 from labonneboite.tests.test_base import AppTest, DatabaseTest
 from labonneboite.web.search.views import get_canonical_results_url, get_location
 
@@ -56,7 +57,7 @@ class SearchEntreprisesTest(DatabaseTest):
         response = self.app.get(url)
 
         self.assertEqual(
-            'http://' + self.TEST_SERVER_NAME + '/entreprises?city=cervieres&zipcode=05100&occupation=boucherie',
+            settings.PREFERRED_URL_SCHEME + '://' + settings.SERVER_NAME + '/entreprises?city=cervieres&zipcode=05100&occupation=boucherie',
             url
         )
         self.assertEqual(200, response.status_code)

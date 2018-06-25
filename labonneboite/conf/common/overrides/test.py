@@ -1,5 +1,7 @@
 import os
 
+TESTING = True
+
 ES_INDEX = 'labonneboite_unit_test'
 
 DB_HOST = os.environ.get('DB_HOST', '127.0.0.1')
@@ -15,3 +17,6 @@ API_KEYS = {
 }
 
 API_ADRESSE_BASE_URL = 'http://urlintrouvablepourlbb.fr'
+
+SENTRY_ENVIRONMENT = "test"
+WTF_CSRF_ENABLED = False

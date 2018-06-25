@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 
 import mock
 
+from labonneboite.conf import settings
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest
 from labonneboite.scripts import create_index as script
 from labonneboite.common.models import OfficeAdminUpdate
@@ -22,7 +23,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
             'name': 'OFFICE 1',
             'raison_sociale': 'Raison sociale 1',
             'naf_text': '\xc9tudes de march\xe9 et sondages',
-            'url': 'http://%s/00000000000001/details' % self.TEST_SERVER_NAME,
+            'url': '%s://%s/00000000000001/details' % (settings.PREFERRED_URL_SCHEME, settings.SERVER_NAME),
             'lon': 6.0,
             'headcount_text': '10 à 19 salariés',
             'stars': 4.0,

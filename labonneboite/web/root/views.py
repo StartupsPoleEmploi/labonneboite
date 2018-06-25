@@ -56,7 +56,7 @@ def faq():
 
 @rootBlueprint.route('/conditions-generales')
 def cgu():
-    host = settings.HOST
+    host = settings.SERVER_NAME
     return render_template('root/cgu.html', host=host)
 
 

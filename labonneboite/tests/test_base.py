@@ -6,6 +6,7 @@ from flask import url_for as flask_url_for
 from flask import _request_ctx_stack
 
 from labonneboite.common.database import db_session, delete_db, engine, init_db
+from labonneboite.common import env
 from labonneboite.common import es
 from labonneboite.conf import settings
 from labonneboite.web.app import app
@@ -29,12 +30,7 @@ class AppTest(unittest.TestCase):
     http://flask.pocoo.org/docs/0.12/testing/#accessing-and-modifying-sessions
     """
 
-    # https://kronosapiens.github.io/blog/2014/08/14/understanding-contexts-in-flask.html
-    TEST_SERVER_NAME = 'test.labonneboite.fr'
-
     def setUp(self):
-        # Setting a SERVER_NAME enables URL generation without a request context but with an application context.
-        app.config['SERVER_NAME'] = self.TEST_SERVER_NAME
         self.app = app.test_client()
         self.app_context = app.app_context()
         self.test_request_context = app.test_request_context()
@@ -96,6 +92,11 @@ class DatabaseTest(AppTest):
     """
 
     def setUp(self):
+        if env.get_current_env() != env.ENV_TEST:
+            raise ValueError("Running database tests, but not in test mode. You"
+                             " most certainly don't want to do that. Set the"
+                             " `LBB_ENV=test` environment variable.")
+
         # Disable elasticsearch logging
         logging.getLogger('elasticsearch').setLevel(logging.CRITICAL)
         logging.getLogger('main').setLevel(logging.CRITICAL)

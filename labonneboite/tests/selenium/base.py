@@ -31,6 +31,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
 
         # Random port generation
         app.config['LIVESERVER_PORT'] = 0
+        app.config['SERVER_NAME'] = None
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
         logging.getLogger('werkzeug').setLevel(logging.CRITICAL)

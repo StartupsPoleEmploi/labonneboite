@@ -42,7 +42,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form.siret = StringField('Siret')
             form.siret.data = "12345678901234"
 
-            url = url_for("officeadminremove.edit_view", id=1)
+            url = url_for("officeadminremove.edit_view", id=1, _external=True)
             expected_text = "Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % url
 
             self.assertEqual(expected_text, make_save_suggestion(form))
@@ -82,7 +82,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form.siret = StringField('Siret')
             form.siret.data = "78548035101646"
 
-            url = url_for("officeadminadd.edit_view", id=office_admin_add.id)
+            url = url_for("officeadminadd.edit_view", id=office_admin_add.id, _external=True)
             expected_text = "Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % url
 
             self.assertEqual(expected_text, make_save_suggestion(form))
@@ -103,7 +103,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             form.siret = StringField('Siret')
             form.siret.data = "78548035101646"
 
-            url = url_for("officeadminupdate.edit_view", id=office_to_update.id)
+            url = url_for("officeadminupdate.edit_view", id=office_to_update.id, _external=True)
             expected_text = "Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % url
 
             self.assertEqual(expected_text, make_save_suggestion(form))
@@ -124,7 +124,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             url, querystring = urllib.parse.splitquery(match.groupdict()['url'])
             parameters = dict(urllib.parse.parse_qsl(querystring))
 
-            self.assertEqual(url_for("officeadminremove.create_view"), url)
+            self.assertEqual(url_for("officeadminremove.create_view", _external=True), url)
             self.assertEqual(expected_parameters, parameters)
 
     # Company exists and no OfficeAdmin found : suggest officeAdminAdd
@@ -143,7 +143,7 @@ class SaveSuggestionsTest(CreateIndexBaseTest):
             url, querystring = urllib.parse.splitquery(match.groupdict()['url'])
             parameters = dict(urllib.parse.parse_qsl(querystring))
 
-            self.assertEqual(url_for("officeadminupdate.create_view"), url)
+            self.assertEqual(url_for("officeadminupdate.create_view", _external=True), url)
             self.assertEqual(expected_parameters, parameters)
 
 

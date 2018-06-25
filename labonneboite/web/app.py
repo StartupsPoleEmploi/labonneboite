@@ -29,7 +29,7 @@ from labonneboite.common.models import Office
 from labonneboite.conf import settings
 
 # labonneboite web.
-from labonneboite.web.config import get_config
+from labonneboite.web.config import CONFIG
 
 
 # Fix a bug with Python 2, strftime and Unicode.
@@ -221,14 +221,14 @@ def register_after_request(flask_app):
 def create_app():
 
     flask_app = Flask(__name__)
-    flask_app.config.from_object(get_config())
+    flask_app.config.from_object(CONFIG)
 
     # The application is deployed on servers behind an HTTP proxy, we need ProxyFix
     # and the X-Forwarded-* HTTP headers in the proxy configuration.
     # http://flask.pocoo.org/docs/0.12/deploying/wsgi-standalone/#proxy-setups
     flask_app.wsgi_app = ProxyFix(flask_app.wsgi_app)
 
-    if get_config().DEBUG:
+    if CONFIG.DEBUG:
         try:
             from flask_debugtoolbar import DebugToolbarExtension
             flask_app.config['DEBUG_TB_PROFILER_ENABLED'] = True

@@ -14,8 +14,11 @@ overrides/production.py
 """
 import os
 
-from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST, ENV_STAGING, ENV_PRODUCTION
+from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
+
+DEBUG = False
+TESTING = False
 
 LOG_LEVEL = 'DEBUG'
 
@@ -27,15 +30,19 @@ NAF_CODES = load_naf_labels()
 
 SEARCHING_TIME = 10000
 
-HOST = 'labonneboite.pole-emploi.fr'
-
 DISTANCE_FILTER_DEFAULT = 10
 
 ENABLE_TIMEIT_TIMERS = True
 
 SENTRY_DSN = None
+SENTRY_ENVIRONMENT = ""
 
 ADMIN_EMAIL = 'no-reply@labonneboite.pole-emploi.fr'
+
+SERVER_NAME = 'labonneboite.pole-emploi.fr'
+PREFERRED_URL_SCHEME = 'http'
+
+WTF_CSRF_ENABLED = True
 
 # Values below are *fake* and should be used in development and test environments only.
 # The real values are confidential, stored outside of github repository
@@ -144,11 +151,3 @@ elif get_current_env() == ENV_DEVELOPMENT:
 elif get_current_env() == ENV_TEST:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.test import *
-elif get_current_env() == ENV_STAGING:
-    # pylint: disable=wildcard-import,unused-wildcard-import
-    from .overrides.staging import *
-elif get_current_env() == ENV_PRODUCTION:
-    # pylint: disable=wildcard-import,unused-wildcard-import
-    from .overrides.production import *
-else:
-    raise Exception("unknown environment")

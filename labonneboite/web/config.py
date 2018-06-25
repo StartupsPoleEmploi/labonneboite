@@ -3,12 +3,15 @@
 Flask app configuration settings.
 """
 from labonneboite.conf import settings
-from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT, ENV_PRODUCTION, ENV_STAGING, ENV_TEST
 
 
-class BaseConfig(object):
-    DEBUG = False
-    ASSETS_DEBUG = False
+class Config(object):
+    DEBUG = settings.DEBUG
+    ASSETS_DEBUG = settings.DEBUG
+    TESTING = settings.TESTING
+
+    SERVER_NAME = settings.SERVER_NAME
+    PREFERRED_URL_SCHEME = settings.PREFERRED_URL_SCHEME
 
     SECRET_KEY = settings.FLASK_SECRET_KEY
 
@@ -19,7 +22,8 @@ class BaseConfig(object):
     MANDRILL_API_KEY = settings.MANDRILL_API_KEY
     MANDRILL_DEFAULT_FROM = 'pole-emploi@noreply-pole-emploi.fr'
 
-    WTF_CSRF_ENABLED = True
+    SENTRY_ENVIRONMENT = settings.SENTRY_ENVIRONMENT
+    WTF_CSRF_ENABLED = settings.WTF_CSRF_ENABLED
 
     # Babel is currently only used with Flask-Admin.
     # http://flask-admin.readthedocs.io/en/latest/advanced/#localization-with-flask-babelex
@@ -46,32 +50,4 @@ class BaseConfig(object):
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_USER_FIELDS = ['external_id', 'email', 'gender', 'first_name', 'last_name']
 
 
-class ProdConfig(BaseConfig):
-    SENTRY_ENVIRONMENT = "production"
-
-
-class StagingConfig(BaseConfig):
-    SENTRY_ENVIRONMENT = "staging"
-
-
-class DevConfig(BaseConfig):
-    DEBUG = True
-    ASSETS_DEBUG = True
-    SENTRY_ENVIRONMENT = "development"
-
-
-class TestConfig(BaseConfig):
-    TESTING = True
-    WTF_CSRF_ENABLED = False
-    SENTRY_ENVIRONMENT = "test"
-
-
-configs = {
-    ENV_DEVELOPMENT: DevConfig,
-    ENV_PRODUCTION: ProdConfig,
-    ENV_STAGING: StagingConfig,
-    ENV_TEST: TestConfig,
-}
-
-def get_config():
-    return configs[get_current_env()]
+CONFIG = Config()
