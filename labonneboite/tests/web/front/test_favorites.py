@@ -19,16 +19,16 @@ class FavoriteBaseTest(DatabaseTest):
                 'lat': 48.866667,
                 'lon': 2.333333,
             }],
-            'zip_code': u'75010',
-            'commune_id': u'75110',
+            'zip_code': '75010',
+            'commune_id': '75110',
         },
         'metz': {
             'coords': [{
                 'lat': 49.133333,
                 'lon': 6.166667,
             }],
-            'zip_code': u'57000',
-            'commune_id': u'57463',
+            'zip_code': '57000',
+            'commune_id': '57463',
         },
     }
 
@@ -36,41 +36,41 @@ class FavoriteBaseTest(DatabaseTest):
         super(FavoriteBaseTest, self).setUp(*args, **kwargs)
 
         # Create a user.
-        self.user = User.create(email=u'j@test.com', gender=u'male', first_name=u'John', last_name=u'Doe')
+        self.user = User.create(email='j@test.com', gender='male', first_name='John', last_name='Doe')
 
         # Insert test data into Elasticsearch.
         docs = [
             {
-                'naf': u'4711F',
-                'siret': u'00000000000001',
+                'naf': '4711F',
+                'siret': '00000000000001',
                 'score': 98,
                 'headcount': 32,
                 'locations': self.positions['metz']['coords'],
-                'name': u'Centre Distributeur E.Leclerc',
+                'name': 'Centre Distributeur E.Leclerc',
             },
             {
-                'naf': u'4722Z',
-                'siret': u'00000000000002',
+                'naf': '4722Z',
+                'siret': '00000000000002',
                 'score': 98,
                 'headcount': 12,
                 'locations': self.positions['metz']['coords'],
-                'name': u'Maison Nicolas',
+                'name': 'Maison Nicolas',
             },
             {
-                'naf': u'4711F',
-                'siret': u'00000000000003',
+                'naf': '4711F',
+                'siret': '00000000000003',
                 'score': 98,
                 'headcount': 32,
                 'locations': self.positions['paris']['coords'],
-                'name': u'Carrefour Paris',
+                'name': 'Carrefour Paris',
             },
             {
-                'naf': u'4722Z',
-                'siret': u'00000000000004',
+                'naf': '4722Z',
+                'siret': '00000000000004',
                 'score': 98,
                 'headcount': 84,
                 'locations': self.positions['paris']['coords'],
-                'name': u'Maistre Mathieu',
+                'name': 'Maistre Mathieu',
             },
         ]
         for i, doc in enumerate(docs, start=1):
@@ -102,7 +102,7 @@ class FavoriteBaseTest(DatabaseTest):
                 naf=doc['naf'],
                 city_code=commune_id,
                 zipcode=zip_code,
-                email=u'foo@bar.com',
+                email='foo@bar.com',
                 departement=zip_code[:2],
                 x=doc['locations'][0]['lon'],
                 y=doc['locations'][0]['lat'],
@@ -110,7 +110,7 @@ class FavoriteBaseTest(DatabaseTest):
             office.save()
 
         # We should have as much entries in MariaDB/MySQL than in Elasticsearch.
-        self.assertEquals(Office.query.count(), len(docs))
+        self.assertEqual(Office.query.count(), len(docs))
 
 
 class FavoriteTest(FavoriteBaseTest):
@@ -122,7 +122,7 @@ class FavoriteTest(FavoriteBaseTest):
         """
         Test download favorites list as csv.
         """
-        office = Office.query.filter(Office.siret == u'00000000000004').one()
+        office = Office.query.filter(Office.siret == '00000000000004').one()
         url = self.url_for('user.favorites_list_as_csv')
 
         # An anonymous user cannot download the favorites list.
@@ -139,7 +139,7 @@ class FavoriteTest(FavoriteBaseTest):
             rv = self.app.get(url)
             self.assertEqual(rv.status_code, 200)
             self.assertEqual('application/csv', rv.mimetype)
-            self.assertIn(u'siret', rv.data.decode('utf-8'))
+            self.assertIn('siret', rv.data.decode('utf-8'))
             self.assertIn(office.siret, rv.data.decode('utf-8'))
 
 
@@ -147,7 +147,7 @@ class FavoriteTest(FavoriteBaseTest):
         """
         Test favorites list.
         """
-        office = Office.query.filter(Office.siret == u'00000000000004').one()
+        office = Office.query.filter(Office.siret == '00000000000004').one()
         url_list = self.url_for('user.favorites_list')
 
         # An anonymous user cannot access the favorites list.
@@ -160,7 +160,7 @@ class FavoriteTest(FavoriteBaseTest):
 
             rv = self.app.get(url_list)
             self.assertEqual(rv.status_code, 200)
-            self.assertTrue(u'Aucun favori pour le moment.' in rv.data.decode('utf-8'))
+            self.assertTrue('Aucun favori pour le moment.' in rv.data.decode('utf-8'))
 
             # Create a favorite for the user.
             UserFavoriteOffice.create(user_id=self.user.id, office_siret=office.siret)
@@ -174,7 +174,7 @@ class FavoriteTest(FavoriteBaseTest):
         """
         Test the creation of a favorite.
         """
-        office = Office.query.filter(Office.siret == u'00000000000002').one()
+        office = Office.query.filter(Office.siret == '00000000000002').one()
         url_list = self.url_for('user.favorites_list')
         url_add = self.url_for('user.favorites_add', siret=office.siret)
 
@@ -211,7 +211,7 @@ class FavoriteTest(FavoriteBaseTest):
         """
         Test the deletion of a favorite.
         """
-        office = Office.query.filter(Office.siret == u'00000000000003').one()
+        office = Office.query.filter(Office.siret == '00000000000003').one()
         url_list = self.url_for('user.favorites_list')
         url_delete = self.url_for('user.favorites_delete', siret=office.siret)
 
@@ -237,4 +237,4 @@ class FavoriteTest(FavoriteBaseTest):
 
             rv = self.app.get(url_list)
             self.assertEqual(rv.status_code, 200)
-            self.assertTrue(u'Aucun favori pour le moment.' in rv.data.decode('utf-8'))
+            self.assertTrue('Aucun favori pour le moment.' in rv.data.decode('utf-8'))

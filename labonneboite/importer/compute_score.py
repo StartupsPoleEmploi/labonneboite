@@ -17,7 +17,7 @@ from operator import getitem
 import os
 import pickle
 import sys
-from urlparse import urlparse
+from urllib.parse import urlparse
 import validators
 
 
@@ -188,7 +188,7 @@ def tranche_to_effectif(tranche):
         '52': 5000,
         '53': 10000
     }
-    if tranche not in map_tranche_to_effectif.keys():
+    if tranche not in list(map_tranche_to_effectif.keys()):
         return 1
     return map_tranche_to_effectif[tranche]
 
@@ -310,8 +310,8 @@ def get_df_etab_with_hiring_monthly_aggregates(departement, prediction_beginning
     df_dpae["siret"] = df_dpae.index
     df_dpae = df_dpae.fillna(0)
 
-    df_dpae.columns = [u'-'.join([str(c) for c in col]) for col in df_dpae.columns.values]
-    siret_raw_column_name = u'siret--'
+    df_dpae.columns = ['-'.join([str(c) for c in col]) for col in df_dpae.columns.values]
+    siret_raw_column_name = 'siret--'
     df_dpae['siret'] = df_dpae[siret_raw_column_name]
     del df_dpae[siret_raw_column_name]
     debug_df(df_dpae, "after transform")
@@ -396,7 +396,7 @@ def get_hirings_over_period_for_office(office, prediction_beginning_date, months
     columns_of_period = []
     for i in range(0, months_per_period):  # [0, 1, 2, ..., months_per_period - 1]
         current_date = start_date + relativedelta(months=i)
-        columns_of_period.append(u'%s-%s-%s' % (prefix, current_date.year, current_date.month))
+        columns_of_period.append('%s-%s-%s' % (prefix, current_date.year, current_date.month))
 
     hirings_over_period = 0
     for column in columns_of_period:

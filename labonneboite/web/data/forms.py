@@ -22,8 +22,8 @@ class NafForm(FlaskForm):
     """
     Enter a NAF code to find associated ROME codes.
     """
-    naf = StringField(u"NAF", validators=[DataRequired()],
-        description=u"Saisissez un code NAF pour trouver les codes ROME associés.", filters=[upper_filter])
+    naf = StringField("NAF", validators=[DataRequired()],
+        description="Saisissez un code NAF pour trouver les codes ROME associés.", filters=[upper_filter])
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -35,15 +35,15 @@ class NafForm(FlaskForm):
 
     def validate_naf(self, field):
         if field.data and not mapping_util.naf_is_valid(field.data):
-            raise ValidationError(u"Ce code NAF n'est pas valide.")
+            raise ValidationError("Ce code NAF n'est pas valide.")
 
 
 class RomeForm(FlaskForm):
     """
     Enter a ROME code to find associated NAF codes.
     """
-    rome = StringField(u"ROME", validators=[DataRequired()],
-        description=u"Saisissez un code ROME pour trouver les codes NAF associés.", filters=[upper_filter])
+    rome = StringField("ROME", validators=[DataRequired()],
+        description="Saisissez un code ROME pour trouver les codes NAF associés.", filters=[upper_filter])
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -55,15 +55,15 @@ class RomeForm(FlaskForm):
 
     def validate_rome(self, field):
         if field.data and not mapping_util.rome_is_valid(field.data):
-            raise ValidationError(u"Ce code ROME n'est pas valide.")
+            raise ValidationError("Ce code ROME n'est pas valide.")
 
 
 class SiretForm(FlaskForm):
     """
     Enter a SIRET to find associated ROME codes.
     """
-    siret = StringField(u"Siret", validators=[DataRequired(), siret_validator],
-        description=u"Saisissez un SIRET pour trouver les codes ROME associés.")
+    siret = StringField("Siret", validators=[DataRequired(), siret_validator],
+        description="Saisissez un SIRET pour trouver les codes ROME associés.")
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -78,6 +78,6 @@ class SiretForm(FlaskForm):
         if not self.errors and field.data:
             office = Office.query.filter_by(siret=self.data['siret']).first()
             if not office:
-                raise ValidationError(u"Ce SIRET n'existe pas.")
+                raise ValidationError("Ce SIRET n'existe pas.")
             # Set office as a form attribute for easy access in the view and to avoid another query.
             self.office = office

@@ -86,10 +86,10 @@ class TestComputeScore(DatabaseTest):
         # --- DPAE/LBB checks
 
         # we should have exactly 5 years of hirings including the last month (2011-12)
-        self.assertNotIn(u'dpae-2006-12', columns)
-        self.assertIn(u'dpae-2007-1', columns)
-        self.assertIn(u'dpae-2011-12', columns)
-        self.assertNotIn(u'dpae-2012-1', columns)
+        self.assertNotIn('dpae-2006-12', columns)
+        self.assertIn('dpae-2007-1', columns)
+        self.assertIn('dpae-2011-12', columns)
+        self.assertNotIn('dpae-2012-1', columns)
 
         # Reminder: for DPAE 1 period = 6 months.
         # We expect 7+2+2=11 (past) periods to be computed, here is why:
@@ -98,22 +98,22 @@ class TestComputeScore(DatabaseTest):
         # and thus ignores last 2 periods and is based on 7 periods before that.
         # TRAIN set is like LIVE set slided 24 months earlier,
         # and thus ignores last 4 periods and is based on 7 periods before that.
-        self.assertNotIn(u'dpae-period-0', columns)
-        self.assertIn(u'dpae-period-1', columns)
-        self.assertIn(u'dpae-period-11', columns)
-        self.assertNotIn(u'dpae-period-12', columns)
+        self.assertNotIn('dpae-period-0', columns)
+        self.assertIn('dpae-period-1', columns)
+        self.assertIn('dpae-period-11', columns)
+        self.assertNotIn('dpae-period-12', columns)
 
         # final score columns
-        self.assertIn(u'score', columns)
-        self.assertIn(u'score_regr', columns)
+        self.assertIn('score', columns)
+        self.assertIn('score_regr', columns)
 
         # --- Alternance/LBA checks
 
         # we should have exactly 5 years of hirings including the last month (2011-12)
-        self.assertNotIn(u'alt-2006-12', columns)
-        self.assertIn(u'alt-2007-1', columns)
-        self.assertIn(u'alt-2011-12', columns)
-        self.assertNotIn(u'alt-2012-1', columns)
+        self.assertNotIn('alt-2006-12', columns)
+        self.assertIn('alt-2007-1', columns)
+        self.assertIn('alt-2011-12', columns)
+        self.assertNotIn('alt-2012-1', columns)
 
         # Reminder: for Alternance 1 period = 6 months.
         # We expect 7+2+2+1=12 (past) periods to be computed, here is why:
@@ -126,14 +126,14 @@ class TestComputeScore(DatabaseTest):
         # TRAIN set is like LIVE set slided 24 months earlier,
         # and thus ignores 4 more periods and is based on 7 periods before that.
 
-        self.assertNotIn(u'alt-period-0', columns)
-        self.assertIn(u'alt-period-1', columns)
-        self.assertIn(u'alt-period-12', columns)
-        self.assertNotIn(u'alt-period-13', columns)
+        self.assertNotIn('alt-period-0', columns)
+        self.assertIn('alt-period-1', columns)
+        self.assertIn('alt-period-12', columns)
+        self.assertNotIn('alt-period-13', columns)
 
         # final score columns
-        self.assertIn(u'score_alternance', columns)
-        self.assertIn(u'score_alternance_regr', columns)
+        self.assertIn('score_alternance', columns)
+        self.assertIn('score_alternance_regr', columns)
 
 
     def test_normalize_url(self):

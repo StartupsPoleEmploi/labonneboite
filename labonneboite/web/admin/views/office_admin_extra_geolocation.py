@@ -53,19 +53,19 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
 
 
     column_labels = {
-        'siret': u"Siret",
-        'codes': u"Départements / Codes communes (INSEE)",
-        'geolocations': u"Latitude/longitude",
-        'reason': u"Raison",
-        'date_created': u"Date de création",
-        'date_end': u"Date de fin",
-        'date_updated': u"Date de modification",
-        'created_by': u"Créé par",
-        'updated_by': u"Modifié par",
+        'siret': "Siret",
+        'codes': "Départements / Codes communes (INSEE)",
+        'geolocations': "Latitude/longitude",
+        'reason': "Raison",
+        'date_created': "Date de création",
+        'date_end': "Date de fin",
+        'date_updated': "Date de modification",
+        'created_by': "Créé par",
+        'updated_by': "Modifié par",
     }
 
     column_descriptions = {
-        'codes': u"Veuillez entrer un département ou un code commune (INSEE) par ligne.",
+        'codes': "Veuillez entrer un département ou un code commune (INSEE) par ligne.",
     }
 
     # `geolocations` is not included, it will be populated based on the `codes` content.
@@ -89,16 +89,16 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
         is_valid = super(OfficeAdminExtraGeoLocationModelView, self).validate_form(form)
         if is_valid and form.data.get('date_end'):
             if datetime.datetime.utcnow() >= form.data['date_end']:
-                msg = (u"La date de fin doit être dans le futur.")
+                msg = ("La date de fin doit être dans le futur.")
                 flash(msg, 'error')
                 return False
         if is_valid and form.data.get('codes'):
             for code in OfficeAdminExtraGeoLocation.codes_as_list(form.data['codes']):
                 if not any([geocoding.is_departement(code), geocoding.is_commune_id(code)]):
                     msg = (
-                        u"`%s` n'est pas un code commune (INSEE) ou un numéro de département valide."
-                        u"<br>"
-                        u"Assurez-vous de ne saisir qu'un élément par ligne."
+                        "`%s` n'est pas un code commune (INSEE) ou un numéro de département valide."
+                        "<br>"
+                        "Assurez-vous de ne saisir qu'un élément par ligne."
                         % code
                     )
                     flash(Markup(msg), 'error')

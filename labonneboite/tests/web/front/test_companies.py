@@ -8,14 +8,14 @@ class RouteTest(DatabaseTest):
     def create_example_office(self):
         # Create an office.
         self.office = Office(
-            departement=u'75',
-            siret=u'78548035101646',
-            company_name=u'NICOLAS',
-            headcount=u'03',
-            city_code=u'75110',
-            zipcode=u'75010',
-            naf=u'7320Z',
-            tel=u'0100000000',
+            departement='75',
+            siret='78548035101646',
+            company_name='NICOLAS',
+            headcount='03',
+            city_code='75110',
+            zipcode='75010',
+            naf='7320Z',
+            tel='0100000000',
             score=80,
             x=2.3488,
             y=48.8534,
@@ -29,10 +29,10 @@ class RouteTest(DatabaseTest):
 
         self.create_example_office()
 
-        self.assertEqual(type(self.office.company_name), unicode)
-        self.assertEqual(type(self.office.address_as_text), unicode)
-        self.assertEqual(type(self.office.phone), unicode)
-        self.assertEqual(type(self.office.google_url), unicode)
+        self.assertEqual(type(self.office.company_name), str)
+        self.assertEqual(type(self.office.address_as_text), str)
+        self.assertEqual(type(self.office.phone), str)
+        self.assertEqual(type(self.office.google_url), str)
 
     def test_office_details_page(self):
         """
@@ -59,7 +59,7 @@ class RouteTest(DatabaseTest):
         """
 
         self.create_example_office()
-        self.office.naf = u'9900Z'
+        self.office.naf = '9900Z'
         self.office.save()
 
         rv = self.app.get('/%s/details' % self.office.siret)
@@ -93,7 +93,7 @@ class RouteTest(DatabaseTest):
         """
 
         self.create_example_office()
-        self.office.naf = u'9900Z'
+        self.office.naf = '9900Z'
         self.office.save()
 
         rv = self.app.get('/%s/download' % self.office.siret)

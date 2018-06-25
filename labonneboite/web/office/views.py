@@ -2,7 +2,7 @@
 
 from datetime import date
 import os
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
@@ -74,7 +74,7 @@ def change_info():
     if form.validate_on_submit():
         client = MandrillClient(current_app.extensions['mandrill'])
         client.send(
-            u"""Un email a été envoyé par le formulaire de contact de la Bonne Boite :<br>
+            """Un email a été envoyé par le formulaire de contact de la Bonne Boite :<br>
             - Action : %s<br>
             - Siret : %s,<br>
             - Prénom : %s,<br>
@@ -98,7 +98,7 @@ def change_info():
                 make_save_suggestion(form)
             )
         )
-        msg = u"Merci pour votre message, nous reviendrons vers vous dès que possible."
+        msg = "Merci pour votre message, nous reviendrons vers vous dès que possible."
         flash(msg, 'success')
 
         return redirect(url_for('office.change_info'))
@@ -152,15 +152,15 @@ def make_save_suggestion(form):
         office_admin_remove = OfficeAdminRemove.query.filter_by(siret=form.siret.data).first()
         if office_admin_remove:
             url = url_for("officeadminremove.edit_view", id=office_admin_remove.id)
-            return u"Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % dirty_fix_url(url)
+            return "Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % dirty_fix_url(url)
         else:
-            return u'Aucune entreprise trouvée avec le siret %s' % form.siret.data
+            return 'Aucune entreprise trouvée avec le siret %s' % form.siret.data
 
     # OfficeAdminAdd already exits ?
     office_admin_add = OfficeAdminAdd.query.filter_by(siret=form.siret.data).first()
     if office_admin_add:
         url = url_for("officeadminadd.edit_view", id=office_admin_add.id)
-        return u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % dirty_fix_url(url)
+        return "Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % dirty_fix_url(url)
 
     # OfficeAdminUpdate already exits ?
     office_admin_update = OfficeAdminUpdate.query.filter(
@@ -169,7 +169,7 @@ def make_save_suggestion(form):
 
     if office_admin_update:
         url = url_for("officeadminupdate.edit_view", id=office_admin_update.id)
-        return u"Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % dirty_fix_url(url)
+        return "Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % dirty_fix_url(url)
 
 
     # No office AdminOffice found : suggest to create an OfficeAdminRemove and OfficeRemoveUpdate
@@ -182,13 +182,13 @@ def make_save_suggestion(form):
         'requested_by_phone': form.phone.data,
         'reason': form.comment.data,
     }
-    params = {key: value.encode('utf8') for key, value in params.iteritems()}
+    params = {key: value.encode('utf8') for key, value in params.items()}
     if form.action.data == "enlever":
         url = url_for('officeadminremove.create_view')
-        status_save = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>"
+        status_save = " Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>"
     else:
         url = url_for('officeadminupdate.create_view')
-        status_save = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>"
+        status_save = "Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>"
 
     url = "%s?%s" % (url, urlencode(params))
     status_save = status_save % dirty_fix_url(url)

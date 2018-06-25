@@ -24,7 +24,7 @@ def upgrade():
 def downgrade():
     op.add_column(
         'hirings',
-        sa.Column('zipcode', mysql.VARCHAR(collation=u'utf8mb4_unicode_ci', length=8), nullable=False)
+        sa.Column('zipcode', mysql.VARCHAR(collation='utf8mb4_unicode_ci', length=8), nullable=False)
     )
 
 

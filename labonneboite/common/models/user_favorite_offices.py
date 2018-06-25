@@ -79,7 +79,7 @@ class UserFavoriteOffice(CRUDMixin, Base):
 
     @classmethod
     def as_csv_header_row(cls):
-        return u'siret;nom;adresse;ville;url'
+        return 'siret;nom;adresse;ville;url'
 
     def as_csv_row(self):
         values = [

@@ -60,7 +60,7 @@ def switch_es_index():
     # Find current index names (there may be one, zero or more)
     alias_name = settings.ES_INDEX
     try:
-        old_index_names = es.Elasticsearch().indices.get_alias(settings.ES_INDEX).keys()
+        old_index_names = list(es.Elasticsearch().indices.get_alias(settings.ES_INDEX).keys())
     except NotFoundError:
         old_index_names = []
 
@@ -174,7 +174,7 @@ def create_job_codes():
     ogr_rome_codes = load_ogr_rome_mapping()
     actions = []
 
-    for ogr, description in ogr_labels.iteritems():
+    for ogr, description in ogr_labels.items():
         if ogr in ogr_rome_codes:
             rome_code = ogr_rome_codes[ogr]
             rome_description = settings.ROME_DESCRIPTIONS[rome_code]
@@ -480,7 +480,7 @@ def add_offices():
             # Create the new office in DB.
             new_office = Office()
             # Use `inspect` because `Office` columns are named distinctly from attributes.
-            for field_name in inspect(Office).columns.keys():
+            for field_name in list(inspect(Office).columns.keys()):
                 try:
                     value = getattr(office_to_add, field_name)
                 except AttributeError:
@@ -535,9 +535,9 @@ def update_offices():
 
             if office:
                 # Apply changes in DB.
-                office.email = u'' if office_to_update.remove_email else (office_to_update.new_email or office.email)
-                office.tel = u'' if office_to_update.remove_phone else (office_to_update.new_phone or office.tel)
-                office.website = u'' if office_to_update.remove_website else (office_to_update.new_website or office.website)
+                office.email = '' if office_to_update.remove_email else (office_to_update.new_email or office.email)
+                office.tel = '' if office_to_update.remove_phone else (office_to_update.new_phone or office.tel)
+                office.website = '' if office_to_update.remove_website else (office_to_update.new_website or office.website)
 
                 office.email_alternance = office_to_update.email_alternance
                 office.phone_alternance = office_to_update.phone_alternance

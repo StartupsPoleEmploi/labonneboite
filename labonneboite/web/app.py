@@ -1,7 +1,7 @@
 # coding: utf8
 
 # Python standard library.
-from urlparse import urlparse
+from urllib.parse import urlparse
 import locale
 import logging
 
@@ -118,29 +118,29 @@ def register_admin(flask_app):
     Register Flask admin views.
     """
     from labonneboite.web.admin.views.index import LbbAdminIndexView
-    admin = Admin(flask_app, name=u'Administration LBB', index_view=LbbAdminIndexView(), template_mode='bootstrap3')
+    admin = Admin(flask_app, name='Administration LBB', index_view=LbbAdminIndexView(), template_mode='bootstrap3')
 
     from labonneboite.web.admin.views.user import UserModelView
     # Use the `endpoint` argument to avoid a Blueprint name collision:
     # https://github.com/flask-admin/flask-admin/issues/1474
-    admin.add_view(UserModelView(User, db_session, endpoint='users', name=u'Utilisateurs'))
+    admin.add_view(UserModelView(User, db_session, endpoint='users', name='Utilisateurs'))
 
     from labonneboite.common.models import OfficeAdminAdd
     from labonneboite.web.admin.views.office_admin_add import OfficeAdminAddModelView
-    admin.add_view(OfficeAdminAddModelView(OfficeAdminAdd, db_session, name=u'Ajouter une entreprise'))
+    admin.add_view(OfficeAdminAddModelView(OfficeAdminAdd, db_session, name='Ajouter une entreprise'))
 
     from labonneboite.common.models import OfficeAdminRemove
     from labonneboite.web.admin.views.office_admin_remove import OfficeAdminRemoveModelView
-    admin.add_view(OfficeAdminRemoveModelView(OfficeAdminRemove, db_session, name=u'Supprimer une entreprise'))
+    admin.add_view(OfficeAdminRemoveModelView(OfficeAdminRemove, db_session, name='Supprimer une entreprise'))
 
     from labonneboite.common.models import OfficeAdminUpdate
     from labonneboite.web.admin.views.office_admin_update import OfficeAdminUpdateModelView
-    admin.add_view(OfficeAdminUpdateModelView(OfficeAdminUpdate, db_session, name=u'Modifier une entreprise'))
+    admin.add_view(OfficeAdminUpdateModelView(OfficeAdminUpdate, db_session, name='Modifier une entreprise'))
 
     from labonneboite.common.models import OfficeAdminExtraGeoLocation
     from labonneboite.web.admin.views.office_admin_extra_geolocation import OfficeAdminExtraGeoLocationModelView
     admin.add_view(OfficeAdminExtraGeoLocationModelView(OfficeAdminExtraGeoLocation, db_session,
-        name=u'Géolocalisations'))
+        name='Géolocalisations'))
 
 
 def register_before_requests(flask_app):
@@ -328,14 +328,14 @@ def social_auth_error(error):
     """
     Handle the situation where a user clicks the `cancel` button on a third party auth provider website.
     """
-    flash(u"Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
+    flash("Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
     # Don't log errors that are not our responsibility
     if not isinstance(error, (
             social_exceptions.AuthCanceled,
             social_exceptions.AuthUnreachableProvider,
             social_exceptions.AuthStateForbidden,
             social_exceptions.AuthStateMissing,
-            social_exceptions.AuthMissingParameter,
+            social_exceptions.AuthMissingParameter
     )):
         app.logger.exception(error)
 

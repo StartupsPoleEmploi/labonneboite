@@ -64,35 +64,35 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
     }
 
     column_labels = {
-        'siret': u"Siret",
-        'company_name': u"Raison sociale",
-        'office_name': u"Enseigne",
-        'naf': u"Code NAF",
-        'street_number': u"Numero rue",
-        'street_name': u"Libellé rue",
-        'zipcode': u"Code postal",
-        'city_code': u"Code commune",
-        'email': u"Email",
-        'tel': u"Téléphone",
-        'website': u"Site web",
-        'flag_alternance': u"Drapeau alternance",
-        'flag_junior': u"Drapeau junior",
-        'flag_senior': u"Drapeau senior",
-        'flag_handicap': u"Drapeau handicap",
-        'departement': u"Département",
-        'headcount': u"Tranche effectif",
-        'score': u"Score",
-        'x': u"Longitude",
-        'y': u"Latitude",
-        'reason': u"Raison",
-        'date_created': u"Date de création",
-        'date_updated': u"Date de modification",
-        'created_by': u"Créé par",
-        'updated_by': u"Modifié par",
+        'siret': "Siret",
+        'company_name': "Raison sociale",
+        'office_name': "Enseigne",
+        'naf': "Code NAF",
+        'street_number': "Numero rue",
+        'street_name': "Libellé rue",
+        'zipcode': "Code postal",
+        'city_code': "Code commune",
+        'email': "Email",
+        'tel': "Téléphone",
+        'website': "Site web",
+        'flag_alternance': "Drapeau alternance",
+        'flag_junior': "Drapeau junior",
+        'flag_senior': "Drapeau senior",
+        'flag_handicap': "Drapeau handicap",
+        'departement': "Département",
+        'headcount': "Tranche effectif",
+        'score': "Score",
+        'x': "Longitude",
+        'y': "Latitude",
+        'reason': "Raison",
+        'date_created': "Date de création",
+        'date_updated': "Date de modification",
+        'created_by': "Créé par",
+        'updated_by': "Modifié par",
     }
 
     column_descriptions = {
-        'reason': u"Raison de l'ajout.",
+        'reason': "Raison de l'ajout.",
     }
 
     form_columns = [
@@ -190,7 +190,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         Ensure that the office to add does not already exist in `OfficeAdminRemove`.
         """
         is_valid = super(OfficeAdminAddModelView, self).validate_form(form)
-        if is_valid and 'siret' in form.data.keys():
+        if is_valid and 'siret' in list(form.data.keys()):
             office_to_remove = OfficeAdminRemove.query.filter_by(siret=form.data['siret']).first()
             if office_to_remove:
                 # Use the link of the list view with a filter on the `siret`, because
@@ -198,9 +198,9 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
                 # https://github.com/flask-admin/flask-admin/issues/1327
                 office_to_remove_url = url_for('officeadminremove.index_view', search=office_to_remove.siret)
                 msg = (
-                    u"Vous ne pouvez pas ajouter cette entreprise car elle existe déjà dans la liste "
-                    u"<b>Supprimer une entreprise</b>.<br>Vous devez d'abord "
-                    u'<a target="_blank" href="{url}">la supprimer de cette liste</a>.'.format(url=office_to_remove_url)
+                    "Vous ne pouvez pas ajouter cette entreprise car elle existe déjà dans la liste "
+                    "<b>Supprimer une entreprise</b>.<br>Vous devez d'abord "
+                    '<a target="_blank" href="{url}">la supprimer de cette liste</a>.'.format(url=office_to_remove_url)
                 )
                 flash(Markup(msg), 'error')
                 return False

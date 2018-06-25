@@ -21,7 +21,7 @@ from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES, NAF_CODES
 apiBlueprint = Blueprint('api', __name__)
 
 OGR_ROME_CODES = load_ogr_rome_mapping()
-ROME_CODES = OGR_ROME_CODES.values()
+ROME_CODES = list(OGR_ROME_CODES.values())
 
 
 class InvalidFetcherArgument(Exception):
@@ -36,19 +36,19 @@ def api_auth_required(function):
     def decorated(*args, **kwargs):
 
         if 'user' not in request.args:
-            return u'missing argument: user', 400
+            return 'missing argument: user', 400
 
         if not current_app.debug:
             try:
                 api_util.check_api_request(request)
             except api_util.TimestampFormatException:
-                return u'timestamp format: %Y-%m-%dT%H:%M:%S', 400
+                return 'timestamp format: %Y-%m-%dT%H:%M:%S', 400
             except api_util.TimestampExpiredException:
-                return u'timestamp has expired', 400
+                return 'timestamp has expired', 400
             except api_util.InvalidSignatureException:
-                return u'signature is invalid', 400
+                return 'signature is invalid', 400
             except api_util.UnknownUserException:
-                return u'user is unknown', 400
+                return 'user is unknown', 400
 
         return function(*args, **kwargs)
 
@@ -61,10 +61,10 @@ def get_ga_query_string():
     """
     ga_query_string = {"utm_medium": "web"}
     if 'user' in request.args:
-        ga_query_string['utm_source'] = u'api__{}'.format(request.args['user'])
-        ga_query_string['utm_campaign'] = u'api__{}'.format(request.args['user'])
+        ga_query_string['utm_source'] = 'api__{}'.format(request.args['user'])
+        ga_query_string['utm_campaign'] = 'api__{}'.format(request.args['user'])
         if 'origin_user' in request.args:
-            ga_query_string['utm_campaign'] += u'__{}'.format(request.args['origin_user'])
+            ga_query_string['utm_campaign'] += '__{}'.format(request.args['origin_user'])
     return ga_query_string
 
 
@@ -235,21 +235,21 @@ def get_location(request_args):
         commune_id = request_args['commune_id']
         city = geocoding.get_city_by_commune_id(commune_id)
         if not city:
-            raise InvalidFetcherArgument(u'could not resolve latitude and longitude from given commune_id')
+            raise InvalidFetcherArgument('could not resolve latitude and longitude from given commune_id')
         latitude = city['coords']['lat']
         longitude = city['coords']['lon']
         zipcode = city['zipcode']
     elif 'latitude' in request_args and 'longitude' in request_args:
         if not request_args.get('latitude') or not request_args.get('longitude'):
-            raise InvalidFetcherArgument(u'latitude or longitude (or both) have no value')
+            raise InvalidFetcherArgument('latitude or longitude (or both) have no value')
 
         try:
             latitude = float(request_args['latitude'])
             longitude = float(request_args['longitude'])
         except ValueError:
-            raise InvalidFetcherArgument(u'latitude and longitude must be float')
+            raise InvalidFetcherArgument('latitude and longitude must be float')
     else:
-        raise InvalidFetcherArgument(u'missing arguments: either commune_id or latitude and longitude')
+        raise InvalidFetcherArgument('missing arguments: either commune_id or latitude and longitude')
 
     location = Location(latitude, longitude)
     return location, zipcode, commune_id
@@ -285,7 +285,7 @@ def create_fetcher(location, request_args):
     if 'sort' in request_args:
         sort = request_args.get('sort')
         if sort not in sorting.SORT_FILTERS:
-            raise InvalidFetcherArgument(u'sort. Possible values : %s' % ', '.join(sorting.SORT_FILTERS))
+            raise InvalidFetcherArgument('sort. Possible values : %s' % ', '.join(sorting.SORT_FILTERS))
     kwargs['sort'] = sort
 
     # Rome_code
@@ -294,24 +294,24 @@ def create_fetcher(location, request_args):
 
     if not rome_codes_keyword_search:
         if not rome_codes:
-            raise InvalidFetcherArgument(u'you must use rome_codes or rome_codes_keyword_search')
+            raise InvalidFetcherArgument('you must use rome_codes or rome_codes_keyword_search')
     else:
         if rome_codes:
-            raise InvalidFetcherArgument(u'you must either use rome_codes or rome_codes_keyword_search but not both')
+            raise InvalidFetcherArgument('you must either use rome_codes or rome_codes_keyword_search but not both')
         else:
             # ROME keyword search : select first match of what the autocomplete result would be
             suggestions = search.build_job_label_suggestions(rome_codes_keyword_search, size=1)
             if len(suggestions) >= 1:
                 rome_codes = suggestions[0]['id']
             else:
-                msg = u'No match found for rome_codes_keyword_search.'
+                msg = 'No match found for rome_codes_keyword_search.'
                 raise InvalidFetcherArgument(msg)
 
     rome_code_list = [code.upper() for code in rome_codes.split(',')]
 
     for rome in rome_code_list:
         if rome.encode('ascii', 'ignore') not in ROME_CODES:  # ROME_CODES contains ascii data but rome is unicode.
-            msg = u'Unknown rome_code: %s - Possible reasons: 1) %s 2) %s' % (
+            msg = 'Unknown rome_code: %s - Possible reasons: 1) %s 2) %s' % (
                 rome,
                 'This rome_code does not exist.',
                 'This rome code exists but is very recent and thus \
@@ -328,7 +328,7 @@ def create_fetcher(location, request_args):
     page_size = check_positive_integer_argument(request_args, 'page_size', pagination.OFFICES_PER_PAGE)
     if page_size > pagination.OFFICES_MAXIMUM_PAGE_SIZE:
         raise InvalidFetcherArgument(
-            u'page_size is too large. Maximum value is %s' % pagination.OFFICES_MAXIMUM_PAGE_SIZE
+            'page_size is too large. Maximum value is %s' % pagination.OFFICES_MAXIMUM_PAGE_SIZE
         )
 
     kwargs['to_number'] = page * page_size
@@ -345,7 +345,7 @@ def create_fetcher(location, request_args):
         expected_naf_codes = mapping_util.map_romes_to_nafs(kwargs['romes'])
         invalid_nafs = [naf for naf in naf_codes if naf not in expected_naf_codes]
         if invalid_nafs:
-            raise InvalidFetcherArgument(u'NAF code(s): %s. Possible values : %s ' % (
+            raise InvalidFetcherArgument('NAF code(s): %s. Possible values : %s ' % (
                 ' '.join(invalid_nafs), ', '.join(expected_naf_codes)
             ))
     kwargs['naf_codes'] = naf_codes
@@ -353,7 +353,7 @@ def create_fetcher(location, request_args):
     # Convert contract to hiring type (DPAE/LBB or Alternance/LBA)
     contract = request_args.get('contract', hiring_type_util.CONTRACT_DEFAULT)
     if contract not in hiring_type_util.CONTRACT_VALUES:
-        raise InvalidFetcherArgument(u'contract. Possible values : %s' % ', '.join(hiring_type_util.CONTRACT_VALUES))
+        raise InvalidFetcherArgument('contract. Possible values : %s' % ', '.join(hiring_type_util.CONTRACT_VALUES))
     kwargs['hiring_type'] = hiring_type_util.CONTRACT_TO_HIRING_TYPE[contract]
 
     # Headcount
@@ -361,7 +361,7 @@ def create_fetcher(location, request_args):
     if 'headcount' in request_args:
         headcount = HEADCOUNT_VALUES.get(request_args.get('headcount'))
         if not headcount:
-            raise InvalidFetcherArgument(u'headcount. Possible values : %s' % ', '.join(HEADCOUNT_VALUES.keys()))
+            raise InvalidFetcherArgument('headcount. Possible values : %s' % ', '.join(list(HEADCOUNT_VALUES.keys())))
     kwargs['headcount'] = headcount
 
     # Departments
@@ -370,7 +370,7 @@ def create_fetcher(location, request_args):
         departments = request_args.get('departments').split(',')
         unknown_departments = [dep for dep in departments if not geocoding.is_departement(dep)]
         if unknown_departments:
-            raise InvalidFetcherArgument(u'departments : %s' % ', '.join(unknown_departments))
+            raise InvalidFetcherArgument('departments : %s' % ', '.join(unknown_departments))
     kwargs['departments'] = departments
 
     return search.Fetcher(location, **kwargs)
@@ -387,7 +387,7 @@ def check_positive_integer_argument(args, name, default_value):
     """
     value = check_integer_argument(args, name, default_value)
     if value <= 0:
-        raise InvalidFetcherArgument(u'{} must be positive'.format(name))
+        raise InvalidFetcherArgument('{} must be positive'.format(name))
     return value
 
 
@@ -404,7 +404,7 @@ def check_integer_argument(args, name, default_value):
     try:
         value = int(value)
     except (TypeError, ValueError):
-        raise InvalidFetcherArgument(u'{} must be integer'.format(name))
+        raise InvalidFetcherArgument('{} must be integer'.format(name))
     return value
 
 

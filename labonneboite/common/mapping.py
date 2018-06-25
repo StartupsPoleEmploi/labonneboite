@@ -13,7 +13,7 @@ from labonneboite.conf import settings
 logger = logging.getLogger('main')
 
 
-SLUGIFIED_ROME_LABELS = {slugify(v): k for k, v in settings.ROME_DESCRIPTIONS.items()}
+SLUGIFIED_ROME_LABELS = {slugify(v): k for k, v in list(settings.ROME_DESCRIPTIONS.items())}
 
 # these variables will be populated once by load_manual_rome_naf_mapping()
 MANUAL_ROME_NAF_MAPPING = {}
@@ -81,7 +81,7 @@ populate_rome_naf_mapping()  # populates once all variables above
 
 @lru_cache(maxsize=1024)
 def get_romes_for_naf(naf):
-    return MANUAL_NAF_ROME_MAPPING[naf].keys()
+    return list(MANUAL_NAF_ROME_MAPPING[naf].keys())
 
 
 @lru_cache(maxsize=1024)
@@ -115,7 +115,7 @@ def map_romes_to_nafs(rome_codes, optional_naf_codes=None):
         except KeyError:
             logger.error('soft fail: no NAF codes for ROME %s', rome)
             naf_codes_with_hirings = {}
-        for naf, _ in naf_codes_with_hirings.iteritems():
+        for naf, _ in naf_codes_with_hirings.items():
             if optional_naf_codes:
                 if naf in optional_naf_codes:
                     naf_codes.add(naf)
@@ -136,8 +136,8 @@ def romes_for_naf(naf):
         ...
     ]
     """
-    romes = {k: v for (k, v) in MANUAL_ROME_NAF_MAPPING.items() if naf in v}
-    romes = sorted(romes.items(), key=lambda (k, v): v[naf], reverse=True)
+    romes = {k: v for (k, v) in list(MANUAL_ROME_NAF_MAPPING.items()) if naf in v}
+    romes = sorted(list(romes.items()), key=lambda k_v: k_v[1][naf], reverse=True)
     Rome = namedtuple('Rome', ['code', 'name', 'nafs'])
     return [Rome(rome[0], settings.ROME_DESCRIPTIONS[rome[0]], rome[1]) for rome in romes]
 
@@ -155,7 +155,7 @@ def nafs_for_rome(rome):
     ]
     """
     nafs = MANUAL_ROME_NAF_MAPPING.get(rome, {})
-    nafs = sorted(nafs.items(), key=lambda (k, v): v, reverse=True)
+    nafs = sorted(list(nafs.items()), key=lambda k_v1: k_v1[1], reverse=True)
     Naf = namedtuple('Naf', ['code', 'name', 'hirings', 'affinity'])
     return [Naf(
         naf[0],

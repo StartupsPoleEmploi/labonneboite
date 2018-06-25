@@ -34,7 +34,7 @@ from operator import itemgetter
 import logging
 import math
 import random
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from locust import HttpLocust, TaskSet, task
 from slugify import slugify
@@ -103,11 +103,11 @@ def pick_location():
 
 
 def pick_job_name():
-    return random.choice(settings.ROME_DESCRIPTIONS.values())
+    return random.choice(list(settings.ROME_DESCRIPTIONS.values()))
 
 
 def pick_job_rome():
-    return random.choice(settings.ROME_DESCRIPTIONS.keys())
+    return random.choice(list(settings.ROME_DESCRIPTIONS.keys()))
 
 
 class UserBehavior(TaskSet):
@@ -133,7 +133,7 @@ class UserBehavior(TaskSet):
         params = {
             'commune_id': commune_id,
             'rome_codes': job,
-            'user': u'labonneboite',
+            'user': 'labonneboite',
         }
 
         timestamp = util.make_timestamp()
@@ -141,7 +141,7 @@ class UserBehavior(TaskSet):
         params['timestamp'] = timestamp
         params['signature'] = signature
 
-        url = '/api/v1/company/?%s' % urllib.urlencode(params)
+        url = '/api/v1/company/?%s' % urllib.parse.urlencode(params)
         logger.info("GET %s", url)
         self.client.get(url)
 
@@ -182,7 +182,7 @@ class UserBehavior(TaskSet):
         if not len(city_name) > index:
             index = len(city_name) - 1
 
-        url = "/suggest_locations?term=%s" % urllib.quote_plus(city_name)[:index]
+        url = "/suggest_locations?term=%s" % urllib.parse.quote_plus(city_name)[:index]
         logger.info("GET %s", url)
         self.client.get(url)
 

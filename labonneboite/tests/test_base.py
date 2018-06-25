@@ -51,7 +51,7 @@ class AppTest(unittest.TestCase):
             url = flask_url_for(endpoint, **kwargs)
             return url
 
-    def login(self, user, social_auth_backend=u'peam-openidconnect'):
+    def login(self, user, social_auth_backend='peam-openidconnect'):
         """
         Logs a user in by simulating a third-party authentication process.
 
@@ -64,10 +64,10 @@ class AppTest(unittest.TestCase):
         _request_ctx_stack.top.user = user
         with self.app.session_transaction() as sess:
             # Session info set by Flask-Login.
-            sess[u'user_id'] = user.id
+            sess['user_id'] = user.id
             # Session info set by Python Social Auth.
-            sess[u'social_auth_last_login_backend'] = social_auth_backend
-            sess[u'%s_state' % social_auth_backend] = u'a1z2e3r4t5y6y'
+            sess['social_auth_last_login_backend'] = social_auth_backend
+            sess['%s_state' % social_auth_backend] = 'a1z2e3r4t5y6y'
 
     def logout(self):
         """

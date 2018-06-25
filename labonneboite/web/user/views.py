@@ -1,6 +1,6 @@
 # coding: utf8
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from flask import Blueprint, Markup
 from flask import abort, current_app, flash, make_response
@@ -62,7 +62,7 @@ def account_delete():
 
         db_session.commit()
 
-        message = u"La suppression de votre compte a bien été effectuée."
+        message = "La suppression de votre compte a bien été effectuée."
         flash(message, 'warning')
 
         # Return the `logout` view directly. It allows us to pass the full
@@ -81,7 +81,7 @@ def personal_data_as_csv():
     """
     Download as a CSV the personal data of a user.
     """
-    header_row = u'prénom;nom;email'
+    header_row = 'prénom;nom;email'
     values = [
         current_user.first_name,
         current_user.last_name,
@@ -92,7 +92,7 @@ def personal_data_as_csv():
 
     return make_csv_response(
         csv_text=csv_text,
-        attachment_name=u'mes_données_personnelles.csv',
+        attachment_name='mes_données_personnelles.csv',
     )
 
 
@@ -104,7 +104,7 @@ def favorites_list_as_csv():
     """
     return make_csv_response(
         csv_text=UserFavoriteOffice.user_favs_as_csv(current_user),
-        attachment_name=u'mes_favoris.csv',
+        attachment_name='mes_favoris.csv',
     )
 
 
@@ -162,12 +162,12 @@ def favorites_add(siret):
 
     UserFavoriteOffice.get_or_create(user=current_user, office=office)
 
-    message = u'"%s - %s" a été ajouté à vos favoris !' % (office.name, office.city)
+    message = '"%s - %s" a été ajouté à vos favoris !' % (office.name, office.city)
     flash(Markup(message), 'success')
 
     next_url = request.form.get('next')
     if next_url and util.is_safe_url(next_url):
-        return redirect(urllib.unquote(next_url))
+        return redirect(urllib.parse.unquote(next_url))
 
     return redirect(url_for('user.favorites_list'))
 
@@ -192,12 +192,12 @@ def favorites_delete(siret):
 
     fav.delete()
 
-    message = u'"%s - %s" a été supprimé de vos favoris !' % (fav.office.name, fav.office.city)
+    message = '"%s - %s" a été supprimé de vos favoris !' % (fav.office.name, fav.office.city)
     flash(message, 'success')
 
     next_url = request.form.get('next')
     if next_url and util.is_safe_url(next_url):
-        return redirect(urllib.unquote(next_url))
+        return redirect(urllib.parse.unquote(next_url))
 
     return redirect(url_for('user.favorites_list'))
 
@@ -211,9 +211,9 @@ def pro_version():
 
     pro.toggle_pro_version()
 
-    redirect_url = request.args.get(u'next', u'/')
+    redirect_url = request.args.get('next', '/')
 
     if not redirect_url or not util.is_safe_url(redirect_url):
-        redirect_url = u'/'
+        redirect_url = '/'
 
     return redirect(redirect_url)

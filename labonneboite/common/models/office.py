@@ -1,8 +1,8 @@
 # coding: utf8
 
-from __future__ import division
+
 import logging
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from babel.dates import format_date
 from slugify import slugify
@@ -126,7 +126,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     # You should normally *not* add any column here - see documentation above.
 
     def __unicode__(self):
-        return u"%s - %s" % (self.siret, self.name)
+        return "%s - %s" % (self.siret, self.name)
 
     def as_json(self,
             rome_codes=None,
@@ -196,23 +196,23 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         # This message should concern only a small number of companies who explicitly requested
         # to appear in extra geolocations.
         if any([distance, zipcode]) and json['address'] and self.show_multi_geolocations_msg(distance, zipcode):
-            json['address'] += u", Cette entreprise recrute aussi dans votre région."
+            json['address'] += ", Cette entreprise recrute aussi dans votre région."
         return json
 
     @property
     def address_fields(self):
         result = []
         if not self.is_small:
-            result.append(u"Service des ressources humaines")
+            result.append("Service des ressources humaines")
         if self.street_name:
-            result.append(u'%s %s' % (self.street_number, self.street_name))
-        result.append(u'%s %s' % (self.zipcode, self.city))
+            result.append('%s %s' % (self.street_number, self.street_name))
+        result.append('%s %s' % (self.zipcode, self.city))
         return result
 
     @property
     def address_as_text(self):
         if self.address_fields:
-            return u", ".join([f for f in self.address_fields if f is not None])
+            return ", ".join([f for f in self.address_fields if f is not None])
         return None
 
     @property
@@ -220,9 +220,9 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         has_phone = self.tel and not self.tel.isspace()
         if has_phone:
             # not sure why, the import botched the phone number...
-            if self.tel[-2] == u'.':
-                s = u'0%s' % self.tel[:-2]
-                return u" ".join(s[i:i + 2] for i in range(0, len(s), 2))
+            if self.tel[-2] == '.':
+                s = '0%s' % self.tel[:-2]
+                return " ".join(s[i:i + 2] for i in range(0, len(s), 2))
             return self.tel
         return None
 
@@ -233,24 +233,24 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         elif self.company_name:
             result = self.company_name.upper()
         else:
-            result = u'sans nom'
+            result = 'sans nom'
         return encoding_util.sanitize_string(result)
 
     @property
     def google_url(self):
         google_search = "%s+%s" % (self.name.replace(' ', '+'), self.city.replace(' ', '+'))
-        return u"https://www.google.fr/search?q=%s" % google_search
+        return "https://www.google.fr/search?q=%s" % google_search
 
     @property
     def kompass_url(self):
-        return u"http://fr.kompass.com/searchCompanies?text=%s" % self.siret
+        return "http://fr.kompass.com/searchCompanies?text=%s" % self.siret
 
     @property
     def headcount_text(self):
         try:
             return settings.HEADCOUNT_INSEE[self.headcount]
         except KeyError:
-            return u''
+            return ''
 
     @property
     def is_small(self):
@@ -275,7 +275,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             return CITY_NAMES[self.city_code].decode('utf-8')
         except KeyError:
             if self.city_code.startswith('75'):
-                return u'Paris'
+                return 'Paris'
             else:
                 raise
 

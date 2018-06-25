@@ -1,8 +1,8 @@
 # coding: utf8
 
 from math import ceil
-from urllib import urlencode
-import urlparse
+from urllib.parse import urlencode
+import urllib.parse
 
 OFFICES_PER_PAGE = 20  # constant for Frontend, variable default for API
 OFFICES_MAXIMUM_PAGE_SIZE = 100  # API only as of now
@@ -40,7 +40,7 @@ class Pagination(object):
         offset = 2
         min_ = max(1, self.page - offset)
         max_ = min(self.pages, self.page + offset)
-        return range(min_, max_ + 1)
+        return list(range(min_, max_ + 1))
 
     @property
     def show_first(self):
@@ -150,7 +150,7 @@ class Page(object):
         self._from_number = None
         self._to_number = None
         self.current_from_number = current_from_number
-        self.url_parts = list(urlparse.urlparse(original_url.encode('utf8')))
+        self.url_parts = list(urllib.parse.urlparse(original_url.encode('utf8')))
 
     def get_from_number(self):
         if not self._from_number:
@@ -171,8 +171,8 @@ class Page(object):
             page_url (unicode)
         """
         params = {'from': self.get_from_number(), 'to': self.get_to_number()}
-        url_query = dict(urlparse.parse_qsl(self.url_parts[4]))
+        url_query = dict(urllib.parse.parse_qsl(self.url_parts[4]))
         url_query.update(params)
         self.url_parts[4] = urlencode(url_query)
-        page_url = urlparse.urlunparse(self.url_parts)
+        page_url = urllib.parse.urlunparse(self.url_parts)
         return page_url.decode('utf8')

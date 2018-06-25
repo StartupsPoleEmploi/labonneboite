@@ -12,7 +12,7 @@ class PrepareMailingDataBaseTest(DatabaseTest):
         super(PrepareMailingDataBaseTest, self).setUp(*args, **kwargs)
 
         # We should have 0 offices in the DB.
-        self.assertEquals(Office.query.count(), 0)
+        self.assertEqual(Office.query.count(), 0)
 
 
 class MinimalisticTest(PrepareMailingDataBaseTest):

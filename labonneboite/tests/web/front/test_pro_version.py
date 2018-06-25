@@ -1,5 +1,5 @@
 # coding: utf8
-from urllib import urlencode
+from urllib.parse import urlencode
 import mock
 
 from labonneboite.common import pro
@@ -17,8 +17,8 @@ class ProVersionTest(DatabaseTest):
         Note : A pro user can be defined by his IP address too but it's not possible to test.
         So, only tests by email are provided
         """
-        user_pro = User.create(email=u'john.doe@pole-emploi.fr', gender=u'male', first_name=u'John', last_name=u'Doe')
-        user_public = User.create(email=u'john.doe@gmail.com', gender=u'male', first_name=u'John', last_name=u'Doe')
+        user_pro = User.create(email='john.doe@pole-emploi.fr', gender='male', first_name='John', last_name='Doe')
+        user_public = User.create(email='john.doe@gmail.com', gender='male', first_name='John', last_name='Doe')
 
         with self.test_request_context:
             # User which is not logged in should not be considered a pro user.
@@ -42,9 +42,9 @@ class ProVersionTest(DatabaseTest):
         Test that the Pro Version is correctly enabled/disabled.
         """
         # Create a user.
-        user_pro = User.create(email=u'x@pole-emploi.fr', gender=u'male', first_name=u'John', last_name=u'Doe')
+        user_pro = User.create(email='x@pole-emploi.fr', gender='male', first_name='John', last_name='Doe')
 
-        next_url = u'http://localhost:8090/entreprises/metz-57000/boucherie?sort=score&d=10&h=1&p=0&f_a=0'
+        next_url = 'http://localhost:8090/entreprises/metz-57000/boucherie?sort=score&d=10&h=1&p=0&f_a=0'
         url = '%s?%s' % (self.url_for('user.pro_version'), urlencode({'next': next_url}))
 
         with self.test_request_context:

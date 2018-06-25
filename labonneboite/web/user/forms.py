@@ -16,5 +16,5 @@ class UserAccountDeleteForm(FlaskForm):
         """
         That shouldn't happen at all but it serves as an additional layer of safety.
         """
-        if field.data != u"1":
+        if field.data != "1":
             raise ValidationError()

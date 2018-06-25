@@ -26,13 +26,13 @@ class UserModelView(AdminModelViewMixin, ModelView):
     ]
 
     column_labels = {
-        'gender':  u"Genre",
-        'first_name': u"Prénom",
-        'last_name': u"Nom",
-        'date_created': u"Date de création",
-        'active': u"Actif",
-        'external_id': u"ID externe",
-        'is_admin': u"Admin",
+        'gender':  "Genre",
+        'first_name': "Prénom",
+        'last_name': "Nom",
+        'date_created': "Date de création",
+        'active': "Actif",
+        'external_id': "ID externe",
+        'is_admin': "Admin",
     }
 
     form_columns = ['active', 'is_admin']

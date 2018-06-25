@@ -29,7 +29,7 @@ def upload():
     elif not current_user.email:
         error_template = "tilkee/missing_email.html"
     if error_template:
-        next_url = request.referrer + u'#company-{}'.format(company.siret) if request.referrer else ''
+        next_url = request.referrer + '#company-{}'.format(company.siret) if request.referrer else ''
         login_url = url_for('social.auth', backend='peam-openidconnect', next=next_url)
         return render_template(error_template, login_url=login_url)
 
@@ -41,11 +41,11 @@ def upload():
 
 def upload_files(company, files):
     if not files:
-        return u'Aucun fichier sélectionné', 400
+        return 'Aucun fichier sélectionné', 400
     for f in files:
         filename = f.filename
         if not utils.is_allowed(filename):
-            return u'Fichier non supporté: {}'.format(filename), 400
+            return 'Fichier non supporté: {}'.format(filename), 400
 
     try:
         project_url = utils.process(files, company, current_user)

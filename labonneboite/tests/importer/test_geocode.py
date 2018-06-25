@@ -32,8 +32,8 @@ class TestGeocode(DatabaseTest):
         unit.find_coordinates_for_address()
         self.assertTrue(len(updates), 1)
         coordinates = updates[0][1]
-        self.assertEquals(int(coordinates[0]), 0)
-        self.assertEquals(int(coordinates[1]), 43)
+        self.assertEqual(int(coordinates[0]), 0)
+        self.assertEqual(int(coordinates[1]), 43)
 
     def test_run_geocoding_jobs(self):
         task = GeocodeJob()
@@ -42,18 +42,18 @@ class TestGeocode(DatabaseTest):
         updates = task.run_geocoding_jobs(jobs)
         self.assertTrue(len(updates), 1)
         coordinates = updates[0][1]
-        self.assertEquals(int(coordinates[0]), 0)
-        self.assertEquals(int(coordinates[1]), 43)
+        self.assertEqual(int(coordinates[0]), 0)
+        self.assertEqual(int(coordinates[1]), 43)
 
     def test_create_geocoding_jobs(self):
         task = GeocodeJob()
         jobs = task.create_geocoding_jobs()
-        self.assertEquals(len(jobs), 0)
+        self.assertEqual(len(jobs), 0)
         make_geocoded_office()
         jobs = task.create_geocoding_jobs()
-        self.assertEquals(len(jobs), 1)
-        self.assertEquals(jobs[0][0], "1234")
-        self.assertEquals(jobs[0][1], "30 rue Edouard Poisson 93300 AUBERVILLIERS")
+        self.assertEqual(len(jobs), 1)
+        self.assertEqual(jobs[0][0], "1234")
+        self.assertEqual(jobs[0][1], "30 rue Edouard Poisson 93300 AUBERVILLIERS")
 
     def test_update_coordinates(self):
         make_geocoded_office()
@@ -61,5 +61,5 @@ class TestGeocode(DatabaseTest):
         updates = [["1234", [0, 43]]]
         task.update_coordinates(updates)
         office = ExportableOffice.query.first()
-        self.assertEquals(int(office.x), 0)
-        self.assertEquals(int(office.y), 43)
+        self.assertEqual(int(office.x), 0)
+        self.assertEqual(int(office.y), 43)

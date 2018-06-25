@@ -14,7 +14,7 @@ class AuthTest(DatabaseTest):
         Test that the session is cleaned after a logout.
         """
 
-        user = User(email=u'j@test.com', gender=u'male', first_name=u'John', last_name=u'Doe')
+        user = User(email='j@test.com', gender='male', first_name='John', last_name='Doe')
         db_session.add(user)
         db_session.flush()
 
@@ -30,29 +30,29 @@ class AuthTest(DatabaseTest):
         with self.test_request_context:
 
             with self.app.session_transaction() as sess:
-                sess[u'this_should_not_be_deleted'] = u'foo'  # This should not be deleted by a login or logout.
+                sess['this_should_not_be_deleted'] = 'foo'  # This should not be deleted by a login or logout.
 
             self.login(user)
 
             with self.app.session_transaction() as sess:
-                self.assertIn(u'this_should_not_be_deleted', sess)
-                self.assertIn(u'user_id', sess)
-                self.assertIn(u'social_auth_last_login_backend', sess)
-                self.assertIn(u'peam-openidconnect_state', sess)
+                self.assertIn('this_should_not_be_deleted', sess)
+                self.assertIn('user_id', sess)
+                self.assertIn('social_auth_last_login_backend', sess)
+                self.assertIn('peam-openidconnect_state', sess)
 
             self.logout()
 
             with self.app.session_transaction() as sess:
-                self.assertIn(u'this_should_not_be_deleted', sess)
-                self.assertNotIn(u'user_id', sess)
-                self.assertNotIn(u'social_auth_last_login_backend', sess)
-                self.assertNotIn(u'peam-openidconnect_state', sess)
+                self.assertIn('this_should_not_be_deleted', sess)
+                self.assertNotIn('user_id', sess)
+                self.assertNotIn('social_auth_last_login_backend', sess)
+                self.assertNotIn('peam-openidconnect_state', sess)
 
     def test_get_user_social_auth(self):
         """
         Test the `get_user_social_auth()` function.
         """
-        user = User(email=u'john@doe.com', gender=u'male', first_name=u'John', last_name=u'Doe')
+        user = User(email='john@doe.com', gender='male', first_name='John', last_name='Doe')
         db_session.add(user)
         db_session.flush()
 
@@ -62,8 +62,8 @@ class AuthTest(DatabaseTest):
 
         db_session.commit()
 
-        self.assertEquals(db_session.query(User).count(), 1)
-        self.assertEquals(db_session.query(UserSocialAuth).count(), 1)
+        self.assertEqual(db_session.query(User).count(), 1)
+        self.assertEqual(db_session.query(UserSocialAuth).count(), 1)
 
         user_social_auth = get_user_social_auth(user.id)
-        self.assertEquals(user_social_auth.id, expected_user_social_auth.id)
+        self.assertEqual(user_social_auth.id, expected_user_social_auth.id)

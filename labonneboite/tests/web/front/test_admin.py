@@ -12,7 +12,7 @@ class AdminTest(DatabaseTest):
     def setUp(self, *args, **kwargs):
         super(AdminTest, self).setUp(*args, **kwargs)
 
-        self.user = User(email=u'john@doe.com', gender=u'male', first_name=u'John', last_name=u'Doe')
+        self.user = User(email='john@doe.com', gender='male', first_name='John', last_name='Doe')
         db_session.add(self.user)
         db_session.flush()
 
@@ -25,7 +25,7 @@ class AdminTest(DatabaseTest):
         db_session.add(user_social_auth)
         db_session.commit()
 
-        self.assertEquals(db_session.query(User).count(), 1)
+        self.assertEqual(db_session.query(User).count(), 1)
 
     def test_admin_access(self):
         """

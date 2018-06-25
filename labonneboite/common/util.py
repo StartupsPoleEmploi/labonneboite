@@ -1,9 +1,9 @@
 # coding: utf8
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 import logging
 import unicodedata
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from functools import wraps
 from time import time
 
@@ -57,7 +57,7 @@ def get_search_url(base_url, request_args, naf=None):
     if request_args.get('mode'):
         query_string['mode'] = request_args.get('mode')
 
-    return "%s?%s" % (base_url, urllib.urlencode(query_string))
+    return "%s?%s" % (base_url, urllib.parse.urlencode(query_string))
 
 
 def get_user_ip():
@@ -73,7 +73,7 @@ def get_user_ip():
 def sanitize_string(s):
     if isinstance(s, str):
         return s.decode('utf-8')
-    elif isinstance(s, unicode):
+    elif isinstance(s, str):
         return s
     raise Exception("not a string")
 
@@ -124,7 +124,7 @@ def get_contact_mode_for_rome_and_office(rome, office):
     except KeyError:
         pass
     try:
-        return naf_prefix_to_rome_to_contact_mode[naf_prefix].values()[0]
+        return list(naf_prefix_to_rome_to_contact_mode[naf_prefix].values())[0]
     except (KeyError, IndexError):
         return CONTACT_MODE_DEFAULT
 
@@ -144,7 +144,7 @@ def unique_elements(iterable, key=None):
     for element in iterable:
         hashed = element if key is None else key(element)
         if isinstance(hashed, dict):
-            hashed = tuple(sorted(hashed.iteritems()))
+            hashed = tuple(sorted(hashed.items()))
         elif isinstance(hashed, list):
             hashed = tuple(hashed)
         if hashed not in seen:

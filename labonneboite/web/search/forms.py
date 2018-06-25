@@ -17,20 +17,20 @@ class CompanySearchForm(FlaskForm):
     """
 
     HEADCOUNT_CHOICES = (
-        (u'1', u'Toutes tailles'),
-        (u'2', u'Moins de 50 salariés'),
-        (u'3', u'Plus de 50 salariés'),
+        ('1', 'Toutes tailles'),
+        ('2', 'Moins de 50 salariés'),
+        ('3', 'Plus de 50 salariés'),
     )
 
-    NAF_CHOICES = [('', u'Tous les secteurs')] + [(k, v) for k, v in settings.NAF_CODES.items()]
+    NAF_CHOICES = [('', 'Tous les secteurs')] + [(k, v) for k, v in list(settings.NAF_CODES.items())]
 
     DISTANCE_CHOICES = (
-        (u'5', u'Moins de 5 km'),
-        (u'10', u'Moins de 10 km'),
-        (u'30', u'Moins de 30 km'),
-        (u'50', u'Moins de 50 km'),
-        (u'100', u'Moins de 100km'),
-        (u'3000', u'France entière')
+        ('5', 'Moins de 5 km'),
+        ('10', 'Moins de 10 km'),
+        ('30', 'Moins de 30 km'),
+        ('50', 'Moins de 50 km'),
+        ('100', 'Moins de 100km'),
+        ('3000', 'France entière')
     )
     DISTANCE_S = DISTANCE_CHOICES[2][0]
 
@@ -44,37 +44,37 @@ class CompanySearchForm(FlaskForm):
         csrf = False
 
     # Typed job
-    j = StringField(u'Job', validators=[DataRequired()])
+    j = StringField('Job', validators=[DataRequired()])
     # Corresponding occupation found by autocomplete
-    occupation = HiddenField(u'', validators=[DataRequired()])
+    occupation = HiddenField('', validators=[DataRequired()])
 
     # Typed location
-    l = StringField(u'Location', validators=[DataRequired()])
+    l = StringField('Location', validators=[DataRequired()])
     # Corresponding coordinates found by autocomplete
     lat = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-90, 90)])
     lon = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-180, 180)])
 
     # Headcount
     h = RadioField(
-        u'Taille d\'entreprise',
+        'Taille d\'entreprise',
         default=1,
         choices=HEADCOUNT_CHOICES,
         validators=[Optional()])
 
     sort = RadioField(
-        u'Classement par',
+        'Classement par',
         choices=sorting.SORTING_CHOICES,
         default=sorting.SORT_FILTER_DEFAULT,
         validators=[Optional()])
 
     naf = SelectField(
-        u'Secteur d\'activité',
+        'Secteur d\'activité',
         choices=NAF_CHOICES,
         default='',
         validators=[Optional()])
 
     d = RadioField(
-        u'Distance',
+        'Distance',
         choices=DISTANCE_CHOICES,
         default=settings.DISTANCE_FILTER_DEFAULT,
         validators=[Optional()])
@@ -83,15 +83,15 @@ class CompanySearchForm(FlaskForm):
 class ProCompanySearchForm(CompanySearchForm):
 
     PUBLIC_CHOICES = (
-        (unicode(search.PUBLIC_ALL), u'Tout'),
-        (unicode(search.PUBLIC_JUNIOR), u'<span class="badge badge-large badge-info" data-toggle="tooltip" title="moins de 26 ans">Junior</span>'),
-        (unicode(search.PUBLIC_SENIOR), u'<span class="badge badge-large badge-info" data-toggle="tooltip" title="plus de 50 ans">Senior</span>'),
-        (unicode(search.PUBLIC_HANDICAP), u'<span class="badge badge-large badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">BOE</span>'),
+        (str(search.PUBLIC_ALL), 'Tout'),
+        (str(search.PUBLIC_JUNIOR), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="moins de 26 ans">Junior</span>'),
+        (str(search.PUBLIC_SENIOR), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="plus de 50 ans">Senior</span>'),
+        (str(search.PUBLIC_HANDICAP), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">BOE</span>'),
     )
 
     # this field is activated only in pro mode
     p = RadioField(
-        u'Public',
+        'Public',
         choices=PUBLIC_CHOICES,
         default=0,
         validators=[Optional()])

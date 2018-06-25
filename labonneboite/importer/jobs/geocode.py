@@ -216,7 +216,7 @@ class GeocodeUnit(object):
                 try:
                     results = response.json()['features']
                     if len(results) >= 1:
-                        coordinates = results[0][u'geometry'][u'coordinates']
+                        coordinates = results[0]['geometry']['coordinates']
                         # let's cache the result for later computations
                         geolocation = Geolocation(
                             full_address=self.full_address,

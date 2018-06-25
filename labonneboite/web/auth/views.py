@@ -1,6 +1,6 @@
 # coding: utf8
 
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from flask import Blueprint, redirect, session, url_for
 from flask_login import current_user, logout_user

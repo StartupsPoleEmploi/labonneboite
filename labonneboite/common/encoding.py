@@ -34,7 +34,7 @@ def sanitize_string(s):
         # last resort
         # 'ignore' will removed any unrecognized character
         return s.decode('utf-8', 'ignore')
-    elif isinstance(s, unicode):
+    elif isinstance(s, str):
         return s
     elif s is None:
         return s # leave None value untouched

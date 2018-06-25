@@ -1,6 +1,6 @@
 # coding: utf8
-import urllib
-from urlparse import parse_qsl
+import urllib.request, urllib.parse, urllib.error
+from urllib.parse import parse_qsl
 
 from flask import url_for
 import mock
@@ -52,7 +52,7 @@ class SearchEntreprisesTest(DatabaseTest):
 
     def test_canonical_url(self):
         with self.app_context:
-            url = get_canonical_results_url('05100', u'Cervières', 'Boucherie')
+            url = get_canonical_results_url('05100', 'Cervières', 'Boucherie')
         response = self.app.get(url)
 
         self.assertEqual(
@@ -197,7 +197,7 @@ class GenericUrlSearchRedirectionTest(AppTest):
         rv = self.app.get("/entreprises/commune/75056/rome/D1104")
         self.assertEqual(rv.status_code, 302)
 
-        url, querystring = urllib.splitquery(rv.location)
+        url, querystring = urllib.parse.splitquery(rv.location)
         parameters = dict(parse_qsl(querystring))
         expected_url = self.url_for('search.entreprises')
         expected_parameters = {
@@ -215,7 +215,7 @@ class GenericUrlSearchRedirectionTest(AppTest):
         rv = self.app.get("/entreprises/commune/75056/rome/D1104?d=100")
         self.assertEqual(rv.status_code, 302)
 
-        url, querystring = urllib.splitquery(rv.location)
+        url, querystring = urllib.parse.splitquery(rv.location)
         parameters = dict(parse_qsl(querystring))
         expected_url = self.url_for('search.entreprises')
         expected_parameters = {
@@ -244,7 +244,7 @@ class GenericUrlSearchRedirectionTest(AppTest):
             'utm_source': 'test',
             'utm_campaign': 'test'
         }
-        url, querystring = urllib.splitquery(rv.location)
+        url, querystring = urllib.parse.splitquery(rv.location)
         parameters = dict(parse_qsl(querystring))
         self.assertEqual(expected_url, url)
         self.assertEqual(expected_parameters, parameters)

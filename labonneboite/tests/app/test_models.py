@@ -17,16 +17,16 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         Test `OfficeAdminExtraGeoLocation.clean()`.
         """
         extra_geolocation = OfficeAdminExtraGeoLocation(
-            siret=u"38524664000176",
-            codes=u"75110\n\n\n\n\n\n\n57616",
-            reason=u"Paris 10 + Metz Saint Julien",
+            siret="38524664000176",
+            codes="75110\n\n\n\n\n\n\n57616",
+            reason="Paris 10 + Metz Saint Julien",
         )
         db_session.add(extra_geolocation)
         db_session.commit()
         # The `clean()` method should have been called automatically.
         extra_geolocation = db_session.query(OfficeAdminExtraGeoLocation).first()
         # Multiple newlines should have been removed.
-        self.assertEqual(extra_geolocation.codes, u'57616\n75110')
+        self.assertEqual(extra_geolocation.codes, '57616\n75110')
         # Corresponding Lat/Lon coords should have been found and stored.
         self.assertEqual(
             extra_geolocation.geolocations,
@@ -38,8 +38,8 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         Test `OfficeAdminExtraGeoLocation.is_outdated()`.
         """
         extra_geolocation = OfficeAdminExtraGeoLocation(
-            siret=u"38524664000176",
-            codes=u"75108",
+            siret="38524664000176",
+            codes="75108",
         )
         extra_geolocation.save()
         self.assertFalse(extra_geolocation.is_outdated())
@@ -52,18 +52,18 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         """
         Test `OfficeAdminExtraGeoLocation.codes_as_list()`.
         """
-        codes = u"   57616\n\n\n\n\n\n     75110  \n  54      "
+        codes = "   57616\n\n\n\n\n\n     75110  \n  54      "
         codes_as_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
-        self.assertItemsEqual(codes_as_list, [u'54', u'57616', u'75110'])
-        codes = u"75\r57\n13"
+        self.assertItemsEqual(codes_as_list, ['54', '57616', '75110'])
+        codes = "75\r57\n13"
         codes_as_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
-        self.assertItemsEqual(codes_as_list, [u'13', u'57', u'75'])
+        self.assertItemsEqual(codes_as_list, ['13', '57', '75'])
 
     def test_codes_as_geolocations(self):
         """
         Test `OfficeAdminExtraGeoLocation.codes_as_geolocations()`.
         """
-        codes = u"75\n57616"
+        codes = "75\n57616"
         codes_as_geolocations = OfficeAdminExtraGeoLocation.codes_as_geolocations(codes)
         expected = [
             # Found for the departement 75.
@@ -97,7 +97,7 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         """
         Test `OfficeAdminExtraGeoLocation.codes_as_json_geolocations()`.
         """
-        codes = u"75110"
+        codes = "75110"
         codes_as_json_geolocations = OfficeAdminExtraGeoLocation.codes_as_json_geolocations(codes)
         expected = '[[48.8815994262695, 2.36229991912841]]'
         self.assertEqual(expected, codes_as_json_geolocations)
@@ -105,12 +105,12 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
     def test_office_as_json(self):
         # Create office
         office = Office(
-            siret=u'00000000000001',
-            company_name=u'1',
-            headcount=u'11',
-            city_code=u'57070',
-            zipcode=u'57070',
-            naf=u'7320Z',
+            siret='00000000000001',
+            company_name='1',
+            headcount='11',
+            city_code='57070',
+            zipcode='57070',
+            naf='7320Z',
             score=90,
             x=6.166667,
             y=49.133333,

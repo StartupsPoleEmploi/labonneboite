@@ -33,9 +33,9 @@ class SynchronizationIndexAndDatabaseTest(unittest.TestCase):
 
         es = Elasticsearch()
         scores = {office.siret: office.score for office in offices}
-        body = {"query": {"filtered": {"filter": {"terms": {"siret": scores.keys()}}}}}
+        body = {"query": {"filtered": {"filter": {"terms": {"siret": list(scores.keys())}}}}}
         res = es.search(index=settings.ES_INDEX, doc_type="office", body=body)
         for office in res['hits']['hits']:
             index_score = office["_source"]["score"]
             siret = office["_source"]["siret"]
-            self.assertEquals(index_score, scores[siret])
+            self.assertEqual(index_score, scores[siret])

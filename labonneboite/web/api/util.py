@@ -1,6 +1,6 @@
 import datetime
 import hmac
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from labonneboite.conf import settings
 
@@ -33,7 +33,7 @@ def get_ordered_argument_string(args):
     ordered_args = []
     for arg in sorted(args_copy):
         ordered_args.append((arg, args_copy[arg]))
-    return urllib.urlencode(ordered_args)
+    return urllib.parse.urlencode(ordered_args)
 
 
 def make_signature(args, timestamp, user='labonneboite'):
@@ -73,7 +73,7 @@ def compute_signature(args, api_key):
 
 def check_signature(request, requested_signature, api_key):
     args = {}
-    for k, v in request.args.iteritems():
+    for k, v in request.args.items():
         # unicode parameters (e.g. rome_codes_keyword_search) need to be properly encoded
         args[k] = v.encode('utf8')
     computed_signature = compute_signature(args, api_key)
