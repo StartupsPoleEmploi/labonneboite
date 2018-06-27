@@ -27,6 +27,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         'company_name',
         'reason',
         'date_created',
+        'date_updated',
     ]
 
     column_details_list = [
