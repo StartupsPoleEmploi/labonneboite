@@ -10,18 +10,19 @@ We train a machine learning algorithm on companies and employment data to create
 
 We use the scikit-learn library : more info http://scikit-learn.org/stable/documentation.html
 """
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 from calendar import monthrange
+import math
 from operator import getitem
 import os
 import pickle
 import sys
 from urllib.parse import urlparse
+
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import validators
 
 
-import math
 import pandas as pd
 import numpy as np
 from sklearn import linear_model
@@ -150,9 +151,7 @@ def normalize_website_url(url):
         return None
 
     # ensure website URL is correct (and is not an email address for example!)
-    try:
-        validators.url(url)
-    except validators.ValidationFailure:
+    if not validators.url(url):
         return None
 
     return url
@@ -166,8 +165,7 @@ def merge_and_normalize_websites(websites):
         return w1
     elif w2:
         return w2
-    else:
-        return ""
+    return ""
 
 
 def tranche_to_effectif(tranche):
@@ -207,9 +205,8 @@ def check_last_historical_data_date(last_historical_data_date):
 def go_back_last_day_of_the_month(date):
     if (date + timedelta(days=1)).day == 1:
         return date  # already a last day of the month
-    else:
-        first_day_of_the_month = date.replace(day=1)
-        return first_day_of_the_month - timedelta(days=1)  # last day of previous month
+    first_day_of_the_month = date.replace(day=1)
+    return first_day_of_the_month - timedelta(days=1)  # last day of previous month
 
 
 @timeit
@@ -450,7 +447,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     data_gap_in_months = months_between_dates(last_historical_data_date, prediction_beginning_date)
     # math.ceil returns a float and not an int, thus we still need to cast it to int.
     # `1.0 * int/int` trick is needed because otherwise int/int gives the floor int value.
-    data_gap_in_periods = int(math.ceil(1.0 * data_gap_in_months / months_per_period))
+    data_gap_in_periods = int(math.ceil(data_gap_in_months / months_per_period))
 
     if prefix_for_fields == "dpae":
         if get_current_env() == ENV_DEVELOPMENT:
@@ -516,7 +513,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     )
 
     logger.debug("(%s %s) X_test_feature_names: %s", departement, prefix_for_fields, X_test_feature_names)
-    
+
     X_live, X_live_feature_names = get_features_for_lag(
         df_etab,
         prefix_for_fields,
@@ -559,7 +556,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
 
     try:
         logger.info("(%s %s) regression_train RMSE : %s", departement, prefix_for_fields, rmse_train)
-        logger.info("(%s %s) regression_test RMSE : %s", departement, prefix_for_fields,  rmse_test)
+        logger.info("(%s %s) regression_test RMSE : %s", departement, prefix_for_fields, rmse_test)
         if rmse_test >= importer_settings.RMSE_MAX:
             raise_with_message("rmse_test too high : %s > %s" % (rmse_test, importer_settings.RMSE_MAX))
     except IndexError:
@@ -582,10 +579,9 @@ def export_df_etab_to_db(df_etab, departement):
     logger.debug("writing sql (%s)...", departement)
 
     def departement_to_str(x):
-        if x["departement"] < 10:
+        if int(x["departement"]) < 10:
             return "0%i" % x["departement"]
-        else:
-            return str(x["departement"])
+        return str(x["departement"])
 
     df_etab['departement'] = df_etab.apply(departement_to_str, axis=1)
 
@@ -655,7 +651,7 @@ def run(
     logger.debug("df_etab_with_hiring_monthly_aggregates loaded for departement %s", departement)
 
     if df_etab is None:
-        logger.warn("no etab/hiring data found for departement %s", departement)
+        logger.warning("no etab/hiring data found for departement %s", departement)
         return False # failed computation (e.g. no data)
 
     # DPAE
@@ -691,8 +687,7 @@ def run(
     export_df_etab_to_db(df_etab, departement)
     if return_df_etab_if_successful:
         return df_etab  # only used in test_compute_score.py for inspection
-    else:
-        return True  # successful computation
+    return True  # successful computation
 
 
 @timeit

@@ -199,22 +199,22 @@ def download(siret):
     full_path = pdf_util.get_file_path(office)
     if os.path.exists(full_path):
         return send_file(full_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)
-    else:
-        dic = detail(siret)
-        office = dic['company']
 
-        contact_mode = dic['contact_mode']
-        dic['stages'] = CONTACT_MODE_STAGES.get(contact_mode, [contact_mode])
-        dic['date'] = date.today()
+    dic = detail(siret)
+    office = dic['company']
 
-        # Render pdf file
-        pdf_data = render_template('office/pdf_detail.html', **dic)
-        pdf_target = pdf_util.convert_to_pdf(pdf_data)
-        data_to_write = pdf_target.getvalue()
-        pdf_util.write_file(office, data_to_write)
+    contact_mode = dic['contact_mode']
+    dic['stages'] = CONTACT_MODE_STAGES.get(contact_mode, [contact_mode])
+    dic['date'] = date.today()
 
-        # Return pdf
-        response = make_response(data_to_write)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
-        return response
+    # Render pdf file
+    pdf_data = render_template('office/pdf_detail.html', **dic)
+    pdf_target = pdf_util.convert_to_pdf(pdf_data)
+    data_to_write = pdf_target.getvalue()
+    pdf_util.write_file(office, data_to_write)
+
+    # Return pdf
+    response = make_response(data_to_write)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
+    return response

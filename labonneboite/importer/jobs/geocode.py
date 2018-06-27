@@ -242,7 +242,7 @@ class GeocodeUnit(object):
                             db_session.rollback()
                             GEOCODING_STATS['rollbacks'] = GEOCODING_STATS.get('rollbacks', 0) + 1
                 except ValueError:
-                    logger.warn('ValueError in json-ing features result %s', response.text)
+                    logger.warning('ValueError in json-ing features result %s', response.text)
 
         if coordinates:
             if coordinates == self.initial_coordinates:

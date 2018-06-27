@@ -22,8 +22,8 @@ class CreateIndexBaseTest(DatabaseTest):
     Create Elasticsearch and DB content for the unit tests.
     """
 
-    def setUp(self, *args, **kwargs):
-        super(CreateIndexBaseTest, self).setUp(*args, **kwargs)
+    def setUp(self):
+        super(CreateIndexBaseTest, self).setUp()
 
         # Mute script logging
         script.logger.setLevel(script.logging.CRITICAL)
@@ -376,7 +376,9 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         Related to a previous bug where some scores where removed.
         """
         # No romes removed when computing scores
-        with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0), mock.patch.object(script.scoring_util, 'SCORE_ALTERNANCE_FOR_ROME_MINIMUM', 0):
+        with mock.patch.object(
+            script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0
+        ), mock.patch.object(script.scoring_util, 'SCORE_ALTERNANCE_FOR_ROME_MINIMUM', 0):
             script.update_offices()
 
         for office in [self.office1, self.office2]:
