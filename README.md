@@ -58,14 +58,14 @@ Clone labonneboite repository:
 
 Create an [isolated Python environment](https://virtualenv.pypa.io/) using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
 
-    $ mkvirtualenv --python=`which python2.7` lbb
+    $ mkvirtualenv --python=`which python3` lbb
     $ workon lbb
 
 Install OS requirements:
 
     # On Debian-based OS:
     
-    $ sudo apt-get install -y language-pack-fr git python python-dev python-virtualenv python-pip mysql-server libmysqlclient-dev libncurses5-dev build-essential python-numpy python-scipy python-mysqldb chromium-chromedriver xvfb graphviz htop libblas-dev liblapack-dev libatlas-base-dev gfortran
+    $ sudo apt-get install -y language-pack-fr git python3 python3-dev python-virtualenv python-pip mysql-server libmysqlclient-dev libncurses5-dev build-essential python-numpy python-scipy python-mysqldb chromium-chromedriver xvfb graphviz htop libblas-dev liblapack-dev libatlas-base-dev gfortran
 
     # On Mac OS:
     
