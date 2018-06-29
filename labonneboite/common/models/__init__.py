@@ -24,4 +24,5 @@ from labonneboite.common.models.office import *
 from labonneboite.common.models.auth import *
 from labonneboite.common.models.user_favorite_offices import *
 from labonneboite.common.models.office_admin import *
+from labonneboite.common.models.recruiter_message import *
 # pylint: enable=wildcard-import

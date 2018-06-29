@@ -1,0 +1,22 @@
+{% if use_lba_template %}
+  {% extends 'base_lba.html' %}
+{% else %}
+  {% extends 'base.html' %}
+{% endif %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="lbb-content">
+  <div class="lbb-single-column-content action-chooser-form">
+
+    <h2>Que voulez-vous faire ?</h2>
+
+    <a class="btn btn-small" href="{{ url_for('contact_form.update_coordinates_form') }}?{{ params }}">Modifier les coordonnées de mon entreprise</a>
+    <a class="btn btn-small" href="{{ url_for('contact_form.update_jobs_form') }}?{{ params }}">Modifier les métiers pour lesquels je reçois des candidatures spontanées</a>
+    <a class="btn btn-small" href="{{ url_for('contact_form.delete_form') }}?{{ params }}">Supprimer mon entreprise</a>
+    <a class="btn btn-small" href="{{ url_for('contact_form.other_form') }}?{{ params }}">Autre demande</a>
+
+  </div>
+</div>
+{% endblock %}

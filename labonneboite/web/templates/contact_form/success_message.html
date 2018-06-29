@@ -1,0 +1,25 @@
+{% if use_lba_template %}
+    {% extends 'base_lba.html' %}
+{% else %}
+    {% extends 'base.html' %}
+{% endif %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="lbb-content">
+    <div class="lbb-single-column-content success-message">
+        <h2>Merci</h2>
+
+        <p>
+            Votre demande a bien été envoyée. Notre équipe revient vers vous par mail et/ou téléphone d'ici quelques jours afin
+            de vous confirmer la prise en compte des modifications. Nous restons à votre écoute sur <a href="mailto:{{ email }}">{{ email }}</a>.
+        </p>
+
+        <ul class='actions'>
+            <li><a href="{{ home_url }}" title="Retour à la page d'accueil du site">Retour à la {{ site_name }}</a></li>
+            <li><a class="btn btn-small" href="{{ action_form_url }}">Effectuer de nouvelles modifications</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

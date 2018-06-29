@@ -144,3 +144,6 @@ def load_naf_labels():
 @lru_cache(maxsize=None)
 def load_rome_naf_mapping():
     return load_csv_file(ROME_NAF_FILE, delimiter=',')
+
+OGR_ROME_CODES = load_ogr_rome_mapping()
+ROME_CODES = list(OGR_ROME_CODES.values())

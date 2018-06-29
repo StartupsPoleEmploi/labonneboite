@@ -12,7 +12,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common import hiring_type_util
 from labonneboite.common.locations import Location
-from labonneboite.common.load_data import load_ogr_rome_mapping
+from labonneboite.common.load_data import ROME_CODES
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
@@ -21,8 +21,7 @@ from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
 
 apiBlueprint = Blueprint('api', __name__)
 
-OGR_ROME_CODES = load_ogr_rome_mapping()
-ROME_CODES = list(OGR_ROME_CODES.values())
+
 
 
 class InvalidFetcherArgument(Exception):
