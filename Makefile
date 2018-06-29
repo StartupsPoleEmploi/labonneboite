@@ -195,6 +195,7 @@ alembic-generate-migration:
 # -------------
 
 run-importer-jobs:
+	make alembic-migrate && \
 	make run-importer-job-00-prepare-all && \
 	make run-importer-job-01-check-etablissements && \
 	make run-importer-job-02-extract-etablissements && \
