@@ -2,25 +2,20 @@
 
 from datetime import date
 import os
-from urllib import urlencode
 
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
 
-from flask import abort, redirect, render_template, flash
-from flask import Blueprint, current_app
+from flask import abort, render_template
+from flask import Blueprint
 from flask import make_response, send_file
-from flask import request, session, url_for
+from flask import request, session
 
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import util
-from labonneboite.common.email_util import MandrillClient
-from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
 from labonneboite.common.contact_mode import CONTACT_MODE_STAGES
-
-from labonneboite.web.office.forms import OfficeRemovalForm
-
+from labonneboite.common.models import Office
 
 officeBlueprint = Blueprint('office', __name__)
 
@@ -45,64 +40,6 @@ def details(siret):
         'rome_code': rome_code,
     }
     return render_template('office/details.html', **context)
-
-
-@officeBlueprint.route('/verification-informations-entreprise/<siret>')
-def change_info_or_apply_for_job(siret):
-    """
-    Ask user if he wants to change company information or apply for a job,
-    in order to avoid the change_info page to be spammed so much by
-    people thinking they are actually applying for a job.
-    """
-    return render_template('office/change_info_or_apply_for_job.html', siret=siret)
-
-
-@officeBlueprint.route('/postuler/<siret>')
-def apply_for_job(siret):
-    """
-    If user arrives here, it means we successfully avoided having him spam the
-    company modification form. Now we just have to explain him what is wrong.
-    """
-    return render_template('office/apply_for_job.html', siret=siret)
-
-@officeBlueprint.route('/informations-entreprise', methods=['GET', 'POST'])
-def change_info():
-    """
-    Let a user fill a form to request a removal or information change about an office.
-    """
-    form = OfficeRemovalForm()
-    if form.validate_on_submit():
-        client = MandrillClient(current_app.extensions['mandrill'])
-        client.send(
-            u"""Un email a été envoyé par le formulaire de contact de la Bonne Boite :<br>
-            - Action : %s<br>
-            - Siret : %s,<br>
-            - Prénom : %s,<br>
-            - Nom : %s, <br>
-            - E-mail : %s,<br>
-            - Tél. : %s,<br>
-            - Commentaire : %s<br>
-            <hr>
-            - Status SAVE : %s
-            <hr>
-
-            Cordialement,<br>
-            La Bonne Boite""" % (
-                form.action.data,
-                form.siret.data,
-                form.first_name.data,
-                form.last_name.data,
-                form.email.data,
-                form.phone.data,
-                form.comment.data,
-                make_save_suggestion(form)
-            )
-        )
-        msg = u"Merci pour votre message, nous reviendrons vers vous dès que possible."
-        flash(msg, 'success')
-
-        return redirect(url_for('office.change_info'))
-    return render_template('office/change_info.html', form=form)
 
 
 def detail(siret):
@@ -133,66 +70,6 @@ def detail(siret):
         'kompass_url': "http://fr.kompass.com/searchCompanies?text=%s" % company.siret,
         'search_url': search_url,
     }
-
-def make_save_suggestion(form):
-    # Save informations
-    company = Office.query.filter_by(siret=form.siret.data).first()
-
-    def dirty_fix_url(url):
-        from labonneboite.common.env import get_current_env, ENV_STAGING, ENV_PRODUCTION
-        if get_current_env() == ENV_STAGING:
-            return 'http://labonneboite.beta.pole-emploi.fr' + url
-        elif get_current_env() == ENV_PRODUCTION:
-            return 'https://labonneboite.pole-emploi.fr' + url
-        else:
-            return url
-
-    if not company:
-        # OfficeAdminRemove already exits ?
-        office_admin_remove = OfficeAdminRemove.query.filter_by(siret=form.siret.data).first()
-        if office_admin_remove:
-            url = url_for("officeadminremove.edit_view", id=office_admin_remove.id)
-            return u"Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % dirty_fix_url(url)
-        else:
-            return u'Aucune entreprise trouvée avec le siret %s' % form.siret.data
-
-    # OfficeAdminAdd already exits ?
-    office_admin_add = OfficeAdminAdd.query.filter_by(siret=form.siret.data).first()
-    if office_admin_add:
-        url = url_for("officeadminadd.edit_view", id=office_admin_add.id)
-        return u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % dirty_fix_url(url)
-
-    # OfficeAdminUpdate already exits ?
-    office_admin_update = OfficeAdminUpdate.query.filter(
-        OfficeAdminUpdate.sirets.like("%{}%".format(form.siret.data))
-    ).first()
-
-    if office_admin_update:
-        url = url_for("officeadminupdate.edit_view", id=office_admin_update.id)
-        return u"Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % dirty_fix_url(url)
-
-
-    # No office AdminOffice found : suggest to create an OfficeAdminRemove and OfficeRemoveUpdate
-    params = {
-        'siret': form.siret.data,
-        'name': company.company_name,
-        'requested_by_email': form.email.data,
-        'requested_by_first_name': form.first_name.data,
-        'requested_by_last_name': form.last_name.data,
-        'requested_by_phone': form.phone.data,
-        'reason': form.comment.data,
-    }
-    params = {key: value.encode('utf8') for key, value in params.iteritems()}
-    if form.action.data == "enlever":
-        url = url_for('officeadminremove.create_view')
-        status_save = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>"
-    else:
-        url = url_for('officeadminupdate.create_view')
-        status_save = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>"
-
-    url = "%s?%s" % (url, urlencode(params))
-    status_save = status_save % dirty_fix_url(url)
-    return status_save
 
 
 @officeBlueprint.route('/<siret>/download')
