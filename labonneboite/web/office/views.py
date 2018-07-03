@@ -2,7 +2,7 @@
 
 from datetime import date
 import os
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
@@ -74,7 +74,7 @@ def change_info():
     if form.validate_on_submit():
         client = MandrillClient(current_app.extensions['mandrill'])
         client.send(
-            u"""Un email a été envoyé par le formulaire de contact de la Bonne Boite :<br>
+            """Un email a été envoyé par le formulaire de contact de la Bonne Boite :<br>
             - Action : %s<br>
             - Siret : %s,<br>
             - Prénom : %s,<br>
@@ -98,7 +98,7 @@ def change_info():
                 make_save_suggestion(form)
             )
         )
-        msg = u"Merci pour votre message, nous reviendrons vers vous dès que possible."
+        msg = "Merci pour votre message, nous reviendrons vers vous dès que possible."
         flash(msg, 'success')
 
         return redirect(url_for('office.change_info'))
@@ -138,29 +138,19 @@ def make_save_suggestion(form):
     # Save informations
     company = Office.query.filter_by(siret=form.siret.data).first()
 
-    def dirty_fix_url(url):
-        from labonneboite.common.env import get_current_env, ENV_STAGING, ENV_PRODUCTION
-        if get_current_env() == ENV_STAGING:
-            return 'http://labonneboite.beta.pole-emploi.fr' + url
-        elif get_current_env() == ENV_PRODUCTION:
-            return 'https://labonneboite.pole-emploi.fr' + url
-        else:
-            return url
-
     if not company:
         # OfficeAdminRemove already exits ?
         office_admin_remove = OfficeAdminRemove.query.filter_by(siret=form.siret.data).first()
         if office_admin_remove:
-            url = url_for("officeadminremove.edit_view", id=office_admin_remove.id)
-            return u"Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % dirty_fix_url(url)
-        else:
-            return u'Aucune entreprise trouvée avec le siret %s' % form.siret.data
+            url = url_for("officeadminremove.edit_view", id=office_admin_remove.id, _external=True)
+            return "Entreprise retirée via Save : <a href='%s'>Voir la fiche de suppression</a>" % url
+        return 'Aucune entreprise trouvée avec le siret %s' % form.siret.data
 
     # OfficeAdminAdd already exits ?
     office_admin_add = OfficeAdminAdd.query.filter_by(siret=form.siret.data).first()
     if office_admin_add:
-        url = url_for("officeadminadd.edit_view", id=office_admin_add.id)
-        return u"Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % dirty_fix_url(url)
+        url = url_for("officeadminadd.edit_view", id=office_admin_add.id, _external=True)
+        return "Entreprise créée via Save : <a href='%s'>Voir la fiche d'ajout</a>" % url
 
     # OfficeAdminUpdate already exits ?
     office_admin_update = OfficeAdminUpdate.query.filter(
@@ -168,8 +158,8 @@ def make_save_suggestion(form):
     ).first()
 
     if office_admin_update:
-        url = url_for("officeadminupdate.edit_view", id=office_admin_update.id)
-        return u"Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % dirty_fix_url(url)
+        url = url_for("officeadminupdate.edit_view", id=office_admin_update.id, _external=True)
+        return "Entreprise modifiée via Save : <a href='%s'>Voir la fiche de modification</a>" % url
 
 
     # No office AdminOffice found : suggest to create an OfficeAdminRemove and OfficeRemoveUpdate
@@ -182,16 +172,16 @@ def make_save_suggestion(form):
         'requested_by_phone': form.phone.data,
         'reason': form.comment.data,
     }
-    params = {key: value.encode('utf8') for key, value in params.iteritems()}
+    params = {key: value.encode('utf8') for key, value in params.items()}
     if form.action.data == "enlever":
-        url = url_for('officeadminremove.create_view')
-        status_save = u" Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>"
+        url = url_for('officeadminremove.create_view', _external=True)
+        status_save = " Une suppression a été demandée : <a href='%s'>Créer une fiche de suppression</a>"
     else:
-        url = url_for('officeadminupdate.create_view')
-        status_save = u"Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>"
+        url = url_for('officeadminupdate.create_view', _external=True)
+        status_save = "Entreprise non modifiée via Save : <a href='%s'>Créer une fiche de modification</a>"
 
     url = "%s?%s" % (url, urlencode(params))
-    status_save = status_save % dirty_fix_url(url)
+    status_save = status_save % url
     return status_save
 
 
@@ -209,22 +199,22 @@ def download(siret):
     full_path = pdf_util.get_file_path(office)
     if os.path.exists(full_path):
         return send_file(full_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)
-    else:
-        dic = detail(siret)
-        office = dic['company']
 
-        contact_mode = dic['contact_mode']
-        dic['stages'] = CONTACT_MODE_STAGES.get(contact_mode, [contact_mode])
-        dic['date'] = date.today()
+    dic = detail(siret)
+    office = dic['company']
 
-        # Render pdf file
-        pdf_data = render_template('office/pdf_detail.html', **dic)
-        pdf_target = pdf_util.convert_to_pdf(pdf_data)
-        data_to_write = pdf_target.getvalue()
-        pdf_util.write_file(office, data_to_write)
+    contact_mode = dic['contact_mode']
+    dic['stages'] = CONTACT_MODE_STAGES.get(contact_mode, [contact_mode])
+    dic['date'] = date.today()
 
-        # Return pdf
-        response = make_response(data_to_write)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
-        return response
+    # Render pdf file
+    pdf_data = render_template('office/pdf_detail.html', **dic)
+    pdf_target = pdf_util.convert_to_pdf(pdf_data)
+    data_to_write = pdf_target.getvalue()
+    pdf_util.write_file(office, data_to_write)
+
+    # Return pdf
+    response = make_response(data_to_write)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
+    return response

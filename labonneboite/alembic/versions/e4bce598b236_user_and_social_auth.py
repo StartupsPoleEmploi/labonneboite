@@ -29,9 +29,9 @@ def upgrade():
         sa.Column('date_created', mysql.DATETIME(), nullable=True),
         sa.Column('active', mysql.TINYINT(display_width=1), autoincrement=False, nullable=True),
         sa.PrimaryKeyConstraint('id'),
-        mysql_collate=u'utf8mb4_unicode_ci',
-        mysql_default_charset=u'utf8mb4',
-        mysql_engine=u'InnoDB'
+        mysql_collate='utf8mb4_unicode_ci',
+        mysql_default_charset='utf8mb4',
+        mysql_engine='InnoDB'
     )
 
     op.create_table(
@@ -41,11 +41,11 @@ def upgrade():
         sa.Column('extra_data', mysql.TEXT(), nullable=True),
         sa.Column('uid', mysql.VARCHAR(length=255), nullable=True),
         sa.Column('user_id', mysql.INTEGER(display_width=11), autoincrement=False, nullable=False),
-        sa.ForeignKeyConstraint(['user_id'], [u'users.id'], name=u'social_auth_usersocialauth_ibfk_1'),
+        sa.ForeignKeyConstraint(['user_id'], ['users.id'], name='social_auth_usersocialauth_ibfk_1'),
         sa.PrimaryKeyConstraint('id'),
-        mysql_collate=u'utf8mb4_unicode_ci',
-        mysql_default_charset=u'utf8mb4',
-        mysql_engine=u'InnoDB'
+        mysql_collate='utf8mb4_unicode_ci',
+        mysql_default_charset='utf8mb4',
+        mysql_engine='InnoDB'
     )
 
     op.create_table(
@@ -55,9 +55,9 @@ def upgrade():
         sa.Column('timestamp', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
         sa.Column('salt', mysql.VARCHAR(length=40), nullable=True),
         sa.PrimaryKeyConstraint('id'),
-        mysql_collate=u'utf8mb4_unicode_ci',
-        mysql_default_charset=u'utf8mb4',
-        mysql_engine=u'InnoDB'
+        mysql_collate='utf8mb4_unicode_ci',
+        mysql_default_charset='utf8mb4',
+        mysql_engine='InnoDB'
     )
 
     op.create_table(
@@ -68,9 +68,9 @@ def upgrade():
         sa.Column('next_step', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
         sa.Column('backend', mysql.VARCHAR(length=32), nullable=True),
         sa.PrimaryKeyConstraint('id'),
-        mysql_collate=u'utf8mb4_unicode_ci',
-        mysql_default_charset=u'utf8mb4',
-        mysql_engine=u'InnoDB'
+        mysql_collate='utf8mb4_unicode_ci',
+        mysql_default_charset='utf8mb4',
+        mysql_engine='InnoDB'
     )
 
     op.create_table(
@@ -79,9 +79,9 @@ def upgrade():
         sa.Column('email', mysql.VARCHAR(length=200), nullable=True),
         sa.Column('code', mysql.VARCHAR(length=32), nullable=True),
         sa.PrimaryKeyConstraint('id'),
-        mysql_collate=u'utf8mb4_unicode_ci',
-        mysql_default_charset=u'utf8mb4',
-        mysql_engine=u'InnoDB'
+        mysql_collate='utf8mb4_unicode_ci',
+        mysql_default_charset='utf8mb4',
+        mysql_engine='InnoDB'
     )
 
     op.create_table(
@@ -94,9 +94,9 @@ def upgrade():
         sa.Column('lifetime', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
         sa.Column('assoc_type', mysql.VARCHAR(length=64), nullable=True),
         sa.PrimaryKeyConstraint('id'),
-        mysql_collate=u'utf8mb4_unicode_ci',
-        mysql_default_charset=u'utf8mb4',
-        mysql_engine=u'InnoDB'
+        mysql_collate='utf8mb4_unicode_ci',
+        mysql_default_charset='utf8mb4',
+        mysql_engine='InnoDB'
     )
 
 def downgrade():

@@ -105,7 +105,7 @@ class ScoreComputingJob(Job):
             if at_least_one_departement_failed:
                 raise Exception('At least one departement failed. See above for details.')
                     
-        for departement, compute_result in compute_results.iteritems():
+        for departement, compute_result in compute_results.items():
             if not compute_result:
                 logger.info("departement with error : %s", departement)
             results.append([departement, compute_result])

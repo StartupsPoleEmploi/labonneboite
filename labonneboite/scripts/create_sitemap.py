@@ -27,13 +27,13 @@ def sitemap():
     pages = []
     now_str = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    cities = [city for city in geocoding.get_cities() if city['zipcode'].endswith(u'00')]
+    cities = [city for city in geocoding.get_cities() if city['zipcode'].endswith('00')]
     top_cities = [
         (city['slug'], city['zipcode'])
         for city in sorted(cities, key=operator.itemgetter('population'), reverse=True)[:94]
     ]
 
-    rome_descriptions = settings.ROME_DESCRIPTIONS.values()
+    rome_descriptions = list(settings.ROME_DESCRIPTIONS.values())
 
     for rome in rome_descriptions:
         occupation = slugify(rome)
@@ -51,11 +51,11 @@ def sitemap():
     with open(sitemap_filename, "w") as f:
         f.write(sitemap_xml)
 
-    print "generated sitemap.xml using %s pages (%s cities x %s rome_descriptions)" % (
+    print("generated sitemap.xml using %s pages (%s cities x %s rome_descriptions)" % (
         len(pages),
         len(top_cities),
         len(rome_descriptions)
-    )
+    ))
 
 if __name__ == "__main__":
     manager.run()

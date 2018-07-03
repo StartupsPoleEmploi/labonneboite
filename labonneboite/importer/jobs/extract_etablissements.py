@@ -63,7 +63,7 @@ class EtablissementExtractJob(Job):
         # FIXME improve this by processing the CSV on-the-fly instead
         self.benchmark_loading_using_pandas()
         self.csv_offices = self.get_offices_from_file()
-        self.csv_sirets = self.csv_offices.keys()
+        self.csv_sirets = list(self.csv_offices.keys())
         self.existing_sirets = self.get_sirets_from_database()
         csv_set = set(self.csv_sirets)
         existing_set = set(self.existing_sirets)
@@ -205,10 +205,11 @@ class EtablissementExtractJob(Job):
 
         with import_util.get_reader(self.input_filename) as myfile:
             header_line = myfile.readline().strip()  # FIXME detect column positions from header
-            if "siret" not in header_line:
+            if b"siret" not in header_line:
                 logger.debug(header_line)
                 raise ValueError("wrong header line")
             for line in myfile:
+                line = line.decode()
                 count += 1
                 if not count % 100000:
                     logger.debug("processed %s lines", count)

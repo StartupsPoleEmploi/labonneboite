@@ -31,6 +31,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
 
         # Random port generation
         app.config['LIVESERVER_PORT'] = 0
+        app.config['SERVER_NAME'] = None
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
         logging.getLogger('werkzeug').setLevel(logging.CRITICAL)
@@ -50,7 +51,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
             # headless display server such as Xvfb is highly non-trivial. In
             # those cases, we just run Chrome. It's fun and allows the user to
             # view the tests running in real time.
-            print "Xvfb is not available. Running selenium tests in non-virtual display."
+            print("Xvfb is not available. Running selenium tests in non-virtual display.")
 
         # Chromedriver is often in /usr/lib/chromium-browser/chromedriver
         chromedriver_path = distutils.spawn.find_executable('chromedriver')
@@ -91,7 +92,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
     def print_js_logs(self):
         # Convenient utility to print client-side logs
         for entry in self.driver.get_log('browser'):
-            print entry
+            print(entry)
 
 def url_has_changed(current_url):
     def check(driver):

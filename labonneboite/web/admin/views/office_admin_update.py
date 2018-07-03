@@ -84,88 +84,88 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     }
 
     column_labels = {
-        'sirets': u"Sirets",
-        'name': u"Nom de l'entreprise",
-        'reason': u"Raison",
-        'contact_mode': u"Modifier le mode de contact",
-        'boost': u"Booster le score - LBB",
-        'romes_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement - LBB",
-        'romes_to_remove': u"Retirer des codes ROME associés à une entreprise - LBB",
-        'boost_alternance': u"Booster le score - Alternance",
-        'romes_alternance_to_boost': u"Limiter le boosting du score à certain codes ROME uniquement - Alternance",
-        'romes_alternance_to_remove': u"Retirer des codes ROME associés à une entreprise - Alternance",
-        'nafs_to_add': u"Ajouter un ou plusieurs NAF à une entreprise",
-        'new_email': u"Nouvel email",
-        'new_phone': u"Nouveau téléphone",
-        'new_website': u"Nouveau site web",
+        'sirets': "Sirets",
+        'name': "Nom de l'entreprise",
+        'reason': "Raison",
+        'contact_mode': "Modifier le mode de contact",
+        'boost': "Booster le score - LBB",
+        'romes_to_boost': "Limiter le boosting du score à certain codes ROME uniquement - LBB",
+        'romes_to_remove': "Retirer des codes ROME associés à une entreprise - LBB",
+        'boost_alternance': "Booster le score - Alternance",
+        'romes_alternance_to_boost': "Limiter le boosting du score à certain codes ROME uniquement - Alternance",
+        'romes_alternance_to_remove': "Retirer des codes ROME associés à une entreprise - Alternance",
+        'nafs_to_add': "Ajouter un ou plusieurs NAF à une entreprise",
+        'new_email': "Nouvel email",
+        'new_phone': "Nouveau téléphone",
+        'new_website': "Nouveau site web",
 
-        'social_network': u'Réseau social',
+        'social_network': 'Réseau social',
 
-        'remove_email': u"Ne pas afficher l'email",
-        'remove_phone': u"Ne pas afficher le téléphone",
-        'remove_website': u"Ne pas afficher le site web",
-        'email_alternance': u"Email dédié à l'alternance",
-        'phone_alternance': u"Téléphone dédié à l'alternance",
-        'website_alternance': u"Site web dédié à l'alternance",
+        'remove_email': "Ne pas afficher l'email",
+        'remove_phone': "Ne pas afficher le téléphone",
+        'remove_website': "Ne pas afficher le site web",
+        'email_alternance': "Email dédié à l'alternance",
+        'phone_alternance': "Téléphone dédié à l'alternance",
+        'website_alternance': "Site web dédié à l'alternance",
 
-        'score': u'Modifier le score LBB',
-        'score_alternance': u'Modifier le score LBA',
+        'score': 'Modifier le score LBB',
+        'score_alternance': 'Modifier le score LBA',
 
-        'requested_by_email': u"Email",
-        'requested_by_first_name': u"Prénom",
-        'requested_by_last_name': u"Nom",
-        'requested_by_phone': u"Téléphone",
-        'date_created': u"Date de création",
-        'date_updated': u"Date de modification",
-        'created_by': u"Créé par",
-        'updated_by': u"Modifié par",
+        'requested_by_email': "Email",
+        'requested_by_first_name': "Prénom",
+        'requested_by_last_name': "Nom",
+        'requested_by_phone': "Téléphone",
+        'date_created': "Date de création",
+        'date_updated': "Date de modification",
+        'created_by': "Créé par",
+        'updated_by': "Modifié par",
     }
 
     column_descriptions = {
         'sirets': Markup(
-            u"Veuillez entrer un siret par ligne"
-            u"<br>"
-            u"Tous les sirets doivent être associés au même NAF (le premier NAF servant de référence)"
+            "Veuillez entrer un siret par ligne"
+            "<br>"
+            "Tous les sirets doivent être associés au même NAF (le premier NAF servant de référence)"
         ),
-        'requested_by_email': u"Email de la personne qui demande la suppression.",
-        'requested_by_first_name': u"Prénom de la personne qui demande la suppression.",
-        'requested_by_last_name': u"Nom de la personne qui demande la suppression.",
-        'requested_by_phone': u"Téléphone de la personne qui demande la suppression.",
-        'boost': u"Cocher cette case pour forcer le positionnement en tête des résultats",
+        'requested_by_email': "Email de la personne qui demande la suppression.",
+        'requested_by_first_name': "Prénom de la personne qui demande la suppression.",
+        'requested_by_last_name': "Nom de la personne qui demande la suppression.",
+        'requested_by_phone': "Téléphone de la personne qui demande la suppression.",
+        'boost': "Cocher cette case pour forcer le positionnement en tête des résultats",
         'romes_to_boost': Markup(
-            u"Veuillez entrer un ROME par ligne."
-            u"<br>"
-            u"Si ce champ est renseigné, le score sera forcé uniquement pour le(s) ROME spécifié(s)."
-            u"<br>"
-            u"<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
+            "Veuillez entrer un ROME par ligne."
+            "<br>"
+            "Si ce champ est renseigné, le score sera forcé uniquement pour le(s) ROME spécifié(s)."
+            "<br>"
+            "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
         ),
         'nafs_to_add': Markup(
-            u"Veuillez entrer un NAF par ligne."
+            "Veuillez entrer un NAF par ligne."
         ),
         'romes_to_remove': Markup(
-            u"Veuillez entrer un ROME par ligne."
-            u"<br>"
-            u"Si ce champ est renseigné, le(s) ROME spécifié(s) ne seront plus associés à cette entreprise sur LBB."
-            u"<br>"
-            u"<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
+            "Veuillez entrer un ROME par ligne."
+            "<br>"
+            "Si ce champ est renseigné, le(s) ROME spécifié(s) ne seront plus associés à cette entreprise sur LBB."
+            "<br>"
+            "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
         ),
         'romes_to_remove': Markup(
-            u"Veuillez entrer un ROME par ligne."
-            u"<br>"
-            u"Si ce champ est renseigné, le(s) ROME spécifié(s) ne seront plus associés à cette entreprise - pour l'alternance."
-            u"<br>"
-            u"<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
+            "Veuillez entrer un ROME par ligne."
+            "<br>"
+            "Si ce champ est renseigné, le(s) ROME spécifié(s) ne seront plus associés à cette entreprise - pour l'alternance."
+            "<br>"
+            "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
         ),
-        'new_email': u"Laisser vide s'il n'y a pas de modification à apporter",
-        'new_phone': u"Laisser vide s'il n'y a pas de modification à apporter",
-        'new_website': u"Laisser vide s'il n'y a pas de modification à apporter",
-        'remove_email': u"Cocher cette case pour supprimer l'email",
-        'remove_phone': u"Cocher cette case pour supprimer le téléphone",
-        'remove_website': u"Cocher cette case pour supprimer le site web",
-        'score': u"Nouveau score (si 0 : suppression de l'entreprise sur LBB mais pas LBA)",
-        'score_aternance': u"Nouveau score alternance (si 0 : suppression de l'entreprise pour l'alternance)",
-        'reason': u"Raison de la modification.",
-        'contact_mode': u"Texte libre (maximum 255 caractères)",
+        'new_email': "Laisser vide s'il n'y a pas de modification à apporter",
+        'new_phone': "Laisser vide s'il n'y a pas de modification à apporter",
+        'new_website': "Laisser vide s'il n'y a pas de modification à apporter",
+        'remove_email': "Cocher cette case pour supprimer l'email",
+        'remove_phone': "Cocher cette case pour supprimer le téléphone",
+        'remove_website': "Cocher cette case pour supprimer le site web",
+        'score': "Nouveau score (si 0 : suppression de l'entreprise sur LBB mais pas LBA)",
+        'score_aternance': "Nouveau score alternance (si 0 : suppression de l'entreprise pour l'alternance)",
+        'reason': "Raison de la modification.",
+        'contact_mode': "Texte libre (maximum 255 caractères)",
     }
 
     form_columns = [
@@ -289,14 +289,14 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         only_one_siret = len(sirets) == 1
 
         if is_valid and not sirets:
-            message = u"Le champs 'Sirets' est obligatoire. Veuillez le renseigner."
+            message = "Le champs 'Sirets' est obligatoire. Veuillez le renseigner."
             flash(message, 'error')
             return False
 
         if is_valid:
             for siret in sirets:
                 if not is_siret(siret):
-                    message = u"Ce siret suivant n'est pas composé de 14 chiffres : {}".format(siret)
+                    message = "Ce siret suivant n'est pas composé de 14 chiffres : {}".format(siret)
                     flash(message, 'error')
                     return False
 
@@ -306,7 +306,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             siret = sirets[0]
             office = Office.query.filter_by(siret=siret).first()
             if not office:
-                message = u"Le siret suivant n'est pas présent sur LBB: {}".format(siret)
+                message = "Le siret suivant n'est pas présent sur LBB: {}".format(siret)
                 flash(message, 'error')
                 return False
 
@@ -324,7 +324,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                     )
 
                 if office_update_conflict.count() > 0:
-                    message = u""""
+                    message = """"
                         Le siret {} est déjà présent dans la fiche n°{}
                     """.format(siret, office_update_conflict[0].id)
                     flash(message, 'error')
@@ -375,11 +375,11 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
             for naf in OfficeAdminUpdate.as_list(nafs_to_add):
                 if naf not in settings.NAF_CODES:
-                    msg = u"`%s` n'est pas un code NAF valide." % naf
+                    msg = "`%s` n'est pas un code NAF valide." % naf
                     flash(msg, 'error')
                     return False
                 if naf == first_office.naf and only_one_siret:
-                    msg = u"Le NAF `%s` est déjà associé à cette entreprise." % naf
+                    msg = "Le NAF `%s` est déjà associé à cette entreprise." % naf
                     flash(msg, 'error')
                     return False
 
@@ -395,7 +395,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             if office_naf:
                 office_romes = [item.code for item in mapping_util.romes_for_naf(office_naf)]
                 if rome not in office_romes:
-                    msg = u"`%s` n'est pas un code ROME lié au NAF de cette entreprise. Champ : '%s'" % (
+                    msg = "`%s` n'est pas un code ROME lié au NAF de cette entreprise. Champ : '%s'" % (
                             rome,
                             self.column_labels[romes_to_remove_field]
                         )
@@ -406,7 +406,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         romes_to_boost = form.data.get(romes_boost_field)
 
         if not form.data.get(boost_field):
-            msg = u"Vous devez cocher la case `%s`. " % self.column_labels[boost_field]
+            msg = "Vous devez cocher la case `%s`. " % self.column_labels[boost_field]
             raise RomeToBoostException(msg)
 
 
@@ -416,7 +416,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
     def validate_rome(self, rome, field_name):
         if not mapping_util.rome_is_valid(rome):
-            msg = u"`%s` n'est pas un code ROME valide. Assurez-vous de ne saisir qu'un élément par ligne. Champ : '%s'" % (
+            msg = "`%s` n'est pas un code ROME valide. Assurez-vous de ne saisir qu'un élément par ligne. Champ : '%s'" % (
                 rome,
                 self.column_labels[field_name]
             )

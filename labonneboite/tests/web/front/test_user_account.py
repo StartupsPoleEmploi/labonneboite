@@ -19,30 +19,30 @@ class UserAccountTest(DatabaseTest):
         """
         super(UserAccountTest, self).setUp(*args, **kwargs)
 
-        self.user = User(email=u'john@doe.com', gender=u'male', first_name=u'John', last_name=u'Doe')
+        self.user = User(email='john@doe.com', gender='male', first_name='John', last_name='Doe')
         db_session.add(self.user)
         db_session.flush()
 
         self.office1 = Office(
-            departement=u'57',
-            siret=u'00000000000001',
-            company_name=u'1',
-            headcount=u'5',
-            city_code=u'57070',
-            zipcode=u'57070',
-            naf=u'7320Z',
+            departement='57',
+            siret='00000000000001',
+            company_name='1',
+            headcount='5',
+            city_code='57070',
+            zipcode='57070',
+            naf='7320Z',
             score=90,
             x=6.166667,
             y=49.133333,
         )
         self.office2 = Office(
-            departement=u'57',
-            siret=u'00000000000002',
-            company_name=u'1',
-            headcount=u'5',
-            city_code=u'57070',
-            zipcode=u'57070',
-            naf=u'7320Z',
+            departement='57',
+            siret='00000000000002',
+            company_name='1',
+            headcount='5',
+            city_code='57070',
+            zipcode='57070',
+            naf='7320Z',
             score=90,
             x=6.166667,
             y=49.133333,
@@ -62,10 +62,10 @@ class UserAccountTest(DatabaseTest):
 
         db_session.commit()
 
-        self.assertEquals(db_session.query(User).count(), 1)
-        self.assertEquals(db_session.query(Office).count(), 2)
-        self.assertEquals(db_session.query(UserFavoriteOffice).count(), 2)
-        self.assertEquals(db_session.query(UserSocialAuth).count(), 1)
+        self.assertEqual(db_session.query(User).count(), 1)
+        self.assertEqual(db_session.query(Office).count(), 2)
+        self.assertEqual(db_session.query(UserFavoriteOffice).count(), 2)
+        self.assertEqual(db_session.query(UserSocialAuth).count(), 1)
 
     def test_download_user_personal_data(self):
         """
@@ -81,7 +81,7 @@ class UserAccountTest(DatabaseTest):
             # Display the account deletion confirmation page.
             rv = self.app.get(url)
             self.assertEqual(rv.status_code, 200)
-            self.assertIn(u'john@doe.com', rv.data.decode('utf-8'))
+            self.assertIn('john@doe.com', rv.data.decode('utf-8'))
 
     @mock.patch.object(settings, 'PEAM_AUTH_BASE_URL', 'http://peamauthbaseurl.com')
     def test_delete_user_account(self):
@@ -107,9 +107,9 @@ class UserAccountTest(DatabaseTest):
             self.assertIn(self.user_social_auth.extra_data['id_token'], rv.location)
 
             # The user and its info should have been deleted.
-            self.assertEquals(db_session.query(User).count(), 0)
-            self.assertEquals(db_session.query(UserFavoriteOffice).count(), 0)
-            self.assertEquals(db_session.query(UserSocialAuth).count(), 0)
+            self.assertEqual(db_session.query(User).count(), 0)
+            self.assertEqual(db_session.query(UserFavoriteOffice).count(), 0)
+            self.assertEqual(db_session.query(UserSocialAuth).count(), 0)
 
             # The user should now be anonymous and cannot access protected pages.
             rv = self.app.get(url)

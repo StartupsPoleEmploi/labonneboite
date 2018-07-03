@@ -35,7 +35,7 @@ class OfficeAdminAdd(OfficeMixin, CRUDMixin, Base):
     def __init__(self, *args, **kwargs):
         # The `headcount` field must be different form the one of `Office`
         # to be able to provide a clean <select> choice in the admin UI.
-        self.headcount = Column('trancheeffectif', ChoiceType(settings.HEADCOUNT_INSEE_CHOICES), default=u"00",
+        self.headcount = Column('trancheeffectif', ChoiceType(settings.HEADCOUNT_INSEE_CHOICES), default="00",
             nullable=False,)
         super(OfficeAdminAdd, self).__init__(*args, **kwargs)
 
@@ -66,11 +66,11 @@ class OfficeAdminRemove(CRUDMixin, Base):
 
     __tablename__ = 'etablissements_admin_remove'
 
-    INITIATIVE_OFFICE = u'office'
-    INITIATIVE_LBB = u'lbb'
+    INITIATIVE_OFFICE = 'office'
+    INITIATIVE_LBB = 'lbb'
     INITIATIVE_CHOICES = [
-        (INITIATIVE_OFFICE, u"L'entreprise"),
-        (INITIATIVE_LBB, u"La Bonne Boite"),
+        (INITIATIVE_OFFICE, "L'entreprise"),
+        (INITIATIVE_LBB, "La Bonne Boite"),
     ]
 
     id = Column(Integer, primary_key=True)
@@ -108,7 +108,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
 
     __tablename__ = 'etablissements_admin_update'
 
-    SEPARATORS = [u'\n', u'\r']
+    SEPARATORS = ['\n', '\r']
 
     id = Column(Integer, primary_key=True)
 
@@ -206,7 +206,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
         """
         html = []
         for rome in self.as_list(romes):
-            html.append(u"{0} - {1}".format(rome, settings.ROME_DESCRIPTIONS[rome]))
+            html.append("{0} - {1}".format(rome, settings.ROME_DESCRIPTIONS[rome]))
         return '<br>'.join(html)
 
 
@@ -218,7 +218,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
 
     __tablename__ = 'etablissements_admin_extra_geolocations'
 
-    GEOLOCATIONS_TEXT_SEPARATORS = [u'\n', u'\r']
+    GEOLOCATIONS_TEXT_SEPARATORS = ['\n', '\r']
 
     id = Column(Integer, primary_key=True)
     siret = Column(String(191), nullable=False, unique=True)
@@ -275,7 +275,10 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
             {"lat" : 48.86, "lon" : 2.35},
         ]
         """
-        return sorted([{'lat': coords[0], 'lon': coords[1]} for coords in json.loads(self.geolocations)])
+        return sorted(
+            [{'lat': coords[0], 'lon': coords[1]} for coords in json.loads(self.geolocations)],
+            key=lambda x: (x['lat'], x['lon'])
+        )
 
     def geolocations_as_html_links(self):
         """
@@ -283,10 +286,10 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         Used in the admin UI.
         """
         html = []
-        link = u'<a href="https://maps.google.com/maps?q={lat},{lon}" target="_blank">{lat}, {lon}</a>'
+        link = '<a href="https://maps.google.com/maps?q={lat},{lon}" target="_blank">{lat}, {lon}</a>'
         for coords in self.geolocations_as_lat_lon_properties():
             html.append(link.format(lat=coords['lat'], lon=coords['lon']))
-        return u'<br>'.join(html)
+        return '<br>'.join(html)
 
     @staticmethod
     def codes_as_list(codes):

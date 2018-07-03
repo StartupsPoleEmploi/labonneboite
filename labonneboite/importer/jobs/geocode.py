@@ -216,7 +216,7 @@ class GeocodeUnit(object):
                 try:
                     results = response.json()['features']
                     if len(results) >= 1:
-                        coordinates = results[0][u'geometry'][u'coordinates']
+                        coordinates = results[0]['geometry']['coordinates']
                         # let's cache the result for later computations
                         geolocation = Geolocation(
                             full_address=self.full_address,
@@ -242,7 +242,7 @@ class GeocodeUnit(object):
                             db_session.rollback()
                             GEOCODING_STATS['rollbacks'] = GEOCODING_STATS.get('rollbacks', 0) + 1
                 except ValueError:
-                    logger.warn('ValueError in json-ing features result %s', response.text)
+                    logger.warning('ValueError in json-ing features result %s', response.text)
 
         if coordinates:
             if coordinates == self.initial_coordinates:

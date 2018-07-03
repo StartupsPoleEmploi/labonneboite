@@ -6,6 +6,7 @@ from flask import url_for as flask_url_for
 from flask import _request_ctx_stack
 
 from labonneboite.common.database import db_session, delete_db, engine, init_db
+from labonneboite.common import env
 from labonneboite.common import es
 from labonneboite.conf import settings
 from labonneboite.web.app import app
@@ -29,12 +30,7 @@ class AppTest(unittest.TestCase):
     http://flask.pocoo.org/docs/0.12/testing/#accessing-and-modifying-sessions
     """
 
-    # https://kronosapiens.github.io/blog/2014/08/14/understanding-contexts-in-flask.html
-    TEST_SERVER_NAME = 'test.labonneboite.fr'
-
     def setUp(self):
-        # Setting a SERVER_NAME enables URL generation without a request context but with an application context.
-        app.config['SERVER_NAME'] = self.TEST_SERVER_NAME
         self.app = app.test_client()
         self.app_context = app.app_context()
         self.test_request_context = app.test_request_context()
@@ -51,7 +47,7 @@ class AppTest(unittest.TestCase):
             url = flask_url_for(endpoint, **kwargs)
             return url
 
-    def login(self, user, social_auth_backend=u'peam-openidconnect'):
+    def login(self, user, social_auth_backend='peam-openidconnect'):
         """
         Logs a user in by simulating a third-party authentication process.
 
@@ -64,10 +60,10 @@ class AppTest(unittest.TestCase):
         _request_ctx_stack.top.user = user
         with self.app.session_transaction() as sess:
             # Session info set by Flask-Login.
-            sess[u'user_id'] = user.id
+            sess['user_id'] = user.id
             # Session info set by Python Social Auth.
-            sess[u'social_auth_last_login_backend'] = social_auth_backend
-            sess[u'%s_state' % social_auth_backend] = u'a1z2e3r4t5y6y'
+            sess['social_auth_last_login_backend'] = social_auth_backend
+            sess['%s_state' % social_auth_backend] = 'a1z2e3r4t5y6y'
 
     def logout(self):
         """
@@ -96,6 +92,11 @@ class DatabaseTest(AppTest):
     """
 
     def setUp(self):
+        if env.get_current_env() != env.ENV_TEST:
+            raise ValueError("Running database tests, but not in test mode. You"
+                             " most certainly don't want to do that. Set the"
+                             " `LBB_ENV=test` environment variable.")
+
         # Disable elasticsearch logging
         logging.getLogger('elasticsearch').setLevel(logging.CRITICAL)
         logging.getLogger('main').setLevel(logging.CRITICAL)

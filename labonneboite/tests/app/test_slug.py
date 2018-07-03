@@ -23,7 +23,7 @@ class SlugDetailsTest(AppTest):
                 'INVALID_SLUG',
             ))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'no city found associated to the slug INVALID_SLUG')
+            self.assertEqual(rv.data, b'no city found associated to the slug INVALID_SLUG')
 
     def test_ok_job_slug(self):
         with self.test_request_context:
@@ -33,8 +33,8 @@ class SlugDetailsTest(AppTest):
             ))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
-            self.assertEqual(data[0]['label'], u'Abattage et découpe des viandes')
-            self.assertEqual(data[0]['rome_code'], u'H2101')
+            self.assertEqual(data[0]['label'], 'Abattage et découpe des viandes')
+            self.assertEqual(data[0]['rome_code'], 'H2101')
 
     def test_ok_multiple_job_slug(self):
         with self.test_request_context:
@@ -44,12 +44,12 @@ class SlugDetailsTest(AppTest):
             ))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
-            self.assertEqual(data[0]['rome_code'], u'F1703')
-            self.assertEqual(data[0]['label'], u'Maçonnerie')
-            self.assertEqual(data[1]['rome_code'], u'F1611')
-            self.assertEqual(data[1]['label'], u'Réalisation et restauration de façades')
-            self.assertEqual(data[2]['rome_code'], u'F1701')
-            self.assertEqual(data[2]['label'], u'Construction en béton')
+            self.assertEqual(data[0]['rome_code'], 'F1703')
+            self.assertEqual(data[0]['label'], 'Maçonnerie')
+            self.assertEqual(data[1]['rome_code'], 'F1611')
+            self.assertEqual(data[1]['label'], 'Réalisation et restauration de façades')
+            self.assertEqual(data[2]['rome_code'], 'F1701')
+            self.assertEqual(data[2]['label'], 'Construction en béton')
 
     def test_ignore_invalid_slug(self):
         with self.test_request_context:
@@ -60,10 +60,10 @@ class SlugDetailsTest(AppTest):
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
             self.assertEqual(len(data), 2)
-            self.assertEqual(data[0]['rome_code'], u'F1703')
-            self.assertEqual(data[0]['label'], u'Maçonnerie')
-            self.assertEqual(data[1]['rome_code'], u'F1611')
-            self.assertEqual(data[1]['label'], u'Réalisation et restauration de façades')
+            self.assertEqual(data[0]['rome_code'], 'F1703')
+            self.assertEqual(data[0]['label'], 'Maçonnerie')
+            self.assertEqual(data[1]['rome_code'], 'F1611')
+            self.assertEqual(data[1]['label'], 'Réalisation et restauration de façades')
 
     def test_empty_list_if_invalid_slugs(self):
         with self.test_request_context:
@@ -83,7 +83,7 @@ class SlugDetailsTest(AppTest):
             ))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
-            self.assertEqual(data['city']['name'], u'Nantes')
+            self.assertEqual(data['city']['name'], 'Nantes')
             self.assertEqual(data['city']['latitude'], 47.235456880128645)
             self.assertEqual(data['city']['longitude'], -1.5498348824858057)
 
@@ -98,8 +98,8 @@ class CityCodeDetailsTest(AppTest):
             ))
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data)
-            self.assertEqual(data['city']['name'], u'Nantes')
-            self.assertEqual(data['city']['slug'], u'nantes-44000')
+            self.assertEqual(data['city']['name'], 'Nantes')
+            self.assertEqual(data['city']['slug'], 'nantes-44000')
             self.assertEqual(data['city']['latitude'], 47.235456880128645)
             self.assertEqual(data['city']['longitude'], -1.5498348824858057)
 
@@ -111,4 +111,4 @@ class CityCodeDetailsTest(AppTest):
                 'INVALID_CODE',
             ))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, 'no city found associated to the code INVALID_CODE')
+            self.assertEqual(rv.data, b'no city found associated to the code INVALID_CODE')

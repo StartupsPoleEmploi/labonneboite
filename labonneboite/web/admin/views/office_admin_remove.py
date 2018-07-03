@@ -53,29 +53,29 @@ class OfficeAdminRemoveModelView(AdminModelViewMixin, ModelView):
     }
 
     column_labels = {
-        'siret': u"Siret",
-        'name': u"Nom de l'entreprise",
-        'reason': u"Raison",
-        'initiative': u"À l'initiative de",
-        'date_follow_up_phone_call': u"Date de rappel",
-        'requested_by_email': u"Email",
-        'requested_by_first_name': u"Prénom",
-        'requested_by_last_name': u"Nom",
-        'requested_by_phone': u"Téléphone",
-        'date_created': u"Date de création",
-        'date_updated': u"Date de modification",
-        'created_by': u"Créé par",
-        'updated_by': u"Modifié par",
+        'siret': "Siret",
+        'name': "Nom de l'entreprise",
+        'reason': "Raison",
+        'initiative': "À l'initiative de",
+        'date_follow_up_phone_call': "Date de rappel",
+        'requested_by_email': "Email",
+        'requested_by_first_name': "Prénom",
+        'requested_by_last_name': "Nom",
+        'requested_by_phone': "Téléphone",
+        'date_created': "Date de création",
+        'date_updated': "Date de modification",
+        'created_by': "Créé par",
+        'updated_by': "Modifié par",
     }
 
     column_descriptions = {
-        'initiative': u"Permet de préciser qui est à l'initiative de la suppression.",
-        'requested_by_email': u"Email de la personne qui demande la suppression.",
-        'requested_by_first_name': u"Prénom de la personne qui demande la suppression.",
-        'requested_by_last_name': u"Nom de la personne qui demande la suppression.",
-        'requested_by_phone': u"Téléphone de la personne qui demande la suppression.",
-        'reason': u"Raison de la suppression.",
-        'date_follow_up_phone_call': u"Date de rappel de l'employeur",
+        'initiative': "Permet de préciser qui est à l'initiative de la suppression.",
+        'requested_by_email': "Email de la personne qui demande la suppression.",
+        'requested_by_first_name': "Prénom de la personne qui demande la suppression.",
+        'requested_by_last_name': "Nom de la personne qui demande la suppression.",
+        'requested_by_phone': "Téléphone de la personne qui demande la suppression.",
+        'reason': "Raison de la suppression.",
+        'date_follow_up_phone_call': "Date de rappel de l'employeur",
     }
 
     form_columns = [
@@ -147,7 +147,7 @@ class OfficeAdminRemoveModelView(AdminModelViewMixin, ModelView):
         Ensure that the office to remove does not already exist in `OfficeAdminAdd`.
         """
         is_valid = super(OfficeAdminRemoveModelView, self).validate_form(form)
-        if is_valid and 'siret' in form.data.keys():
+        if is_valid and 'siret' in list(form.data.keys()):
             office_to_add = OfficeAdminAdd.query.filter_by(siret=form.data['siret']).first()
             if office_to_add:
                 # Use the link of the list view with a filter on the `siret`, because
@@ -155,9 +155,9 @@ class OfficeAdminRemoveModelView(AdminModelViewMixin, ModelView):
                 # https://github.com/flask-admin/flask-admin/issues/1327
                 office_to_add_url = url_for('officeadminadd.index_view', search=office_to_add.siret)
                 msg = (
-                    u"Vous ne pouvez pas supprimer cette entreprise car elle existe déjà dans la liste "
-                    u"<b>Ajouter une entreprise</b>.<br>Vous devez d'abord "
-                    u'<a target="_blank" href="{url}">la supprimer de cette liste</a>.'.format(url=office_to_add_url)
+                    "Vous ne pouvez pas supprimer cette entreprise car elle existe déjà dans la liste "
+                    "<b>Ajouter une entreprise</b>.<br>Vous devez d'abord "
+                    '<a target="_blank" href="{url}">la supprimer de cette liste</a>.'.format(url=office_to_add_url)
                 )
                 flash(Markup(msg), 'error')
                 return False

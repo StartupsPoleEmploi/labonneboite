@@ -1,11 +1,11 @@
-import sys, os, traceback, signal, codeop, cStringIO, cPickle, tempfile
+import sys, os, traceback, signal, codeop, io, pickle, tempfile
 
 def pipename(pid):
     """Return name of pipe to use"""
     return os.path.join(tempfile.gettempdir(), 'debug-%d' % pid)
 
 class NamedPipe(object):
-    def __init__(self, name, end=0, mode=0666):
+    def __init__(self, name, end=0, mode=0o666):
         """Open a pair of pipes, name.in and name.out for communication
         with another process.  One process should pass 1 for end, and the
         other 0.  Data is marshalled with pickle."""
@@ -30,7 +30,7 @@ class NamedPipe(object):
 
     def put(self,msg):
         if self.is_open():
-            data = cPickle.dumps(msg,1)
+            data = pickle.dumps(msg,1)
             self.out.write("%d\n" % len(data))
             self.out.write(data)
             self.out.flush()
@@ -45,7 +45,7 @@ class NamedPipe(object):
             l = int(txt)
             data=self.inp.read(l)
             if len(data) < l: self.inp.close()
-            return cPickle.loads(data)  # Convert back to python object.
+            return pickle.loads(data)  # Convert back to python object.
 
     def close(self):
         self.inp.close()
@@ -87,16 +87,16 @@ def remote_debug(sig,frame):
                 try:
                     code = codeop.compile_command(txt)
                     if code:
-                        sys.stdout = cStringIO.StringIO()
+                        sys.stdout = io.StringIO()
                         sys.stderr = sys.stdout
-                        exec code in globs,locs
+                        exec(code, globs,locs)
                         txt = ''
                         pipe.put(sys.stdout.getvalue() + '>>> ')
                     else:
                         pipe.put('... ')
                 except:
                     txt='' # May be syntax err.
-                    sys.stdout = cStringIO.StringIO()
+                    sys.stdout = io.StringIO()
                     sys.stderr = sys.stdout
                     traceback.print_exc()
                     pipe.put(sys.stdout.getvalue() + '>>> ')
@@ -116,7 +116,7 @@ def debug_process(pid):
     pipe = NamedPipe(pipename(pid), 1)
     try:
         while pipe.is_open():
-            txt=raw_input(pipe.get()) + '\n'
+            txt=input(pipe.get()) + '\n'
             pipe.put(txt)
     except EOFError:
         pass # Exit.
@@ -127,7 +127,7 @@ def listen():
 
 if __name__=='__main__':
     if len(sys.argv) != 2:
-        print "Error: Must provide process id to debug"
+        print("Error: Must provide process id to debug")
     else:
         pid = int(sys.argv[1])
         debug_process(pid)

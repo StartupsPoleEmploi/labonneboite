@@ -167,13 +167,13 @@ def compute_additional_data(commune_id, rome_1_id, rome_2_id):
             # names of these columns are in COLUMNS_FOR_EACH_OFFICE
             values += [office.siret, office.name, office.city_code, office_url]
 
-    list_text = u''.join(
+    list_text = ''.join(
         ["<li><a href='%s'>%s</a></li>" % (url_from_siret(o.siret), o.name) for o in offices]
     )
 
     # For the record GMS does not directly support utf8 characters with accent (e.g. 'é').
     # It also does not support html encoding (e.g. '&eacute;') as it breaks at the `;`.
-    main_text = u"<ul>%s</ul>" % list_text
+    main_text = "<ul>%s</ul>" % list_text
 
     # remove new lines
     main_text = main_text.strip().replace('\n', '').replace('\r', '')
@@ -194,7 +194,7 @@ def prepare_mailing_data():
     # inspired by
     # https://stackoverflow.com/questions/16236684/apply-pandas-function-to-column-to-create-multiple-new-columns
     # and https://stackoverflow.com/questions/13331698/how-to-apply-a-function-to-two-columns-of-pandas-dataframe
-    temp = zip(*df[[COMMUNE_COLUMN, ROME_1_COLUMN, ROME_2_COLUMN]].apply(lambda x: compute_additional_data(*x), axis=1))
+    temp = list(zip(*df[[COMMUNE_COLUMN, ROME_1_COLUMN, ROME_2_COLUMN]].apply(lambda x: compute_additional_data(*x), axis=1)))
     for index, column in enumerate(ADDITIONAL_COLUMNS):
         df[column] = temp[index]
 

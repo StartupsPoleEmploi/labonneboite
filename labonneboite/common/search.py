@@ -31,11 +31,11 @@ PUBLIC_HANDICAP = 3
 PUBLIC_CHOICES = [PUBLIC_ALL, PUBLIC_JUNIOR, PUBLIC_SENIOR, PUBLIC_HANDICAP]
 
 KEY_TO_LABEL_DISTANCES = {
-    u'*-10.0': u'less_10_km',
-    u'*-30.0': u'less_30_km',
-    u'*-50.0': u'less_50_km',
-    u'*-100.0': u'less_100_km',
-    u'*-3000.0': u'france',
+    '*-10.0': 'less_10_km',
+    '*-30.0': 'less_30_km',
+    '*-50.0': 'less_50_km',
+    '*-100.0': 'less_100_km',
+    '*-3000.0': 'france',
 }
 
 FILTERS = ['naf', 'headcount', 'hiring_type', 'distance']
@@ -280,7 +280,7 @@ class Fetcher(object):
 
             # Suggest other distances.
             last_count = 0
-            for distance, distance_label in [(30, u'30 km'), (50, u'50 km'), (3000, u'France entière')]:
+            for distance, distance_label in [(30, '30 km'), (50, '50 km'), (3000, 'France entière')]:
                 company_count = self._get_company_count(self.romes, distance)
                 if company_count > last_count:
                     last_count = company_count
@@ -291,7 +291,7 @@ class Fetcher(object):
 
     def get_alternative_rome_descriptions(self):
         alternative_rome_descriptions = []
-        for alternative, count in self.alternative_rome_codes.iteritems():
+        for alternative, count in self.alternative_rome_codes.items():
             if settings.ROME_DESCRIPTIONS.get(alternative) and count:
                 desc = settings.ROME_DESCRIPTIONS.get(alternative)
                 slug = slugify(desc)
@@ -745,7 +745,7 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         if len(rome_codes) > 1:
             # Identify which rome_code actually matched this company.
             keyname = get_score_for_rome_field_name(hiring_type, rome_codes[0]).split('.')[0]
-            all_scores = es_company[u'_source'][keyname]
+            all_scores = es_company['_source'][keyname]
             scores_of_searched_romes = dict([
                 (rome, all_scores[rome]) for rome in rome_codes if rome in all_scores
             ])
@@ -840,7 +840,7 @@ def build_location_suggestions(term):
         source = hit['_source']
         if source['zipcode']:  # and hit['_score'] > 0.1 * first_score:
             city_name = source['city_name'].replace('"', '')
-            label = u'%s (%s)' % (city_name, source['zipcode'])
+            label = '%s (%s)' % (city_name, source['zipcode'])
             city = {
                 'city': source['slug'],
                 'zipcode': source['zipcode'],
@@ -904,12 +904,12 @@ def build_job_label_suggestions(term, size=autocomplete.MAX_JOBS):
 
     # Since ordering cannot be done easily through Elasticsearch 1.7 (`max_score` not working),
     # we do it in Python at this time.
-    results = res[u'aggregations'][u'by_rome_code'][u'buckets']
+    results = res['aggregations']['by_rome_code']['buckets']
     results.sort(key=lambda e: e['by_top_hit']['hits']['max_score'], reverse=True)
 
     for hit in results:
         if len(suggestions) < size:
-            hit = hit[u'by_top_hit'][u'hits'][u'hits'][0]
+            hit = hit['by_top_hit']['hits']['hits'][0]
             source = hit['_source']
             highlight = hit.get('highlight', {})
             try:

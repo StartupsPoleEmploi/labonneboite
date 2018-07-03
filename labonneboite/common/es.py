@@ -53,7 +53,7 @@ def drop_indexes_of_alias(name=settings.ES_INDEX):
     """
     Drop indexes associated to alias.
     """
-    for index in Elasticsearch().indices.get_alias(name).keys():
+    for index in list(Elasticsearch().indices.get_alias(name).keys()):
         drop_index(index=index)
 
 

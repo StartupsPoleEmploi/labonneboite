@@ -27,6 +27,25 @@ STARS_MAXIMUM = 5.0
 # on the score you see in production.
 # #########################################################################
 
+def round_half_up(x):
+    """
+    The 'round' function from Python 3 is different from Python 2.7's:
+    https://docs.python.org/2.7/library/functions.html#round
+    https://docs.python.org/3/library/functions.html#round
+
+    This function emulates the behaviour from Python 2.7, where:
+
+        round(integer + 0.5) == integer + 1 if integer >= 0 else integer
+    """
+    diff = x - math.floor(x)
+    if diff < 0.5:
+        return int(math.floor(x))
+    elif diff > 0.5:
+        return int(math.ceil(x))
+
+    return int(math.ceil(x) if x > 0 else math.floor(x))
+
+
 # very good hit/miss ratio observed while running create_index.py
 # thanks to bucketing float values of hirings, see get_score_from_hirings
 @lru_cache(maxsize=512*1024)
@@ -72,7 +91,7 @@ def _get_score_from_hirings(hirings, as_float=False):
 
     if as_float:
         return score
-    return int(round(score))
+    return round_half_up(score)
 
 
 def get_score_from_hirings(hirings, as_float=False, skip_bucketing=False):
@@ -85,7 +104,7 @@ def get_score_from_hirings(hirings, as_float=False, skip_bucketing=False):
     elif hirings <= 3:
         hirings = round(hirings, 1)
     else:
-        hirings = round(hirings)
+        hirings = round_half_up(hirings)
     return _get_score_from_hirings(hirings, as_float=False)
 
 

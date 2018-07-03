@@ -1,6 +1,6 @@
 # coding: utf8
 import time
-import urlparse
+import urllib.parse
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
@@ -20,8 +20,8 @@ class TestResetNaf(LbbSeleniumTestCase):
         self.driver.get(url)
 
         current_url = self.driver.current_url
-        url = urlparse.urlparse(current_url)
-        parameters = dict(urlparse.parse_qsl(url.query))
+        url = urllib.parse.urlparse(current_url)
+        parameters = dict(urllib.parse.parse_qsl(url.query))
         self.assertEqual('/entreprises', url.path)
         self.assertEqual('comptabilite', parameters['occupation'])
         self.assertEqual('metz', parameters['city']) # city parameter is defined on redirect
@@ -30,13 +30,13 @@ class TestResetNaf(LbbSeleniumTestCase):
 
         # Filter by NAF `Activités comptables` (`6920Z`).
         select = Select(self.driver.find_element_by_id('naf'))
-        select.select_by_value(u'6920Z')
+        select.select_by_value('6920Z')
         WebDriverWait(self.driver, 10).until(url_has_changed(current_url))
 
         # The form should be auto-submitted after an option has been selected.
         current_url = self.driver.current_url
-        url = urlparse.urlparse(current_url)
-        parameters = dict(urlparse.parse_qsl(url.query))
+        url = urllib.parse.urlparse(current_url)
+        parameters = dict(urllib.parse.parse_qsl(url.query))
         self.assertEqual('/entreprises', url.path)
         self.assertEqual('comptabilite', parameters['occupation'])
         self.assertEqual('Metz (57000)', parameters['l'])
@@ -60,8 +60,8 @@ class TestResetNaf(LbbSeleniumTestCase):
         # The NAF filter should be reset.
         WebDriverWait(self.driver, 10).until(url_has_changed(current_url))
         current_url = self.driver.current_url
-        url = urlparse.urlparse(current_url)
-        parameters = dict(urlparse.parse_qsl(url.query))
+        url = urllib.parse.urlparse(current_url)
+        parameters = dict(urllib.parse.parse_qsl(url.query))
         self.assertEqual('/entreprises', url.path)
         self.assertEqual('boucherie', parameters['occupation'])
         self.assertEqual('Metz (57000)', parameters['l']) # form value is now full city name

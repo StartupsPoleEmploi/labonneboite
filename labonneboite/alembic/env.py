@@ -1,4 +1,4 @@
-from __future__ import with_statement
+
 from logging.config import fileConfig
 
 from alembic import context

@@ -1,0 +1,126 @@
+Flask<0.13
+Flask-Mandrill
+Flask-Script
+
+# Flask assets.
+Flask-Assets
+cssmin
+jsmin
+
+# Forms.
+Flask-WTF
+WTForms
+
+# Flask admin.
+Flask-Admin
+
+# Localization With Flask-Babelex.
+# http://flask-admin.readthedocs.io/en/latest/advanced/#localization-with-flask-babelex
+Flask-BabelEx
+speaklater
+
+# Monitoring and debug tools.
+Flask-DebugToolbar
+ipdb
+ipython
+mock
+pylint
+raven[flask]
+# profiling tools used in create_index.py
+pycallgraph
+pyprof2calltree
+line-profiler
+
+# Databases and migrations.
+alembic
+mysqlclient
+SQLAlchemy-Utils
+SQLAlchemy
+
+# Elasticsearch
+# as of Jan 2018 we are using Elasticsearch 1.7, a very old version.
+# According to http://elasticsearch-py.readthedocs.io/en/master/index.html
+# we should thus use the major 1.x.y version of the python library.
+# To figure out which 1.x.y version is the latest, run:
+# pip install --upgrade "elasticsearch>=1.0.0,<2.0.0"
+elasticsearch<2.0.0
+
+# Users and auth management.
+# `pyjwkest` is required by `social-auth-core` which is required by `social-auth-app-flask`.
+Flask-Login
+pyjwkest
+social-auth-app-flask-sqlalchemy
+social-auth-app-flask
+
+# Unit tests.
+nose
+selenium
+PyVirtualDisplay
+Werkzeug
+Flask-Testing
+
+# Data and Importer.
+numpy
+pandas
+scikit-learn
+scipy
+
+# PDF utils and dependencies.
+html5lib
+xhtml2pdf
+
+# Utils.
+gevent  # only used by geocode importer job and locust load testing
+gnureadline
+python-slugify
+requests
+validators
+
+# Pillow
+# For now, stick to Pillow 2.9 because later releases for Ubuntu 14.04 requires extra packages.
+# https://askubuntu.com/a/687637
+Pillow==2.9.0
+
+# Deployment.
+uWSGI
+
+# Load testing.
+locustio
+pyzmq
+
+# Secondary dependencies.
+# Explicitly specify secondary dependencies to ensure consistent build behavior.
+argparse
+backports.functools-lru-cache
+blinker
+certifi
+chardet
+click
+configparser
+EasyProcess
+future
+greenlet
+idna
+isort
+itsdangerous
+Jinja2
+lazy-object-proxy
+Mako
+MarkupSafe
+mccabe
+oauthlib
+pycryptodomex
+PyJWT
+PyPDF2
+python-dateutil
+python-editor
+python-openid
+pytz
+requests-oauthlib
+six
+social-auth-core
+social-auth-storage-sqlalchemy
+Unidecode
+urllib3
+webassets
+wrapt

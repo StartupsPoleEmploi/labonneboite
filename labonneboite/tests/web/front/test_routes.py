@@ -1,10 +1,11 @@
 # coding: utf8
-import urllib
-from urlparse import parse_qsl
+import urllib.request, urllib.parse, urllib.error
+from urllib.parse import parse_qsl
 
 from flask import url_for
 import mock
 
+from labonneboite.conf import settings
 from labonneboite.tests.test_base import AppTest, DatabaseTest
 from labonneboite.web.search.views import get_canonical_results_url, get_location
 
@@ -30,7 +31,7 @@ class SearchEntreprisesTest(DatabaseTest):
             get_address.assert_called_once_with(42, 6, limit=1)
             self.assertEqual(200, response.status_code)
 
-        self.assertIn("Gotham City 19100", response.data)
+        self.assertIn("Gotham City 19100", response.data.decode())
 
 
     def test_search_by_coordinates_with_no_associated_address(self):
@@ -52,11 +53,11 @@ class SearchEntreprisesTest(DatabaseTest):
 
     def test_canonical_url(self):
         with self.app_context:
-            url = get_canonical_results_url('05100', u'Cervières', 'Boucherie')
+            url = get_canonical_results_url('05100', 'Cervières', 'Boucherie')
         response = self.app.get(url)
 
         self.assertEqual(
-            'http://' + self.TEST_SERVER_NAME + '/entreprises?city=cervieres&zipcode=05100&occupation=boucherie',
+            settings.PREFERRED_URL_SCHEME + '://' + settings.SERVER_NAME + '/entreprises?city=cervieres&zipcode=05100&occupation=boucherie',
             url
         )
         self.assertEqual(200, response.status_code)
@@ -177,7 +178,7 @@ class SearchLegacyResultsTest(DatabaseTest):
         url = self.url_for('search.results', city='nancy', zipcode='54100', occupation='strategie-commerciale')
         rv = self.app.get(url, follow_redirects=True)
         self.assertEqual(rv.status_code, 200)
-        self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data)
+        self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data.decode())
 
     def test_search_with_wrong_zipcode_and_naf_filter(self):
         # Because of a wrong zipcode, the naf filter should not be taken into
@@ -187,7 +188,7 @@ class SearchLegacyResultsTest(DatabaseTest):
             url += '?naf=8610Z'
             rv = self.app.get(url, follow_redirects=True)
             self.assertEqual(rv.status_code, 200)
-            self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data)
+            self.assertIn("La ville que vous avez choisie n'est pas valide", rv.data.decode())
 
 
 
@@ -197,7 +198,7 @@ class GenericUrlSearchRedirectionTest(AppTest):
         rv = self.app.get("/entreprises/commune/75056/rome/D1104")
         self.assertEqual(rv.status_code, 302)
 
-        url, querystring = urllib.splitquery(rv.location)
+        url, querystring = urllib.parse.splitquery(rv.location)
         parameters = dict(parse_qsl(querystring))
         expected_url = self.url_for('search.entreprises')
         expected_parameters = {
@@ -215,7 +216,7 @@ class GenericUrlSearchRedirectionTest(AppTest):
         rv = self.app.get("/entreprises/commune/75056/rome/D1104?d=100")
         self.assertEqual(rv.status_code, 302)
 
-        url, querystring = urllib.splitquery(rv.location)
+        url, querystring = urllib.parse.splitquery(rv.location)
         parameters = dict(parse_qsl(querystring))
         expected_url = self.url_for('search.entreprises')
         expected_parameters = {
@@ -244,7 +245,7 @@ class GenericUrlSearchRedirectionTest(AppTest):
             'utm_source': 'test',
             'utm_campaign': 'test'
         }
-        url, querystring = urllib.splitquery(rv.location)
+        url, querystring = urllib.parse.splitquery(rv.location)
         parameters = dict(parse_qsl(querystring))
         self.assertEqual(expected_url, url)
         self.assertEqual(expected_parameters, parameters)

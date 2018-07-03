@@ -15,26 +15,26 @@ CACHE = {}
 
 
 def city_as_dict(item):
-    first_zipcode = item[u'codesPostaux'][0]
+    first_zipcode = item['codesPostaux'][0]
 
     # Use the "main" zipcode for cities that are subdivided into arrondissements.
-    if item[u'nom'] == 'Lyon':
-        first_zipcode = u"69000"
-    elif item[u'nom'] == 'Marseille':
-        first_zipcode = u"13000"
-    elif item[u'nom'] == 'Paris':
-        first_zipcode = u"75000"
+    if item['nom'] == 'Lyon':
+        first_zipcode = "69000"
+    elif item['nom'] == 'Marseille':
+        first_zipcode = "13000"
+    elif item['nom'] == 'Paris':
+        first_zipcode = "75000"
 
     return {
-        'name': item[u'nom'],
-        'slug': slugify(item[u'nom']),
-        'commune_id': item[u'code'],
-        'zipcodes': item[u'codesPostaux'],
+        'name': item['nom'],
+        'slug': slugify(item['nom']),
+        'commune_id': item['code'],
+        'zipcodes': item['codesPostaux'],
         'zipcode': first_zipcode,
-        'population': item[u'population'],
+        'population': item['population'],
         'coords': {
-            'lon': item[u'centre'][u'coordinates'][0],
-            'lat': item[u'centre'][u'coordinates'][1],
+            'lon': item['centre']['coordinates'][0],
+            'lat': item['centre']['coordinates'][1],
         },
     }
 
@@ -61,14 +61,14 @@ def load_cities_cache():
     COMMUNES_TO_SKIP = [
         # Communes without `centre` attribute.
         # ------------------------------------
-        u"17004",  # Île-d'Aix (Fort-Boyard)
+        "17004",  # Île-d'Aix (Fort-Boyard)
         # Communes without `population` attribute.
         # ----------------------------------------
         # Meuse (starting with 55), because there is no more inhabitants.
-        u"55039", u"55050", u"55139", u"55189", u"55239", u"55307",
+        "55039", "55050", "55139", "55189", "55239", "55307",
         # Mayotte (starting with 976), because there is no accurate population data available yet.
-        u"97601", u"97602", u"97603", u"97604", u"97605", u"97606", u"97607", u"97608", u"97609",
-        u"97610", u"97611", u"97612", u"97613", u"97614", u"97615", u"97616", u"97617",
+        "97601", "97602", "97603", "97604", "97605", "97606", "97607", "97608", "97609",
+        "97610", "97611", "97612", "97613", "97614", "97615", "97616", "97617",
     ]
 
     cities = []
@@ -76,7 +76,7 @@ def load_cities_cache():
     json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/cities.json")
     with open(json_file, 'r') as json_data:
         for item in json.load(json_data):
-            if item[u'code'] not in COMMUNES_TO_SKIP:
+            if item['code'] not in COMMUNES_TO_SKIP:
                 cities.append(city_as_dict(item))
 
     json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/arrondissements_as_cities.json")
@@ -149,7 +149,7 @@ def get_all_cities_from_departement(departement):
     """
     return [
         city
-        for commune_id, city in CACHE['cities_by_commune_id'].items()
+        for commune_id, city in list(CACHE['cities_by_commune_id'].items())
         if commune_id.startswith(departement)
     ]
 

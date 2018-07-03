@@ -26,8 +26,8 @@ class User(CRUDMixin, UserMixin, Base):
     __tablename__ = 'users'
 
     GENDERS = [
-        (u'male', u'Homme'),
-        (u'female', u'Femme'),
+        ('male', 'Homme'),
+        ('female', 'Femme'),
     ]
 
     id = Column(Integer, primary_key=True)

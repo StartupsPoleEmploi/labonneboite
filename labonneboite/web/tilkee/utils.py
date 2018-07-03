@@ -41,7 +41,7 @@ def process(files, company, user):
     } for fobj, s3_url in zip(files, document_s3_urls)]
     response = post('/v2/wrapper/token_from_files', json={
         'project': {
-            'name': u'{} / {}'.format(company.name, company.siret)
+            'name': '{} / {}'.format(company.name, company.siret)
         },
         'person': {
             # The user ID will be used to find the project among existing
@@ -97,11 +97,11 @@ def upload_file(fobj):
     except requests.ReadTimeout:
         fobj.seek(0, 2) # seek to end of file
         file_size_megabytes = fobj.tell() / (1024*1024.)
-        message = u'AWS upload timeout: filesize={} Mb"'.format(file_size_megabytes)
+        message = 'AWS upload timeout: filesize={} Mb"'.format(file_size_megabytes)
         raise TilkeeError(message)
 
     if response.status_code != 201:
-        message = u'Upload failed: data={data} status={response.status_code} content="{response.content}"'.format(
+        message = 'Upload failed: data={data} status={response.status_code} content="{response.content}"'.format(
             data=data, response=response
         )
         raise TilkeeError(message)

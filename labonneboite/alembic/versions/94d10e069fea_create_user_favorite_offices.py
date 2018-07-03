@@ -25,14 +25,14 @@ def upgrade():
         sa.Column('user_id', mysql.INTEGER(display_width=11), autoincrement=False, nullable=False),
         sa.Column('office_siret', mysql.VARCHAR(length=191), nullable=False),
         sa.Column('date_created', mysql.DATETIME(), nullable=False),
-        sa.ForeignKeyConstraint(['office_siret'], [u'etablissements.siret'], name=u'user_favorite_offices_ibfk_2',
+        sa.ForeignKeyConstraint(['office_siret'], ['etablissements.siret'], name='user_favorite_offices_ibfk_2',
             ondelete='CASCADE'),
-        sa.ForeignKeyConstraint(['user_id'], [u'users.id'], name=u'user_favorite_offices_ibfk_1', ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['user_id'], ['users.id'], name='user_favorite_offices_ibfk_1', ondelete='CASCADE'),
         sa.UniqueConstraint('user_id', 'office_siret', name='_user_fav_office'),
         sa.PrimaryKeyConstraint('id'),
-        mysql_collate=u'utf8mb4_unicode_ci',
-        mysql_default_charset=u'utf8mb4',
-        mysql_engine=u'InnoDB'
+        mysql_collate='utf8mb4_unicode_ci',
+        mysql_default_charset='utf8mb4',
+        mysql_engine='InnoDB'
     )
 
 def downgrade():

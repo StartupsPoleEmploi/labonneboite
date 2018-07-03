@@ -9,7 +9,7 @@ def sanitize_string(s):
     Note that some of our data sources have very poor quality,
     and sometimes even mix different encodings
     """
-    if isinstance(s, str):
+    if isinstance(s, bytes):
         # the main optimistic case : UTF-8
         try:
             return s.decode('utf-8')
@@ -34,11 +34,11 @@ def sanitize_string(s):
         # last resort
         # 'ignore' will removed any unrecognized character
         return s.decode('utf-8', 'ignore')
-    elif isinstance(s, unicode):
+    elif isinstance(s, str):
         return s
     elif s is None:
         return s # leave None value untouched
-    raise Exception("not a string nor a unicode nor None")
+    raise Exception("not a string nor bytes nor None")
 
 
 def strip_french_accents(u):

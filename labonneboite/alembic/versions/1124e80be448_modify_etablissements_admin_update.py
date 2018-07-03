@@ -24,10 +24,10 @@ depends_on = None
 def upgrade():
 
     op.add_column('etablissements_admin_update', sa.Column('romes_to_boost',
-        mysql.TEXT(collation=u'utf8mb4_unicode_ci'), nullable=False))
+        mysql.TEXT(collation='utf8mb4_unicode_ci'), nullable=False))
 
     op.add_column('etablissements_admin_update', sa.Column('boost', mysql.TINYINT(display_width=1),
-        server_default=sa.text(u"'0'"), autoincrement=False, nullable=False))
+        server_default=sa.text("'0'"), autoincrement=False, nullable=False))
 
     conn = op.get_bind()
     for item in conn.execute("SELECT * FROM `etablissements_admin_update`;"):

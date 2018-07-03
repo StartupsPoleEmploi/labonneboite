@@ -77,10 +77,11 @@ class DpaeExtractJob(Job):
         with import_util.get_reader(self.input_filename) as myfile:
             con, cur = import_util.create_cursor()
             header_line = myfile.readline().strip()   # FIXME detect column positions from header
-            if "siret" not in header_line:
+            if b"siret" not in header_line:
                 logger.debug(header_line)
                 raise Exception("wrong header line")
             for line in myfile:
+                line = line.decode()
                 count += 1
                 if not count % 100000:
                     logger.debug("reading line %i", count)

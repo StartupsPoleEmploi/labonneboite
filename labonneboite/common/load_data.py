@@ -29,7 +29,7 @@ def load_pickle_file(filename):
 
 def load_csv_file(filename, delimiter='|'):
     def f(full_filename):
-        csv_file = open(full_filename, 'rb')
+        csv_file = open(full_filename, 'r')
         reader = csv.reader(csv_file, delimiter=delimiter)
         return reader
 
@@ -59,7 +59,7 @@ def load_rows_as_dict(rows):
             raise IndexError("wrong number of fields")
         if row[0] in d:
             raise ValueError("duplicate key")
-        d[row[0]] = row[1].decode('utf8')
+        d[row[0]] = row[1]
     return d
 
 
@@ -71,7 +71,7 @@ def load_rows_as_dict_of_dict(rows):
         # values of 3 fields
         f1 = row[0]
         f2 = row[1]
-        f3 = row[2].decode('utf8')
+        f3 = row[2]
         if f1 in d:
             if f2 in d[f1]:
                 raise ValueError("duplicate key")

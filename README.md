@@ -58,14 +58,14 @@ Clone labonneboite repository:
 
 Create an [isolated Python environment](https://virtualenv.pypa.io/) using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
 
-    $ mkvirtualenv --python=`which python2.7` lbb
+    $ mkvirtualenv --python=`which python3` lbb
     $ workon lbb
 
 Install OS requirements:
 
     # On Debian-based OS:
     
-    $ sudo apt-get install -y language-pack-fr git python python-dev python-virtualenv python-pip mysql-server libmysqlclient-dev libncurses5-dev build-essential python-numpy python-scipy python-mysqldb chromium-chromedriver xvfb graphviz htop libblas-dev liblapack-dev libatlas-base-dev gfortran
+    $ sudo apt-get install -y language-pack-fr git python3 python3-dev python-virtualenv python-pip mysql-server libmysqlclient-dev libncurses5-dev build-essential python-numpy python-scipy python-mysqldb chromium-chromedriver xvfb graphviz htop libblas-dev liblapack-dev libatlas-base-dev gfortran
 
     # On Mac OS:
     
@@ -107,6 +107,26 @@ http://localhost:5000 and start browsing.
 We are using [Nose](https://nose.readthedocs.io/):
 
     $ make test-all
+
+## Upgrade requirements
+
+Our requirements are managed with [`pip-tools`](https://github.com/jazzband/pip-tools):
+
+    pip install pip-tools
+    make requirements-compile
+
+To upgrade a package DO NOT EDIT `requirements.txt` DIRECTLY! Instead, run:
+
+    pip-compile -o requirements.txt --upgrade-package mypackagename requirements.in
+
+This last command will upgrade `mypackagename` and its dependencies to the
+latest version. To update your virtualenv, you can then run:
+
+    pip-sync
+
+or:
+
+    pip install -r requirements
 
 # Debugging
 

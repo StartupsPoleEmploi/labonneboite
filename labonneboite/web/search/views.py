@@ -1,6 +1,6 @@
 # coding: utf8
 
-from urllib import urlencode
+from urllib.parse import urlencode
 import json
 
 from slugify import slugify
@@ -63,7 +63,7 @@ def job_slug_details():
 
     job_slug = request.args.get('job-slug', '')
     if not job_slug:
-        return u'no job-slug given', 400
+        return 'no job-slug given', 400
 
     slugs = job_slug.split(',')
     for slug in slugs:
@@ -92,14 +92,14 @@ def city_slug_details():
 
     city_slug = request.args.get('city-slug', '')
     if not city_slug:
-        return u'no city-slug given', 400
+        return 'no city-slug given', 400
 
     city = city_slug.split('-')
     zipcode = ''.join(city[-1:])
     city_location = CityLocation(zipcode, city_slug)
 
     if not city_location.is_location_correct:
-        return u'no city found associated to the slug {}'.format(city_slug), 400
+        return 'no city found associated to the slug {}'.format(city_slug), 400
 
     result['city'] = {
         'name': city_location.name,
@@ -120,11 +120,11 @@ def city_code_details():
 
     city_code = request.args.get('city-code', '')
     if not city_code:
-        return u'no city-code given', 400
+        return 'no city-code given', 400
 
     city = geocoding.get_city_by_commune_id(city_code)
     if not city:
-        return u'no city found associated to the code {}'.format(city_code), 400
+        return 'no city found associated to the code {}'.format(city_code), 400
 
     result['city'] = {
         'name': city['name'],
@@ -153,7 +153,7 @@ PARAMETER_FIELD_MAPPING = {
 def get_parameters(args):
     kwargs = {}
 
-    for param, field_name in PARAMETER_FIELD_MAPPING.iteritems():
+    for param, field_name in PARAMETER_FIELD_MAPPING.items():
         kwargs[field_name] = args.get(param, '')
 
     try:
@@ -216,7 +216,7 @@ def results(city, zipcode, occupation):
     params['zipcode'] = zipcode
     params['occupation'] = occupation
     params = {
-        key.encode('utf8'): value.encode('utf8') for key, value in params.iteritems()
+        key.encode('utf8'): value.encode('utf8') for key, value in params.items()
     }
 
     redirect_url = url_for('search.entreprises')
@@ -244,7 +244,7 @@ def entreprises():
     job_doesnt_exist = not rome
 
     # Build form
-    form_kwargs = {key: val for key, val in request.args.items() if val}
+    form_kwargs = {key: val for key, val in list(request.args.items()) if val}
     form_kwargs['j'] = settings.ROME_DESCRIPTIONS.get(rome, occupation)
 
     if 'occupation' not in form_kwargs:
@@ -317,7 +317,7 @@ def entreprises():
     )
     current_page = pagination_manager.get_current_page()
 
-    form.naf.choices = [('', u'Tous les secteurs')] + sorted(naf_codes_with_descriptions, key=lambda t: t[1])
+    form.naf.choices = [('', 'Tous les secteurs')] + sorted(naf_codes_with_descriptions, key=lambda t: t[1])
     form.validate()
 
     canonical_url = get_canonical_results_url(

@@ -1,6 +1,6 @@
 
 import json
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from flask import url_for
 import mock
@@ -26,7 +26,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             sirets='00000000000008',
             name='Office 8',
             boost_alternance=True,
-            romes_alternance_to_boost=u"D1211",  # Boost score only for this ROME.
+            romes_alternance_to_boost="D1211",  # Boost score only for this ROME.
         )
         office_to_update.save(commit=True)
         script.update_offices()
@@ -34,9 +34,9 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
 
         params = self.add_security_params({
             'commune_id': self.positions['nantes']['commune_id'],
-            'rome_codes': u'D1211',
-            'user': u'labonneboite',
-            'contract': u'alternance'
+            'rome_codes': 'D1211',
+            'user': 'labonneboite',
+            'contract': 'alternance'
         })
 
         with self.test_request_context:
@@ -44,10 +44,10 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             self.assertEqual(rv.status_code, 200)
             data_list = json.loads(rv.data)
 
-            self.assertEquals(len(data_list['companies']), 2)
+            self.assertEqual(len(data_list['companies']), 2)
 
             # 00000000000008 should be boosted and be the first result
-            self.assertEquals(data_list['companies'][0]['siret'], '00000000000008')
+            self.assertEqual(data_list['companies'][0]['siret'], '00000000000008')
             self.assertTrue(data_list['companies'][0]['boosted'])
 
             # 00000000000009 should not be boosted and be the second result
@@ -69,17 +69,17 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
 
         params = self.add_security_params({
             'commune_id': self.positions['nantes']['commune_id'],
-            'rome_codes': u'D1211',
-            'user': u'labonneboite',
-            'contract': u'alternance'
+            'rome_codes': 'D1211',
+            'user': 'labonneboite',
+            'contract': 'alternance'
         })
 
         with self.test_request_context:
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            self.assertEqual(rv.status_code, 200)
+            self.assertEqual(rv.status_code, 200, msg=rv.data)
             data_list = json.loads(rv.data)
 
-            self.assertEquals(len(data_list['companies']), 2)
+            self.assertEqual(len(data_list['companies']), 2)
 
             # 00000000000009 is boosted and is the first result
             self.assertTrue(data_list['companies'][0]['boosted'])
