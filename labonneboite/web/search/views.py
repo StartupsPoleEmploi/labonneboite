@@ -19,6 +19,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common.locations import CityLocation, Location, NamedLocation
 from labonneboite.common.models import UserFavoriteOffice
+from labonneboite.web.utils import fix_csrf_session
 
 from labonneboite.conf import settings
 from labonneboite.web.search.forms import make_company_search_form
@@ -211,6 +212,7 @@ def results(city, zipcode, occupation):
     city-related location parameters. This view is preserved so that older urls
     still work.
     """
+    fix_csrf_session()
     params = request.args.copy()
     params['city'] = city
     params['zipcode'] = zipcode
@@ -232,6 +234,7 @@ def entreprises():
     Expected arguments are those returned by get_parameters and expected by the
     selected company search form.
     """
+    fix_csrf_session()
     session['search_args'] = request.args
     location, named_location = get_location(request.args)
 
@@ -427,6 +430,7 @@ def results_by_commune_and_rome(commune_id, rome_id):
     For more information about the differences between commune_id and zipcode,
     please consult README file
     """
+    fix_csrf_session()
     try:
         rome_description = settings.ROME_DESCRIPTIONS[rome_id.upper()]
         slugified_rome_description = slugify(rome_description)

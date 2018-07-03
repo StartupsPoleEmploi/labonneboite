@@ -21,6 +21,7 @@ from labonneboite.common import util
 from labonneboite.web.auth.views import logout
 from labonneboite.common.pagination import Pagination, FAVORITES_PER_PAGE
 from labonneboite.web.user.forms import UserAccountDeleteForm
+from labonneboite.web.utils import fix_csrf_session
 
 
 userBlueprint = Blueprint('user', __name__)
@@ -32,6 +33,7 @@ def account():
     """
     The current user account main page.
     """
+    fix_csrf_session()
     return render_template('user/account.html')
 
 
@@ -122,6 +124,7 @@ def favorites_list():
     """
     List the favorited offices of a user.
     """
+    fix_csrf_session()
     try:
         page = int(request.args.get('page'))
     except (TypeError, ValueError):

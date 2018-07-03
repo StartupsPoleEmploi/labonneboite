@@ -7,6 +7,7 @@ from labonneboite.common import doorbell
 from labonneboite.common import pro
 from labonneboite.conf import settings
 from labonneboite.web.search.forms import CompanySearchForm
+from labonneboite.web.utils import fix_csrf_session
 
 
 rootBlueprint = Blueprint('root', __name__)
@@ -14,6 +15,7 @@ rootBlueprint = Blueprint('root', __name__)
 
 @rootBlueprint.route('/')
 def home():
+    fix_csrf_session()
     return render_template('home.html', form=CompanySearchForm())
 
 
