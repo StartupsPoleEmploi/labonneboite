@@ -112,7 +112,7 @@ def company_count():
         location, _, commune_id = get_location(request.args)
         fetcher = create_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
-        message = 'Invalid request argument: {}'.format(e.message)
+        message = 'Invalid request argument: {}'.format(e.args[0])
         return message, 400
 
     fetcher.compute_company_count()
