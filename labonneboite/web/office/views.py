@@ -18,6 +18,7 @@ from labonneboite.common.email_util import MandrillClient
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
 from labonneboite.common.contact_mode import CONTACT_MODE_STAGES
+from labonneboite.web.utils import fix_csrf_session
 
 from labonneboite.web.office.forms import OfficeRemovalForm
 
@@ -31,6 +32,7 @@ def details(siret):
     Display the details of an office.
     In case the context of a rome_code is given, display appropriate score value for this rome_code
     """
+    fix_csrf_session()
     rome_code = request.args.get('rome_code', None)
     company = Office.query.filter_by(siret=siret).first()
     if not company:
@@ -70,6 +72,7 @@ def change_info():
     """
     Let a user fill a form to request a removal or information change about an office.
     """
+    fix_csrf_session()
     form = OfficeRemovalForm()
     if form.validate_on_submit():
         client = MandrillClient(current_app.extensions['mandrill'])
