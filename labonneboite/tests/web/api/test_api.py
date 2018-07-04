@@ -208,7 +208,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
 
@@ -222,7 +222,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
 
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
@@ -270,7 +270,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['headcount_text'], '10 000 salariés et plus')
@@ -381,7 +381,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data_direct_search = json.loads(rv.data)
+            data_direct_search = json.loads(rv.data.decode())
 
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
@@ -390,7 +390,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data_keyword_search = json.loads(rv.data)
+            data_keyword_search = json.loads(rv.data.decode())
 
             self.assertEqual(data_direct_search, data_keyword_search)
 
@@ -413,7 +413,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['rome_code'], 'M1607')
             self.assertEqual(data['rome_label'], 'Secrétariat')
 
@@ -440,7 +440,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 'rome_codes': rome,
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['rome_code'], rome)
             self.assertEqual(data['rome_label'], 'Animation de vente')
 
@@ -541,7 +541,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 3)
             self.assertEqual(len(data['companies']), 2)
 
@@ -557,7 +557,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
@@ -574,7 +574,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertIn('rome_code=D1405', data['companies'][0]['url'])
@@ -597,7 +597,7 @@ class ApiCompanyListTest(ApiBaseTest):
             with mock.patch.object(scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0):
                 rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
                 self.assertEqual(rv.status_code, 200)
-                data = json.loads(rv.data)
+                data = json.loads(rv.data.decode())
                 self.assertEqual(data['companies_count'], 1)
                 self.assertEqual(len(data['companies']), 1)
 
@@ -660,7 +660,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 0)
             self.assertEqual(len(data['companies']), 0)
 
@@ -675,7 +675,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(len(data['companies']), 3)
             for company in data['companies']:
                 self.assertNotIn('email', company)
@@ -703,7 +703,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
@@ -717,7 +717,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000005')
@@ -736,7 +736,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
             self.assertIn('matched_rome_code', data['companies'][0])
@@ -790,7 +790,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
             self.assertNotEqual(data['companies'][0]['naf'], data['companies'][1]['naf'])
@@ -806,7 +806,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000006')
@@ -820,7 +820,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000007')
@@ -836,7 +836,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
 
@@ -876,7 +876,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
             self.assertEqual(data["companies"][0]['siret'], '00000000000008')
@@ -894,7 +894,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
             sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
@@ -934,7 +934,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
 
@@ -948,7 +948,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000012')
@@ -964,7 +964,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000013')
@@ -979,7 +979,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
@@ -995,7 +995,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             sirets = {c['siret']: c for c in data['companies']}
             self.assertEqual(sorted(sirets.keys()), ['00000000000015', '00000000000016'])
             self.assertFalse(sirets['00000000000015']['alternance'])
@@ -1023,7 +1023,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
             sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
             self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
@@ -1037,7 +1037,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
             sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
             self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
@@ -1051,7 +1051,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000017')
 
@@ -1064,7 +1064,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000018')
 
@@ -1077,7 +1077,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
 
             # Check distance filter
             self.assertEqual(data['filters']['distance']['less_30_km'], 4)
@@ -1116,7 +1116,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             nafs_expected = {
                 '4910Z': ['4910Z', 2, 'Transport ferroviaire interurbain de voyageurs'],
                 '4920Z': ['4920Z', 1, 'Transports ferroviaires de fret'],
@@ -1138,7 +1138,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['filters']['headcount']['small'], 2)
             self.assertEqual(data['filters']['headcount']['big'], 1)
 
@@ -1150,7 +1150,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['filters']['headcount']['small'], 2)
             self.assertEqual(data['filters']['headcount']['big'], 1)
 
@@ -1164,7 +1164,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['filters']['contract']['dpae'], 3)
             self.assertEqual(data['filters']['contract']['alternance'], 1)
 
@@ -1176,7 +1176,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['filters']['contract']['dpae'], 3)
             self.assertEqual(data['filters']['contract']['alternance'], 1)
 
@@ -1190,7 +1190,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
 
             self.assertEqual(data['filters']['distance']['less_10_km'], 3)
             self.assertEqual(data['filters']['distance']['less_30_km'], 4)
@@ -1206,7 +1206,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_filter_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['filters']['distance']['less_10_km'], 3)
             self.assertEqual(data['filters']['distance']['less_30_km'], 4)
             self.assertEqual(data['filters']['distance']['less_50_km'], 5)
@@ -1223,7 +1223,7 @@ class ApiCompanyListTest(ApiBaseTest):
 
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
 
             self.assertTrue(data['companies_count'] >= 1)
             expect = '/entreprises/commune/{}/rome/{}'.format(self.positions['toulon']['commune_id'], 'N4403')
@@ -1244,7 +1244,7 @@ class ApiCompanyListTest(ApiBaseTest):
 
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
 
             self.assertTrue(data['companies_count'] >= 1)
             expect = '/entreprises/commune/{}/rome/{}'.format(self.positions['toulon']['commune_id'], 'N4403')
@@ -1266,7 +1266,7 @@ class ApiCompanyListTest(ApiBaseTest):
 
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
 
             # ensure we return home URL and not search URL
             self.assertNotIn('/entreprises', data['url'])
@@ -1285,7 +1285,7 @@ class ApiCompanyListTest(ApiBaseTest):
 
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
 
             self.assertEqual(data['companies_count'], 0)
             self.assertEqual(len(data['companies']), 0)
@@ -1304,7 +1304,7 @@ class ApiCompanyListTest(ApiBaseTest):
 
             rv = self.app.get('%s?%s' % (url_for("api.company_count"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data_count = json.loads(rv.data)
+            data_count = json.loads(rv.data.decode())
 
             self.assertIn('companies_count', data_count)
             self.assertTrue(data_count['companies_count'] >= 1)
@@ -1312,7 +1312,7 @@ class ApiCompanyListTest(ApiBaseTest):
 
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data_list = json.loads(rv.data)
+            data_list = json.loads(rv.data.decode())
 
             self.assertIn('companies_count', data_list)
             self.assertEqual(data_list['companies_count'], data_count['companies_count'])
@@ -1332,8 +1332,8 @@ class ApiCompanyListTest(ApiBaseTest):
         with mock.patch.object(settings, 'API_INTERNAL_CONSUMERS', ['labonneboite']):
             response_privileged = self.app.get(self.url_for("api.company_list", **params))
 
-        company_without_info = json.loads(response_unprivileged.data)['companies'][0]
-        company_with_info = json.loads(response_privileged.data)['companies'][0]
+        company_without_info = json.loads(response_unprivileged.data.decode())['companies'][0]
+        company_with_info = json.loads(response_privileged.data.decode())['companies'][0]
 
         self.assertNotIn("email", company_without_info)
         self.assertNotIn("phone", company_without_info)
@@ -1366,7 +1366,7 @@ class ApiCompanyListTrackingCodesTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             company_url = data['companies'][0]['url']
 
         self.assertTrackingCodesEqual(company_url, 'web', 'api__labonneboite', 'api__labonneboite')
@@ -1382,7 +1382,7 @@ class ApiCompanyListTrackingCodesTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
 
             company_url = data['companies'][0]['url']
             self.assertTrackingCodesEqual(company_url, 'web', 'api__labonneboite', 'api__labonneboite__someuser')
@@ -1398,7 +1398,7 @@ class ApiCompanyListTrackingCodesTest(ApiBaseTest):
             })
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
 
             company_url = data['url']
             self.assertTrackingCodesEqual(company_url, 'web', 'api__labonneboite', 'api__labonneboite__someuser')
