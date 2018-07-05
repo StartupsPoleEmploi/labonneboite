@@ -42,7 +42,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
         with self.test_request_context:
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200)
-            data_list = json.loads(rv.data)
+            data_list = json.loads(rv.data.decode())
 
             self.assertEqual(len(data_list['companies']), 2)
 
@@ -77,7 +77,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
         with self.test_request_context:
             rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
             self.assertEqual(rv.status_code, 200, msg=rv.data)
-            data_list = json.loads(rv.data)
+            data_list = json.loads(rv.data.decode())
 
             self.assertEqual(len(data_list['companies']), 2)
 

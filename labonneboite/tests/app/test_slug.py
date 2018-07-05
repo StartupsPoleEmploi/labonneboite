@@ -32,7 +32,7 @@ class SlugDetailsTest(AppTest):
                 'abattage-et-decoupe-des-viandes',
             ))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data[0]['label'], 'Abattage et découpe des viandes')
             self.assertEqual(data[0]['rome_code'], 'H2101')
 
@@ -43,7 +43,7 @@ class SlugDetailsTest(AppTest):
                 'maconnerie,realisation-et-restauration-de-facades,construction-en-beton',
             ))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data[0]['rome_code'], 'F1703')
             self.assertEqual(data[0]['label'], 'Maçonnerie')
             self.assertEqual(data[1]['rome_code'], 'F1611')
@@ -58,7 +58,7 @@ class SlugDetailsTest(AppTest):
                 'maconnerie,INVALID_SLUG,realisation-et-restauration-de-facades',
             ))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(len(data), 2)
             self.assertEqual(data[0]['rome_code'], 'F1703')
             self.assertEqual(data[0]['label'], 'Maçonnerie')
@@ -72,7 +72,7 @@ class SlugDetailsTest(AppTest):
                 'INVALID_SLUG_1,INVALID_SLUG_2',
             ))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(len(data), 0)
 
     def test_ok_city_slug(self):
@@ -82,7 +82,7 @@ class SlugDetailsTest(AppTest):
                 'nantes-44000',
             ))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['city']['name'], 'Nantes')
             self.assertEqual(data['city']['latitude'], 47.235456880128645)
             self.assertEqual(data['city']['longitude'], -1.5498348824858057)
@@ -97,7 +97,7 @@ class CityCodeDetailsTest(AppTest):
                 '44109',
             ))
             self.assertEqual(rv.status_code, 200)
-            data = json.loads(rv.data)
+            data = json.loads(rv.data.decode())
             self.assertEqual(data['city']['name'], 'Nantes')
             self.assertEqual(data['city']['slug'], 'nantes-44000')
             self.assertEqual(data['city']['latitude'], 47.235456880128645)

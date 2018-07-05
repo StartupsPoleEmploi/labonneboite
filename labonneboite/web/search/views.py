@@ -360,7 +360,13 @@ def get_canonical_results_url(zipcode, city, occupation):
     """
     The canonical url for each result page should have very few querystring arguments.
     """
-    return url_for('search.entreprises', city=slugify(city), zipcode=zipcode, occupation=slugify(occupation))
+    # Here we use urlencode instead of passing querystring values to url_for
+    # because we want to preserve argument order.
+    return url_for('search.entreprises') + '?' + urlencode([
+        ('city', slugify(city)),
+        ('zipcode', zipcode),
+        ('occupation', slugify(occupation)),
+    ])
 
 
 def get_location(request_args):

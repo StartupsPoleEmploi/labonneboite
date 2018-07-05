@@ -56,7 +56,7 @@ Clone labonneboite repository:
 
     $ git clone https://github.com/StartupsPoleEmploi/labonneboite.git
 
-Create an [isolated Python environment](https://virtualenv.pypa.io/) using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
+Create an [isolated Python environment](https://virtualenv.pypa.io/), for example using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
 
     $ mkvirtualenv --python=`which python3` lbb
     $ workon lbb
@@ -127,6 +127,40 @@ latest version. To update your virtualenv, you can then run:
 or:
 
     pip install -r requirements
+
+## Advanced
+
+### Building Python 3.4.3 from source
+
+For now, La Bonne Boite runs in production under Python 3.4.3. You might now have this specific version on your own computer, so you are going to have to create a virtualenv that runs this specific version of Python. Here is the procedure to build python 3.4.3 from source.
+
+Install system requirements for building python from source with all features:
+
+    # On ubuntu
+    sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
+
+Download Python 3.4.3 and decompress the archive:
+
+    wget https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz
+    tar xzf Python-3.4.3.tgz
+    cd Python-3.4.3/
+
+Configure, build and install in local folder:
+
+    ./configure --prefix=$(pwd)/build
+    make
+    make install
+
+Create a virtualenv using this specific version of Python:
+
+    mkvirtualenv --python=./build/bin/python3.4 lbb
+    
+And you are good to go!
+
+NOTE: this procedure does not work under Ubuntu 18.04 or Debian 9. This is because these releases rely on libssl-1.1 while libssl-1.0 is required for python 3.4. More information:
+
+* pyenv issue: https://github.com/pyenv/pyenv/issues/945
+* python bug: https://bugs.python.org/issue26470
 
 # Debugging
 
