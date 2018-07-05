@@ -52,8 +52,7 @@ def get_features(endpoint, **params):
         endpoint (str)
         params (dict): key/value dictionary to pass as query string
     """
-    # FIXME: insecure SSL request because we don't have SNI in production
-    response = requests.get(settings.API_ADRESSE_BASE_URL + endpoint, params=params, verify=False)
+    response = requests.get(settings.API_ADRESSE_BASE_URL + endpoint, params=params)
     if response.status_code >= 400:
         error = 'adresse-api.data.gouv.fr responded with a {} error: {}'.format(
             response.status_code, response.content
