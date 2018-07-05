@@ -128,9 +128,8 @@ or:
 
     pip install -r requirements
 
-## Advanced
 
-### Building Python 3.4.3 from source
+## Building Python 3.4.3 from source
 
 For now, La Bonne Boite runs in production under Python 3.4.3. You might now have this specific version on your own computer, so you are going to have to create a virtualenv that runs this specific version of Python. Here is the procedure to build python 3.4.3 from source.
 
@@ -157,10 +156,30 @@ Create a virtualenv using this specific version of Python:
     
 And you are good to go!
 
-NOTE: this procedure does not work under Ubuntu 18.04 or Debian 9. This is because these releases rely on libssl-1.1 while libssl-1.0 is required for python 3.4. More information:
+### Note for Ubuntu 18.04
+
+The procedure above does not work under Ubuntu 18.04 or Debian 9. This is because these releases rely on libssl-1.1 while libssl-1.0 is required for python 3.4. If you don't have the right version of libssl, `make install` will end with an error message "Ignoring ensurepip failure: pip 6.0.8 requires SSL/TLS". You will then not be able to install packages with pip  More information:
 
 * pyenv issue: https://github.com/pyenv/pyenv/issues/945
 * python bug: https://bugs.python.org/issue26470
+
+Building openssl 1.0.0:
+
+    wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz
+    tar xzf openssl-1.0.2o.tar.gz
+    cd openssl-1.0.2o/
+    ./config shared -fPIC --prefix=$(pwd)/build --openssldir=$(pwd)/build/openssl
+    make
+    make install
+
+And then to build Python 3.4.3 using this local version of Openssl, replace the python build steps above by:
+
+    CFLAGS="-I/path/to/openssl-1.0.2o/build/include" LDFLAGS="-L/path/to/openssl-1.0.2o/build/lib" ./configure --prefix=$(pwd)/build
+    make
+    make install
+
+(you may have to run `make clean` before to clean artifacts from previous builds)
+
 
 # Debugging
 
