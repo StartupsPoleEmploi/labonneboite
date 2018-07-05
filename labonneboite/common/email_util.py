@@ -28,7 +28,7 @@ class MandrillClient(EmailClient):
             to=[{'email': to_email}],
             html=html,
             from_email=from_email)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode())
         if content[0]["status"] != "sent":
             raise Exception("email was not sent from %s to %s" % (from_email, to_email))
         return response
