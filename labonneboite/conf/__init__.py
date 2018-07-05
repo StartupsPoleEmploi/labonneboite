@@ -22,10 +22,13 @@ if settings_common.get_current_env() != settings_common.ENV_TEST:
     # Don't override settings in tests
     settings_module = os.path.join(os.path.dirname(__file__), 'local_settings.py')
     settings_module = os.environ.get('LBB_SETTINGS', settings_module)
-    settings = imp.load_source('settings', settings_module)
-
-    # Iterate over each setting defined in the `settings_common` module and add them to the dynamically
-    # imported `settings` module if they don't already exist.
-    for setting in dir(settings_common):
-        if not hasattr(settings, setting):
-            setattr(settings, setting, getattr(settings_common, setting))
+    try:
+        settings = imp.load_source('settings', settings_module)
+    except FileNotFoundError:
+        pass
+    else:
+        # Iterate over each setting defined in the `settings_common` module and add them to the dynamically
+        # imported `settings` module if they don't already exist.
+        for setting in dir(settings_common):
+            if not hasattr(settings, setting):
+                setattr(settings, setting, getattr(settings_common, setting))
