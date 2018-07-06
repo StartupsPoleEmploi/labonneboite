@@ -14,11 +14,11 @@ from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
 
 class UserAccountTest(DatabaseTest):
 
-    def setUp(self, *args, **kwargs):
+    def setUp(self):
         """
         Populate the DB with data required for these tests to work.
         """
-        super(UserAccountTest, self).setUp(*args, **kwargs)
+        super(UserAccountTest, self).setUp()
 
         self.user = User(email='john@doe.com', gender='male', first_name='John', last_name='Doe')
         db_session.add(self.user)
