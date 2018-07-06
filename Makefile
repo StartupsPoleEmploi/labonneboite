@@ -4,7 +4,7 @@ LOCUST_HOST = http://localhost:5000
 # Requirements
 # ------------
 
-requirements-compile:
+compile-requirements:
 	pip-compile -o requirements.txt requirements.in
 
 # Services and data
