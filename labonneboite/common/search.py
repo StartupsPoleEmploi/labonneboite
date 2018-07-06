@@ -8,7 +8,7 @@ import unidecode
 import elasticsearch
 import elasticsearch.exceptions
 from slugify import slugify
-from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import sorting

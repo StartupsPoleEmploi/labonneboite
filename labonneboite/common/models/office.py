@@ -12,7 +12,7 @@ from sqlalchemy.dialects import mysql
 from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.dialects import mysql
 
-from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import scoring as scoring_util

@@ -5,7 +5,7 @@ import re
 import subprocess
 from datetime import datetime
 import logging
-from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 
 import MySQLdb as mdb
 

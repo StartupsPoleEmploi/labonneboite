@@ -9,7 +9,6 @@ argparse==1.2.1
 astroid==1.6.5            # via pylint
 babel==2.6.0              # via flask-babelex
 backcall==0.1.0           # via ipython
-backports.functools-lru-cache==1.4
 blinker==1.4
 certifi==2017.4.17
 chardet==3.0.4

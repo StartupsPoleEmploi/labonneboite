@@ -1,7 +1,7 @@
 # coding: utf8
 import logging
 
-from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 import requests
 
 from labonneboite.conf import settings

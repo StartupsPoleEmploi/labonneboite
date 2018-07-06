@@ -2,7 +2,7 @@ import os
 import pickle
 import csv
 
-from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 
 USE_ROME_SLICING_DATASET = False  # Rome slicing dataset is not ready yet
 
