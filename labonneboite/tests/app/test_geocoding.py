@@ -1,13 +1,11 @@
 # coding: utf8
 import json
 import os
-import unittest
-
-import mock
+from unittest import mock, TestCase
 from labonneboite.common import geocoding
 
 
-class GeocodingTest(unittest.TestCase):
+class GeocodingTest(TestCase):
 
     def test_get_cities(self):
         all_cities = geocoding.get_cities()
@@ -64,7 +62,7 @@ class GeocodingTest(unittest.TestCase):
         self.assertEqual(saint_julien_les_metz['commune_id'], '57616')
 
 
-class AdresseApiTest(unittest.TestCase):
+class AdresseApiTest(TestCase):
 
 
     def setUp(self):

@@ -1,6 +1,6 @@
 # coding: utf8
 import datetime
-import mock
+from unittest import mock
 
 from flask import url_for
 from social_flask_sqlalchemy.models import UserSocialAuth

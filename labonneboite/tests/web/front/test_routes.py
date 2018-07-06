@@ -1,9 +1,9 @@
 # coding: utf8
+from unittest import mock
 import urllib.request, urllib.parse, urllib.error
 from urllib.parse import parse_qsl
 
 from flask import url_for
-import mock
 
 from labonneboite.conf import settings
 from labonneboite.tests.test_base import AppTest, DatabaseTest

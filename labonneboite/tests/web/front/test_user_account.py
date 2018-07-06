@@ -1,5 +1,6 @@
 # coding: utf8
-import mock
+from unittest import mock
+
 from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common.database import db_session

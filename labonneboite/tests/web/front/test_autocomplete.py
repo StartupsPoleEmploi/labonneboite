@@ -1,7 +1,6 @@
 # coding: utf8
 import json
-
-import mock
+from unittest import mock
 
 from labonneboite.tests.test_base import AppTest
 

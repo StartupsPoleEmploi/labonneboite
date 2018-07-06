@@ -23,7 +23,6 @@ speaklater
 Flask-DebugToolbar
 ipdb
 ipython
-mock
 pylint
 raven[flask]
 # profiling tools used in create_index.py

@@ -1,6 +1,6 @@
 # coding: utf8
 from urllib.parse import urlencode
-import mock
+from unittest import mock
 
 from labonneboite.common import pro
 from labonneboite.common.models import User

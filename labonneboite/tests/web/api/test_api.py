@@ -2,9 +2,9 @@
 
 import datetime
 import json
+from unittest import mock
 from urllib.parse import urlencode
 import urllib.parse
-import mock
 
 from flask import url_for
 from labonneboite.common import scoring as scoring_util
