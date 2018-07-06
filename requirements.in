@@ -19,12 +19,13 @@ Flask-Admin
 Flask-BabelEx
 speaklater
 
-# Monitoring and debug tools.
+# Development tools.
 Flask-DebugToolbar
 ipdb
 ipython
 pylint
-raven[flask]
+pip-tools
+
 # profiling tools used in create_index.py
 pycallgraph
 pyprof2calltree
@@ -77,8 +78,9 @@ validators
 # https://askubuntu.com/a/687637
 Pillow==2.9.0
 
-# Deployment.
+# Deployment and production
 uWSGI
+raven[flask]
 
 # Load testing.
 locustio
