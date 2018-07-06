@@ -71,7 +71,6 @@ xhtml2pdf
 
 # Utils.
 gevent  # only used by geocode importer job and locust load testing
-gnureadline
 python-slugify
 requests
 validators
