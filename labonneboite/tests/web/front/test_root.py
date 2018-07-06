@@ -1,5 +1,5 @@
 # coding: utf8
-import mock
+from unittest import mock
 
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.common import pro

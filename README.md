@@ -113,7 +113,7 @@ We are using [Nose](https://nose.readthedocs.io/):
 Our requirements are managed with [`pip-tools`](https://github.com/jazzband/pip-tools):
 
     pip install pip-tools
-    make requirements-compile
+    make compile-requirements
 
 To upgrade a package DO NOT EDIT `requirements.txt` DIRECTLY! Instead, run:
 

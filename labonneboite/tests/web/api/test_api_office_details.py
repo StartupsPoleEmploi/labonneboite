@@ -1,9 +1,8 @@
 # coding: utf8
 
 import json
+from unittest import mock
 from urllib.parse import urlencode
-
-import mock
 
 from labonneboite.conf import settings
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest

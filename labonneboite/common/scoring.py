@@ -1,7 +1,7 @@
 # coding: utf8
 
 import math
-from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.conf import settings

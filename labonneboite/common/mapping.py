@@ -2,7 +2,7 @@
 
 from collections import namedtuple
 import logging
-from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 
 from slugify import slugify
 
