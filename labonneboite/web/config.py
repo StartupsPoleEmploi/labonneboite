@@ -36,6 +36,7 @@ class Config(object):
     # List of supported third party authentication providers.
     SOCIAL_AUTH_AUTHENTICATION_BACKENDS = (
         'labonneboite.web.auth.backends.peam.PEAMOpenIdConnect',
+        'labonneboite.web.auth.backends.peam.PEAMOpenIdConnectNoPrompt',
     )
 
     # PEAM backend config.
@@ -50,5 +51,14 @@ class Config(object):
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_AUTH_EXTRA_ARGUMENTS = {'realm': '/individu'}
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_USER_FIELDS = ['external_id', 'email', 'gender', 'first_name', 'last_name']
 
+
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_KEY = settings.PEAM_CLIENT_ID
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_SECRET = settings.PEAM_CLIENT_SECRET
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_AUTH_EXTRA_ARGUMENTS = {'realm': '/individu', 'prompt': 'none'}
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_USER_FIELDS = ['external_id', 'email', 'gender', 'first_name', 'last_name']
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_SCOPE = [
+        'application_%s' % settings.PEAM_CLIENT_ID,
+        'api_peconnect-individuv1',
+    ]
 
 CONFIG = Config()

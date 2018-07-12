@@ -25,14 +25,14 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
 
     def request_access_token(self, *args, **kwargs):
         kwargs['params'] = {'realm': '/individu'}
-        return self.get_json(*args, **kwargs)
+        result = self.get_json(*args, **kwargs)
+        return result
 
     def user_data(self, access_token, *args, **kwargs):
         url = self.userinfo_url()
         try:
             return self.get_json(
-                url,
-                params={'realm': '/individu'},
+                url, params={'realm': '/individu'},
                 headers={'Authorization': 'Bearer {0}'.format(access_token)}
             )
         except requests.HTTPError as e:
@@ -58,3 +58,14 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         except KeyError as e:
             # Sometimes PEAM responds without the user details.
             raise AuthFailedMissingReturnValues(*e.args)
+
+
+# pylint:disable=abstract-method
+class PEAMOpenIdConnectNoPrompt(PEAMOpenIdConnect):
+    name = 'peam-openidconnect-no-prompt'
+
+    def auth_complete_params(self, state=None):
+        # Avoid user interaction during authorization
+        params = super().auth_complete_params(state=state)
+        params['prompt'] = 'none'
+        return params

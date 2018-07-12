@@ -268,6 +268,7 @@ def create_app():
         'js/tilkee.js',
         'js/tooltip.js',  # Depends on 'js/vendor/bootstrap-tooltip.js'.
         'js/unobfuscate.js',
+        'js/transparent-sso.js',
         filters='jsmin',
         output='gen/packed.%(version)s.js',
     )

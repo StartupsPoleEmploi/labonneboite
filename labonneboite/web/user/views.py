@@ -1,6 +1,8 @@
 # coding: utf8
 
-import urllib.request, urllib.parse, urllib.error
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from flask import Blueprint, Markup
 from flask import abort, current_app, flash, make_response
@@ -220,3 +222,8 @@ def pro_version():
         redirect_url = '/'
 
     return redirect(redirect_url)
+
+@userBlueprint.route('/header.html')
+def header():
+    # TODO set next_url
+    return render_template("user/header.html")
