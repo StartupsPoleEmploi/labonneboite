@@ -121,63 +121,8 @@
         <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi" width="74">
       </li>
       
-      <li class="float-right">
-        {# START LOGIN ZONE #}
-        {% if not user.is_authenticated %}
-          <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
-            <a href="#" class="lbb-header-btn">
-              <img src="{{ url_for('static', filename='images/user.svg') }}" alt="">
-              <span>Connexion</span>
-            </a>
-            <div class="lbb-dropdown lbb-dropdown-right text-right">
-              <p>
-                <a class="logo-pe-connect rgpd-consent-required" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ request.url | urlencode }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Pôle emploi Connect"></a><br>
-                <i>Connectez-vous à La Bonne Boite en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
-              </p>
-            </div>
-          </div>
-        {% else %}
-          <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
-            <a href="#" class="lbb-header-btn">
-              <img src="{{ url_for('static', filename='images/user-color.svg') }}" alt="">
-              <span>Mon compte</span>
-            </a>
-            <div class="lbb-dropdown lbb-dropdown-right text-right">
-              <p>
-                <b>{{ user.first_name | title }} {{ user.last_name }}</b>
-              </p>
-              <ul>
-                <li>
-                  <a href="{{ url_for('user.account') }}">Mon compte</a>
-                </li>
-                <li>
-                  <a href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
-                </li>
-                {% if user.is_admin %}
-                  <li>
-                    <a href="{{ url_for('admin.index') }}">Admin</a>
-                  </li>
-                {% endif %}
-              </ul>
-              <hr>
-              {% if pro_version_enabled %}
-                <p>
-                  <small class="badge badge-info">Version PRO</small>
-                </p>
-                <ul>
-                  <li>
-                    <a href="{{ url_for('data.home') }}">Mapping ROME/NAF</a>
-                  </li>
-                </ul>
-                <hr>
-              {% endif %}
-              <p>
-                <a href="{{ url_for('auth.logout') }}" class="logout">Se déconnecter</a>
-              </p>
-            </div>
-          </div>
-        {% endif %}
-        {# END LOGIN ZONE #}
+      <li class="float-right" id="user-header">
+          {% include 'user/header.html' %}
       </li>
 
       {# PRO ZONE #}
@@ -283,6 +228,12 @@
       </div>
   </div>
 
+  <script>
+      {# Place global js variables here #} 
+      window.USER_IS_AUTHENTICATED = {{ "true" if user.is_authenticated else "false" }};
+  </script>
+  {% block scripts %}{% endblock %}
+
   {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
   {% if tilkee_enabled %}
   <script>
@@ -298,8 +249,6 @@
           });
       })(jQuery);
   </script>
-
-  {% block scripts %}{% endblock %}
 
   {# Google Analytics (GA) Tracking Code #}
   {# for best performance should ideally be inside HEAD and after GO snippet #}

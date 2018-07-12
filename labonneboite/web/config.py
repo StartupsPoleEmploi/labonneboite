@@ -36,19 +36,23 @@ class Config(object):
     # List of supported third party authentication providers.
     SOCIAL_AUTH_AUTHENTICATION_BACKENDS = (
         'labonneboite.web.auth.backends.peam.PEAMOpenIdConnect',
+        'labonneboite.web.auth.backends.peam.PEAMOpenIdConnectNoPrompt',
     )
 
-    # PEAM backend config.
-    SOCIAL_AUTH_PEAM_OPENIDCONNECT_VERIFY_SSL = settings.PEAM_VERIFY_SSL
-    SOCIAL_AUTH_PEAM_OPENIDCONNECT_KEY = settings.PEAM_CLIENT_ID
-    SOCIAL_AUTH_PEAM_OPENIDCONNECT_SECRET = settings.PEAM_CLIENT_SECRET
+    # PEAM backends config.
+    SOCIAL_AUTH_VERIFY_SSL = settings.PEAM_VERIFY_SSL
+    SOCIAL_AUTH_KEY = settings.PEAM_CLIENT_ID
+    SOCIAL_AUTH_SECRET = settings.PEAM_CLIENT_SECRET
     # Extra scope.
-    SOCIAL_AUTH_PEAM_OPENIDCONNECT_SCOPE = [
+    SOCIAL_AUTH_SCOPE = [
         'application_%s' % settings.PEAM_CLIENT_ID,
         'api_peconnect-individuv1',
     ]
+    SOCIAL_AUTH_USER_FIELDS = ['external_id', 'email', 'gender', 'first_name', 'last_name']
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_AUTH_EXTRA_ARGUMENTS = {'realm': '/individu'}
-    SOCIAL_AUTH_PEAM_OPENIDCONNECT_USER_FIELDS = ['external_id', 'email', 'gender', 'first_name', 'last_name']
-
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_AUTH_EXTRA_ARGUMENTS = {'realm': '/individu', 'prompt': 'none'}
+    # For some reason, the redirect passed to "next=..." is not sent back by
+    # PE.fr, so we need to define a redirect url manually
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_LOGIN_REDIRECT_URL = '/authentication/iframe'
 
 CONFIG = Config()
