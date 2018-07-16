@@ -61,7 +61,7 @@ Create an [isolated Python environment](https://virtualenv.pypa.io/), for exampl
     $ mkvirtualenv --python=`which python3` lbb
     $ workon lbb
 
-Install OS requirements:
+### Install OS requirements:
 
     # On Debian-based OS:
     
@@ -80,56 +80,7 @@ Install OS requirements:
 
 You will also need to install docker and docker-compose. Follow the instructions related to your particular OS from the [official Docker documentation](https://docs.docker.com/install/).
 
-Install python requirements:
-
-    $ pip install -r requirements.txt
-    $ python setup.py develop
-
-Start required services (MySQL and Elasticsearch):
-
-    $ make services
-
-Create databases and import data:
-
-    $ make data
-
-If needed, run `make clear-data` to clear any old/partial data you might already have.
-
-## Launch web app
-
-    make serve-web-app
-
-The app is available on port `5000` on host machine. Open a web browser, load
-http://localhost:5000 and start browsing.
-
-## Running tests
-
-We are using [Nose](https://nose.readthedocs.io/):
-
-    $ make test-all
-
-## Upgrade requirements
-
-Our requirements are managed with [`pip-tools`](https://github.com/jazzband/pip-tools):
-
-    pip install pip-tools
-    make compile-requirements
-
-To upgrade a package DO NOT EDIT `requirements.txt` DIRECTLY! Instead, run:
-
-    pip-compile -o requirements.txt --upgrade-package mypackagename requirements.in
-
-This last command will upgrade `mypackagename` and its dependencies to the
-latest version. To update your virtualenv, you can then run:
-
-    pip-sync
-
-or:
-
-    pip install -r requirements
-
-
-## Building Python 3.4.3 from source
+### Build Python 3.4.3 from source
 
 For now, La Bonne Boite runs in production under Python 3.4.3. You might now have this specific version on your own computer, so you are going to have to create a virtualenv that runs this specific version of Python. Here is the procedure to build python 3.4.3 from source.
 
@@ -153,10 +104,10 @@ Configure, build and install in local folder:
 Create a virtualenv using this specific version of Python:
 
     mkvirtualenv --python=./build/bin/python3.4 lbb
-    
+
 And you are good to go!
 
-### Note for Ubuntu 18.04
+#### Note for Ubuntu 18.04
 
 The procedure above does not work under Ubuntu 18.04 or Debian 9. This is because these releases rely on libssl-1.1 while libssl-1.0 is required for python 3.4. If you don't have the right version of libssl, `make install` will end with an error message "Ignoring ensurepip failure: pip 6.0.8 requires SSL/TLS". You will then not be able to install packages with pip  More information:
 
@@ -180,10 +131,55 @@ And then to build Python 3.4.3 using this local version of Openssl, replace the 
 
 (you may have to run `make clean` before to clean artifacts from previous builds)
 
+### Install python requirements:
 
-# Debugging
+Our requirements are managed with [`pip-tools`](https://github.com/jazzband/pip-tools):
 
-## Accessing your local MySQL
+    pip install pip-tools
+    make requirements-compile
+
+To update your virtualenv, you can then run:
+
+    pip-sync
+    python setup.py develop
+
+#### Notes for Mac OS
+
+If you get a `ld: library not found for -lintl` error when running `pip-sync`, try this fix: `ln -s /usr/local/Cellar/gettext/0.19.8.1/lib/libintl.* /usr/local/lib/`. For more information see [this post](https://github.com/unbit/uwsgi-docs/issues/363).
+
+#### How to upgrade a specific package
+
+To upgrade a package DO NOT EDIT `requirements.txt` DIRECTLY! Instead, run:
+
+    pip-compile -o requirements.txt --upgrade-package mypackagename requirements.in
+
+This last command will upgrade `mypackagename` and its dependencies to the
+latest version.
+
+### Start required services (MySQL and Elasticsearch)
+
+    $ make services
+
+### Create databases and import data
+
+    $ make data
+
+If needed, run `make clear-data` to clear any old/partial data you might already have.
+
+## Launch web app
+
+    make serve-web-app
+
+The app is available on port `5000` on host machine. Open a web browser, load
+http://localhost:5000 and start browsing.
+
+## Run tests
+
+We are using [Nose](https://nose.readthedocs.io/):
+
+    $ make test-all
+
+## Access your local MySQL
 
 To access your local MySQL in your MySQL GUI, for example using Sequel Pro:
 
@@ -202,7 +198,7 @@ however with great power comes great responsiblity...
 - Doc: https://www.elastic.co/guide/en/elasticsearch/reference/1.7/index.html
 - Python binding: http://elasticsearch-py.readthedocs.io/en/1.6.0/
 
-### Accessing your local Elasticsearch
+### Access your local Elasticsearch
 
 Docker forwards port 9200 from your host to your guest VM.
 
@@ -210,7 +206,7 @@ Simply open http://localhost:9200 in your web browser, or, better, install the c
 
 You can also use `curl` to explore your cluster.
 
-### Examples:
+### Examples
 
 Locally:
 
@@ -240,12 +236,6 @@ Locally:
 Note that we only have data in Metz region.
 
 Any search on another region than Metz will give zero results.
-
-## Profiling
-
-You will need to install a kgrind file visualizer for profiling. Kgrind files store the detailed results of a profiling.
-- For Mac OS install and use QCacheGrind: `brew update && brew install qcachegrind`
-- For other OSes: install and use [KCacheGrind](https://kcachegrind.github.io/html/Home.html)
 
 ## Running scripts
 
@@ -320,7 +310,13 @@ The load testing is designed to run directly from your vagrant VM using 4 cores 
 - Start your swarm with for example 1 user then increase slowly and observe what happens.
 - As long as your observed RPS stays coherent with your number of users, it means the app behaves correctly. As soon as the RPS is less than it shoud be and/or you get many 500 errors (check your logs) it means the load is too high or that your available bandwidth is too low.
 
-## `create_index.py`
+## Profiling
+
+You will need to install a kgrind file visualizer for profiling. Kgrind files store the detailed results of a profiling.
+- For Mac OS install and use QCacheGrind: `brew update && brew install qcachegrind`
+- For other OSes: install and use [KCacheGrind](https://kcachegrind.github.io/html/Home.html)
+
+### Profiling `create_index.py`
 
 Here is how to profile the `create_index.py` script and its (long) reindexing of all elasticsearch data. This script is the first we had to do some profiling on, but the idea is that all techniques below should be easily reusable for future profilings of other parts of the code.
 
