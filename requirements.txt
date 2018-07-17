@@ -95,8 +95,8 @@ sqlalchemy-utils==0.32.13
 sqlalchemy==1.1.11
 traitlets==4.3.2          # via ipython
 typing==3.6.4             # via ipython
-unidecode==0.4.21
-urllib3==1.21.1
+unidecode==0.4.21         # via python-slugify
+urllib3==1.21.1           # via elasticsearch, requests
 uwsgi==2.0.17
 validators==0.11.2
 wcwidth==0.1.7            # via prompt-toolkit

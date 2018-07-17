@@ -116,7 +116,7 @@ pyzmq
 # six
 # social-auth-core
 # social-auth-storage-sqlalchemy
-Unidecode
-urllib3
+# Unidecode
+# urllib3
 webassets
 wrapt
