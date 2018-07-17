@@ -87,7 +87,7 @@ pyzmq
 
 # Secondary dependencies.
 # Explicitly specify secondary dependencies to ensure consistent build behavior.
-argparse
+# argparse
 blinker
 certifi
 chardet

@@ -6,7 +6,6 @@
 #
 alembic==0.9.3
 appnope==0.1.0            # via ipython
-argparse==1.2.1
 astroid==1.6.5            # via pylint
 babel==2.6.0              # via flask-babelex
 backcall==0.1.0           # via ipython
