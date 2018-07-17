@@ -112,10 +112,10 @@ pyzmq
 # python-editor
 # python-openid
 # pytz
-requests-oauthlib
-six
-social-auth-core
-social-auth-storage-sqlalchemy
+# requests-oauthlib
+# six
+# social-auth-core
+# social-auth-storage-sqlalchemy
 Unidecode
 urllib3
 webassets

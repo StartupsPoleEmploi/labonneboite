@@ -79,17 +79,17 @@ pyvirtualdisplay==0.2.1
 pyzmq==16.0.2
 raven[flask]==6.8.0
 reportlab==3.4.0          # via xhtml2pdf
-requests-oauthlib==0.8.0
+requests-oauthlib==0.8.0  # via social-auth-core
 requests==2.18.1
 scikit-learn==0.16.1
 scipy==0.15.1
 selenium==2.53.0
 simplegeneric==0.8.1      # via ipython
-six==1.10.0
+six==1.10.0               # via astroid, html5lib, mock, prompt-toolkit, pyjwkest, pylint, python-dateutil, social-auth-app-flask, social-auth-app-flask-sqlalchemy, social-auth-core, social-auth-storage-sqlalchemy, sqlalchemy-utils, traitlets, validators, xhtml2pdf
 social-auth-app-flask-sqlalchemy==1.0.1
 social-auth-app-flask==1.0.0
 social-auth-core[openidconnect]==1.4.0
-social-auth-storage-sqlalchemy==1.1.0
+social-auth-storage-sqlalchemy==1.1.0  # via social-auth-app-flask-sqlalchemy
 speaklater==1.3
 sqlalchemy-utils==0.32.13
 sqlalchemy==1.1.11
