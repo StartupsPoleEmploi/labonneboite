@@ -99,13 +99,13 @@ pyzmq
 # idna
 # isort
 # itsdangerous
-Jinja2
-lazy-object-proxy
-Mako
-MarkupSafe
-mccabe
-oauthlib
-pycryptodomex
+# Jinja2
+# lazy-object-proxy
+# Mako
+# MarkupSafe
+# mccabe
+# oauthlib
+# pycryptodomex
 PyJWT
 PyPDF2
 python-dateutil
