@@ -13,7 +13,6 @@ blinker==1.4
 certifi==2017.4.17
 chardet==3.0.4
 click==6.7
-configparser==3.5.0
 cssmin==0.2.0
 decorator==4.3.0          # via ipython, traitlets, validators
 defusedxml==0.5.0         # via python3-openid, social-auth-core

@@ -92,7 +92,7 @@ blinker
 certifi
 chardet
 click
-configparser
+# configparser
 EasyProcess
 future
 greenlet
