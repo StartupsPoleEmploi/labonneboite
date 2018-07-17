@@ -9,14 +9,14 @@ appnope==0.1.0            # via ipython
 astroid==1.6.5            # via pylint
 babel==2.6.0              # via flask-babelex
 backcall==0.1.0           # via ipython
-blinker==1.4
-certifi==2017.4.17
-chardet==3.0.4
-click==6.7
+blinker==1.4              # via flask-debugtoolbar, raven
+certifi==2017.4.17        # via requests
+chardet==3.0.4            # via requests
+click==6.7                # via flask
 cssmin==0.2.0
 decorator==4.3.0          # via ipython, traitlets, validators
 defusedxml==0.5.0         # via python3-openid, social-auth-core
-easyprocess==0.2.3
+easyprocess==0.2.3        # via pyvirtualdisplay
 elasticsearch==1.9.0
 flask-admin==1.5.0
 flask-assets==0.12
@@ -28,17 +28,17 @@ flask-script==2.0.5
 flask-testing==0.7.1
 flask-wtf==0.14.2
 flask==0.12.4
-future==0.16.0
+future==0.16.0            # via pyjwkest
 gevent==1.1.1
-greenlet==0.4.12
+greenlet==0.4.12          # via gevent
 html5lib==1.0.1
 httplib2==0.11.3          # via xhtml2pdf
-idna==2.5
+idna==2.5                 # via requests
 ipdb==0.10.1
 ipython-genutils==0.2.0   # via traitlets
 ipython==6.4.0
-isort==4.2.15
-itsdangerous==0.24
+isort==4.2.15             # via pylint
+itsdangerous==0.24        # via flask, flask-debugtoolbar
 jedi==0.12.0              # via ipython
 jinja2==2.9.6
 jsmin==2.2.2

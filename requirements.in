@@ -88,17 +88,17 @@ pyzmq
 # Secondary dependencies.
 # Explicitly specify secondary dependencies to ensure consistent build behavior.
 # argparse
-blinker
-certifi
-chardet
-click
+# blinker
+# certifi
+# chardet
+# click
 # configparser
-EasyProcess
-future
-greenlet
-idna
-isort
-itsdangerous
+# EasyProcess
+# future
+# greenlet
+# idna
+# isort
+# itsdangerous
 Jinja2
 lazy-object-proxy
 Mako
