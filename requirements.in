@@ -118,5 +118,5 @@ pyzmq
 # social-auth-storage-sqlalchemy
 # Unidecode
 # urllib3
-webassets
+# webassets
 wrapt
