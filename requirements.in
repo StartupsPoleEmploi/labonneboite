@@ -46,9 +46,7 @@ SQLAlchemy
 elasticsearch<2.0.0
 
 # Users and auth management.
-# `pyjwkest` is required by `social-auth-core` which is required by `social-auth-app-flask`.
 Flask-Login
-pyjwkest
 social-auth-app-flask-sqlalchemy
 social-auth-app-flask
 
@@ -56,7 +54,6 @@ social-auth-app-flask
 nose
 selenium
 PyVirtualDisplay
-Werkzeug
 Flask-Testing
 
 # Data and Importer.
