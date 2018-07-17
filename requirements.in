@@ -106,12 +106,12 @@ pyzmq
 # mccabe
 # oauthlib
 # pycryptodomex
-PyJWT
-PyPDF2
-python-dateutil
-python-editor
-python-openid
-pytz
+# PyJWT
+# PyPDF2
+# python-dateutil
+# python-editor
+# python-openid
+# pytz
 requests-oauthlib
 six
 social-auth-core
