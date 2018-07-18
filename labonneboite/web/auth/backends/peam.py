@@ -64,7 +64,7 @@ class PEAMOpenIdConnect(PEAMOAuth2, OpenIdConnectAuth):
                 'external_id': response['sub'],
                 'gender': response['gender'],
                 'first_name': response['given_name'],
-                'last_name': response['family_name'],
+                'last_name': response['family_name'] if 'family_name' in response else None,
             }
         except KeyError as e:
             # Sometimes PEAM responds without the user details.
