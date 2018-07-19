@@ -50,6 +50,8 @@ Flask-Login
 social-auth-app-flask-sqlalchemy
 social-auth-app-flask
 social-auth-core[openidconnect]
+# stick to pycryptodomex 3.4.6 as 3.6.3 breaks production
+pycryptodomex==3.4.6
 
 # Unit tests.
 nose
