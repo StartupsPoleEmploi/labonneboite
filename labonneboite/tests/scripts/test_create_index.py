@@ -116,6 +116,7 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
             "departement": "57",
             "headcount": "12",
             "score": 90,
+            "score_alternance": 75,
             "x": 6.17952,
             "y": 49.1044,
             "reason": "Demande de mise en avant",
