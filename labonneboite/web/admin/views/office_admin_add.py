@@ -49,6 +49,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         'departement',
         'headcount',
         'score',
+        'score_alternance',
         'x',
         'y',
         'reason',
@@ -82,6 +83,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         'departement': "Département",
         'headcount': "Tranche effectif",
         'score': "Score",
+        'score_alternance': "Score alternance",
         'x': "Longitude",
         'y': "Latitude",
         'reason': "Raison",
@@ -93,6 +95,8 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
 
     column_descriptions = {
         'reason': "Raison de l'ajout.",
+        'score': "Valeur recommandée : entre 80 et 90",
+        'score_alternance': "Valeur recommandée : entre 80 et 90",
     }
 
     form_columns = [
@@ -114,6 +118,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         'flag_handicap',
         'headcount',
         'score',
+        'score_alternance',
         'y',
         'x',
         'reason',
@@ -170,6 +175,9 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
             'choices': settings.HEADCOUNT_INSEE_CHOICES,
         },
         'score': {
+            'validators': [validators.NumberRange(min=0, max=100)],
+        },
+        'score_alternance': {
             'validators': [validators.NumberRange(min=0, max=100)],
         },
         'reason': {
