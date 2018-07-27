@@ -63,7 +63,7 @@ pip-tools==2.0.2
 prompt-toolkit==1.0.15    # via ipython
 ptyprocess==0.6.0         # via pexpect
 pycallgraph==1.0.1
-pycryptodomex==3.4.6
+pycryptodomex==3.6.3      # via pyjwkest
 pygments==2.2.0           # via ipython
 pyjwkest==1.4.0           # via social-auth-core
 pyjwt==1.5.2              # via social-auth-core
