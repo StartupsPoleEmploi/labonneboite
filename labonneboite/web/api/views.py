@@ -4,6 +4,7 @@ from functools import wraps
 
 from flask import abort, Blueprint, current_app, jsonify, request, url_for
 
+from labonneboite.common import activity
 from labonneboite.common import geocoding
 from labonneboite.common import search
 from labonneboite.common import sorting
@@ -15,7 +16,7 @@ from labonneboite.common.load_data import load_ogr_rome_mapping
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
-from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES, NAF_CODES
+from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
 
 
 apiBlueprint = Blueprint('api', __name__)
@@ -99,6 +100,16 @@ def company_list():
 
     result = get_result(fetcher, commune_id)
     result['companies'] = companies
+    activity.log_search(
+        sirets=[company['siret'] for company in companies],
+        count=fetcher.company_count,
+        source='api',
+        localisation={
+            'codepostal': zipcode,
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+        },
+    )
     return jsonify(result)
 
 

@@ -1,4 +1,6 @@
 # coding: utf8
+import unittest.mock
+
 from labonneboite.common.models import Office
 from labonneboite.tests.test_base import DatabaseTest
 
@@ -79,6 +81,12 @@ class RouteTest(DatabaseTest):
         self.assertEqual('application/pdf', rv.mimetype)
         self.assertLess(1000, rv.content_length)
 
+    def test_download_triggers_activity_log(self):
+        self.create_example_office()
+        with unittest.mock.patch('labonneboite.common.activity.log') as activity_log:
+            self.app.get(self.url_for('office.download', siret=self.office.siret))
+            activity_log.assert_called_with('telecharger-pdf', siret=self.office.siret)
+
     def test_download_missing_siret(self):
         """
         Test the office PDF download of a non existing office
@@ -97,4 +105,11 @@ class RouteTest(DatabaseTest):
         self.office.save()
 
         rv = self.app.get(self.url_for('office.download', siret=self.office.siret))
+        self.assertEqual(rv.status_code, 200)
+
+    def test_toggle_details_event(self):
+        self.create_example_office()
+        with unittest.mock.patch('labonneboite.common.activity.log') as activity_log:
+            rv = self.app.post(self.url_for('office.toggle_details_event', siret=self.office.siret))
+            activity_log.assert_called_with('afficher-details', siret=self.office.siret)
         self.assertEqual(rv.status_code, 200)

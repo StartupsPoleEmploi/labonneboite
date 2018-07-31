@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 from flask import Blueprint, redirect, session, url_for, render_template
 from flask_login import current_user, logout_user
 
+from labonneboite.common import activity
 from labonneboite.common.models import get_user_social_auth
 from labonneboite.conf import settings
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
@@ -30,6 +31,7 @@ def logout(user_social_auth=None):
         user_social_auth = get_user_social_auth(current_user.id)
 
     # Log the user out and destroy the LBB session.
+    activity.log('deconnexion')
     logout_user()
 
     # Clean the session: drop Python Social Auth info because it isn't done by `logout_user`.
