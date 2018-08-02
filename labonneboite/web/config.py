@@ -39,6 +39,7 @@ class Config(object):
     )
 
     # PEAM backend config.
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_VERIFY_SSL = settings.PEAM_VERIFY_SSL
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_KEY = settings.PEAM_CLIENT_ID
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_SECRET = settings.PEAM_CLIENT_SECRET
     # Extra scope.
