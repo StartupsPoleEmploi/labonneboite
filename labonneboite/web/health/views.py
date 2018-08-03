@@ -15,10 +15,7 @@ def health_all():
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot)
     `yes` if Elastic Search and Database are ok
     """
-    if health_util.is_db_alive() and health_util.is_elasticsearch_alive():
-        return make_response("yes")
-    else:
-        return make_response("no")
+    return health_response(health_util.is_db_alive() and health_util.is_elasticsearch_alive())
 
 
 @healthBlueprint.route('/db')
@@ -27,10 +24,8 @@ def health_db():
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot)
     `yes` if Database is ok
     """
-    if health_util.is_db_alive():
-        return make_response("yes")
-    else:
-        return make_response("no")
+    return health_response(health_util.is_db_alive())
+
 
 @healthBlueprint.route('/es')
 def health_es():
@@ -38,10 +33,8 @@ def health_es():
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot)
     `yes` if Elastic Search is ok
     """
-    if health_util.is_elasticsearch_alive():
-        return make_response("yes")
-    else:
-        return make_response("no")
+    return health_response(health_util.is_elasticsearch_alive())
+
 
 @healthBlueprint.route('/uwsgi')
 def health_uwsgi():
@@ -49,4 +42,8 @@ def health_uwsgi():
     Dummy health check to test if uwsgi is up. If this part of the code is reached,
     it obviously means uwsgi is up, so there is nothing to test.
     """
-    return make_response("yes")
+    return health_response(True)
+
+
+def health_response(is_healthy):
+    return make_response("yes" if is_healthy else "no")
