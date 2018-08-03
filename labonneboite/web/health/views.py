@@ -42,3 +42,11 @@ def health_es():
         return make_response("yes")
     else:
         return make_response("no")
+
+@healthBlueprint.route('/uwsgi')
+def health_uwsgi():
+    """
+    Dummy health check to test if uwsgi is up. If this part of the code is reached,
+    it obviously means uwsgi is up, so there is nothing to test.
+    """
+    return make_response("yes")
