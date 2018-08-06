@@ -16,3 +16,7 @@ class HealthTest(AppTest):
         rv = self.app.get("/health/es")
         self.assertEqual(rv.status_code, 200)
         self.assertEqual(rv.data, b'yes')
+
+        rv = self.app.get("/health/uwsgi")
+        self.assertEqual(rv.status_code, 200)
+        self.assertEqual(rv.data, b'yes')

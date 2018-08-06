@@ -1,7 +1,7 @@
 # coding: utf8
 
 from flask import Blueprint
-from flask import abort, make_response
+from flask import make_response
 
 from labonneboite.web.health import util as health_util
 
@@ -13,32 +13,37 @@ healthBlueprint = Blueprint('health', __name__)
 def health_all():
     """
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot)
-    200 if Elastic Search and Database are ok
+    `yes` if Elastic Search and Database are ok
     """
-    if health_util.is_db_alive() and health_util.is_elasticsearch_alive():
-        return make_response("yes")
-    else:
-        abort(500)
+    return health_response(health_util.is_db_alive() and health_util.is_elasticsearch_alive())
 
 
 @healthBlueprint.route('/db')
 def health_db():
     """
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot)
-    200 if Database is ok
+    `yes` if Database is ok
     """
-    if health_util.is_db_alive():
-        return make_response("yes")
-    else:
-        abort(500)
+    return health_response(health_util.is_db_alive())
+
 
 @healthBlueprint.route('/es')
 def health_es():
     """
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot)
-    200 if Elastic Search is ok
+    `yes` if Elastic Search is ok
     """
-    if health_util.is_elasticsearch_alive():
-        return make_response("yes")
-    else:
-        abort(500)
+    return health_response(health_util.is_elasticsearch_alive())
+
+
+@healthBlueprint.route('/uwsgi')
+def health_uwsgi():
+    """
+    Dummy health check to test if uwsgi is up. If this part of the code is reached,
+    it obviously means uwsgi is up, so there is nothing to test.
+    """
+    return health_response(True)
+
+
+def health_response(is_healthy):
+    return make_response("yes" if is_healthy else "no")
