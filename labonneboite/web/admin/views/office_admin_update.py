@@ -339,7 +339,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             try:
                 self.validate_romes_to_boost(form, 'romes_to_boost', 'boost')
             except (RomeToBoostException, InvalidRome) as e:
-                flash(e.message, 'error')
+                flash(e.args[0], 'error')
                 return False
 
         # Codes ROMES to boost or to add (for alternance)
@@ -347,7 +347,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             try:
                 self.validate_romes_to_boost(form, 'romes_to_boost', 'boost_alternance')
             except (RomeToBoostException, InvalidRome) as e:
-                flash(e.message, 'error')
+                flash(e.args[0], 'error')
                 return False
 
 
@@ -357,7 +357,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 office_naf = first_office.naf if only_one_siret else None
                 self.validate_romes_to_remove(form, 'romes_to_remove', office_naf)
             except (RomeToRemoveException, InvalidRome) as e:
-                flash(e.message, 'error')
+                flash(e.args[0], 'error')
                 return False
 
         # Codes ROMES to remove (for alternance)
@@ -366,7 +366,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 office_naf = first_office.naf if only_one_siret else None
                 self.validate_romes_to_remove(form, 'romes_alternance_to_remove', office_naf)
             except (RomeToRemoveException, InvalidRome) as e:
-                flash(e.message, 'error')
+                flash(e.args[0], 'error')
                 return False
 
         # Codes NAF to add
