@@ -184,7 +184,7 @@ def company_filter_list():
         location, _, _ = get_location(request.args)
         fetcher = create_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
-        message = 'Invalid request argument: {}'.format(e.message)
+        message = 'Invalid request argument: {}'.format(e.args[0])
         return message, 400
 
     # Add aggregations

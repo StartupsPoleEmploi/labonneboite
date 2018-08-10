@@ -377,7 +377,7 @@ def aggregate_distance(aggregations_raw):
         try:
             label = KEY_TO_LABEL_DISTANCES[key]
         except KeyError as e:
-            e.message = "Unknown distance_aggretions key : %s" % distance_aggregate['key']
+            e.args[0] = "Unknown distance_aggretions key : %s" % distance_aggregate['key']
             logger.exception(e)
             continue
 
@@ -707,7 +707,7 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
             try:
                 company = company_dict[siret]
             except KeyError as e:
-                e.message = "ES and DB out of sync: siret %s is in ES but not in DB - this should never happen" % siret
+                e.args[0] = "ES and DB out of sync: siret %s is in ES but not in DB - this should never happen" % siret
                 logger.exception(e)
                 raise
             if company.has_city():
