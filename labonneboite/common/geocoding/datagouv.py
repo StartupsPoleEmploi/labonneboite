@@ -3,11 +3,14 @@ import logging
 
 from functools import lru_cache
 import requests
+from requests.exceptions import ConnectionError
 
 from labonneboite.conf import settings
 
 
 logger = logging.getLogger('main')
+
+BAN_TIMEOUT = 3
 
 
 
@@ -52,12 +55,21 @@ def get_features(endpoint, **params):
         endpoint (str)
         params (dict): key/value dictionary to pass as query string
     """
-    response = requests.get(settings.API_ADRESSE_BASE_URL + endpoint, params=params)
+    try:
+        response = requests.get(
+            settings.API_ADRESSE_BASE_URL + endpoint,
+            params=params,
+            timeout=BAN_TIMEOUT,
+        )
+    except ConnectionError:
+        # FIXME log BAN DOWN event
+        return []
     if response.status_code >= 400:
         error = 'adresse-api.data.gouv.fr responded with a {} error: {}'.format(
             response.status_code, response.content
         )
         # We log an error only if we made an incorrect request
+        # FIXME Where does this log go? Not found in uwsgi log nor sentry.
         log_level = logging.WARNING if response.status_code >= 500 else logging.ERROR
         logger.log(log_level, error)
         return []

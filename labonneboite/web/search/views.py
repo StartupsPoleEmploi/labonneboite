@@ -53,6 +53,10 @@ def autocomplete_locations():
     suggestions = []
     if term:
         suggestions = geocoding.get_coordinates(term, limit=autocomplete.MAX_LOCATIONS)
+    if not suggestions:
+        suggestions = search_util.build_location_suggestions(term)
+        if suggestions:
+            pass  # FIXME log BAN LIKELY DOWN event
     for suggestion in suggestions:
         suggestion['value'] = suggestion['label']
     return make_response(json.dumps(suggestions))
