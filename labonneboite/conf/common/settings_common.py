@@ -9,8 +9,6 @@ Environment-specific values of these parameters are overriden in files:
 overrides/development.py
 overrides/test.py
 overrides/lbbdev.py
-overrides/staging.py
-overrides/production.py
 """
 import os
 

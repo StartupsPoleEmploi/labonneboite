@@ -3,7 +3,7 @@ import logging
 
 from functools import lru_cache
 import requests
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, ReadTimeout
 
 from labonneboite.conf import settings
 
@@ -61,7 +61,7 @@ def get_features(endpoint, **params):
             params=params,
             timeout=BAN_TIMEOUT,
         )
-    except ConnectionError:
+    except (ConnectionError, ReadTimeout):
         # FIXME log BAN DOWN event
         return []
     if response.status_code >= 400:
