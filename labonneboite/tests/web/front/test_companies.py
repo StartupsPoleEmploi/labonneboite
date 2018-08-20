@@ -41,7 +41,7 @@ class RouteTest(DatabaseTest):
 
         self.create_example_office()
 
-        rv = self.app.get('/%s/details' % self.office.siret)
+        rv = self.app.get(self.url_for('office.details', siret=self.office.siret))
         self.assertEqual(rv.status_code, 200)
 
     def test_office_details_page_of_non_existing_office(self):
@@ -50,7 +50,7 @@ class RouteTest(DatabaseTest):
         """
 
         # The details page of an nonexistent office should raise a 404.
-        rv = self.app.get('/7x5x8x3x1x1x46/details')
+        rv = self.app.get(self.url_for('office.details', siret='7x5x8x3x1x1x46'))
         self.assertEqual(rv.status_code, 404)
 
     def test_office_details_page_of_office_having_buggy_naf(self):
@@ -62,7 +62,7 @@ class RouteTest(DatabaseTest):
         self.office.naf = '9900Z'
         self.office.save()
 
-        rv = self.app.get('/%s/details' % self.office.siret)
+        rv = self.app.get(self.url_for('office.details', siret=self.office.siret))
         self.assertEqual(rv.status_code, 200)
 
     def test_download_regular_office(self):
@@ -73,7 +73,7 @@ class RouteTest(DatabaseTest):
         self.create_example_office()
 
         # normal behavior
-        rv = self.app.get("/%s/download" % self.office.siret)
+        rv = self.app.get(self.url_for('office.download', siret=self.office.siret))
 
         self.assertEqual(rv.status_code, 200)
         self.assertEqual('application/pdf', rv.mimetype)
@@ -84,7 +84,7 @@ class RouteTest(DatabaseTest):
         Test the office PDF download of a non existing office
         """
         # siret does not exist
-        rv = self.app.get("/1234567890/download")
+        rv = self.app.get(self.url_for('office.download', siret='1234567890'))
         self.assertEqual(rv.status_code, 404)
 
     def test_download_of_office_having_buggy_naf(self):
@@ -96,5 +96,5 @@ class RouteTest(DatabaseTest):
         self.office.naf = '9900Z'
         self.office.save()
 
-        rv = self.app.get('/%s/download' % self.office.siret)
+        rv = self.app.get(self.url_for('office.download', siret=self.office.siret))
         self.assertEqual(rv.status_code, 200)

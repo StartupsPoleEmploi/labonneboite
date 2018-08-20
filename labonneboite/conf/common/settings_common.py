@@ -113,6 +113,7 @@ FLASK_SECRET_KEY = '<set it>'
 
 # Settings that need to be overwritten
 # FIXME there should be a default value for these settings in the code whenever the setting is not defined.
+PEAM_VERIFY_SSL = True
 PEAM_CLIENT_ID = '<set it>'
 PEAM_CLIENT_SECRET = '<set it>'
 PEAM_AUTH_BASE_URL = '<set it>'
