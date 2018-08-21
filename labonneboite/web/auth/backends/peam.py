@@ -21,7 +21,7 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     AUTHORIZATION_URL = '%s/connexion/oauth2/authorize' % settings.PEAM_AUTH_BASE_URL
     ACCESS_TOKEN_URL = '%s/connexion/oauth2/access_token' % settings.PEAM_AUTH_BASE_URL
     REFRESH_TOKEN_URL = '%s/connexion/oauth2/access_token' % settings.PEAM_AUTH_BASE_URL
-    USERINFO_URL = settings.PEAM_USERINFO_URL
+    USERINFO_URL = '%s/partenaire/peconnect-individu/v1/userinfo' % settings.PEAM_API_BASE_URL
 
     def request_access_token(self, *args, **kwargs):
         kwargs['params'] = {'realm': '/individu'}
