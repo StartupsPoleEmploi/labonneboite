@@ -63,3 +63,15 @@ def get_user_social_auth(user_id, provider=PEAMOpenIdConnect.name):
         .order_by(desc(UserSocialAuth.id))
         .first()
     )
+
+# TODO get rid of this which is unused anywhere
+# def get_user_social_auth_no_prompt(user_id, provider=PEAMOpenIdConnectNoPrompt.name):
+    # """
+    # Return the latest `UserSocialAuth` instance for the given `user_id` and `provider`.
+    # """
+    # return (
+        # db_session.query(UserSocialAuth)
+        # .filter_by(user_id=user_id, provider=provider)
+        # .order_by(desc(UserSocialAuth.id))
+        # .first()
+    # )
