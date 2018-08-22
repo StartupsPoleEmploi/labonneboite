@@ -326,6 +326,7 @@
 
     ga('set', 'dimension1', {{ 1 if pro_version_enabled else 0 }});
     ga('set', 'dimension2', {{ 1 if user.is_authenticated else 0 }});
+    ga('set', 'dimension6', Cookies.get('idutkes')? 1 : 0);
 
   </script>
 
