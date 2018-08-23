@@ -201,7 +201,6 @@ alembic-generate-migration:
 # -------------
 
 run-importer-jobs:
-	make alembic-migrate && \
 	make run-importer-job-00-prepare-all && \
 	make run-importer-job-01-check-etablissements && \
 	make run-importer-job-02-extract-etablissements && \
@@ -214,7 +213,7 @@ run-importer-jobs:
 	make run-importer-job-08-populate-flags && \
 	echo "all importer jobs completed successfully."
 
-run-importer-job-00-prepare-all:  # FIXME DNRY table names
+run-importer-job-00-prepare-all: alembic-migrate
 	export LBB_ENV=development && \
 		cd labonneboite/importer && \
 		echo delete from hirings                   | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \

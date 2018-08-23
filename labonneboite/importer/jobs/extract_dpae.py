@@ -116,7 +116,11 @@ class DpaeExtractJob(Job):
                     # and we ignore CTT.
                     and (
                         contract_type == Hiring.CONTRACT_TYPE_CDI
-                        or (contract_type == Hiring.CONTRACT_TYPE_CDD and contract_duration > 31)
+                        or (
+                            contract_type == Hiring.CONTRACT_TYPE_CDD
+                            and contract_duration is not None
+                            and contract_duration > 31
+                        )
                     )
                 )
 

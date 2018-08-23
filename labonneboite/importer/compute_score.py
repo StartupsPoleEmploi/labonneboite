@@ -579,9 +579,7 @@ def export_df_etab_to_db(df_etab, departement):
     logger.debug("writing sql (%s)...", departement)
 
     def departement_to_str(x):
-        if int(x["departement"]) < 10:
-            return "0%i" % x["departement"]
-        return str(x["departement"])
+        return "{:02d}".format(int(x["departement"]))
 
     df_etab['departement'] = df_etab.apply(departement_to_str, axis=1)
 
