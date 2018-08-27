@@ -744,6 +744,9 @@ def update_data_profiling_wrapper(create_full, create_partial, disable_parallel_
 
 
 def run():
+    logger.info(get_office_as_es_doc(Office.query.get('31290872600069')))
+    return  # FIXME
+    
     parser = argparse.ArgumentParser(
         description="Update elasticsearch data: offices, ogr_codes and locations.")
     parser.add_argument('-f', '--full', action='store_true',
