@@ -294,6 +294,7 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
     boosted_romes = {}
     boosted_alternance_romes = {}
 
+    logger.info("office_nafs: %s", ",".join(office_nafs))
 
     for naf in office_nafs:
         try:
@@ -313,6 +314,8 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
         # Add unrelated rome for indexing (with boost) and remove unwanted romes
         rome_codes = set(naf_rome_codes).union(set(romes_to_boost)) - set(romes_to_remove)
 
+        logger.info("rome_codes: %s", ",".join(rome_codes))
+
         for rome_code in rome_codes:
             # Manage office boosting - DPAE
             if office_to_update and office_to_update.boost:
@@ -330,6 +333,11 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                 naf_code=naf)
 
             if score_dpae >= scoring_util.SCORE_FOR_ROME_MINIMUM or rome_code in boosted_romes:
+                logger.info("SELECTED --- rome_code:%s score_dpae:%s SCORE_FOR_ROME_MINIMUM:%s",
+                    rome_code,
+                    score_dpae,
+                    scoring_util.SCORE_FOR_ROME_MINIMUM,
+                )
                 if rome_code in scores_by_rome:
                     # this ROME was already computed before for another NAF
                     if score_dpae > scores_by_rome[rome_code]:
@@ -338,6 +346,12 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                 else:
                     scores_by_rome[rome_code] = score_dpae
                     st.increment_office_score_for_rome_count()
+            else:
+                logger.info("ignored rome_code:%s score_dpae:%s SCORE_FOR_ROME_MINIMUM:%s",
+                    rome_code,
+                    score_dpae,
+                    scoring_util.SCORE_FOR_ROME_MINIMUM,
+                )
 
 
         ## 2 - Alternance
@@ -349,6 +363,8 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
             romes_alternance_to_remove = office_to_update.as_list(office_to_update.romes_alternance_to_remove)
 
         rome_codes_alternance = set(naf_rome_codes).union(set(romes_alternance_to_boost)) - set(romes_alternance_to_remove)
+
+        logger.info("rome_codes_alternance: %s", ",".join(rome_codes_alternance))
 
         for rome_code in rome_codes_alternance:
             # Manage office boosting - Alternance
@@ -744,6 +760,9 @@ def update_data_profiling_wrapper(create_full, create_partial, disable_parallel_
 
 
 def run():
+    logger.info(get_office_as_es_doc(Office.query.get('31290872600069')))
+    return  # FIXME
+    
     parser = argparse.ArgumentParser(
         description="Update elasticsearch data: offices, ogr_codes and locations.")
     parser.add_argument('-f', '--full', action='store_true',
