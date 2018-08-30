@@ -335,6 +335,9 @@ def social_auth_error(error):
         # We thought user was connected on PE.fr, but in fact he wasn't, so we
         # can't log the user in without interaction
         pass
+    elif isinstance(error, social_exceptions.AuthForbidden):
+        # "Your credentials aren't allowed"
+        pass
     elif not isinstance(error, (
             social_exceptions.AuthCanceled,
             social_exceptions.AuthUnreachableProvider,
