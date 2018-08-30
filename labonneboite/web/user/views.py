@@ -57,7 +57,7 @@ def account_delete():
         # We have to delete it because it has a foreign key to the User table.
         # We don't need to deal with the other tables of Social Auth, see:
         # https://python-social-auth.readthedocs.io/en/latest/storage.html
-        db_session.query(UserSocialAuth).filter_by(id=user_social_auth.id).delete()
+        db_session.query(UserSocialAuth).filter_by(user_id=current_user.id).delete()
 
         # Delete the current user.
         # The user's favorites will be deleted at the same time because of the `ondelete='CASCADE'`
