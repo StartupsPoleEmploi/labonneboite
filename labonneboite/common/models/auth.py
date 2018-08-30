@@ -53,13 +53,13 @@ class User(CRUDMixin, UserMixin, Base):
         return self.active
 
 
-def get_user_social_auth(user_id, provider=PEAMOpenIdConnect.name):
+def get_user_social_auth(user_id):
     """
-    Return the latest `UserSocialAuth` instance for the given `user_id` and `provider`.
+    Return the latest `UserSocialAuth` instance for the given `user_id`.
     """
     return (
         db_session.query(UserSocialAuth)
-        .filter_by(user_id=user_id, provider=provider)
+        .filter_by(user_id=user_id)
         .order_by(desc(UserSocialAuth.id))
         .first()
     )
