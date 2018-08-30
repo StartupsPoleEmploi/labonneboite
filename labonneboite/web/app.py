@@ -332,6 +332,8 @@ def social_auth_error(error):
     flash("Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
     # Don't log errors that are not our responsibility
     if isinstance(error, social_exceptions.AuthFailed) and error.args[0] == 'The request requires some interaction that is not allowed.':
+        # We thought user was connected on PE.fr, but in fact he wasn't, so we
+        # can't log the user in without interaction
         pass
     elif not isinstance(error, (
             social_exceptions.AuthCanceled,
