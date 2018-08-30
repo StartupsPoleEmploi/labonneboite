@@ -12,7 +12,7 @@ from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common.database import Base, db_session
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
+from labonneboite.common import user_util
 
 
 class User(CRUDMixin, UserMixin, Base):
@@ -26,8 +26,9 @@ class User(CRUDMixin, UserMixin, Base):
     __tablename__ = 'users'
 
     GENDERS = [
-        ('male', 'Homme'),
-        ('female', 'Femme'),
+        (user_util.GENDER_MALE, 'Homme'),
+        (user_util.GENDER_FEMALE, 'Femme'),
+        (user_util.GENDER_OTHER, 'Autre'),
     ]
 
     id = Column(Integer, primary_key=True)
@@ -53,13 +54,13 @@ class User(CRUDMixin, UserMixin, Base):
         return self.active
 
 
-def get_user_social_auth(user_id, provider=PEAMOpenIdConnect.name):
+def get_user_social_auth(user_id):
     """
-    Return the latest `UserSocialAuth` instance for the given `user_id` and `provider`.
+    Return the latest `UserSocialAuth` instance for the given `user_id`.
     """
     return (
         db_session.query(UserSocialAuth)
-        .filter_by(user_id=user_id, provider=provider)
+        .filter_by(user_id=user_id)
         .order_by(desc(UserSocialAuth.id))
         .first()
     )

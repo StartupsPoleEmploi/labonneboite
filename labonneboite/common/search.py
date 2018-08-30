@@ -1,14 +1,12 @@
 # coding: utf8
 
+from functools import lru_cache
 from datetime import datetime
 import collections
 import logging
 import unidecode
 
-import elasticsearch
-import elasticsearch.exceptions
 from slugify import slugify
-from functools import lru_cache
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import sorting
@@ -321,10 +319,7 @@ def fetch_companies(naf_codes, rome_codes, latitude, longitude, distance, aggreg
         **kwargs
     )
 
-    try:
-        sort = kwargs['sort']
-    except KeyError:
-        sort = sorting.SORT_FILTER_DEFAULT
+    sort = kwargs.get('sort', sorting.SORT_FILTER_DEFAULT)
 
     companies, companies_count, aggregations_raw = get_companies_from_es_and_db(
         json_body,
@@ -377,7 +372,7 @@ def aggregate_distance(aggregations_raw):
         try:
             label = KEY_TO_LABEL_DISTANCES[key]
         except KeyError as e:
-            e.args[0] = "Unknown distance_aggretions key : %s" % distance_aggregate['key']
+            # Unknown distance aggregation key
             logger.exception(e)
             continue
 
@@ -428,10 +423,7 @@ def build_json_body_elastic_search(
     # works based on the first of the romes. Not urgent, as multi rome is API only,
     # and also this would increase complexity of the ES sorting mechanism.
     rome_code = rome_codes[0]
-    score_for_rome_field_name = score_for_rome_field_names[0]
     boosted_rome_field_name = get_boosted_rome_field_name(hiring_type, rome_code)
-
-
 
     # Build filters.
     filters = []
@@ -706,9 +698,9 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         for siret in siret_list:
             try:
                 company = company_dict[siret]
-            except KeyError as e:
-                e.args[0] = "ES and DB out of sync: siret %s is in ES but not in DB - this should never happen" % siret
-                logger.exception(e)
+            except KeyError:
+                # ES and DB out of sync: siret is in ES but not in DB - this should never happen
+                logger.error("ES and DB out of sync: siret %s is in ES but not in DB - this should never happen", siret)
                 raise
             if company.has_city():
                 companies.append(company)
