@@ -8,6 +8,7 @@ from social_core.exceptions import AuthUnreachableProvider
 from social_core.backends.open_id_connect import OpenIdConnectAuth
 
 from labonneboite.conf import settings
+from labonneboite.common import user_util
 from .exceptions import AuthFailedMissingReturnValues
 
 
@@ -51,7 +52,7 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
                 'email': response.get('email', ''),  # Explicitly fallback to an empty string when there is no email.
                 # Mandatory fields.
                 'external_id': response['sub'],
-                'gender': response['gender'],
+                'gender': response.get('gender', user_util.GENDER_OTHER),
                 'first_name': response['given_name'],
                 'last_name': response.get('family_name'),
             }
