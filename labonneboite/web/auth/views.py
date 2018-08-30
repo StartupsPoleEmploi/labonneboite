@@ -2,7 +2,7 @@
 
 from urllib.parse import urlencode
 
-from flask import Blueprint, redirect, session, url_for
+from flask import Blueprint, redirect, session, url_for, render_template
 from flask_login import current_user, logout_user
 
 from labonneboite.common.models import get_user_social_auth
@@ -59,3 +59,7 @@ def logout_from_peam_callback():
     The route where a user is redirected after a log out through the PEAM website.
     """
     return redirect(url_for('root.home'))
+
+@authBlueprint.route('/iframe')
+def iframe():
+    return render_template("auth/iframe.html") if current_user.is_authenticated else ""

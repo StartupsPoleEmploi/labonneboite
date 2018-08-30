@@ -118,7 +118,6 @@ PEAM_CLIENT_ID = '<set it>'
 PEAM_CLIENT_SECRET = '<set it>'
 PEAM_AUTH_BASE_URL = '<set it>'
 PEAM_API_BASE_URL = '<set it>'
-PEAM_USERINFO_URL = '<set it>'
 MANDRILL_API_KEY = '<set it>'
 FORM_EMAIL = '<set it>'
 

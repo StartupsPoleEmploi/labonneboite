@@ -21,18 +21,18 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     AUTHORIZATION_URL = '%s/connexion/oauth2/authorize' % settings.PEAM_AUTH_BASE_URL
     ACCESS_TOKEN_URL = '%s/connexion/oauth2/access_token' % settings.PEAM_AUTH_BASE_URL
     REFRESH_TOKEN_URL = '%s/connexion/oauth2/access_token' % settings.PEAM_AUTH_BASE_URL
-    USERINFO_URL = settings.PEAM_USERINFO_URL
+    USERINFO_URL = '%s/partenaire/peconnect-individu/v1/userinfo' % settings.PEAM_API_BASE_URL
 
     def request_access_token(self, *args, **kwargs):
         kwargs['params'] = {'realm': '/individu'}
-        return self.get_json(*args, **kwargs)
+        result = self.get_json(*args, **kwargs)
+        return result
 
     def user_data(self, access_token, *args, **kwargs):
         url = self.userinfo_url()
         try:
             return self.get_json(
-                url,
-                params={'realm': '/individu'},
+                url, params={'realm': '/individu'},
                 headers={'Authorization': 'Bearer {0}'.format(access_token)}
             )
         except requests.HTTPError as e:
@@ -58,3 +58,11 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         except KeyError as e:
             # Sometimes PEAM responds without the user details.
             raise AuthFailedMissingReturnValues(*e.args)
+
+
+# pylint:disable=abstract-method
+class PEAMOpenIdConnectNoPrompt(PEAMOpenIdConnect):
+    name = 'peam-openidconnect-no-prompt'
+    # For some reason, the 'state' session parameter is not set by PE.fr, so we
+    # need to ignore it.
+    STATE_PARAMETER = False

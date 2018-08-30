@@ -268,6 +268,7 @@ def create_app():
         'js/tilkee.js',
         'js/tooltip.js',  # Depends on 'js/vendor/bootstrap-tooltip.js'.
         'js/unobfuscate.js',
+        'js/transparent-sso.js',
         filters='jsmin',
         output='gen/packed.%(version)s.js',
     )
@@ -330,7 +331,9 @@ def social_auth_error(error):
     """
     flash("Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
     # Don't log errors that are not our responsibility
-    if not isinstance(error, (
+    if isinstance(error, social_exceptions.AuthFailed) and error.args[0] == 'The request requires some interaction that is not allowed.':
+        pass
+    elif not isinstance(error, (
             social_exceptions.AuthCanceled,
             social_exceptions.AuthUnreachableProvider,
             social_exceptions.AuthStateForbidden,
