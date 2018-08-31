@@ -22,7 +22,8 @@ from labonneboite.common.load_data import load_city_codes
 from labonneboite.common import util
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
-
+from labonneboite.importer import settings as importer_settings
+ 
 
 logger = logging.getLogger('main')
 
@@ -307,9 +308,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return (100 * self.get_stars_for_rome_code(rome_code)) / 5
 
     def qualifies_for_alternance(self):
-        # Avoid importing importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
-        # to avoid mixing importer stuff and production.
-        return self.score_alternance >= 50
+        return self.score_alternance >= importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
 
     @property
     def url(self):

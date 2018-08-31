@@ -127,7 +127,6 @@ def reduce_scores_into_table(
         departements,
         target_table,
         select_fields,
-        drop_low_scores
     ):
     """
     Analog to a Map/Reduce operation.
@@ -148,11 +147,6 @@ def reduce_scores_into_table(
         departement_table = "etablissements_%s" % departement
         query = """insert into %s select %s from %s""" % (
             target_table, select_fields, departement_table)
-        if drop_low_scores:
-            query += " where score >= %s or score_alternance >= %s" % (
-                importer_settings.SCORE_REDUCING_MINIMUM_THRESHOLD,
-                importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD,
-            )
         try:
             run_raw_mysql_query(query)
             successes += 1
@@ -215,7 +209,6 @@ def reduce_scores_for_main_db(departements):
         departements=departements,
         target_table=importer_settings.SCORE_REDUCING_TARGET_TABLE,
         select_fields=get_select_fields_for_main_db(),
-        drop_low_scores=True
     )
 
 
@@ -226,7 +219,6 @@ def reduce_scores_for_backoffice(departements):
         departements=departements,
         target_table=importer_settings.BACKOFFICE_ETABLISSEMENT_TABLE,
         select_fields=get_select_fields_for_backoffice(),
-        drop_low_scores=False
     )
 
 

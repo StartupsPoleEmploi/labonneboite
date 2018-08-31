@@ -9,7 +9,7 @@ from cProfile import Profile
 from pyprof2calltree import convert
 from elasticsearch.exceptions import TransportError, NotFoundError
 from elasticsearch.helpers import bulk
-from sqlalchemy import inspect
+from sqlalchemy import inspect, and_, or_
 
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common.util import timeit
@@ -26,6 +26,7 @@ from labonneboite.common.load_data import load_ogr_labels, OGR_ROME_CODES
 from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
+from labonneboite.importer import settings as importer_settings
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 # use this instead if you wish to investigate from which logger exactly comes each line of log
@@ -414,7 +415,15 @@ def create_offices_for_departement(departement):
 
     logger.info("STARTED indexing offices for departement=%s ...", departement)
 
-    for _, office in enumerate(db_session.query(Office).filter_by(departement=departement).all()):
+    for _, office in enumerate(db_session.query(Office).filter(
+        and_(
+            Office.departement == departement,
+            or_(
+                Office.score >= importer_settings.SCORE_REDUCING_MINIMUM_THRESHOLD,
+                Office.score_alternance >= importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD,
+            ),
+        )
+    ).all()):
 
         st.increment_office_count()
 
