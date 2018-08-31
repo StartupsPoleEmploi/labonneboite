@@ -58,20 +58,22 @@ def activate_logging(flask_app):
     Activate the logging system.
     http://flask.pocoo.org/docs/0.12/errorhandling/
     """
-    # We are happy with how the flask app logger is configured, so we just copy
-    # its configuration for the main logger
     main_logger = logging.getLogger('main')
+    main_logger.setLevel(settings.LOG_LEVEL)
+    flask_app.logger.setLevel(settings.LOG_LEVEL)
+    engine.logger.setLevel(settings.LOG_LEVEL_DB_ENGINE)
+
+    # We are happy with how the flask app logger is configured, so we just copy
+    # its configuration for the main and sqlalchemy loggers
     for handler in flask_app.logger.handlers:
         main_logger.addHandler(handler)
+        engine.logger.addHandler(handler)
 
     if settings.SENTRY_DSN:
         Sentry(flask_app, dsn=settings.SENTRY_DSN, logging=True, level=logging.ERROR)
         flask_app.logger.debug("sentry is enabled")
     else:
         flask_app.logger.debug("sentry is disabled")
-
-    flask_app.logger.setLevel(settings.LOG_LEVEL)
-    main_logger.setLevel(settings.LOG_LEVEL)
 
 
 def register_extensions(flask_app):
@@ -207,17 +209,6 @@ def register_teardown_appcontext(flask_app):
     flask_app.teardown_appcontext(shutdown_session)
 
 
-def register_after_request(flask_app):
-    """
-    Register after_request functions.
-    """
-    def add_logging(response):
-        message = "new python request for %r" % request.url
-        flask_app.logger.debug(message)
-        return response
-    flask_app.after_request(add_logging)
-
-
 def create_app():
 
     flask_app = Flask(__name__)
@@ -244,7 +235,6 @@ def create_app():
     register_context_processors(flask_app)
     register_teardown_appcontext(flask_app)
     register_teardown_appcontext(flask_app)
-    register_after_request(flask_app)
 
     # Assets.
     assets = Environment(app=flask_app)

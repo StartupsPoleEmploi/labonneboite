@@ -2,6 +2,7 @@
 
 # http://flask.pocoo.org/docs/0.12/patterns/sqlalchemy/#declarative
 # http://docs.sqlalchemy.org/en/rel_1_1/
+import logging
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -34,7 +35,7 @@ def get_db_string(db_params=None):
 
 ENGINE_PARAMS = {
     'convert_unicode': True,
-    'echo': True if CURRENT_ENV == ENV_DEVELOPMENT else False,  # Output all SQL statements in console in dev mode.
+    'echo': False,
     'pool_recycle': 280,
 }
 

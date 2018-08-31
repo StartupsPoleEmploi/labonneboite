@@ -32,7 +32,7 @@ def write_file(office, data):
     with open(filename, "wb") as f:
         f.write(data)
     f.close()
-    logger.info("wrote PDF file to %s", filename)
+    logger.debug("wrote PDF file to %s", filename)
 
 
 def delete_file(office):
