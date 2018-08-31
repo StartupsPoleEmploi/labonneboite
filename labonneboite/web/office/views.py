@@ -7,11 +7,12 @@ from urllib.parse import urlencode
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
 
-from flask import abort, redirect, render_template, flash
+from flask import abort, redirect, render_template, flash, jsonify
 from flask import Blueprint, current_app
 from flask import make_response, send_file
 from flask import request, session, url_for
 
+from labonneboite.common import activity
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import util
 from labonneboite.common.email_util import MandrillClient
@@ -46,6 +47,7 @@ def details(siret):
         'company': company,
         'rome_code': rome_code,
     }
+    activity.log('details', siret=siret)
     return render_template('office/details.html', **context)
 
 
@@ -198,6 +200,8 @@ def download(siret):
     except NoResultFound:
         abort(404)
 
+    activity.log('telecharger-pdf', siret=siret)
+
     attachment_name = 'fiche_entreprise_%s.pdf' % slugify(office.name, separator='_')
     full_path = pdf_util.get_file_path(office)
     if os.path.exists(full_path):
@@ -221,3 +225,14 @@ def download(siret):
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
     return response
+
+
+@officeBlueprint.route('/events/toggle-details/<siret>', methods=['POST'])
+def toggle_details_event(siret):
+    try:
+        Office.query.filter(Office.siret == siret).one()
+    except NoResultFound:
+        abort(404)
+
+    activity.log('afficher-details', siret=siret)
+    return jsonify({})

@@ -9,6 +9,7 @@ from flask import abort, make_response, redirect, render_template, request, sess
 from flask import Blueprint
 from flask_login import current_user
 
+from labonneboite.common import activity
 from labonneboite.common import autocomplete
 from labonneboite.common import geocoding
 from labonneboite.common import doorbell
@@ -269,8 +270,20 @@ def entreprises():
     # Render different template if it's an ajax call
     template = 'search/results.html' if not request.is_xhr else 'search/results_content.html'
 
+    activity_log_properties = dict(
+        emploi=occupation,
+        localisation={
+            'nom': named_location.name if named_location else None,
+            'ville': named_location.city if named_location else None,
+            'codepostal': named_location.zipcode if named_location else None,
+            'latitude': location.latitude if location else None,
+            'longitude': location.longitude if location else None,
+        },
+    )
+
     # Stop here in case of invalid arguments
     if not form.validate() or job_doesnt_exist:
+        log_search_activity(activity_log_properties)
         return render_template(template, job_doesnt_exist=job_doesnt_exist, form=form)
 
     # Convert request arguments to fetcher parameters
@@ -357,7 +370,23 @@ def entreprises():
         'tile_server_url': settings.TILE_SERVER_URL,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
     }
+
+    activity_log_properties['distance'] = fetcher.distance
+    activity_log_properties['effectif'] = fetcher.headcount
+    activity_log_properties['tri'] = fetcher.sort
+    activity_log_sirets = [company.siret for company in companies]
+    activity.log_search(sirets=activity_log_sirets, count=company_count, page=current_page, **activity_log_properties)
+
     return render_template(template, **context)
+
+
+def log_search_activity(activity_log_properties, companies=None, company_count=None, page=None):
+    resultats = {
+        'page': page,
+        'total': company_count,
+        'sirets': [company.siret for company in companies] if companies is not None else None,
+    }
+    activity.log('recherche', resultats=resultats, **activity_log_properties)
 
 
 def get_canonical_results_url(zipcode, city, occupation):

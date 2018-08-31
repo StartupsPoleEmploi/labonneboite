@@ -128,6 +128,8 @@ var trackOutboundLink = function(url) {
         .not($resultContainer)
         .removeClass('active');
 
+      // Trigger event
+      $.post('/events/toggle-details/' + siret, {'csrf_token': CSRF_TOKEN});
     });
 
   };

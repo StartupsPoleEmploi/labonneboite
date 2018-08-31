@@ -683,7 +683,7 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
 
 
     es = Elasticsearch()
-    logger.info("Elastic Search request : %s", json_body)
+    logger.debug("Elastic Search request : %s", json_body)
     res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
 
     companies_count = res['hits']['total']

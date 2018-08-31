@@ -8,6 +8,7 @@ from social_core.exceptions import AuthUnreachableProvider
 from social_core.backends.open_id_connect import OpenIdConnectAuth
 
 from labonneboite.conf import settings
+from labonneboite.common import activity
 from labonneboite.common import user_util
 from .exceptions import AuthFailedMissingReturnValues
 
@@ -59,6 +60,11 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         except KeyError as e:
             # Sometimes PEAM responds without the user details.
             raise AuthFailedMissingReturnValues(*e.args)
+
+    def complete(self, *args, **kwargs):
+        user = super().complete(*args, **kwargs)
+        activity.log('connexion', user=user)
+        return user
 
 
 # pylint:disable=abstract-method

@@ -13,6 +13,7 @@ from flask_login import current_user
 from flask_wtf import csrf
 from social_flask_sqlalchemy.models import UserSocialAuth
 
+from labonneboite.common import activity
 from labonneboite.common.database import db_session
 from labonneboite.common.models import get_user_social_auth
 from labonneboite.common.models import Office
@@ -169,6 +170,7 @@ def favorites_add(siret):
 
     message = '"%s - %s" a été ajouté à vos favoris !' % (office.name, office.city)
     flash(Markup(message), 'success')
+    activity.log('ajout-favori', siret=siret)
 
     next_url = request.form.get('next')
     if next_url and util.is_safe_url(next_url):
@@ -199,6 +201,7 @@ def favorites_delete(siret):
 
     message = '"%s - %s" a été supprimé de vos favoris !' % (fav.office.name, fav.office.city)
     flash(message, 'success')
+    activity.log('suppression-favori', siret=siret)
 
     next_url = request.form.get('next')
     if next_url and util.is_safe_url(next_url):

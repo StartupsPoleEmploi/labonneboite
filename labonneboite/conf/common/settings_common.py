@@ -10,6 +10,7 @@ overrides/development.py
 overrides/test.py
 overrides/lbbdev.py
 """
+import logging
 import os
 
 from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
@@ -18,7 +19,12 @@ from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 DEBUG = False
 TESTING = False
 
-LOG_LEVEL = 'DEBUG'
+LOG_LEVEL = logging.INFO
+LOG_LEVEL_DB_ENGINE = logging.WARNING
+
+LOG_LEVEL_USER_ACTIVITY = logging.INFO
+LOGGING_HANDLER_USER_ACTIVITY = logging.StreamHandler()
+LOG_FORMAT_USER_ACTIVITY = '%(message)s'
 
 GLOBAL_STATIC_PATH = '/tmp'
 

@@ -231,6 +231,7 @@
   <script>
       {# Place global js variables here #} 
       window.USER_IS_AUTHENTICATED = {{ "true" if user.is_authenticated else "false" }};
+      window.CSRF_TOKEN = "{{ csrf_token() }}";
   </script>
   {% block scripts %}{% endblock %}
 
