@@ -109,3 +109,111 @@ textarea.form-error,
     font-size: 14px;  /* Fallback in `px` for browsers that don't support rem. */
     font-size: 0.875rem;
 }
+.coordinates-disclaimer {
+    margin: 35px 0 50px 0;
+}
+.checkbox-container input {
+    float: left;
+    display: inline-block;
+    margin-top: 5px;
+    margin-right: 15px;
+}
+.checkbox-container label {
+    margin-top: 0;
+}
+
+.action-chooser-form > a.btn {
+    display: block;
+    text-align: center;
+    padding: 15px;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+.action-chooser-form h2 {
+    margin-bottom: 50px;
+}
+
+.contact-form > div {
+    margin-top: 30px;
+}
+
+.contact-form #new_contact_mode {
+    list-style: none;
+    margin: 15px 0 0 0;
+    padding: 0;
+    display: flex;
+}
+@media (max-width: 800px) {
+    .contact-form #new_contact_mode {
+        display: inherit;
+        margin: 15px 0 0 30px;
+    }
+}
+.contact-form .submit-button .btn {
+    margin-top: 30px;
+    font-size: 1.2em;
+}
+.contact-form #new_contact_mode li {
+    flex: 1;
+}
+.required-text {
+    margin-bottom: 20px;
+    font-size: .75em
+}
+.contact-form #new_contact_mode li label {
+    display: inline;
+    font-weight: normal;
+}
+.mini-site-promotion {
+    margin-top: 50px;
+}
+
+/* Update jobs form */
+.update-jobs-form table,
+.update-jobs-form table th,
+.update-jobs-form table td {
+    border: none;
+}
+.update-jobs-form table th {
+    text-align: center;
+}
+
+.update-jobs-form table td {
+    padding: 15px;
+}
+.update-jobs-form table td input[type=checkbox]{
+    zoom: 1.25;
+    vertical-align: middle;
+}
+.update-jobs-form table tr.removed td {
+    background-color: #DDD;
+    opacity: .5;
+}
+.update-jobs-form .remove {
+    font-size: .9em;
+}
+.update-jobs-form .add-new-jobs {
+    margin: 40px 0 60px 0;
+}
+
+.success-message h2 {
+    margin-bottom: 30px;
+}
+.success-message ul {
+    list-style: none;
+    text-align: center;
+}
+.success-message a.btn {
+    font-size: 1em;
+}
+.success-message .actions {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+.success-message ul li {
+    display: inline-block;
+}
+.success-message ul li:first-child {
+    margin-right: 40px;
+    margin-bottom: 30px;
+}

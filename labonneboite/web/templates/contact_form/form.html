@@ -1,0 +1,51 @@
+{% if use_lba_template %}
+  {% extends 'base_lba.html' %}
+{% else %}
+  {% extends 'base.html' %}
+{% endif %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block scripts %}
+  {% assets "recruiter_form" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+{% endblock %}
+
+{% block content %}
+<div class="lbb-content">
+  <div class="lbb-single-column-content">
+
+    {% if not hide_return %}<a class="return-btn" href="{{ url_for('contact_form.ask_action') }}?{{ params }}">Retour</a>{% endif %}
+
+    <form class="form-vertical contact-form {{ extra_submit_class }}" action="" method="post">
+        <h2>{{ title }}</h2>
+
+        {% if show_coordinates_disclaimer %}
+        <p class="coordinates-disclaimer">Voici les coordonnées actuellement visibles sur les service La Bonne Boite et La Bonne alternance par les candidats, nous vous invitons à les compléter, modifier ou supprimer à votre guise puis à cliquer sur valider</p>
+        {% endif %}
+
+        {% if show_required_disclaimer %}
+          <div class="text-center required-text">Le remplissage des champs accompagnés d'une étoile '*' est obligatoire</div>
+        {% endif %}
+
+        {% include "includes/form_content.html" %}
+
+        {% if show_disclaimer %}
+          <p>* Lors de cette première étape d’identification, vos données personnelles nous permettent de lancer le processus de contrôle et ainsi valider votre légitimité à modifier une fiche entreprise. Vos données personnelles d’identification ne seront pas utilisées à d’autres fins.</p>
+        {% endif %}
+
+        {% if show_entreprise_page %}
+          <p class="mini-site-promotion">
+            Vous n’avez pas de site Web ou souhaitez être encore plus visible sur Internet, Pôle emploi vous propose de créer gratuitement et facilement un mini-site entreprise !
+            Pour plus d’information cliquez sur ce lien :
+            <a href="https://www.pole-emploi.fr/employeur/nouveaute-pourquoi-creer-une-page-entreprise--@/article.jspz?id=256395" title="Pourquoi créer une page entreprise ? (Ouverture dans une nouvelle fenêtre)" target="_blank">
+              Ma page entreprise
+            </a>
+          </p>
+        {% endif %}
+    </form>
+
+
+
+  </div>
+</div>
+{% endblock %}

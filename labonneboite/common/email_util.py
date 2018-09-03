@@ -9,6 +9,9 @@ from labonneboite.conf import settings
 logger = logging.getLogger('main')
 
 
+class MailNoSendException(Exception):
+    pass
+
 class EmailClient(object):
     to = settings.FORM_EMAIL
     from_email = settings.ADMIN_EMAIL
@@ -30,5 +33,5 @@ class MandrillClient(EmailClient):
             from_email=from_email)
         content = json.loads(response.content.decode())
         if content[0]["status"] != "sent":
-            raise Exception("email was not sent from %s to %s" % (from_email, to_email))
+            raise MailNoSendException("email was not sent from %s to %s" % (from_email, to_email))
         return response

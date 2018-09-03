@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name=viewport content="width=device-width, initial-scale=1">
+  <meta name="google-site-verification" content="u049KXeNisFhYyb2alIBRJGWP1E6Y0YFfgyk1nWH1Xs">
+  <title>{% block fulltitle %}{% block title %}{% endblock %} | La Bonne Boite{% endblock %}</title>
+
+  {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/lba-design.css') }}" type="text/css">
+</head>
+
+<body>
+  <header class="lbb-header-wrapper">
+    <a href="{{ url_for('root.home') }}" title="Aller sur la Bonne Boite - Ouverture dans une nouvelle fenêtre" target="_blank">
+      <img class="logo-lbb" src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite" width="74">
+    </a>
+    <a href="https://labonnealternance.pole-emploi.fr/" title="Aller sur la Bonne alternance - Ouverture dans une nouvelle fenêtre"  target="_blank">
+      <img src="{{ url_for('static', filename='images/logo-lba.svg') }}" alt="Logo La Bonne alternance">
+    </a>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="lbb-flash-alerts">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} js-alert-close">
+            <p>{{ message }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div id="content">{% block content %}{% endblock %}</div>
+
+  {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+
+  <script>
+      // Trigger our own ready event
+      (function($){
+          $(document).ready(function() {
+            $(document).trigger('lbbready');
+          });
+      })(jQuery);
+  </script>
+
+</body>
+</html>

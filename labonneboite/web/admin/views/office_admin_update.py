@@ -1,15 +1,39 @@
-# coding: utf8
+# coding: utf
+import logging
+
 from flask import flash, request
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView
 from wtforms import validators
+from sqlalchemy.orm.exc import NoResultFound
 
 from labonneboite.common import mapping as mapping_util
-from labonneboite.common.models import Office, OfficeAdminUpdate
+from labonneboite.common import models
 from labonneboite.common.siret import is_siret
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter, siret_validator
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
+
+logger = logging.getLogger('main')
+
+UPDATE_STYLE = 'border: solid 5px green'
+DESCRIPTION_TEMPLATE = '<strong style="color: red;">Ancienne valeur : {}</strong><br>{}'
+
+CONTACT_MODES_ITEMS = (
+    ('email', 'Envoyez votre candidature par mail'),
+    ('mail', 'Envoyez votre candidature par courrier'),
+    ('office', 'Présentez vous directement à l\'entreprise'),
+    ('website', 'Postulez via le site internet de l\'entreprise'),
+    ('phone', 'Contactez l\'entreprise par téléphone'),
+)
+CONTACT_MODES = dict(CONTACT_MODES_ITEMS)
+
+HIDE_CHECKBOXES = {
+    'new_email': 'remove_email',
+    'new_phone': 'remove_phone',
+    'new_website': 'remove_website',
+}
+
 
 class RomeToRemoveException(Exception):
     pass
@@ -19,6 +43,14 @@ class RomeToBoostException(Exception):
 
 class InvalidRome(Exception):
     pass
+
+
+def is_empty_field(value):
+    """
+    Specific function for detecing empty value
+    We don't use 'if' because the field could be a boolean
+    """
+    return value is None or value == ''
 
 
 class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
@@ -263,29 +295,155 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     }
 
     def create_form(self):
+        # Call only when a form is created
         form = super(OfficeAdminUpdateModelView, self).create_form()
-        if 'siret' in request.args:
-            form.sirets.data = request.args['siret']
-        if 'name' in request.args:
-            form.name.data = request.args['name']
-        if 'requested_by_email' in request.args:
-            form.requested_by_email.data = request.args['requested_by_email']
-        if 'requested_by_first_name' in request.args:
-            form.requested_by_first_name.data = request.args['requested_by_first_name']
-        if 'requested_by_last_name' in request.args:
-            form.requested_by_last_name.data = request.args['requested_by_last_name']
-        if 'requested_by_phone' in request.args:
-            form.requested_by_phone.data = request.args['requested_by_phone']
-        if 'reason' in request.args:
-            form.reason.data = request.args['reason']
+        return self.prefill_form(form)
+
+    def on_form_prefill(self, form, id):
+        # Call only when a form is updated
+        return self.prefill_form(form, id)
+
+    def prefill_form(self, form, form_id=None):
+        """
+        When the form is creating, we retrieve the recruiter_message (based on 'recruiter_message_id' and 'recruiter_message_type' (if given)
+        Then, for each field of the recruiter message, we compare it with the OfficeAdminUpdate stored in database.
+        If changes, we give to the field a specific design (added in `form_widget_args`) and fill the form field with the new value.
+
+        Return:
+            The form updated with the new values and new field styles (if recruiter_message)
+        """
+        # Clean all styles before all
+        self.form_widget_args = {}
+
+        recruiter_message_id = request.args.get('recruiter_message_id', '')
+        recruiter_message_type = request.args.get('recruiter_message_type', '')
+        if not recruiter_message_id or not recruiter_message_type:
+            return form
+        try:
+            recruiter_message = self.get_recruiter_message(recruiter_message_id, recruiter_message_type)
+        except NoResultFound as e:
+            logger.exception(e) # Should not happen
+            return form
+
+        # Set sirets field on creation
+        if form_id is None:
+            self.form_widget_args.update({'sirets':{'style': UPDATE_STYLE}})
+            form.sirets.data = recruiter_message.siret
+
+
+        office_admin_update = models.OfficeAdminUpdate.query.filter(models.OfficeAdminUpdate.id == form_id).first()
+
+        # Common behavior
+        self.handle_diff('requested_by_last_name', recruiter_message.requested_by_last_name, office_admin_update, form)
+        self.handle_diff('requested_by_first_name', recruiter_message.requested_by_first_name, office_admin_update, form)
+        self.handle_diff('requested_by_email', recruiter_message.requested_by_email, office_admin_update, form)
+        self.handle_diff('requested_by_first_name', recruiter_message.requested_by_first_name, office_admin_update, form)
+        self.handle_diff('requested_by_last_name', recruiter_message.requested_by_last_name, office_admin_update, form)
+        self.handle_diff('requested_by_phone', recruiter_message.requested_by_phone.replace(" ", ""), office_admin_update, form)
+
+        if recruiter_message_type == models.UpdateCoordinatesRecruiterMessage.name:
+            self.handle_diff('new_website', recruiter_message.new_website, office_admin_update, form)
+            self.handle_diff('new_email', recruiter_message.new_email, office_admin_update, form)
+            self.handle_diff('new_phone', recruiter_message.new_phone.replace(" ", ""), office_admin_update, form)
+            self.handle_diff('social_network', recruiter_message.social_network, office_admin_update, form)
+            self.handle_diff('phone_alternance', recruiter_message.new_phone_alternance.replace(" ", ""), office_admin_update, form)
+            self.handle_diff('email_alternance', recruiter_message.new_email_alternance, office_admin_update, form)
+            self.handle_diff('contact_mode', CONTACT_MODES.get(recruiter_message.contact_mode, ''), office_admin_update, form)
+
+        elif recruiter_message_type == models.RemoveRecruiterMessage.name:
+            # The field is a boolean in contact form but an integer in the OfficeAdminpdate
+            new_score = 0 if recruiter_message.remove_lbb else form.score.data
+            new_score_alternance = 0 if recruiter_message.remove_lba else form.score_alternance.data
+            self.handle_diff('score', new_score, office_admin_update, form)
+            self.handle_diff('score_alternance', new_score_alternance, office_admin_update, form)
+
+        elif recruiter_message_type == models.UpdateJobsRecruiterMessage.name:
+            self.handle_diff('romes_to_boost', self.format(recruiter_message.romes_to_add), office_admin_update, form)
+            self.handle_diff('romes_alternance_to_boost', self.format(recruiter_message.romes_alternance_to_add), office_admin_update, form)
+            self.handle_diff('romes_to_remove', self.format(recruiter_message.romes_to_remove), office_admin_update, form)
+            self.handle_diff('romes_alternance_to_remove', self.format(recruiter_message.romes_alternance_to_remove), office_admin_update, form)
+
+        elif recruiter_message_type == models.OtherRecruiterMessage.name:
+            self.handle_diff('reason', recruiter_message.comment, office_admin_update, form)
 
         return form
+
+
+    def handle_diff(self, form_field, new_value, office_admin_update, form):
+        """
+        This method compare the current OfficeAdminUpdate with the recruiterMessage given for a specific field.
+        If a field has a new value, the field will be highlight a specific design and the old value
+        will be added in the description.
+
+        If there is no officeAdminUpdate, we only fill the form field
+        """
+
+        # OfficeAdminUpdate's creation (when there is no office_admin_update)
+        if office_admin_update is None:
+            # So we only set the value
+            if not is_empty_field(new_value):
+                self.form_widget_args.update({form_field:{'style': UPDATE_STYLE}})
+                form[form_field].data = new_value
+
+            if form_field in HIDE_CHECKBOXES and not new_value:
+                self.check_checkbox(form, HIDE_CHECKBOXES[form_field])
+            return
+
+
+        # OfficeAdminUpdate update
+        current_value = getattr(office_admin_update, form_field)
+
+        # Handle None and empty string value
+        if is_empty_field(current_value) and is_empty_field(new_value):
+            self.form_widget_args.update({form_field:{'style': UPDATE_STYLE}})
+            return
+
+
+
+        if current_value != new_value:
+            form[form_field].data = new_value
+            self.form_widget_args.update({form_field:{'style': UPDATE_STYLE}})
+
+            # For phone, website and e-mail, we need to check the hide checkbox if recruiter send an empty string (or refill it)
+            if form_field in HIDE_CHECKBOXES:
+                checkbox_field_name = HIDE_CHECKBOXES[form_field]
+
+                checkbox_field = getattr(office_admin_update, checkbox_field_name)
+
+                if not checkbox_field and current_value and not new_value:
+                    self.check_checkbox(form, checkbox_field_name)
+                # or at contrary, unchecked it if a new value have been send
+                elif checkbox_field and new_value:
+                    self.uncheck_checkbox(form, checkbox_field_name)
+
+
+            # Update description with old value, added to the current description
+            current_description = self.column_descriptions.get(form_field, '')
+            new_description = Markup.escape(DESCRIPTION_TEMPLATE.format(current_value, current_description))
+            form[form_field].description = new_description
+
+
+        # Handle None and empty string value
+        if is_empty_field(current_value) and is_empty_field(new_value):
+            return
+
+
+    def check_checkbox(self, form, checkbox_field_name):
+        checkbox_current_description = self.column_descriptions.get(checkbox_field_name, '')
+        form[checkbox_field_name].data = True
+        form[checkbox_field_name].description = Markup(DESCRIPTION_TEMPLATE.format("Case non cochée", checkbox_current_description))
+
+    def uncheck_checked(self, form, checkbox_field_name):
+            checkbox_current_description = self.column_descriptions.get(checkbox_field_name, '')
+            form[checkbox_field_name].data = False
+            form[checkbox_field_name].description = Markup(DESCRIPTION_TEMPLATE.format("Case cochée", checkbox_current_description))
+
 
     def validate_form(self, form):
         is_valid = super(OfficeAdminUpdateModelView, self).validate_form(form)
 
         # All sirets must be well formed
-        sirets = OfficeAdminUpdate.as_list(form.data['sirets'])
+        sirets = models.OfficeAdminUpdate.as_list(form.data['sirets'])
         only_one_siret = len(sirets) == 1
 
         if is_valid and not sirets:
@@ -304,23 +462,25 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         # If more than one siret : no siret validation
         if is_valid and only_one_siret:
             siret = sirets[0]
-            office = Office.query.filter_by(siret=siret).first()
+            office = models.Office.query.filter_by(siret=siret).first()
             if not office:
                 message = "Le siret suivant n'est pas présent sur LBB: {}".format(siret)
                 flash(message, 'error')
                 return False
 
         if is_valid:
+
+            # Show old value in description
             for siret in sirets:
                 if 'id' in request.args:
                     # Avoid conflict with itself if update by adding id != request.args['id']
-                    office_update_conflict = OfficeAdminUpdate.query.filter(
-                        OfficeAdminUpdate.sirets.like("%{}%".format(siret)),
-                        OfficeAdminUpdate.id != request.args['id']
+                    office_update_conflict = models.OfficeAdminUpdate.query.filter(
+                        models.OfficeAdminUpdate.sirets.like("%{}%".format(siret)),
+                        models.OfficeAdminUpdate.id != request.args['id']
                     )
                 else:
-                    office_update_conflict = OfficeAdminUpdate.query.filter(
-                        OfficeAdminUpdate.sirets.like("%{}%".format(siret))
+                    office_update_conflict =models. OfficeAdminUpdate.query.filter(
+                        models.OfficeAdminUpdate.sirets.like("%{}%".format(siret))
                     )
 
                 if office_update_conflict.count() > 0:
@@ -332,7 +492,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
 
         # Get company
-        first_office = Office.query.filter_by(siret=sirets[0]).first() if sirets else None
+        first_office = models.Office.query.filter_by(siret=sirets[0]).first() if sirets else None
 
         # Codes ROMES to boost or to add
         if is_valid and form.data.get('romes_to_boost'):
@@ -373,7 +533,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         if is_valid and form.data.get('nafs_to_add'):
             nafs_to_add = form.data.get('nafs_to_add')
 
-            for naf in OfficeAdminUpdate.as_list(nafs_to_add):
+            for naf in models.OfficeAdminUpdate.as_list(nafs_to_add):
                 if naf not in settings.NAF_CODES:
                     msg = "`%s` n'est pas un code NAF valide." % naf
                     flash(msg, 'error')
@@ -389,7 +549,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     def validate_romes_to_remove(self, form, romes_to_remove_field, office_naf=None):
         romes_to_remove = form.data.get(romes_to_remove_field)
 
-        for rome in OfficeAdminUpdate.as_list(romes_to_remove):
+        for rome in models.OfficeAdminUpdate.as_list(romes_to_remove):
             self.validate_rome(rome, romes_to_remove_field)
 
             if office_naf:
@@ -410,7 +570,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             raise RomeToBoostException(msg)
 
 
-        for rome in OfficeAdminUpdate.as_list(romes_to_boost):
+        for rome in models.OfficeAdminUpdate.as_list(romes_to_boost):
             self.validate_rome(rome, romes_boost_field)
 
 
@@ -421,3 +581,24 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 self.column_labels[field_name]
             )
             raise InvalidRome(msg)
+
+
+    def format(self, romes_str, char=','):
+        return romes_str.replace(char, models.OfficeAdminUpdate.SEPARATORS[0])
+
+
+    def get_recruiter_message(self, message_id, message_type):
+        MESSAGE_CLASSES = {
+            models.UpdateCoordinatesRecruiterMessage.name: models.UpdateCoordinatesRecruiterMessage,
+            models.RemoveRecruiterMessage.name: models.RemoveRecruiterMessage,
+            models.UpdateJobsRecruiterMessage.name: models.UpdateJobsRecruiterMessage,
+            models.OtherRecruiterMessage.name: models.OtherRecruiterMessage,
+        }
+
+        try:
+            recruiter_message = MESSAGE_CLASSES[message_type].query.filter_by(id=message_id).one()
+        except NoResultFound as e:
+            e.message = 'No recruiter message found => type: {} & id: {}'.format(message_id,message_type)
+            raise
+
+        return recruiter_message

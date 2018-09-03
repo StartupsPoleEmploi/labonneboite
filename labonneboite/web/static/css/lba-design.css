@@ -1,0 +1,116 @@
+/* Header */
+.lbb-header-wrapper {
+    text-align: center;
+    height: 100px;
+}
+
+.lbb-header-wrapper a {
+    text-decoration: none;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.lbb-header-wrapper a img {
+    padding-top: 30px;
+}
+
+.lbb-header-wrapper a img.logo-lbb {
+    padding-top: 20px;
+    margin-right: 20px;
+}
+
+/* Form */
+form input[type=text],
+form input[type=tel],
+form input[type=email],
+form input[type=url] {
+    border-radius: 20px;
+    display: inline-block;
+    border: 1px solid #a9a9a9;
+    padding: 10px 20px;
+    margin: 3px 0;
+    color: black;
+    font-size: .85em;
+}
+
+.form-help-text, .required-text {
+    font-size: .75em;
+}
+.required-text { margin-top: 10px; }
+
+label {
+    font-weight: normal !important;
+}
+input[type=submit], button, a.btn.btn-small {
+    background-color: #066ee7 !important;
+    color: #fff !important;
+    border-radius: 20px !important;
+    padding: 8px 60px;
+    font-weight: 700;
+    text-decoration: none;
+    border: none !important;
+    font-size: 1.25em;
+}
+a.btn.btn-small {
+    font-size: 1.1em;
+}
+
+/* Action chooser form */
+.action-chooser-form {
+    background: white;
+    padding: 40px 80px 80px 80px;
+}
+.action-chooser-form a.btn.btn-small {
+    margin-bottom: 40px;
+    padding: 30px 0;
+}
+
+input[type=submit]:hover, button:hover, a.btn {
+    cursor: pointer;
+    background-color: #0562ce;
+}
+.submit-button {
+    text-align: center;
+}
+
+/* Specific form page */
+body {
+    background: -webkit-gradient(linear,left bottom,right top,from(cyan),color-stop(blue),color-stop(purple),to(#f0f));
+    background: -webkit-linear-gradient(bottom left,cyan,blue,purple,#f0f);
+    background: -o-linear-gradient(bottom left,cyan,blue,purple,#f0f);
+    background: linear-gradient(to top right,cyan,blue,purple,#f0f);
+    min-height: 100vh;
+}
+.lbb-single-column-content {
+    max-width: 1050px;
+}
+.lbb-footer-wrapper, #content {
+    background: transparent;
+    background-color: transparent;
+}
+form, .success-message {
+    background: white;
+    padding: 30px 50px;
+    margin-top: 10px;
+}
+
+h2 {
+    display: block;
+    font-size: .1.75em;
+    color: #444;
+}
+a.return-btn {
+    color: white;
+    text-transform: lowercase;
+    font-size: .85em;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.update-jobs-form table td,
+.update-jobs-form table th,
+.update-jobs-form table { border: none; background-color: white; }
+.update-jobs-form table { margin-bottom: 50px; }
+.update-jobs-form button.remove { padding: 5px 15px; }
+
+.add-new-jobs { margin-bottom: 50px; }

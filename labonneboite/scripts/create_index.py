@@ -22,7 +22,7 @@ from labonneboite.common import hiring_type_util
 from labonneboite.common import es
 from labonneboite.common.search import fetch_companies
 from labonneboite.common.database import db_session
-from labonneboite.common.load_data import load_ogr_labels, load_ogr_rome_mapping
+from labonneboite.common.load_data import load_ogr_labels, OGR_ROME_CODES
 from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
@@ -171,7 +171,7 @@ def create_job_codes():
     # libelles des appelations pour les codes ROME
     ogr_labels = load_ogr_labels()
     # correspondance appellation vers rome
-    ogr_rome_codes = load_ogr_rome_mapping()
+    ogr_rome_codes = OGR_ROME_CODES
     actions = []
 
     for ogr, description in ogr_labels.items():
@@ -619,7 +619,7 @@ def update_offices_geolocations():
 
 @timeit
 def sanity_check_rome_codes():
-    ogr_rome_mapping = load_ogr_rome_mapping()
+    ogr_rome_mapping = OGR_ROME_CODES
     rome_labels = settings.ROME_DESCRIPTIONS
     rome_naf_mapping = mapping_util.MANUAL_ROME_NAF_MAPPING
 

@@ -5,6 +5,12 @@
     display: none !important;
 }
 
+.sr-only {
+    position: absolute;
+    left: -1000px;
+    top: -1000px;
+}
+
 .break-word {
     word-wrap: break-word;
 }
@@ -23,6 +29,10 @@
 
 .text-bold {
     font-weight: bold;
+}
+
+.text-underline {
+    text-decoration: underline;
 }
 
 .lbb-green {
