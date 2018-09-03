@@ -334,19 +334,25 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         office_admin_update = models.OfficeAdminUpdate.query.filter(models.OfficeAdminUpdate.id == form_id).first()
 
         # Common behavior
+        recruiter_phone = recruiter_message.requested_by_phone.replace(" ", "") if recruiter_message.requested_by_phone else None
+
         self.handle_diff('requested_by_last_name', recruiter_message.requested_by_last_name, office_admin_update, form)
         self.handle_diff('requested_by_first_name', recruiter_message.requested_by_first_name, office_admin_update, form)
         self.handle_diff('requested_by_email', recruiter_message.requested_by_email, office_admin_update, form)
         self.handle_diff('requested_by_first_name', recruiter_message.requested_by_first_name, office_admin_update, form)
         self.handle_diff('requested_by_last_name', recruiter_message.requested_by_last_name, office_admin_update, form)
-        self.handle_diff('requested_by_phone', recruiter_message.requested_by_phone.replace(" ", ""), office_admin_update, form)
+        self.handle_diff('requested_by_phone', recruiter_phone, office_admin_update, form)
+
 
         if recruiter_message_type == models.UpdateCoordinatesRecruiterMessage.name:
+            new_phone = recruiter_message.new_phone.replace(" ", "") if recruiter_message.new_phone else None
+            new_phone_alternance = recruiter_message.new_phone_alternance.replace(" ", "") if recruiter_message.new_phone_alternance else None
+
             self.handle_diff('new_website', recruiter_message.new_website, office_admin_update, form)
             self.handle_diff('new_email', recruiter_message.new_email, office_admin_update, form)
-            self.handle_diff('new_phone', recruiter_message.new_phone.replace(" ", ""), office_admin_update, form)
+            self.handle_diff('new_phone', new_phone, office_admin_update, form)
             self.handle_diff('social_network', recruiter_message.social_network, office_admin_update, form)
-            self.handle_diff('phone_alternance', recruiter_message.new_phone_alternance.replace(" ", ""), office_admin_update, form)
+            self.handle_diff('phone_alternance', new_phone_alternance, office_admin_update, form)
             self.handle_diff('email_alternance', recruiter_message.new_email_alternance, office_admin_update, form)
             self.handle_diff('contact_mode', CONTACT_MODES.get(recruiter_message.contact_mode, ''), office_admin_update, form)
 
@@ -419,7 +425,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
             # Update description with old value, added to the current description
             current_description = self.column_descriptions.get(form_field, '')
-            new_description = Markup.escape(DESCRIPTION_TEMPLATE.format(current_value, current_description))
+            new_description = Markup(DESCRIPTION_TEMPLATE.format(Markup.escape(current_value), current_description))
             form[form_field].description = new_description
 
 
@@ -584,7 +590,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
 
     def format(self, romes_str, char=','):
-        return romes_str.replace(char, models.OfficeAdminUpdate.SEPARATORS[0])
+        return romes_str.replace(char, models.OfficeAdminUpdate.SEPARATORS[0]) if romes_str else romes_str
 
 
     def get_recruiter_message(self, message_id, message_type):
