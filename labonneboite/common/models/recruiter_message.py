@@ -78,7 +78,6 @@ class UpdateCoordinatesRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base)
     new_phone_alternance = Column(mysql.TINYTEXT, nullable=True)
     social_network = Column(mysql.TINYTEXT, nullable=True)
 
-    @classmethod
     def fill_values(self, form):
         self.new_website = form.new_website.data
         self.new_email = form.new_email.data
@@ -98,7 +97,6 @@ class UpdateJobsRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
     romes_alternance_to_add = Column(mysql.TINYTEXT, nullable=True)
     romes_alternance_to_remove = Column(mysql.TINYTEXT, nullable=True)
 
-    @classmethod
     def fill_values(self, form):
         try:
             office = Office.query.filter(Office.siret == form.siret.data).first()
