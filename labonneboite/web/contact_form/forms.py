@@ -75,4 +75,9 @@ def compute_romes():
     return extract_romes(), extract_romes('lbb'), extract_romes('lba'), extract_romes('hide')
 
 def extract_romes(expected_value=None):
-    return list([key for key, value in request.form if key in ROME_CODES and (expected_value is None or expected_value in value)])
+    return list(
+        [
+            key for key, value in dict(request.form).items()
+            if key in ROME_CODES and (expected_value is None or expected_value in value)
+        ]
+    )
