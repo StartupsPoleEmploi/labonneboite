@@ -1,6 +1,6 @@
 {% if use_lba_template %} {% extends 'base_lba.html' %} {% else %} {% extends 'base.html' %} {% endif %}
 
-{% block scripts %}
+{% block footer_scripts %}
   {% assets "recruiter_form" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
 {% endblock %}
 

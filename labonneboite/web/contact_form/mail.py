@@ -10,7 +10,6 @@ from labonneboite.common.email_util import MandrillClient
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.common import models
 from labonneboite.web.contact_form import forms
-from labonneboite.common.load_data import ROME_CODES
 
 def compute_action_name(form):
     form_to_action = {
@@ -189,8 +188,8 @@ def make_save_suggestion(form, recruiter_message, recruiter_message_type):
         if office_admin_remove:
             url = url_for("officeadminremove.edit_view", id=office_admin_remove.id, _external=True, **params)
             return "Entreprise retirée via Save : <a href='{}'>Voir la fiche de suppression</a>".format(url)
-        else:
-            return 'Aucune entreprise trouvée avec le siret {}'.format(form.siret.data)
+
+        return 'Aucune entreprise trouvée avec le siret {}'.format(form.siret.data)
 
     # OfficeAdminAdd already exists ?
     office_admin_add = OfficeAdminAdd.query.filter_by(siret=form.siret.data).first()
@@ -199,7 +198,10 @@ def make_save_suggestion(form, recruiter_message, recruiter_message_type):
         return "Entreprise créée via Save : <a href='{}'>Voir la fiche d'ajout</a>".format(url)
 
     # OfficeAdminUpdate already exits ?
-    office_admin_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets.like("%{}%".format(form.siret.data))).first()
+    office_admin_update = OfficeAdminUpdate.query.filter(
+        OfficeAdminUpdate.sirets.like("%{}%".format(form.siret.data))
+    ).first()
+
     if office_admin_update:
         url = url_for("officeadminupdate.edit_view", id=office_admin_update.id, _external=True, **params)
         return "Entreprise modifiée via Save : <a href='{}'>Voir la fiche de modification</a>".format(url)

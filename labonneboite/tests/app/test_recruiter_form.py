@@ -124,7 +124,8 @@ class FormContactMailTest(DatabaseTest):
     def test_new_coordinates(self):
         with app.app_context():
             form = create_update_coordinates_form()
-            mail_content = mail.generate_update_coordinates_mail(form, models.UpdateCoordinatesRecruiterMessage.create_from_form(form))
+            recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(form)
+            mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
 
             contact_mode_label = forms.CONTACT_MODES_LABELS.get(form.new_contact_mode, '')
             contact_mode_expected = 'Mode de contact à privilégier : {}'.format(contact_mode_label)
@@ -147,10 +148,17 @@ class FormContactMailTest(DatabaseTest):
                 create_office()
 
                 form = create_update_jobs_form()
-                mail_content = mail.generate_update_jobs_mail(form, models.UpdateJobsRecruiterMessage.create_from_form(form))
+                recruiter_message = models.UpdateJobsRecruiterMessage.create_from_form(form)
+                mail_content = mail.generate_update_jobs_mail(form, recruiter_message)
 
-                self.assertIn('Romes à ajouter LBB : <ul><li>Ecriture d\'ouvrages, de livres (E1102)</li></ul>', mail_content)
-                self.assertIn('Romes à ajouter LBA : <ul><li>Ecriture d\'ouvrages, de livres (E1102)</li></ul>', mail_content)
+                self.assertIn(
+                    'Romes à ajouter LBB : <ul><li>Ecriture d\'ouvrages, de livres (E1102)</li></ul>',
+                    mail_content
+                )
+                self.assertIn(
+                    'Romes à ajouter LBA : <ul><li>Ecriture d\'ouvrages, de livres (E1102)</li></ul>',
+                    mail_content
+                )
 
 
 class CreateFormContactDatabase(DatabaseTest):

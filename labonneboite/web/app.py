@@ -265,7 +265,14 @@ def create_app():
         output='gen/packed.%(version)s.js',
     )
     assets.register('js_all', js)
-    assets.register('recruiter_form', Bundle('js/recruiter-forms.js', filters='jsmin',output='gen/packed.recruiter_form.%(version)s.js',))
+
+    assets.register(
+        'recruiter_form',
+        Bundle('js/recruiter-forms.js',
+        filters='jsmin',
+        output='gen/packed.recruiter_form.%(version)s.js',)
+    )
+
     css = Bundle(
         # LBB.
         'css/_base.css',  # Order is important.

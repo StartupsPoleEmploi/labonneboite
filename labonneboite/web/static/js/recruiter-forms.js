@@ -42,7 +42,7 @@
     $tr.addClass('removed');
     $nestedInputs.each(function(index, el) { $(el).prop('checked', false); });
     $hideInput.prop('checked', true);
-    $input.text('Restaurer');
+    $input.text('Rajouter');
   }
 
   function enableRow($tr, checkAll) {
