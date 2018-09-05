@@ -1,5 +1,6 @@
 # coding: utf
 import logging
+from contextlib import suppress
 
 from flask import flash, request
 from flask import Markup
@@ -10,7 +11,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import models
 from labonneboite.common.siret import is_siret
-from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter, siret_validator
+from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
 
@@ -181,10 +182,11 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             "<br>"
             "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
         ),
-        'romes_to_remove': Markup(
+        'romes_alternance_to_remove': Markup(
             "Veuillez entrer un ROME par ligne."
             "<br>"
-            "Si ce champ est renseigné, le(s) ROME spécifié(s) ne seront plus associés à cette entreprise - pour l'alternance."
+            "Si ce champ est renseigné, le(s) ROME spécifié(s) "
+            "ne seront plus associés à cette entreprise - pour l'alternance."
             "<br>"
             "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
         ),
@@ -305,9 +307,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
     def prefill_form(self, form, form_id=None):
         """
-        When the form is creating, we retrieve the recruiter_message (based on 'recruiter_message_id' and 'recruiter_message_type' (if given)
+        When the form is creating, we retrieve the recruiter_message
+        based on 'recruiter_message_id' and 'recruiter_message_type' (if given).
+
         Then, for each field of the recruiter message, we compare it with the OfficeAdminUpdate stored in database.
-        If changes, we give to the field a specific design (added in `form_widget_args`) and fill the form field with the new value.
+        If changes, we give to the field a specific design (added in `form_widget_args`) and fill the form field
+        with the new value.
 
         Return:
             The form updated with the new values and new field styles (if recruiter_message)
@@ -325,28 +330,45 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             logger.exception(e) # Should not happen
             return form
 
-        # Set sirets field on creation
+        # Set sirets and office name fields on creation
         if form_id is None:
             self.form_widget_args.update({'sirets':{'style': UPDATE_STYLE}})
             form.sirets.data = recruiter_message.siret
+            with suppress(NoResultFound):
+                office = models.Office.query.filter(models.Office.siret == recruiter_message.siret).one()
+                self.form_widget_args.update({'name':{'style': UPDATE_STYLE}})
+                form.name.data = office.name
 
 
         office_admin_update = models.OfficeAdminUpdate.query.filter(models.OfficeAdminUpdate.id == form_id).first()
 
         # Common behavior
-        recruiter_phone = recruiter_message.requested_by_phone.replace(" ", "") if recruiter_message.requested_by_phone else None
+        recruiter_phone = recruiter_message.requested_by_phone
+        recruiter_phone = recruiter_phone.replace(" ", "") if recruiter_phone else None
 
         self.handle_diff('requested_by_last_name', recruiter_message.requested_by_last_name, office_admin_update, form)
-        self.handle_diff('requested_by_first_name', recruiter_message.requested_by_first_name, office_admin_update, form)
+        self.handle_diff(
+            'requested_by_first_name',
+            recruiter_message.requested_by_first_name,
+            office_admin_update,
+            form
+        )
         self.handle_diff('requested_by_email', recruiter_message.requested_by_email, office_admin_update, form)
-        self.handle_diff('requested_by_first_name', recruiter_message.requested_by_first_name, office_admin_update, form)
+        self.handle_diff(
+            'requested_by_first_name',
+            recruiter_message.requested_by_first_name,
+            office_admin_update,
+            form
+        )
         self.handle_diff('requested_by_last_name', recruiter_message.requested_by_last_name, office_admin_update, form)
         self.handle_diff('requested_by_phone', recruiter_phone, office_admin_update, form)
 
 
         if recruiter_message_type == models.UpdateCoordinatesRecruiterMessage.name:
             new_phone = recruiter_message.new_phone.replace(" ", "") if recruiter_message.new_phone else None
-            new_phone_alternance = recruiter_message.new_phone_alternance.replace(" ", "") if recruiter_message.new_phone_alternance else None
+
+            new_phone_alternance = recruiter_message.new_phone_alternance
+            new_phone_alternance = new_phone_alternance.replace(" ", "") if new_phone_alternance else None
 
             self.handle_diff('new_website', recruiter_message.new_website, office_admin_update, form)
             self.handle_diff('new_email', recruiter_message.new_email, office_admin_update, form)
@@ -354,7 +376,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             self.handle_diff('social_network', recruiter_message.social_network, office_admin_update, form)
             self.handle_diff('phone_alternance', new_phone_alternance, office_admin_update, form)
             self.handle_diff('email_alternance', recruiter_message.new_email_alternance, office_admin_update, form)
-            self.handle_diff('contact_mode', CONTACT_MODES.get(recruiter_message.contact_mode, ''), office_admin_update, form)
+            self.handle_diff(
+                'contact_mode',
+                CONTACT_MODES.get(recruiter_message.contact_mode, ''),
+                office_admin_update,
+                form
+            )
 
         elif recruiter_message_type == models.RemoveRecruiterMessage.name:
             # The field is a boolean in contact form but an integer in the OfficeAdminpdate
@@ -365,9 +392,24 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
         elif recruiter_message_type == models.UpdateJobsRecruiterMessage.name:
             self.handle_diff('romes_to_boost', self.format(recruiter_message.romes_to_add), office_admin_update, form)
-            self.handle_diff('romes_alternance_to_boost', self.format(recruiter_message.romes_alternance_to_add), office_admin_update, form)
-            self.handle_diff('romes_to_remove', self.format(recruiter_message.romes_to_remove), office_admin_update, form)
-            self.handle_diff('romes_alternance_to_remove', self.format(recruiter_message.romes_alternance_to_remove), office_admin_update, form)
+            self.handle_diff(
+                'romes_alternance_to_boost',
+                self.format(recruiter_message.romes_alternance_to_add),
+                office_admin_update,
+                form
+            )
+            self.handle_diff(
+                'romes_to_remove',
+                self.format(recruiter_message.romes_to_remove),
+                office_admin_update,
+                form
+            )
+            self.handle_diff(
+                'romes_alternance_to_remove',
+                self.format(recruiter_message.romes_alternance_to_remove),
+                office_admin_update,
+                form
+            )
 
         elif recruiter_message_type == models.OtherRecruiterMessage.name:
             self.handle_diff('reason', recruiter_message.comment, office_admin_update, form)
@@ -410,7 +452,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             form[form_field].data = new_value
             self.form_widget_args.update({form_field:{'style': UPDATE_STYLE}})
 
-            # For phone, website and e-mail, we need to check the hide checkbox if recruiter send an empty string (or refill it)
+            # For phone, website and e-mail, we need to check the hide checkbox
+            # if recruiter send an empty string (or refill it)
             if form_field in HIDE_CHECKBOXES:
                 checkbox_field_name = HIDE_CHECKBOXES[form_field]
 
@@ -437,12 +480,16 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     def check_checkbox(self, form, checkbox_field_name):
         checkbox_current_description = self.column_descriptions.get(checkbox_field_name, '')
         form[checkbox_field_name].data = True
-        form[checkbox_field_name].description = Markup(DESCRIPTION_TEMPLATE.format("Case non cochée", checkbox_current_description))
+        form[checkbox_field_name].description = Markup(
+            DESCRIPTION_TEMPLATE.format("Case non cochée", checkbox_current_description)
+        )
 
     def uncheck_checked(self, form, checkbox_field_name):
-            checkbox_current_description = self.column_descriptions.get(checkbox_field_name, '')
-            form[checkbox_field_name].data = False
-            form[checkbox_field_name].description = Markup(DESCRIPTION_TEMPLATE.format("Case cochée", checkbox_current_description))
+        checkbox_current_description = self.column_descriptions.get(checkbox_field_name, '')
+        form[checkbox_field_name].data = False
+        form[checkbox_field_name].description = Markup(
+            DESCRIPTION_TEMPLATE.format("Case cochée", checkbox_current_description)
+        )
 
 
     def validate_form(self, form):
@@ -485,7 +532,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                         models.OfficeAdminUpdate.id != request.args['id']
                     )
                 else:
-                    office_update_conflict =models. OfficeAdminUpdate.query.filter(
+                    office_update_conflict = models.OfficeAdminUpdate.query.filter(
                         models.OfficeAdminUpdate.sirets.like("%{}%".format(siret))
                     )
 
@@ -582,11 +629,13 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
     def validate_rome(self, rome, field_name):
         if not mapping_util.rome_is_valid(rome):
-            msg = "`%s` n'est pas un code ROME valide. Assurez-vous de ne saisir qu'un élément par ligne. Champ : '%s'" % (
-                rome,
-                self.column_labels[field_name]
+            msg = "`{}` n'est pas un code ROME valide. Assurez-vous de ne saisir qu'un élément par ligne. Champ : '{}'"
+            raise InvalidRome(
+                msg.format(
+                    rome,
+                    self.column_labels[field_name]
+                )
             )
-            raise InvalidRome(msg)
 
 
     def format(self, romes_str, char=','):
@@ -601,10 +650,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             models.OtherRecruiterMessage.name: models.OtherRecruiterMessage,
         }
 
-        try:
-            recruiter_message = MESSAGE_CLASSES[message_type].query.filter_by(id=message_id).one()
-        except NoResultFound as e:
-            e.message = 'No recruiter message found => type: {} & id: {}'.format(message_id,message_type)
-            raise
+        recruiter_message = MESSAGE_CLASSES[message_type].query.filter_by(id=message_id).one()
 
         return recruiter_message

@@ -2,12 +2,11 @@
 from functools import wraps
 from urllib.parse import urlencode
 import logging
-from contextlib import suppress
 
 from flask import redirect, render_template, flash
 from flask import Blueprint, Markup
 from flask import url_for, request
-from wtforms import BooleanField, StringField, SelectField, TextAreaField, HiddenField, RadioField, SelectMultipleField
+from wtforms import SelectMultipleField
 from wtforms.widgets import CheckboxInput, ListWidget
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -31,8 +30,10 @@ JOB_CHOICES = [
     ('hide', 'Supprimer ce métier'),
 ]
 
+ERROR_CONTACT_MODE_MESSAGE = 'Vous avez indiqué vouloir être contacté \'{}\' mais le champ \'{}\' n\'est pas renseigné. Nous vous invitons à le remplir.'
+
 # Get form value from office.contact_mode text
-CONTACT_MODES_LABEL_TO_FORM_VALUE = { v:k for k, v in CONTACT_MODES.items() }
+CONTACT_MODES_LABEL_TO_FORM_VALUE = {v:k for k, v in CONTACT_MODES.items()}
 
 def create_form(form_class):
     """
@@ -85,7 +86,7 @@ def change_info():
         if not office:
             flash(unknown_siret_message(), 'error')
         else:
-            params = {key:form.data[key] for key in ['siret','last_name','first_name','phone','email']}
+            params = {key: form.data[key] for key in ['siret', 'last_name', 'first_name', 'phone', 'email']}
             if is_recruiter_from_lba():
                 params.update({"origin":"labonnealternance"})
             url = url_for('contact_form.ask_action', **params)
@@ -120,7 +121,10 @@ def update_coordinates_form(form):
         return redirect(url_for('contact_form.change_info'))
 
     # Fill form with form value (or office value by default)
-    form.new_contact_mode.data = request.form.get('new_contact_mode', CONTACT_MODES_LABEL_TO_FORM_VALUE.get(office.contact_mode, ''))
+    form.new_contact_mode.data = request.form.get(
+        'new_contact_mode',
+        CONTACT_MODES_LABEL_TO_FORM_VALUE.get(office.contact_mode, '')
+    )
     form.new_website.data = request.form.get('new_website', office.website)
     form.new_email.data = request.form.get('new_email', office.email)
     form.new_phone.data = request.form.get('new_phone', office.phone)
@@ -129,24 +133,40 @@ def update_coordinates_form(form):
     form.new_email_alternance.data = request.form.get('new_email_alternance', office.email_alternance)
 
     if form.validate_on_submit():
-        recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(form)
-        mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
+        form_valid = True
 
-        try:
-            mail.send_mail(mail_content)
-        except MailNoSendException as e:
-            logger.error(e)
-            flash(generate_fail_flash_content(), 'error')
-        else:
-            redirect_params = get_success_value()
-            return render_template('contact_form/success_message.html',
-                title="Merci pour votre message",
-                use_lba_template=is_recruiter_from_lba(),
-                site_name=redirect_params.get('site_name'),
-                email=redirect_params.get('email'),
-                home_url=redirect_params.get('home_url'),
-                action_form_url=url_for('contact_form.ask_action', **request.args),
-            )
+        # If a recruiter choose a contact_mode, the associated field became required
+        contact_mode = form.new_contact_mode.data
+        if contact_mode == 'website' and not form.new_website.data:
+            flash(ERROR_CONTACT_MODE_MESSAGE.format('Via votre site internet', 'Site Internet'),'error')
+            form_valid = False
+        elif contact_mode == 'phone' and not form.new_phone.data:
+            flash(ERROR_CONTACT_MODE_MESSAGE.format('Par téléphone', 'Téléphone'),'error')
+            form_valid = False
+        elif contact_mode == 'email' and not form.new_email.data:
+            flash(ERROR_CONTACT_MODE_MESSAGE.format('Par email', 'Email recruteur'),'error')
+            form_valid = False
+
+
+        if form_valid:
+            recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(form)
+            mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
+
+            try:
+                mail.send_mail(mail_content)
+            except MailNoSendException as e:
+                logger.exception(e)
+                flash(generate_fail_flash_content(), 'error')
+            else:
+                redirect_params = get_success_value()
+                return render_template('contact_form/success_message.html',
+                    title="Merci pour votre message",
+                    use_lba_template=is_recruiter_from_lba(),
+                    site_name=redirect_params.get('site_name'),
+                    email=redirect_params.get('email'),
+                    home_url=redirect_params.get('home_url'),
+                    action_form_url=url_for('contact_form.ask_action', **request.args),
+                )
 
     return render_template('contact_form/form.html',
         title='Modifier ma fiche entreprise',
@@ -196,7 +216,7 @@ def update_jobs_form():
         try:
             mail.send_mail(mail_content)
         except MailNoSendException as e:
-            logger.error(e)
+            logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
         else:
             redirect_params = get_success_value()
@@ -230,7 +250,7 @@ def delete_form(form):
         try:
             mail.send_mail(mail_content)
         except MailNoSendException as e:
-            logger.error(e)
+            logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
         else:
             redirect_params = get_success_value()
@@ -262,7 +282,7 @@ def other_form(form):
         try:
             mail.send_mail(mail_content)
         except MailNoSendException as e:
-            logger.error(e)
+            logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
         else:
             redirect_params = get_success_value()
@@ -343,4 +363,7 @@ def extract_manually_added_jobs(office):
 
 def unknown_siret_message():
     email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
-    return 'Ce siret n\'est pas connu de notre service. Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>'.format(email, email)
+    return """
+        Ce siret n\'est pas connu de notre service.
+        Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>
+    """.format(email, email)

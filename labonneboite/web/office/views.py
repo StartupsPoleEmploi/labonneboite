@@ -6,8 +6,8 @@ import os
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
 
-from flask import abort, redirect, render_template, flash, jsonify
-from flask import Blueprint, current_app
+from flask import abort, render_template, jsonify
+from flask import Blueprint
 from flask import make_response, send_file
 from flask import request, session
 
