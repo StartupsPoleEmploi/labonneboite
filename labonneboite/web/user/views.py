@@ -166,7 +166,7 @@ def favorites_add(siret):
     if not office:
         abort(404)
 
-    UserFavoriteOffice.get_or_create(user=current_user, office=office)
+    UserFavoriteOffice.add_favorite(user=current_user, office=office)
 
     message = '"%s - %s" a été ajouté à vos favoris !' % (office.name, office.city)
     flash(Markup(message), 'success')
