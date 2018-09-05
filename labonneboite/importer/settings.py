@@ -77,5 +77,3 @@ elif get_current_env() == ENV_DEVELOPMENT:
 elif get_current_env() == ENV_TEST:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .conf.test import *
-else:
-    raise Exception("unknown environment for importer")
