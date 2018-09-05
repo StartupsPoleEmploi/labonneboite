@@ -9,7 +9,7 @@ from slugify import slugify
 from flask import url_for
 from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy.dialects import mysql
-from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy import PrimaryKeyConstraint, Index
 from sqlalchemy.dialects import mysql
 
 from functools import lru_cache
@@ -110,10 +110,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     Then you need to add a migration to create this column in each relevant model,
     not just the Office model, see your Mixin documentation for the list of models.
 
-    You also need to add this new column in these two files:
-    labonneboite/importer/db/etablissements_exportable.sql
-    labonneboite/importer/db/etablissements_backoffice.sql
-    and in method importer.util.get_select_fields_for_main_db
+    You also need to add this new column in the method:
+    - importer.util.get_select_fields_for_main_db
 
     Then, be sure to double check that both `make run_importer_jobs` and
     `make test_all` complete successfully.
@@ -121,6 +119,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     __tablename__ = settings.OFFICE_TABLE
     __table_args__ = (
+        Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),
     )
 

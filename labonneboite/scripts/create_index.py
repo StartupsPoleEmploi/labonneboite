@@ -415,7 +415,7 @@ def create_offices_for_departement(departement):
 
     logger.info("STARTED indexing offices for departement=%s ...", departement)
 
-    for _, office in enumerate(db_session.query(Office).filter(
+    all_offices = db_session.query(Office).filter(
         and_(
             Office.departement == departement,
             or_(
@@ -423,8 +423,9 @@ def create_offices_for_departement(departement):
                 Office.score_alternance >= importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD,
             ),
         )
-    ).all()):
+    ).all()
 
+    for office in all_offices:
         st.increment_office_count()
 
         es_doc = get_office_as_es_doc(office)

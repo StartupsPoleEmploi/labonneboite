@@ -85,6 +85,7 @@ class ExportableOffice(FinalOfficeMixin, CRUDMixin, Base):
     """
     __tablename__ = importer_settings.SCORE_REDUCING_TARGET_TABLE
     __table_args__ = (
+        Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),
     )
 
