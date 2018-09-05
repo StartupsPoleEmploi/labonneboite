@@ -14,6 +14,9 @@ from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
 
+def has_text_content(s):
+    return s is not None and len(s) > 0 and not s.isspace()
+
 @timeit
 def check_departements(departements):
     for dep in departements:
@@ -216,14 +219,14 @@ class EtablissementExtractJob(Job):
 
                 try:
                     fields = import_util.get_fields_from_csv_line(line)
-                    if len(fields) != 16:
+                    if len(fields) != 18:
                         logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
 
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
                         libellerue, codecommune, codepostal, email, tel, \
                         trancheeffectif_etablissement, _, _, _, \
-                        website1, website2 = fields
+                        website1, website2, better_email, better_tel = fields
 
                     if not siret_util.is_siret(siret):
                         logger.exception("wrong siret : %s", siret)
@@ -236,6 +239,13 @@ class EtablissementExtractJob(Job):
 
                 website1 = encoding_util.strip_french_accents(website1)
                 website2 = encoding_util.strip_french_accents(website2)
+
+                if has_text_content(better_tel):
+                    tel = better_tel
+
+                if has_text_content(better_email):
+                    email = better_email
+
                 email = encoding_util.strip_french_accents(email)
 
                 if codecommune.strip():
@@ -281,7 +291,7 @@ class EtablissementExtractJob(Job):
 
         if unprocessable_departement_errors > 2500:
             raise ValueError("too many unprocessable_departement_errors")
-        if no_zipcode_count > 50000:
+        if no_zipcode_count > 75000:
             raise ValueError("too many no_zipcode_count")
         if format_errors > 5:
             raise ValueError("too many format_errors")

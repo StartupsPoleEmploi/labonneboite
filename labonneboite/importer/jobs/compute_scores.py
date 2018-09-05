@@ -25,6 +25,7 @@ COMPUTE_SCORES_DEBUG_MODE = False
 # compute scores only for those departements, or all if empty list
 # examples: ["90"] ["51", "10"] []
 # departement 90 has the least offices - thus is it most suitable for a quick debugging
+# departements ["14", "69"] are the only departements with actual data in local dev
 COMPUTE_SCORES_DEBUG_DEPARTEMENTS = ["90"]
 
 # If parallel computing is enabled, you cannot use debugger like ipdb from

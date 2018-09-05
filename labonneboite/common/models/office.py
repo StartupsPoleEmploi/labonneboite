@@ -9,7 +9,7 @@ from slugify import slugify
 from flask import url_for
 from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy.dialects import mysql
-from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy import PrimaryKeyConstraint, Index
 from sqlalchemy.dialects import mysql
 
 from functools import lru_cache
@@ -22,7 +22,8 @@ from labonneboite.common.load_data import load_city_codes
 from labonneboite.common import util
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
-
+from labonneboite.importer import settings as importer_settings
+ 
 
 logger = logging.getLogger('main')
 
@@ -109,10 +110,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     Then you need to add a migration to create this column in each relevant model,
     not just the Office model, see your Mixin documentation for the list of models.
 
-    You also need to add this new column in these two files:
-    labonneboite/importer/db/etablissements_exportable.sql
-    labonneboite/importer/db/etablissements_backoffice.sql
-    and in method importer.util.get_select_fields_for_main_db
+    You also need to add this new column in the method:
+    - importer.util.get_select_fields_for_main_db
 
     Then, be sure to double check that both `make run_importer_jobs` and
     `make test_all` complete successfully.
@@ -120,6 +119,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     __tablename__ = settings.OFFICE_TABLE
     __table_args__ = (
+        Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),
     )
 
@@ -307,9 +307,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return (100 * self.get_stars_for_rome_code(rome_code)) / 5
 
     def qualifies_for_alternance(self):
-        # Avoid importing importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
-        # to avoid mixing importer stuff and production.
-        return self.score_alternance >= 50
+        return self.score_alternance >= importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
 
     @property
     def url(self):
