@@ -45,6 +45,7 @@ ADMIN_EMAIL = 'no-reply@labonneboite.pole-emploi.fr'
 
 SERVER_NAME = 'labonneboite.pole-emploi.fr'
 PREFERRED_URL_SCHEME = 'http'
+COOKIE_SECURE = False
 
 WTF_CSRF_ENABLED = True
 
