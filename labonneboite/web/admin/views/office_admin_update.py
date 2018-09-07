@@ -14,6 +14,7 @@ from labonneboite.common.siret import is_siret
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
+from labonneboite.importer.settings import SCORE_REDUCING_MINIMUM_THRESHOLD, SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
 
 logger = logging.getLogger('main')
 
@@ -35,6 +36,7 @@ HIDE_CHECKBOXES = {
     'new_website': 'remove_website',
 }
 
+LITTLE_BOOST_VALUE = 75
 
 class RomeToRemoveException(Exception):
     pass
@@ -331,13 +333,33 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             return form
 
         # Set sirets and office name fields on creation
+        office = models.Office.query.filter(models.Office.siret == recruiter_message.siret).first()
+
         if form_id is None:
-            self.form_widget_args.update({'sirets':{'style': UPDATE_STYLE}})
+            self.set_update_style('sirets')
             form.sirets.data = recruiter_message.siret
-            with suppress(NoResultFound):
-                office = models.Office.query.filter(models.Office.siret == recruiter_message.siret).one()
-                self.form_widget_args.update({'name':{'style': UPDATE_STYLE}})
+
+            if office:
+                self.set_update_style('name')
                 form.name.data = office.name
+
+        # If recruiter ask for updating his coordinates and job,
+        # we assume that he wants to appear on LBB
+        # so we improve his score if too low
+        ask_job_or_coordinate_changes = recruiter_message_type in [
+            models.UpdateCoordinatesRecruiterMessage.name,
+            models.UpdateCoordinatesRecruiterMessage.name
+        ]
+
+        if office and ask_job_or_coordinate_changes:
+            if office.score <= SCORE_REDUCING_MINIMUM_THRESHOLD:
+                self.set_update_style('score')
+                self.set_little_boost(form['score'], office.score)
+
+            if office.score_alternance <= SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD:
+                self.set_update_style('score_alternance')
+                self.set_little_boost(form['score_alternance'], office.score_alternance)
+
 
 
         office_admin_update = models.OfficeAdminUpdate.query.filter(models.OfficeAdminUpdate.id == form_id).first()
@@ -430,7 +452,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         if office_admin_update is None:
             # So we only set the value
             if not is_empty_field(new_value):
-                self.form_widget_args.update({form_field:{'style': UPDATE_STYLE}})
+                self.set_update_style(form_field)
                 form[form_field].data = new_value
 
             if form_field in HIDE_CHECKBOXES and not new_value:
@@ -443,14 +465,14 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
         # Handle None and empty string value
         if is_empty_field(current_value) and is_empty_field(new_value):
-            self.form_widget_args.update({form_field:{'style': UPDATE_STYLE}})
+            self.set_update_style(form_field)
             return
 
 
 
         if current_value != new_value:
             form[form_field].data = new_value
-            self.form_widget_args.update({form_field:{'style': UPDATE_STYLE}})
+            self.set_update_style(form_field)
 
             # For phone, website and e-mail, we need to check the hide checkbox
             # if recruiter send an empty string (or refill it)
@@ -653,3 +675,18 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         recruiter_message = MESSAGE_CLASSES[message_type].query.filter_by(id=message_id).one()
 
         return recruiter_message
+
+
+    def set_little_boost(self, form_field, score):
+        form_field.data = LITTLE_BOOST_VALUE
+
+        form_field.description = Markup("""
+            <strong style="color: red;">
+                Le recruteur nous ayant contacté et son score étant trop bas ({}).
+                Nous supposons qu'il souhaite apparaître davantage et lui attribuons un léger boost.
+            </strong>
+        """).format(score)
+
+
+    def set_update_style(self, field_name):
+        self.form_widget_args.update({field_name:{'style': UPDATE_STYLE}})
