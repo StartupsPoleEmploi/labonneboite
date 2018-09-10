@@ -1,6 +1,6 @@
 *.pyc
 .ipynb_checkpoints/
-local_settings.py
+local_settings.py*
 build/
 dist/
 ####
