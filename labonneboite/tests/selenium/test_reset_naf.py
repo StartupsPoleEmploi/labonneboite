@@ -28,9 +28,9 @@ class TestResetNaf(LbbSeleniumTestCase):
         self.assertEqual('57000', parameters['zipcode'])
         self.assertNotIn('naf', parameters)
 
-        # Filter by NAF `Activités comptables` (`6920Z`).
+        # Filter by NAF `Activités des agents et courtiers d'assurances` (`6622Z`).
         select = Select(self.driver.find_element_by_id('naf'))
-        select.select_by_value('6920Z')
+        select.select_by_value('6622Z')
         WebDriverWait(self.driver, 10).until(url_has_changed(current_url))
 
         # The form should be auto-submitted after an option has been selected.
@@ -40,7 +40,7 @@ class TestResetNaf(LbbSeleniumTestCase):
         self.assertEqual('/entreprises', url.path)
         self.assertEqual('comptabilite', parameters['occupation'])
         self.assertEqual('Metz (57000)', parameters['l'])
-        self.assertEqual('6920Z', parameters['naf'])
+        self.assertEqual('6622Z', parameters['naf'])
 
         # Perform another search on `boucher`.
         job_input = self.driver.find_element_by_name('j')
