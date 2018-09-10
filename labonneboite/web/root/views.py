@@ -18,6 +18,9 @@ def home():
     fix_csrf_session()
     return render_template('home.html', form=CompanySearchForm())
 
+@rootBlueprint.route('/favicon.ico')
+def favicon():
+    return send_from_directory(current_app.static_folder, 'images/favicon.ico')
 
 @rootBlueprint.route('/robots.txt')
 @rootBlueprint.route('/googleaece67026df0ee76.html')
