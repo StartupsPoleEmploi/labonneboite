@@ -15,6 +15,10 @@ class Config(object):
 
     SECRET_KEY = settings.FLASK_SECRET_KEY
 
+    # Set 'secure' attribute on cookies on https
+    SESSION_COOKIE_SECURE = settings.COOKIE_SECURE
+    REMEMBER_COOKIE_SECURE = settings.COOKIE_SECURE
+
     VERSIONS = 'timestamp'
     URL_EXPIRE = True
     JSON_AS_ASCII = False
