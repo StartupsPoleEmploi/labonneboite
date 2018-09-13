@@ -1,5 +1,5 @@
 from labonneboite.importer.models.computing import RawOffice
-from labonneboite.importer.jobs.extract_etablissements import EtablissementExtractJob
+from labonneboite.importer.jobs.extract_etablissements import EtablissementExtractJob, normalize_website_url
 from .test_base import DatabaseTest
 
 
@@ -58,3 +58,13 @@ class TestEtablissements(DatabaseTest):
         task.delete_deletable_offices()
         self.assertEqual(len(RawOffice.query.all()), 1)
         self.assertEqual(RawOffice.query.first().siret, "00685016800011")
+
+    def test_normalize_url(self):
+        self.assertEqual(normalize_website_url(None), None)
+        self.assertEqual(normalize_website_url(''), None)
+        self.assertEqual(normalize_website_url('abc'), None)
+        self.assertEqual(normalize_website_url('abc.com'), 'http://abc.com')
+        self.assertEqual(normalize_website_url('abc.fr'), 'http://abc.fr')
+        self.assertEqual(normalize_website_url('http://abc.fr'), 'http://abc.fr')
+        self.assertEqual(normalize_website_url('https://abc.fr'), 'https://abc.fr')
+        self.assertEqual(normalize_website_url('abc@def.fr'), None)

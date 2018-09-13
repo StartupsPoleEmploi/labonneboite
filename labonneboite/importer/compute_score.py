@@ -16,12 +16,9 @@ from operator import getitem
 import os
 import pickle
 import sys
-from urllib.parse import urlparse
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-import validators
-
 
 import pandas as pd
 import numpy as np
@@ -130,44 +127,6 @@ def check_number_highly_scored_companies(departement, high_new_scores):
             raise Exception(error_msg)
 
 
-def normalize_website_url(url):
-    """
-    website URLs are raw data entered by human, with lots of mistakes,
-    so it has to be automatically cleaned up and normalized
-    """
-    if (not url) or ('@' in url) or ('.' not in url) or (len(url) <= 3):
-        return None
-
-    url = url.replace('"', '').strip()
-
-    # add missing http prefix if needed
-    if not urlparse(url).scheme:
-        url = "http://" + url
-
-    # normalization
-    try:
-        url = urlparse(url).geturl()
-    except ValueError:
-        return None
-
-    # ensure website URL is correct (and is not an email address for example!)
-    if not validators.url(url):
-        return None
-
-    return url
-
-
-def merge_and_normalize_websites(websites):
-    w1, w2 = websites
-    w1 = normalize_website_url(w1)
-    w2 = normalize_website_url(w2)
-    if w1:
-        return w1
-    elif w2:
-        return w2
-    return ""
-
-
 def tranche_to_effectif(tranche):
     map_tranche_to_effectif = {
         '00': 0,
@@ -216,22 +175,10 @@ def get_df_etab(departement):
         select * from %s where departement = %s and siret != ''
         """ % (RawOffice.__tablename__, departement), get_engine())
     debug_df(df_etab, "after loading from raw office table")
-    if "website1" not in list(df_etab.columns):
-        raise Exception("missing website1 column")
     if df_etab.empty:
         logger.warning("dataframe empty for departement %s", departement)
         return None
     logger.debug("loading data (%s) OK (%i etablissements)!", departement, len(df_etab))
-
-    # tricky dataframe operation: merge two columns into one using an element wise function
-    # http://stackoverflow.com/questions/13331698/how-to-apply-a-function-to-two-columns-of-pandas-dataframe
-    df_etab["website"] = df_etab[['website1', 'website2']].apply(merge_and_normalize_websites, axis=1)
-    debug_df(df_etab, "after processing website")
-    del df_etab['website1']
-    del df_etab['website2']
-    debug_df(df_etab, "after removing website1 and website2")
-    if "website" not in list(df_etab.columns):
-        raise Exception("missing website column")
 
     logger.debug("adding effectif (%s)...", departement)
     df_etab['effectif'] = df_etab['trancheeffectif'].map(tranche_to_effectif)

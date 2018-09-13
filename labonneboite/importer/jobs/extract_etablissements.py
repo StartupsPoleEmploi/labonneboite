@@ -1,4 +1,6 @@
+from urllib.parse import urlparse
 import pandas as pd
+import validators
 
 from labonneboite.importer import settings
 from labonneboite.importer import jenkins
@@ -16,6 +18,44 @@ from labonneboite.importer.jobs.common import logger
 
 def has_text_content(s):
     return s is not None and len(s) > 0 and not s.isspace()
+
+
+def merge_and_normalize_websites(websites):
+    for website in websites:
+        clean_website = normalize_website_url(website)
+        if clean_website:
+            return clean_website
+    return ""
+
+
+def normalize_website_url(url):
+    """
+    website URLs are raw data entered by human, with lots of mistakes,
+    so it has to be automatically cleaned up and normalized
+    """
+    if (not url) or ('@' in url) or ('.' not in url) or (len(url) <= 3):
+        return None
+
+    url = encoding_util.strip_french_accents(url)
+
+    url = url.replace('"', '').strip()
+
+    # add missing http prefix if needed
+    if not urlparse(url).scheme:
+        url = "http://" + url
+
+    # normalization
+    try:
+        url = urlparse(url).geturl()
+    except ValueError:
+        return None
+
+    # ensure website URL is correct (and is not an email address for example!)
+    if not validators.url(url):
+        return None
+
+    return url
+
 
 @timeit
 def check_departements(departements):
@@ -106,8 +146,7 @@ class EtablissementExtractJob(Job):
             tel=%%s,
             departement=%%s,
             trancheeffectif=%%s,
-            website1=%%s,
-            website2=%%s
+            website=%%s
         where siret=%%s""" % settings.RAW_OFFICE_TABLE
 
         count = 0
@@ -137,8 +176,8 @@ class EtablissementExtractJob(Job):
         con, cur = import_util.create_cursor()
         query = """INSERT into %s(siret, raisonsociale, enseigne, codenaf, numerorue,
             libellerue, codecommune, codepostal, email, tel, departement, trancheeffectif,
-            website1, website2)
-        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.RAW_OFFICE_TABLE
+            website)
+        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.RAW_OFFICE_TABLE
 
         count = 1
         logger.info("create new offices in table %s", settings.RAW_OFFICE_TABLE)
@@ -219,14 +258,15 @@ class EtablissementExtractJob(Job):
 
                 try:
                     fields = import_util.get_fields_from_csv_line(line)
-                    if len(fields) != 18:
+                    if len(fields) != 19:
                         logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
 
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
                         libellerue, codecommune, codepostal, email, tel, \
                         trancheeffectif_etablissement, _, _, _, \
-                        website1, website2, better_email, better_tel = fields
+                        website1, website2, better_email, better_tel, \
+                        website3 = fields
 
                     if not siret_util.is_siret(siret):
                         logger.exception("wrong siret : %s", siret)
@@ -237,8 +277,7 @@ class EtablissementExtractJob(Job):
                     format_errors += 1
                     continue
 
-                website1 = encoding_util.strip_french_accents(website1)
-                website2 = encoding_util.strip_french_accents(website2)
+                website = merge_and_normalize_websites([website1, website2, website3])
 
                 if has_text_content(better_tel):
                     tel = better_tel
@@ -257,10 +296,10 @@ class EtablissementExtractJob(Job):
                             codepostal = "0%s" % codepostal
                         etab_create_fields = siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
                             codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-                            website1, website2
+                            website
                         etab_update_fields = raisonsociale, enseigne, codenaf, numerorue, libellerue, \
                             codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-                            website1, website2, siret
+                            website, siret
                         if codepostal.startswith(departement):
                             departement_counter_dic.setdefault(departement, 0)
                             departement_counter_dic[departement] += 1
