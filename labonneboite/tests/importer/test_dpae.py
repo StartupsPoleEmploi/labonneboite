@@ -4,25 +4,27 @@ from labonneboite.importer.models.computing import Hiring
 from labonneboite.importer.util import get_departement_from_zipcode
 from .test_base import DatabaseTest
 
+FIRST_DPAE_FILE_NAME = "LBB_XDPDPAE_2016-11-10_2015-10-10.csv"
+SECOND_DPAE_FILE_NAME = "LBB_XDPDPAE_2016-12-10_2015-11-10.csv"
 
 class TestDpae(DatabaseTest):
 
     def test_check_dpae(self):
-        filename = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv")
+        filename = self.get_data_file_path(FIRST_DPAE_FILE_NAME)
         check_dpae.check_file(filename)
         self.assertEqual(Hiring.query.count(), 0)
 
     def test_extract_dpae(self):
         self.assertEqual(Hiring.query.count(), 0)
-        filename = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv")
+        filename = self.get_data_file_path(FIRST_DPAE_FILE_NAME)
         task = extract_dpae.DpaeExtractJob(filename)
         task.run()
         self.assertEqual(Hiring.query.count(), 6)
 
     def test_extract_dpae_two_files_diff(self):
         # Second file contains duplicated records and one record from the future and only 2 really new valid records.
-        filename_first_month = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv")
-        filename_second_month = self.get_data_file_path("LBB_XDPDPA_DPAE_20151110_20161210_20161210_094110.csv")
+        filename_first_month = self.get_data_file_path(FIRST_DPAE_FILE_NAME)
+        filename_second_month = self.get_data_file_path(SECOND_DPAE_FILE_NAME)
         task = extract_dpae.DpaeExtractJob(filename_first_month)
         task.run()
         self.assertEqual(Hiring.query.count(), 6)
@@ -35,13 +37,13 @@ class TestDpae(DatabaseTest):
         self.assertEqual(departement, "06")
 
     def test_extract_gz_format(self):
-        filename = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.gz")
+        filename = self.get_data_file_path(FIRST_DPAE_FILE_NAME + ".gz")
         task = extract_dpae.DpaeExtractJob(filename)
         task.run()
         self.assertEqual(Hiring.query.count(), 6)
 
     def test_extract_bz2_format(self):
-        filename = self.get_data_file_path("LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.bz2")
+        filename = self.get_data_file_path(FIRST_DPAE_FILE_NAME + ".bz2")
         task = extract_dpae.DpaeExtractJob(filename)
         task.run()
         self.assertEqual(Hiring.query.count(), 6)

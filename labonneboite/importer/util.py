@@ -103,7 +103,7 @@ def is_processed(filename):
 
 def check_runnable(filename, file_type):
     patterns = {
-        'dpae': 'LBB_XDPDPA_DPAE_.*',
+        'dpae': 'LBB_XDPDPAE_.*',
         'etablissements': 'LBB_EGCEMP_ENTREPRISE_.*'
     }
     base_name = os.path.basename(filename)
