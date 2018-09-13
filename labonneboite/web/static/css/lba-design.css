@@ -19,6 +19,14 @@
     margin-right: 20px;
 }
 
+/* Alert */
+.alert.alert-error {
+    background: red;
+}
+.alert.alert-error a.alert__close {
+    color: black;
+}
+
 /* Form */
 form input[type=text],
 form input[type=tel],

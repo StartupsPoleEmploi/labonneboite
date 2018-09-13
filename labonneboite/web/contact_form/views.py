@@ -363,7 +363,8 @@ def extract_manually_added_jobs(office):
 
 def unknown_siret_message():
     email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
-    return """
+    msg = """
         Ce siret n\'est pas connu de notre service.
         Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>
     """.format(email, email)
+    return Markup(msg)
