@@ -225,7 +225,7 @@ run-importer-job-00-prepare-all: alembic-migrate
 		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
 		cp ../tests/importer/data/LBB_XDPDPAE_2016-11-10_2015-10-10.csv data/ && \
-		cp ../tests/importer/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
+		cp ../tests/importer/data/LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv data/ && \
 		echo "completed importer run preparation."
 
 run-importer-job-01-check-etablissements:

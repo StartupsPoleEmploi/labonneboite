@@ -21,7 +21,7 @@ def make_raw_office():
 class TestEtablissements(DatabaseTest):
 
     def test_get_sirets_from_database(self):
-        filename = self.get_data_file_path("LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv")
+        filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
         task = EtablissementExtractJob(filename)
         etabs = task.get_sirets_from_database()
         self.assertEqual(len(etabs), 0)
@@ -31,13 +31,13 @@ class TestEtablissements(DatabaseTest):
         self.assertEqual(etabs[0], "12345678901234")
 
     def test_get_offices_from_file(self):
-        filename = self.get_data_file_path("LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv")
+        filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
         task = EtablissementExtractJob(filename)
         etabs = task.get_offices_from_file()
         self.assertEqual(len(list(etabs.keys())), 24)
 
     def test_create_new_offices(self):
-        filename = self.get_data_file_path("LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv")
+        filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
         task = EtablissementExtractJob(filename)
         task.csv_offices = task.get_offices_from_file()
         task.creatable_sirets = [
@@ -47,7 +47,7 @@ class TestEtablissements(DatabaseTest):
         self.assertEqual(len(RawOffice.query.all()), 2)
 
     def test_delete_offices(self):
-        filename = self.get_data_file_path("LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv")
+        filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
         task = EtablissementExtractJob(filename)
         task.csv_offices = task.get_offices_from_file()
         task.creatable_sirets = [

@@ -104,7 +104,7 @@ def is_processed(filename):
 def check_runnable(filename, file_type):
     patterns = {
         'dpae': 'LBB_XDPDPAE_.*',
-        'etablissements': 'LBB_EGCEMP_ENTREPRISE_.*'
+        'etablissements': 'LBB_ETABLISSEMENT_.*'
     }
     base_name = os.path.basename(filename)
     return re.match(patterns[file_type], base_name) and not is_processed(base_name)
