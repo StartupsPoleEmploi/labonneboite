@@ -180,7 +180,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'alternance': self.qualifies_for_alternance(),
         }
 
-        # Warning: the `distance`, `boost` and `matched_rome` fields are added by `get_companies_from_es_and_db`,
+        # Warning: the `distance`, `boost` and `matched_rome` fields are added by `get_offices_from_es_and_db`,
         # they are NOT model fields or properties!
         if hasattr(self, 'distance'):
             json['distance'] = self.distance
@@ -192,6 +192,13 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             json['matched_rome_code'] = rome_code
             json['matched_rome_label'] = settings.ROME_DESCRIPTIONS[rome_code]
             json['matched_rome_slug'] = slugify(settings.ROME_DESCRIPTIONS[rome_code])
+
+        # offers* fields are added by VisibleMarketFetcher.get_offices,
+        # they are NOT model fields or properties
+        if hasattr(self, 'offers_count'):
+            json['offers_count'] = self.offers_count
+        if hasattr(self, 'offers'):
+            json['offers'] = self.offers
 
         # This message should concern only a small number of companies who explicitly requested
         # to appear in extra geolocations.

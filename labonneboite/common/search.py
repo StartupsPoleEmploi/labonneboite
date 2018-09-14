@@ -15,6 +15,7 @@ from labonneboite.common import hiring_type_util
 from labonneboite.common import util
 from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.models import Office
+from labonneboite.common.fetcher import Fetcher
 from labonneboite.common.es import Elasticsearch
 from labonneboite.conf import settings
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
@@ -40,23 +41,27 @@ FILTERS = ['naf', 'headcount', 'hiring_type', 'distance']
 DISTANCE_FILTER_MAX = 3000
 
 
-
-class Fetcher(object):
+class HiddenMarketFetcher(Fetcher):
+    """
+    Fetch offices having a high hiring potential whether or not they
+    have public job offers.
+    """
 
     def __init__(
-            self, search_location,
-            romes=None,
-            distance=None,
-            sort=None,
-            hiring_type=None,
-            from_number=1,
-            to_number=OFFICES_PER_PAGE,
-            public=None,
-            headcount=None,
-            naf=None,
-            naf_codes=None,
-            aggregate_by=None,
-            departments=None,
+        self,
+        search_location,
+        romes=None,
+        distance=None,
+        sort=None,
+        hiring_type=None,
+        from_number=1,
+        to_number=OFFICES_PER_PAGE,
+        public=None,
+        headcount=None,
+        naf=None,
+        naf_codes=None,
+        aggregate_by=None,
+        departments=None,
     ):
         self.location = search_location
 
@@ -78,7 +83,7 @@ class Fetcher(object):
         except (TypeError, ValueError):
             self.headcount = settings.HEADCOUNT_WHATEVER
 
-        # Empty list is needed to handle companies with ROME not related to their NAF
+        # Empty list is needed to handle offices with ROME not related to their NAF
         self.naf = naf
         self.naf_codes = naf_codes or {}
         if self.naf and not self.naf_codes:
@@ -90,18 +95,24 @@ class Fetcher(object):
         # Other properties.
         self.alternative_rome_codes = {}
         self.alternative_distances = collections.OrderedDict()
-        self.company_count = None
+        self.office_count = None
         self.departments = departments
+
 
     @property
     def flag_handicap(self):
         return self.public == PUBLIC_HANDICAP
+
+
     @property
     def flag_junior(self):
         return self.public == PUBLIC_JUNIOR
+
+
     @property
     def flag_senior(self):
         return self.public == PUBLIC_SENIOR
+
 
     def update_aggregations(self, aggregations):
         if self.headcount and 'headcount' in aggregations:
@@ -111,8 +122,9 @@ class Fetcher(object):
         if self.naf and 'naf' in aggregations:
             aggregations['naf'] = self.get_naf_aggregations()
 
-    def _get_company_count(self, rome_codes, distance):
-        return count_companies(
+
+    def _get_office_count(self, rome_codes, distance):
+        return count_offices(
             self.naf_codes,
             rome_codes,
             self.location.latitude,
@@ -128,8 +140,9 @@ class Fetcher(object):
             sort=self.sort,
         )
 
+
     def get_naf_aggregations(self):
-        _, _, aggregations = fetch_companies(
+        _, _, aggregations = fetch_offices(
             {}, # No naf filter
             self.romes,
             self.location.latitude,
@@ -145,8 +158,9 @@ class Fetcher(object):
         )
         return aggregations['naf']
 
+
     def get_headcount_aggregations(self):
-        _, _, aggregations = fetch_companies(
+        _, _, aggregations = fetch_offices(
             self.naf_codes,
             self.romes,
             self.location.latitude,
@@ -162,13 +176,14 @@ class Fetcher(object):
         )
         return aggregations['headcount']
 
+
     def get_contract_aggregations(self):
         """
         As contract/hiring_type (dpae/alternance) is not technically a filter,
         we cannot do a regular aggregation about it. Instead we manually
         do two ES calls everytime.
         """
-        total_dpae = count_companies(
+        total_dpae = count_offices(
             self.naf_codes,
             self.romes,
             self.location.latitude,
@@ -182,7 +197,7 @@ class Fetcher(object):
             departments=self.departments,
         )
 
-        total_alternance = count_companies(
+        total_alternance = count_offices(
             self.naf_codes,
             self.romes,
             self.location.latitude,
@@ -200,7 +215,7 @@ class Fetcher(object):
 
 
     def get_distance_aggregations(self):
-        _, _, aggregations = fetch_companies(
+        _, _, aggregations = fetch_offices(
             self.naf_codes,
             self.romes,
             self.location.latitude,
@@ -217,31 +232,31 @@ class Fetcher(object):
         return aggregations['distance']
 
 
-    def compute_company_count(self):
-        self.company_count = self._get_company_count(self.romes, self.distance)
-        logger.debug("set company_count to %s", self.company_count)
+    def compute_office_count(self):
+        self.office_count = self._get_office_count(self.romes, self.distance)
+        logger.debug("set office_count to %s", self.office_count)
 
 
-    def get_companies(self, add_suggestions=False):
-        self.compute_company_count()
+    def get_offices(self, add_suggestions=False):
+        self.compute_office_count()
 
         current_page_size = self.to_number - self.from_number + 1
 
         # Needed in rare case when an old page is accessed (via user bookmark and/or crawling bot)
-        # which no longer exists due to newer company dataset having less result pages than before
+        # which no longer exists due to newer office dataset having less result pages than before
         # for this search.
-        if self.from_number > self.company_count:
+        if self.from_number > self.office_count:
             self.from_number = 1
             self.to_number = current_page_size
 
         # Adjustement needed when the last page is requested and does not have exactly page_size items.
-        if self.to_number > self.company_count + 1:
-            self.to_number = self.company_count + 1
+        if self.to_number > self.office_count + 1:
+            self.to_number = self.office_count + 1
 
         result = {}
         aggregations = {}
-        if self.company_count:
-            result, _, aggregations = fetch_companies(
+        if self.office_count:
+            result, _, aggregations = fetch_offices(
                 self.naf_codes,
                 self.romes,
                 self.location.latitude,
@@ -259,21 +274,21 @@ class Fetcher(object):
                 aggregate_by=self.aggregate_by,
             )
 
-        if self.company_count <= current_page_size and add_suggestions:
+        if self.office_count <= current_page_size and add_suggestions:
 
             # Suggest other jobs.
             # Build a flat list of all the alternative romes of all searched romes.
             alternative_rome_codes = [alt_rome for rome in self.romes for alt_rome in ROME_MOBILITIES[rome]]
             for rome in set(alternative_rome_codes) - set(self.romes):
-                company_count = self._get_company_count([rome], self.distance)
-                self.alternative_rome_codes[rome] = company_count
+                office_count = self._get_office_count([rome], self.distance)
+                self.alternative_rome_codes[rome] = office_count
 
             # Suggest other distances.
             last_count = 0
             for distance, distance_label in [(30, '30 km'), (50, '50 km'), (3000, 'France entière')]:
-                company_count = self._get_company_count(self.romes, distance)
-                if company_count > last_count:
-                    last_count = company_count
+                office_count = self._get_office_count(self.romes, distance)
+                if office_count > last_count:
+                    last_count = office_count
                     self.alternative_distances[distance] = (distance_label, last_count)
 
         return result, aggregations
@@ -289,18 +304,20 @@ class Fetcher(object):
         return alternative_rome_descriptions
 
 
-def count_companies(naf_codes, rome_codes, latitude, longitude, distance, **kwargs):
+def count_offices(naf_codes, rome_codes, latitude, longitude, distance, **kwargs):
     json_body = build_json_body_elastic_search(naf_codes, rome_codes, latitude, longitude, distance, **kwargs)
     # Drop the sorting clause as it is not needed anyway for a simple count.
     del json_body["sort"]
-    return count_companies_from_es(json_body)
+    return count_offices_from_es(json_body)
 
-def count_companies_from_es(json_body):
+
+def count_offices_from_es(json_body):
     es = Elasticsearch()
     res = es.count(index=settings.ES_INDEX, doc_type="office", body=json_body)
     return res["count"]
 
-def fetch_companies(naf_codes, rome_codes, latitude, longitude, distance, aggregate_by=None, **kwargs):
+
+def fetch_offices(naf_codes, rome_codes, latitude, longitude, distance, aggregate_by=None, **kwargs):
     json_body = build_json_body_elastic_search(
         naf_codes,
         rome_codes,
@@ -313,7 +330,7 @@ def fetch_companies(naf_codes, rome_codes, latitude, longitude, distance, aggreg
 
     sort = kwargs.get('sort', sorting.SORT_FILTER_DEFAULT)
 
-    companies, companies_count, aggregations_raw = get_companies_from_es_and_db(
+    offices, office_count, aggregations_raw = get_offices_from_es_and_db(
         json_body,
         sort=sort,
         rome_codes=rome_codes,
@@ -333,7 +350,8 @@ def fetch_companies(naf_codes, rome_codes, latitude, longitude, distance, aggreg
             if distance == DISTANCE_FILTER_MAX:
                 aggregations['distance'] = aggregate_distance(aggregations_raw)
 
-    return companies, companies_count, aggregations
+    return offices, office_count, aggregations
+
 
 def aggregate_naf(aggregations_raw):
     return [{
@@ -357,6 +375,7 @@ def aggregate_headcount(aggregations_raw):
 
     return {'small': small, 'big': big}
 
+
 def aggregate_distance(aggregations_raw):
     distances_aggregations = {}
     for distance_aggregate in aggregations_raw['distance']['buckets']:
@@ -372,11 +391,13 @@ def aggregate_distance(aggregations_raw):
 
     return distances_aggregations
 
+
 def get_score_for_rome_field_name(hiring_type, rome_code):
     return {
         hiring_type_util.DPAE: "scores_by_rome.%s",
         hiring_type_util.ALTERNANCE: "scores_alternance_by_rome.%s",
     }[hiring_type] % rome_code
+
 
 def get_boosted_rome_field_name(hiring_type, rome_code):
     hiring_type = hiring_type or hiring_type_util.DEFAULT
@@ -559,8 +580,8 @@ def build_json_body_elastic_search(
                 "score_mode": "multiply",
                 # How to combine the result of function_score with the original _score from the query.
                 # We multiply so that our final _score = (random x max(score_for_rome for rome in romes)).
-                # This way, on average the combined _score of a company having score 100 will be 5 times as much
-                # as the combined _score of a company having score 20, and thus will be 5 times more likely
+                # This way, on average the combined _score of a office having score 100 will be 5 times as much
+                # as the combined _score of a office having score 20, and thus will be 5 times more likely
                 # to appear on first page.
                 "boost_mode": "multiply",
             }
@@ -652,19 +673,19 @@ def build_json_body_elastic_search(
     return json_body
 
 
-def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
+def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
     """
-    Fetch companies first from Elasticsearch, then from the database.
+    Fetch offices first from Elasticsearch, then from the database.
 
-    Returns a tuple of (companies, companies_count), where `companies` is a
+    Returns a tuple of (offices, office_count), where `offices` is a
     list of results as Office instances (with some extra attributes only available
-    in Elasticsearch) and `companies_count` an integer of the results number.
+    in Elasticsearch) and `office_count` an integer of the results number.
 
-    `sort` is needed to find back the distance between each company and the search location,
+    `sort` is needed to find back the distance between each office and the search location,
     to store it and display it later on the frontend or in the API result.
 
     `rome_codes` and `hiring_type` are needed in the case of multi rome search, to find
-    back for each company which rome_code actually did match.
+    back for each office which rome_code actually did match.
     """
     if sort not in sorting.SORT_FILTERS:
         # This should never happen.
@@ -678,31 +699,31 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
     logger.debug("Elastic Search request : %s", json_body)
     res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
 
-    companies_count = res['hits']['total']
-    companies = []
+    office_count = res['hits']['total']
+    offices = []
     siret_list = [office["_source"]["siret"] for office in res['hits']['hits']]
 
     if siret_list:
 
-        company_objects = Office.query.filter(Office.siret.in_(siret_list))
-        company_dict = {obj.siret: obj for obj in company_objects}
+        office_objects = Office.query.filter(Office.siret.in_(siret_list))
+        office_dict = {obj.siret: obj for obj in office_objects}
 
         for siret in siret_list:
             try:
-                company = company_dict[siret]
+                office = office_dict[siret]
             except KeyError:
                 # ES and DB out of sync: siret is in ES but not in DB - this should never happen
                 logger.error("ES and DB out of sync: siret %s is in ES but not in DB - this should never happen", siret)
                 raise
-            if company.has_city():
-                companies.append(company)
+            if office.has_city():
+                offices.append(office)
             else:
-                logging.info("company siret %s does not have city, ignoring...", siret)
+                logging.info("office siret %s does not have city, ignoring...", siret)
 
     # FIXME it's not great to add new properties to an existing object. It
     # would be better to wrap the office objects in a new OfficeResult
     # class that would add new properties related to the query.
-    es_companies_by_siret = {
+    es_offices_by_siret = {
         item['_source']['siret']: item for item in res['hits']['hits']
     }
     # FIXME These hardcoded values are soooooo ugly, unfortunately it is not so
@@ -715,49 +736,49 @@ def get_companies_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         sorting.SORT_FILTER_DISTANCE: 1,  # (distance_sort)
         sorting.SORT_FILTER_SCORE: 3,  # (boosted_romes_sort, randomized_score_sort, distance_sort)
     }[sort]
-    for position, company in enumerate(companies, start=1):
+    for position, office in enumerate(offices, start=1):
         # Get the corresponding item from the Elasticsearch results.
-        es_company = es_companies_by_siret[company.siret]
+        es_office = es_offices_by_siret[office.siret]
 
-        if len(es_company["sort"]) != sort_fields_total:
+        if len(es_office["sort"]) != sort_fields_total:
             raise ValueError("Incorrect number of sorting fields in ES response.")
         # Add an extra `distance` attribute with one digit.
-        company.distance = round(es_company["sort"][distance_sort_index], 1)
+        office.distance = round(es_office["sort"][distance_sort_index], 1)
         # position is later used in labonneboite/web/static/js/results.js
-        company.position = position
+        office.position = position
 
         if len(rome_codes) > 1:
-            # Identify which rome_code actually matched this company.
+            # Identify which rome_code actually matched this office.
             keyname = get_score_for_rome_field_name(hiring_type, rome_codes[0]).split('.')[0]
-            all_scores = es_company['_source'][keyname]
+            all_scores = es_office['_source'][keyname]
             scores_of_searched_romes = dict([
                 (rome, all_scores[rome]) for rome in rome_codes if rome in all_scores
             ])
             # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
             rome_with_highest_score = max(scores_of_searched_romes, key=scores_of_searched_romes.get)
             # Store it as an extra attribute.
-            company.matched_rome = rome_with_highest_score
+            office.matched_rome = rome_with_highest_score
             rome_code_for_contact_mode = rome_with_highest_score
         else:
             rome_code_for_contact_mode = rome_codes[0]
 
         # Set boost flag
-        company.boost = False
+        office.boost = False
         boosted_rome_keyname = get_boosted_rome_field_name(hiring_type, rome_codes[0]).split('.')[0]
-        if boosted_rome_keyname in es_company['_source']:
-            boost_romes = es_company['_source'][boosted_rome_keyname]
+        if boosted_rome_keyname in es_office['_source']:
+            boost_romes = es_office['_source'][boosted_rome_keyname]
             romes_intersection = set(rome_codes).intersection(boost_romes)
-            company.boost = bool(romes_intersection)
+            office.boost = bool(romes_intersection)
 
         # Set contact mode and position
-        company.contact_mode = util.get_contact_mode_for_rome_and_office(rome_code_for_contact_mode, company)
+        office.contact_mode = util.get_contact_mode_for_rome_and_office(rome_code_for_contact_mode, office)
 
     try:
         aggregations = res['aggregations']
     except KeyError:
         aggregations = []
 
-    return companies, companies_count, aggregations
+    return offices, office_count, aggregations
 
 
 @lru_cache(maxsize=8*1024)

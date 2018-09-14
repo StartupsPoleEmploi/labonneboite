@@ -10,7 +10,7 @@ from labonneboite.conf import settings
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import hiring_type_util
 from labonneboite.common import geocoding
-from labonneboite.common.search import fetch_companies
+from labonneboite.common.search import fetch_offices
 
 logging.basicConfig(level=logging.INFO)
 
@@ -89,7 +89,7 @@ def get_results(commune_id, rome_1_id, rome_2_id):
         if mapping_util.rome_is_valid(rome_id):
             naf_code_list = mapping_util.map_romes_to_nafs([rome_id])
             # FIXME randomize per user to avoid spamming companies
-            offices, _, _ = fetch_companies(
+            offices, _, _ = fetch_offices(
                 naf_codes=naf_code_list,
                 rome_codes=[rome_id],
                 latitude=latitude,

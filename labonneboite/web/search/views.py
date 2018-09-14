@@ -237,7 +237,7 @@ def entreprises():
     This view takes arguments as a query string.
 
     Expected arguments are those returned by get_parameters and expected by the
-    selected company search form.
+    selected office search form.
     """
     fix_csrf_session()
     session['search_args'] = request.args
@@ -289,8 +289,8 @@ def entreprises():
     # Convert request arguments to fetcher parameters
     parameters = get_parameters(request.args)
 
-    # Fetch companies and alternatives
-    fetcher = search_util.Fetcher(
+    # Fetch offices and alternatives
+    fetcher = search_util.HiddenMarketFetcher(
         location,
         romes=[rome],
         distance=parameters['distance'],
@@ -306,17 +306,17 @@ def entreprises():
     )
     alternative_rome_descriptions = []
     naf_codes_with_descriptions = []
-    companies = []
-    company_count = 0
+    offices = []
+    office_count = 0
     alternative_distances = {}
 
     # Aggregations
-    companies, aggregations = fetcher.get_companies(add_suggestions=True)
-    company_count = fetcher.company_count
+    offices, aggregations = fetcher.get_offices(add_suggestions=True)
+    office_count = fetcher.office_count
     alternative_distances = fetcher.alternative_distances
     alternative_rome_descriptions = fetcher.get_alternative_rome_descriptions()
 
-    # If a filter or more are selected, the aggregations returned by fetcher.get_companies()
+    # If a filter or more are selected, the aggregations returned by fetcher.get_offices()
     # will be filtered too... To avoid that, we are doing additionnal calls (one by filter activated)
     if aggregations:
         fetcher.update_aggregations(aggregations)
@@ -330,7 +330,7 @@ def entreprises():
 
     # Pagination.
     pagination_manager = pagination.PaginationManager(
-        company_count,
+        office_count,
         fetcher.from_number,
         fetcher.to_number,
         request.full_path,
@@ -349,9 +349,9 @@ def entreprises():
         'alternative_distances': alternative_distances,
         'alternative_rome_descriptions': alternative_rome_descriptions,
         'canonical_url': canonical_url,
-        'companies': list(companies),
+        'companies': list(offices),
         'companies_per_page': pagination.OFFICES_PER_PAGE,
-        'company_count': company_count,
+        'company_count': office_count,
         'distance': fetcher.distance,
         'doorbell_tags': doorbell.get_tags('results'),
         'form': form,
@@ -375,17 +375,17 @@ def entreprises():
     activity_log_properties['effectif'] = fetcher.headcount
     activity_log_properties['tri'] = fetcher.sort
     activity_log_properties['naf'] = fetcher.naf
-    activity_log_sirets = [company.siret for company in companies]
-    activity.log_search(sirets=activity_log_sirets, count=company_count, page=current_page, **activity_log_properties)
+    activity_log_sirets = [office.siret for office in offices]
+    activity.log_search(sirets=activity_log_sirets, count=office_count, page=current_page, **activity_log_properties)
 
     return render_template(template, **context)
 
 
-def log_search_activity(activity_log_properties, companies=None, company_count=None, page=None):
+def log_search_activity(activity_log_properties, offices=None, office_count=None, page=None):
     resultats = {
         'page': page,
-        'total': company_count,
-        'sirets': [company.siret for company in companies] if companies is not None else None,
+        'total': office_count,
+        'sirets': [office.siret for office in offices] if offices is not None else None,
     }
     activity.log('recherche', resultats=resultats, **activity_log_properties)
 

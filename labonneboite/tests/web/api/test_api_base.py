@@ -1,5 +1,8 @@
 # coding: utf8
 
+import os
+import json
+
 from labonneboite.common.models import Office
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.api import util
@@ -169,6 +172,7 @@ class ApiBaseTest(DatabaseTest):
             {
                 'naf': '7320Z',  # Map to ROME D1405.
                 'siret': '00000000000002',
+                'company_name': 'Raison sociale 2',
                 'score': 69,
                 'score_alternance': 18,
                 'headcount': 31,
@@ -529,3 +533,8 @@ class ApiBaseTest(DatabaseTest):
         params['timestamp'] = timestamp
         params['signature'] = signature
         return params
+
+
+    def get_fixture(self, fixture):
+        fixture_path = os.path.join(os.path.dirname(__file__), 'fixtures', fixture)
+        return json.load(open(fixture_path))

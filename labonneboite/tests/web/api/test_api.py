@@ -12,7 +12,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common import search as search_util
 from labonneboite.common import hiring_type_util
 from labonneboite.common.models import Office
-from labonneboite.common.search import fetch_companies
+from labonneboite.common.search import fetch_offices
 from labonneboite.common import pagination
 from labonneboite.conf import settings
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest
@@ -26,7 +26,7 @@ class ApiGenericTest(ApiBaseTest):
         latitude = 49.305658  # 15 Avenue François Mitterrand, 57290 Fameck, France.
         longitude = 6.116853
         distance = 100
-        companies, _, _ = fetch_companies(
+        companies, _, _ = fetch_offices(
             naf_codes,
             [rome_code],
             latitude,
@@ -46,7 +46,7 @@ class ApiGenericTest(ApiBaseTest):
         longitude = 6.116853
         distance = 100
         headcount = settings.HEADCOUNT_SMALL_ONLY
-        companies, _, _ = fetch_companies(
+        companies, _, _ = fetch_offices(
             naf_codes,
             [rome_code],
             latitude,
@@ -67,7 +67,7 @@ class ApiGenericTest(ApiBaseTest):
         latitude += 0.1 # original coordinates will unfortunately give a distance with 0 digit
         longitude = 6.116853
         distance = 100
-        companies, _, _ = fetch_companies(
+        companies, _, _ = fetch_offices(
             naf_codes,
             [rome_code],
             latitude,
@@ -1341,6 +1341,124 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertIn("email", company_with_info)
         self.assertIn("phone", company_with_info)
         self.assertIn("website", company_with_info)
+
+
+class ApiOffersOfficesListTest(ApiBaseTest):
+    """
+    Test the API route: `offers_offices_list`.
+    """
+
+    def test_happy_path(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
+                'rome_codes': 'D1405',
+                'contract': 'alternance',
+                'user': 'labonneboite',
+                'distance': 50,
+            })
+
+            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
+                rv = self.app.get('%s?%s' % (url_for("api.offers_offices_list"), urlencode(params)))
+            
+            self.assertEqual(rv.status_code, 200)
+            result = json.loads(rv.data.decode())
+            self.assertEqual(result['companies_count'], 2)
+            self.assertEqual(len(result['companies']), 2)
+            for office_json in result['companies']:
+                self.assertIn('distance', office_json)
+                self.assertIn('offers_count', office_json)
+                self.assertIn('offers', office_json)
+
+
+    def test_multi_rome_is_supported(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
+                'rome_codes': 'D1405,D1507',
+                'contract': 'alternance',
+                'user': 'labonneboite',
+                'distance': 50,
+            })
+
+            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
+                rv = self.app.get('%s?%s' % (url_for("api.offers_offices_list"), urlencode(params)))
+            
+            self.assertEqual(rv.status_code, 200)
+            result = json.loads(rv.data.decode())
+            self.assertEqual(result['companies_count'], 2)
+            self.assertEqual(len(result['companies']), 2)
+            for office_json in result['companies']:
+                self.assertIn('distance', office_json)
+                self.assertIn('offers_count', office_json)
+                self.assertIn('offers', office_json)
+
+
+    def test_dpae_scoring_not_supported(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+                'distance': 50,
+            })
+
+            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
+                rv = self.app.get('%s?%s' % (url_for("api.offers_offices_list"), urlencode(params)))
+            
+            self.assertEqual(rv.status_code, 400)
+            self.assertIn(b'parameter contract is required', rv.data)
+
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
+                'rome_codes': 'D1405',
+                'contract': 'dpae',
+                'user': 'labonneboite',
+                'distance': 50,
+            })
+
+            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
+                rv = self.app.get('%s?%s' % (url_for("api.offers_offices_list"), urlencode(params)))
+            
+            self.assertEqual(rv.status_code, 400)
+            self.assertIn(b'only contract=alternance is supported', rv.data)
+
+
+    def test_gps_search_not_supported(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
+                'longitude': self.positions['bayonville_sur_mad']['coords'][0]['lon'],
+                'rome_codes': 'D1405',
+                'contract': 'alternance',
+                'user': 'labonneboite',
+                'distance': 50,
+            })
+
+            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
+                rv = self.app.get('%s?%s' % (url_for("api.offers_offices_list"), urlencode(params)))
+            
+            self.assertEqual(rv.status_code, 400)
+            self.assertIn(b'parameter longitude is not supported', rv.data)
+
+
+    def test_pagination_not_supported(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
+                'rome_codes': 'D1405',
+                'contract': 'alternance',
+                'user': 'labonneboite',
+                'distance': 50,
+                'page': 2,
+            })
+
+            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
+                rv = self.app.get('%s?%s' % (url_for("api.offers_offices_list"), urlencode(params)))
+            
+            self.assertEqual(rv.status_code, 400)
+            self.assertIn(b'only page=1 is supported as pagination is not implemented', rv.data)
 
 
 class ApiCompanyListTrackingCodesTest(ApiBaseTest):

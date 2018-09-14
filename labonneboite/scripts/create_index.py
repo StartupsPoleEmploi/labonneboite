@@ -20,7 +20,7 @@ from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import hiring_type_util
 from labonneboite.common import es
-from labonneboite.common.search import fetch_companies
+from labonneboite.common.search import fetch_offices
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, OGR_ROME_CODES
 from labonneboite.common.models import Office
@@ -678,7 +678,7 @@ def sanity_check_rome_codes():
     for rome_id in romes_from_rome_naf_mapping:
         naf_code_list = mapping_util.map_romes_to_nafs([rome_id])
         disable_verbose_loggers()
-        offices, _, _ = fetch_companies(
+        offices, _, _ = fetch_offices(
             naf_codes=naf_code_list,
             rome_codes=[rome_id],
             latitude=latitude,
