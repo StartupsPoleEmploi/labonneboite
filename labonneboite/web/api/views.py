@@ -271,10 +271,8 @@ def create_fetcher(location, request_args):
     Returns the filters given a set of parameters.
 
     Required parameters:
-    - `location` (Location)
+    - `location` (Location): location near which to search.
     - `rome_codes`: one or more "Pôle emploi ROME" codes, comma separated.
-    - `commune_id`: "code INSEE" of the city near which to search. If empty `latitude` and `longitude` are required.
-    - `latitude` and `longitude`: coordinates of a location near which to search. If empty `commune_id` is required.
 
     Optional parameters:
     - `distance`: perimeter of the search radius (in Km) in which to search.
