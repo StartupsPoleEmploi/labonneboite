@@ -57,15 +57,7 @@ class Fetcher(object):
             naf_codes=None,
             aggregate_by=None,
             departments=None,
-            **kwargs
     ):
-        """
-        This constructor takes many arguments; the goal is to reduce this list
-        and to never rely on kwargs.
-
-        Args:
-            search_location (Location)
-        """
         self.location = search_location
 
         self.romes = romes
