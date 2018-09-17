@@ -136,12 +136,3 @@ class TestComputeScore(DatabaseTest):
         self.assertIn('score_alternance_regr', columns)
 
 
-    def test_normalize_url(self):
-        self.assertEqual(compute_score.normalize_website_url(None), None)
-        self.assertEqual(compute_score.normalize_website_url(''), None)
-        self.assertEqual(compute_score.normalize_website_url('abc'), None)
-        self.assertEqual(compute_score.normalize_website_url('abc.com'), 'http://abc.com')
-        self.assertEqual(compute_score.normalize_website_url('abc.fr'), 'http://abc.fr')
-        self.assertEqual(compute_score.normalize_website_url('http://abc.fr'), 'http://abc.fr')
-        self.assertEqual(compute_score.normalize_website_url('https://abc.fr'), 'https://abc.fr')
-        self.assertEqual(compute_score.normalize_website_url('abc@def.fr'), None)

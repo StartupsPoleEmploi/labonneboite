@@ -16,6 +16,6 @@ def get_etablissement_filename():
     else:
         with open(settings.JENKINS_ETAB_PROPERTIES_FILENAME, "r") as f:
             # file content looks like this:
-            # LBB_ETABLISSEMENT_INPUT_FILE=/srv/lbb/labonneboite/importer/data/LBB_EGCEMP_ENTREPRISE_123.csv.bz2\n
+            # LBB_ETABLISSEMENT_INPUT_FILE=/srv/lbb/labonneboite/importer/data/LBB_ETABLISSEMENT_2016-12-19_2015-11-19.bz2\n
             etablissement_filename = f.read().strip().split('=')[1]
     return etablissement_filename

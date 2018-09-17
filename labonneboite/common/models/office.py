@@ -50,6 +50,7 @@ class PrimitiveOfficeMixin(object):
     tel = Column(String(191), default='', nullable=False)
     departement = Column(String(8), nullable=False)
     headcount = Column('trancheeffectif', String(2))
+    website = Column(String(191), default='', nullable=False)
 
 
 class OfficeMixin(PrimitiveOfficeMixin):
@@ -60,8 +61,6 @@ class OfficeMixin(PrimitiveOfficeMixin):
     each time you add/change/remove a field here to keep all models
     in sync.
     """
-    website = Column(String(191), default='', nullable=False)
-
     social_network = Column(mysql.TINYTEXT, nullable=True)
 
     email_alternance = Column('email_alternance', mysql.TINYTEXT, default='', nullable=True)

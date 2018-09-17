@@ -112,10 +112,10 @@ mysql-local-shell:
 
 rebuild-importer-tests-compressed-files:
 	cd labonneboite/tests/importer/data && \
-	rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.gz && \
-	gzip --keep LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv && \
-	rm LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv.bz2 && \
-	bzip2 --keep LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv
+	rm -f LBB_XDPDPAE_2016-11-10_2015-10-10.csv.gz && \
+	gzip --keep LBB_XDPDPAE_2016-11-10_2015-10-10.csv && \
+	rm -f LBB_XDPDPAE_2016-11-10_2015-10-10.csv.bz2 && \
+	bzip2 --keep LBB_XDPDPAE_2016-11-10_2015-10-10.csv
 
 # Load testing
 # ------------
@@ -224,8 +224,8 @@ run-importer-job-00-prepare-all: alembic-migrate
 		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
-		cp ../tests/importer/data/LBB_XDPDPA_DPAE_20151010_20161110_20161110_174915.csv data/ && \
-		cp ../tests/importer/data/LBB_EGCEMP_ENTREPRISE_20151119_20161219_20161219_153447.csv data/ && \
+		cp ../tests/importer/data/LBB_XDPDPAE_2016-11-10_2015-10-10.csv data/ && \
+		cp ../tests/importer/data/LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv data/ && \
 		echo "completed importer run preparation."
 
 run-importer-job-01-check-etablissements:

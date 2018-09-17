@@ -66,9 +66,7 @@ class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
         PrimaryKeyConstraint('siret'),
     )
 
-    # columns specific to this very model
-    website1 = Column(String(191))
-    website2 = Column(String(191))
+    # any column specific to this very model should go here.
 
 
 class ExportableOffice(FinalOfficeMixin, CRUDMixin, Base):
