@@ -50,6 +50,19 @@ class UserFavoriteOffice(CRUDMixin, Base):
     }
 
     @classmethod
+    def add_favorite(cls, user, office):
+        """
+        Add a favorite to a user.
+        Avoid as much as possible replication errors by ignoring duplicates.
+        """
+        statement = cls.__table__.insert().prefix_with("IGNORE").values(
+            user_id=user.id,
+            office_siret=office.siret,
+        )
+        db_session.execute(statement)
+        db_session.commit()
+
+    @classmethod
     def user_favs_as_sirets(cls, user):
         """
         Returns the favorites offices of a user as a list of sirets.
