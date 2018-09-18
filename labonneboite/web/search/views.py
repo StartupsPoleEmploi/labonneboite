@@ -374,6 +374,7 @@ def entreprises():
     activity_log_properties['distance'] = fetcher.distance
     activity_log_properties['effectif'] = fetcher.headcount
     activity_log_properties['tri'] = fetcher.sort
+    activity_log_properties['naf'] = fetcher.naf
     activity_log_sirets = [company.siret for company in companies]
     activity.log_search(sirets=activity_log_sirets, count=company_count, page=current_page, **activity_log_properties)
 

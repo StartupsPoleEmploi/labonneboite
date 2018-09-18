@@ -103,6 +103,7 @@ def company_list():
         sirets=[company['siret'] for company in companies],
         count=fetcher.company_count,
         source='api',
+        naf=fetcher.naf_codes,
         localisation={
             'codepostal': zipcode,
             'latitude': location.latitude,
