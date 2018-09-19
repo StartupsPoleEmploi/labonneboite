@@ -28,7 +28,7 @@ Le « potentiel d'embauche » est un indicateur basé sur une technique d'intell
 
 La Bonne Boite a été déployée en France avec des premiers résultats encourageants, et est en cours de développement pour d'autres pays (Luxembourg).
 
-La Bonne Boite c’est un [site web](https://labonneboite.pole-emploi.fr) mais aussi une [API](https://www.emploi-store-dev.fr/portail-developpeur/detailapicatalogue/labonneboite)
+La Bonne Boite c’est un [site web](https://labonneboite.pole-emploi.fr) mais aussi une [API](https://www.emploi-store-dev.fr/portail-developpeur/detailapicatalogue/57909ba23b2b8d019ee6cc5f)
 
 La Bonne Boite, [on en parle dans la presse](https://labonneboite.pole-emploi.fr/espace-presse)
 
@@ -44,7 +44,7 @@ The "hiring potential" is an indicator based on a machine learning model, in thi
 
 It has already been deployed in France with early results that are very promising. Early development is being made for new countries (Luxembourg).
 
-La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API](https://www.emploi-store-dev.fr/portail-developpeur/detailapicatalogue/labonneboite).
+La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API](https://www.emploi-store-dev.fr/portail-developpeur/detailapicatalogue/57909ba23b2b8d019ee6cc5f).
 
 [Press Coverage on La Bonne Boite](https://labonneboite.pole-emploi.fr/espace-presse)
 
