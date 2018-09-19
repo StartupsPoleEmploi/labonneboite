@@ -153,7 +153,7 @@ def update_coordinates_form(form):
             mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
 
             try:
-                mail.send_mail(mail_content)
+                mail.send_mail(mail_content, get_subject())
             except MailNoSendException as e:
                 logger.exception(e)
                 flash(generate_fail_flash_content(), 'error')
@@ -214,7 +214,7 @@ def update_jobs_form():
         mail_content = mail.generate_update_jobs_mail(form, recruiter_message)
 
         try:
-            mail.send_mail(mail_content)
+            mail.send_mail(mail_content, get_subject())
         except MailNoSendException as e:
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
@@ -248,7 +248,7 @@ def delete_form(form):
         mail_content = mail.generate_delete_mail(form, recruiter_message)
 
         try:
-            mail.send_mail(mail_content)
+            mail.send_mail(mail_content, get_subject())
         except MailNoSendException as e:
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
@@ -280,7 +280,7 @@ def other_form(form):
         mail_content = mail.generate_other_mail(form, recruiter_message)
 
         try:
-            mail.send_mail(mail_content)
+            mail.send_mail(mail_content, get_subject())
         except MailNoSendException as e:
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
@@ -328,6 +328,8 @@ def get_success_value():
         'email': 'labonneboite@pole-emploi.fr',
     }
 
+def get_subject():
+    return 'Nouveau message entreprise depuis LBA' if is_recruiter_from_lba() else 'Nouveau message entreprise depuis LBB'
 
 def generate_fail_flash_content():
     email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
