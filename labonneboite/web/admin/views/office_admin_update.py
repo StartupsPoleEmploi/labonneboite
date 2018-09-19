@@ -506,7 +506,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             DESCRIPTION_TEMPLATE.format("Case non cochée", checkbox_current_description)
         )
 
-    def uncheck_checked(self, form, checkbox_field_name):
+    def uncheck_checkbox(self, form, checkbox_field_name):
         checkbox_current_description = self.column_descriptions.get(checkbox_field_name, '')
         form[checkbox_field_name].data = False
         form[checkbox_field_name].description = Markup(
