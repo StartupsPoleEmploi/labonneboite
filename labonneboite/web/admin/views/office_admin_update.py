@@ -366,7 +366,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
         # Common behavior
         recruiter_phone = recruiter_message.requested_by_phone
-        recruiter_phone = recruiter_phone.replace(" ", "") if recruiter_phone else None
+        recruiter_phone = clean_phone(recruiter_phone) if recruiter_phone else None
 
         self.handle_diff('requested_by_last_name', recruiter_message.requested_by_last_name, office_admin_update, form)
         self.handle_diff(
@@ -387,10 +387,10 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
 
         if recruiter_message_type == models.UpdateCoordinatesRecruiterMessage.name:
-            new_phone = recruiter_message.new_phone.replace(" ", "") if recruiter_message.new_phone else None
+            new_phone = clean_phone(recruiter_message.new_phone) if recruiter_message.new_phone else None
 
             new_phone_alternance = recruiter_message.new_phone_alternance
-            new_phone_alternance = new_phone_alternance.replace(" ", "") if new_phone_alternance else None
+            new_phone_alternance = clean_phone(new_phone_alternance) if new_phone_alternance else None
 
             self.handle_diff('new_website', recruiter_message.new_website, office_admin_update, form)
             self.handle_diff('new_email', recruiter_message.new_email, office_admin_update, form)
@@ -690,3 +690,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
     def set_update_style(self, field_name):
         self.form_widget_args.update({field_name:{'style': UPDATE_STYLE}})
+
+def clean_phone(phone):
+    return phone.replace(" ", "").replace(".", "")
