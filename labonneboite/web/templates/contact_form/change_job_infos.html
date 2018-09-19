@@ -28,26 +28,37 @@
         </thead>
         <tbody>
 
-          {% for field in form if field.widget.html_tag == 'ul' %}
-          <tr id="{{ field.id }}" {% if field.errors %} class="form-error" {% endif %}>
-            <td>
-              <span>{{ field.label }}</span>
-            </td>
-            {% for choice in field.choices %}
-            <td class="text-center">
-              <span class="sr-only">{{ choice[1] }}</span>
-              <input
-                {% if choice[0] == 'hide' %}class="hide sr-only" {% endif %}
-                {% if choice[0] in field.default %}checked="checked" {% endif %}
-                type="checkbox"
-                name="{{ field.id }}"
-                value="{{ choice[0] }}" />
+          {% for rome_field in rome_fields %}
+            <tr id="{{ rome_field.code }}" {% if rome_field.current_values[0] == 'hide' %}class="removed"{% endif %}>
+              <td>
+                <label for={{ rome_field.code }}>{{ rome_field.name }}</label>
+              </td>
 
-                {% if choice[0] == 'hide' %}<button class="remove btn">Supprimer</button>{% endif %}
+              <td class="text-center">
+                  <span class="sr-only">Intéressé par les candidatures</span>
+                  <input
+                    {% if 'lbb' in rome_field.current_values %}checked="checked" {% endif %}
+                    type="checkbox" name="{{ rome_field.code }}" value="lbb" />
+              </td>
 
-            </td>
-            {% endfor %}
-          </tr>
+              <td class="text-center">
+                  <span class="sr-only">Métier ouvert à l'alternance</span>
+                  <input
+                    {% if 'lba' in rome_field.current_values %}checked="checked" {% endif %}
+                    type="checkbox" name="{{ rome_field.code }}" value="lba" />
+              </td>
+
+              <td>
+                  <span class="sr-only">Supprimer ce métier</span>
+                  <input class="hide sr-only"
+                    {% if 'hide' in rome_field.current_values %}checked="checked" {% endif %}
+                    type="checkbox" name="{{ rome_field.code }}" value="hide" />
+
+                    <button class="remove btn">
+                      {% if 'hide' in rome_field.current_values %}Restaurer{% else %}Supprimer{% endif %}
+                    </button>
+              </td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
