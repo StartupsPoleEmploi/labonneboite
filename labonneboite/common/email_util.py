@@ -24,9 +24,11 @@ class MandrillClient(EmailClient):
     def __init__(self, mandrill):
         self.mandrill = mandrill
 
+
     def send(self, html):
         from_email = self.from_email
         to_email = self.to
+        success = True
 
         try:
             response = self.mandrill.send_email(
@@ -34,10 +36,16 @@ class MandrillClient(EmailClient):
                 to=[{'email': to_email}],
                 html=html,
                 from_email=from_email)
-            content = json.loads(response.content.decode())
-            if content[0]["status"] != "sent":
-                raise MailNoSendException("email was not sent from %s to %s" % (from_email, to_email))
         except HTTPError:
+            success = False
+        else:
+            content = response.json()
+            if content[0]["status"] != "sent":
+                logger.error('Unexpected Mandrill status : {}'.format(content))
+                success = False
+
+        if not success:
             raise MailNoSendException("email was not sent from %s to %s" % (from_email, to_email))
+
 
         return response
