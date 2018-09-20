@@ -24,12 +24,6 @@ logger = logging.getLogger('main')
 
 contactFormBlueprint = Blueprint('contact_form', __name__)
 
-JOB_CHOICES = [
-    ('lbb', 'Intéressé par les candidatures'),
-    ('lba', 'Métier ouvert à l\'alternance'),
-    ('hide', 'Supprimer ce métier'),
-]
-
 ERROR_CONTACT_MODE_MESSAGE = 'Vous avez indiqué vouloir être contacté \'{}\' mais le champ \'{}\' n\'est pas renseigné. Nous vous invitons à le remplir.'
 
 # Get form value from office.contact_mode text
@@ -179,35 +173,26 @@ def update_coordinates_form(form):
 
 
 @contactFormBlueprint.route('/informations-entreprise/modifier-metiers', methods=['GET', 'POST'])
-def update_jobs_form():
+@create_form(forms.OfficeUpdateJobsForm)
+def update_jobs_form(form):
     try:
         office = get_office_from_siret(request.args['siret'])
     except NoResultFound:
         flash(unknown_siret_message(), 'error')
         return redirect(url_for('contact_form.change_info'))
 
-
-    form = forms.OfficeUpdateJobsForm
     office_romes = mapping_util.romes_for_naf(office.naf)
 
+    rome_fields = []
     for rome in office_romes:
         # Retrieve old values
-        values = dict(request.form).get(rome.code, ['lbb', 'lba'])
+        current_values = dict(request.form).get(rome.code, ['lbb', 'lba'])
 
-        setattr(
-            form,
-            rome.code,
-            SelectMultipleField(
-                rome.name,
-                choices=JOB_CHOICES,
-                widget=ListWidget(),
-                option_widget=CheckboxInput(),
-                default=values
-            )
-        )
-
-    form = form()
-    add_identication_data(form)
+        rome_fields.append({
+            'code': rome.code,
+            'name': rome.name,
+            'current_values': current_values
+        })
 
     if form.validate_on_submit():
         recruiter_message = models.UpdateJobsRecruiterMessage.create_from_form(form)
@@ -226,9 +211,9 @@ def update_jobs_form():
                 site_name=redirect_params.get('site_name'),
                 email=redirect_params.get('email'),
                 home_url=redirect_params.get('home_url'),
+                rome_fields=rome_fields,
                 action_form_url=url_for('contact_form.ask_action', **request.args),
             )
-
 
 
     return render_template('contact_form/change_job_infos.html',
@@ -237,6 +222,7 @@ def update_jobs_form():
         params=urlencode(request.args),
         use_lba_template=is_recruiter_from_lba(),
         manually_added_jobs=extract_manually_added_jobs(office),
+        rome_fields=rome_fields,
     )
 
 

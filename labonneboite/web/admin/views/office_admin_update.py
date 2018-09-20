@@ -422,13 +422,13 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             )
             self.handle_diff(
                 'romes_to_remove',
-                self.format(recruiter_message.romes_to_remove),
+                self.format(self.filter_romes(recruiter_message.romes_to_remove, office.naf)),
                 office_admin_update,
                 form
             )
             self.handle_diff(
                 'romes_alternance_to_remove',
-                self.format(recruiter_message.romes_alternance_to_remove),
+                self.format(self.filter_romes(recruiter_message.romes_alternance_to_remove,  office.naf)),
                 office_admin_update,
                 form
             )
@@ -662,6 +662,16 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
     def format(self, romes_str, char=','):
         return romes_str.replace(char, models.OfficeAdminUpdate.SEPARATORS[0]) if romes_str else romes_str
+
+    # Temporary fix
+    # Remove romes_to_removed not related to the office
+    def filter_romes(self, romes_str, naf):
+        office_romes = [item.code for item in mapping_util.romes_for_naf(naf)]
+        romes = romes_str.split(',')
+        romes_to_keep = [rome for rome in romes if rome in office_romes]
+
+        return ','.join(romes_to_keep)
+
 
 
     def get_recruiter_message(self, message_id, message_type):
