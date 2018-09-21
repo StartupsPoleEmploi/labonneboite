@@ -16,7 +16,6 @@ class MailNoSendException(Exception):
 class EmailClient(object):
     to = settings.FORM_EMAIL
     from_email = settings.ADMIN_EMAIL
-    subject = 'nouveau message entreprise LBB'
 
 
 class MandrillClient(EmailClient):
@@ -25,14 +24,14 @@ class MandrillClient(EmailClient):
         self.mandrill = mandrill
 
 
-    def send(self, html):
+    def send(self, html, subject):
         from_email = self.from_email
         to_email = self.to
         success = True
 
         try:
             response = self.mandrill.send_email(
-                subject=self.subject,
+                subject=subject,
                 to=[{'email': to_email}],
                 html=html,
                 from_email=from_email)

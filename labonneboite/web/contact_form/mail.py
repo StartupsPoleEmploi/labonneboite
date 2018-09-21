@@ -41,9 +41,9 @@ def common_mail_template(form):
     )
 
 
-def send_mail(mail_content):
+def send_mail(mail_content, subject):
     client = MandrillClient(current_app.extensions['mandrill'])
-    client.send(mail_content)
+    client.send(mail_content, subject)
 
 
 def generate_update_coordinates_mail(form, recruiter_message):
