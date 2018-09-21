@@ -29,6 +29,25 @@ ERROR_CONTACT_MODE_MESSAGE = 'Vous avez indiqué vouloir être contacté \'{}\' 
 # Get form value from office.contact_mode text
 CONTACT_MODES_LABEL_TO_FORM_VALUE = {v:k for k, v in CONTACT_MODES.items()}
 
+
+@contactFormBlueprint.route('/verification-informations-entreprise', methods=['GET'])
+@contactFormBlueprint.route('/verification-informations-entreprise/<siret>', methods=['GET'])
+def change_info_or_apply_for_job(siret=None):
+    """
+    Ask user if he wants to change company information or apply for a job,
+    in order to avoid the change_info page to be spammed so much by
+    people thinking they are actually applying for a job.
+    """
+    return render_template('contact_form/change_info_or_apply_for_job.html', use_lba_template=is_recruiter_from_lba(), siret=siret)
+
+@contactFormBlueprint.route('/postuler/<siret>', methods=['GET'])
+def apply_for_job(siret):
+    """
+    If user arrives here, it means we successfully avoided having him spam the
+    company modification form. Now we just have to explain him what is wrong.
+    """
+    return render_template('contact_form/apply_for_job.html', siret=siret, use_lba_template=is_recruiter_from_lba())
+
 def create_form(form_class):
     """
     A decorator that inject hidden fields from OfficeHiddenIdentificationForm
