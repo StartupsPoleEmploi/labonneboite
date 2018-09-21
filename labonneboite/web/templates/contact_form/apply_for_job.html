@@ -1,0 +1,28 @@
+{% if use_lba_template %}
+    {% extends 'base_lba.html' %}
+{% else %}
+    {% extends 'base.html' %}
+{% endif %}
+
+{% block title %}Postuler dans cette entreprise pour y travailler{% endblock %}
+
+{% block content %}
+<div class="lbb-content">
+    <div class="lbb-single-column-content application-text">
+        <h2>Postuler dans cette entreprise pour y travailler</h2>
+
+        <p>Vous souhaitez postuler auprès de cette entreprise.</p>
+
+        <p>Nous ne proposons pas encore cette fonctionnalité.</p>
+
+        <p>
+            Vous devez donc contacter directement l’entreprise en vous aidant des informations présentes sur
+            {% if use_lba_template %}
+                <a href="https://labonnealternance.pole-emploi.fr/details-entreprises/{{ siret }}" target="_blank">cette page</a>.
+            {% else %}
+                <a href="{{ url_for('office.details', siret=siret) }}" target="_blank">cette page</a>.
+            {% endif %}
+        </p>
+    </div>
+</div>
+{% endblock %}

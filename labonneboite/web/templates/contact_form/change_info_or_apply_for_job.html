@@ -1,0 +1,34 @@
+{% if use_lba_template %}
+    {% extends 'base_lba.html' %}
+{% else %}
+    {% extends 'base.html' %}
+{% endif %}
+￼
+￼ {% block title %}Demande de modification des informations de mon entreprise{% endblock %}
+￼
+￼ {% block content %}
+￼ <div class="lbb-content">
+￼   <div class="lbb-single-column-content verification-form">
+￼
+￼     <h2>Demande de modification des informations de mon entreprise</h2>
+￼
+￼     <p class="text-center">Veuillez sélectionner votre situation :</p>
+￼
+￼     <p class="text-center">
+        {% if use_lba_template %}
+            <a class="btn btn-large btn-small" href="{{ url_for('contact_form.apply_for_job', siret=siret, origin='labonnealternance') }}">Je souhaite postuler dans cette entreprise pour y travailler.</a>
+        {% else %}
+            <a class="btn btn-large" href="{{ url_for('contact_form.apply_for_job', siret=siret) }}">Je souhaite postuler dans cette entreprise pour y travailler.</a>
+        {% endif %}
+￼     </p>
+￼     <p class="text-center">
+        {% if use_lba_template %}
+￼           <a class="btn btn-small" href="{{ url_for('contact_form.change_info', origin='labonnealternance') }}">￼Je travaille déjà dans cette entreprise et je souhaite modifier ses informations.</a>
+        {% else %}
+    ￼       <a class="btn btn-small" href="{{ url_for('contact_form.change_info') }}">￼Je travaille déjà dans cette entreprise et je souhaite modifier ses informations.</a>
+        {% endif %}
+￼     </p>
+￼
+￼   </div>
+￼ </div>
+￼ {% endblock %}

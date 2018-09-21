@@ -63,6 +63,17 @@ a.btn.btn-small {
     font-size: 1.1em;
 }
 
+
+/* Verification form and application-text pages */
+.verification-form, .application-text {
+    background: white;
+    padding: 40px 80px 80px 80px;
+}
+
+.verification-form p, .application-text p {
+    color: #444;
+}
+
 /* Action chooser form */
 .action-chooser-form {
     background: white;
