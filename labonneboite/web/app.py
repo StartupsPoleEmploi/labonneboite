@@ -242,8 +242,8 @@ def create_app():
     assets = Environment(app=flask_app)
     js = Bundle(
         # Vendor.
-        'js/vendor/jquery.min.js',  # Order is important.
-        'js/vendor/jquery-ui.1.11.2.js',  # Order is important.
+        'js/vendor/jquery.min.js',
+        'js/vendor/jquery-ui.1.11.4.min.js',
         'js/vendor/bootstrap-tooltip.js',
         'js/vendor/js.cookie.js',
         # LBB.
