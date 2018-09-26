@@ -3,10 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name=viewport content="width=device-width, initial-scale=1">
-  <meta name="google-site-verification" content="u049KXeNisFhYyb2alIBRJGWP1E6Y0YFfgyk1nWH1Xs">
+
+  {% if google_site_verification_code %}
+    <meta name="google-site-verification" content="{{ google_site_verification_code }}">
+  {% endif %}
+
   <title>{% block fulltitle %}{% block title %}{% endblock %} | La Bonne Boite{% endblock %}</title>
 
   {% if enable_google_optimize %}
+    <meta name="google-site-verification" content="u049KXeNisFhYyb2alIBRJGWP1E6Y0YFfgyk1nWH1Xs">
     {# Google Optimize (GO) page-hiding snippet #}
     {# should be inside HEAD and before GA snippet #}
     {# see https://support.google.com/360suite/optimize/answer/6262084#step-2 #}
@@ -114,12 +119,12 @@
           <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite" width="74">
         </a>
       </li>
-      
+
       <li class="float-right lbb-header-logo-pole-emploi">
         {# The hardcoded width attribute is required by IE 11. #}
         <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi" width="74">
       </li>
-      
+
       <li class="float-right" id="user-header">
           {% include 'user/header.html' %}
       </li>
