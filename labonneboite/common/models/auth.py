@@ -64,3 +64,18 @@ def get_user_social_auth(user_id):
         .order_by(desc(UserSocialAuth.id))
         .first()
     )
+
+
+def find_user(strategy, details, backend, *args, user=None, **kwargs):
+    """
+    Function designed to be inserted just before replace
+    social_core.pipeline.user.create_user in the social pipeline. We need to
+    search for existing users because we have 2 different authentication
+    backends. If we don't find the user before we call the create_user
+    function, each backend will create a new user. Thus, a single user may be
+    subscribed twice, with different favorites.
+    """
+    user = user or User.query.filter_by(external_id=details.get('external_id')).first()
+    return {
+        'user': user
+    }
