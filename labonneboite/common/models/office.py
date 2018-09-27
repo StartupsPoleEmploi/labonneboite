@@ -119,6 +119,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     __tablename__ = settings.OFFICE_TABLE
     __table_args__ = (
         Index('dept_i', 'departement'),
+        Index('_raisonsociale_codecommune', 'raisonsociale', 'codecommune'),
         PrimaryKeyConstraint('siret'),
     )
 
