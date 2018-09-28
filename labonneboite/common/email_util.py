@@ -3,6 +3,7 @@
 import json
 import logging
 from urllib.error import HTTPError
+from requests.exceptions import ConnectionError
 
 from labonneboite.conf import settings
 
@@ -35,7 +36,7 @@ class MandrillClient(EmailClient):
                 to=[{'email': to_email}],
                 html=html,
                 from_email=from_email)
-        except HTTPError:
+        except (HTTPError, ConnectionError):
             success = False
         else:
             content = response.json()
