@@ -1,6 +1,5 @@
 # coding: utf8
 
-from datetime import date
 import os
 
 from slugify import slugify
@@ -9,12 +8,11 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import abort, render_template, jsonify
 from flask import Blueprint
 from flask import make_response, send_file
-from flask import request, session
+from flask import request
 
 from labonneboite.common import activity
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import util
-from labonneboite.conf import settings
 from labonneboite.common.contact_mode import CONTACT_MODE_STAGES
 from labonneboite.web.utils import fix_csrf_session
 from labonneboite.common.models import Office
@@ -46,71 +44,53 @@ def details(siret):
     return render_template('office/details.html', **context)
 
 
-def detail(siret):
-    company = Office.query.filter(Office.siret == siret).one()
-
-    if 'search_args' in session:
-        search_url = util.get_search_url('/resultat', session['search_args'])
-    else:
-        search_url = None
-    rome = request.args.get('r')
-    if rome not in settings.ROME_DESCRIPTIONS:
-        rome = None
-        rome_description = None
-    else:
-        rome_description = settings.ROME_DESCRIPTIONS[rome]
-
-    contact_mode = util.get_contact_mode_for_rome_and_office(rome, company)
-
-    google_search = "%s+%s" % (company.name.replace(' ', '+'), company.city.replace(' ', '+'))
-    google_url = "https://www.google.fr/search?q=%s" % google_search
-
-    return {
-        'company': company,
-        'contact_mode': contact_mode,
-        'rome': rome,
-        'rome_description': rome_description,
-        'google_url': google_url,
-        'kompass_url': "http://fr.kompass.com/searchCompanies?text=%s" % company.siret,
-        'search_url': search_url,
-    }
-
-
 @officeBlueprint.route('/<siret>/download')
 def download(siret):
     """
     Download the PDF of an office.
     """
-    try:
-        office = Office.query.filter(Office.siret == siret).one()
-    except NoResultFound:
-        abort(404)
+    office = get_office_or_404(siret)
 
     activity.log('telecharger-pdf', siret=siret)
 
     attachment_name = 'fiche_entreprise_%s.pdf' % slugify(office.name, separator='_')
-    full_path = pdf_util.get_file_path(office)
-    if os.path.exists(full_path):
-        return send_file(full_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)
+    pdf_path = office_detail_pdf_path(office)
+    return send_file(pdf_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)
 
-    dic = detail(siret)
-    office = dic['company']
 
-    contact_mode = dic['contact_mode']
-    dic['stages'] = CONTACT_MODE_STAGES.get(contact_mode, [contact_mode])
-    dic['date'] = date.today()
+@officeBlueprint.route('/<siret>/download.html')
+def download_html(siret):
+    office = get_office_or_404(siret)
+    return make_response(office_detail_html(office))
 
-    # Render pdf file
-    pdf_data = render_template('office/pdf_detail.html', **dic)
-    pdf_target = pdf_util.convert_to_pdf(pdf_data)
-    data_to_write = pdf_target.getvalue()
-    pdf_util.write_file(office, data_to_write)
 
-    # Return pdf
-    response = make_response(data_to_write)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
-    return response
+def get_office_or_404(siret):
+    try:
+        return Office.query.filter(Office.siret == siret).one()
+    except NoResultFound:
+        abort(404)
+
+
+def office_detail_pdf_path(office):
+    path = pdf_util.get_file_path(office)
+    if not os.path.exists(path):
+        pdf_data = office_detail_html(office)
+        pdf_target = pdf_util.convert_to_pdf(pdf_data)
+        data_to_write = pdf_target.getvalue()
+        pdf_util.write_file(office, data_to_write, path)
+    return path
+
+
+def office_detail_html(office):
+    """
+    Return the html corresponding to the office details.
+    """
+    contact_mode = util.get_contact_mode_for_rome_and_office(None, office)
+    return render_template('office/pdf_detail.html', **{
+        'company': office,
+        'contact_mode': contact_mode,
+        'stages': CONTACT_MODE_STAGES.get(contact_mode, [contact_mode]),
+    })
 
 
 @officeBlueprint.route('/events/toggle-details/<siret>', methods=['POST'])

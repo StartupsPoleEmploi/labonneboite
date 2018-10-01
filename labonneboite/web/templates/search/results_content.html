@@ -119,8 +119,8 @@
       {% for company in companies %}
       <div id="company-{{ company.siret }}" class="lbb-bright-container lbb-result">
           {% with show_more_info=1 %}
-            {% include "includes/office_header.html" %}
-            {% include "includes/office_content.html" %}
+            {% include "includes/office/header.html" %}
+            {% include "includes/office/content.html" %}
           {% endwith %}
         </div>
       {% endfor %}
