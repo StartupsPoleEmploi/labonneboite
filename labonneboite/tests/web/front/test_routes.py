@@ -51,6 +51,21 @@ class SearchEntreprisesTest(DatabaseTest):
         self.assertEqual(200, response.status_code)
 
 
+    def test_search_by_non_float_coordinates(self):
+        self.es.index(index=settings.ES_INDEX, doc_type='ogr', id=1, body={
+            'ogr_code': '10974',
+            'ogr_description': 'Animateur commercial / Animatrice commerciale',
+            'rome_code': 'D1501',
+            'rome_description': 'Animation de vente'
+        })
+        self.es.indices.flush(index=settings.ES_INDEX)
+
+        url = self.url_for('search.entreprises', lat='undefined', lon='undefined', j='D1501')
+        response = self.app.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertIn("La ville que vous avez choisie n'est pas valide", response.data.decode())
+
+
     def test_canonical_url(self):
         with self.app_context:
             url = get_canonical_results_url('05100', 'Cervières', 'Boucherie')
