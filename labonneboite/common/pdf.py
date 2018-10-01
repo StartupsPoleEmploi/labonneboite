@@ -21,19 +21,18 @@ def get_file_path(office):
                         "%s.pdf" % office.siret)
 
 
-def write_file(office, data):
-    filename = get_file_path(office)
-    if not os.path.exists(os.path.dirname(filename)):
+def write_file(office, data, path):
+    if not os.path.exists(os.path.dirname(path)):
         try:
-            os.makedirs(os.path.dirname(filename))
+            os.makedirs(os.path.dirname(path))
         except OSError as exc:
             # Guard against race condition
             if exc.errno != errno.EEXIST:
                 raise
-    with open(filename, "wb") as f:
+    with open(path, "wb") as f:
         f.write(data)
     f.close()
-    logger.debug("wrote PDF file to %s", filename)
+    logger.debug("wrote PDF file to %s", path)
 
 
 def delete_file(office):

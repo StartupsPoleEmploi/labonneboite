@@ -49,34 +49,48 @@ def download(siret):
     """
     Download the PDF of an office.
     """
-    try:
-        office = Office.query.filter(Office.siret == siret).one()
-    except NoResultFound:
-        abort(404)
+    office = get_office_or_404(siret)
 
     activity.log('telecharger-pdf', siret=siret)
 
     attachment_name = 'fiche_entreprise_%s.pdf' % slugify(office.name, separator='_')
-    full_path = pdf_util.get_file_path(office)
-    if os.path.exists(full_path):
-        return send_file(full_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)
+    pdf_path = office_detail_pdf_path(office)
+    return send_file(pdf_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)
 
-    # Render pdf file
+
+@officeBlueprint.route('/<siret>/download.html')
+def download_html(siret):
+    office = get_office_or_404(siret)
+    return make_response(office_detail_html(office))
+
+
+def get_office_or_404(siret):
+    try:
+        return Office.query.filter(Office.siret == siret).one()
+    except NoResultFound:
+        abort(404)
+
+
+def office_detail_pdf_path(office):
+    path = pdf_util.get_file_path(office)
+    if not os.path.exists(path):
+        pdf_data = office_detail_html(office)
+        pdf_target = pdf_util.convert_to_pdf(pdf_data)
+        data_to_write = pdf_target.getvalue()
+        pdf_util.write_file(office, data_to_write, path)
+    return path
+
+
+def office_detail_html(office):
+    """
+    Return the html corresponding to the office details.
+    """
     contact_mode = util.get_contact_mode_for_rome_and_office(None, office)
-    pdf_data = render_template('office/pdf_detail.html', **{
+    return render_template('office/pdf_detail.html', **{
         'company': office,
         'contact_mode': contact_mode,
         'stages': CONTACT_MODE_STAGES.get(contact_mode, [contact_mode]),
     })
-    pdf_target = pdf_util.convert_to_pdf(pdf_data)
-    data_to_write = pdf_target.getvalue()
-    pdf_util.write_file(office, data_to_write)
-
-    # Return pdf
-    response = make_response(data_to_write)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
-    return response
 
 
 @officeBlueprint.route('/events/toggle-details/<siret>', methods=['POST'])
