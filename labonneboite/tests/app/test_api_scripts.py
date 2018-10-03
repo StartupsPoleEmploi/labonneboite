@@ -1,6 +1,5 @@
 
 import json
-from urllib.parse import urlencode
 from unittest import mock
 
 from flask import url_for
@@ -40,7 +39,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
         })
 
         with self.test_request_context:
-            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 200)
             data_list = json.loads(rv.data.decode())
 
@@ -75,7 +74,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
         })
 
         with self.test_request_context:
-            rv = self.app.get('%s?%s' % (url_for("api.company_list"), urlencode(params)))
+            rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 200, msg=rv.data)
             data_list = json.loads(rv.data.decode())
 

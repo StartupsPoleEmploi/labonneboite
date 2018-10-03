@@ -1,5 +1,4 @@
 # coding: utf8
-from urllib.parse import urlencode
 from unittest import mock
 
 from labonneboite.common import pro
@@ -45,7 +44,7 @@ class ProVersionTest(DatabaseTest):
         user_pro = User.create(email='x@pole-emploi.fr', gender='male', first_name='John', last_name='Doe')
 
         next_url = 'http://localhost:8090/entreprises/metz-57000/boucherie?sort=score&d=10&h=1&p=0&f_a=0'
-        url = '%s?%s' % (self.url_for('user.pro_version'), urlencode({'next': next_url}))
+        url = self.url_for('user.pro_version', **{'next': next_url})
 
         with self.test_request_context:
 

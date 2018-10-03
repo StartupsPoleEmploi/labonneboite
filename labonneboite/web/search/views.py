@@ -222,12 +222,8 @@ def results(city, zipcode, occupation):
     params['city'] = city
     params['zipcode'] = zipcode
     params['occupation'] = occupation
-    params = {
-        key.encode('utf8'): value.encode('utf8') for key, value in params.items()
-    }
 
-    redirect_url = url_for('search.entreprises')
-    redirect_url += '?' + urlencode(params)
+    redirect_url = url_for('search.entreprises', **params)
     return redirect(redirect_url)
 
 
