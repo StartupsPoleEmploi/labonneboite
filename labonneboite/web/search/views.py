@@ -238,7 +238,6 @@ def entreprises():
     fix_csrf_session()
     session['search_args'] = request.args
     location, named_location = get_location(request.args)
-    location_doesnt_exist = not location
 
     occupation = request.args.get('occupation', '')
     if not occupation and 'j' in request.args:
@@ -260,8 +259,9 @@ def entreprises():
         # removed it from the url)
         form_kwargs['l'] = named_location.name
 
-    form_kwargs['lat'] = location.latitude if location else 0.0
-    form_kwargs['lon'] = location.longitude if location else 0.0
+    if location:
+        form_kwargs['lat'] = location.latitude
+        form_kwargs['lon'] = location.longitude
 
     form = make_company_search_form(**form_kwargs)
 
@@ -280,7 +280,7 @@ def entreprises():
     )
 
     # Stop here in case of invalid arguments
-    if location_doesnt_exist or job_doesnt_exist or not form.validate():
+    if not form.validate() or job_doesnt_exist:
         log_search_activity(activity_log_properties)
         return render_template(template, job_doesnt_exist=job_doesnt_exist, form=form)
 
