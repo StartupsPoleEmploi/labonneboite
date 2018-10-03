@@ -7,6 +7,7 @@ from flask import abort, Blueprint, current_app, jsonify, request, url_for
 from labonneboite.common import activity
 from labonneboite.common import geocoding
 from labonneboite.common import search
+from labonneboite.common import offers
 from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
@@ -14,6 +15,7 @@ from labonneboite.common import hiring_type_util
 from labonneboite.common.locations import Location
 from labonneboite.common.load_data import ROME_CODES
 from labonneboite.common.models import Office
+from labonneboite.common.fetcher import InvalidFetcherArgument
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
@@ -22,11 +24,6 @@ from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
 apiBlueprint = Blueprint('api', __name__)
 
 
-
-
-class InvalidFetcherArgument(Exception):
-    pass
-
 def api_auth_required(function):
     """
     A decorator that checks that auth and security params are valid.
@@ -34,6 +31,7 @@ def api_auth_required(function):
     """
     @wraps(function)
     def decorated(*args, **kwargs):
+        log_api_request()
 
         if 'user' not in request.args:
             return 'missing argument: user', 400
@@ -68,40 +66,50 @@ def get_ga_query_string():
     return ga_query_string
 
 
+def log_api_request():
+    current_app.logger.debug("API request received: %s", request.full_path)
+
+
+@apiBlueprint.route('/offers/offices/')
+@api_auth_required
+def offers_offices_list():
+
+    try:
+        fetcher = create_visible_market_fetcher(request.args)
+    except InvalidFetcherArgument as e:
+        return response_400(e)
+
+    _, zipcode, _ = get_location(request.args)
+
+    offices = fetcher.get_offices()
+
+    result = build_result(fetcher, offices, fetcher.commune_id, zipcode, add_url=False)
+
+    return jsonify(result)
+
+
 # Note: `company` should be renamed to `office` wherever possible.
-# Unfortunately old routes cannot change.
+# Unfortunately old routes and response formats cannot change due
+# to our retrocompatibility standard.
+
 
 @apiBlueprint.route('/company/')
 @api_auth_required
 def company_list():
 
-    current_app.logger.debug("API request received: %s", request.full_path)
-
     try:
         location, zipcode, commune_id = get_location(request.args)
-        fetcher = create_fetcher(location, request.args)
+        fetcher = create_hidden_market_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
-        message = 'Invalid request argument: {}'.format(e.args[0])
-        return message, 400
+        return response_400(e)
 
-    companies, _ = fetcher.get_companies(add_suggestions=False)
+    offices, _ = fetcher.get_offices(add_suggestions=False)
 
-    companies = [
-        patch_company_result_with_sensitive_information(request.args['user'], company, company.as_json(
-            rome_codes=fetcher.romes,
-            distance=fetcher.distance,
-            zipcode=zipcode,
-            extra_query_string=get_ga_query_string(),
-            hiring_type=fetcher.hiring_type,
-        ), fetcher.hiring_type == hiring_type_util.ALTERNANCE)
-        for company in companies
-    ]
+    result = build_result(fetcher, offices, commune_id, zipcode)
 
-    result = get_result(fetcher, commune_id)
-    result['companies'] = companies
     activity.log_search(
-        sirets=[company['siret'] for company in companies],
-        count=fetcher.company_count,
+        sirets=[office.siret for office in offices],
+        count=fetcher.office_count,
         source='api',
         naf=fetcher.naf_codes,
         localisation={
@@ -117,31 +125,45 @@ def company_list():
 @api_auth_required
 def company_count():
 
-    current_app.logger.debug("API request received: %s", request.full_path)
-
     try:
         location, _, commune_id = get_location(request.args)
-        fetcher = create_fetcher(location, request.args)
+        fetcher = create_hidden_market_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
-        message = 'Invalid request argument: {}'.format(e.args[0])
-        return message, 400
+        return response_400(e)
 
-    fetcher.compute_company_count()
+    fetcher.compute_office_count()
     result = get_result(fetcher, commune_id)
     return jsonify(result)
+
+
+def build_result(fetcher, offices, commune_id, zipcode, add_url=True):
+    offices = [
+        patch_office_result_with_sensitive_information(request.args['user'], office, office.as_json(
+            rome_codes=fetcher.romes,
+            distance=fetcher.distance,
+            zipcode=zipcode,
+            extra_query_string=get_ga_query_string(),
+            hiring_type=fetcher.hiring_type,
+        ), fetcher.hiring_type == hiring_type_util.ALTERNANCE)
+        for office in offices
+    ]
+
+    result = get_result(fetcher, commune_id, add_url)
+    result['companies'] = offices
+    return result
 
 
 def get_result(fetcher, commune_id=None, add_url=True, add_count=True):
     result = {}
     if len(fetcher.romes) == 1:
-        # Showing which rome_code matched at the result level and not the company level
+        # Showing which rome_code matched at the result level and not the office level
         # only makes sense for single rome search. For multi rome search, the rome_code
-        # which matched is added at the company level in office.py:as_json()
+        # which matched is added at the office level in office.py:as_json()
         rome_code = fetcher.romes[0]
         result['rome_code'] = rome_code
         result['rome_label'] = settings.ROME_DESCRIPTIONS[rome_code]
     if add_count:
-        result['companies_count'] = fetcher.company_count
+        result['companies_count'] = fetcher.get_office_count()
     if add_url:
         result['url'] = compute_frontend_url(fetcher, get_ga_query_string(), commune_id)
     return result
@@ -152,7 +174,7 @@ def compute_frontend_url(fetcher, query_string, commune_id):
     Compute web page URL that corresponds to the API request.
     """
 
-    if not fetcher.company_count >= 1:
+    if not fetcher.office_count >= 1:
         # Always return home URL if zero results
         # (requested by PE.fr)
         return url_for('root.home', _external=True, **query_string)
@@ -189,19 +211,17 @@ def compute_frontend_url(fetcher, query_string, commune_id):
 @apiBlueprint.route('/filter/')
 @api_auth_required
 def company_filter_list():
-    current_app.logger.debug("API request received: %s", request.full_path)
 
     try:
         location, _, _ = get_location(request.args)
-        fetcher = create_fetcher(location, request.args)
+        fetcher = create_hidden_market_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
-        message = 'Invalid request argument: {}'.format(e.args[0])
-        return message, 400
+        return response_400(e)
 
     # Add aggregations
     fetcher.aggregate_by = search.FILTERS
 
-    _, aggregations = fetcher.get_companies(add_suggestions=False)
+    _, aggregations = fetcher.get_offices(add_suggestions=False)
 
     if 'contract' in aggregations:
         raise ValueError("Error, contract aggregation should only be computed at a later step.")
@@ -210,7 +230,7 @@ def company_filter_list():
     if fetcher.aggregate_by:
         result['filters'] = aggregations
 
-        # If a filter or more are selected, the aggregations returned by fetcher.get_companies()
+        # If a filter or more are selected, the aggregations returned by fetcher.get_offices()
         # will be filtered too... To avoid that, we are doing additionnal ES calls (one by filter activated).
         if 'naf_codes' in request.args and 'naf' in fetcher.aggregate_by:
             result['filters']['naf'] = fetcher.get_naf_aggregations()
@@ -226,6 +246,11 @@ def company_filter_list():
     return jsonify(result)
 
 
+def response_400(e):
+    message = 'Invalid request argument: {}'.format(e.args[0])
+    return message, 400
+
+
 def get_location(request_args):
     """
     Parse request arguments to compute location objects.
@@ -236,6 +261,7 @@ def get_location(request_args):
     Return:
         location (Location)
         zipcode (str)
+        commune_id (str)
     """
     location = None
     zipcode = None
@@ -266,15 +292,51 @@ def get_location(request_args):
     return location, zipcode, commune_id
 
 
-def create_fetcher(location, request_args):
+def create_visible_market_fetcher(request_args):
+    UNSUPPORTED_PARAMETERS = ['sort', 'naf_codes', 'headcount', 'departments', 'longitude', 'latitude']
+    MANDATORY_PARAMETERS = ['rome_codes', 'commune_id', 'contract']
+
+    for param in UNSUPPORTED_PARAMETERS:
+        if request_args.get(param):
+            raise InvalidFetcherArgument('parameter %s is not supported' % param)
+
+    for param in MANDATORY_PARAMETERS:
+        if not request_args.get(param):
+            raise InvalidFetcherArgument('parameter %s is required' % param)
+
+    commune_id = request_args.get('commune_id')
+
+    romes = [code.upper() for code in request_args.get('rome_codes').split(',')]
+    validate_rome_codes(romes)
+
+    page, page_size = get_page_and_page_size(request_args)
+    if page != 1:
+        raise InvalidFetcherArgument('only page=1 is supported as pagination is not implemented')
+
+    distance = get_distance(request_args)
+
+    contract = request_args.get('contract')
+    if contract == hiring_type_util.CONTRACT_ALTERNANCE:
+        hiring_type = hiring_type_util.CONTRACT_TO_HIRING_TYPE[contract]
+    else:
+        raise InvalidFetcherArgument('only contract=alternance is supported')
+
+    return offers.VisibleMarketFetcher(
+        romes=romes,
+        commune_id=commune_id,
+        distance=distance,
+        hiring_type=hiring_type,
+        page_size=page_size,
+    )
+
+
+def create_hidden_market_fetcher(location, request_args):
     """
     Returns the filters given a set of parameters.
 
     Required parameters:
-    - `location` (Location)
+    - `location` (Location): location near which to search.
     - `rome_codes`: one or more "Pôle emploi ROME" codes, comma separated.
-    - `commune_id`: "code INSEE" of the city near which to search. If empty `latitude` and `longitude` are required.
-    - `latitude` and `longitude`: coordinates of a location near which to search. If empty `commune_id` is required.
 
     Optional parameters:
     - `distance`: perimeter of the search radius (in Km) in which to search.
@@ -288,7 +350,7 @@ def create_fetcher(location, request_args):
     - `sort`: one value, only between 'score' (default) and 'distance'
     - `headcount`: one value, only between 'all' (default), 'small' or 'big'
     """
-    # Arguments to build the Fetcher object
+    # Arguments to build the HiddenMarketFetcher object
     kwargs = {}
 
     # Sort
@@ -320,34 +382,18 @@ def create_fetcher(location, request_args):
 
     rome_code_list = [code.upper() for code in rome_codes.split(',')]
 
-    for rome in rome_code_list:
-        if rome not in ROME_CODES:  # ROME_CODES contains ascii data but rome is unicode.
-            msg = 'Unknown rome_code: %s - Possible reasons: 1) %s 2) %s' % (
-                rome,
-                'This rome_code does not exist.',
-                'This rome code exists but is very recent and thus \
-                    we do not have enough data yet to build relevant results for it. \
-                    We typically need at least 12 months of data before we can build \
-                    relevant results for a given rome_code.'
-            )
-            raise InvalidFetcherArgument(msg)
+    validate_rome_codes(rome_code_list)
 
     kwargs['romes'] = rome_code_list
 
     # Page and page_size
-    page = check_positive_integer_argument(request_args, 'page', 1)
-    page_size = check_positive_integer_argument(request_args, 'page_size', pagination.OFFICES_PER_PAGE)
-    if page_size > pagination.OFFICES_MAXIMUM_PAGE_SIZE:
-        raise InvalidFetcherArgument(
-            'page_size is too large. Maximum value is %s' % pagination.OFFICES_MAXIMUM_PAGE_SIZE
-        )
-
+    page, page_size = get_page_and_page_size(request_args)
     kwargs['to_number'] = page * page_size
     kwargs['from_number'] = kwargs['to_number'] - page_size + 1
 
     # Distance
     # WARNING: MAP uses distance=0 in their use of the API.
-    kwargs['distance'] = check_integer_argument(request_args, 'distance', settings.DISTANCE_FILTER_DEFAULT)
+    kwargs['distance'] = get_distance(request_args)
 
     # Naf
     naf_codes = {}
@@ -384,7 +430,37 @@ def create_fetcher(location, request_args):
             raise InvalidFetcherArgument('departments : %s' % ', '.join(unknown_departments))
     kwargs['departments'] = departments
 
-    return search.Fetcher(location, **kwargs)
+    return search.HiddenMarketFetcher(location, **kwargs)
+
+
+def get_distance(request_args):
+    return check_integer_argument(request_args, 'distance', settings.DISTANCE_FILTER_DEFAULT)
+
+
+def get_page_and_page_size(request_args):
+    page = check_positive_integer_argument(request_args, 'page', 1)
+    page_size = check_positive_integer_argument(request_args, 'page_size', pagination.OFFICES_PER_PAGE)
+    if page_size > pagination.OFFICES_MAXIMUM_PAGE_SIZE:
+        raise InvalidFetcherArgument(
+            'page_size is too large. Maximum value is %s' % pagination.OFFICES_MAXIMUM_PAGE_SIZE
+        )
+    return page, page_size
+
+
+def validate_rome_codes(rome_code_list):
+    for rome in rome_code_list:
+        if rome not in ROME_CODES:  # ROME_CODES contains ascii data but rome is unicode.
+            msg = 'Unknown rome_code: %s - Possible reasons: 1) %s 2) %s' % (
+                rome,
+                'This rome_code does not exist.',
+                'This rome code exists but is very recent and thus \
+                    we do not have enough data yet to build relevant results for it. \
+                    We typically need at least 12 months of data before we can build \
+                    relevant results for a given rome_code.'
+            )
+            raise InvalidFetcherArgument(msg)
+    if len(rome_code_list) == 0:
+        raise InvalidFetcherArgument("At least one rome_code is required.")
 
 
 def check_positive_integer_argument(args, name, default_value):
@@ -467,11 +543,11 @@ def get_office_details(siret, alternance=False):
             'zipcode': office.zipcode,
         },
     }
-    patch_company_result_with_sensitive_information(request.args['user'], office, result, alternance)
+    patch_office_result_with_sensitive_information(request.args['user'], office, result, alternance)
     return jsonify(result)
 
 
-def patch_company_result_with_sensitive_information(api_username, office, result, alternance=False):
+def patch_office_result_with_sensitive_information(api_username, office, result, alternance=False):
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
     if api_username in settings.API_INTERNAL_CONSUMERS:

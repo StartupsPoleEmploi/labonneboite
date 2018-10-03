@@ -17,9 +17,12 @@ from labonneboite.conf.common import settings_common
 # Dynamically import LBB_SETTINGS environment variable as the `settings`
 # module, or import `local_settings.py` as the `settings` module if it does not
 # exist.
+
 settings = settings_common
+
+# Don't override settings in tests
 if settings_common.get_current_env() != settings_common.ENV_TEST:
-    # Don't override settings in tests
+    
     settings_module = os.path.join(os.path.dirname(__file__), 'local_settings.py')
     settings_module = os.environ.get('LBB_SETTINGS', settings_module)
     try:
