@@ -1,5 +1,6 @@
 # coding: utf8
 
+from werkzeug.datastructures import MultiDict
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, HiddenField, RadioField, DecimalField
 from wtforms.validators import DataRequired, Optional, NumberRange
@@ -99,5 +100,5 @@ class ProCompanySearchForm(CompanySearchForm):
 
 def make_company_search_form(**kwargs):
     if pro.pro_version_enabled():
-        return ProCompanySearchForm(**kwargs)
-    return CompanySearchForm(**kwargs)
+        return ProCompanySearchForm(MultiDict(kwargs))
+    return CompanySearchForm(MultiDict(kwargs))

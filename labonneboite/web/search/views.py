@@ -258,9 +258,11 @@ def entreprises():
         # Override form location only if it is not available (e.g when user has
         # removed it from the url)
         form_kwargs['l'] = named_location.name
+
     if location:
         form_kwargs['lat'] = location.latitude
         form_kwargs['lon'] = location.longitude
+
     form = make_company_search_form(**form_kwargs)
 
     # Render different template if it's an ajax call
