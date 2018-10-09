@@ -6,9 +6,9 @@
 <div class="lbb-content">
   <div class="lbb-single-column-content">
 
-    <h2>Mon compte</h2>
+    <h1>Mon compte</h1>
 
-    <h3>Mes données personnelles</h3>
+    <h2>Mes données personnelles</h2>
 
     <ul>
       <li>Prénom: {{ user.first_name | title }}</li>
@@ -19,7 +19,7 @@
 
     <hr>
 
-    <h3>Exporter mes données (droit à la portabilité)</h3>
+    <h2>Exporter mes données (droit à la portabilité)</h2>
 
     <p>
       Télécharger au format CSV
@@ -30,7 +30,7 @@
 
     <hr>
 
-    <h3>Supprimer mon compte et mes données (droit à l'oubli)</h3>
+    <h2>Supprimer mon compte et mes données (droit à l'oubli)</h2>
 
     <p>
       <a href="{{ url_for('user.account_delete') }}" class="rgpd-account-delete-attempt">Supprimer mon compte et mes données</a>

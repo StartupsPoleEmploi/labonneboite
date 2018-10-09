@@ -45,12 +45,12 @@ class CompanySearchForm(FlaskForm):
         csrf = False
 
     # Typed job
-    j = StringField('Job', validators=[DataRequired()])
+    j = StringField('Métier recherché', validators=[DataRequired()])
     # Corresponding occupation found by autocomplete
     occupation = HiddenField('', validators=[DataRequired()])
 
     # Typed location
-    l = StringField('Location', validators=[DataRequired()])
+    l = StringField('Lieu de recherche', validators=[DataRequired()])
     # Corresponding coordinates found by autocomplete
     lat = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-90, 90)])
     lon = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-180, 180)])

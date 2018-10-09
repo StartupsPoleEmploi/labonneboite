@@ -10,16 +10,16 @@
     float: left;
     width: 30px;
     line-height: 17px;
-    
+
     text-align: center;
-    
+
     background-color: white;
     color: #5d5d5d;
 }
 
 /* Switch state */
 .lbb-switch > span.off, .lbb-switch.on > span.on {
-    background-color: #1c86f2;
+    background-color: #166bc1;
     color: white;
 }
 .lbb-switch.on > span.off {

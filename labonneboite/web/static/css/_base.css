@@ -17,7 +17,7 @@ https://github.com/milligram/milligram
 https://github.com/owenversteeg/min
 
 Colors:
-#006cff     => blue (links)
+#0061E6     => blue (links)
 #183152     => dark blue (buttons hover)
 #7c408b     => purple (buttons)
 #5d5d5d     => mid grey (text)
@@ -185,12 +185,12 @@ img {
 --------------------------------------------------------------------------- */
 
 a:link {
-    color: #006cff;
+    color: #0061E6;
     text-decoration: underline;
 }
 
 a:visited {
-    color: #006cff;
+    color: #0061E6;
     text-decoration: none;
 }
 

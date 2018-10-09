@@ -113,7 +113,7 @@ form, .success-message {
     margin-top: 10px;
 }
 
-h2 {
+h1, h2 {
     display: block;
     font-size: .1.75em;
     color: #444;

@@ -1,6 +1,6 @@
 <div class="lbb-result__header">
 
-  <h2>
+  <h3>
     <span>{{ company.name }}</span>
     - <small>{{ company.city }}</small>
     {% if pro_version_enabled %}
@@ -17,15 +17,15 @@
         BOE</small>
       {% endif %}
     {% endif %}
-  </h2>
+  </h3>
 
   <div class="grid-row grid-spacing">
     <div class="grid-col-4">
-      <h3 class="company-naf-text">{{ company.naf_text }}</h3>
+      <h4 class="company-naf-text">{{ company.naf_text }}</h4>
       <p>{{ company.headcount_text }}</p>
     </div>
     <div class="grid-col-4">
-      <h3 class="lbb-green">
+      <h4 class="lbb-green">
         Potentiel d'embauche<br>
         <span class="rating-stars">
           <b style="width: {{ company.get_stars_for_rome_code_as_percentage(rome_code) }}%;">
@@ -33,13 +33,13 @@
           </b>
         </span>
         <span class="rating-value">{{ '%0.1f' % company.get_stars_for_rome_code(rome_code) }}</span>
-      </h3>
+      </h4>
     </div>
     <div class="grid-col-4">
       {% if distance and zipcode and company.show_multi_geolocations_msg(distance, zipcode) %}
-        <h3>Cette entreprise recrute aussi dans votre région.</h3>
+        <h4>Cette entreprise recrute aussi dans votre région.</h4>
       {% else %}
-        <h3>{{ company.distance }} Km</h3>
+        <h4>{{ company.distance }} Km</h4>
       {% endif %}
     </div>
   </div>
