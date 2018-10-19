@@ -291,7 +291,9 @@ class EtablissementExtractJob(Job):
                     departement = import_util.get_departement_from_zipcode(codepostal)
                     process_this_departement = departement in departements
                     if process_this_departement:
-
+                        # Trello Pz5UlnFh : supprimer-les-emails-pe-des-entreprises-qui-ne-sont-pas-des-agences-pe
+                        if  email.endswith("@pole-emploi.fr") and raisonsociale != "POLE EMPLOI":
+                            email = ""
                         if len(codepostal) == 4:
                             codepostal = "0%s" % codepostal
                         etab_create_fields = siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
