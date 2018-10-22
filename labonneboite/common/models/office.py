@@ -120,6 +120,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     __table_args__ = (
         Index('dept_i', 'departement'),
         Index('_raisonsociale_codecommune', 'raisonsociale', 'codecommune'),
+        Index('_enseigne_codecommune', 'enseigne', 'codecommune'),
         PrimaryKeyConstraint('siret'),
     )
 

@@ -6,7 +6,7 @@ from labonneboite.common.fetcher import Fetcher
 from labonneboite.common.load_data import OGR_ROME_CODES
 from labonneboite.common import hiring_type_util
 from labonneboite.common import esd
-from sqlalchemy import tuple_
+from sqlalchemy import tuple_, or_
 
 
 OFFRES_ESD_ENDPOINT_URL = "https://api.emploi-store.fr/partenaire/offresdemploi/v1/rechercheroffres"
@@ -60,8 +60,13 @@ class VisibleMarketFetcher(Fetcher):
         # Fetch matching offices from db. Offers without a match
         # will silently be dropped.
         offices = Office.query.filter(
-            tuple_(Office.city_code, Office.company_name).in_(
-                office_key_to_offers.keys()
+            or_(
+                tuple_(Office.city_code, Office.company_name).in_(
+                    office_key_to_offers.keys()
+                ),
+                tuple_(Office.city_code, Office.office_name).in_(
+                    office_key_to_offers.keys()
+                ),                
             )
         ).limit(self.page_size).all()
 
