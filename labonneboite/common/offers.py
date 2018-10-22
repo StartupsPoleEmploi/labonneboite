@@ -11,6 +11,7 @@ from sqlalchemy import tuple_
 
 OFFRES_ESD_ENDPOINT_URL = "https://api.emploi-store.fr/partenaire/offresdemploi/v1/rechercheroffres"
 OFFRES_ESD_MAXIMUM_PAGE_SIZE = 150
+OFFRES_ESD_MAXIMUM_DISTANCE = 200
 
 HIRING_TYPE_TO_CONTRACT_NATURE_CODES = {
     hiring_type_util.ALTERNANCE: ["E2", "FS"],
@@ -101,7 +102,7 @@ class VisibleMarketFetcher(Fetcher):
           "criterias" : {
             "cityCode": self.commune_id,
             "romeProfessionCardCode": rome,
-            "cityDistance": self.distance,
+            "cityDistance": min(self.distance, OFFRES_ESD_MAXIMUM_DISTANCE),
             "contractNatureCode": self.get_contract_nature_codes()
           }
         }
