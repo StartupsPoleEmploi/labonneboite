@@ -9,7 +9,7 @@ from labonneboite.conf import settings
 
 logger = logging.getLogger('main')
 
-ESD_TOKEN_ENDPOINT_URL = "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token"
+ESD_TOKEN_ENDPOINT_URL = "%s/connexion/oauth2/access_token" % settings.PEAM_TOKEN_BASE_URL
 ESD_TIMEOUT = 5
 
 ESD_OFFERS_MAX_ATTEMPTS = 3

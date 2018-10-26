@@ -1,6 +1,7 @@
 # coding: utf8
 import json
 from collections import defaultdict
+from labonneboite.conf import settings
 from labonneboite.common.models import Office
 from labonneboite.common.fetcher import Fetcher
 from labonneboite.common.load_data import OGR_ROME_CODES
@@ -9,7 +10,8 @@ from labonneboite.common import esd
 from sqlalchemy import tuple_, or_
 
 
-OFFRES_ESD_ENDPOINT_URL = "https://api.emploi-store.fr/partenaire/offresdemploi/v1/rechercheroffres"
+OFFRES_ESD_ENDPOINT_URL = "%s/partenaire/offresdemploi/v1/rechercheroffres" % settings.PEAM_API_BASE_URL
+
 OFFRES_ESD_MAXIMUM_PAGE_SIZE = 150
 OFFRES_ESD_MAXIMUM_DISTANCE = 200
 
