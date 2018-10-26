@@ -54,6 +54,12 @@
     background-color: #fff;
 }
 
+.btn.btn-reset {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
 /* Sizes.
 =========================================================================== */
 

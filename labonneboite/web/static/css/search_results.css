@@ -152,7 +152,6 @@
 =========================================================================== */
 
 .lbb-result__actions {
-    background: #efefef;
     margin: 15px -20px -20px -20px;
     padding: 5px 20px;
     vertical-align: middle;
@@ -165,10 +164,33 @@
     margin: 5px 5px 5px 0;
 }
 
+.lbb-result__actions .lbb-dropdown-wrapper > button {
+    padding: 0 5px;
+    top: -3px;
+    position: relative;
+}
+.lbb-result__actions .lbb-dropdown-wrapper > button:hover {
+    cursor: pointer;
+}
+
 .lbb-result__actions .btn-memo {
     width: 215px;
     height: 31px;
     background: #fff;
+    min-width: inherit !important;
+    padding-right: 0;
+    margin-right: 0;
+}
+
+.lbb-result__actions .badge.badge-info {
+    color: #fff;
+    padding: 3px;
+    width: 19px;
+    font-weight: bolder;
+    font-size: 14px;
+    height: 19px;
+    border-radius: 50%;
+    background-color: #00CBFF;
 }
 
 @media (min-width: 800px) {

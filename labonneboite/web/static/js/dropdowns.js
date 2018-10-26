@@ -12,6 +12,7 @@
     });
 
     $('.lbb-dropdown-wrapper > a').toggleDropdown();
+    $('.lbb-dropdown-wrapper > button').toggleDropdown();
 
   });
 

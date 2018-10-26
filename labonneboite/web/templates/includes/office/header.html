@@ -78,8 +78,10 @@
       data-width="180"><!-- Empty on purpose. -->
     </a>
     <div class="lbb-dropdown-wrapper">
-      <a href="#"><small>MEMO ? &#x25B4;</small></a>
-      <div class="lbb-dropdown lbb-dropdown-top-right lbb-dropdown-large">
+      <button class="btn btn-reset" aria-describedby="{{ company.siret }}" aria-controls="{{ company.siret }}" aria-haspopup="true">
+        <small class="badge badge-info">?</small>
+      </button>
+      <div class="lbb-dropdown lbb-dropdown-top-right lbb-dropdown-large" role="tooltip">
         <p><b>En cliquant sur le bouton "Importer dans MEMO" :</b></p>
         <ul>
           <li>Vous pouvez suivre toutes vos candidatures en un seul endroit</li>
