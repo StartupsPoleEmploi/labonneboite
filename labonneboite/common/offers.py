@@ -50,8 +50,10 @@ class VisibleMarketFetcher(Fetcher):
         for rome in self.romes:
             offers += self.get_offers_for_rome(rome)
 
-        # To identity the office of a given offer, as siret is absent in offers data,
-        # we instead use the couple office_key = (company_name, city_code).
+        # To identify the office of a given offer, as siret is absent in offers data,
+        # we instead use the couple (company_name, city_code) in the offer's data.
+        # It will matched to an office either on (company_name, city_code)
+        # or on (office_name, city_code).
         # Let's group offers by their parent office using this office_key. 
         office_key_to_offers = defaultdict(list)
         for offer in offers:
@@ -78,9 +80,14 @@ class VisibleMarketFetcher(Fetcher):
         # - `offer_count` and `offers` : useful minimalistic information about the offers found
         #                for this office.
         for office in offices:
-            office_key = (office.city_code, office.company_name)
-            office_offers = office_key_to_offers[office_key]
-            first_offer = office_offers[0]
+            office_possible_keys = [
+                (office.city_code, office.company_name),
+                (office.city_code, office.office_name),
+            ]
+            for office_key in office_possible_keys:
+                if office_key in office_key_to_offers:
+                    office_offers = office_key_to_offers[office_key]
+                    first_offer = office_offers[0]
             office.distance = first_offer["distance"]
             office.matched_rome = OGR_ROME_CODES[first_offer["romeProfessionCode"]]
             office.offers_count = len(office_offers)
