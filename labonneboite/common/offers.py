@@ -84,14 +84,22 @@ class VisibleMarketFetcher(Fetcher):
                 (office.city_code, office.company_name),
                 (office.city_code, office.office_name),
             ]
+            first_offer = None
+
             for office_key in office_possible_keys:
                 if office_key in office_key_to_offers:
                     office_offers = office_key_to_offers[office_key]
                     first_offer = office_offers[0]
-            office.distance = first_offer["distance"]
-            office.matched_rome = OGR_ROME_CODES[first_offer["romeProfessionCode"]]
-            office.offers_count = len(office_offers)
-            office.offers = [{"url": offer['origins'][0]['originUrl']} for offer in office_offers]
+                    break
+                    
+            if first_offer is not None:
+                office.distance = first_offer['distance']
+                office.matched_rome = OGR_ROME_CODES[first_offer['romeProfessionCode']]
+                office.offers_count = len(office_offers)
+                office.offers = [{"url": offer['origins'][0]['originUrl']} for offer in office_offers]
+
+        # Only keep offices which actually matched an offer.
+        offices = [office for office in offices if hasattr(office, 'offers_count')]
 
         self.office_count = len(offices)
         return offices
