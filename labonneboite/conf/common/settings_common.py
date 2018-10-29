@@ -118,13 +118,14 @@ ROME_NAF_PROBABILITY_CUTOFF = 0.05
 
 FLASK_SECRET_KEY = '<set it>'
 
+PEAM_AUTH_BASE_URL = 'https://authentification-candidat.pole-emploi.fr'
+PEAM_API_BASE_URL = 'https://api.emploi-store.fr'
+PEAM_TOKEN_BASE_URL = 'https://entreprise.pole-emploi.fr'
+PEAM_VERIFY_SSL = True
 # Settings that need to be overwritten
 # FIXME there should be a default value for these settings in the code whenever the setting is not defined.
-PEAM_VERIFY_SSL = True
 PEAM_CLIENT_ID = '<set it>'
 PEAM_CLIENT_SECRET = '<set it>'
-PEAM_AUTH_BASE_URL = '<set it>'
-PEAM_API_BASE_URL = '<set it>'
 MANDRILL_API_KEY = '<set it>'
 FORM_EMAIL = '<set it>'
 

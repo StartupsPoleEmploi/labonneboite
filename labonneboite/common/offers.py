@@ -1,16 +1,19 @@
 # coding: utf8
 import json
 from collections import defaultdict
+from labonneboite.conf import settings
 from labonneboite.common.models import Office
 from labonneboite.common.fetcher import Fetcher
 from labonneboite.common.load_data import OGR_ROME_CODES
 from labonneboite.common import hiring_type_util
 from labonneboite.common import esd
-from sqlalchemy import tuple_
+from sqlalchemy import tuple_, or_
 
 
-OFFRES_ESD_ENDPOINT_URL = "https://api.emploi-store.fr/partenaire/offresdemploi/v1/rechercheroffres"
+OFFRES_ESD_ENDPOINT_URL = "%s/partenaire/offresdemploi/v1/rechercheroffres" % settings.PEAM_API_BASE_URL
+
 OFFRES_ESD_MAXIMUM_PAGE_SIZE = 150
+OFFRES_ESD_MAXIMUM_DISTANCE = 200
 
 HIRING_TYPE_TO_CONTRACT_NATURE_CODES = {
     hiring_type_util.ALTERNANCE: ["E2", "FS"],
@@ -59,8 +62,13 @@ class VisibleMarketFetcher(Fetcher):
         # Fetch matching offices from db. Offers without a match
         # will silently be dropped.
         offices = Office.query.filter(
-            tuple_(Office.city_code, Office.company_name).in_(
-                office_key_to_offers.keys()
+            or_(
+                tuple_(Office.city_code, Office.company_name).in_(
+                    office_key_to_offers.keys()
+                ),
+                tuple_(Office.city_code, Office.office_name).in_(
+                    office_key_to_offers.keys()
+                ),                
             )
         ).limit(self.page_size).all()
 
@@ -101,7 +109,7 @@ class VisibleMarketFetcher(Fetcher):
           "criterias" : {
             "cityCode": self.commune_id,
             "romeProfessionCardCode": rome,
-            "cityDistance": self.distance,
+            "cityDistance": min(self.distance, OFFRES_ESD_MAXIMUM_DISTANCE),
             "contractNatureCode": self.get_contract_nature_codes()
           }
         }

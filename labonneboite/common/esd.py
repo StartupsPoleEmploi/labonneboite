@@ -1,17 +1,30 @@
 # coding: utf8
 import logging
 import datetime
+import time
 import requests
+from urllib.parse import urlencode
 from requests.exceptions import ConnectionError, ReadTimeout
 from labonneboite.conf import settings
 
 logger = logging.getLogger('main')
 
-ESD_TOKEN_ENDPOINT_URL = "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token"
+ESD_TOKEN_ENDPOINT_URL = "%s/connexion/oauth2/access_token" % settings.PEAM_TOKEN_BASE_URL
 ESD_TIMEOUT = 5
+
+ESD_OFFERS_MAX_ATTEMPTS = 3
+ESD_OFFERS_THROTTLE_IN_SECONDS = 1
 
 
 class TokenFailure(Exception):
+    pass
+
+
+class TooManyRequests(Exception):
+    pass
+
+
+class RequestFailed(Exception):
     pass
 
 
@@ -35,14 +48,19 @@ class EsdToken(object):
 
     @classmethod
     def prepare_token(cls):
-        data = "realm=%%2Fpartenaire&grant_type=client_credentials&client_id=%s&client_secret=%s&scope=application_%s%%20api_offresdemploiv1 o2dsoffre" % (
-            settings.PEAM_CLIENT_ID,
-            settings.PEAM_CLIENT_SECRET,
-            settings.PEAM_CLIENT_ID,
-        )
+        data = urlencode([
+            ('realm', '/partenaire'),
+            ('grant_type', 'client_credentials'),
+            ('client_id', settings.PEAM_CLIENT_ID),
+            ('client_secret', settings.PEAM_CLIENT_SECRET),
+            ('scope', "application_%s" % settings.PEAM_CLIENT_ID)
+        ])
+        data += "%20api_offresdemploiv1 o2dsoffre qos_silver_offresdemploiv1 qos_silver_offresdemploiv2"
+
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
         }
+
         response = _get_response(
             url=ESD_TOKEN_ENDPOINT_URL,
             data=data,
@@ -64,7 +82,16 @@ def get_response(url, data):
         'Authorization': 'Bearer {}'.format(EsdToken.get_token()),
         'Content-Type': 'application/json',
     }
-    return _get_response(url, data, headers)
+    attempts = 1
+
+    response = {'results': []}
+    while attempts <= ESD_OFFERS_MAX_ATTEMPTS:
+        try:
+            return _get_response(url, data, headers)
+        except TooManyRequests:
+            time.sleep(ESD_OFFERS_THROTTLE_IN_SECONDS)
+            attempts += 1
+    return response
 
 
 def _get_response(url, data, headers):
@@ -81,9 +108,12 @@ def _get_response(url, data, headers):
         )
     except (ConnectionError, ReadTimeout) as e:
         logger.exception(e)
-        return []
+        raise e
 
-    if response.status_code >= 400:
+    http_too_many_requests = 429
+    if response.status_code == http_too_many_requests:
+        raise TooManyRequests
+    elif response.status_code >= 400:
         error = '{} responded with a {} error: {}'.format(
             url,
             response.status_code,
@@ -91,6 +121,6 @@ def _get_response(url, data, headers):
         )
         log_level = logging.WARNING if response.status_code >= 500 else logging.ERROR
         logger.log(log_level, error)
-        return []
+        raise RequestFailed
 
     return response.json()
