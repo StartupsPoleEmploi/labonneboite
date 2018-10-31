@@ -1,8 +1,9 @@
 # coding: utf
+from collections import namedtuple
 import logging
 from contextlib import suppress
 
-from flask import flash, request
+from flask import abort, flash, redirect, request, url_for
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView
 from wtforms import validators
@@ -298,6 +299,38 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         },
     }
 
+    def _handle_view(self, name, **kwargs):
+        # This method is executed before calling any view method.
+
+        """
+            Sometimes, recruiter send two emails at the same time. Both contain a create office_admin_update link.
+            But, when the first office_admin_update is created, the suggestion in the second mail became wrong.
+            And, on saving, we got a conflict with the recently created office_admin_update.
+            To avoid that, we redirect to the edit page if, afterall, an office_admin_update already exists for the company siret.
+        """
+        if name == 'create_view':
+            recruiter_message_params = self.get_recruiter_message_params()
+            if not recruiter_message_params.id or not recruiter_message_params.type:
+                try:
+                    recruiter_message = self.get_recruiter_message(recruiter_message_params)
+                    office_update_conflict = models.OfficeAdminUpdate.query.filter(
+                        models.OfficeAdminUpdate.sirets.like("%{}%".format(recruiter_message.siret))
+                    )
+
+
+                    if office_update_conflict.count() > 0:
+                        params = {
+                            "recruiter_message_id": recruiter_message_params.id,
+                            "recruiter_message_type": recruiter_message_params.type,
+                        }
+                        url = url_for("officeadminupdate.edit_view", id=office_update_conflict[0].id, **params)
+                        return redirect(url, code=302)
+                except NoResultFound:
+                    pass
+
+        return super(OfficeAdminUpdateModelView, self)._handle_view(name, **kwargs)
+
+
     def create_form(self):
         # Call only when a form is created
         form = super(OfficeAdminUpdateModelView, self).create_form()
@@ -322,12 +355,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         # Clean all styles before all
         self.form_widget_args = {}
 
-        recruiter_message_id = request.args.get('recruiter_message_id', '')
-        recruiter_message_type = request.args.get('recruiter_message_type', '')
-        if not recruiter_message_id or not recruiter_message_type:
+        recruiter_message_params = self.get_recruiter_message_params()
+        if not recruiter_message_params.id or not recruiter_message_params.type:
             return form
+
         try:
-            recruiter_message = self.get_recruiter_message(recruiter_message_id, recruiter_message_type)
+            recruiter_message = self.get_recruiter_message(recruiter_message_params)
         except NoResultFound as e:
             logger.exception(e) # Should not happen
             return form
@@ -346,9 +379,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         # If recruiter ask for updating his coordinates and job,
         # we assume that he wants to appear on LBB
         # so we improve his score if too low
-        ask_job_or_coordinate_changes = recruiter_message_type in [
+        ask_job_or_coordinate_changes = recruiter_message_params.type in [
             models.UpdateCoordinatesRecruiterMessage.name,
-            models.UpdateCoordinatesRecruiterMessage.name
+            models.UpdateJobsRecruiterMessage.name
         ]
 
         if office and ask_job_or_coordinate_changes:
@@ -386,7 +419,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         self.handle_diff('requested_by_phone', recruiter_phone, office_admin_update, form)
 
 
-        if recruiter_message_type == models.UpdateCoordinatesRecruiterMessage.name:
+        if recruiter_message_params.type == models.UpdateCoordinatesRecruiterMessage.name:
             new_phone = clean_phone(recruiter_message.new_phone) if recruiter_message.new_phone else None
 
             new_phone_alternance = recruiter_message.new_phone_alternance
@@ -405,14 +438,14 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 form
             )
 
-        elif recruiter_message_type == models.RemoveRecruiterMessage.name:
+        elif recruiter_message_params.type == models.RemoveRecruiterMessage.name:
             # The field is a boolean in contact form but an integer in the OfficeAdminpdate
             new_score = 0 if recruiter_message.remove_lbb else form.score.data
             new_score_alternance = 0 if recruiter_message.remove_lba else form.score_alternance.data
             self.handle_diff('score', new_score, office_admin_update, form)
             self.handle_diff('score_alternance', new_score_alternance, office_admin_update, form)
 
-        elif recruiter_message_type == models.UpdateJobsRecruiterMessage.name:
+        elif recruiter_message_params.type == models.UpdateJobsRecruiterMessage.name:
             self.handle_diff('romes_to_boost', self.format(recruiter_message.romes_to_add), office_admin_update, form)
             self.handle_diff(
                 'romes_alternance_to_boost',
@@ -428,12 +461,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             )
             self.handle_diff(
                 'romes_alternance_to_remove',
-                self.format(self.filter_romes(recruiter_message.romes_alternance_to_remove,  office.naf)),
+                self.format(self.filter_romes(recruiter_message.romes_alternance_to_remove, office.naf)),
                 office_admin_update,
                 form
             )
 
-        elif recruiter_message_type == models.OtherRecruiterMessage.name:
+        elif recruiter_message_params.type == models.OtherRecruiterMessage.name:
             self.handle_diff('reason', recruiter_message.comment, office_admin_update, form)
 
         return form
@@ -673,8 +706,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         return ','.join(romes_to_keep)
 
 
+    def get_recruiter_message_params(self):
+        RecruiterMessageParams = namedtuple('RecruiterMessageParams', ['id', 'type'])
+        return RecruiterMessageParams(request.args.get('recruiter_message_id', ''), request.args.get('recruiter_message_type', ''))
 
-    def get_recruiter_message(self, message_id, message_type):
+
+    def get_recruiter_message(self, recruiter_message_params):
         MESSAGE_CLASSES = {
             models.UpdateCoordinatesRecruiterMessage.name: models.UpdateCoordinatesRecruiterMessage,
             models.RemoveRecruiterMessage.name: models.RemoveRecruiterMessage,
@@ -682,7 +719,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             models.OtherRecruiterMessage.name: models.OtherRecruiterMessage,
         }
 
-        recruiter_message = MESSAGE_CLASSES[message_type].query.filter_by(id=message_id).one()
+        recruiter_message = MESSAGE_CLASSES[recruiter_message_params.type].query.filter_by(id=recruiter_message_params.id).one()
 
         return recruiter_message
 
