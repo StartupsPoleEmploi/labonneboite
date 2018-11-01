@@ -140,6 +140,13 @@ ENABLE_GOOGLE_OPTIMIZE = False
 MEMO_JS_URL = 'https://memo.pole-emploi.fr/js/importButton/memoButton-min.js'
 API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
 
+# Je postule
+JEPOSTULE_BASE_URL = 'http://127.0.0.1:8000'
+JEPOSTULE_CLIENT_ID = '<set it>'
+JEPOSTULE_CLIENT_SECRET = '<set it>'
+JEPOSTULE_BETA_EMAILS = []
+JEPOSTULE_QUOTA = 0
+
 # Tilkee parameters: credentials are provided by the Tilkee tech team
 TILKEE_ENABLED = False
 TILKEE_API_BASE_URL = 'https://api.tilkee.com'

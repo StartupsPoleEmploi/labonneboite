@@ -47,19 +47,20 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
             raise
 
     def get_user_details(self, response):
-        try:
-            return {
-                # Optional fields.
-                'gender': response.get('gender', user_util.GENDER_OTHER),
-                # Mandatory fields.
-                'email': response['email'],
-                'external_id': response['sub'],
-                'first_name': response['given_name'],
-                'last_name': response['family_name'],
-            }
-        except KeyError as e:
-            # Sometimes PEAM responds without the user details.
-            raise AuthFailedMissingReturnValues(*e.args)
+        user_details = {
+            'gender': response.get('gender', user_util.GENDER_OTHER),
+            'email': response.get('email'),
+            'external_id': response.get('sub'),
+            'first_name': response.get('given_name'),
+            'last_name': response.get('family_name'),
+        }
+        # Sometimes PEAM responds without the user details. For instance, the
+        # email address is empty when a user has not validated its account.
+        required_fields = ('email', 'external_id', 'first_name', 'last_name')
+        for field in required_fields:
+            if not user_details[field]:
+                raise AuthFailedMissingReturnValues(self, field)
+        return user_details
 
     def complete(self, *args, **kwargs):
         user = super().complete(*args, **kwargs)

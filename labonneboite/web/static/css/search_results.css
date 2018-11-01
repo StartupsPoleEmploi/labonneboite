@@ -172,7 +172,7 @@
 }
 
 @media (min-width: 800px) {
-    .tilkee-button {
+    .tilkee-button, .jepostule-button {
         float: right;
     }
 }
