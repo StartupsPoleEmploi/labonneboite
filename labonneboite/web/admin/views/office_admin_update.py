@@ -310,7 +310,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         """
         if name == 'create_view':
             recruiter_message_params = self.get_recruiter_message_params()
-            if not recruiter_message_params.id or not recruiter_message_params.type:
+            if recruiter_message_params.id and recruiter_message_params.type:
                 try:
                     recruiter_message = self.get_recruiter_message(recruiter_message_params)
                     office_update_conflict = models.OfficeAdminUpdate.query.filter(
