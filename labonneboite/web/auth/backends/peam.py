@@ -50,12 +50,12 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         try:
             return {
                 # Optional fields.
-                'email': response.get('email', ''),  # Explicitly fallback to an empty string when there is no email.
-                # Mandatory fields.
-                'external_id': response['sub'],
                 'gender': response.get('gender', user_util.GENDER_OTHER),
+                # Mandatory fields.
+                'email': response['email'],
+                'external_id': response['sub'],
                 'first_name': response['given_name'],
-                'last_name': response.get('family_name'),
+                'last_name': response['family_name'],
             }
         except KeyError as e:
             # Sometimes PEAM responds without the user details.
