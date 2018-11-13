@@ -21,20 +21,21 @@
       {% endif %}
 
 
+      <h2 class="sr-only lbb-result-info">Trier les résultats de recherche</h2>
       <form action="{{ url_for('search.entreprises') }}" class="js-search-form" method="get">
 
         <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
           <div class="lbb-sidebar js-form-search-filters">
             <div class="lbb-sidebar-toggle-wrapper">
-              <a class="lbb-sidebar-toggle" href="#">« Retour</a>
+              <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
               <hr>
             </div>
-            <h2>Trier par</h2>
+            <h3>Trier par</h3>
             <div class="lbb-sidebar-item">
               {{ form.sort }}
             </div>
             <hr>
-            <h2>Filtrer par</h2>
+            <h3>Filtrer par</h3>
             <div class="lbb-sidebar-item">
               <p>
                 {{ form.naf.label }}
@@ -77,7 +78,8 @@
 
       </form>
 
-      <div id="lbb-result-map" class="lbb-bright-container"></div>
+      <h2 class="sr-only lbb-result-info">Résultats de la recherche</h2>
+      <div id="lbb-result-map" class="lbb-bright-container" aria-hidden="true"></div>
 
       {% if not companies %}
         <div class="lbb-bright-container ga-no-results">

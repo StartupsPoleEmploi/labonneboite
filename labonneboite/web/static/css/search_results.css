@@ -83,7 +83,7 @@
     color: #5d5d5d;
 }
 
-.lbb-sidebar h2 {
+.lbb-sidebar h3 {
     font-style: italic;
     font-size: 14px;  /* Fallback in `px` for browsers that don't support rem. */
     font-size: 0.875rem;
@@ -131,12 +131,12 @@
     margin-top: 0;  /* Cancel default spacing across block-level elements inside. */
 }
 
-.lbb-result h2 {
+.lbb-result h3 {
     font-size: 20px;  /* Fallback in `px` for browsers that don't support rem. */
     font-size: 1.25rem;
 }
 
-.lbb-result h3 {
+.lbb-result h4 {
     color: #5d5d5d;
     font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
     font-size: 1rem;

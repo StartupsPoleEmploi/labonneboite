@@ -4,15 +4,15 @@
     <div class="grid-row grid-spacing">
       <div class="grid-col-4">
 
-        <h3>Raison sociale</h3>
+        <h4>Raison sociale</h4>
         <p>{{ company.company_name }}</p>
 
         {% if company.office_name %}
-        <h3>Enseigne</h3>
+        <h4>Enseigne</h4>
         <p>{{ company.office_name }}</p>
         {% endif %}
 
-        <h3>Adresse</h3>
+        <h4>Adresse</h4>
         <p class="easy-copy-paste">
           {% for f in company.address_fields %}
             {{ f }}<br>
@@ -23,7 +23,7 @@
       <div class="grid-col-4">
 
         {% if company.email or company.phone or company.website %}
-        <h3>Contact</h3>
+        <h4>Contact</h4>
         <ul>
           {% if company.email %}
           <li>
@@ -43,18 +43,18 @@
         </ul>
         {% endif %}
 
-        <h3 class="lbb-purple">C'est mon entreprise !</h3>
+        <h4 class="lbb-purple">C'est mon entreprise !</h4>
         <p><a href="{{ url_for('contact_form.change_info_or_apply_for_job', siret=company.siret) }}" target="_blank">Modifier ces informations</a></p>
 
       </div>
       <div class="grid-col-4">
 
         {% if company.contact_mode %}{# Not available everywhere, we can live without it most of the time. #}
-        <h3>Mode de contact à privilégier</h3>
+        <h4>Mode de contact à privilégier</h4>
         <p>{{ company.contact_mode }}</p>
         {% endif %}
 
-        <h3>Informations supplémentaires</h3>
+        <h4>Informations supplémentaires</h4>
         <ul>
           <li>
             <a href="{{ company.google_url }}" target="_blank" onclick="trackOutboundLink('{{ company.google_url }}');">Google</a>
@@ -71,7 +71,7 @@
     </div>
 
     {# Map. #}
-    <div class="js-map-container lbb-result__content__map">
+    <div class="js-map-container lbb-result__content__map" aria-hidden="true">
       {# Hidden input are used in JavaScript. #}
       <input name="company-name" type="hidden" value="{{ company.name }}">
       <input name="company-longitude" type="hidden" value="{{ company.x }}">

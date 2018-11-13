@@ -7,7 +7,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block footer_scripts %}
-  {% assets "recruiter_form" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% assets "recruiter_form" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 {% endblock %}
 
 {% block content %}
@@ -17,7 +17,7 @@
     {% if not hide_return %}<a class="return-btn" href="{{ url_for('contact_form.ask_action') }}?{{ params }}">Retour</a>{% endif %}
 
     <form class="form-vertical contact-form {{ extra_submit_class }}" action="" method="post">
-        <h2>{{ title }}</h2>
+        <h1>{{ title }}</h1>
 
         {% if show_coordinates_disclaimer %}
         <p class="coordinates-disclaimer">Voici les coordonnées actuellement visibles sur les service La Bonne Boite et La Bonne alternance par les candidats, nous vous invitons à les compléter, modifier ou supprimer à votre guise puis à cliquer sur valider</p>

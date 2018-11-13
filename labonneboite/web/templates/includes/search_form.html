@@ -7,6 +7,7 @@
     {% if form.j.errors %}
       {% set css_class = "input-icon input-icon-suitcase form-error" %}
     {% endif %}
+    {{ form.j.label(class="sr-only") }}
     {{ form.j(class=css_class, required="required", placeholder=placeholder) }}
 
     {% set css_class = "input-icon input-icon-location" %}
@@ -14,6 +15,7 @@
     {% if form.l.errors %}
       {% set css_class = "input-icon input-icon-location form-error" %}
     {% endif %}
+    {{ form.l.label(class="sr-only") }}
     {{ form.l(class=css_class, required="required", placeholder=placeholder) }}
 
   </div>

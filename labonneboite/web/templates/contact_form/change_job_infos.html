@@ -1,7 +1,7 @@
 {% if use_lba_template %} {% extends 'base_lba.html' %} {% else %} {% extends 'base.html' %} {% endif %}
 
 {% block footer_scripts %}
-  {% assets "recruiter_form" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% assets "recruiter_form" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 {% endblock %}
 
 {% block title %}{{ title }}{% endblock %} {% block content %}

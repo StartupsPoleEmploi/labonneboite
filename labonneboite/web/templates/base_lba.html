@@ -34,8 +34,8 @@
 
   <div id="content">{% block content %}{% endblock %}</div>
 
-  {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
-  {% assets "recruiter_form" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% assets "js_all" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% assets "recruiter_form" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 
 
   <script>
