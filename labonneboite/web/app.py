@@ -29,6 +29,7 @@ from labonneboite.common.models import Office
 from labonneboite.conf import settings
 
 # labonneboite web.
+from labonneboite.web.auth.backends.exceptions import AuthFailedMissingReturnValues
 from labonneboite.web.config import CONFIG
 from labonneboite.web.jepostule.utils import jepostule_enabled
 
@@ -334,6 +335,7 @@ def log_extra_context():
 
 
 @app.errorhandler(social_exceptions.AuthException)
+@app.errorhandler(AuthFailedMissingReturnValues)
 def social_auth_error(error):
     """
     Handle the situation where a user clicks the `cancel` button on a third party auth provider website.
@@ -348,7 +350,7 @@ def social_auth_error(error):
     elif isinstance(error, social_exceptions.AuthForbidden):
         # "Your credentials aren't allowed"
         pass
-    elif isinstance(error, social_exceptions.AuthMissingParameter):
+    elif isinstance(error, social_exceptions.AuthMissingParameter) or isinstance(error, AuthFailedMissingReturnValues):
         flash_message = "Veuillez vérifier vos emails et procéder à la validation de votre compte Pôle Emploi."
     elif not isinstance(error, (
             social_exceptions.AuthCanceled,
