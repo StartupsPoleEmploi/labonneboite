@@ -30,6 +30,7 @@ from labonneboite.conf import settings
 
 # labonneboite web.
 from labonneboite.web.config import CONFIG
+from labonneboite.web.jepostule.utils import jepostule_enabled
 
 
 # Fix a bug with Python 2, strftime and Unicode.
@@ -99,6 +100,7 @@ def register_blueprints(flask_app):
     from labonneboite.web.health.views import healthBlueprint
     from labonneboite.web.office.views import officeBlueprint
     from labonneboite.web.contact_form.views import contactFormBlueprint
+    from labonneboite.web.jepostule.views import jepostuleBlueprint
     from labonneboite.web.root.views import rootBlueprint
     from labonneboite.web.search.views import searchBlueprint
     from labonneboite.web.tilkee.views import tilkeeBlueprint
@@ -110,6 +112,7 @@ def register_blueprints(flask_app):
     flask_app.register_blueprint(healthBlueprint, url_prefix='/health')
     flask_app.register_blueprint(officeBlueprint)
     flask_app.register_blueprint(contactFormBlueprint)
+    flask_app.register_blueprint(jepostuleBlueprint, url_prefix='/jepostule')
     flask_app.register_blueprint(rootBlueprint)
     flask_app.register_blueprint(searchBlueprint)
     flask_app.register_blueprint(tilkeeBlueprint, url_prefix='/candidature')
@@ -198,8 +201,12 @@ def register_context_processors(flask_app):
         except AttributeError:
             return {'user': None}
 
+    def inject_jepostule_flag():
+        return {'jepostule_enabled': hasattr(g, 'user') and jepostule_enabled(g.user)}
+
     flask_app.context_processor(inject_dict_for_all_templates)
     flask_app.context_processor(inject_user)
+    flask_app.context_processor(inject_jepostule_flag)
 
 
 def register_teardown_appcontext(flask_app):
@@ -289,6 +296,7 @@ def create_app():
         'css/dropdowns.css',
         'css/forms.css',
         'css/grid.css',
+        'css/jepostule.css',
         'css/home.css',
         'css/modal.css',
         'css/pagination.css',
@@ -330,7 +338,8 @@ def social_auth_error(error):
     """
     Handle the situation where a user clicks the `cancel` button on a third party auth provider website.
     """
-    flash("Une erreur est survenue lors de votre connexion. Veuillez réessayer", 'error')
+    flash_message = "Une erreur est survenue lors de votre connexion. Veuillez réessayer."
+
     # Don't log errors that are not our responsibility
     if isinstance(error, social_exceptions.AuthFailed) and error.args[0] == 'The request requires some interaction that is not allowed.':
         # We thought user was connected on PE.fr, but in fact he wasn't, so we
@@ -339,14 +348,16 @@ def social_auth_error(error):
     elif isinstance(error, social_exceptions.AuthForbidden):
         # "Your credentials aren't allowed"
         pass
+    elif isinstance(error, social_exceptions.AuthMissingParameter):
+        flash_message = "Veuillez vérifier vos emails et procéder à la validation de votre compte Pôle Emploi."
     elif not isinstance(error, (
             social_exceptions.AuthCanceled,
             social_exceptions.AuthUnreachableProvider,
             social_exceptions.AuthStateForbidden,
             social_exceptions.AuthStateMissing,
-            social_exceptions.AuthMissingParameter
     )):
         app.logger.exception(error)
+    flash(flash_message, 'error')
 
     # If there us a next url in session and it's safe, redirect to it.
     next_url = session.get('next')

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Je postule{% endblock %}
+
+{% block content %}
+<iframe id="jepostule" width="100%" height="900px" src="{{ iframe_base }}{{ iframe_path }}" frameborder="0"></iframe>
+{% endblock %}
+
+{% block footer_scripts %}
+<script>
+    function onReceiveMessage(e) {
+        if (e.origin === "{{ iframe_base }}" && e.data.topic === "jepostule") {
+            var data = e.data;
+            if (data.action === "resize") {
+                document.getElementById("jepostule").height = data.value;
+            } else {
+                ga('send', 'event', 'jepostule', data.action, data.label, data.value);
+            }
+        }
+    }
+    window.addEventListener("message", onReceiveMessage, false);
+</script>
+{% endblock %}
