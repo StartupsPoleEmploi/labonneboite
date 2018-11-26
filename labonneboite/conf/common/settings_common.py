@@ -137,7 +137,7 @@ GOOGLE_TAG_MANAGER_ID = 'AAA-AAAAAAA'
 ENABLE_ADBLOCK_TRACKING = False
 ENABLE_GOOGLE_OPTIMIZE = False
 
-MEMO_JS_URL = 'https://memo.pole-emploi.fr/js/importButton/memoButton-min.js'
+MEMO_JS_URL = 'https://memo.pole-emploi.fr/js/importButton/memoButtonLBB-min.js'
 API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
 
 # Je postule
