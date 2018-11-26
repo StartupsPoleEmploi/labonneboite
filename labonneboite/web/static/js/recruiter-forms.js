@@ -83,10 +83,19 @@
         var $siret = $form.find("input[name='siret']");
         if(!$siret.val()) $siret.val(values.siret);
 
-        $form.find("input[name='last_name']").val(values.lastName);
-        $form.find("input[name='first_name']").val(values.firstName);
+        // Do not override last_name/first_name/email is data comes from PE Connect
+        var isConnectedRecruiter = $('[data-esd-recruiter="true"]').length > 0;
+
+        if(!isConnectedRecruiter) {
+          $form.find("input[name='last_name']").val(values.lastName);
+          $form.find("input[name='first_name']").val(values.firstName);
+          $form.find("input[name='email']").val(values.email);
+        } else {
+          $form.find("input[name='last_name']").attr('disabled', 'disabled');
+          $form.find("input[name='first_name']").attr('disabled', 'disabled');
+          $form.find("input[name='email']").attr('disabled', 'disabled');
+        }
         $form.find("input[name='phone']").val(values.phone);
-        $form.find("input[name='email']").val(values.email);
       } catch(error) {
         console.log(error)
         return;

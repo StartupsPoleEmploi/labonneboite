@@ -13,6 +13,7 @@ from labonneboite.common import user_util
 from .exceptions import AuthFailedMissingReturnValues
 
 
+
 # pylint:disable=abstract-method
 class PEAMOpenIdConnect(OpenIdConnectAuth):
     """

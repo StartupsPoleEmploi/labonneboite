@@ -3,11 +3,9 @@ from functools import wraps
 from urllib.parse import urlencode
 import logging
 
-from flask import redirect, render_template, flash
+from flask import flash, redirect, render_template, session
 from flask import Blueprint, Markup
 from flask import url_for, request
-from wtforms import SelectMultipleField
-from wtforms.widgets import CheckboxInput, ListWidget
 from sqlalchemy.orm.exc import NoResultFound
 
 
@@ -19,6 +17,7 @@ from labonneboite.common.email_util import MailNoSendException
 from labonneboite.web.contact_form import forms, mail
 from labonneboite.web.utils import fix_csrf_session
 from labonneboite.common.load_data import ROME_CODES
+from labonneboite.web.auth.backends import peam_recruiter
 
 logger = logging.getLogger('main')
 
@@ -39,6 +38,17 @@ def change_info_or_apply_for_job(siret=None):
     people thinking they are actually applying for a job.
     """
     return render_template('contact_form/change_info_or_apply_for_job.html', use_lba_template=is_recruiter_from_lba(), siret=siret)
+
+
+@contactFormBlueprint.route('/connexion-recruteur', methods=['GET'])
+@contactFormBlueprint.route('/connexion-recruteur/<siret>', methods=['GET'])
+def ask_recruiter_pe_connect(siret=None):
+    """
+    Ask recruiters if they wants to be connected with their Pole Emploi recruiter account
+    in order to validate their identity more quickly/easely
+    """
+    return render_template('contact_form/ask_recruiter_pe_connect.html', use_lba_template=is_recruiter_from_lba(), siret=siret)
+
 
 @contactFormBlueprint.route('/postuler/<siret>', methods=['GET'])
 def apply_for_job(siret):
@@ -87,9 +97,18 @@ def change_info():
     fix_csrf_session()
     form = forms.OfficeIdentificationForm()
 
+    # Clear session if user comes from 'I don't have recruiter account'
+    if request.args.get('no_pe_connect', ''):
+        peam_recruiter.clear_pe_connect_recruiter_session()
+
     # Siret information is present when coming from change_info route.
     # Apply it only if user has not typed anything else yet.
     params = request.args.copy()
+
+    form.last_name.data = form.last_name.data or session.get(peam_recruiter.SessionKeys.LASTNAME.value)
+    form.first_name.data = form.first_name.data or session.get(peam_recruiter.SessionKeys.FIRSTNAME.value)
+    form.email.data = form.email.data or session.get(peam_recruiter.SessionKeys.EMAIL.value)
+
     siret = params.get('siret')
     if siret and not form.data['siret']:
         form.siret.data = siret
@@ -110,6 +129,8 @@ def change_info():
         submit_text='suivant',
         extra_submit_class='identification-form',
         form=form,
+        is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
+        is_recruiter=peam_recruiter.is_recruiter(),
         use_lba_template=is_recruiter_from_lba(),
         show_disclaimer=True,
         hide_return=True,
@@ -151,18 +172,22 @@ def update_coordinates_form(form):
         # If a recruiter choose a contact_mode, the associated field became required
         contact_mode = form.new_contact_mode.data
         if contact_mode == 'website' and not form.new_website.data:
-            flash(ERROR_CONTACT_MODE_MESSAGE.format('Via votre site internet', 'Site Internet'),'error')
+            flash(ERROR_CONTACT_MODE_MESSAGE.format('Via votre site internet', 'Site Internet'), 'error')
             form_valid = False
         elif contact_mode == 'phone' and not form.new_phone.data:
-            flash(ERROR_CONTACT_MODE_MESSAGE.format('Par téléphone', 'Téléphone'),'error')
+            flash(ERROR_CONTACT_MODE_MESSAGE.format('Par téléphone', 'Téléphone'), 'error')
             form_valid = False
         elif contact_mode == 'email' and not form.new_email.data:
-            flash(ERROR_CONTACT_MODE_MESSAGE.format('Par email', 'Email recruteur'),'error')
+            flash(ERROR_CONTACT_MODE_MESSAGE.format('Par email', 'Email recruteur'), 'error')
             form_valid = False
 
 
         if form_valid:
-            recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(form)
+            recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(
+                form,
+                is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
+                sub=peam_recruiter.get_recruiter_uid()
+            )
             mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
 
             try:

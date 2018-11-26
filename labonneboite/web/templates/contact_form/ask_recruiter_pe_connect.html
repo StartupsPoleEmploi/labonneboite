@@ -1,0 +1,40 @@
+{% if use_lba_template %}
+    {% extends 'base_lba.html' %}
+{% else %}
+    {% extends 'base.html' %}
+{% endif %}
+
+{% block title %}Demande de modification des informations de mon entreprise{% endblock %}
+
+{% block content %}
+<div class="lbb-content">
+    <div class="lbb-single-column-content verification-form">
+
+        <h2>Demande de modification des informations de mon entreprise</h2>
+
+        <p class="text-center">Veuillez utiliser vos identifiants Pôle emploi “accès recruteur” pour une prise en
+            compte plus rapide de vos modifications.</p>
+
+        <p class="text-center">
+            {% if use_lba_template %}
+            <a class="logo-pe-connect rgpd-consent-required" title="Se connecter avec Pôle Emploi recruteur" href="{{ url_for('auth.peam_recruiter_connect', siret=siret, origin='labonnealternance' )}}">
+                <img src="/static/images/logo-pe-connect.svg" alt="Pôle emploi Connect">
+            </a>
+            {% else %}
+            <a class="logo-pe-connect rgpd-consent-required" title="Se connecter avec Pôle Emploi recruteur" href="{{ url_for('auth.peam_recruiter_connect', siret=siret) }}">
+                <img src="/static/images/logo-pe-connect.svg" alt="Pôle emploi Connect">
+            </a>
+            {% endif %}
+        </p>
+        <p class="text-center">
+            {% if use_lba_template %}
+            <a class="btn btn-small" href="{{ url_for('contact_form.change_info', siret=siret, no_pe_connect=1, origin='labonnealternance') }}">Je
+                n'ai pas d'identifiants Pôle Emploi</a>
+            {% else %}
+            <a class="btn btn-small" href="{{ url_for('contact_form.change_info', siret=siret, no_pe_connect=1) }}">Je
+                n'ai pas d'identifiants Pôle Emploi</a>
+            {% endif %}
+        </p>
+    </div>
+</div>
+{% endblock %}

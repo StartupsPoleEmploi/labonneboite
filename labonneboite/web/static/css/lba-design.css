@@ -65,11 +65,13 @@ a.btn.btn-small {
 
 
 /* Verification form and application-text pages */
+.verification-form .logo-pe-connect img {
+    width: 500px;
+}
 .verification-form, .application-text {
     background: white;
     padding: 40px 80px 80px 80px;
 }
-
 .verification-form p, .application-text p {
     color: #444;
 }

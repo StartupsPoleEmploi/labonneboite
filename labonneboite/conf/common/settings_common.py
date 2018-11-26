@@ -119,6 +119,7 @@ ROME_NAF_PROBABILITY_CUTOFF = 0.05
 FLASK_SECRET_KEY = '<set it>'
 
 PEAM_AUTH_BASE_URL = 'https://authentification-candidat.pole-emploi.fr'
+PEAM_AUTH_RECRUITER_BASE_URL = 'https://entreprise.pole-emploi.fr/'
 PEAM_API_BASE_URL = 'https://api.emploi-store.fr'
 PEAM_TOKEN_BASE_URL = 'https://entreprise.pole-emploi.fr'
 PEAM_VERIFY_SSL = True

@@ -1,6 +1,5 @@
 # coding: utf8
-from urllib.parse import urlencode
-from flask import escape
+from flask import escape, session
 
 from flask import current_app, url_for
 
@@ -10,6 +9,7 @@ from labonneboite.common.email_util import MandrillClient
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.common import models
 from labonneboite.web.contact_form import forms
+from labonneboite.web.auth.backends.peam_recruiter import SessionKeys, is_certified_recruiter
 
 def compute_action_name(form):
     form_to_action = {
@@ -22,6 +22,10 @@ def compute_action_name(form):
 
 
 def common_mail_template(form):
+
+    certified_recruiter = is_certified_recruiter()
+    unique_recruiter_id = session.get(SessionKeys.UID.value, '')
+
     return """
         Un email a été envoyé par le formulaire de contact de la Bonne Boite :<br>
         - Action : {}<br>
@@ -29,7 +33,9 @@ def common_mail_template(form):
         - Prénom : {},<br>
         - Nom : {}, <br>
         - E-mail : {},<br>
-        - Téléphone : {},<br>
+        - Téléphone : {},<br><br>
+
+        - Recruteur certifié : <strong>{}</strong> -- Identifiant unique ==> {}
         <hr>
     """.format(
         compute_action_name(form),
@@ -38,6 +44,8 @@ def common_mail_template(form):
         escape(form.last_name.data),
         escape(form.email.data),
         escape(form.phone.data),
+        'oui' if certified_recruiter else 'non',
+        unique_recruiter_id,
     )
 
 
