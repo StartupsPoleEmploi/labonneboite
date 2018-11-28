@@ -2,6 +2,7 @@
 import argparse
 import contextlib
 import logging
+import glob
 import os
 
 import multiprocessing as mp
@@ -27,6 +28,7 @@ from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
+from labonneboite.importer import util as importer_util
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 # use this instead if you wish to investigate from which logger exactly comes each line of log
@@ -624,7 +626,46 @@ def update_offices_geolocations():
             office.save()
             # Apply changes in ElasticSearch.
             body = {'doc': {'locations': locations}}
-            es.Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret, body=body, params={'ignore': 404})
+            es.Elasticsearch().update(
+                index=settings.ES_INDEX,
+                doc_type=es.OFFICE_TYPE,
+                id=office.siret,
+                body=body,
+                params={'ignore': 404},
+            )
+
+
+def get_latest_scam_emails():
+    list_of_files = glob.glob(os.path.join(settings.SCAM_EMAILS_FOLDER, 'BLACKLIST_EMAILS_FULL_*.csv.bz2'))
+    latest_file = max(list_of_files, key=os.path.getctime)
+    with importer_util.get_reader(latest_file) as myfile:
+        logger.info("Processing scam emails file %s ...", latest_file)
+        myfile.readline()  # ignore header
+        emails = [email.decode().strip().replace('"', '') for email in myfile]
+    return emails
+
+
+@timeit
+def remove_scam_emails():
+    scam_emails = get_latest_scam_emails()
+
+    def chunks(l, n):
+        """
+        Yield successive n-sized chunks from l.
+        """
+        for i in xrange(0, len(l), n):
+            yield l[i:i+n]
+
+    for scam_emails_chunk in chunks(scam_emails, 100):
+        query = Office.query.filter(Office.email.in_(scam_emails_chunk))
+        office_count = query.count()
+        if office_count:
+            query.update({Office.email: ''}, synchronize_session="fetch")
+        logger.info(
+            "Removed a chunk of %d scam emails from %d offices.",
+            len(scam_emails_chunk),
+            office_count,
+        )
 
 
 @timeit
@@ -729,6 +770,8 @@ def update_data(create_full, create_partial, disable_parallel_computing):
     remove_offices()
     update_offices()
     update_offices_geolocations()
+
+    remove_scam_emails()
 
     if create_full:
         sanity_check_rome_codes()
