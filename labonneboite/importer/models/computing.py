@@ -30,6 +30,10 @@ class Hiring(CRUDMixin, Base):
         # Improve performance of importer compute_scores parallel jobs
         # by quickly fetching all hirings of any given departement. 
         Index('_departement', 'departement'),
+
+        # Make it fast to retrieve all hirings of a given siret.
+        # For convenience only, not actually used by the importer itself.
+        Index('_siret', 'siret'),
     )
 
     CONTRACT_TYPE_CDD = 1
