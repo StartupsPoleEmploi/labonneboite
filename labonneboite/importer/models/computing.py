@@ -27,7 +27,9 @@ class Hiring(CRUDMixin, Base):
     """
     __tablename__ = importer_settings.HIRING_TABLE
     __table_args__ = (
-        Index('dept_i', 'departement'),
+        # Improve performance of importer compute_scores parallel jobs
+        # by quickly fetching all hirings of any given departement. 
+        Index('_departement', 'departement'),
     )
 
     CONTRACT_TYPE_CDD = 1
@@ -62,8 +64,11 @@ class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
     """
     __tablename__ = importer_settings.RAW_OFFICE_TABLE
     __table_args__ = (
-        Index('dept_i', 'departement'),
         PrimaryKeyConstraint('siret'),
+        
+        # Improve performance of importer compute_scores parallel jobs
+        # by quickly fetching all offices of any given departement.        
+        Index('_departement', 'departement'),
     )
 
     # any column specific to this very model should go here.
@@ -82,11 +87,21 @@ class ExportableOffice(FinalOfficeMixin, CRUDMixin, Base):
     table will replace the content of the main Office table.
     """
     __tablename__ = importer_settings.SCORE_REDUCING_TARGET_TABLE
+
     __table_args__ = (
-        Index('dept_i', 'departement'),
+        PrimaryKeyConstraint('siret'),
+
+        # Improve performance of create_index.py parallel jobs
+        # by quickly fetching all offices of any given departement.
+        Index('_departement', 'departement'),
+        
+        # Improve offer-office matching performance. 
         Index('_raisonsociale_codecommune', 'raisonsociale', 'codecommune'),
         Index('_enseigne_codecommune', 'enseigne', 'codecommune'),
-        PrimaryKeyConstraint('siret'),
+
+        # Improve performance of create_index.py remove_scam_emails()
+        # by quickly locating offices having a given scam email.
+        Index('_email', 'email'),
     )
 
 
