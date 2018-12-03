@@ -13,6 +13,8 @@
             var data = e.data;
             if (data.action === "resize") {
                 document.getElementById("jepostule").height = data.value;
+            } else if(data.action === "quit") {
+                window.location = data.label;
             } else {
                 ga('send', 'event', 'jepostule', data.action, data.label, data.value);
             }
