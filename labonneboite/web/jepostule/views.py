@@ -23,16 +23,12 @@ def application(siret):
     if not company or not company.email:
         abort(404)
 
-    # TODO DEBUG FIXME
-    # employer_email = company.email
-    employer_email = current_user.email.split('@')[0] + '+employeur' + '@' + current_user.email.split('@')[1]
-
     data = {
         'candidate_first_name': current_user.first_name,
         'candidate_last_name': current_user.last_name,
         'candidate_email': current_user.email.lower(),
         'candidate_peid': current_user.external_id,
-        'employer_email': employer_email.lower(),
+        'employer_email': company.email.lower(),
         'employer_description': company.name,
         'siret': siret,
         'client_id': settings.JEPOSTULE_CLIENT_ID,
