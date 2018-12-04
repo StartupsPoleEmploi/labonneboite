@@ -548,6 +548,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
 
     def validate_form(self, form):
+        # Add http:// is missing
+        form['new_website'].data = format_url(form['new_website'].data)
+        form['social_network'].data = format_url(form['social_network'])
+        form['website_alternance'].data = format_url(form['website_alternance'])
+
+
         is_valid = super(OfficeAdminUpdateModelView, self).validate_form(form)
 
         # All sirets must be well formed
@@ -740,3 +746,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
 def clean_phone(phone):
     return phone.replace(" ", "").replace(".", "")
+
+def format_url(value):
+    # Auto-adding http:// if missing
+    if value and not value.startswith('http://') and not value.startswith('https://'):
+        return '{}{}'.format('http://', value)
+    return value
