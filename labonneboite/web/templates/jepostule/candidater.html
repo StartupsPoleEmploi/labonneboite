@@ -6,7 +6,7 @@
 <iframe id="jepostule" width="100%" height="900px" src="{{ iframe_base }}{{ iframe_path }}" frameborder="0"></iframe>
 {% endblock %}
 
-{% block footer_scripts %}
+{% block extrahead %}
 <script>
     function onReceiveMessage(e) {
         if (e.origin === "{{ iframe_base }}" && e.data.topic === "jepostule") {
