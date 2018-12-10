@@ -265,7 +265,7 @@ class EtablissementExtractJob(Job):
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
                         libellerue, codecommune, codepostal, email, tel, \
                         trancheeffectif_etablissement, _, _, _, \
-                        website1, website2, better_email, better_tel, \
+                        website1, website2, _, better_tel, \
                         website3 = fields
 
                     if not siret_util.is_siret(siret):
@@ -282,9 +282,7 @@ class EtablissementExtractJob(Job):
                 if has_text_content(better_tel):
                     tel = better_tel
 
-                if has_text_content(better_email):
-                    email = better_email
-
+                
                 email = encoding_util.strip_french_accents(email)
 
                 if codecommune.strip():
