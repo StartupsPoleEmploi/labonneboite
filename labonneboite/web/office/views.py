@@ -1,6 +1,7 @@
 # coding: utf8
 
 import os
+import time
 
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
@@ -73,6 +74,9 @@ def get_office_or_404(siret):
 
 def office_detail_pdf_path(office):
     path = pdf_util.get_file_path(office)
+    seconds_in_a_day = 24 * 60 * 60
+    if os.path.exists(path) and time.time() - os.path.getmtime(path) > seconds_in_a_day:
+        os.remove(path)
     if not os.path.exists(path):
         pdf_data = office_detail_html(office)
         pdf_target = pdf_util.convert_to_pdf(pdf_data)
