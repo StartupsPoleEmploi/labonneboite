@@ -186,7 +186,7 @@ def update_coordinates_form(form):
             recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(
                 form,
                 is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
-                sub=peam_recruiter.get_recruiter_uid()
+                uid=peam_recruiter.get_recruiter_uid()
             )
             mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
 
