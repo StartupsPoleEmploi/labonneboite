@@ -87,7 +87,7 @@ def create_office():
 
 class FormContactMailTest(DatabaseTest):
     def test_other_form(self):
-        with app.app_context():
+        with app.app_context(), self.test_request_context:
             form = create_other_form()
             mail_content = mail.generate_other_mail(form, models.OtherRecruiterMessage.create_from_form(form))
 
@@ -110,7 +110,7 @@ class FormContactMailTest(DatabaseTest):
         # All possibilities
         for expected1, answer1 in answers:
             for expected2, answer2 in answers:
-                with app.app_context():
+                with app.app_context(), self.test_request_context:
                     form = create_remove_form({'remove_lbb': answer1, 'remove_lba': answer2})
                     mail_content = mail.generate_delete_mail(form, models.RemoveRecruiterMessage.create_from_form(form))
 
@@ -122,7 +122,7 @@ class FormContactMailTest(DatabaseTest):
 
 
     def test_new_coordinates(self):
-        with app.app_context():
+        with app.app_context(), self.test_request_context:
             form = create_update_coordinates_form()
             recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(form)
             mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
@@ -163,7 +163,7 @@ class FormContactMailTest(DatabaseTest):
 
 class CreateFormContactDatabase(DatabaseTest):
     def test_save_other_form(self):
-        with app.app_context():
+        with app.app_context(), self.test_request_context:
             recruiter_message = models.OtherRecruiterMessage.create_from_form(create_other_form())
 
             self.assertEquals('00000000000008', recruiter_message.siret)
@@ -175,7 +175,7 @@ class CreateFormContactDatabase(DatabaseTest):
 
 
     def test_save_remove_form(self):
-        with app.app_context():
+        with app.app_context(), self.test_request_context:
             recruiter_message = models.RemoveRecruiterMessage.create_from_form(create_remove_form())
 
             self.assertTrue(recruiter_message.remove_lbb)
@@ -183,7 +183,7 @@ class CreateFormContactDatabase(DatabaseTest):
 
 
     def test_save_update_coordinates_form(self):
-        with app.app_context():
+        with app.app_context(), self.test_request_context:
             recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(create_update_coordinates_form())
 
             self.assertEquals('http://exemple.com', recruiter_message.new_website)

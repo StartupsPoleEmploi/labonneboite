@@ -164,7 +164,13 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     requested_by_last_name = Column(String(191), default='', nullable=False)
     requested_by_phone = Column(String(191), default='', nullable=False)
 
-    reason = Column(Text, default='', nullable=False)  # Reason of the update.
+    # Certified Recruiter values (from Emploi Store Developper)
+    certified_recruiter = Column(Boolean, default=False, nullable=False)
+    recruiter_uid = Column(String(191), default='', nullable=True)
+
+    # Reason of the update
+    reason = Column(Text, default='', nullable=False)
+
     # Metadata.
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
     date_updated = Column(DateTime, nullable=True)

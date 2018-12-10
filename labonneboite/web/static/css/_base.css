@@ -299,3 +299,8 @@ textarea {
 textarea {
     min-height: 150px;
 }
+
+input:disabled {
+    background-color: rgb(235, 235, 228);
+    cursor: not-allowed;
+}

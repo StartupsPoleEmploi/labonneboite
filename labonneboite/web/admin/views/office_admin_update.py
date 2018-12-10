@@ -105,6 +105,10 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'requested_by_first_name',
         'requested_by_last_name',
         'requested_by_phone',
+
+        'certified_recruiter',
+        'recruiter_uid',
+
         'reason',
         'created_by',
         'date_created',
@@ -153,6 +157,10 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'requested_by_phone': "Téléphone",
         'date_created': "Date de création",
         'date_updated': "Date de modification",
+
+        'certified_recruiter': 'Recruteur certifié',
+        'recruiter_uid': 'Identifiant unique du recruteur',
+
         'created_by': "Créé par",
         'updated_by': "Modifié par",
     }
@@ -202,6 +210,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'score': "Nouveau score (si 0 : suppression de l'entreprise sur LBB mais pas LBA)",
         'score_aternance': "Nouveau score alternance (si 0 : suppression de l'entreprise pour l'alternance)",
         'reason': "Raison de la modification.",
+        'certified_recruiter': 'Identifiant unique du recruteur',
+        'recruiter_uid': 'Recruteur avec un email vérifié et l\'habilitation "recruteurcertifie" sur l\'ESD',
         'contact_mode': "Texte libre (maximum 255 caractères)",
     }
 
@@ -232,6 +242,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'requested_by_first_name',
         'requested_by_last_name',
         'requested_by_phone',
+        'certified_recruiter',
+        'recruiter_uid',
         'reason',
     ]
 
@@ -293,6 +305,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'requested_by_phone': {
             'filters': [strip_filter, nospace_filter],
             'validators': [validators.optional(), phone_validator],
+        },
+        'recruiter_uid': {
+            'filters': [strip_filter, nospace_filter],
         },
         'reason': {
             'filters': [strip_filter],
@@ -431,6 +446,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             self.handle_diff('social_network', recruiter_message.social_network, office_admin_update, form)
             self.handle_diff('phone_alternance', new_phone_alternance, office_admin_update, form)
             self.handle_diff('email_alternance', recruiter_message.new_email_alternance, office_admin_update, form)
+            self.handle_diff('certified_recruiter', recruiter_message.certified_recruiter, office_admin_update, form)
+            self.handle_diff('recruiter_uid', recruiter_message.recruiter_uid, office_admin_update, form)
             self.handle_diff(
                 'contact_mode',
                 CONTACT_MODES.get(recruiter_message.contact_mode, ''),
@@ -650,6 +667,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                     msg = "Le NAF `%s` est déjà associé à cette entreprise." % naf
                     flash(msg, 'error')
                     return False
+
+        # Identifiant recruteur
+        if is_valid and form.data.get('certified_recruiter') and not form.data.get('recruiter_uid'):
+            msg = "La case 'Recruteur certifié' est cochée mais aucun identifiant n'est indiqué."
+            flash(msg, 'error')
+            return False
 
         return is_valid
 

@@ -1,10 +1,10 @@
-import datetime, enum
+import datetime
 
 from sqlalchemy.dialects import mysql
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column
 from sqlalchemy import Boolean, DateTime, Integer, String, Text
-from sqlalchemy.types import Enum
 from sqlalchemy.orm.exc import NoResultFound
+
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office
 from labonneboite.common.database import Base
@@ -24,12 +24,16 @@ class RecruiterMessageCommon(object):
     requested_by_email = Column(mysql.TINYTEXT, nullable=True)
     requested_by_phone = Column(mysql.TINYTEXT, nullable=True)
 
+    # Certified Recruiter values (from Emploi Store Developper)
+    certified_recruiter = Column(Boolean, default=False, nullable=False)
+    recruiter_uid = Column(String(191), default='', nullable=True)
+
     # Timestamps
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=True)
     date_updated = Column(DateTime, nullable=True)
 
     @classmethod
-    def create_from_form(cls, form):
+    def create_from_form(cls, form, is_certified_recruiter=False, uid=''):
         instance = cls()
         instance.siret = form.siret.data
         instance.siret = form.siret.data
@@ -37,6 +41,8 @@ class RecruiterMessageCommon(object):
         instance.requested_by_last_name = form.last_name.data
         instance.requested_by_email = form.email.data
         instance.requested_by_phone = form.phone.data
+        instance.certified_recruiter = is_certified_recruiter
+        instance.recruiter_uid = uid
         instance.fill_values(form)
         return instance.save()
 

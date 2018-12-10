@@ -12,12 +12,14 @@
 
 {% block content %}
 <div class="lbb-content">
-  <div class="lbb-single-column-content">
+  <div class="lbb-single-column-content" {% if is_recruiter %}data-esd-recruiter="true"{% endif %}>
 
     {% if not hide_return %}<a class="return-btn" href="{{ url_for('contact_form.ask_action') }}?{{ params }}">Retour</a>{% endif %}
 
     <form class="form-vertical contact-form {{ extra_submit_class }}" action="" method="post">
-        <h1>{{ title }}</h1>
+      <h1>{{ title }}</h1>
+
+        {% if is_certified_recruiter %}<div class="alert alert-success">Recruteur certifié</div>{% endif %}
 
         {% if show_coordinates_disclaimer %}
         <p class="coordinates-disclaimer">Voici les coordonnées actuellement visibles sur les service La Bonne Boite et La Bonne alternance par les candidats, nous vous invitons à les compléter, modifier ou supprimer à votre guise puis à cliquer sur valider</p>
