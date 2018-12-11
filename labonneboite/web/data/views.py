@@ -6,8 +6,9 @@ from flask import Blueprint
 from flask import redirect, render_template, request, url_for
 
 from labonneboite.common import mapping as mapping_util
+from labonneboite.common.models import Office
 from labonneboite.conf import settings
-from labonneboite.web.data.forms import NafForm, RomeForm, SiretForm
+from labonneboite.web.data.forms import NafForm, RomeForm, SiretForm, EmailForm
 
 
 dataBlueprint = Blueprint('data', __name__)
@@ -99,3 +100,39 @@ def romes_for_siret():
         'total_hirings_for_naf': sum(rome.nafs[naf] for rome in romes),
     }
     return render_template('data/romes_for_siret.html', **context)
+
+
+@dataBlueprint.route('/sirets-for-email')
+def sirets_for_email():
+    """
+    Find SIRETS associated with a given email
+    """
+    email = request.args.get('email', '')
+    companies = []
+    save_link = ''
+
+    form = EmailForm(email=email)
+
+    if email and form.validate():
+        offices = Office.query.filter(Office.email == email).all()
+
+        if offices:
+            for office in offices:
+                companies.append({
+                    'siret': office.siret,
+                    'name': office.name,
+                })
+
+            sirets = ','.join([office.siret for office in offices])
+            save_link = url_for('officeadminupdate.create_view', _external=True, sirets=sirets)
+
+
+    context = {
+        'current_tab': 'sirets_for_email',
+        'companies': companies,
+        'email': email,
+        'form': form,
+        'save_link': save_link,
+    }
+
+    return render_template('data/sirets_for_email.html', **context)

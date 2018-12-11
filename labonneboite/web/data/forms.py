@@ -2,7 +2,7 @@
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, ValidationError
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Email
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office
@@ -81,3 +81,19 @@ class SiretForm(FlaskForm):
                 raise ValidationError("Ce SIRET n'existe pas.")
             # Set office as a form attribute for easy access in the view and to avoid another query.
             self.office = office
+
+
+class EmailForm(FlaskForm):
+    """
+    Enter a MAIL to find associated SIRETS.
+    """
+    email = StringField("Email", validators=[DataRequired(), Email()],
+        description="Saisissez un email pour trouver les sirets associés.")
+
+    class Meta:
+        # CSRF validation is enabled globally but we don't want the CSRF token
+        # to be included in this form.
+        # The token can be removed safely here because this form is always submitted in GET.
+        # See http://goo.gl/QxWXBH for CSRF token with the GET method: server-side actions
+        # that have state changing affect should only respond to POST requests.
+        csrf = False

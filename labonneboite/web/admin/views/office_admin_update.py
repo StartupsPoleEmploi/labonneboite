@@ -349,6 +349,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     def create_form(self):
         # Call only when a form is created
         form = super(OfficeAdminUpdateModelView, self).create_form()
+
+        # Inject sirets from URL
+        sirets = request.args.get('sirets', '')
+        if sirets:
+            form['sirets'].data = sirets.replace(',','\n')
+
         return self.prefill_form(form)
 
     def on_form_prefill(self, form, id):

@@ -17,6 +17,10 @@
           {% if current_tab == 'romes_for_siret' %}SIRET/ROME
           {% else %}<a href="{{ url_for('data.romes_for_siret') }}">SIRET/ROME</a>{% endif %}
         </li>
+        <li>
+          {% if current_tab == 'sirets_for_email' %}EMAIL/SIRETS
+          {% else %}<a href="{{ url_for('data.sirets_for_email') }}">EMAIL/SIRETS</a>{% endif %}
+        </li>
     </ol>
 
     {% block data_content %}{% endblock %}
