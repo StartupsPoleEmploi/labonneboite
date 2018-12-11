@@ -159,6 +159,8 @@ TILKEE_COMPANY_ID = '<set it>'
 # Google site verification code - for linking with Google Search Console
 GOOGLE_SITE_VERIFICATION_CODE = None
 
+SCAM_EMAILS_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'scripts', 'scam_emails')
+
 
 if get_current_env() == ENV_LBBDEV:
     # pylint: disable=wildcard-import,unused-wildcard-import

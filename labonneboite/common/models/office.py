@@ -117,11 +117,21 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     """
 
     __tablename__ = settings.OFFICE_TABLE
+
     __table_args__ = (
-        Index('dept_i', 'departement'),
+        PrimaryKeyConstraint('siret'),
+
+        # Improve performance of create_index.py parallel jobs
+        # by quickly fetching all offices of any given departement.
+        Index('_departement', 'departement'),
+        
+        # Improve offer-office matching performance. 
         Index('_raisonsociale_codecommune', 'raisonsociale', 'codecommune'),
         Index('_enseigne_codecommune', 'enseigne', 'codecommune'),
-        PrimaryKeyConstraint('siret'),
+
+        # Improve performance of create_index.py remove_scam_emails()
+        # by quickly locating offices having a given scam email.
+        Index('_email', 'email'),
     )
 
     # You should normally *not* add any column here - see documentation above.
