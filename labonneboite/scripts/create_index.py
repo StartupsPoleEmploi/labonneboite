@@ -663,6 +663,7 @@ def remove_scam_emails():
         office_count = query.count()
         if office_count:
             query.update({Office.email: ''}, synchronize_session="fetch")
+            db_session.commit()
         logger.info(
             "Removed a chunk of %d scam emails from %d offices.",
             len(scam_emails_chunk),
