@@ -644,6 +644,7 @@ def get_latest_scam_emails():
         logger.info("Processing scam emails file %s ...", latest_file)
         myfile.readline()  # ignore header
         emails = [email.decode().strip().replace('"', '') for email in myfile]
+        emails = [email for email in emails if email != '']
     return emails
 
 
@@ -663,6 +664,7 @@ def remove_scam_emails():
         office_count = query.count()
         if office_count:
             query.update({Office.email: ''}, synchronize_session="fetch")
+            db_session.commit()
         logger.info(
             "Removed a chunk of %d scam emails from %d offices.",
             len(scam_emails_chunk),
