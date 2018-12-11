@@ -44,7 +44,7 @@ class TestEtablissements(DatabaseTest):
         codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
         website = etabs.get('26560004900267').get('create_fields')
         self.assertEqual(raisonsociale, 'POLE EMPLOI')
-        self.assertEqual(email, 'better_quality_email@pole-emploi.fr')
+        self.assertEqual(email, 'origin_email@pole-emploi.fr')
 
     def test_create_new_offices(self):
         filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
