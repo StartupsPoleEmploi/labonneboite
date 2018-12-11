@@ -567,8 +567,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     def validate_form(self, form):
         # Add http:// is missing
         form['new_website'].data = format_url(form['new_website'].data)
-        form['social_network'].data = format_url(form['social_network'])
-        form['website_alternance'].data = format_url(form['website_alternance'])
+        form['social_network'].data = format_url(form['social_network'].data)
+        form['website_alternance'].data = format_url(form['website_alternance'].data)
 
 
         is_valid = super(OfficeAdminUpdateModelView, self).validate_form(form)
