@@ -644,6 +644,7 @@ def get_latest_scam_emails():
         logger.info("Processing scam emails file %s ...", latest_file)
         myfile.readline()  # ignore header
         emails = [email.decode().strip().replace('"', '') for email in myfile]
+        emails = [email for email in emails if email != '']
     return emails
 
 
