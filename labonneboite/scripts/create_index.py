@@ -637,6 +637,8 @@ def update_offices_geolocations():
 
 def get_latest_scam_emails():
     list_of_files = glob.glob(os.path.join(settings.SCAM_EMAILS_FOLDER, 'BLACKLIST_EMAILS_FULL_*.csv.bz2'))
+    if len(list_of_files) == 0:
+        raise ValueError("No blacklist file found. Path is most likely incorrect.")
     latest_file = max(list_of_files, key=os.path.getctime)
     with importer_util.get_reader(latest_file) as myfile:
         logger.info("Processing scam emails file %s ...", latest_file)
