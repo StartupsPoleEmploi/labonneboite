@@ -258,15 +258,15 @@ class EtablissementExtractJob(Job):
 
                 try:
                     fields = import_util.get_fields_from_csv_line(line)
-                    if len(fields) != 19:
+                    if len(fields) != 22:
                         logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
 
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
                         libellerue, codecommune, codepostal, email, tel, \
                         trancheeffectif_etablissement, _, _, _, \
-                        website1, website2, _, better_tel, \
-                        website3 = fields
+                        website1, website2, better_tel, \
+                        website3, _, _, _ ,_ = fields
 
                     if not siret_util.is_siret(siret):
                         logger.exception("wrong siret : %s", siret)
