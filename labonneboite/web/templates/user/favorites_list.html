@@ -4,12 +4,12 @@
 
 {% block extrahead %}
   {{ super() }}
-  <link href="{{ mapbox_css_url }}" rel="stylesheet" type="text/css">
+  <link href="{{ maps_css_url }}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block scripts %}
   {{ super() }}
-  <script src="{{ mapbox_js_url }}"></script>
+  <script src="{{ maps_js_url }}"></script>
 {% endblock %}
 
 {% block content %}

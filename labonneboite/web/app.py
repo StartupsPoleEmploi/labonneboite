@@ -179,8 +179,11 @@ def register_context_processors(flask_app):
     def inject_dict_for_all_templates():
         return {
             'hotjar_tag': hotjar.get_hotjar_tag(),
-            'mapbox_css_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css',
-            'mapbox_js_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js',
+            # TODO replace this shit with proper embeds https://leafletjs.com/download.html
+            # 'maps_css_url': 'https://unpkg.com/leaflet@1.3.4/dist/leaflet.css',
+            # 'maps_js_url': 'https://unpkg.com/leaflet@1.3.4/dist/leaflet.js',
+            'maps_css_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css',
+            'maps_js_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js',
             'memo_js_url': settings.MEMO_JS_URL,
             'user_is_pro': pro.user_is_pro(),
             'pro_version_enabled': pro.pro_version_enabled(),

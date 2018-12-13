@@ -1,9 +1,9 @@
 /* jshint esversion: 6 */
 function createMap(element) {
-  L.mapbox.accessToken = 'pk.eyJ1IjoibGFib25uZWJvaXRlIiwiYSI6ImNpaDNoN3A0cDAwcmdybGx5aXF1Z21lOGIifQ.znyUeU7KoIY9Ns_AQPquAg';
-  var mapEl = L.mapbox.map(element, 'mapbox.streets', {
-      attributionControl: false
-  });
+  var mapEl = L.map(element);
+  L.tileLayer(
+     'https://maps.labonneboite.pole-emploi.fr/styles/osm-bright/{z}/{x}/{y}.png'
+  ).addTo(mapEl);
   mapEl.scrollWheelZoom.disable();
   return mapEl;
 }
