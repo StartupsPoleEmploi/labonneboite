@@ -96,7 +96,11 @@ class VisibleMarketFetcher(Fetcher):
                 office.distance = first_offer['distance']
                 office.matched_rome = OGR_ROME_CODES[first_offer['romeProfessionCode']]
                 office.offers_count = len(office_offers)
-                office.offers = [{"url": offer['origins'][0]['originUrl']} for offer in office_offers]
+                office.offers = [{'url': offer['origins'][0]['originUrl']} for offer in office_offers]
+                for offer in office_offers:
+                    if 'companyContactEmail' in offer:
+                        office.email = offer['companyContactEmail']
+                        break
 
         # Only keep offices which actually matched an offer.
         offices = [office for office in offices if hasattr(office, 'offers_count')]
