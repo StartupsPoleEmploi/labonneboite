@@ -51,24 +51,24 @@ class VisibleMarketFetcher(Fetcher):
             offers += self.get_offers_for_rome(rome)
 
         # To identify the office of a given offer, as siret is absent in offers data,
-        # we instead use the couple (company_name, city_code) in the offer's data.
-        # It will matched to an office either on (company_name, city_code)
-        # or on (office_name, city_code).
+        # we instead use the couple (company_name, departement) in the offer's data.
+        # It will matched to an office either on (company_name, departement)
+        # or on (office_name, departement).
         # Let's group offers by their parent office using this office_key. 
         office_key_to_offers = defaultdict(list)
         for offer in offers:
-            if 'cityCode' in offer and 'companyName' in offer:
-                office_key = (offer['cityCode'], offer['companyName'])
+            if 'departmentCode' in offer and 'companyName' in offer:
+                office_key = (offer['departmentCode'], offer['companyName'])
                 office_key_to_offers[office_key].append(offer)
 
         # Fetch matching offices from db. Offers without a match
         # will silently be dropped.
         offices = Office.query.filter(
             or_(
-                tuple_(Office.city_code, Office.company_name).in_(
+                tuple_(Office.departement, Office.company_name).in_(
                     office_key_to_offers.keys()
                 ),
-                tuple_(Office.city_code, Office.office_name).in_(
+                tuple_(Office.departement, Office.office_name).in_(
                     office_key_to_offers.keys()
                 ),                
             )
@@ -81,8 +81,8 @@ class VisibleMarketFetcher(Fetcher):
         #                for this office.
         for office in offices:
             office_possible_keys = [
-                (office.city_code, office.company_name),
-                (office.city_code, office.office_name),
+                (office.departement, office.company_name),
+                (office.departement, office.office_name),
             ]
             first_offer = None
 

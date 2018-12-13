@@ -100,8 +100,8 @@ class ExportableOffice(FinalOfficeMixin, CRUDMixin, Base):
         Index('_departement', 'departement'),
         
         # Improve offer-office matching performance. 
-        Index('_raisonsociale_codecommune', 'raisonsociale', 'codecommune'),
-        Index('_enseigne_codecommune', 'enseigne', 'codecommune'),
+        Index('_raisonsociale_departement', 'raisonsociale', 'departement'),
+        Index('_enseigne_departement', 'enseigne', 'departement'),
 
         # Improve performance of create_index.py remove_scam_emails()
         # by quickly locating offices having a given scam email.
