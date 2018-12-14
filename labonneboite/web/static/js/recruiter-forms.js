@@ -90,10 +90,6 @@
           $form.find("input[name='last_name']").val(values.lastName);
           $form.find("input[name='first_name']").val(values.firstName);
           $form.find("input[name='email']").val(values.email);
-        } else {
-          $form.find("input[name='last_name']").attr('disabled', 'disabled');
-          $form.find("input[name='first_name']").attr('disabled', 'disabled');
-          $form.find("input[name='email']").attr('disabled', 'disabled');
         }
         $form.find("input[name='phone']").val(values.phone);
       } catch(error) {
@@ -101,6 +97,18 @@
         return;
       }
 
+    }
+  }
+
+  function disablePeamRecruiterFields() {
+    if($('.identification-form').length > 0) {
+      var $form = $('.identification-form');
+      var isConnectedRecruiter = $('[data-esd-recruiter="true"]').length > 0;
+      if(!isConnectedRecruiter) return;
+
+      $form.find("input[name='last_name']").attr('disabled', 'disabled');
+      $form.find("input[name='first_name']").attr('disabled', 'disabled');
+      $form.find("input[name='email']").attr('disabled', 'disabled');
     }
   }
 
@@ -170,6 +178,7 @@
   $(document).on('lbbready', function () {
     initJobFormHandler();
     addLastSubmittedValue();
+    disablePeamRecruiterFields();
   });
 
 })(jQuery);
