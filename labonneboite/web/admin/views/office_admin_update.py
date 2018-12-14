@@ -438,6 +438,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         )
         self.handle_diff('requested_by_last_name', recruiter_message.requested_by_last_name, office_admin_update, form)
         self.handle_diff('requested_by_phone', recruiter_phone, office_admin_update, form)
+        self.handle_diff('certified_recruiter', recruiter_message.certified_recruiter, office_admin_update, form)
+        self.handle_diff('recruiter_uid', recruiter_message.recruiter_uid, office_admin_update, form)
 
 
         if recruiter_message_params.type == models.UpdateCoordinatesRecruiterMessage.name:
@@ -452,8 +454,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             self.handle_diff('social_network', recruiter_message.social_network, office_admin_update, form)
             self.handle_diff('phone_alternance', new_phone_alternance, office_admin_update, form)
             self.handle_diff('email_alternance', recruiter_message.new_email_alternance, office_admin_update, form)
-            self.handle_diff('certified_recruiter', recruiter_message.certified_recruiter, office_admin_update, form)
-            self.handle_diff('recruiter_uid', recruiter_message.recruiter_uid, office_admin_update, form)
             self.handle_diff(
                 'contact_mode',
                 CONTACT_MODES.get(recruiter_message.contact_mode, ''),

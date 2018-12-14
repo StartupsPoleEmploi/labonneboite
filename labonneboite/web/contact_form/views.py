@@ -239,7 +239,11 @@ def update_jobs_form(form):
         })
 
     if form.validate_on_submit():
-        recruiter_message = models.UpdateJobsRecruiterMessage.create_from_form(form)
+        recruiter_message = models.UpdateJobsRecruiterMessage.create_from_form(
+            form,
+            is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
+            uid=peam_recruiter.get_recruiter_uid()
+        )
         mail_content = mail.generate_update_jobs_mail(form, recruiter_message)
 
         try:
@@ -274,7 +278,11 @@ def update_jobs_form(form):
 @create_form(forms.OfficeRemoveForm)
 def delete_form(form):
     if form.validate_on_submit():
-        recruiter_message = models.RemoveRecruiterMessage.create_from_form(form)
+        recruiter_message = models.RemoveRecruiterMessage.create_from_form(
+            form,
+            is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
+            uid=peam_recruiter.get_recruiter_uid()
+        )
         mail_content = mail.generate_delete_mail(form, recruiter_message)
 
         try:
@@ -306,7 +314,11 @@ def delete_form(form):
 @create_form(forms.OfficeOtherRequestForm)
 def other_form(form):
     if form.validate_on_submit():
-        recruiter_message = models.OtherRecruiterMessage.create_from_form(form)
+        recruiter_message = models.OtherRecruiterMessage.create_from_form(
+            form,
+            is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
+            uid=peam_recruiter.get_recruiter_uid()
+        )
         mail_content = mail.generate_other_mail(form, recruiter_message)
 
         try:
