@@ -11,7 +11,7 @@ from labonneboite.conf import settings
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
 from labonneboite.web.contact_form.views import is_recruiter_from_lba
 from labonneboite.web.auth.backends.peam_recruiter import SessionKeys, is_recruiter, is_certified_recruiter
-from labonneboite.web.auth.backends.peam_recruiter import get_token_data, get_recruiter_data, PeamRecruiterError
+from labonneboite.web.auth.backends.peam_recruiter import get_token_data, get_recruiter_data, PeamRecruiterError, PeamRecruiterLoginCancelled
 
 authBlueprint = Blueprint('auth', __name__)
 
@@ -122,11 +122,22 @@ def peam_recruiter_token_callback():
     session_state = session.get('STATE', '')
     session_nonce = session.get('NONCE', '')
 
+    # Redirect params
+    redirect_params = {}
+    if siret:
+        # Note: if we set siret=None directly in redirect_params, we will have an extra / at the end of the generated url
+        # Which will cause a 404 error
+        redirect_params.update({'siret':siret})
+    if recruiter_from_lba:
+        redirect_params.update({'origin':'labonnealternance'})
+
     # Code value
     code = request.args.get('code', '')
     try:
-        if session_state != state or not code:
-            raise PeamRecruiterError('Wrong state value {} - {} or missing access token'.format(session_state, state))
+        if session_state != state:
+            raise PeamRecruiterError('Wrong state value {} - {}'.format(session_state, state))
+        elif not code:
+            raise PeamRecruiterLoginCancelled()
 
         token_data = get_token_data(code)
 
@@ -138,14 +149,18 @@ def peam_recruiter_token_callback():
 
         # User infos
         recruiter_data = get_recruiter_data(access_token)
-
+    except PeamRecruiterError as e:
+        logger.exception(e)
+    except PeamRecruiterLoginCancelled as e:
+        pass
+    else:
         # Profile need to be certified (email and habilitation)
         uid = recruiter_data.get('sub', '')
         habilitation = recruiter_data.get('habilitation', '')
         email_verified = recruiter_data.get('email_verified') == 'true'
 
         if habilitation != 'recruteurcertifie' and not uid and not email_verified:
-            redirect_url = url_for('contact_form.ask_recruiter_pe_connect', siret=siret, origin='labonnealternance') if recruiter_from_lba else url_for('contact_form.ask_recruiter_pe_connect', siret=siret,)
+            redirect_url = url_for('contact_form.ask_recruiter_pe_connect', **redirect_params)
             message = "Votre compte n'est pas certifié. Veuillez recommencer ou utiliser le formulaire sans connexion"
             flash(message, 'error')
             return redirect(redirect_url)
@@ -158,14 +173,13 @@ def peam_recruiter_token_callback():
         session[SessionKeys.HABILITATION.value] = habilitation
         session[SessionKeys.UID.value] = uid
 
-        redirect_url = url_for('contact_form.change_info', siret=siret, origin='labonnealternance') if recruiter_from_lba else url_for('contact_form.change_info', siret=siret,)
+        redirect_url = url_for('contact_form.change_info', **redirect_params)
         return redirect(redirect_url)
 
-    except PeamRecruiterError as e:
-        logger.exception(e)
 
     # Fail
-    redirect_url = url_for('contact_form.ask_recruiter_pe_connect', siret=siret, origin='labonnealternance') if recruiter_from_lba else url_for('contact_form.ask_recruiter_pe_connect', siret=siret,)
+    redirect_url = url_for('contact_form.ask_recruiter_pe_connect', **redirect_params)
+
     message = "Erreur lors de la connexion. Veuillez réessayer ultérieurement ou utiliser le formulaire sans connexion"
     flash(message, 'error')
     return redirect(redirect_url)

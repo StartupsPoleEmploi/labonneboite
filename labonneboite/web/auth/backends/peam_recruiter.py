@@ -8,6 +8,9 @@ from labonneboite.conf import settings
 class PeamRecruiterError(Exception):
     pass
 
+class PeamRecruiterLoginCancelled(Exception):
+    pass
+
 # Recruiter session value keys
 class SessionKeys(Enum):
     EMAIL = 'SESSION_EMAIL'
