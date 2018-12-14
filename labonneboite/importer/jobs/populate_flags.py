@@ -31,6 +31,8 @@ def populate_flag(flag):
     cur.execute(query)
     con.commit()
     logger.info("completed populating %s ... ", flag)
+    cur.close()
+    con.close()
 
 
 def run_sql_script(sql_script):
@@ -41,6 +43,9 @@ def run_sql_script(sql_script):
         if len(query) >= 1:
             cur.execute(query)
             con.commit()
+    cur.close()
+    con.close()
+
 
 
 @timeit

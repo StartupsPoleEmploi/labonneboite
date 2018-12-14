@@ -173,6 +173,8 @@ class DpaeExtractJob(Job):
         statistics.save()
         con.commit()
         logger.info("finished importing dpae...")
+        cur.close()
+        con.close()
         return something_new
 
 

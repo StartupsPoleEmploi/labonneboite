@@ -66,6 +66,8 @@ def check_departements(departements):
         count = cur.fetchone()[0]
         if count < 1000:
             logger.error("only %s results for departement %s", count, dep)
+        cur.close()
+        con.close()
 
 
 class EtablissementExtractJob(Job):
@@ -163,9 +165,11 @@ class EtablissementExtractJob(Job):
     def get_sirets_from_database(self):
         query = "select siret from %s" % settings.RAW_OFFICE_TABLE
         logger.info("get offices from database")
-        _, cur = import_util.create_cursor()
+        con, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
+        cur.close()
+        con.close()
         return [row[0] for row in rows if siret_util.is_siret(row[0])]
 
     @timeit
@@ -204,6 +208,8 @@ class EtablissementExtractJob(Job):
         if statements:
             cur.executemany(query, statements)
             con.commit()
+        cur.close()
+        con.close()
         logger.info("%i offices updated.", count)
 
     @timeit
@@ -234,6 +240,8 @@ class EtablissementExtractJob(Job):
         if statements:
             cur.executemany(query, statements)
             con.commit()
+        cur.close()
+        con.close()
         logger.info("%i new offices created.", count)
 
     @timeit
@@ -249,6 +257,8 @@ class EtablissementExtractJob(Job):
             except:
                 logger.warning("deletable_sirets=%s", self.deletable_sirets)
                 raise
+        cur.close()
+        con.close()
         logger.info("%i old offices deleted.", len(self.deletable_sirets))
 
     @timeit
