@@ -1,10 +1,14 @@
 # coding: utf8
+import urllib.parse
+
 from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common.database import db_session
 from labonneboite.common.models import get_user_social_auth, User
 from labonneboite.tests.test_base import DatabaseTest
+from labonneboite.web.app import app
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
+from labonneboite.web.auth import utils as auth_utils
 
 
 class AuthTest(DatabaseTest):
@@ -67,3 +71,30 @@ class AuthTest(DatabaseTest):
 
         user_social_auth = get_user_social_auth(user.id)
         self.assertEqual(user_social_auth.id, expected_user_social_auth.id)
+
+    def test_login_url(self):
+        with self.app_context:
+            login_url = auth_utils.login_url()
+
+        parsed = urllib.parse.urlsplit(login_url)
+        querystring = urllib.parse.parse_qs(parsed.query)
+        self.assertIsNotNone(login_url)
+        self.assertEqual(['1'], querystring['keep'])
+        self.assertNotIn('next', querystring)
+
+    def test_login_url_with_next(self):
+        next_url = 'http://infinityandbeyond.com/subpath?arg=value'
+        with self.app_context:
+            login_url = auth_utils.login_url(next_url=next_url)
+
+        parsed = urllib.parse.urlsplit(login_url)
+        querystring = urllib.parse.parse_qs(parsed.query)
+        self.assertEqual([next_url], querystring['next'])
+
+    def test_login_url_with_request(self):
+        with app.test_request_context(path='/pioupiou', base_url='http://laser.com'):
+            login_url = auth_utils.login_url()
+
+        parsed = urllib.parse.urlsplit(login_url)
+        querystring = urllib.parse.parse_qs(parsed.query)
+        self.assertEqual(['http://laser.com/pioupiou'], querystring['next'])

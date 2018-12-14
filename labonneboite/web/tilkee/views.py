@@ -1,12 +1,13 @@
 # coding: utf8
 import logging
 
-from flask import Blueprint, render_template, request, url_for
+from flask import Blueprint, render_template, request
 from flask.helpers import BadRequest
 from flask_login import current_user
 
 from labonneboite.conf import settings
 from labonneboite.common.models.office import Office
+from labonneboite.web.auth.utils import login_url
 from . import utils
 
 
@@ -30,8 +31,7 @@ def upload():
         error_template = "tilkee/missing_email.html"
     if error_template:
         next_url = request.referrer + '#company-{}'.format(company.siret) if request.referrer else ''
-        login_url = url_for('social.auth', backend='peam-openidconnect', next=next_url)
-        return render_template(error_template, login_url=login_url)
+        return render_template(error_template, login_url=login_url(next_url=next_url))
 
     if request.method == 'GET':
         return render_template("tilkee/upload.html", company=company, file_extensions=utils.ALLOWED_FILE_EXTENSIONS)
@@ -60,3 +60,4 @@ def upload_files(company, files):
 def postuler():
     if not current_user.is_authenticated:
         return render_template("tilkee/login.html")
+    return None

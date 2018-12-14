@@ -2,6 +2,8 @@
 """
 Flask app configuration settings.
 """
+from datetime import timedelta
+
 from labonneboite.conf import settings
 
 
@@ -36,6 +38,11 @@ class Config(object):
     SOCIAL_AUTH_USER_MODEL = 'labonneboite.common.models.auth.User'
     SOCIAL_AUTH_LOGIN_URL = '/'
     SOCIAL_AUTH_INACTIVE_USER_URL = '/'
+
+    # Persist user authentication in cookie, and not just in session
+    SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = [settings.REMEMBER_ME_ARG_NAME] # used by social_core
+    REMEMBER_COOKIE_NAME = 'auth' # used by social_flask and flask_login
+    REMEMBER_COOKIE_DURATION = timedelta(days=365)
 
     # List of supported third party authentication providers.
     SOCIAL_AUTH_AUTHENTICATION_BACKENDS = (

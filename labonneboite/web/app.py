@@ -29,6 +29,7 @@ from labonneboite.common.models import Office
 from labonneboite.conf import settings
 
 # labonneboite web.
+from labonneboite.web.auth import utils as auth_utils
 from labonneboite.web.auth.backends.exceptions import AuthFailedMissingReturnValues
 from labonneboite.web.config import CONFIG
 from labonneboite.web.jepostule.utils import jepostule_enabled
@@ -191,6 +192,7 @@ def register_context_processors(flask_app):
             'enable_adblock_tracking': settings.ENABLE_ADBLOCK_TRACKING,
             'tilkee_enabled': settings.TILKEE_ENABLED,
             'google_site_verification_code': settings.GOOGLE_SITE_VERIFICATION_CODE,
+            'login_url': auth_utils.login_url,
         }
 
     def inject_user():
@@ -350,7 +352,7 @@ def social_auth_error(error):
     elif isinstance(error, social_exceptions.AuthForbidden):
         # "Your credentials aren't allowed"
         pass
-    elif isinstance(error, social_exceptions.AuthMissingParameter) or isinstance(error, AuthFailedMissingReturnValues):
+    elif isinstance(error, (social_exceptions.AuthMissingParameter, AuthFailedMissingReturnValues)):
         flash_message = "Veuillez vérifier vos emails et procéder à la validation de votre compte Pôle Emploi."
     elif not isinstance(error, (
             social_exceptions.AuthCanceled,

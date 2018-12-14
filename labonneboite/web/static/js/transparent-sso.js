@@ -42,7 +42,7 @@
           // redirect is an url that will signal the parent window (this one)
           // with a USER_SSO_CONNECTED message if the user is correctly connected.
           var iframeUrl = window.location.protocol + '//' + window.location.host + '/authentication/iframe';
-          var peamURL = window.location.origin + '/authorize/login/peam-openidconnect-no-prompt/?next=' + encodeURIComponent(iframeUrl);
+          var peamURL = window.location.origin + '/authorize/login/peam-openidconnect-no-prompt/?keep=1&next=' + encodeURIComponent(iframeUrl);
           var ifr = document.createElement("iframe");
           ifr.setAttribute("src", peamURL);
           ifr.setAttribute("style", "display:none;");
