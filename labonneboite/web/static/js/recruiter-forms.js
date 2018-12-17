@@ -76,26 +76,28 @@
 
       var rawValues = localStorage.getItem(FORM_STORAGE_KEY);
       if(!rawValues) return;
+
+      var values = {};
       try {
-        var values = JSON.parse(rawValues);
-
-        // Do not override value if the siret (coming from URL parameter) is already here
-        var $siret = $form.find("input[name='siret']");
-        if(!$siret.val()) $siret.val(values.siret);
-
-        // Do not override last_name/first_name/email is data comes from PE Connect
-        var isConnectedRecruiter = $('[data-esd-recruiter="true"]').length > 0;
-
-        if(!isConnectedRecruiter) {
-          $form.find("input[name='last_name']").val(values.lastName);
-          $form.find("input[name='first_name']").val(values.firstName);
-          $form.find("input[name='email']").val(values.email);
-        }
-        $form.find("input[name='phone']").val(values.phone);
+        values = JSON.parse(rawValues);
       } catch(error) {
-        console.log(error)
+        console.log(error);
         return;
       }
+
+      // Do not override value if the siret (coming from URL parameter) is already here
+      var $siret = $form.find("input[name='siret']");
+      if(!$siret.val()) $siret.val(values.siret);
+
+      // Do not override last_name/first_name/email is data comes from PE Connect
+      var isConnectedRecruiter = $('[data-esd-recruiter="true"]').length > 0;
+
+      if(!isConnectedRecruiter) {
+        $form.find("input[name='last_name']").val(values.lastName);
+        $form.find("input[name='first_name']").val(values.firstName);
+        $form.find("input[name='email']").val(values.email);
+      }
+      $form.find("input[name='phone']").val(values.phone);
 
     }
   }
