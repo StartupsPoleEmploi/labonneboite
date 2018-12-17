@@ -241,7 +241,7 @@ def get_fields_from_csv_line(line, delimiter='|'):
 
 def parse_dpae_line(line):
     fields = get_fields_from_csv_line(line)
-    required_fields = 25
+    required_fields = 27
     if len(fields) != required_fields:  # an assert statement here does not work from nosetests
         msg = ("found %s fields instead of %s in line: %s" % (
             len(fields), required_fields, line
