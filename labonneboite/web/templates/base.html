@@ -236,6 +236,20 @@
       </div>
   </div>
 
+  <div id="jepostule-not-authentified-modal" class="modal modal-closed">
+    <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
+    <div class="modal-content">
+      <div class="modal-content-inner text-center">
+        <p class="text-bold">Cette fonctionnalité est disponible uniquement aux utilisateurs connectés.</p>
+        <p>
+            <a class="logo-pe-connect rgpd-consent-required" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ (next_url or request.url) | urlencode }}">
+              <img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Pôle emploi Connect">
+            </a>
+          </p>
+      </div>
+    </div>
+  </div>
+
   <script>
       {# Place global js variables here #}
       window.USER_IS_AUTHENTICATED = {{ "true" if user.is_authenticated else "false" }};
@@ -250,6 +264,13 @@
     $(document).on('lbbready', showTilkeeIntro);
   </script>
   {% endif %}
+
+  <script>
+    $(".jepostule-not-authentified").on('click', function() {
+      ga('send', 'event', 'Modal', 'open', 'jepostule-not-authentified-modal');
+      showModal("#jepostule-not-authentified-modal");
+    });
+  </script>
 
   <script>
       // Trigger our own ready event

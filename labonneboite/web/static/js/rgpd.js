@@ -53,6 +53,7 @@ function userHasNotYetDecidedRGPD() {
     $('.rgpd-consent-required').on('click', function (e) {
       if (userHasOptInRGPD() === false) {
         alert('Vous devez accepter notre politique de confidentialité pour utiliser notre service.');
+        closeModals();
         $(".lbb-dropdown").hide();  // hide PE connect dropdown
         showModal("#rgpd-modal");
         e.preventDefault();
