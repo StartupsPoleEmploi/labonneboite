@@ -280,7 +280,7 @@ def parse_dpae_line(line):
 
     choices = {
         "- de 26 ans": TRANCHE_AGE_JUNIOR,
-        "de 26 ans  50 ans": TRANCHE_AGE_MIDDLE,
+        "de 26 ans ? 50 ans": TRANCHE_AGE_MIDDLE,
         "+ de 50 ans": TRANCHE_AGE_SENIOR
     }
 
