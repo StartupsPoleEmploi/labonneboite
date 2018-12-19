@@ -31,7 +31,10 @@ def new_elasticsearch_instance():
     In some cases e.g. parallel jobs you may need a dedicated es connection for each
     of your threads.
     """
-    return elasticsearch.Elasticsearch(timeout=settings.ES_TIMEOUT)
+    return elasticsearch.Elasticsearch(
+        hosts=[settings.ES_HOST],
+        timeout=settings.ES_TIMEOUT
+    )
 
 
 def drop_and_create_index():
