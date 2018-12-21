@@ -45,3 +45,5 @@ script:
   - mysql -u travis lbb_test < ./labonneboite/alembic/sql/etablissements.sql
   - create_index --full
   - nosetests labonneboite/tests/selenium
+  # Build docker image
+  - docker build .
