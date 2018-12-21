@@ -105,6 +105,7 @@ HEADCOUNT_VALUES = {
 ES_INDEX = 'labonneboite'
 # Set ES_TIMEOUT environment variable to 0 to remove ES timeouts entirely
 ES_TIMEOUT = int(os.environ.get('ES_TIMEOUT', 10)) or None
+ES_HOST = 'localhost:9200'
 DB_HOST = 'localhost'
 DB_PORT = 3306
 DB_NAME = 'labonneboite'
