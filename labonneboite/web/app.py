@@ -270,6 +270,7 @@ def create_app():
         'js/results-toggle-sidebar.js',
         'js/results.js',
         'js/tilkee.js',
+        'js/toggle-long-text.js',
         'js/tooltip.js',  # Depends on 'js/vendor/bootstrap-tooltip.js'.
         'js/unobfuscate.js',
         'js/transparent-sso.js',

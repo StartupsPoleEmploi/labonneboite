@@ -70,6 +70,14 @@
       </div>
     </div>
 
+    {% if company.is_groupement_employeurs %}
+      <h4>Cette entreprise est un groupement d'employeurs.</h4>
+      <div id="more-1" class="fulltext">
+        <p>Les groupements d'employeurs (GE) permettent à des entreprises de s'associer afin d'embaucher collectivement du personnel. Le salarié est recruté par le groupement d'employeurs lui-même. Il a un seul contrat de travail qui le lie à ce groupement d’employeurs et il partage son temps de travail entre les différentes sociétés qui le composent. Il dispose bien évidemment des mêmes droits et devoirs que tout salarié.</p>
+      </div>
+      <button aria-expanded="false" aria-controls="more-1" class="toggle-content" hidden><span class="text">En savoir plus</span></button>
+    {% endif %}
+
     {# Map. #}
     <div class="js-map-container lbb-result__content__map" aria-hidden="true">
       {# Hidden input are used in JavaScript. #}

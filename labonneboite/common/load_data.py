@@ -52,6 +52,13 @@ def load_csv_file(filename, delimiter='|'):
     return rows
 
 
+def load_rows_as_set(rows):
+    for row in rows:
+        if len(row) != 1:
+            raise IndexError("wrong number of fields")
+    return set([row[0] for row in rows])
+
+
 def load_rows_as_dict(rows):
     d = {}
     for row in rows:
@@ -103,6 +110,13 @@ def load_ogr_labels():
     rows = load_csv_file("ogr_labels.csv")
     ogr_to_label = load_rows_as_dict(rows)
     return ogr_to_label
+
+
+@lru_cache(maxsize=None)
+def load_groupements_employeurs():
+    rows = load_csv_file("groupements_employeurs.csv")
+    sirets = load_rows_as_set(rows)
+    return sirets
 
 
 @lru_cache(maxsize=None)

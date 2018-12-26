@@ -4,6 +4,7 @@ import unittest.mock
 from labonneboite.common.models import Office
 from labonneboite.common import pdf
 from labonneboite.tests.test_base import DatabaseTest
+from labonneboite.common.load_data import load_groupements_employeurs
 
 
 class DownloadTest(DatabaseTest):
@@ -67,6 +68,35 @@ class DownloadTest(DatabaseTest):
 
         rv = self.app.get(self.url_for('office.details', siret=self.office.siret))
         self.assertEqual(rv.status_code, 200)
+
+    def test_office_details_page_of_office_which_is_a_groupement_employeurs(self):
+        """
+        Test the office details page of an office being a groupement d'employeurs.
+        """
+        self.office.siret = '30651644400024'  # first siret in groupements_employeurs.csv
+        self.office.save()
+
+        self.assertIn(self.office.siret, load_groupements_employeurs())
+
+        rv = self.app.get(self.url_for('office.details', siret=self.office.siret))
+        self.assertEqual(rv.status_code, 200)
+        self.assertIn(
+            u"Cette entreprise est un groupement d'employeurs.",
+            rv.data.decode(),
+        )
+
+    def test_office_details_page_of_office_which_is_not_a_groupement_employeurs(self):
+        """
+        Test the office details page of an office not being a groupement d'employeurs.
+        """
+        self.assertFalse(self.office.siret in load_groupements_employeurs())
+
+        rv = self.app.get(self.url_for('office.details', siret=self.office.siret))
+        self.assertEqual(rv.status_code, 200)
+        self.assertNotIn(
+            u"Cette entreprise est un groupement d'employeurs.",
+            rv.data.decode(),
+        )
 
     def test_download_regular_office(self):
         """

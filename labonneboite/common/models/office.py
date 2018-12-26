@@ -18,7 +18,7 @@ from labonneboite.common import encoding as encoding_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import hiring_type_util
 from labonneboite.common.database import Base, db_session, DATABASE
-from labonneboite.common.load_data import load_city_codes
+from labonneboite.common.load_data import load_city_codes, load_groupements_employeurs
 from labonneboite.common import util
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
@@ -262,6 +262,14 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     @property
     def kompass_url(self):
         return "http://fr.kompass.com/searchCompanies?text=%s" % self.siret
+
+    @property
+    def is_groupement_employeurs(self):
+        """
+        A "groupement d'employeurs" is a French-only juridical entity
+        which is basically a collection of offices.
+        """
+        return self.siret in load_groupements_employeurs()
 
     @property
     def headcount_text(self):
