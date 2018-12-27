@@ -982,7 +982,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
-            self.assertEqual(data['companies'][0]['contact_mode'], 'Envoyer un CV et une lettre de motivation')
+            self.assertEqual(data['companies'][0]['contact_mode_code'], 'email')
+            self.assertEqual(data['companies'][0]['contact_mode'], 'Envoyer un CV et une lettre de motivation par email')
 
 
     def test_flag_alternance(self):

@@ -9,9 +9,9 @@
 
     {% include "includes/office/pdf_header.html" %}
 
-    {% for company, contact_mode in companies %}
-    {% include "includes/office/info_table.html" %}
-    <br>
+    {% for office in offices %}
+      {% include "includes/office/info_table.html" %}
+      <br>
     {% endfor %}
   </body>
 </html>

@@ -17,7 +17,7 @@ from labonneboite.importer.jobs.common import logger
 
 
 def has_text_content(s):
-    return s is not None and len(s) > 0 and not s.isspace()
+    return s and s.strip()
 
 
 def merge_and_normalize_websites(websites):

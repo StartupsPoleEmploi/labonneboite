@@ -758,9 +758,6 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
             rome_with_highest_score = max(scores_of_searched_romes, key=scores_of_searched_romes.get)
             # Store it as an extra attribute.
             office.matched_rome = rome_with_highest_score
-            rome_code_for_contact_mode = rome_with_highest_score
-        else:
-            rome_code_for_contact_mode = rome_codes[0]
 
         # Set boost flag
         office.boost = False
@@ -769,9 +766,6 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
             boost_romes = es_office['_source'][boosted_rome_keyname]
             romes_intersection = set(rome_codes).intersection(boost_romes)
             office.boost = bool(romes_intersection)
-
-        # Set contact mode and position
-        office.contact_mode = util.get_contact_mode_for_rome_and_office(rome_code_for_contact_mode, office)
 
     try:
         aggregations = res['aggregations']

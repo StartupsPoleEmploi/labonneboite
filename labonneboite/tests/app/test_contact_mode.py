@@ -1,8 +1,8 @@
 # coding: utf8
 import unittest
 
-from labonneboite.common import util
-from labonneboite.common.load_data import load_contact_modes
+from labonneboite.common.contact_mode import (CONTACT_MODE_MAIL, CONTACT_MODE_EMAIL,
+        CONTACT_MODE_OFFICE, CONTACT_MODE_WEBSITE, CONTACT_MODE_PHONE)
 from labonneboite.common.models import Office
 
 class ContactModeTest(unittest.TestCase):
@@ -11,47 +11,75 @@ class ContactModeTest(unittest.TestCase):
         """
         Ensure contact_mode works in all edge cases.
         """
-        contact_mode_dict = load_contact_modes()
+        # office has no data at all
+        office = Office()
+        self.assertEqual(office.recommended_contact_mode, None)
+        self.assertEqual(office.recommended_contact_mode_label, '')
 
-        # Case 1 : naf and rome are in contact_mode mapping
-        office1 = Office()
-        rome = 'H2504'
-        office1.naf = '1712Z'
-        naf_prefix = office1.naf[:2]
+        # office has a contact_mode suggesting email but has no data
+        office = Office()
+        office.contact_mode = 'Contactez nous par mail'
+        office.email = ''
+        self.assertEqual(office.recommended_contact_mode, None)
 
-        self.assertIn(naf_prefix, contact_mode_dict)
-        self.assertIn(rome, contact_mode_dict[naf_prefix])
-        contact_mode = util.get_contact_mode_for_rome_and_office(rome, office1)
-        self.assertEqual(contact_mode, 'Se présenter spontanément')
+        # office has a contact_mode suggesting email and has data
+        office = Office()
+        office.contact_mode = 'Contactez nous par mail'
+        office.email = 'pouac@plonk.fr'
+        self.assertEqual(office.recommended_contact_mode, CONTACT_MODE_EMAIL)
 
-        # Case 2 : naf is in contact_mode mapping but rome is not
-        office2 = Office()
-        rome = 'D1408'
-        office2.naf = '1712Z'
-        naf_prefix = office2.naf[:2]
+        # office has a contact_mode suggesting phone but has no data
+        office = Office()
+        office.contact_mode = 'Contactez nous par téléphone'
+        office.tel = ''
+        self.assertEqual(office.recommended_contact_mode, None)
 
-        self.assertIn(naf_prefix, contact_mode_dict)
-        self.assertNotIn(rome, contact_mode_dict[naf_prefix])
-        contact_mode = util.get_contact_mode_for_rome_and_office(rome, office2)
-        self.assertEqual(contact_mode, 'Se présenter spontanément')
+        # office has a contact_mode suggesting phone and has data
+        office = Office()
+        office.contact_mode = 'Contactez nous par téléphone'
+        office.tel = '0199009900'
+        self.assertEqual(office.recommended_contact_mode, CONTACT_MODE_PHONE)
 
-        # Case 3 : naf is not in contact_mode mapping
-        office3 = Office()
-        rome = 'D1408'
-        office3.naf = '9900Z'
-        naf_prefix = office3.naf[:2]
+        # office has a contact_mode suggesting website but has no data
+        office = Office()
+        office.contact_mode = 'Déposez votre CV sur notre site internet'
+        office.website = ''
+        self.assertEqual(office.recommended_contact_mode, None)
 
-        self.assertNotIn(naf_prefix, contact_mode_dict)
-        contact_mode = util.get_contact_mode_for_rome_and_office(rome, office3)
-        self.assertEqual(contact_mode, 'Envoyer un CV et une lettre de motivation')
+        # office has a contact_mode suggesting website and has data
+        office = Office()
+        office.contact_mode = 'Déposez votre CV sur notre site internet'
+        office.website = 'http://www.pouac.fr'
+        self.assertEqual(office.recommended_contact_mode, CONTACT_MODE_WEBSITE)
 
-        # Case 4 : custom contact_mode
-        custom_contact_mode = 'Send a Fax'
+        # office has a contact_mode suggesting postal mail
+        office = Office()
+        office.contact_mode = 'Envoyez votre CV par courrier'
+        self.assertEqual(office.recommended_contact_mode, CONTACT_MODE_MAIL)
 
-        office4 = Office()
-        rome = 'D1408'
-        office4.naf = '1712Z'
-        office4.contact_mode = custom_contact_mode
+        # office has a contact_mode suggesting showing up
+        office = Office()
+        office.contact_mode = 'Présentez vous directement à notre entreprise'
+        self.assertEqual(office.recommended_contact_mode, CONTACT_MODE_OFFICE)
 
-        contact_mode = util.get_contact_mode_for_rome_and_office(rome, office4)
-        self.assertEqual(contact_mode, custom_contact_mode)
+        # in absence of contact_mode, email has precedence over phone
+        office = Office()
+        office.email = 'pouac@plonk.fr'
+        office.tel = '0199009900'
+        self.assertEqual(office.recommended_contact_mode, CONTACT_MODE_EMAIL)
+
+        # in absence of contact_mode and email, phone has precedence over website
+        office = Office()
+        office.email = ''
+        office.tel = '0199009900'
+        office.website = 'http://www.pouac.fr'
+        self.assertEqual(office.recommended_contact_mode, CONTACT_MODE_PHONE)
+
+        # only a website
+        office = Office()
+        office.email = ''
+        office.tel = ''
+        office.website = 'http://www.pouac.fr'
+        self.assertEqual(office.recommended_contact_mode, CONTACT_MODE_WEBSITE)
+
+

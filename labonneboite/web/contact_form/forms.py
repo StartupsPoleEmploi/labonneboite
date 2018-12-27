@@ -5,18 +5,20 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, TextAreaField, HiddenField, RadioField
 from wtforms import validators
 from wtforms.fields.html5 import EmailField, TelField
-from wtforms.validators import DataRequired, Email, Optional, Regexp, URL, Length
+from wtforms.validators import DataRequired, Email, Optional, Regexp, URL
 
 from labonneboite.common.load_data import ROME_CODES
+from labonneboite.common.contact_mode import (CONTACT_MODE_MAIL, CONTACT_MODE_EMAIL,
+        CONTACT_MODE_OFFICE, CONTACT_MODE_WEBSITE, CONTACT_MODE_PHONE)
 
-CONTACT_MODES = (
-    ('mail', 'Par courrier'),
-    ('email', 'Par email'),
-    ('phone', 'Par téléphone'),
-    ('office', 'Sur place'),
-    ('website', 'Via votre site internet'),
+CONTACT_MODES_SORTED_LABELS = (
+    (CONTACT_MODE_MAIL, 'Par courrier'),
+    (CONTACT_MODE_EMAIL, 'Par email'),
+    (CONTACT_MODE_PHONE, 'Par téléphone'),
+    (CONTACT_MODE_OFFICE, 'Sur place'),
+    (CONTACT_MODE_WEBSITE, 'Via votre site internet'),
 )
-CONTACT_MODES_LABELS = dict(CONTACT_MODES)
+CONTACT_MODES_LABELS = dict(CONTACT_MODES_SORTED_LABELS)
 PHONE_REGEX = "^(0|\+33)[1-9]([-. ]?[0-9]{2}){4}$"
 
 
@@ -74,7 +76,7 @@ class OfficeUpdateJobsForm(OfficeHiddenIdentificationForm):
 
 class OfficeUpdateCoordinatesForm(OfficeHiddenIdentificationForm):
     # Note : we add new_ to avoid conflict with request.args
-    new_contact_mode = RadioField('Mode de contact à privilégier', choices=CONTACT_MODES, default='email')
+    new_contact_mode = RadioField('Mode de contact à privilégier', choices=CONTACT_MODES_SORTED_LABELS, default='email')
     new_website = StringField(
         'Site Internet',
         validators=[URL(), Optional()], render_kw={"placeholder": "http://exemple.com"}

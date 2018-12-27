@@ -9,11 +9,11 @@
 
     {% include "includes/office/pdf_header.html" %}
 
-    <h1 class="headline">L'entreprise <span class="company-name">{{ company.name }}</span> est recommandée (*) par La Bonne Boite</h1>
+    <h1 class="headline">L'entreprise <span class="company-name">{{ office.name }}</span> est recommandée (*) par La Bonne Boite</h1>
 
     {% include "includes/office/info_table.html" %}
 
-    <h2>La voie du succès pour travailler chez <span class="company-name">{{ company.name }}</span></h2>
+    <h2>La voie du succès pour travailler chez <span class="company-name">{{ office.name }}</span></h2>
 
     <table class="planning">
       <tr>
@@ -28,10 +28,10 @@
         <td class="done"></td>
         <td class="done" style="color: #19c158;"><b>Bravo, vous avez déjà réussi la première étape !</b></td>
       </tr>
-      {% for stage in stages %}
+      {% for contact_step in office.recommended_contact_steps %}
         <tr>
           <td class="bigcell">{{ loop.index + 1 }}</td>
-          <td>{{ stage }}</td>
+          <td>{{ contact_step }}</td>
           <td>.................</td>
           <td>.................</td>
         </tr>
