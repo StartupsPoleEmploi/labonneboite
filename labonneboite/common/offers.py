@@ -100,7 +100,10 @@ class VisibleMarketFetcher(Fetcher):
                 for offer in office_offers:
                     if 'companyContactEmail' in offer:
                         office.email = offer['companyContactEmail']
-                        break
+                    if 'companyContactPhone' in offer:
+                        office.tel = offer['companyContactPhone']
+                    if 'companyUrl' in offer:
+                        office.website = offer['companyUrl']
 
         # Only keep offices which actually matched an offer.
         offices = [office for office in offices if hasattr(office, 'offers_count')]
