@@ -236,8 +236,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     @property
     def phone(self):
-        # FIXME ''.isspace() == False o_O
-        has_phone = self.tel and not self.tel.isspace()
+        has_phone = self.tel and self.tel.strip()
         if has_phone:
             # not sure why, the import botched the phone number...
             if self.tel[-2] == '.':
