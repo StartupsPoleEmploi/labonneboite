@@ -1,3 +1,4 @@
 User-agent: *
-Crawl-delay: 2 # sets a 2 second time-out
+# Disabled to facilitate crawling, this parameter shouldn't be necessary.
+#Crawl-delay: 2 # sets a 2 second time-out
 Disallow: /*/download
