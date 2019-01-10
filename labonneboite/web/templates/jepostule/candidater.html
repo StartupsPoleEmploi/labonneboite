@@ -19,7 +19,7 @@
                 ga('send', 'event', 'jepostule', data.action, data.label, data.value);
                 if (data.action === 'navigate' && data.label === '#fin' && window.hj !== undefined) {
                     // trigger hotjar scenario
-                    hj.trigger('trigger', 'sondage-candidat-jepostule');
+                    hj('trigger', 'sondage-candidat-jepostule');
                 }
             }
         }
