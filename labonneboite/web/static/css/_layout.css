@@ -71,7 +71,6 @@ This is a wrapper because it can't have a fixed width in order to apply a full c
 .lbb-header-wrapper {
     width: 100%;
     background: #fff;
-    border-bottom: 1px solid #cbcbcb;
 }
 
 .lbb-header-wrapper * + * {
