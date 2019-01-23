@@ -13,6 +13,9 @@ compile-requirements:
 services:
 	cd docker/ && docker-compose up -d
 
+init-services: services ## Launch services and wait until mysql is ready
+	cd docker && until docker-compose logs mysql | grep "MySQL init process done. Ready for start up."; do sleep 1; done
+
 database: database-dev database-test
 
 database-dev: services
@@ -28,6 +31,11 @@ data: database alembic-migrate populate-data-dev
 populate-data-dev:
 	mysql -u root --host 127.0.0.1 --port 3307 labonneboite < ./labonneboite/alembic/sql/etablissements.sql
 	LBB_ENV=development python ./labonneboite/scripts/create_index.py --full
+
+populate-data-test:
+	LBB_ENV=test alembic upgrade head
+	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
+	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
 
 clear-data: clear-data-dev clear-data-test
 
@@ -57,6 +65,9 @@ clean:
 
 clean-pyc:
 	find $(PACKAGE_DIR) "(" -name "*.pyc" ")" -delete
+
+clean-services: stop-services ## Delete containers and attached volumes
+	cd docker && docker-compose rm --force -v
 
 # Code quality
 # ------------
@@ -131,44 +142,45 @@ start-locust-against-localhost:
 # Tests
 # -----
 
-test-unit: clean-pyc test-app test-web test-scripts test-importer
+NOSETESTS = nosetests -s $(NOSETESTS_OPTS)
+
+test-unit: clean-pyc
+	LBB_ENV=test $(NOSETESTS) \
+			labonneboite/tests/app/ \
+			labonneboite/tests/web/ \
+			labonneboite/tests/scripts/ \
+			labonneboite/tests/importer/
 
 test-all: test-unit test-selenium test-integration
 
 check-all: test-all run-importer-jobs
 
 test-app:
-	LBB_ENV=test nosetests -s labonneboite/tests/app
+	LBB_ENV=test $(NOSETESTS) labonneboite/tests/app
 
 test-importer:
-	LBB_ENV=test nosetests -s labonneboite/tests/importer
+	LBB_ENV=test $(NOSETESTS) labonneboite/tests/importer
 
 # convenient shortcut when working on the importer
 check-importer: test-importer run-importer-jobs
 
 test-api:
-	LBB_ENV=test nosetests -s labonneboite/tests/web/api
+	LBB_ENV=test $(NOSETESTS) labonneboite/tests/web/api
 
 test-front:
-	LBB_ENV=test nosetests -s labonneboite/tests/web/front
+	LBB_ENV=test $(NOSETESTS) labonneboite/tests/web/front
 
 test-web: test-api test-front
 
 test-scripts:
-	LBB_ENV=test nosetests -s labonneboite/tests/scripts
+	LBB_ENV=test $(NOSETESTS) labonneboite/tests/scripts
 
 # Selenium and integration tests are run against the full database (not the
 # test one) as of now: we use LBB_ENV=development.
-test-integration: clear-data-test database-test
-	LBB_ENV=test alembic upgrade head
-	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
-	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
-	LBB_ENV=test nosetests -s labonneboite/tests/integration
-test-selenium: clear-data-test database-test
-	LBB_ENV=test alembic upgrade head
-	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
-	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
-	LBB_ENV=test nosetests -s labonneboite/tests/selenium
+test-integration: clear-data-test database-test populate-data-test
+	LBB_ENV=test $(NOSETESTS) labonneboite/tests/integration
+test-selenium: clear-data-test database-test populate-data-test
+	LBB_ENV=test $(NOSETESTS) labonneboite/tests/selenium
 
 # Convenient reminder about how to run a specific test manually.
 test-custom:
