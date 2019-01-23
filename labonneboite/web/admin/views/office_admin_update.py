@@ -1,9 +1,8 @@
 # coding: utf
 from collections import namedtuple
 import logging
-from contextlib import suppress
 
-from flask import abort, flash, redirect, request, url_for
+from flask import flash, redirect, request, url_for
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView
 from wtforms import validators
@@ -316,12 +315,14 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
     def _handle_view(self, name, **kwargs):
         # This method is executed before calling any view method.
-
         """
-            Sometimes, recruiter send two emails at the same time. Both contain a create office_admin_update link.
-            But, when the first office_admin_update is created, the suggestion in the second mail became wrong.
-            And, on saving, we got a conflict with the recently created office_admin_update.
-            To avoid that, we redirect to the edit page if, afterall, an office_admin_update already exists for the company siret.
+        Sometimes, recruiter send two emails at the same time. Both contain
+        a create office_admin_update link.  But, when the first
+        office_admin_update is created, the suggestion in the second mail
+        became wrong.  And, on saving, we got a conflict with the recently
+        created office_admin_update. To avoid that, we redirect to the edit
+        page if, afterall, an office_admin_update already exists for the
+        company siret.
         """
         if name == 'create_view':
             recruiter_message_params = self.get_recruiter_message_params()
@@ -331,7 +332,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                     office_update_conflict = models.OfficeAdminUpdate.query.filter(
                         models.OfficeAdminUpdate.sirets.like("%{}%".format(recruiter_message.siret))
                     )
-
 
                     if office_update_conflict.count() > 0:
                         params = {
@@ -345,7 +345,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
         return super(OfficeAdminUpdateModelView, self)._handle_view(name, **kwargs)
 
-
     def create_form(self):
         # Call only when a form is created
         form = super(OfficeAdminUpdateModelView, self).create_form()
@@ -353,7 +352,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         # Inject sirets from URL
         sirets = request.args.get('sirets', '')
         if sirets:
-            form['sirets'].data = sirets.replace(',','\n')
+            form['sirets'].data = sirets.replace(',', '\n')
 
         return self.prefill_form(form)
 
@@ -383,7 +382,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         try:
             recruiter_message = self.get_recruiter_message(recruiter_message_params)
         except NoResultFound as e:
-            logger.exception(e) # Should not happen
+            # Should not happen
+            logger.exception(e)
             return form
 
         # Set sirets and office name fields on creation

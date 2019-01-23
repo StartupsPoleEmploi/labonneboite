@@ -166,12 +166,12 @@ class CreateFormContactDatabase(DatabaseTest):
         with app.app_context(), self.test_request_context:
             recruiter_message = models.OtherRecruiterMessage.create_from_form(create_other_form())
 
-            self.assertEquals('00000000000008', recruiter_message.siret)
-            self.assertEquals('Napoléon', recruiter_message.requested_by_first_name)
-            self.assertEquals('Bonaparte', recruiter_message.requested_by_last_name)
-            self.assertEquals('bonaparte@napoleon.fr', recruiter_message.requested_by_email)
-            self.assertEquals('0123456789', recruiter_message.requested_by_phone)
-            self.assertEquals('Bonjour à tous', recruiter_message.comment)
+            self.assertEqual('00000000000008', recruiter_message.siret)
+            self.assertEqual('Napoléon', recruiter_message.requested_by_first_name)
+            self.assertEqual('Bonaparte', recruiter_message.requested_by_last_name)
+            self.assertEqual('bonaparte@napoleon.fr', recruiter_message.requested_by_email)
+            self.assertEqual('0123456789', recruiter_message.requested_by_phone)
+            self.assertEqual('Bonjour à tous', recruiter_message.comment)
 
 
     def test_save_remove_form(self):
@@ -186,13 +186,13 @@ class CreateFormContactDatabase(DatabaseTest):
         with app.app_context(), self.test_request_context:
             recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(create_update_coordinates_form())
 
-            self.assertEquals('http://exemple.com', recruiter_message.new_website)
-            self.assertEquals('exemple@domaine.com', recruiter_message.new_email)
-            self.assertEquals('01 77 86 39 49', recruiter_message.new_phone)
-            self.assertEquals('office', recruiter_message.contact_mode)
-            self.assertEquals('exemple-alternance@domaine.com', recruiter_message.new_email_alternance)
-            self.assertEquals('02 77 86 39 49', recruiter_message.new_phone_alternance)
-            self.assertEquals('https://www.facebook.com/poleemploi/', recruiter_message.social_network)
+            self.assertEqual('http://exemple.com', recruiter_message.new_website)
+            self.assertEqual('exemple@domaine.com', recruiter_message.new_email)
+            self.assertEqual('01 77 86 39 49', recruiter_message.new_phone)
+            self.assertEqual('office', recruiter_message.contact_mode)
+            self.assertEqual('exemple-alternance@domaine.com', recruiter_message.new_email_alternance)
+            self.assertEqual('02 77 86 39 49', recruiter_message.new_phone_alternance)
+            self.assertEqual('https://www.facebook.com/poleemploi/', recruiter_message.social_network)
 
 
     def test_save_update_jobs_form(self):
