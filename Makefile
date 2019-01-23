@@ -13,6 +13,9 @@ compile-requirements:
 services:
 	cd docker/ && docker-compose up -d
 
+init-services: services ## Launch services and wait until mysql is ready
+	cd docker && until docker-compose logs mysql | grep "MySQL init process done. Ready for start up."; do sleep 1; done
+
 database: database-dev database-test
 
 database-dev: services
