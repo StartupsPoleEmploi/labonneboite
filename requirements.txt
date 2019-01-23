@@ -18,7 +18,7 @@ defusedxml==0.5.0         # via python3-openid, social-auth-core
 easyprocess==0.2.3        # via pyvirtualdisplay
 elasticsearch==1.9.0
 first==2.0.1              # via pip-tools
-flask-admin==1.5.1
+flask-admin==1.5.3
 flask-assets==0.12
 flask-babelex==0.9.3
 flask-debugtoolbar==0.10.1
@@ -93,7 +93,6 @@ speaklater==1.3
 sqlalchemy-utils==0.32.13
 sqlalchemy==1.1.11
 traitlets==4.3.2          # via ipython
-typing==3.6.4             # via ipython
 unidecode==0.4.21         # via python-slugify
 urllib3==1.24.1           # via elasticsearch, requests
 uwsgi==2.0.17
