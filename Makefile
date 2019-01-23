@@ -144,7 +144,12 @@ start-locust-against-localhost:
 
 NOSETESTS = nosetests -s $(NOSETESTS_OPTS)
 
-test-unit: clean-pyc test-app test-web test-scripts test-importer
+test-unit: clean-pyc
+	LBB_ENV=test $(NOSETESTS) \
+			labonneboite/tests/app/ \
+			labonneboite/tests/web/ \
+			labonneboite/tests/scripts/ \
+			labonneboite/tests/importer/
 
 test-all: test-unit test-selenium test-integration
 
