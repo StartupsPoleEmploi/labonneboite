@@ -63,6 +63,9 @@ clean:
 clean-pyc:
 	find $(PACKAGE_DIR) "(" -name "*.pyc" ")" -delete
 
+clean-services: stop-services ## Delete containers and attached volumes
+	cd docker && docker-compose rm --force -v
+
 # Code quality
 # ------------
 
