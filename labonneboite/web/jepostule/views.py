@@ -48,7 +48,7 @@ def get_token(**params):
     try:
         response = requests.post(
             settings.JEPOSTULE_BASE_URL + '/auth/application/token/',
-            data=params, timeout=5
+            data=params, timeout=20
         )
     except requests.ReadTimeout:
         raise JePostuleError('Request token timeout')
