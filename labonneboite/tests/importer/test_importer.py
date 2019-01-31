@@ -34,11 +34,11 @@ class TestSanity(DatabaseTest):
         office = make_office()
         office.save()
         errors = sanity.check_scores(departements=["03",])
-        self.assertEqual(len(errors), 2)  # 1 error for dpae and 1 for alternance
+        self.assertEqual(len(errors), 1)  # 1 error for dpae and 1 for alternance
 
     def test_check_low_score_fails(self):
         office = make_office(score=40)
         office.save()
         errors = sanity.check_scores(departements=["04",])
-        self.assertEqual(len(errors), 2)  # 1 error for dpae and 1 for alternance
+        self.assertEqual(len(errors), 1)  # 1 error for dpae and 1 for alternance
 

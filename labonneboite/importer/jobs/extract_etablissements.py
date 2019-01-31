@@ -338,7 +338,7 @@ class EtablissementExtractJob(Job):
                     process_this_departement = departement in departements
                     if process_this_departement:
                         # Trello Pz5UlnFh : supprimer-les-emails-pe-des-entreprises-qui-ne-sont-pas-des-agences-pe
-                        if  email.endswith("@pole-emploi.fr") and raisonsociale != "POLE EMPLOI":
+                        if  "@pole-emploi." in email and raisonsociale != "POLE EMPLOI":
                             email = ""
                         if len(codepostal) == 4:
                             codepostal = "0%s" % codepostal
