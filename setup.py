@@ -18,6 +18,7 @@ setup(
     entry_points={
         'console_scripts': [
             'create_index = labonneboite.scripts.create_index:run',
+            'check_etablissements = labonneboite.importer.jobs.check_etablissements:run',
             'update_lbb_data = labonneboite.importer.importer:run'
         ],
     },
