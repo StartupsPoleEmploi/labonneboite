@@ -19,6 +19,12 @@ setup(
         'console_scripts': [
             'create_index = labonneboite.scripts.create_index:run',
             'check_etablissements = labonneboite.importer.jobs.check_etablissements:run',
+            'check_dpae = labonneboite.importer.jobs.check_dpae:run',
+            'extract_etablissements = labonneboite.importer.jobs.extract_etablissements:run',
+            'extract_dpae = labonneboite.importer.jobs.extract_dpae:run_main',
+            'compute_scores = labonneboite.importer.jobs.compute_scores:run_main',
+            'validate_scores = labonneboite.importer.jobs.validate_scores:run',
+            'geocode = labonneboite.importer.jobs.geocode:run_main',
             'update_lbb_data = labonneboite.importer.importer:run'
         ],
     },

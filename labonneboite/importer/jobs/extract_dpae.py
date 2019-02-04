@@ -178,10 +178,14 @@ class DpaeExtractJob(Job):
         return something_new
 
 
-if __name__ == "__main__":
+def run_main():
     import logging
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger('main')
     dpae_filename = jenkins.get_dpae_filename()
     task = DpaeExtractJob(dpae_filename)
     task.run()
+
+
+if __name__ == '__main__':
+    run_main()

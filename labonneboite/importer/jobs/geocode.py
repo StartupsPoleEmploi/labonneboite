@@ -262,6 +262,12 @@ class GeocodeUnit(object):
             GEOCODING_STATS['coordinates_not_found'] = GEOCODING_STATS.get('coordinates_not_found', 0) + 1
 
 
-if __name__ == "__main__":
+def run_main():
     geocode_task = GeocodeJob()
     geocode_task.run()
+
+
+
+if __name__ == "__main__":
+    run_main()
+    
