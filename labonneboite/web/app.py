@@ -205,12 +205,12 @@ def register_context_processors(flask_app):
         except AttributeError:
             return {'user': None}
 
-    def inject_jepostule_flag():
-        return {'jepostule_enabled': hasattr(g, 'user') and jepostule_enabled(g.user)}
+    def inject_jepostule_enabled():
+        return {'jepostule_enabled': jepostule_enabled}
 
     flask_app.context_processor(inject_dict_for_all_templates)
     flask_app.context_processor(inject_user)
-    flask_app.context_processor(inject_jepostule_flag)
+    flask_app.context_processor(inject_jepostule_enabled)
 
 
 def register_teardown_appcontext(flask_app):

@@ -85,7 +85,7 @@
     {% endif %}
 
     {% if jepostule_globally_enabled %}
-      {% if jepostule_enabled and company.email %}
+      {% if jepostule_enabled(user, company) %}
         <a class="jepostule-button btn btn-small" href="{{ url_for('jepostule.application', siret=company.siret) }}" target="_blank" rel="noopener">Postuler</a>
       {% endif %}
 
