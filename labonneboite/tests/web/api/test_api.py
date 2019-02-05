@@ -63,7 +63,7 @@ class ApiGenericTest(ApiBaseTest):
         rome_code = 'D1408'
         naf_codes = ['7320Z']
         latitude = 49.305658  # 15 Avenue François Mitterrand, 57290 Fameck, France.
-        latitude += 0.1 # original coordinates will unfortunately give a distance with 0 digit
+        latitude += 0.1  # original coordinates will unfortunately give a distance with 0 digit
         longitude = 6.116853
         distance = 100
         companies, _, _ = fetch_offices(
@@ -353,8 +353,10 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data,
-                b'Invalid request argument: you must use rome_codes or rome_codes_keyword_search')
+            self.assertEqual(
+                rv.data,
+                b'Invalid request argument: you must use rome_codes or rome_codes_keyword_search'
+            )
 
     def test_rome_codes_search_by_keyword_normal_case(self):
         self.es.index(index=settings.ES_INDEX, doc_type='ogr', id=1, body={
@@ -427,8 +429,10 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data,
-                b'Invalid request argument: No match found for rome_codes_keyword_search.')
+            self.assertEqual(
+                rv.data,
+                b'Invalid request argument: No match found for rome_codes_keyword_search.'
+            )
 
     def test_rome_code_and_label_are_present_in_response(self):
         with self.test_request_context:
@@ -744,8 +748,10 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertIn('matched_rome_code', data['companies'][1])
             self.assertIn('matched_rome_label', data['companies'][1])
             self.assertIn('matched_rome_slug', data['companies'][1])
-            self.assertEqual(set([c['siret'] for c in data['companies']]),
-                set(['00000000000004', '00000000000005']))
+            self.assertEqual(
+                set([c['siret'] for c in data['companies']]),
+                set(['00000000000004', '00000000000005'])
+            )
 
             # 4) Multi rome search for both `D1405` and `M1801` ROME codes, sorting by score.
             params = self.add_security_params({
@@ -764,8 +770,10 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertIn('matched_rome_code', data['companies'][1])
             self.assertIn('matched_rome_label', data['companies'][1])
             self.assertIn('matched_rome_slug', data['companies'][1])
-            self.assertEqual(set([c['siret'] for c in data['companies']]),
-                set(['00000000000004', '00000000000005']))
+            self.assertEqual(
+                set([c['siret'] for c in data['companies']]),
+                set(['00000000000004', '00000000000005'])
+            )
 
     def test_wrong_naf_value(self):
         with self.test_request_context:
@@ -984,7 +992,6 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
             self.assertEqual(data['companies'][0]['contact_mode'], 'Envoyer un CV et une lettre de motivation')
 
-
     def test_flag_alternance(self):
         with self.test_request_context:
             params = self.add_security_params({
@@ -999,7 +1006,6 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(sorted(sirets.keys()), ['00000000000015', '00000000000016'])
             self.assertFalse(sirets['00000000000015']['alternance'])
             self.assertTrue(sirets['00000000000016']['alternance'])
-
 
     def test_department_filters(self):
         with self.test_request_context:
@@ -1103,7 +1109,6 @@ class ApiCompanyListTest(ApiBaseTest):
             # Check contract filter
             self.assertEqual(data['filters']['contract']['dpae'], 3)
             self.assertEqual(data['filters']['contract']['alternance'], 1)
-
 
     def test_filters_when_filtering_by_naf(self):
         with self.test_request_context:
@@ -1359,7 +1364,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
 
             with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
-            
+
             self.assertEqual(rv.status_code, 200)
             result = json.loads(rv.data.decode())
             self.assertEqual(result['companies_count'], 2)
@@ -1368,7 +1373,6 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 self.assertIn('distance', office_json)
                 self.assertIn('offers_count', office_json)
                 self.assertIn('offers', office_json)
-
 
     def test_multi_rome_is_supported(self):
         with self.test_request_context:
@@ -1382,7 +1386,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
 
             with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
-            
+
             self.assertEqual(rv.status_code, 200)
             result = json.loads(rv.data.decode())
             self.assertEqual(result['companies_count'], 2)
@@ -1391,7 +1395,6 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 self.assertIn('distance', office_json)
                 self.assertIn('offers_count', office_json)
                 self.assertIn('offers', office_json)
-
 
     def test_dpae_scoring_not_supported(self):
         with self.test_request_context:
@@ -1404,7 +1407,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
 
             with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
-            
+
             self.assertEqual(rv.status_code, 400)
             self.assertIn(b'parameter contract is required', rv.data)
 
@@ -1419,10 +1422,9 @@ class ApiOffersOfficesListTest(ApiBaseTest):
 
             with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
-            
+
             self.assertEqual(rv.status_code, 400)
             self.assertIn(b'only contract=alternance is supported', rv.data)
-
 
     def test_gps_search_not_supported(self):
         with self.test_request_context:
@@ -1437,10 +1439,9 @@ class ApiOffersOfficesListTest(ApiBaseTest):
 
             with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
-            
+
             self.assertEqual(rv.status_code, 400)
             self.assertIn(b'parameter longitude is not supported', rv.data)
-
 
     def test_pagination_not_supported(self):
         with self.test_request_context:
@@ -1455,7 +1456,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
 
             with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
-            
+
             self.assertEqual(rv.status_code, 400)
             self.assertIn(b'only page=1 is supported as pagination is not implemented', rv.data)
 

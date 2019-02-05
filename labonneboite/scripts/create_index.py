@@ -123,6 +123,7 @@ class Counter(object):
     Needed to be able to have a variable (counter) shared between all parallel jobs.
     Inspired from https://stackoverflow.com/questions/2080660/python-multiprocessing-and-a-shared-counter
     """
+
     def __init__(self):
         self.val = mp.Value('i', 0)
 
@@ -139,17 +140,22 @@ completed_jobs_counter = Counter()
 
 
 class StatTracker:
+
     def __init__(self):
         self.office_count = 0
         self.indexed_office_count = 0
         self.office_score_for_rome_count = 0
         self.office_score_alternance_for_rome_count = 0
+
     def increment_office_count(self):
         self.office_count += 1
+
     def increment_indexed_office_count(self):
         self.indexed_office_count += 1
+
     def increment_office_score_for_rome_count(self):
         self.office_score_for_rome_count += 1
+
     def increment_office_score_alternance_for_rome_count(self):
         self.office_score_alternance_for_rome_count += 1
 
@@ -637,7 +643,7 @@ def update_offices_geolocations():
 
 def get_latest_scam_emails():
     list_of_files = glob.glob(os.path.join(settings.SCAM_EMAILS_FOLDER, 'BLACKLIST_EMAILS_FULL_*.csv.bz2'))
-    if len(list_of_files) == 0:
+    if not list_of_files:
         raise ValueError("No blacklist file found. Path is most likely incorrect.")
     latest_file = max(list_of_files, key=os.path.getctime)
     with importer_util.get_reader(latest_file) as myfile:
@@ -656,8 +662,8 @@ def remove_scam_emails():
         """
         Yield successive n-sized chunks from l.
         """
-        for i in xrange(0, len(l), n):
-            yield l[i:i+n]
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
 
     for scam_emails_chunk in chunks(scam_emails, 100):
         query = Office.query.filter(Office.email.in_(scam_emails_chunk))

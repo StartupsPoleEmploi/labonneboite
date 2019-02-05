@@ -1,16 +1,17 @@
 # coding: utf8
-import json, logging, random, string, urllib
-from urllib.parse import urlencode, quote
+import logging
+import string
+import random
+from urllib.parse import urlencode
 
-from flask import Blueprint, flash, redirect, session, url_for, render_template, request, session
+from flask import Blueprint, flash, redirect, session, url_for, render_template, request
 from flask_login import current_user, logout_user
 
 from labonneboite.common import activity
 from labonneboite.common.models import get_user_social_auth
 from labonneboite.conf import settings
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
-from labonneboite.web.contact_form.views import is_recruiter_from_lba
-from labonneboite.web.auth.backends.peam_recruiter import SessionKeys, is_recruiter, is_certified_recruiter
+from labonneboite.web.auth.backends.peam_recruiter import SessionKeys
 from labonneboite.web.auth.backends.peam_recruiter import get_token_data, get_recruiter_data, PeamRecruiterError, PeamRecruiterLoginCancelled
 
 authBlueprint = Blueprint('auth', __name__)
@@ -127,9 +128,9 @@ def peam_recruiter_token_callback():
     if siret:
         # Note: if we set siret=None directly in redirect_params, we will have an extra / at the end of the generated url
         # Which will cause a 404 error
-        redirect_params.update({'siret':siret})
+        redirect_params.update({'siret': siret})
     if recruiter_from_lba:
-        redirect_params.update({'origin':'labonnealternance'})
+        redirect_params.update({'origin': 'labonnealternance'})
 
     # Code value
     code = request.args.get('code', '')
@@ -175,7 +176,6 @@ def peam_recruiter_token_callback():
 
         redirect_url = url_for('contact_form.change_info', **redirect_params)
         return redirect(redirect_url)
-
 
     # Fail
     redirect_url = url_for('contact_form.ask_recruiter_pe_connect', **redirect_params)
