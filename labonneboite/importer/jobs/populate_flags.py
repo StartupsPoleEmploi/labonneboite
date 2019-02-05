@@ -152,9 +152,15 @@ def make_link_file_to_new_archive(archive_path):
         copyfile(archive_path, link_path)
 
 
-if __name__ == "__main__":
+def run_main():
     prepare_flags_junior_and_senior()
     prepare_flag_handicap()
     populate_flags()
     filename = dump()
     make_link_file_to_new_archive(filename)
+
+
+
+if __name__ == "__main__":
+    run_main()
+    
