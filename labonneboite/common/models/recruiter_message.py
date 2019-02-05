@@ -98,10 +98,10 @@ class UpdateJobsRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
     __tablename__ = 'update_jobs_recruiter_message'
     name = 'update_jobs'
 
-    romes_to_add = Column(mysql.TINYTEXT, nullable=True)
-    romes_to_remove = Column(mysql.TINYTEXT, nullable=True)
-    romes_alternance_to_add = Column(mysql.TINYTEXT, nullable=True)
-    romes_alternance_to_remove = Column(mysql.TINYTEXT, nullable=True)
+    romes_to_add = Column(mysql.TEXT, nullable=True)
+    romes_to_remove = Column(mysql.TEXT, nullable=True)
+    romes_alternance_to_add = Column(mysql.TEXT, nullable=True)
+    romes_alternance_to_remove = Column(mysql.TEXT, nullable=True)
 
     def fill_values(self, form):
         try:
