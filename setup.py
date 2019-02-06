@@ -26,7 +26,7 @@ setup(
             'validate_scores = labonneboite.importer.jobs.validate_scores:run',
             'geocode = labonneboite.importer.jobs.geocode:run_main',
             'populate_flags = labonneboite.importer.jobs.populate_flags:run_main',
-            'update_lbb_data = labonneboite.importer.importer:run'
+            'update_lbb_data = labonneboite.importer.importer:run',
         ],
     },
     classifiers=[

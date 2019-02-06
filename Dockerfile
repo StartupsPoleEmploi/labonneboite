@@ -17,7 +17,7 @@ RUN apt update && \
     && pip3 install virtualenv
 
 # Install python requirements
-RUN mkdir -p /labonneboite/logs /labonneboite/src
+RUN mkdir -p /labonneboite/logs /labonneboite/src /labonneboite/src/workspace
 WORKDIR /labonneboite/src
 COPY requirements.txt .
 RUN virtualenv ../env && \
