@@ -1,10 +1,14 @@
 /* jshint esversion: 6 */
-function createMap(element) {
-  var mapEl = L.map(element);
-  L.tileLayer(
-     'https://maps.labonneboite.pole-emploi.fr/styles/osm-bright/{z}/{x}/{y}.png'
-  ).addTo(mapEl);
-  mapEl.scrollWheelZoom.disable();
+function createMap(element, center, zoom) {
+  var mapEl = new mapboxgl.Map({
+    container: element,
+    style: 'https://maps.labonneboite.pole-emploi.fr/styles/osm-bright/style.json',
+    attributionControl: false,
+    center: center,
+    zoom: zoom
+  });
+  mapEl.addControl(new mapboxgl.NavigationControl(), 'top-left');
+  mapEl.scrollZoom.disable();
   return mapEl;
 }
 
@@ -22,26 +26,24 @@ function createMap(element) {
       return;
     }
 
-    var map = createMap($map[0]);
     var minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-    var companyCount = 0;
-
+    var companies = [];
     $(".lbb-result").each(function() {
       var companyName = $(this).find('input[name="company-name"]').val();
       var lat = $(this).find('input[name="company-latitude"]').val();
       var lng = $(this).find('input[name="company-longitude"]').val();
       var siret = $(this).find('input[name="company-siret"]').val();
       var description = $(this).find('.company-naf-text').html();
-
-      var coords = [lat, lng];
       var link = "<a class='map-marker' href='#company-" + siret + "'>" + companyName + "</a><br>" + description;
-      L.marker(coords).addTo(map).bindPopup(link);
+      companies.push({
+        coords: [lng, lat],
+        link: link
+      });
 
-      companyCount += 1;
-      minLat = Math.min(minLat, lat);
-      maxLat = Math.max(maxLat, lat);
       minLng = Math.min(minLng, lng);
       maxLng = Math.max(maxLng, lng);
+      minLat = Math.min(minLat, lat);
+      maxLat = Math.max(maxLat, lat);
     });
 
     $map.on("click", "a.map-marker", function(e) {
@@ -52,19 +54,40 @@ function createMap(element) {
     });
 
     // Focus either on the companies or the requested coordinates
-    if (center !== null && zoom !== null) {
-      // Reset to the same position if we just moved the map
-      map.setView(center, zoom);
-    } else if (companyCount == 1) {
-      map.setView([minLat, minLng], 13);
-    } else if (companyCount > 0) {
-      map.fitBounds([
-        [minLat, minLng],
-        [maxLat, maxLng]
-      ]);
-    } else {
-      map.setView([$latitude.val(), $longitude.val()], 13);
+    var bounds = null;
+    if (center === null || zoom === null) {
+      zoom = zoom || 13;
+      if (companies.length == 0) {
+        center = [$longitude.val(), $latitude.val()];
+      }
+      else {
+        center = [0.5*(minLng + maxLng), 0.5*(minLat + maxLat)];
+        if (companies.length > 1) {
+          bounds = [
+            [minLng, minLat],
+            [maxLng, maxLat]
+          ];
+        }
+      }
     }
+
+    var map = createMap($map[0], center, zoom);
+    map.on("load", function() {
+      if (bounds) {
+        // We cannot fit to bounds in constructor: this feature was added in
+        // v0.51.0 of mapbox-gl.js while we are using v0.43.0.
+        // https://github.com/mapbox/mapbox-gl-js/pull/5518/files
+        map.fitBounds(bounds, { duration: 0 }, { initialZoom: true });
+      }
+      companies.forEach(function(company) {
+        var popup = new mapboxgl.Popup()
+          .setHTML(company.link);
+        var marker = new mapboxgl.Marker()
+          .setLngLat(company.coords)
+          .setPopup(popup)
+          .addTo(map);
+      });
+    });
 
     // Add auto-refresh check
     $map.append("<div id='map-auto-refresh'><div id='map-auto-refresh-checkbox'><input type='checkbox'></input><span>Rechercher quand je déplace la carte<span></div></div>");
@@ -73,7 +96,6 @@ function createMap(element) {
         autoRefreshActivated = $(this).is(':checked');
         ga('send', 'event', 'Carte', 'toggle autorefresh', autoRefreshActivated ? 1 : 0);
     });
-
 
     var onMapMove = function() {
       if(autoRefreshActivated) {
@@ -92,9 +114,12 @@ function createMap(element) {
       ga('send', 'event', 'Carte', 'drag');
       onMapMove();
     };
-    var onMapZoom = function() {
-        ga('send', 'event', 'Carte', 'zoom');
-        onMapMove();
+    var onMapZoom = function(e) {
+      if (e.initialZoom) {
+        return;
+      }
+      ga('send', 'event', 'Carte', 'zoom');
+      onMapMove();
     };
 
     var updateMap = function() {
@@ -111,7 +136,7 @@ function createMap(element) {
       var earthPerimeterAtCompanyLocationKm = earthPerimeterKm * Math.cos(center.lat);
       // See leaflet.js zoom definition https://wiki.openstreetmap.org/wiki/Zoom_levels
       var pixelSizeKm = earthPerimeterAtCompanyLocationKm / (256 * Math.pow(2, zoom));
-      var mapHeightPixels = map.getSize().y;
+      var mapHeightPixels = map.getContainer().scrollHeight;
       var windowHeightKm = pixelSizeKm * mapHeightPixels * 2;// 2 is an arbitrary scaling factor to include results just ouside the bounding box
       var newDistance = distances[distances.length - 1];
       for(var d=0; d < distances.length; d++) {
@@ -125,7 +150,7 @@ function createMap(element) {
       $('.js-search-form').trigger('submit', {async: true});
     };
     map.on('dragend', onMapDrag);
-    map.on('zoom', onMapZoom);
+    map.on('zoomend', onMapZoom);
   }
 
   $(document).on('lbbready', function () {

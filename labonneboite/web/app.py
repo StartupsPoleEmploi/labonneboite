@@ -163,11 +163,13 @@ def register_before_requests(flask_app):
         https://github.com/python-social-auth/social-examples/blob/15f87f/example-flask/example/__init__.py#L57-L60
         """
         g.user = current_user._get_current_object()
+
     def make_session_permanent():
         """
         Make the session permanent. Flask defaults to timedelta(days=31).
         """
         session.permanent = True
+
     flask_app.before_request(global_user)
     flask_app.before_request(make_session_permanent)
 
@@ -179,11 +181,6 @@ def register_context_processors(flask_app):
     def inject_dict_for_all_templates():
         return {
             'hotjar_tag': hotjar.get_hotjar_tag(),
-            # TODO replace this shit with proper embeds https://leafletjs.com/download.html
-            # 'maps_css_url': 'https://unpkg.com/leaflet@1.3.4/dist/leaflet.css',
-            # 'maps_js_url': 'https://unpkg.com/leaflet@1.3.4/dist/leaflet.js',
-            'maps_css_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css',
-            'maps_js_url': 'https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js',
             'memo_js_url': settings.MEMO_JS_URL,
             'user_is_pro': pro.user_is_pro(),
             'pro_version_enabled': pro.pro_version_enabled(),
@@ -284,9 +281,11 @@ def create_app():
 
     assets.register(
         'recruiter_form',
-        Bundle('js/recruiter-forms.js',
-        filters='jsmin',
-        output='gen/packed.recruiter_form.%(version)s.js',)
+        Bundle(
+            'js/recruiter-forms.js',
+            filters='jsmin',
+            output='gen/packed.recruiter_form.%(version)s.js',
+        )
     )
 
     css = Bundle(

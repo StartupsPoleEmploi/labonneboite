@@ -7,7 +7,7 @@
   {% if city_name and rome_description %}
   <meta name="title" content="Entreprises qui recrutent à {{ city_name }} dans {{ rome_description }} | La Bonne Boite">
   {% endif %}
-  <link href="{{ maps_css_url }}" rel="stylesheet" type="text/css">
+  {% include "includes/map-styles.html" %}
   {% if canonical_url %}
   <link rel="canonical" href="{{ canonical_url }}">
   {% endif %}
@@ -15,7 +15,7 @@
 
 {% block scripts %}
   {{ super() }}
-  <script src="{{ maps_js_url }}"></script>
+  {% include "includes/map-scripts.html" %}
   {% include "includes/doorbell.html" %}
 {% endblock %}
 {% block footer_scripts %}
