@@ -40,7 +40,10 @@ def load_csv_file(filename, delimiter='|'):
     for row in reader:
         if len_previous_row:
             # at least second line of CSV file
-            if len(row) != len_previous_row:
+            if len(row) == 0:
+                # skip empty rows
+                continue
+            elif len(row) != len_previous_row:
                 raise IndexError("found row with abnormal number of fields : %s" % row)
             rows.append(row)
         else:
