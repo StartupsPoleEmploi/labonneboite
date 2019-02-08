@@ -1,6 +1,9 @@
 # coding: utf8
 """
 Provides user registration and login using PEAM (Pôle Emploi Access Management).
+
+Useful documentation of social-auth-core:
+https://python-social-auth.readthedocs.io/en/latest/
 """
 import requests
 
@@ -11,8 +14,6 @@ from labonneboite.conf import settings
 from labonneboite.common import activity
 from labonneboite.common import user_util
 from .exceptions import AuthFailedMissingReturnValues
-
-
 
 # pylint:disable=abstract-method
 class PEAMOpenIdConnect(OpenIdConnectAuth):
@@ -25,6 +26,13 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     ACCESS_TOKEN_URL = '%s/connexion/oauth2/access_token' % settings.PEAM_AUTH_BASE_URL
     REFRESH_TOKEN_URL = '%s/connexion/oauth2/access_token' % settings.PEAM_AUTH_BASE_URL
     USERINFO_URL = '%s/partenaire/peconnect-individu/v1/userinfo' % settings.PEAM_API_BASE_URL
+
+    # as documented in https://python-social-auth.readthedocs.io/en/latest/use_cases.html#multiple-scopes-per-provider
+    def get_scope(self):
+        scope = super(PEAMOpenIdConnect, self).get_scope()
+        # enable higher quota of req/s to avoid 429 HTTP errors
+        scope = scope + ['qos_silver_peconnect-individuv1']
+        return scope
 
     def request_access_token(self, *args, **kwargs):
         kwargs['params'] = {'realm': '/individu'}
