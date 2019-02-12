@@ -27,7 +27,6 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     USERINFO_URL = '%s/partenaire/peconnect-individu/v1/userinfo' % settings.PEAM_API_BASE_URL
 
     def request_access_token(self, *args, **kwargs):
-        kwargs['params'] = {'realm': '/individu'}
         result = self.get_json(*args, **kwargs)
         return result
 
@@ -35,11 +34,10 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         url = self.userinfo_url()
         try:
             return self.get_json(
-                url, params={'realm': '/individu'},
-                headers={'Authorization': 'Bearer {0}'.format(access_token)}
+                url, headers={'Authorization': 'Bearer {0}'.format(access_token)}
             )
         except requests.HTTPError as e:
-            if e.response.status_code == 502: # Bad Gateway
+            if e.response.status_code == 502:  # Bad Gateway
                 # 502 errors are not properly handled by social_core (see
                 # handle_http_errors decorator in social_core.utils)
                 # If we don't raise an exception, the user sees a spinning wheel.

@@ -75,8 +75,7 @@ class Config(object):
         'api_peconnect-individuv1',
     ]
     SOCIAL_AUTH_USER_FIELDS = ['external_id', 'email', 'gender', 'first_name', 'last_name']
-    SOCIAL_AUTH_PEAM_OPENIDCONNECT_AUTH_EXTRA_ARGUMENTS = {'realm': '/individu'}
-    SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_AUTH_EXTRA_ARGUMENTS = {'realm': '/individu', 'prompt': 'none'}
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_AUTH_EXTRA_ARGUMENTS = {'prompt': 'none'}
     # For some reason, the redirect passed to "next=..." is not sent back by
     # PE.fr, so we need to define a redirect url manually
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_LOGIN_REDIRECT_URL = '/authentication/iframe'
