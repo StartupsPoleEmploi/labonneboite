@@ -13,7 +13,7 @@ from labonneboite.tests.scripts.test_create_index import CreateIndexBaseTest
 
 class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
 
-    @mock.patch.object(es.settings, 'ES_TIMEOUT', 20)
+    @mock.patch.object(es.settings, 'ES_TIMEOUT', 90)
     def setUp(self, *args, **kwargs):
         super(ApiScriptsTest, self).setUp(*args, **kwargs)
 
@@ -51,7 +51,6 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
 
             # 00000000000009 should not be boosted and be the second result
             self.assertFalse(data_list['companies'][1]['boosted'])
-
 
     def test_update_office_boost_flag_all_romes_alternance(self):
         """
