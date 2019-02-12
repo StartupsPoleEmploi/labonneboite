@@ -58,10 +58,10 @@ PyVirtualDisplay
 Flask-Testing
 
 # Data and Importer.
-numpy==1.16.1
-pandas==0.22.0
+numpy
+pandas
 scikit-learn
-scipy==1.2.0
+scipy
 
 # PDF utils and dependencies.
 html5lib
