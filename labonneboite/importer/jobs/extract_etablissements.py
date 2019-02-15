@@ -12,6 +12,7 @@ from labonneboite.common import departements as dpt
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import siret as siret_util
 from labonneboite.common.database import db_session
+from labonneboite.common.chunks import chunks
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
@@ -248,18 +249,19 @@ class EtablissementExtractJob(Job):
     def delete_deletable_offices(self):
         con, cur = import_util.create_cursor()
         if self.deletable_sirets:
-            stringified_siret_list = ",".join(self.deletable_sirets)
-            logger.info("going to delete %i offices...", len(self.deletable_sirets))
-            query = """DELETE FROM %s where siret IN (%s)""" % (settings.RAW_OFFICE_TABLE, stringified_siret_list)
-            try:
-                cur.execute(query)
-                con.commit()
-            except:
-                logger.warning("deletable_sirets=%s", self.deletable_sirets)
-                raise
+            for sirets in chunks(list(self.deletable_sirets), 500):
+                stringified_siret_list = ",".join(sirets)
+                logger.info("deleting a chunk of %i offices...", len(sirets))
+                query = """DELETE FROM %s where siret IN (%s)""" % (settings.RAW_OFFICE_TABLE, stringified_siret_list)
+                try:
+                    cur.execute(query)
+                    con.commit()
+                except:
+                    logger.warning("error while deleting chunk of sirets : %s", sirets)
+                    raise
         cur.close()
         con.close()
-        logger.info("%i old offices deleted.", len(self.deletable_sirets))
+        logger.info("%i no longer existing offices deleted.", len(self.deletable_sirets))
 
     @timeit
     def benchmark_loading_using_pandas(self):
