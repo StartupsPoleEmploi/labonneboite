@@ -22,6 +22,12 @@ class TestResults(LbbSeleniumTestCase):
         for element in company_container.find_elements_by_class_name('lbb-result__details'):
             self.assertEqual(element.value_of_css_property('display'), 'none')
 
+        # Hide Memo tooltip (show only the first time)
+        memo_button_close_button = self.driver.find_elements_by_class_name('introjs-donebutton')
+        if memo_button_close_button:
+            memo_button_close_button[0].click()
+            time.sleep(0.5)
+
         # Hide RGPD modal if present.
         rgpd_accept_button = self.driver.find_elements_by_class_name('rgpd-accept')
         if rgpd_accept_button:
@@ -30,12 +36,6 @@ class TestResults(LbbSeleniumTestCase):
 
         toggle_details = self.driver.find_elements_by_class_name('js-result-toggle-details')[0]
         time.sleep(0.5)
-
-        # Hide Memo tooltip (show only the first time)
-        memo_button_close_button = self.driver.find_elements_by_class_name('introjs-donebutton')
-        if memo_button_close_button:
-            memo_button_close_button[0].click()
-            time.sleep(0.5)
 
         # Display company details.
         toggle_details.click()

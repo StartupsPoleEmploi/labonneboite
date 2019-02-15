@@ -12,7 +12,6 @@ from labonneboite.conf import settings
 from labonneboite.web.app import app
 
 
-
 class LbbSeleniumTestCase(LiveServerTestCase):
     """
     Sets up the environment for Selenium tests and exposes
@@ -63,7 +62,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
 
         # Configure logging
         capabilities = DesiredCapabilities.CHROME
-        capabilities['loggingPrefs'] = {'browser':'ALL'}
+        capabilities['loggingPrefs'] = {'browser': 'ALL'}
 
         self.driver = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_path)
 
@@ -73,7 +72,6 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         # Implicitely wait at most 10 seconds when trying to select an element
         # that does not exist yet.
         self.driver.implicitly_wait(10)
-
 
     def tearDown(self):
         self.print_js_logs()
