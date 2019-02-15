@@ -35,6 +35,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
         logging.getLogger('werkzeug').setLevel(logging.CRITICAL)
+        logging.getLogger('easyprocess').setLevel(logging.CRITICAL)
 
         return app
 
