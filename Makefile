@@ -177,10 +177,9 @@ test-web: test-api test-front
 test-scripts:
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/scripts
 
-# Selenium and integration tests are run against the full database (not the
-# test one) as of now: we use LBB_ENV=development.
 test-integration: clear-data-test database-test populate-data-test
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/integration
+
 test-selenium: clear-data-test database-test populate-data-test
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/selenium
 
