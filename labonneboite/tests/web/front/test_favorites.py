@@ -142,7 +142,6 @@ class FavoriteTest(FavoriteBaseTest):
             self.assertIn('siret', rv.data.decode('utf-8'))
             self.assertIn(office.siret, rv.data.decode('utf-8'))
 
-
     def test_favorites_list(self):
         """
         Test favorites list.
@@ -177,6 +176,8 @@ class FavoriteTest(FavoriteBaseTest):
         office = Office.query.filter(Office.siret == '00000000000002').one()
         url_list = self.url_for('user.favorites_list')
         url_add = self.url_for('user.favorites_add', siret=office.siret)
+        url_search_without_domain = '/entreprises/nancy-54100/strategie-commerciale'
+        url_search_with_domain = 'http://labonneboite.pole-emploi.fr' + url_search_without_domain
 
         # An anonymous user cannot add a favorite.
         rv = self.app.post(url_add)
@@ -186,9 +187,21 @@ class FavoriteTest(FavoriteBaseTest):
 
             self.login(self.user)
 
+            rv = self.app.get(url_list)
+            self.assertEqual(rv.status_code, 200)
+            self.assertTrue('Aucun favori pour le moment.' in rv.data.decode('utf-8'))
+
+            # Adding favorite without next_url :
+            # User should be redirected to the favorites list by default.
             rv = self.app.post(url_add)
             self.assertEqual(rv.status_code, 302)
-            self.assertEqual(rv.location, url_list)  # User should be redirected to the list by default.
+            self.assertEqual(rv.location, url_list)
+
+            # Adding favorite from search results - the realistic case.
+            # User should be redirected back to the search results.
+            rv = self.app.post(url_add, data={'next': url_search_without_domain})
+            self.assertEqual(rv.status_code, 302)
+            self.assertEqual(rv.location, url_search_with_domain)
 
             favorites = UserFavoriteOffice.query.filter(UserFavoriteOffice.user_id == self.user.id).all()
             self.assertEqual(1, len(favorites))
@@ -214,6 +227,8 @@ class FavoriteTest(FavoriteBaseTest):
         office = Office.query.filter(Office.siret == '00000000000003').one()
         url_list = self.url_for('user.favorites_list')
         url_delete = self.url_for('user.favorites_delete', siret=office.siret)
+        url_search_without_domain = '/entreprises/nancy-54100/strategie-commerciale'
+        url_search_with_domain = 'http://labonneboite.pole-emploi.fr' + url_search_without_domain
 
         # An anonymous user cannot delete a favorite.
         rv = self.app.post(url_delete)
@@ -231,9 +246,20 @@ class FavoriteTest(FavoriteBaseTest):
             self.assertTrue(office.name in rv.data.decode('utf-8'))
             self.assertTrue(office.city in rv.data.decode('utf-8'))
 
+            # Deleting favorite without next_url :
+            # User should be redirected to the favorites list by default.
             rv = self.app.post(url_delete)
             self.assertEqual(rv.status_code, 302)
-            self.assertEqual(rv.location, url_list)  # User should be redirected to the list by default.
+            self.assertEqual(rv.location, url_list)
+
+            # Create again the favorite for the user.
+            UserFavoriteOffice.create(user_id=self.user.id, office_siret=office.siret)
+
+            # Deleting favorite from search results - the realistic case.
+            # User should be redirected back to the search results.
+            rv = self.app.post(url_delete, data={'next': url_search_without_domain})
+            self.assertEqual(rv.status_code, 302)
+            self.assertEqual(rv.location, url_search_with_domain)
 
             rv = self.app.get(url_list)
             self.assertEqual(rv.status_code, 200)

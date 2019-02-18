@@ -55,13 +55,13 @@
       {% if (user_favs_as_sirets is defined) and (company.siret not in user_favs_as_sirets) %}
         <form action="{{ url_for('user.favorites_add', siret=company.siret) }}" method="post" class="form-inline">
           <button class="btn btn-success btn-small" type="submit">Ajouter aux favoris</button>
-          <input type="hidden" name="next" value ="{{ request.url | urlencode }}">
+          <input type="hidden" name="next" value="{{ request.full_path | urlencode }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         </form>
       {% else %}
         <form action="{{ url_for('user.favorites_delete', siret=company.siret) }}" method="post" class="form-inline">
           <button class="btn btn-error btn-small" type="submit">Supprimer des favoris</button>
-          <input type="hidden" name="next" value ="{{ request.url | urlencode }}">
+          <input type="hidden" name="next" value="{{ request.full_path | urlencode }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         </form>
       {% endif %}

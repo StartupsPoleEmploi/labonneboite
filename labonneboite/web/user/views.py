@@ -165,7 +165,6 @@ def favorites_add(siret):
     """
     Add an office to the favorites of a user.
     """
-
     # Since we are not using a FlaskForm but a hidden input with the token in the
     # form, CSRF validation has to be done manually.
     # CSRF validation can be disabled globally (e.g. in unit tests), so ensure that
@@ -183,11 +182,19 @@ def favorites_add(siret):
     flash(Markup(message), 'success')
     activity.log('ajout-favori', siret=siret)
 
-    next_url = request.form.get('next')
-    if next_url and util.is_safe_url(next_url):
-        return redirect(urllib.parse.unquote(next_url))
+    return get_redirect_after_favorite_operation()
 
-    return redirect(url_for('user.favorites_list'))
+
+def get_redirect_after_favorite_operation():
+    next_url = request.form.get('next')
+    if next_url:
+        decoded_next_url = urllib.parse.unquote(next_url)
+        if util.is_decoded_url_safe(decoded_next_url):
+            return redirect(decoded_next_url)
+        else:
+            return 'invalid next_url', 400
+    else:
+        return redirect(url_for('user.favorites_list'))
 
 
 @userBlueprint.route('/favorites/delete/<siret>', methods=['POST'])
@@ -196,7 +203,6 @@ def favorites_delete(siret):
     """
     Delete an office from the favorites of a user.
     """
-
     # Since we are not using a FlaskForm but a hidden input with the token in the
     # form, CSRF validation has to be done manually.
     # CSRF validation can be disabled globally (e.g. in unit tests), so ensure that
@@ -214,11 +220,7 @@ def favorites_delete(siret):
     flash(message, 'success')
     activity.log('suppression-favori', siret=siret)
 
-    next_url = request.form.get('next')
-    if next_url and util.is_safe_url(next_url):
-        return redirect(urllib.parse.unquote(next_url))
-
-    return redirect(url_for('user.favorites_list'))
+    return get_redirect_after_favorite_operation()
 
 
 @userBlueprint.route('/pro-version')
@@ -231,12 +233,13 @@ def pro_version():
 
     pro.toggle_pro_version()
 
-    redirect_url = request.args.get('next', '/')
+    redirect_url = urllib.parse.unquote(request.args.get('next', '/'))
 
-    if not redirect_url or not util.is_safe_url(redirect_url):
+    if not redirect_url or not util.is_decoded_url_safe(redirect_url):
         redirect_url = '/'
 
     return redirect(redirect_url)
+
 
 @userBlueprint.route('/header.html')
 def header():

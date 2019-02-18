@@ -43,8 +43,9 @@ class ProVersionTest(DatabaseTest):
         # Create a user.
         user_pro = User.create(email='x@pole-emploi.fr', gender='male', first_name='John', last_name='Doe')
 
-        next_url = 'http://localhost:8090/entreprises/metz-57000/boucherie?sort=score&d=10&h=1&p=0&f_a=0'
-        url = self.url_for('user.pro_version', **{'next': next_url})
+        next_url_without_domain = '/entreprises/metz-57000/boucherie?sort=score&d=10&h=1&p=0&f_a=0'
+        next_url_with_domain = 'http://labonneboite.pole-emploi.fr' + next_url_without_domain
+        url = self.url_for('user.pro_version', **{'next': next_url_without_domain})
 
         with self.test_request_context:
 
@@ -59,7 +60,7 @@ class ProVersionTest(DatabaseTest):
             # Enable pro version.
             rv = self.app.get(url)
             self.assertEqual(rv.status_code, 302)
-            self.assertEqual(rv.location, next_url)
+            self.assertEqual(rv.location, next_url_with_domain)
             # It is unclear what is the root cause of the following test
             # failure. The session object manipulated in the
             # pro_version_enabled function is different from the session
@@ -74,7 +75,7 @@ class ProVersionTest(DatabaseTest):
             # Disable pro version.
             rv = self.app.get(url)
             self.assertEqual(rv.status_code, 302)
-            self.assertEqual(rv.location, next_url)
+            self.assertEqual(rv.location, next_url_with_domain)
             self.assertFalse(pro.pro_version_enabled())
 
             with self.app.session_transaction() as sess:
