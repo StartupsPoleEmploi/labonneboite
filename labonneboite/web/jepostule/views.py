@@ -17,10 +17,8 @@ jepostuleBlueprint = Blueprint('jepostule', __name__)
 
 @jepostuleBlueprint.route('/candidater/<siret>')
 def application(siret):
-    if not jepostule_enabled(current_user):
-        abort(404)
     company = Office.query.filter_by(siret=siret).first()
-    if not company or not company.email:
+    if not jepostule_enabled(current_user, company):
         abort(404)
 
     data = {

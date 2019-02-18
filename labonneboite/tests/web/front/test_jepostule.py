@@ -1,6 +1,7 @@
 from unittest import mock, TestCase
 
 from labonneboite.web.jepostule import views
+from labonneboite.web.jepostule import utils
 
 
 class JePostuleTests(TestCase):
@@ -33,3 +34,7 @@ class JePostuleTests(TestCase):
         with mock.patch.object(views.requests, 'post', return_value=mock_response) as mock_post:
             self.assertRaises(views.JePostuleError, views.get_token, client_id="client_id", client_secret="secret")
             mock_post.assert_called_once()
+
+    def test_valid_email(self):
+        self.assertTrue(utils.is_valid_email("patron@macdonalds.com"))
+        self.assertFalse(utils.is_valid_email("patron@macdonald's.com"))
