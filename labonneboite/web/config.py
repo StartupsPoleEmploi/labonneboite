@@ -81,4 +81,8 @@ class Config(object):
     # PE.fr, so we need to define a redirect url manually
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_LOGIN_REDIRECT_URL = '/authentication/iframe'
 
+    # Define connection timeouts to make sure LBB is not going to timeout before PEAM
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_URLOPEN_TIMEOUT = 8
+    SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_URLOPEN_TIMEOUT = 5
+
 CONFIG = Config()
