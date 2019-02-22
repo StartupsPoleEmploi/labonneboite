@@ -17,6 +17,8 @@ from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common.database import DATABASE
 from labonneboite.common import encoding as encoding_util
 
+logging.basicConfig(level=logging.INFO, format='%(message)s')
+
 logger = logging.getLogger('main')
 
 TRANCHE_AGE_SENIOR = "51-99"
@@ -136,14 +138,14 @@ def reduce_scores_into_table(
     errors = successes = 0
 
     # empty existing table before filling it again
-    run_raw_mysql_query("delete from %s" % target_table)
+    run_sql_script("delete from %s" % target_table)
 
     for departement in departements:
         departement_table = "etablissements_%s" % departement
         query = """insert into %s select %s from %s""" % (
             target_table, select_fields, departement_table)
         try:
-            run_raw_mysql_query(query)
+            run_sql_script(query)
             successes += 1
         except subprocess.CalledProcessError:
             logger.error("an error happened while reducing departement=%s description=%s using query [%s]",
@@ -224,7 +226,7 @@ def clean_temporary_tables():
     for departement in departements:
         departement_table = "etablissements_%s" % departement
         drop_table_query = "drop table if exists %s" % departement_table
-        run_raw_mysql_query(drop_table_query)
+        run_sql_script(drop_table_query)
 
 
 def get_fields_from_csv_line(line, delimiter='|'):
@@ -338,13 +340,16 @@ def get_departement_from_zipcode(zipcode):
     return departement
 
 
-def run_raw_mysql_query(query):
-    password_statement = "-p'%s'" % DATABASE['PASSWORD']
-    subprocess.check_call("""mysql -u %s %s --host %s --port %d %s -e'%s'""" % (
-            DATABASE['USER'],
-            password_statement,
-            DATABASE['HOST'],
-            DATABASE['PORT'],
-            DATABASE['NAME'],
-            query),
-        shell=True)
+
+
+
+def run_sql_script(sql_script):
+    con, cur = create_cursor()
+
+    for query in sql_script.split(';'):
+        query = query.strip()
+        if len(query) >= 1:
+            cur.execute(query)
+            con.commit()
+    cur.close()
+    con.close()

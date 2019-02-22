@@ -35,18 +35,6 @@ def populate_flag(flag):
     con.close()
 
 
-def run_sql_script(sql_script):
-    con, cur = import_util.create_cursor()
-
-    for query in sql_script.split(';'):
-        query = query.strip()
-        if len(query) >= 1:
-            cur.execute(query)
-            con.commit()
-    cur.close()
-    con.close()
-
-
 
 @timeit
 def prepare_flags_junior_and_senior():
@@ -93,7 +81,7 @@ def prepare_flags_junior_and_senior():
         drop table if exists flag_tmp2;
     """ % settings.HIRING_TABLE
 
-    run_sql_script(sql_script)
+    import_util.run_sql_script(sql_script)
     logger.info("completed preparing flags_junior_and_senior.")
 
 
@@ -112,7 +100,7 @@ def prepare_flag_handicap():
         );
     """ % settings.HIRING_TABLE
 
-    run_sql_script(sql_script)
+    import_util.run_sql_script(sql_script)
     logger.info("completed preparing flag_handicap.")
 
 
