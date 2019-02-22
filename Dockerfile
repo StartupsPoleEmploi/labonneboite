@@ -9,6 +9,8 @@ RUN apt update && \
     DEBIAN_FRONTEND=noninteractive apt install -y \
         git \
         libmysqlclient-dev \
+        # install mysqldump required by the importer
+        mysql-client \
         language-pack-fr \
         python3 python3-dev python3-pip \
         tzdata \
