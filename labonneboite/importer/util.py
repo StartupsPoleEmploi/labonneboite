@@ -12,7 +12,6 @@ import MySQLdb as mdb
 from labonneboite.common import departements as dpt
 from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
-from labonneboite.conf import settings
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common.database import DATABASE
 from labonneboite.common import encoding as encoding_util
@@ -145,9 +144,9 @@ def reduce_scores_into_table(
         query = """insert into %s select %s from %s""" % (
             target_table, select_fields, departement_table)
         try:
-            run_sql_script(query)
+            run_sql_script(query)  # FIXME
             successes += 1
-        except subprocess.CalledProcessError:
+        except mdb.ProgrammingError:
             logger.error("an error happened while reducing departement=%s description=%s using query [%s]",
                 departement, description, query)
             errors += 1
@@ -338,9 +337,6 @@ def get_departement_from_zipcode(zipcode):
     if departement in ["2A", "2B"]:  # special case of Corsica
         departement = "20"
     return departement
-
-
-
 
 
 def run_sql_script(sql_script):
