@@ -53,7 +53,7 @@ def check_for_updates(input_folder):
 
 
 @timeit
-def back_up(backup_folder, table, filename, timestamp, copy_to_remote_server=True, new_table_name=None):
+def back_up(backup_folder, table, filename, timestamp, new_table_name=None):
     timestamp_filename = '%s_backup_%s.sql.gz' % (filename, timestamp)
     backup_filename = os.path.join(backup_folder, timestamp_filename)
     password_statement = "-p'%s'" % DATABASE['PASSWORD']
@@ -71,7 +71,8 @@ def back_up(backup_folder, table, filename, timestamp, copy_to_remote_server=Tru
         """mysqldump -u %s %s --host %s --port %d %s %s | sed 's/`%s`/`%s`/g' | gzip > %s""" % (
             DATABASE['USER'],
             password_statement,
-            DATABASE['HOST'], DATABASE['PORT'],
+            DATABASE['HOST'],
+            DATABASE['PORT'],
             DATABASE['NAME'],
             table,
             table,
@@ -79,12 +80,6 @@ def back_up(backup_folder, table, filename, timestamp, copy_to_remote_server=Tru
             backup_filename),
         shell=True)
 
-
-    if copy_to_remote_server:
-        logger.info("copying the file to remote server")
-        subprocess.check_call("scp %s %s@%s:%s " % (
-            backup_filename, settings.BACKUP_USER, settings.BACKUP_SERVER, settings.BACKUP_SERVER_PATH),
-            shell=True)
     logger.info("finished back up !")
     return backup_filename
 

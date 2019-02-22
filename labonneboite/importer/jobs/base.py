@@ -27,9 +27,6 @@ class Job(object):
         if self.file_type:
             logger.info("file type:%s, checking the task is runnable with that file", self.file_type)
             self.check_runnable()
-        if settings.BACKUP_FIRST:
-            logger.info("backing up existing table before proceeding...")
-            self.back_up_input_table()
         if self.import_type:
             logger.info("recording in db we processed this input file...")
             self.record_task()
@@ -68,8 +65,3 @@ class Job(object):
             import_type=self.import_type,
         )
         task.save()
-
-    @timeit
-    def back_up_input_table(self):
-        timestamp = datetime.now().strftime('%Y_%m_%d_%H%M')
-        import_util.back_up(settings.BACKUP_INPUT_FOLDER, self.table_name, self.file_type, timestamp)

@@ -120,12 +120,10 @@ def prepare_flag_handicap():
 def dump():
     timestamp = datetime.now().strftime('%Y_%m_%d_%H%M')
 
-    copy_to_remote_server = settings.BACKUP_FIRST
     logger.info("backing up table %s ...", settings.SCORE_REDUCING_TARGET_TABLE)
     etab_result = import_util.back_up(
         settings.BACKUP_OUTPUT_FOLDER, settings.SCORE_REDUCING_TARGET_TABLE,
-        "export_etablissement", timestamp, copy_to_remote_server,
-        new_table_name="etablissements_new")
+        "export_etablissement", timestamp, new_table_name="etablissements_new")
 
     tar_filename = os.path.join(settings.BACKUP_FOLDER, "%s.tar.bz2" % timestamp)
     with tarfile.open(tar_filename, "w:bz2") as tar:

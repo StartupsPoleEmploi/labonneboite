@@ -24,10 +24,6 @@ RAW_OFFICE_TABLE = 'etablissements_raw'
 HIRING_TABLE = 'hirings'
 SCORE_REDUCING_TARGET_TABLE = 'etablissements_exportable'
 
-# --- importer table backuping process
-BACKUP_FIRST = False
-BACKUP_INPUT_FOLDER = os.path.join(LBB_ROOT_FOLDER, 'backups', 'inputs')
-
 # --- importer input directory of DPAE and ETABLISSEMENT exports
 INPUT_SOURCE_FOLDER = os.path.join(IMPORTER_ROOT_FOLDER, 'data')
 
