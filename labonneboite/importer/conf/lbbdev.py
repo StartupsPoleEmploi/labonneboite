@@ -22,5 +22,3 @@ MINIMUM_OFFICES_PER_DEPARTEMENT_FOR_DPAE = 500
 MINIMUM_OFFICES_PER_DEPARTEMENT_FOR_ALTERNANCE = 0
 
 # --- job 8/8 : populate_flags
-BACKUP_OUTPUT_FOLDER = '/srv/lbb/backups/outputs'
-BACKUP_FOLDER = '/srv/lbb/backups'
