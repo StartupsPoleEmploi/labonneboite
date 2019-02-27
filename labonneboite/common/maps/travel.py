@@ -90,7 +90,7 @@ def durations(origin, destinations, mode=None):
         try:
             computed = backend.durations(origin, destinations_to_fetch)
         except exceptions.BackendUnreachable:
-            computed = [None]*len(destinations_to_fetch)
+            computed = [None] * len(destinations_to_fetch)
 
         # Store in cache
         for destination, duration in zip(destinations_to_fetch, computed):

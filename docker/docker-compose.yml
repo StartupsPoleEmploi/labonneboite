@@ -36,3 +36,6 @@ services:
     volumes:
       - ./redis.conf:/redis.conf:ro
       - redis:/data
+
+volumes:
+  redis: 

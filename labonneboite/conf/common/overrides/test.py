@@ -10,6 +10,7 @@ DB_PORT = int(os.environ.get('DB_PORT', 3307))
 DB_NAME = os.environ.get('DB_NAME', 'lbb_test')
 DB_USER = os.environ.get('DB_USER', 'lbb_test')
 DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
+REDIS_HOST = 'incorrecthost'
 
 LOG_LEVEL_USER_ACTIVITY = logging.ERROR
 

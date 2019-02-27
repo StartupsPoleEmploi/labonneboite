@@ -18,13 +18,6 @@
   {% include "includes/map-scripts.html" %}
   {% include "includes/doorbell.html" %}
 {% endblock %}
-{% block footer_scripts %}
-  <script>
-    ga('set', 'dimension3', "{{ city_name }}");
-    ga('set', 'dimension4', "{{ rome_description }}");
-    ga('set', 'dimension5', "{{ distance }}");
-  </script>
-{% endblock %}
 
 {% block content %}
 {% include 'search/results_content.html' %}
@@ -32,12 +25,12 @@
 
 {% block footer_scripts %}
   <script>
-    ga('set', 'dimension3', "{{ city }}");
+    ga('set', 'dimension3', "{{ city_name }}");
     ga('set', 'dimension4', "{{ rome_description }}");
     ga('set', 'dimension5', "{{ distance }}");
 
     {# Load travel durations to companies #}
-    {% if city %}
+    {% if location %}
     (function() {
       var companySirets = [];
       var companyCoordinates = [];
@@ -53,7 +46,7 @@
           url: "{{ url_for('maps.durations') }}",
           method: 'POST',
           data: JSON.stringify({
-            origin: [{{ city.location.latitude }}, {{ city.location.longitude }}],
+            origin: [{{ location.latitude }}, {{ location.longitude }}],
             destinations: companyCoordinates,
             travel_mode: "{{ travel_mode }}",
             {# csrf_token: "{{ csrf_token() }}" #}

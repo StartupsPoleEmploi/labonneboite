@@ -17,7 +17,7 @@ def isochrone(origin, duration):
     endpoint = 'isochrone/isochrone.json'
     params = {
         'location': '{:.7f},{:.7f}'.format(origin[1], origin[0]),
-        'time': int(duration*60),
+        'time': int(duration * 60),
         'smoothing': 'true',
         # Settings holes=true yields really beautiful maps, but very hard to
         # debug. Also, requires more data transfer.

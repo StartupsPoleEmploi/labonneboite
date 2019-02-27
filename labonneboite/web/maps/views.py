@@ -58,7 +58,14 @@ def isochrone():
     latitude = city['coords']['lat']
     longitude = city['coords']['lon']
 
-    travel_isochrone = travel.isochrone((latitude, longitude), duration, mode=travel_mode)
+    travel_isochrone = travel.isochrone((latitude, longitude), duration, mode=travel_mode) or []
+
+    # We reverse the isochrones to make life easier to js
+    travel_isochrone = [
+        [
+            [coords[1], coords[0]] for coords in polygon
+        ] for polygon in travel_isochrone
+    ]
 
     return render_template('search/geo.html',
         latitude=latitude,

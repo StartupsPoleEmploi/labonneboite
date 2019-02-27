@@ -2,8 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="{{ mapbox_js_url }}"></script>
-        <link href="{{ mapbox_css_url }}" rel="stylesheet" type="text/css">
+        {% include "includes/map-styles.html" %}
         <style>
             body {
                 margin:0; padding:0;
@@ -12,6 +11,7 @@
                 position:absolute; top:0; bottom:0; width:100%;
             }
         </style>
+        {% include "includes/map-scripts.html" %}
     </head>
 
     <body>
@@ -20,15 +20,32 @@
     
     {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
     <script>
-        L.mapbox.accessToken = 'pk.eyJ1IjoibGFib25uZWJvaXRlIiwiYSI6ImNpaDNoN3A0cDAwcmdybGx5aXF1Z21lOGIifQ.znyUeU7KoIY9Ns_AQPquAg';
-        var lat = {{ latitude }};
-        var lng = {{ longitude }};
-        var coords = [lat, lng];
-        var map = L.mapbox.map('map', 'mapbox.streets').setView(coords, 13);
-
-        var isochrones = {{ isochrone }};
-        for (var i = 0; i < isochrones.length; i+=1) {
-            map.addLayer(L.polygon(isochrones[i]));
-        }
+        var isochrone = {{ isochrone }};
+        var map = createMap("map", [{{ longitude }}, {{ latitude }}], 11);
+        map.on("load", function() {
+            // Source: https://docs.mapbox.com/mapbox-gl-js/example/geojson-polygon/
+            // This is not working very well, yet... Isochrone is not pretty.
+            for(var i = 0; i < isochrone.length; i++) {
+                map.addLayer({
+                    id: "isochrone_" + i,
+                    type: "fill",
+                    source: {
+                        type: 'geojson',
+                        data: {
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Polygon',
+                                coordinates: [isochrone[i]],
+                            },
+                        }
+                    },
+                    layout: {},
+                    paint: {
+                        'fill-color': '#088',
+                        'fill-opacity': 0.8
+                    }
+                });
+            }
+        });
     </script>
 </html>

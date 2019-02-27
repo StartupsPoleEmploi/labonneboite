@@ -243,15 +243,19 @@ class ApiCompanyListTest(ApiBaseTest):
             )
 
     def test_invalid_longitude_or_latitude(self):
-        params = self.add_security_params({
-            'rome_codes': u'D1405',
-            'user': u'labonneboite',
-            'latitude': '42',
-            'longitude': 'unparsable',
-        })
-        rv = self.app.get('/api/v1/company/?%s' % urlencode(params))
-        self.assertEqual(rv.status_code, 400)
-        self.assertIn(u'Invalid request argument: latitude/longitude', rv.data)
+        with self.test_request_context:
+            params = self.add_security_params({
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+                'latitude': '42',
+                'longitude': 'unparsable',
+            })
+            rv = self.app.get(self.url_for('api.company_list', **params))
+            self.assertEqual(rv.status_code, 400)
+            self.assertEqual(
+                rv.data,
+                b'Invalid request argument: latitude and longitude must be float'
+            )
 
     def test_unknown_commune_id(self):
         with self.test_request_context:
