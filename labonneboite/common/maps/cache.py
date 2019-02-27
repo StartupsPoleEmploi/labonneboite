@@ -7,7 +7,8 @@ from flask import current_app
 from labonneboite.conf import settings
 
 # Here we define caches to store results provided by vendor APIs, so that
-# we don't exceed our allowed quotas. The various classes have different storage backends.
+# we don't exceed our allowed quotas. The various classes have different storage
+# backends.
 
 
 class BaseCache(object):
@@ -112,7 +113,6 @@ class RedisCache(BaseCache):
             # Share one connection pool for all RedisCache instances
             cls.CONNECTION_POOL = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
         return redis.StrictRedis(connection_pool=cls.CONNECTION_POOL)
-
 
     def get(self, key, default=None):
         value = self.__safe(self.__redis.get, key)

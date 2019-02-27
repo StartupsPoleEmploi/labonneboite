@@ -74,34 +74,6 @@ class SearchEntreprisesTest(DatabaseTest):
         )
         self.assertEqual(200, response.status_code)
 
-    def test_search_correctly_redirects(self):
-        with self.test_request_context:
-            rv = self.app.get(url_for('search.search', **{
-                'sort': 'score',
-                'naf': '',
-                'distance': 50,
-                'duration': 15,
-                'headcount': 1,
-                'flag_alternance': 0,
-                'job': 'Boucherie',
-                'location': 'Metz (57000)',
-                'city': 'metz',
-                'zipcode': '57000',
-                'occupation': 'boucherie',
-            }))
-            expected_location = url_for('search.results', city='metz', zipcode='57000', occupation='boucherie')
-
-        self.assertEqual(rv.status_code, 302)
-        location = parse_qsl(rv.location)
-        self.assertEqual(expected_location, location.path)
-        self.assertEqual({
-            'sort': 'score',
-            'd': '50',
-            'dur': '15',
-            'f_a': '0',
-            'h': '1'
-        }, dict(parse_qsl(location.query)))
-
 
 class EntreprisesLocationTest(AppTest):
 

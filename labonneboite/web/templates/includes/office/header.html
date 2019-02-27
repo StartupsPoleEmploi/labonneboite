@@ -39,9 +39,9 @@
       {% if distance and zipcode and company.show_multi_geolocations_msg(distance, zipcode) %}
         <h4>Cette entreprise recrute aussi dans votre région.</h4>
       {% elif company.distance %}
-        <h4>{{ company.distance }} km</h4>
+        <p>{{ company.distance }} km
           <span class="travel-duration" data-siret="{{ company.siret }}" data-latitude="{{ company.latitude }}" data-longitude="{{ company.longitude }}"></span>
-        </h4>
+        </p>
       {% endif %}
     </div>
   </div>

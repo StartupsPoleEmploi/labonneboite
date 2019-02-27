@@ -36,8 +36,8 @@ class CompanySearchForm(FlaskForm):
     )
 
     DURATION_CHOICES = [
-        (str(dur), u'Moins de {:d} min'.format(dur)) for dur in maps_constants.ISOCHRONE_DURATIONS_MINUTES
-    ] + [('0', u'France entière')]
+        (str(dur), 'Moins de {:d} min'.format(dur)) for dur in maps_constants.ISOCHRONE_DURATIONS_MINUTES
+    ] + [('0', 'France entière')]
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -84,12 +84,12 @@ class CompanySearchForm(FlaskForm):
         validators=[Optional()])
 
     tr = HiddenField(
-        u'Mode de transport',
+        'Mode de transport',
         default=maps_constants.DEFAULT_TRAVEL_MODE,
         validators=[Optional()])
 
     dur = RadioField(
-        u'Durée de trajet',
+        'Durée de trajet',
         choices=DURATION_CHOICES,
         default=DURATION_CHOICES[-1][0],
         validators=[Optional()])

@@ -125,6 +125,7 @@ img.img-icon.img-choice {
     height: 32px;
     vertical-align: middle;
     margin-top: 0;
+    cursor: pointer;
 }
 
 /* E-mail obfuscation.

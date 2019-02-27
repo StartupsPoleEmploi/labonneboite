@@ -197,8 +197,8 @@ IGN_CREDENTIALS = {
     'username': '',
     'password': ''
 }
+NAVITIA_API_TOKEN = 'setme'
 
-# This must be last in order to override settings
 if get_current_env() == ENV_LBBDEV:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.lbbdev import *

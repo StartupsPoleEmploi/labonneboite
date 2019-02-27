@@ -1,4 +1,4 @@
-from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 import requests
 
 from flask import current_app
