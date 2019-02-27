@@ -136,7 +136,7 @@ And then to build Python 3.4.3 using this local version of Openssl, replace the 
 Our requirements are managed with [`pip-tools`](https://github.com/jazzband/pip-tools):
 
     pip install pip-tools
-    make requirements-compile
+    make compile-requirements
 
 To update your virtualenv, you can then run:
 
