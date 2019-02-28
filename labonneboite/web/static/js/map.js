@@ -8,6 +8,7 @@ function createMap(element, center, zoom) {
     zoom: zoom
   });
   mapEl.addControl(new mapboxgl.NavigationControl(), 'top-left');
+  mapEl.addControl(new AttributionControl({ compact: true }));
   mapEl.scrollZoom.disable();
   return mapEl;
 }
