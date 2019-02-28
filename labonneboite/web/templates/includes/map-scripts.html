@@ -1,1 +1,11 @@
-<script src="https://maps.labonneboite.pole-emploi.fr/mapbox-gl.js"></script>
+<script src="{{ url_for('static', filename='js/vendor/mapbox-gl.0.53.1.js') }}"></script>
+<script>
+    class AttributionControl extends mapboxgl.AttributionControl {
+        //Source: https://github.com/mapbox/mapbox-gl-js/blob/v0.53.1/src/ui/control/attribution_control.js
+        _updateAttributions() {
+            this._innerContainer.innerHTML = '<a href="https://www.openstreetmap.org/copyright" target="_blank" title="© Contributeurs OpenStreetMap (ouverture dans un nouvel onglet)">&copy; Contributeurs OpenStreetMap</a>';
+            this._container.classList.remove('mapboxgl-attrib-empty');
+            this._editLink = null;
+        }
+    }
+</script>
