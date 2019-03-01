@@ -162,7 +162,7 @@ def get_shared_select_fields():
     return (
         """siret, raisonsociale, enseigne, codenaf,
         trancheeffectif, numerorue, libellerue, codepostal,
-        tel, email, website, """
+        tel, email, website, flag_poe_afpr, flag_pmsmp, """
         + "0, 0, 0, 0, " # stand for flag_alternance, flag_junior, flag_senior, flag_handicap
         + "0, " # stands for has_multi_geolocation
         + "codecommune, "

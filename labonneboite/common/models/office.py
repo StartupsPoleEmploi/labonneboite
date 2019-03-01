@@ -51,7 +51,8 @@ class PrimitiveOfficeMixin(object):
     departement = Column(String(8), nullable=False)
     headcount = Column('trancheeffectif', String(2))
     website = Column(String(191), default='', nullable=False)
-
+    flag_poe_afpr = Column(Boolean, default=False, nullable=False)
+    flag_pmsmp = Column(Boolean, default=False, nullable=False)
 
 class OfficeMixin(PrimitiveOfficeMixin):
     """

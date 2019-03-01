@@ -189,7 +189,9 @@ class EtablissementExtractJob(Job):
             tel=%%s,
             departement=%%s,
             trancheeffectif=%%s,
-            website=%%s
+            website=%%s,
+            flag_poe_afpr=%%s,
+            flag_pmsmp=%%s
         where siret=%%s""" % settings.RAW_OFFICE_TABLE
 
         count = 0
@@ -221,8 +223,8 @@ class EtablissementExtractJob(Job):
         con, cur = import_util.create_cursor()
         query = """INSERT into %s(siret, raisonsociale, enseigne, codenaf, numerorue,
             libellerue, codecommune, codepostal, email, tel, departement, trancheeffectif,
-            website)
-        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.RAW_OFFICE_TABLE
+            website, flag_poe_afpr, flag_pmsmp)
+        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.RAW_OFFICE_TABLE
 
         count = 1
         logger.info("create new offices in table %s", settings.RAW_OFFICE_TABLE)
@@ -316,7 +318,7 @@ class EtablissementExtractJob(Job):
                         libellerue, codecommune, codepostal, email, tel, \
                         trancheeffectif_etablissement, _, _, _, \
                         website1, website2, better_tel, \
-                        website3, _, _, _ ,_ = fields
+                        website3, _, contrat_afpr, contrat_poe, contrat_pmsmp = fields
 
                     if not siret_util.is_siret(siret):
                         logger.exception("wrong siret : %s", siret)
@@ -331,7 +333,13 @@ class EtablissementExtractJob(Job):
 
                 if has_text_content(better_tel):
                     tel = better_tel
+                flag_pmsmp = 0
+                if contrat_pmsmp == "O" :
+                    flag_pmsmp = 1
 
+                flag_poe_afpr = 0
+                if contrat_poe == "O" or contrat_afpr == "O" :
+                    flag_poe_afpr = 1
                 
                 email = encoding_util.strip_french_accents(email)
 
@@ -346,10 +354,10 @@ class EtablissementExtractJob(Job):
                             codepostal = "0%s" % codepostal
                         etab_create_fields = siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
                             codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-                            website
+                            website, flag_poe_afpr, flag_pmsmp
                         etab_update_fields = raisonsociale, enseigne, codenaf, numerorue, libellerue, \
                             codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-                            website, siret
+                            website, flag_poe_afpr, flag_pmsmp, siret
                         if codepostal.startswith(departement):
                             departement_counter_dic.setdefault(departement, 0)
                             departement_counter_dic[departement] += 1
