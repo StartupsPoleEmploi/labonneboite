@@ -58,7 +58,7 @@ def check_file(dpae_filename):
     logger.info("all tests passed with flying colors!")
 
 
-if __name__ == "__main__":
+def run():
     filename = import_util.detect_runnable_file("dpae")
     if filename:
         check_file(filename)
@@ -67,3 +67,6 @@ if __name__ == "__main__":
         sys.exit(0)
     else:
         sys.exit(-1)
+
+if __name__ == '__main__':
+    run()

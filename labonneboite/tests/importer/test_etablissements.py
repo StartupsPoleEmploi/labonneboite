@@ -28,13 +28,23 @@ class TestEtablissements(DatabaseTest):
         make_raw_office()
         etabs = task.get_sirets_from_database()
         self.assertEqual(len(etabs), 1)
-        self.assertEqual(etabs[0], "12345678901234")
+        self.assertEqual(etabs[0], "12345678901234") 
 
     def test_get_offices_from_file(self):
         filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
         task = EtablissementExtractJob(filename)
         etabs = task.get_offices_from_file()
-        self.assertEqual(len(list(etabs.keys())), 24)
+        self.assertEqual(len(list(etabs.keys())), 26)
+        siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
+        codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
+        website = etabs.get('26560004900167').get('create_fields')
+        self.assertEqual(raisonsociale, 'CTRE HOSPITALIER JOSSELIN')
+        self.assertEqual(email, '')
+        siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
+        codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
+        website = etabs.get('26560004900267').get('create_fields')
+        self.assertEqual(raisonsociale, 'POLE EMPLOI')
+        self.assertEqual(email, 'origin_email@pole-emploi.fr')
 
     def test_create_new_offices(self):
         filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
@@ -68,3 +78,4 @@ class TestEtablissements(DatabaseTest):
         self.assertEqual(normalize_website_url('http://abc.fr'), 'http://abc.fr')
         self.assertEqual(normalize_website_url('https://abc.fr'), 'https://abc.fr')
         self.assertEqual(normalize_website_url('abc@def.fr'), None)
+

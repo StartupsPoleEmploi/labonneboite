@@ -12,6 +12,7 @@ from labonneboite.common import departements as dpt
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import siret as siret_util
 from labonneboite.common.database import db_session
+from labonneboite.common.chunks import chunks
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
@@ -66,6 +67,8 @@ def check_departements(departements):
         count = cur.fetchone()[0]
         if count < 1000:
             logger.error("only %s results for departement %s", count, dep)
+        cur.close()
+        con.close()
 
 
 class EtablissementExtractJob(Job):
@@ -112,7 +115,45 @@ class EtablissementExtractJob(Job):
         existing_set = set(self.existing_sirets)
         # 1 - create offices which did not exist before
         self.creatable_sirets = csv_set - existing_set
+
+        
+        logger.info("nombre d'etablissement dans le csv : %i" % len(csv_set))
+
+        i = 0 
+        logger.info("liste de 20 sirets dans le csv" )
+        if csv_set :
+            while  i < 20 :
+                i=i+1
+                value_test = csv_set.pop()
+                csv_set.add(value_test)
+                logger.info(" siret : %s" % value_test )
+
+
+        logger.info("nombre d'etablissement existant : %i" % len(existing_set))
+
+        i = 0 
+        logger.info("liste de 20 sirets existant" )
+        if existing_set :
+            while  i < 20 :
+                i=i+1
+                value_test = existing_set.pop()
+                existing_set.add(value_test)
+                logger.info(" siret : %s" % value_test )
+
+
+        logger.info("nombre d'etablissement à créer : %i" % len(self.creatable_sirets))
+
+        i = 0 
+        logger.info("liste de 20 sirets à créer" )
+        if self.creatable_sirets :
+            while  i < 20 :
+                i=i+1
+                value_test = self.creatable_sirets.pop()
+                self.creatable_sirets.add(value_test)
+                logger.info(" siret : %s" % value_test )
+        
         num_created = self.create_creatable_offices()
+
         # 2 - delete offices which no longer exist
         self.deletable_sirets = existing_set - csv_set
         self.delete_deletable_offices()
@@ -125,9 +166,11 @@ class EtablissementExtractJob(Job):
     def get_sirets_from_database(self):
         query = "select siret from %s" % settings.RAW_OFFICE_TABLE
         logger.info("get offices from database")
-        _, cur = import_util.create_cursor()
+        con, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
+        cur.close()
+        con.close()
         return [row[0] for row in rows if siret_util.is_siret(row[0])]
 
     @timeit
@@ -166,6 +209,8 @@ class EtablissementExtractJob(Job):
         if statements:
             cur.executemany(query, statements)
             con.commit()
+        cur.close()
+        con.close()
         logger.info("%i offices updated.", count)
 
     @timeit
@@ -196,22 +241,27 @@ class EtablissementExtractJob(Job):
         if statements:
             cur.executemany(query, statements)
             con.commit()
+        cur.close()
+        con.close()
         logger.info("%i new offices created.", count)
 
     @timeit
     def delete_deletable_offices(self):
         con, cur = import_util.create_cursor()
         if self.deletable_sirets:
-            stringified_siret_list = ",".join(self.deletable_sirets)
-            logger.info("going to delete %i offices...", len(self.deletable_sirets))
-            query = """DELETE FROM %s where siret IN (%s)""" % (settings.RAW_OFFICE_TABLE, stringified_siret_list)
-            try:
-                cur.execute(query)
-                con.commit()
-            except:
-                logger.warning("deletable_sirets=%s", self.deletable_sirets)
-                raise
-        logger.info("%i old offices deleted.", len(self.deletable_sirets))
+            for sirets in chunks(list(self.deletable_sirets), 500):
+                stringified_siret_list = ",".join(sirets)
+                logger.info("deleting a chunk of %i offices...", len(sirets))
+                query = """DELETE FROM %s where siret IN (%s)""" % (settings.RAW_OFFICE_TABLE, stringified_siret_list)
+                try:
+                    cur.execute(query)
+                    con.commit()
+                except:
+                    logger.warning("error while deleting chunk of sirets : %s", sirets)
+                    raise
+        cur.close()
+        con.close()
+        logger.info("%i no longer existing offices deleted.", len(self.deletable_sirets))
 
     @timeit
     def benchmark_loading_using_pandas(self):
@@ -258,15 +308,15 @@ class EtablissementExtractJob(Job):
 
                 try:
                     fields = import_util.get_fields_from_csv_line(line)
-                    if len(fields) != 19:
+                    if len(fields) != 22:
                         logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
 
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
                         libellerue, codecommune, codepostal, email, tel, \
                         trancheeffectif_etablissement, _, _, _, \
-                        website1, website2, better_email, better_tel, \
-                        website3 = fields
+                        website1, website2, better_tel, \
+                        website3, _, _, _ ,_ = fields
 
                     if not siret_util.is_siret(siret):
                         logger.exception("wrong siret : %s", siret)
@@ -282,16 +332,16 @@ class EtablissementExtractJob(Job):
                 if has_text_content(better_tel):
                     tel = better_tel
 
-                if has_text_content(better_email):
-                    email = better_email
-
+                
                 email = encoding_util.strip_french_accents(email)
 
                 if codecommune.strip():
                     departement = import_util.get_departement_from_zipcode(codepostal)
                     process_this_departement = departement in departements
                     if process_this_departement:
-
+                        # Trello Pz5UlnFh : supprimer-les-emails-pe-des-entreprises-qui-ne-sont-pas-des-agences-pe
+                        if  "@pole-emploi." in email and raisonsociale != "POLE EMPLOI":
+                            email = ""
                         if len(codepostal) == 4:
                             codepostal = "0%s" % codepostal
                         etab_create_fields = siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \

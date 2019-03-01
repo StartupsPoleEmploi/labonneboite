@@ -76,7 +76,7 @@ class GeocodeJob(Job):
                 coordinates_y
             from %s
         """ % (settings.SCORE_REDUCING_TARGET_TABLE)
-        _, cur = import_util.create_cursor()
+        con, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
         geocoding_jobs = []
@@ -99,6 +99,8 @@ class GeocodeJob(Job):
             if not count % 10000:
                 logger.info("loading geocoding jobs from db... loaded %s rows", count)
         logger.info("%i geocoding jobs created...", len(geocoding_jobs))
+        cur.close()
+        con.close()
         return geocoding_jobs
 
 
@@ -123,11 +125,14 @@ class GeocodeJob(Job):
             logger.info("geocoding with ban... %i of %i done", count, len(coordinates_updates))
             cur.executemany(update_query, statements)
             con.commit()
+        cur.close()
+        con.close()
+
 
 
     @timeit
     def validate_coordinates(self):
-        _, cur = import_util.create_cursor()
+        con, cur = import_util.create_cursor()
         query = """
         select
         sum(
@@ -142,6 +147,9 @@ class GeocodeJob(Job):
         logger.info("geocoding_ratio = %s", geocoding_ratio)
         if geocoding_ratio < settings.MINIMUM_GEOCODING_RATIO:
             raise AbnormallyLowGeocodingRatioException
+        cur.close()
+        con.close()
+
 
 
     @timeit
@@ -254,6 +262,12 @@ class GeocodeUnit(object):
             GEOCODING_STATS['coordinates_not_found'] = GEOCODING_STATS.get('coordinates_not_found', 0) + 1
 
 
-if __name__ == "__main__":
+def run_main():
     geocode_task = GeocodeJob()
     geocode_task.run()
+
+
+
+if __name__ == "__main__":
+    run_main()
+    

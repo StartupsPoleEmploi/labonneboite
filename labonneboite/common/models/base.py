@@ -15,8 +15,8 @@ class CRUDMixin(object):
         return instance.save(commit=commit)
 
     @classmethod
-    def get(cls, id):
-        return cls.query.get(id)
+    def get(cls, object_id):
+        return cls.query.get(object_id)
 
     def save(self, commit=True):
         db_session.add(self)

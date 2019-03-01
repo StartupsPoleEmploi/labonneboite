@@ -166,20 +166,25 @@ class DpaeExtractJob(Job):
             raise IOError('too many zipcode errors')
         if self.invalid_row_errors > settings.MAXIMUM_INVALID_ROWS:
             raise IOError('too many invalid_row errors')
+        con.commit()
+        cur.close()
+        con.close()
         statistics = DpaeStatistics(
             last_import=datetime.now(),
             most_recent_data_date=self.last_historical_data_date_in_file,
         )
         statistics.save()
-        con.commit()
         logger.info("finished importing dpae...")
         return something_new
 
 
-if __name__ == "__main__":
+def run_main():
     import logging
     logging.basicConfig(level=logging.DEBUG)
-    logger = logging.getLogger('main')
     dpae_filename = jenkins.get_dpae_filename()
     task = DpaeExtractJob(dpae_filename)
     task.run()
+
+
+if __name__ == '__main__':
+    run_main()

@@ -1,7 +1,7 @@
-kc_siret|dc_naf_id|dc_adresse|dc_codepostal|dc_commune_id|dn_tailleetablissement|dc_communenaissancepays|kd_dateembauche|dc_typecontrat_id|dd_datefincdd|dc_romev3_1_id|dc_romev3_2_id|kd_datecreation|dc_privepublic|dc_commune_id|dc_natureemploi_id|dc_qualitesalarie_id|dn_dureetravailhebdo|dn_dureetravailmensuelle|dn_dureetravailannuelle|nbrjourtravaille|iiann|dc_lblprioritede|kn_trancheage|duree_pec
-51146379600017|||69800||||2016-10-01 00:00:00|1||||||||||||200||NULL|de 26 ans à 50 ans|10
-51146379600017|||14700||||2016-11-15 00:00:00|2||||||||||||3||NULL|- de 26 ans|30
-51146379600017|||14700||||2016-11-14 00:00:00|2||||||||||||3||NULL|+ de 50 ans|30
-51146379600017|||14700||||2021-11-07 00:00:00|1||||||||||||300||NULL|+ de 50 ans|30
-51146379600017|||14700||||2016-10-01 00:00:00|2||||||||||||3||NULL|+ de 50 ans|30
-03880702000011|||14700||||2015-04-09 00:00:00|2||||||||||||3||NULL|+ de 50 ans|40
+kc_siret|dc_naf_id|dc_adresse|dc_codepostal|dc_commune_id|dn_tailleetablissement|dc_communenaissancepays|kd_dateembauche|dc_typecontrat_id|dd_datefincdd|dc_romev3_1_id|dc_romev3_2_id|kd_datecreation|dc_privepublic|dc_commune_id|dc_natureemploi_id|dc_qualitesalarie_id|dn_dureetravailhebdo|dn_dureetravailmensuelle|dn_dureetravailannuelle|nbrjourtravaille|iiann|dc_lblprioritede|kn_trancheage|duree_pec|dc_ididentiteexterne|premiere_embauche
+51146379600017|||69800||||2016-10-01 00:00:00|1||||||||||||200||NULL|de 26 ans ? 50 ans|10||
+51146379600017|||14700||||2016-11-15 00:00:00|2||||||||||||3||NULL|- de 26 ans|30||
+51146379600017|||14700||||2016-11-14 00:00:00|2||||||||||||3||NULL|+ de 50 ans|30||
+51146379600017|||14700||||2021-11-07 00:00:00|1||||||||||||300||NULL|+ de 50 ans|30||
+51146379600017|||14700||||2016-10-01 00:00:00|2||||||||||||3||NULL|+ de 50 ans|30||
+03880702000011|||14700||||2015-04-09 00:00:00|2||||||||||||3||NULL|+ de 50 ans|40||

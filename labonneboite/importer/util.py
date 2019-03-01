@@ -12,10 +12,11 @@ import MySQLdb as mdb
 from labonneboite.common import departements as dpt
 from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
-from labonneboite.conf import settings
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common.database import DATABASE
 from labonneboite.common import encoding as encoding_util
+
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 logger = logging.getLogger('main')
 
@@ -53,7 +54,7 @@ def check_for_updates(input_folder):
 
 
 @timeit
-def back_up(backup_folder, table, filename, timestamp, copy_to_remote_server=True, new_table_name=None):
+def back_up(backup_folder, table, filename, timestamp, new_table_name=None):
     timestamp_filename = '%s_backup_%s.sql.gz' % (filename, timestamp)
     backup_filename = os.path.join(backup_folder, timestamp_filename)
     password_statement = "-p'%s'" % DATABASE['PASSWORD']
@@ -71,7 +72,8 @@ def back_up(backup_folder, table, filename, timestamp, copy_to_remote_server=Tru
         """mysqldump -u %s %s --host %s --port %d %s %s | sed 's/`%s`/`%s`/g' | gzip > %s""" % (
             DATABASE['USER'],
             password_statement,
-            DATABASE['HOST'], DATABASE['PORT'],
+            DATABASE['HOST'],
+            DATABASE['PORT'],
             DATABASE['NAME'],
             table,
             table,
@@ -79,12 +81,6 @@ def back_up(backup_folder, table, filename, timestamp, copy_to_remote_server=Tru
             backup_filename),
         shell=True)
 
-
-    if copy_to_remote_server:
-        logger.info("copying the file to remote server")
-        subprocess.check_call("scp %s %s@%s:%s " % (
-            backup_filename, settings.BACKUP_USER, settings.BACKUP_SERVER, settings.BACKUP_SERVER_PATH),
-            shell=True)
     logger.info("finished back up !")
     return backup_filename
 
@@ -141,16 +137,16 @@ def reduce_scores_into_table(
     errors = successes = 0
 
     # empty existing table before filling it again
-    run_raw_mysql_query("delete from %s" % target_table)
+    run_sql_script("delete from %s" % target_table)
 
     for departement in departements:
         departement_table = "etablissements_%s" % departement
         query = """insert into %s select %s from %s""" % (
             target_table, select_fields, departement_table)
         try:
-            run_raw_mysql_query(query)
+            run_sql_script(query)  # FIXME
             successes += 1
-        except subprocess.CalledProcessError:
+        except mdb.ProgrammingError:
             logger.error("an error happened while reducing departement=%s description=%s using query [%s]",
                 departement, description, query)
             errors += 1
@@ -229,7 +225,7 @@ def clean_temporary_tables():
     for departement in departements:
         departement_table = "etablissements_%s" % departement
         drop_table_query = "drop table if exists %s" % departement_table
-        run_raw_mysql_query(drop_table_query)
+        run_sql_script(drop_table_query)
 
 
 def get_fields_from_csv_line(line, delimiter='|'):
@@ -241,7 +237,7 @@ def get_fields_from_csv_line(line, delimiter='|'):
 
 def parse_dpae_line(line):
     fields = get_fields_from_csv_line(line)
-    required_fields = 25
+    required_fields = 27
     if len(fields) != required_fields:  # an assert statement here does not work from nosetests
         msg = ("found %s fields instead of %s in line: %s" % (
             len(fields), required_fields, line
@@ -280,7 +276,7 @@ def parse_dpae_line(line):
 
     choices = {
         "- de 26 ans": TRANCHE_AGE_JUNIOR,
-        "de 26 ans  50 ans": TRANCHE_AGE_MIDDLE,
+        "de 26 ans ? 50 ans": TRANCHE_AGE_MIDDLE,
         "+ de 50 ans": TRANCHE_AGE_SENIOR
     }
 
@@ -343,13 +339,13 @@ def get_departement_from_zipcode(zipcode):
     return departement
 
 
-def run_raw_mysql_query(query):
-    password_statement = "-p'%s'" % DATABASE['PASSWORD']
-    subprocess.check_call("""mysql -u %s %s --host %s --port %d %s -e'%s'""" % (
-            DATABASE['USER'],
-            password_statement,
-            DATABASE['HOST'],
-            DATABASE['PORT'],
-            DATABASE['NAME'],
-            query),
-        shell=True)
+def run_sql_script(sql_script):
+    con, cur = create_cursor()
+
+    for query in sql_script.split(';'):
+        query = query.strip()
+        if len(query) >= 1:
+            cur.execute(query)
+            con.commit()
+    cur.close()
+    con.close()

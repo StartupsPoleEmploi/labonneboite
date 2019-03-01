@@ -31,16 +31,9 @@ def populate_flag(flag):
     cur.execute(query)
     con.commit()
     logger.info("completed populating %s ... ", flag)
+    cur.close()
+    con.close()
 
-
-def run_sql_script(sql_script):
-    con, cur = import_util.create_cursor()
-
-    for query in sql_script.split(';'):
-        query = query.strip()
-        if len(query) >= 1:
-            cur.execute(query)
-            con.commit()
 
 
 @timeit
@@ -88,7 +81,7 @@ def prepare_flags_junior_and_senior():
         drop table if exists flag_tmp2;
     """ % settings.HIRING_TABLE
 
-    run_sql_script(sql_script)
+    import_util.run_sql_script(sql_script)
     logger.info("completed preparing flags_junior_and_senior.")
 
 
@@ -107,7 +100,7 @@ def prepare_flag_handicap():
         );
     """ % settings.HIRING_TABLE
 
-    run_sql_script(sql_script)
+    import_util.run_sql_script(sql_script)
     logger.info("completed preparing flag_handicap.")
 
 
@@ -115,12 +108,10 @@ def prepare_flag_handicap():
 def dump():
     timestamp = datetime.now().strftime('%Y_%m_%d_%H%M')
 
-    copy_to_remote_server = settings.BACKUP_FIRST
     logger.info("backing up table %s ...", settings.SCORE_REDUCING_TARGET_TABLE)
     etab_result = import_util.back_up(
         settings.BACKUP_OUTPUT_FOLDER, settings.SCORE_REDUCING_TARGET_TABLE,
-        "export_etablissement", timestamp, copy_to_remote_server,
-        new_table_name="etablissements_new")
+        "export_etablissement", timestamp, new_table_name="etablissements_new")
 
     tar_filename = os.path.join(settings.BACKUP_FOLDER, "%s.tar.bz2" % timestamp)
     with tarfile.open(tar_filename, "w:bz2") as tar:
@@ -147,9 +138,15 @@ def make_link_file_to_new_archive(archive_path):
         copyfile(archive_path, link_path)
 
 
-if __name__ == "__main__":
+def run_main():
     prepare_flags_junior_and_senior()
     prepare_flag_handicap()
     populate_flags()
     filename = dump()
     make_link_file_to_new_archive(filename)
+
+
+
+if __name__ == "__main__":
+    run_main()
+    

@@ -21,6 +21,7 @@ from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import hiring_type_util
 from labonneboite.common import es
+from labonneboite.common.chunks import chunks
 from labonneboite.common.search import fetch_offices
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, OGR_ROME_CODES
@@ -657,13 +658,6 @@ def get_latest_scam_emails():
 @timeit
 def remove_scam_emails():
     scam_emails = get_latest_scam_emails()
-
-    def chunks(l, n):
-        """
-        Yield successive n-sized chunks from l.
-        """
-        for i in range(0, len(l), n):
-            yield l[i:i + n]
 
     for scam_emails_chunk in chunks(scam_emails, 100):
         query = Office.query.filter(Office.email.in_(scam_emails_chunk))

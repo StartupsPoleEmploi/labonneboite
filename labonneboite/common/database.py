@@ -36,7 +36,7 @@ def get_db_string(db_params=None):
 ENGINE_PARAMS = {
     'convert_unicode': True,
     'echo': False,
-    'pool_recycle': 280,
+    'pool_recycle': 30,
 }
 
 engine = create_engine(get_db_string(), **ENGINE_PARAMS)
@@ -62,6 +62,15 @@ db_session = scoped_session(sessionmaker(**SESSIONMAKER_PARAMS))
 
 Base = declarative_base()
 Base.query = db_session.query_property()
+
+
+def get_dedicated_session():
+    """
+    Get a fresh new db connection, useful in very long scripts (importer...)
+    where you risk getting a "MySQL server has gone away" error because
+    the main db session was unused for too long.
+    """
+    return scoped_session(sessionmaker(**SESSIONMAKER_PARAMS))
 
 
 def init_db():
