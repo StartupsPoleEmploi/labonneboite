@@ -162,7 +162,7 @@ def get_shared_select_fields():
     return (
         """siret, raisonsociale, enseigne, codenaf,
         trancheeffectif, numerorue, libellerue, codepostal,
-        tel, email, website, flag_poe_afpr, flag_pmsmp, """
+        tel, email, website, """
         + "0, 0, 0, 0, " # stand for flag_alternance, flag_junior, flag_senior, flag_handicap
         + "0, " # stands for has_multi_geolocation
         + "codecommune, "
@@ -180,6 +180,7 @@ def get_select_fields_for_main_db():
         + ', ""'  # stands for email_alternance
         + ', score_alternance'
         + ', "", "", "", ""'  # stand for social_network, phone_alternance, website_alternance, contact_mode
+        + ', flag_poe_afpr, flag_pmsmp'
     )
 
 
@@ -195,6 +196,7 @@ def get_select_fields_for_backoffice():
     fields += ", score_alternance, score_alternance_regr"
     for i in range(7, 0, -1):  # [7, 6, 5, 4, 3, 2, 1]
         fields += ", `alt-period-%s`" % i
+    fields += ', flag_poe_afpr, flag_pmsmp'
     return fields
 
 
