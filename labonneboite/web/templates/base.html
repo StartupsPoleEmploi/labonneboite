@@ -66,14 +66,12 @@
     <ul class="lbb-header">
       <li class="lbb-header-logo-lbb">
         <a href="/">
-          {# The hardcoded width attribute is required by IE 11. #}
-          <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite" width="74">
+          <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite">
         </a>
       </li>
 
       <li class="float-right lbb-header-logo-pole-emploi">
-        {# The hardcoded width attribute is required by IE 11. #}
-        <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi" width="74">
+        <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
       </li>
 
       <li class="float-right" id="user-header">
@@ -349,7 +347,7 @@
     {# https://juliencoquet.com/en/2015/12/29/measuring-the-impact-of-adblocking-with-google-analytics/ #}
     <script src="{{ url_for('static', filename='js/ads.js') }}"></script>
     <script>// <![CDATA[
-    jQuery(document).ready(checkAds()); 
+    jQuery(document).ready(checkAds());
             function checkAds() {
                 if (document.getElementById('adsense') != undefined) {
                     document.write("<script>dataLayer.push({'event':'adBlock','blocked':'false'});</sc" + "ript>");
@@ -359,6 +357,23 @@
             }
     // ]]></script>
   {% endif %}
+
+  <script type="text/javascript">
+    var ua = window.navigator.userAgent;
+    // MSIE : IE6 -> 10 & Trident: IE 11
+    if (ua.indexOf('MSIE ') !== -1 || ua.indexOf('Trident/') !== -1) {
+      var id = 'polyfill-ie-css';
+      if (!document.getElementById(id)) {
+        var fcss = document.getElementsByTagName('link')[0];
+        var css = document.createElement('link');
+        css.id = id;
+        css.rel = 'stylesheet';
+        css.href = "/static/css/ie-patch.css";
+        fcss.parentNode.insertBefore(css, fcss);
+      }
+    }
+  </script>
+
 
   {% block footer_scripts %}{% endblock %}
 
