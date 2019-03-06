@@ -8,7 +8,7 @@ function createMap(element, center, zoom) {
     zoom: zoom
   });
   mapEl.addControl(new mapboxgl.NavigationControl(), 'top-left');
-  mapEl.addControl(new AttributionControl({ compact: true }));
+  mapEl.addControl(new mapboxgl.AttributionControl({ compact: true }));
   mapEl.scrollZoom.disable();
   return mapEl;
 }
@@ -122,6 +122,11 @@ function createMap(element, center, zoom) {
       ga('send', 'event', 'Carte', 'zoom');
       onMapMove();
     };
+    var onMapLoad = function() {
+      $('.mapboxgl-ctrl-attrib .mapboxgl-ctrl-attrib-inner')
+        .html('<a href="https://www.openstreetmap.org/copyright" target="_blank" title="© Contributeurs OpenStreetMap (ouverture dans un nouvel onglet)">&copy; Contributeurs OpenStreetMap</a>');
+    }
+
 
     var updateMap = function() {
       ga('send', 'event', 'Carte', 'update');
@@ -152,6 +157,7 @@ function createMap(element, center, zoom) {
     };
     map.on('dragend', onMapDrag);
     map.on('zoomend', onMapZoom);
+    map.on('load', onMapLoad);
   }
 
   $(document).on('lbbready', function () {
