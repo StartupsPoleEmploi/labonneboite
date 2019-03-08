@@ -42,6 +42,10 @@ def press():
     }
     return render_template('root/press.html', **context)
 
+@rootBlueprint.route('/accessibilite')
+def accessibility():
+    return render_template('root/accessibility.html')
+
 
 @rootBlueprint.route('/comment-faire-une-candidature-spontanee')
 def lbb_help():
