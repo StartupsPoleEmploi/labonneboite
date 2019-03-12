@@ -11,6 +11,10 @@
     top: -1000px;
 }
 
+.italic {
+    font-style: italic;
+}
+
 .break-word {
     word-wrap: break-word;
 }
