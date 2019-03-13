@@ -69,11 +69,6 @@ Create an [isolated Python environment](https://virtualenv.pypa.io/), for exampl
 
     # On Mac OS:
     
-    # important: you need to install this older version of mysql
-    # in order to get older library /usr/local/lib/libmysqlclient.18.dylib
-    # which is required by latest pip MySQL-python-1.2.5
-    $ brew install mysql@5.5
-    
     # dependencies required for selenium tests
     $ brew install selenium-server-standalone
     $ brew tap caskroom/cask && brew install caskroom/cask/chromedriver
