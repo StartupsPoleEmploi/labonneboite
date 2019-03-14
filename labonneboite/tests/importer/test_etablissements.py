@@ -37,12 +37,12 @@ class TestEtablissements(DatabaseTest):
         self.assertEqual(len(list(etabs.keys())), 26)
         siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
         codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-        website = etabs.get('26560004900167').get('create_fields')
+        website, flag_poe_afpr, flag_pmsmp = etabs.get('26560004900167').get('create_fields')
         self.assertEqual(raisonsociale, 'CTRE HOSPITALIER JOSSELIN')
         self.assertEqual(email, '')
         siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
         codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-        website = etabs.get('26560004900267').get('create_fields')
+        website, flag_poe_afpr, flag_pmsmp = etabs.get('26560004900267').get('create_fields')
         self.assertEqual(raisonsociale, 'POLE EMPLOI')
         self.assertEqual(email, 'origin_email@pole-emploi.fr')
 
