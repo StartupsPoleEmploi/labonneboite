@@ -167,6 +167,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['bayonville_sur_mad']['coords'],
                 'name': 'Office 1',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['bayonville_sur_mad']['zip_code'][0:2],
             },
             {
@@ -179,6 +180,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['bayonville_sur_mad']['coords'],
                 'name': 'Office 2',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['bayonville_sur_mad']['zip_code'][0:2],
             },
             {
@@ -190,6 +192,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['bayonville_sur_mad']['coords'],
                 'name': 'Office 3',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['bayonville_sur_mad']['zip_code'][0:2],
             },
             {
@@ -201,6 +204,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['caen']['coords'],
                 'name': 'Office 4',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['caen']['zip_code'][0:2],
             },
             {
@@ -212,6 +216,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['caen']['coords'],
                 'name': 'Office 5',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['caen']['zip_code'][0:2],
             },
             # For NAF filter
@@ -224,6 +229,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['metz']['coords'],
                 'name': 'Office 6',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['metz']['zip_code'][0:2],
             },
             {
@@ -235,6 +241,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['metz']['coords'],
                 'name': 'Office 7',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['metz']['zip_code'][0:2],
             },
             # For result sort
@@ -247,6 +254,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['nantes']['coords'],
                 'name': 'Office 8',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['nantes']['zip_code'][0:2],
             },
             {
@@ -258,6 +266,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['reze']['coords'], # City close to Nantes
                 'name': 'Office 9',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['reze']['zip_code'][0:2],
             },
             # For contract filter
@@ -270,6 +279,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['lille']['coords'],
                 'name': 'Office 10',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['lille']['zip_code'][0:2],
             },
             {
@@ -281,6 +291,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['lille']['coords'],
                 'name': 'Office 11',
                 'flag_alternance': 1,
+                'flag_pmsmp': 0,
                 'department': self.positions['lille']['zip_code'][0:2],
             },
             # For headcount filter
@@ -293,6 +304,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['toulouse']['coords'],
                 'name': 'Office 12',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['toulouse']['zip_code'][0:2],
             },
             {
@@ -304,6 +316,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['toulouse']['coords'],
                 'name': 'Office 13',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['toulouse']['zip_code'][0:2],
             },
             # For headcount_text
@@ -316,6 +329,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['pau']['coords'],
                 'name': 'Office 14',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['pau']['zip_code'][0:2],
             },
             # For flag_alternance in response
@@ -328,6 +342,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['poitiers']['coords'],
                 'name': 'Office 15',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['poitiers']['zip_code'][0:2],
             },
             {
@@ -339,9 +354,10 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['poitiers']['coords'],
                 'name': 'Office 16',
                 'flag_alternance': 1,
+                'flag_pmsmp': 0,
                 'department': self.positions['poitiers']['zip_code'][0:2],
             },
-            # For filter_by_department
+            # For filter_by_department and filter_by_flag_pmsmp
             {
                 'naf': '5229A',  # Map to Rome N1202
                 'siret': '00000000000017',
@@ -351,6 +367,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['paris']['coords'],
                 'name': 'Office 17',
                 'flag_alternance': 0,
+                'flag_pmsmp': 1,
                 'department': self.positions['paris']['zip_code'][0:2],
             },
             {
@@ -362,6 +379,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['neuilly-sur-seine']['coords'],
                 'name': 'Office 18',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['neuilly-sur-seine']['zip_code'][0:2],
             },
             # For filters in response tests
@@ -374,6 +392,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['toulon']['coords'],
                 'name': 'Office 19',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['toulon']['zip_code'][0:2],
             },
             {
@@ -385,6 +404,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['toulon']['coords'],
                 'name': 'Office 20',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['toulon']['zip_code'][0:2],
             },
             {
@@ -396,6 +416,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['toulon']['coords'],
                 'name': 'Office 21',
                 'flag_alternance': 1,
+                'flag_pmsmp': 0,
                 'department': self.positions['toulon']['zip_code'][0:2],
             },
             # For distance filter => between 10-30km
@@ -408,6 +429,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['hyeres']['coords'], # 15km of Toulon
                 'name': 'Office 23',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['hyeres']['zip_code'][0:2],
             },
             # For distance filter => between 30-50km
@@ -420,6 +442,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['aubagne']['coords'], # 35km of Toulon
                 'name': 'Office 24',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['aubagne']['zip_code'][0:2],
             },
             # For distance between 50-100km
@@ -432,6 +455,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['draguignan']['coords'], # 60km of Toulon
                 'name': 'Office 25',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['draguignan']['zip_code'][0:2],
             },
             # For distance filter => between 100-3000km
@@ -444,6 +468,7 @@ class ApiBaseTest(DatabaseTest):
                 'locations': self.positions['limoges']['coords'], # 500km of Toulon
                 'name': 'Office 26',
                 'flag_alternance': 0,
+                'flag_pmsmp': 0,
                 'department': self.positions['limoges']['zip_code'][0:2],
             },
         ]
@@ -513,6 +538,7 @@ class ApiBaseTest(DatabaseTest):
                 departement=zip_code[:2],
                 company_name=doc['company_name'] if 'company_name' in doc else '',
                 flag_alternance=doc['flag_alternance'],
+                flag_pmsmp=doc['flag_pmsmp'],
                 headcount=doc['headcount'],
                 x=doc['locations'][0]['lon'],
                 y=doc['locations'][0]['lat'],

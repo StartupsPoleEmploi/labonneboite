@@ -349,6 +349,8 @@ def create_hidden_market_fetcher(location, request_args):
     - `contract`: one value, only between 'all' (default) or 'alternance'
     - `sort`: one value, only between 'score' (default) and 'distance'
     - `headcount`: one value, only between 'all' (default), 'small' or 'big'
+    - `departments`: one or more departments, comma separated.
+    - `flag_pmsmp`: 1 to see only companies having flag_pmsmp=1, all companies otherwise.
     """
     # Arguments to build the HiddenMarketFetcher object
     kwargs = {}
@@ -430,7 +432,30 @@ def create_hidden_market_fetcher(location, request_args):
             raise InvalidFetcherArgument('departments : %s' % ', '.join(unknown_departments))
     kwargs['departments'] = departments
 
+    # PMSMP filter only available for internal users.
+    if request.args['user'] in settings.API_INTERNAL_CONSUMERS:
+        kwargs['flag_pmsmp'] = check_bool_argument(request_args, 'flag_pmsmp', 0)
+
     return search.HiddenMarketFetcher(location, **kwargs)
+
+
+def check_bool_argument(args, name, default_value):
+    """
+    Return value from arguments, check that value is boolean.
+
+    Args:
+        args (dict)
+        name (str)
+        default_value (int)
+    """
+    value = args.get(name, default_value)
+    try:
+        value = int(value)
+        if value not in [0, 1]:
+            raise ValueError
+    except (TypeError, ValueError):
+        raise InvalidFetcherArgument('{} must be boolean (0 or 1)'.format(name))
+    return value
 
 
 def get_distance(request_args):

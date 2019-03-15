@@ -62,6 +62,7 @@ class HiddenMarketFetcher(Fetcher):
         naf_codes=None,
         aggregate_by=None,
         departments=None,
+        flag_pmsmp=None,
     ):
         self.location = search_location
 
@@ -97,6 +98,7 @@ class HiddenMarketFetcher(Fetcher):
         self.alternative_distances = collections.OrderedDict()
         self.office_count = None
         self.departments = departments
+        self.flag_pmsmp = flag_pmsmp
 
 
     @property
@@ -136,6 +138,7 @@ class HiddenMarketFetcher(Fetcher):
             headcount=self.headcount,
             hiring_type=self.hiring_type,
             departments=self.departments,
+            flag_pmsmp=self.flag_pmsmp,
             aggregate_by=None,
             sort=self.sort,
         )
@@ -155,6 +158,7 @@ class HiddenMarketFetcher(Fetcher):
             headcount=self.headcount,
             hiring_type=self.hiring_type,
             departments=self.departments,
+            flag_pmsmp=self.flag_pmsmp,
         )
         return aggregations['naf']
 
@@ -173,6 +177,7 @@ class HiddenMarketFetcher(Fetcher):
             headcount=settings.HEADCOUNT_WHATEVER, # No headcount filter
             hiring_type=self.hiring_type,
             departments=self.departments,
+            flag_pmsmp=self.flag_pmsmp,
         )
         return aggregations['headcount']
 
@@ -195,6 +200,7 @@ class HiddenMarketFetcher(Fetcher):
             headcount=self.headcount,
             hiring_type=hiring_type_util.DPAE,
             departments=self.departments,
+            flag_pmsmp=self.flag_pmsmp,
         )
 
         total_alternance = count_offices(
@@ -209,6 +215,7 @@ class HiddenMarketFetcher(Fetcher):
             headcount=self.headcount,
             hiring_type=hiring_type_util.ALTERNANCE,
             departments=self.departments,
+            flag_pmsmp=self.flag_pmsmp,
         )
 
         return {'alternance': total_alternance, 'dpae': total_dpae}
@@ -228,6 +235,7 @@ class HiddenMarketFetcher(Fetcher):
             headcount=self.headcount,
             hiring_type=self.hiring_type,
             departments=self.departments,
+            flag_pmsmp=self.flag_pmsmp,
         )
         return aggregations['distance']
 
@@ -271,6 +279,7 @@ class HiddenMarketFetcher(Fetcher):
                 sort=self.sort,
                 hiring_type=self.hiring_type,
                 departments=self.departments,
+                flag_pmsmp=self.flag_pmsmp,
                 aggregate_by=self.aggregate_by,
             )
 
@@ -424,6 +433,7 @@ def build_json_body_elastic_search(
         flag_handicap=0,
         aggregate_by=None,
         departments=None,
+        flag_pmsmp=None,
     ):
 
     hiring_type = hiring_type or hiring_type_util.DEFAULT
@@ -519,6 +529,13 @@ def build_json_body_elastic_search(
         filters.append({
             'terms': {
                 'department': departments,
+            }
+        })
+
+    if flag_pmsmp == 1:
+        filters.append({
+            "term": {
+                "flag_pmsmp": 1,
             }
         })
 
