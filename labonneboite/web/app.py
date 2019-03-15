@@ -187,6 +187,7 @@ def register_context_processors(flask_app):
             'last_data_deploy_date': Office.get_date_of_last_data_deploy(),
             'google_analytics_id': settings.GOOGLE_ANALYTICS_ID,
             'google_optimize_id': settings.GOOGLE_OPTIMIZE_ID,
+            'seo_google_analytics_id': settings.SEO_GOOGLE_ANALYTICS_ID,
             'enable_google_optimize': settings.ENABLE_GOOGLE_OPTIMIZE,
             'google_tag_manager_id': settings.GOOGLE_TAG_MANAGER_ID,
             'enable_adblock_tracking': settings.ENABLE_ADBLOCK_TRACKING,

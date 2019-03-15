@@ -135,6 +135,7 @@ FORM_EMAIL = '<set it>'
 # GA/GO snippets are only useful in production and staging,
 # we use dummy values everywhere else
 GOOGLE_ANALYTICS_ID = 'UA-00000000-0'
+SEO_GOOGLE_ANALYTICS_ID = 'UA-00000000-1'
 GOOGLE_OPTIMIZE_ID = 'GTM-AAAA00A'
 GOOGLE_TAG_MANAGER_ID = 'AAA-AAAAAAA'
 ENABLE_ADBLOCK_TRACKING = False
