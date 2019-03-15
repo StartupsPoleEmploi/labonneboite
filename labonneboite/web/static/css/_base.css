@@ -303,3 +303,23 @@ input:disabled {
     background-color: rgb(235, 235, 228);
     cursor: not-allowed;
 }
+
+::placeholder {
+    color:rgb(80,80,80);
+}
+
+
+/* Escape links
+--------------------------------------------------------------------------- */
+a.escape-link {
+   display: inline-block;
+   color: #555;
+   background: #fff;
+   padding: .5em;
+   position: absolute;
+   left: -99999px;
+   z-index: 100;
+}
+a.escape-link:focus {
+   left: 0;
+}

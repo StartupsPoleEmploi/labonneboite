@@ -11,7 +11,7 @@
       $.deactivateAllDropdowns();
     });
 
-    $('.lbb-dropdown-wrapper > a').toggleDropdown();
+    $('.lbb-dropdown-wrapper > .lbb-header-btn').toggleDropdown();
 
   });
 
@@ -34,6 +34,7 @@
       $.deactivateAllDropdowns();
       // Activate the current dropdown.
       $wrapper.addClass('active');
+      $('.lbb-dropdown-wrapper > .lbb-header-btn').attr('aria-expanded', 'true');
       $dropdown.css('display', 'block');
 
     });
@@ -42,6 +43,7 @@
 
   jQuery.deactivateAllDropdowns = function () {
     $('.lbb-dropdown-wrapper').removeClass('active');
+    $('.lbb-dropdown-wrapper > .lbb-header-btn').attr('aria-expanded', 'false');
     $('.lbb-dropdown').css('display', 'none');
   };
 

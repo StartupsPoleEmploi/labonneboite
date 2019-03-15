@@ -1,23 +1,23 @@
 {% if not user.is_authenticated %}
 <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
-  <a href="#" class="lbb-header-btn">
+  <button class="lbb-header-btn" aria-expanded="false" aria-controls="menu-content">
     <img src="{{ url_for('static', filename='images/user.svg') }}" alt="">
     <span>Connexion</span>
-  </a>
-  <div class="lbb-dropdown lbb-dropdown-right text-right">
+  </button>
+  <div id="menu-content" class="lbb-dropdown lbb-dropdown-right text-right">
     <p>
-    <a class="logo-pe-connect rgpd-consent-required" href="{{ login_url(next_url=next_url) }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Pôle emploi Connect"></a><br>
+    <a class="logo-pe-connect rgpd-consent-required" href="{{ login_url(next_url=next_url) }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Se connecter avec Pôle emploi"></a><br>
       <i>Connectez-vous à La Bonne Boite en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
     </p>
   </div>
 </div>
 {% else %}
 <div class="lbb-dropdown-wrapper lbb-header-btn-wrapper">
-  <a href="#" class="lbb-header-btn">
+  <button class="lbb-header-btn" aria-expanded="false" aria-controls="menu-content">
     <img src="{{ url_for('static', filename='images/user-color.svg') }}" alt="">
-    <span>Mon compte</span>
-  </a>
-  <div class="lbb-dropdown lbb-dropdown-right text-right">
+    <span>Menu</span>
+  </button>
+  <div id="menu-content" class="lbb-dropdown lbb-dropdown-right text-right" role="navigation">
     <p>
       <b>{{ user.first_name | title }} {{ user.last_name }}</b>
     </p>
@@ -37,7 +37,7 @@
     <hr>
     {% if pro_version_enabled %}
       <p>
-        <small class="badge badge-info">Version PRO</small>
+        <span class="badge badge-info small">Version PRO</small>
       </p>
       <ul>
         <li>
