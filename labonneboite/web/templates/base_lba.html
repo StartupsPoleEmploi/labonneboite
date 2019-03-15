@@ -11,7 +11,9 @@
 </head>
 
 <body>
-  <header class="lbb-header-wrapper">
+  <a class="escape-link" href="#main-anchor">Passer directement au contenu principal</a>
+
+  <header role="banner" class="lbb-header-wrapper">
     <a href="{{ url_for('root.home') }}" title="Aller sur la Bonne Boite - Ouverture dans une nouvelle fenêtre" target="_blank">
       <img class="logo-lbb" src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite" width="74">
     </a>
@@ -32,7 +34,10 @@
     {% endif %}
   {% endwith %}
 
-  <div id="content">{% block content %}{% endblock %}</div>
+  <main role="main" id="content">
+    <a id="contenu" tabindex="-1"></a>
+    {% block content %}{% endblock %}
+  </main>
 
   {% assets "js_all" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
   {% assets "recruiter_form" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}

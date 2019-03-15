@@ -2,19 +2,19 @@
 
   <h3>
     <span>{{ company.name }}</span>
-    - <small>{{ company.city }}</small>
+    - <span class="small">{{ company.city }}</span>
     {% if pro_version_enabled %}
       {% if company.flag_junior %}
-        - <small class="badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute une proportion élevée de juniors (moins de 26 ans) - indicateur exclusif version PRO">
-        Junior</small>
+        - <span class="small badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute une proportion élevée de juniors (moins de 26 ans) - indicateur exclusif version PRO">
+        Junior</span>
       {% endif %}
       {% if company.flag_senior %}
-        - <small class="badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute une proportion élevée de seniors (plus de 50 ans) - indicateur exclusif version PRO">
-        Senior</small>
+        - <span class="small badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute une proportion élevée de seniors (plus de 50 ans) - indicateur exclusif version PRO">
+        Senior</span>
       {% endif %}
       {% if company.flag_handicap %}
-        - <small class="badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute des BOE (Bénéficiaire de l'Obligation d'Emploi) - indicateur exclusif version PRO">
-        BOE</small>
+        - <span class="small badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute des BOE (Bénéficiaire de l'Obligation d'Emploi) - indicateur exclusif version PRO">
+        BOE</span>
       {% endif %}
     {% endif %}
   </h3>

@@ -25,9 +25,13 @@
     margin-top: 0;  /* Cancel default spacing across block-level elements inside. */
 }
 
-.rgpd-banner a:link,
-.rgpd-banner a:visited,
-.rgpd-banner a:active,
-.rgpd-banner a:hover {
+.rgpd-banner button {
+    font-size: 1em;
+    text-decoration: underline;
+    border: none;
+    background-color: transparent;
     color: #fff;
+}
+.rgpd-banner button:hover {
+    cursor: pointer;
 }

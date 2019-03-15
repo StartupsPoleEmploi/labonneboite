@@ -73,6 +73,12 @@
     margin: 0 !important;
 }
 
+.small { font-size: 0.85em; }
+
+/* Lock the scroll position by adding this class to the `<html>` element. */
+.lock-scroll { overflow: hidden !important; }
+
+
 /* A container with a bright background used to wrap content when a dark color is used for the main background. */
 .lbb-bright-container {
     background: #fff;
