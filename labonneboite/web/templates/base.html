@@ -41,6 +41,7 @@
   {% block extrahead %}{% endblock %}
   {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
 
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ seo_google_analytics_id }}"></script>
 </head>
 
 <body>
@@ -283,24 +284,6 @@
   </script>
 
   {# Google Analytics (GA) Tracking Code #}
-    {# GA for SEO #}
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <!-- https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers#working_with_multiple_trackers -->
-    <!-- https://developers.google.com/analytics/devguides/collection/gtagjs/pages -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ seo_google_analytics_id }}"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      ga('create', '{{ seo_google_analytics_id }}', 'auto', { cookieExpires: 31536000, name: 'gaSEO' });
-      gtag('js', new Date());
-      // anonymize IP address in GA if RGPD consent is rejected
-      if (userHasOptOutRGPD() === true) {
-        // https://developers.google.com/analytics/devguides/collection/analyticsjs/ip-anonymization
-        ga('set', 'anonymizeIp', true);
-      }
-      ga('gaSEO.send', 'pageview');
-    </script>
-
   {# for best performance should ideally be inside HEAD and after GO snippet #}
   {# if not in HEAD section and if GO enabled, users (whether or not using Adblock) will experience #}
   {# an additional blank page time - which ends only when GA snippet is loaded #}
@@ -325,7 +308,15 @@
     ga('set', 'dimension1', {{ 1 if pro_version_enabled else 0 }});
     ga('set', 'dimension2', {{ 1 if user.is_authenticated else 0 }});
     ga('set', 'dimension6', Cookies.get('idutkes')? 1 : 0);
+  </script>
 
+  {# GA for SEO #}
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <!-- https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers#working_with_multiple_trackers -->
+  <!-- https://developers.google.com/analytics/devguides/collection/gtagjs/pages -->
+  <script>
+    ga('create', '{{ seo_google_analytics_id }}', 'auto', { cookieExpires: 31536000, name: 'gaSEO' });
+    ga('gaSEO.send', 'pageview');
   </script>
 
 
