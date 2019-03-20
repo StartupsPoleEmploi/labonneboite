@@ -140,7 +140,7 @@ def change_info():
 def ask_action():
     return render_template('contact_form/ask_action.html',
         title='Que voulez-vous faire ?',
-        params=urlencode(request.args),
+        params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
     )
 
@@ -203,13 +203,15 @@ def update_coordinates_form(form):
                     site_name=redirect_params.get('site_name'),
                     email=redirect_params.get('email'),
                     home_url=redirect_params.get('home_url'),
+                    suggest_update_jobs=True,
+                    params=extract_recruiter_data(),
                     action_form_url=url_for('contact_form.ask_action', **request.args),
                 )
 
     return render_template('contact_form/form.html',
         title='Modifier ma fiche entreprise',
         form=form,
-        params=urlencode(request.args),
+        params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
         show_entreprise_page=True,
         show_coordinates_disclaimer=True,
@@ -260,6 +262,8 @@ def update_jobs_form(form):
                 email=redirect_params.get('email'),
                 home_url=redirect_params.get('home_url'),
                 rome_fields=rome_fields,
+                suggest_update_coordinates=True,
+                params=extract_recruiter_data(),
                 action_form_url=url_for('contact_form.ask_action', **request.args),
             )
 
@@ -267,7 +271,7 @@ def update_jobs_form(form):
     return render_template('contact_form/change_job_infos.html',
         title='Demande de modification des métiers',
         form=form,
-        params=urlencode(request.args),
+        params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
         manually_added_jobs=extract_manually_added_jobs(office),
         rome_fields=rome_fields,
@@ -305,7 +309,7 @@ def delete_form(form):
     return render_template('contact_form/form.html',
         title='Supprimer mon entreprise',
         form=form,
-        params=urlencode(request.args),
+        params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
     )
 
@@ -342,7 +346,7 @@ def other_form(form):
         'contact_form/form.html',
         form=form,
         title='Autre demande',
-        params=urlencode(request.args),
+        params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
         show_required_disclaimer=True,
     )
@@ -412,3 +416,18 @@ def unknown_siret_message():
         Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>
     """.format(email, email)
     return Markup(msg)
+
+
+
+def extract_recruiter_data():
+    """
+    We extract, from the URL, the data given in the first step of the contact process
+    """
+
+    keys = ['siret', 'last_name', 'first_name', 'phone', 'email']
+
+    params = {
+        k: request.args[k] for k in keys if k in request.args
+    }
+
+    return urlencode(params)

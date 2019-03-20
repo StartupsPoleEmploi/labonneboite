@@ -13,12 +13,38 @@
 
         <p>
             Votre demande a bien été envoyée. Notre équipe revient vers vous par mail et/ou téléphone d'ici quelques jours afin
-            de vous confirmer la prise en compte des modifications. Nous restons à votre écoute sur <a href="mailto:{{ email }}">{{ email }}</a>.
+            de vous confirmer la prise en compte des modifications.
+
+            {% if suggest_update_jobs %}
+                Nous vous invitons à  confirmer les métiers pour lesquels vous souhaitez recevoir  des candidatures spontanées en cliquant sur le bouton ci-dessous.
+            {% elif suggest_update_coordinates %}
+                Nous vous invitons à  confirmer vos données de contact visibles par les candidats en cliquant sur le bouton ci-dessous.
+            {% else %}{% endif %}
+
+            Nous restons à votre écoute sur <a href="mailto:{{ email }}">{{ email }}</a>.
         </p>
+
 
         <ul class='actions'>
             <li><a href="{{ home_url }}" title="Retour à la page d'accueil du site">Retour à la {{ site_name }}</a></li>
-            <li><a class="btn btn-small" href="{{ action_form_url }}">Effectuer de nouvelles modifications</a></li>
+
+
+            {% if suggest_update_jobs %}
+                <li>
+                    <a class="btn btn-small" href="{{ url_for('contact_form.update_jobs_form') }}?{{ params }}">
+                        Mettre à jour les métiers pour lesquels je reçois des candidatures spontanées
+                    </a>
+                </li>
+            {% elif suggest_update_coordinates %}
+                <li>
+                    <a class="btn btn-small" href="{{ url_for('contact_form.update_coordinates_form') }}?{{ params }}">
+                        Mettre à jour les coordonnées de mon entreprise
+                    </a>
+                </li>
+            {% else %}
+                <li><a class="btn btn-small" href="{{ action_form_url }}">Effectuer de nouvelles modifications</a></li>
+            {% endif %}
+
         </ul>
     </div>
 </div>
