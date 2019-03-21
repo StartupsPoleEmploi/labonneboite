@@ -1007,6 +1007,85 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertFalse(sirets['00000000000015']['alternance'])
             self.assertTrue(sirets['00000000000016']['alternance'])
 
+    def test_flag_pmsmp_filter_incorrect_value(self):
+        with self.test_request_context:
+            # Invalid flag_pmsmp filter => Expected error message
+            with mock.patch.object(settings, 'API_INTERNAL_CONSUMERS', ['labonneboite']):
+                params = self.add_security_params({
+                    'commune_id': self.positions['paris']['commune_id'],
+                    'rome_codes': 'N1202',
+                    'user': 'labonneboite',
+                    'flag_pmsmp': '18',
+                })
+                rv = self.app.get(self.url_for("api.company_list", **params))
+                self.assertEqual(rv.status_code, 400)
+                self.assertIn(
+                    'Invalid request argument: flag_pmsmp must be boolean (0 or 1)',
+                    rv.data.decode(),
+                )
+
+    def test_flag_pmsmp_filter_get_all_companies(self):
+        with self.test_request_context:
+            # flag_pmsmp=0 (all companies) => Expected 2 results
+            with mock.patch.object(settings, 'API_INTERNAL_CONSUMERS', ['labonneboite']):
+                params = self.add_security_params({
+                    'commune_id': self.positions['paris']['commune_id'],
+                    'rome_codes': 'N1202',
+                    'user': 'labonneboite',
+                    'flag_pmsmp': '0',
+                })
+                rv = self.app.get(self.url_for("api.company_list", **params))
+                self.assertEqual(rv.status_code, 200)
+                data = json.loads(rv.data.decode())
+                self.assertEqual(data['companies_count'], 2)
+                sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
+                self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
+
+    def test_flag_pmsmp_filter_silently_ignored_if_user_is_not_authorized(self):
+        with self.test_request_context:
+            # Unauthorized api user => flag_pmsmp=1 silently ignored, still getting 2 results
+            params = self.add_security_params({
+                'commune_id': self.positions['paris']['commune_id'],
+                'rome_codes': 'N1202',
+                'user': 'labonneboite',
+                'flag_pmsmp': '1',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data.decode())
+            self.assertEqual(data['companies_count'], 2)
+            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
+            self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
+
+    def test_flag_pmsmp_filter_normal_behavior(self):
+        with self.test_request_context:
+            # no flag_pmsmp filter => Expected 2 results
+            params = self.add_security_params({
+                'commune_id': self.positions['paris']['commune_id'],
+                'rome_codes': 'N1202',
+                'user': 'labonneboite'
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data.decode())
+            self.assertEqual(data['companies_count'], 2)
+            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
+            self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
+
+            # flag_pmsmp=1 (only pmsmp companies) => Expected 1 result
+            with mock.patch.object(settings, 'API_INTERNAL_CONSUMERS', ['labonneboite']):
+                params = self.add_security_params({
+                    'commune_id': self.positions['paris']['commune_id'],
+                    'rome_codes': 'N1202',
+                    'user': 'labonneboite',
+                    'flag_pmsmp': '1',
+                })
+                rv = self.app.get(self.url_for("api.company_list", **params))
+                self.assertEqual(rv.status_code, 200)
+                data = json.loads(rv.data.decode())
+                self.assertEqual(data['companies_count'], 1)
+                self.assertEqual(data['companies'][0]['siret'], '00000000000017')
+
     def test_department_filters(self):
         with self.test_request_context:
             # Invalid departments filter => Expected error message

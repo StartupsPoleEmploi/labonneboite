@@ -265,6 +265,7 @@ def get_office_as_es_doc(office):
         'flag_junior': int(office.flag_junior),
         'flag_senior': int(office.flag_senior),
         'flag_handicap': int(office.flag_handicap),
+        'flag_pmsmp': int(office.flag_pmsmp),
     }
 
     if office.y and office.x:
