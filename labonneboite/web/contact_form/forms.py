@@ -99,6 +99,10 @@ class OfficeUpdateCoordinatesForm(OfficeHiddenIdentificationForm):
         validators=[validators.optional(), Regexp(PHONE_REGEX)],
         render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"}
     )
+    rgpd_consent = BooleanField(
+        'En cochant cette case, vous consentez à diffuser des données à caractère personnel sur les services numériques de Pôle emploi.',
+        [validators.required()]
+    )
 
 
 class OfficeRemoveForm(OfficeHiddenIdentificationForm):
