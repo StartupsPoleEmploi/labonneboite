@@ -40,7 +40,7 @@ The whole mecanism is based on Flask sessions:
 
 PEAM stands for *Pôle Emploi Access Management*. See the [documentation](https://www-r.es-qvr-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/utiliser-les-api/authorization-code-flow.html).
 
-One image of our project is used by the PEAM website: `logo-lbb-square.png`.
+One image of our project is used by the PEAM website: `logo-lbb-square.jpg`.
 
 PEAM is built on top of the [OAuth2](https://oauth.net/2/) and [OpenIdConnect](http://openid.net/connect/) protocols:
 

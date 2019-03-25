@@ -1,7 +1,6 @@
 /* Header */
 .lbb-header-wrapper {
     text-align: center;
-    height: 100px;
 }
 
 .lbb-header-wrapper a {
@@ -15,8 +14,16 @@
 }
 
 .lbb-header-wrapper a img.logo-lbb {
-    padding-top: 20px;
+    padding-top: 10px;
+    width: 160px;
     margin-right: 20px;
+    padding-bottom: 10px;
+}
+.lbb-header-wrapper a img.logo-lba {
+    height: 100px;
+    width: 175px;
+    padding: 15px 0;
+    margin-left: 40px;
 }
 
 /* Alert */
