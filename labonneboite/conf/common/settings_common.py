@@ -137,10 +137,8 @@ FORM_EMAIL = '<set it>'
 # we use dummy values everywhere else
 GOOGLE_ANALYTICS_ID = 'UA-00000000-0'
 SEO_GOOGLE_ANALYTICS_ID = 'UA-00000000-1'
-GOOGLE_OPTIMIZE_ID = 'GTM-AAAA00A'
-GOOGLE_TAG_MANAGER_ID = 'AAA-AAAAAAA'
-ENABLE_ADBLOCK_TRACKING = False
 ENABLE_GOOGLE_OPTIMIZE = False
+GOOGLE_OPTIMIZE_ID = 'GTM-AAAA00A'
 
 MEMO_JS_URL = 'https://memo.pole-emploi.fr/js/importButton/memoButtonLBB-min.js'
 API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
