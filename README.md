@@ -75,20 +75,20 @@ Create an [isolated Python environment](https://virtualenv.pypa.io/), for exampl
 
 You will also need to install docker and docker-compose. Follow the instructions related to your particular OS from the [official Docker documentation](https://docs.docker.com/install/).
 
-### Build Python 3.4.3 from source
+### Build Python 3.6.8 from source
 
-For now, La Bonne Boite runs in production under Python 3.4.3. You might now have this specific version on your own computer, so you are going to have to create a virtualenv that runs this specific version of Python. Here is the procedure to build python 3.4.3 from source.
+For now, La Bonne Boite runs in production under Python 3.6.8. You might now have this specific version on your own computer, so you are going to have to create a virtualenv that runs this specific version of Python. Here is the procedure to build python 3.6.8 from source.
 
 Install system requirements for building python from source with all features:
 
     # On ubuntu
     sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
 
-Download Python 3.4.3 and decompress the archive:
+Download Python 3.6.8 and decompress the archive:
 
-    wget https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz
-    tar xzf Python-3.4.3.tgz
-    cd Python-3.4.3/
+    wget https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
+    tar xzf Python-3.6.8.tgz
+    cd Python-3.6.8/
 
 Configure, build and install in local folder:
 
@@ -98,42 +98,18 @@ Configure, build and install in local folder:
 
 Create a virtualenv using this specific version of Python:
 
-    mkvirtualenv --python=./build/bin/python3.4 lbb
+    mkvirtualenv --python=./build/bin/python3.6 lbb
 
 And you are good to go!
-
-#### Note for Ubuntu 18.04
-
-The procedure above does not work under Ubuntu 18.04 or Debian 9. This is because these releases rely on libssl-1.1 while libssl-1.0 is required for python 3.4. If you don't have the right version of libssl, `make install` will end with an error message "Ignoring ensurepip failure: pip 6.0.8 requires SSL/TLS". You will then not be able to install packages with pip  More information:
-
-* pyenv issue: https://github.com/pyenv/pyenv/issues/945
-* python bug: https://bugs.python.org/issue26470
-
-Building openssl 1.0.0:
-
-    wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz
-    tar xzf openssl-1.0.2o.tar.gz
-    cd openssl-1.0.2o/
-    ./config shared -fPIC --prefix=$(pwd)/build --openssldir=$(pwd)/build/openssl
-    make
-    make install
-
-And then to build Python 3.4.3 using this local version of Openssl, replace the python build steps above by:
-
-    CFLAGS="-I/path/to/openssl-1.0.2o/build/include" LDFLAGS="-L/path/to/openssl-1.0.2o/build/lib" ./configure --prefix=$(pwd)/build
-    make
-    make install
-
-(you may have to run `make clean` before to clean artifacts from previous builds)
 
 ### Install python requirements:
 
 Our requirements are managed with [`pip-tools`](https://github.com/jazzband/pip-tools):
-
+    pip install --upgrade pip
     pip install pip-tools
     make compile-requirements
 
-To update your virtualenv, you can then run:
+To update your virtualenv, you must then run:
 
     pip-sync
     python setup.py develop
@@ -154,6 +130,11 @@ latest version.
 ### Start required services (MySQL and Elasticsearch)
 
     $ make services
+
+#### Known issues
+
+You may have to run `sudo usermod -a -G docker $USER`, then reboot your computer to enable the current user to use docker, as the problem is described [here](https://techoverflow.net/2017/03/01/solving-docker-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket/)
+
 
 ### Create databases and import data
 
