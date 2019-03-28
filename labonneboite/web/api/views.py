@@ -64,7 +64,7 @@ def add_cors_headers(function):
         user = request.args.get('user', None)
         if user in settings.CORS_ALLOWED_USERS and hasattr(response, 'headers'):
             response.headers.add("Access-Control-Allow-Origin", "*")
-            response.headers.add("Access-Control-Allow-Methods", "GET, OPTIONS")
+            response.headers.add("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
             response.headers.add("Access-Control-Max-Age", "1000")
             response.headers.add("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
 
