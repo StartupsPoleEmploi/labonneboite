@@ -4,6 +4,7 @@ Flask-Script
 
 # Flask assets.
 Flask-Assets
+Flask-cors
 cssmin
 jsmin
 

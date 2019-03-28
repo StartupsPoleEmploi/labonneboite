@@ -19,6 +19,7 @@ from labonneboite.common.fetcher import InvalidFetcherArgument
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
+from flask.ext.cors import cross_origin
 
 
 apiBlueprint = Blueprint('api', __name__)
@@ -51,27 +52,6 @@ def api_auth_required(function):
         return function(*args, **kwargs)
 
     return decorated
-
-
-def add_cors_headers(function):
-    """
-    A decorator adding CORS headers when needed
-    """
-    @wraps(function)
-    def decorated(*args, **kwargs):
-        response = function(*args, **kwargs)
-
-        user = request.args.get('user', None)
-        if user in settings.CORS_ALLOWED_USERS and hasattr(response, 'headers'):
-            response.headers.add("Access-Control-Allow-Origin", "*")
-            response.headers.add("Access-Control-Allow-Methods", "GET, OPTIONS, POST")
-            response.headers.add("Access-Control-Max-Age", "1000")
-            response.headers.add("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
-
-        return response
-
-    return decorated
-
 
 
 def get_ga_query_string():
@@ -116,7 +96,7 @@ def offers_offices_list():
 
 @apiBlueprint.route('/company/')
 @api_auth_required
-@add_cors_headers
+@cross_origin()
 def company_list():
 
     try:
