@@ -53,6 +53,25 @@ def api_auth_required(function):
     return decorated
 
 
+def add_cors_headers(function):
+    """
+    A decorator adding CORS headers when needed
+    """
+    @wraps(function)
+    def decorated(*args, **kwargs):
+        response = function(*args, **kwargs)
+
+        user = request.args.get('user', None)
+        if user in settings.CORS_ALLOWED_USERS:
+            response.headers.add("Access-Control-Allow-Origin", "*")
+            response.headers.add('Access-Control-Allow-Headers', "*")
+            response.headers.add('Access-Control-Allow-Methods', "*")
+        return response
+
+    return decorated
+
+
+
 def get_ga_query_string():
     """
     Define additional Google Analytics query string to add to office urls and global url
@@ -95,6 +114,7 @@ def offers_offices_list():
 
 @apiBlueprint.route('/company/')
 @api_auth_required
+@add_cors_headers
 def company_list():
 
     try:
