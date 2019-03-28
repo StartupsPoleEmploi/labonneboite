@@ -62,7 +62,7 @@ def add_cors_headers(function):
         response = function(*args, **kwargs)
 
         user = request.args.get('user', None)
-        if user in settings.CORS_ALLOWED_USERS:
+        if user in settings.CORS_ALLOWED_USERS and request.is_xhr:
             response.headers.add("Access-Control-Allow-Origin", "*")
             response.headers.add('Access-Control-Allow-Headers', "*")
             response.headers.add('Access-Control-Allow-Methods', "*")
