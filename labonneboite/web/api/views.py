@@ -62,10 +62,12 @@ def add_cors_headers(function):
         response = function(*args, **kwargs)
 
         user = request.args.get('user', None)
-        if user in settings.CORS_ALLOWED_USERS and request.is_xhr:
+        if user in settings.CORS_ALLOWED_USERS and hasattr(response, 'headers'):
             response.headers.add("Access-Control-Allow-Origin", "*")
-            response.headers.add('Access-Control-Allow-Headers', "*")
-            response.headers.add('Access-Control-Allow-Methods', "*")
+            response.headers.add("Access-Control-Allow-Methods", "GET, OPTIONS")
+            response.headers.add("Access-Control-Max-Age", "1000")
+            response.headers.add("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
+
         return response
 
     return decorated
@@ -122,6 +124,7 @@ def company_list():
         fetcher = create_hidden_market_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
         return response_400(e)
+
 
     offices, _ = fetcher.get_offices(add_suggestions=False)
 
