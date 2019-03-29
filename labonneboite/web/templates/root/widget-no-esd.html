@@ -1,0 +1,11 @@
+{% block title %}Widget{% endblock %}
+
+{% block content %}
+<main class="lbb-content">
+    <labonnealternance-widget
+        style="width: 600px; border: solid 1px lightgray; display: block; min-height: 30px; margin: 30px auto 0 auto"
+        data-widget-name="test-lbb"
+    ></labonnealternance-widget>
+    <script src="https://labonnealternance.pole-emploi.fr/widget-lba.js" async></script>
+</main>
+{% endblock %}
