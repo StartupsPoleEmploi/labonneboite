@@ -1,4 +1,6 @@
 # coding: utf8
+import requests
+
 
 from flask import Blueprint, current_app
 from flask import abort, send_from_directory, redirect, render_template, request
@@ -77,3 +79,28 @@ def cookbook():
 @rootBlueprint.route('/stats')
 def stats():
     return redirect('https://datastudio.google.com/open/0B0PPPCjOppNIdVNXVVM0QnJHNEE')
+
+
+@rootBlueprint.route('/widget-esd')
+def widget():
+    ACCESS_TOKEN_URL = "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Fpartenaire"
+
+    data = {
+        'grant_type': 'client_credentials',
+        'client_id': settings.PEAM_CLIENT_ID,
+        'client_secret': settings.PEAM_CLIENT_SECRET,
+        'scope': 'application_{} api_labonneboitev1'.format(settings.PEAM_CLIENT_ID)
+    }
+
+    try:
+        resp = requests.post(ACCESS_TOKEN_URL, data=data, headers={'Content-Type':'application/x-www-form-urlencoded'}, verify=False)
+        response = resp.json()
+        return render_template('root/widget-esd.html', access_token=response['access_token'])
+    except Exception as e:
+        print(e)
+        abort(418)
+
+
+@rootBlueprint.route('/widget-no-esd')
+def widget_no_esd():
+    return render_template('root/widget-no-esd.html')
