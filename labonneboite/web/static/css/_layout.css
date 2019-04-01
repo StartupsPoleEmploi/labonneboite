@@ -50,6 +50,10 @@ This is a wrapper because it can't have a fixed width in order to apply a full c
     </div>
   </div>
 */
+#content {
+    margin: 0;
+}
+
 .lbb-content-purple-wrapper {
     background: #7c408b;
     margin: 0;
@@ -95,16 +99,18 @@ ul.lbb-header {
     width: 74px;
     text-align: center;
 }
-@media (max-width: 500px) { 
+@media (max-width: 500px) {
     .lbb-header > li.lbb-header-entry {
         width: 60px;
         padding: 0;
     }
 }
 
-.lbb-header-logo-lbb,
+.lbb-header-logo-lbb {
+    width: 160px;
+}
 .lbb-header-logo-pole-emploi {
-    width: 74px;  /* This width will give a height of ~ 70px for each logos since they have the same proportions. */
+    width: 74px;
 }
 
 /* User buttons. */
