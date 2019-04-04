@@ -86,7 +86,7 @@
 
     {% if jepostule_globally_enabled %}
       {% if jepostule_enabled(user, company) %}
-        <a class="jepostule-button btn btn-small" href="{{ url_for('jepostule.application', siret=company.siret) }}" target="_blank" rel="noopener">Postuler</a>
+        <a class="jepostule-button btn btn-small" href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}" target="_blank" rel="noopener">Postuler</a>
       {% endif %}
 
       {% if not user.is_authenticated and company.email %}
