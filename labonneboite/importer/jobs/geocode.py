@@ -91,7 +91,7 @@ class GeocodeJob(Job):
             try:
                 full_address = self.get_full_adress(street_number, street_name, zipcode, city)
                 initial_coordinates = [coordinates_x, coordinates_y]
-                geocoding_jobs.append([siret, full_address, initial_coordinates])
+                geocoding_jobs.append([siret, full_address, initial_coordinates, codecommune])
             except IncorrectAdressDataException:
                 logger.warning("incorrect address for %s %s %s %s", street_number, street_name, zipcode, city)
             count += 1
@@ -157,8 +157,8 @@ class GeocodeJob(Job):
         ban_jobs = []
         coordinates_updates = []
         count = 0
-        for siret, full_address, initial_coordinates in geocoding_jobs:
-            unit = GeocodeUnit(siret, full_address, coordinates_updates, initial_coordinates)
+        for siret, full_address, initial_coordinates, city_code in geocoding_jobs:
+            unit = GeocodeUnit(siret, full_address, coordinates_updates, initial_coordinates, city_code)
             job_id = pool.spawn(unit.find_coordinates_for_address)
             ban_jobs.append(job_id)
             count += 1
@@ -193,11 +193,12 @@ class GeocodeJob(Job):
 
 class GeocodeUnit(object):
 
-    def __init__(self, siret, address, updates, initial_coordinates):
+    def __init__(self, siret, address, updates, initial_coordinates, city_code):
         self.siret = siret
         self.full_address = address
         self.updates = updates
         self.initial_coordinates = initial_coordinates
+        self.city_code = city_code
 
     def find_coordinates_for_address(self):
         """
@@ -208,7 +209,8 @@ class GeocodeUnit(object):
         # FIXME refer to settings.API_ADRESS_BASE_URL and make sure we don't
         # make real requests in unit tests
         BASE = "http://api-adresse.data.gouv.fr/search/?q="
-        geocoding_request = "%s%s" % (BASE, self.full_address)
+        # Documentation API adresse data gouv : https://adresse.data.gouv.fr/api
+        geocoding_request = "%s%s&citycode=%s" % (BASE, self.full_address, self.city_code)
         geolocation = Geolocation.get(self.full_address)
 
         if geolocation:

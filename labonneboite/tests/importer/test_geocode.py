@@ -28,7 +28,9 @@ class TestGeocode(DatabaseTest):
         address = "1 rue Marca 64000 Pau"
         updates = []
         initial_coordinates = [0, 0]
-        unit = GeocodeUnit(siret, address, updates, initial_coordinates)
+        city_code = '64445'
+
+        unit = GeocodeUnit(siret, address, updates, initial_coordinates,city_code)
         unit.find_coordinates_for_address()
         self.assertTrue(len(updates), 1)
         coordinates = updates[0][1]
@@ -38,7 +40,7 @@ class TestGeocode(DatabaseTest):
     def test_run_geocoding_jobs(self):
         task = GeocodeJob()
         initial_coordinates = [0, 0]
-        jobs = [[1234, "1 rue Marca 64000 Pau", initial_coordinates]]
+        jobs = [[1234, "1 rue Marca 64000 Pau", initial_coordinates,'64445']]
         updates = task.run_geocoding_jobs(jobs)
         self.assertTrue(len(updates), 1)
         coordinates = updates[0][1]
