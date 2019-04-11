@@ -12,10 +12,10 @@
 
     <h2>Que voulez-vous faire ?</h2>
 
-    <a class="btn btn-small" href="{{ url_for('contact_form.update_coordinates_form') }}?{{ params }}">Modifier les coordonnées de mon entreprise</a>
-    <a class="btn btn-small" href="{{ url_for('contact_form.update_jobs_form') }}?{{ params }}">Modifier les métiers pour lesquels je reçois des candidatures spontanées</a>
-    <a class="btn btn-small" href="{{ url_for('contact_form.delete_form') }}?{{ params }}">Supprimer mon entreprise</a>
-    <a class="btn btn-small" href="{{ url_for('contact_form.other_form') }}?{{ params }}">Autre demande</a>
+    <a class="btn btn-small" href="{{ url_for('contact_form.ask_recruiter_pe_connect', siret=siret, action_name='update_coordinates') }}">Modifier les coordonnées de mon entreprise</a>
+    <a class="btn btn-small" href="{{ url_for('contact_form.ask_recruiter_pe_connect', siret=siret, action_name='update_jobs') }}">Modifier les métiers pour lesquels je reçois des candidatures spontanées</a>
+    <a class="btn btn-small" href="{{ url_for('contact_form.ask_recruiter_pe_connect', siret=siret, action_name='delete') }}">Supprimer mon entreprise</a>
+    <a class="btn btn-small" href="{{ url_for('contact_form.ask_recruiter_pe_connect', siret=siret, action_name='other') }}">Autre demande</a>
 
   </div>
 </div>

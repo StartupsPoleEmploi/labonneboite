@@ -111,7 +111,7 @@
           <a href="#" class="rgpd-info" title="Politique de confidentialité et utilisation de vos données personnelles (R.G.P.D)">R.G.P.D</a>
         </li>
         <li class="text-bold">
-          <a href="{{ url_for('contact_form.ask_recruiter_pe_connect') }}" title="Accès recruteurs pour modification de vos données entreprises">Accès recruteurs</a>
+          <a href="{{ url_for('contact_form.ask_action') }}" title="Accès recruteurs pour modification de vos données entreprises">Accès recruteurs</a>
         </li>
         <li>
           <span class="js-obfuscated-email">rf.iolpme-elop@etiobennobal</span>
@@ -268,7 +268,11 @@
       ga('set', 'anonymizeIp', true);
     }
 
-    ga('send', 'pageview');
+    {% if custom_ga_pageview %}
+      ga('send', 'pageview', '{{ custom_ga_pageview }}');
+    {% else %}
+      ga('send', 'pageview');
+    {% endif %}
 
     ga('set', 'dimension1', {{ 1 if pro_version_enabled else 0 }});
     ga('set', 'dimension2', {{ 1 if user.is_authenticated else 0 }});
