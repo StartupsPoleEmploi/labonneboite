@@ -28,7 +28,13 @@ ERROR_CONTACT_MODE_MESSAGE = 'Vous avez indiqué vouloir être contacté \'{}\' 
 # Get form value from office.contact_mode text
 CONTACT_MODES_LABEL_TO_FORM_VALUE = {v:k for k, v in CONTACT_MODES.items()}
 
-
+ACTION_NAMES = [
+    'update_coordinates',
+    'update_jobs',
+    'delete',
+    'other',
+]
+ 
 @contactFormBlueprint.route('/verification-informations-entreprise', methods=['GET'])
 @contactFormBlueprint.route('/verification-informations-entreprise/<siret>', methods=['GET'])
 def change_info_or_apply_for_job(siret=None):
@@ -37,17 +43,31 @@ def change_info_or_apply_for_job(siret=None):
     in order to avoid the change_info page to be spammed so much by
     people thinking they are actually applying for a job.
     """
-    return render_template('contact_form/change_info_or_apply_for_job.html', use_lba_template=is_recruiter_from_lba(), siret=siret)
+    return render_template(
+        'contact_form/change_info_or_apply_for_job.html',
+        use_lba_template=is_recruiter_from_lba(),
+        siret=siret,
+    )
 
 
 @contactFormBlueprint.route('/connexion-recruteur', methods=['GET'])
-@contactFormBlueprint.route('/connexion-recruteur/<siret>', methods=['GET'])
-def ask_recruiter_pe_connect(siret=None):
+def ask_recruiter_pe_connect():
     """
     Ask recruiters if they wants to be connected with their Pole Emploi recruiter account
     in order to validate their identity more quickly/easely
     """
-    return render_template('contact_form/ask_recruiter_pe_connect.html', use_lba_template=is_recruiter_from_lba(), siret=siret)
+    action_name = get_action_name()
+    if not action_name:
+        flash('Une erreur inattendue est survenue, veuillez sélectionner à nouveau une action', 'error')
+        return redirect(url_for('contact_form.ask_action'))
+
+    return render_template(
+        'contact_form/ask_recruiter_pe_connect.html',
+        use_lba_template=is_recruiter_from_lba(),
+        siret=request.args.get('siret', ''),
+        action_name=action_name,
+        custom_ga_pageview='/recruteur/%s/connexion' % action_name,
+    )
 
 
 @contactFormBlueprint.route('/postuler/<siret>', methods=['GET'])
@@ -56,7 +76,11 @@ def apply_for_job(siret):
     If user arrives here, it means we successfully avoided having him spam the
     company modification form. Now we just have to explain him what is wrong.
     """
-    return render_template('contact_form/apply_for_job.html', siret=siret, use_lba_template=is_recruiter_from_lba())
+    return render_template(
+        'contact_form/apply_for_job.html',
+        siret=siret,
+        use_lba_template=is_recruiter_from_lba(),
+    )
 
 def create_form(form_class):
     """
@@ -88,6 +112,13 @@ def add_identication_data(form):
     form.email.data = request.args['email']
 
 
+def get_action_name():
+    action_name = request.args.get('action_name', None)
+    if action_name not in ACTION_NAMES:
+        action_name = None
+    return action_name
+
+
 @contactFormBlueprint.route('/informations-entreprise', methods=['GET', 'POST'])
 def change_info():
     """
@@ -105,6 +136,11 @@ def change_info():
     # Apply it only if user has not typed anything else yet.
     params = request.args.copy()
 
+    action_name = get_action_name()
+    if not action_name:
+        flash('Une erreur inattendue est survenue, veuillez sélectionner à nouveau une action', 'error')
+        return redirect(url_for('contact_form.ask_action'))
+
     form.last_name.data = form.last_name.data or session.get(peam_recruiter.SessionKeys.LASTNAME.value)
     form.first_name.data = form.first_name.data or session.get(peam_recruiter.SessionKeys.FIRSTNAME.value)
     form.email.data = form.email.data or session.get(peam_recruiter.SessionKeys.EMAIL.value)
@@ -121,7 +157,8 @@ def change_info():
             params = {key: form.data[key] for key in ['siret', 'last_name', 'first_name', 'phone', 'email']}
             if is_recruiter_from_lba():
                 params.update({"origin":"labonnealternance"})
-            url = url_for('contact_form.ask_action', **params)
+            action_form_url = "contact_form.%s_form" % action_name
+            url = url_for(action_form_url, **params)
             return redirect(url)
 
     return render_template('contact_form/form.html',
@@ -134,14 +171,16 @@ def change_info():
         use_lba_template=is_recruiter_from_lba(),
         show_disclaimer=True,
         hide_return=True,
+        custom_ga_pageview='/recruteur/%s/identification' % action_name,
     )
 
-@contactFormBlueprint.route('/informations-entreprise/action', methods=['GET', 'POST'])
+@contactFormBlueprint.route('/informations-entreprise/action', methods=['GET'])
 def ask_action():
     return render_template('contact_form/ask_action.html',
         title='Que voulez-vous faire ?',
-        params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
+        siret=request.args.get('siret', ''),
+        custom_ga_pageview='/recruteur/choix-action',
     )
 
 
@@ -206,6 +245,7 @@ def update_coordinates_form(form):
                     suggest_update_jobs=True,
                     params=extract_recruiter_data(),
                     action_form_url=url_for('contact_form.ask_action', **request.args),
+                    custom_ga_pageview='/recruteur/update_coordinates/success',
                 )
 
     return render_template('contact_form/form.html',
@@ -215,6 +255,7 @@ def update_coordinates_form(form):
         use_lba_template=is_recruiter_from_lba(),
         show_entreprise_page=True,
         show_coordinates_disclaimer=True,
+        custom_ga_pageview='/recruteur/update_coordinates/update_coordinates',
     )
 
 
@@ -265,6 +306,7 @@ def update_jobs_form(form):
                 suggest_update_coordinates=True,
                 params=extract_recruiter_data(),
                 action_form_url=url_for('contact_form.ask_action', **request.args),
+                custom_ga_pageview='/recruteur/update_jobs/success',
             )
 
 
@@ -275,6 +317,7 @@ def update_jobs_form(form):
         use_lba_template=is_recruiter_from_lba(),
         manually_added_jobs=extract_manually_added_jobs(office),
         rome_fields=rome_fields,
+        custom_ga_pageview='/recruteur/update_jobs/update_jobs',
     )
 
 
@@ -303,6 +346,7 @@ def delete_form(form):
                 email=redirect_params.get('email'),
                 home_url=redirect_params.get('home_url'),
                 action_form_url=url_for('contact_form.ask_action', **request.args),
+                custom_ga_pageview='/recruteur/delete/success',
             )
 
 
@@ -311,6 +355,7 @@ def delete_form(form):
         form=form,
         params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
+        custom_ga_pageview='/recruteur/delete/delete',
     )
 
 
@@ -339,6 +384,7 @@ def other_form(form):
                 email=redirect_params.get('email'),
                 home_url=redirect_params.get('home_url'),
                 action_form_url=url_for('contact_form.ask_action', **request.args),
+                custom_ga_pageview='/recruteur/other/success',
             )
 
 
@@ -349,6 +395,7 @@ def other_form(form):
         params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
         show_required_disclaimer=True,
+        custom_ga_pageview='/recruteur/other/other',
     )
 
 
@@ -421,7 +468,7 @@ def unknown_siret_message():
 
 def extract_recruiter_data():
     """
-    We extract, from the URL, the data given in the first step of the contact process
+    We extract from the URL, the data given in the "identifiez-vous" step of the contact process
     """
 
     keys = ['siret', 'last_name', 'first_name', 'phone', 'email']

@@ -25,10 +25,10 @@
         </p>
         <p class="text-center">
             {% if use_lba_template %}
-            <a class="btn btn-small" href="{{ url_for('contact_form.ask_recruiter_pe_connect', siret=siret, origin='labonnealternance') }}">Je
+            <a class="btn btn-small" href="{{ url_for('contact_form.ask_action', siret=siret, origin='labonnealternance') }}">Je
                 travaille déjà dans cette entreprise et je souhaite modifier ses informations.</a>
             {% else %}
-            <a class="btn btn-small" href="{{ url_for('contact_form.ask_recruiter_pe_connect', siret=siret) }}">Je
+            <a class="btn btn-small" href="{{ url_for('contact_form.ask_action', siret=siret) }}">Je
                 travaille déjà dans cette entreprise et je souhaite modifier ses informations.</a>
             {% endif %}
         </p>
