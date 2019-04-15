@@ -31,6 +31,7 @@ def application(siret):
         'siret': siret,
         'client_id': settings.JEPOSTULE_CLIENT_ID,
         'next_url': request.referrer or '',
+        'rome_code': request.args.get('rome_code', ''),
     }
     token, timestamp = get_token(**data)
     data['token'] = token
