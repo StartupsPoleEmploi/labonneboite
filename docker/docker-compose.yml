@@ -29,7 +29,7 @@ services:
       - 3307:3306
 
   redis:
-    image: redis:4.0.6
+    image: redis:5
     command: ["redis-server", "/redis.conf"]
     ports:
       - "6379:6379"
@@ -38,4 +38,4 @@ services:
       - redis:/data
 
 volumes:
-  redis: 
+  redis:

@@ -87,7 +87,8 @@ class RedisCache(BaseCache):
             return func(*args, **kwargs)
         # Note that this also catches MasterNotFoundError exceptions
         except redis.ConnectionError:
-            # Attempt to reconnect and re-run: this may happen with redis sentinel, when one of the nodes becomes unavailable.
+            # Attempt to reconnect and re-run: this may happen with redis sentinel, when
+            # one of the nodes becomes unavailable.
             self._redis_instance = self.__connect()
             try:
                 return func(*args, **kwargs)
@@ -99,8 +100,8 @@ class RedisCache(BaseCache):
     @classmethod
     def __connect(cls):
         """
-        Connect to either a Redis Sentinel or Redis server, depending on the settings. Return the corresponding redis
-        client.
+        Connect to either a Redis Sentinel or Redis server, depending on the settings.
+        Return the corresponding redis client.
         """
         # Try to connect to sentinel instance
         if settings.REDIS_SENTINELS:
@@ -111,19 +112,25 @@ class RedisCache(BaseCache):
         # Connect directly to redis
         if cls.CONNECTION_POOL is None:
             # Share one connection pool for all RedisCache instances
-            cls.CONNECTION_POOL = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
+            cls.CONNECTION_POOL = redis.ConnectionPool(
+                host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT
+            )
         return redis.StrictRedis(connection_pool=cls.CONNECTION_POOL)
 
     def get(self, key, default=None):
         value = self.__safe(self.__redis.get, key)
         if value is None:
             return default
-        # Push back expire date, so that recently-accessed keys disappear last. Kind-of like an LRU cache.
+        # Push back expire date, so that recently-accessed keys disappear last. Kind-of
+        # like an LRU cache.
         self.__safe(self.__redis.expire, key, self.EXPIRES_IN_SECONDS)
         return json.loads(value)
 
     def set(self, key, value):
-        self.__safe(self.__redis.set, key, json.dumps(value), ex=self.EXPIRES_IN_SECONDS)
+        self.__safe(
+            self.__redis.set, key, json.dumps(value), ex=self.EXPIRES_IN_SECONDS
+        )
 
     def clear(self):
         self.__safe(self.__redis.flushdb)
