@@ -6,6 +6,7 @@ of the form (latitude, longitude).
 """
 
 import logging
+import json
 
 from .cache import Cache
 from .constants import DEFAULT_TRAVEL_MODE, TRAVEL_MODES
@@ -48,7 +49,9 @@ def directions(origin, destination, mode=None):
     Return:
         A list of coordinates that represents the travel line
     """
-    return backend_cached_func(DIRECTIONS_CACHE, 'directions', mode, origin, destination)
+    return backend_cached_func(
+        DIRECTIONS_CACHE, 'directions', mode, origin, destination
+    )
 
 
 def durations(origin, destinations, mode=None):
@@ -163,4 +166,4 @@ def cache_key(backend_name, func_name, mode, *args):
     Compute the key used to store the result of the backend function to which
     *args will be passed.
     """
-    return tuple([backend_name, func_name, mode] + list(args))
+    return json.dumps([backend_name, func_name, mode] + list(args)).encode()

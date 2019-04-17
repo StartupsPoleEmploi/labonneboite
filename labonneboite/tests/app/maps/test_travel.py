@@ -20,9 +20,10 @@ class mock_backend(object):
 class BackendCacheFuncTests(unittest.TestCase):
 
     def test_cache_key(self):
-        self.assertEqual(('funcname', 'travelmode', 'arg1', 'arg2'),
-                         travel.cache_key('funcname', 'travelmode', 'arg1', 'arg2'))
-
+        self.assertEqual(
+            b'["funcname", "travelmode", "arg1", "arg2"]',
+            travel.cache_key('funcname', 'travelmode', 'arg1', 'arg2')
+        )
 
     def test_available_backend(self):
         backend = mock.Mock(isochrone=mock.Mock(return_value=666))
@@ -35,7 +36,6 @@ class BackendCacheFuncTests(unittest.TestCase):
 
         self.assertEqual(666, result)
         self.assertEqual(result, cache.get(cache_key))
-
 
     def test_unavailable_backend(self):
         backend = mock.Mock(isochrone=mock.Mock(side_effect=travel.exceptions.BackendUnreachable))
@@ -55,12 +55,10 @@ class DurationsTests(unittest.TestCase):
     def setUp(self):
         travel.DURATIONS_CACHE.clear()
 
-
     @mock.patch.object(travel.vendors, 'backend', return_value=mock_backend)
     def test_durations(self, backend):
         durations = travel.durations(places.vallouise, [places.paris, places.metz], 'car')
         self.assertEqual([7000, 5000], durations)
-
 
     @mock.patch.object(travel.vendors, 'backend', return_value=mock_backend)
     def test_invalid_destination(self, backend):
@@ -68,7 +66,6 @@ class DurationsTests(unittest.TestCase):
         durations = travel.durations(places.vallouise, [invalid], 'car')
 
         self.assertEqual([None], durations)
-
 
     def test_caching(self):
         def durations(origin, destinations):
