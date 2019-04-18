@@ -49,8 +49,8 @@
             <div class="lbb-sidebar-item">
               <p>{{ form.tr.label.text }}</p>
               {% for mode in travel_modes %}
-              <img class="img-icon img-choice travelmode-choice {{ '' if (form.tr.data or form.tr.default) == mode else 'hidden' }}" src="{{ url_for('static', filename='images/icons/travel/' + mode + '-selected.svg') }}" alt="Moyen de transport : {{ mode }}">
-              <img class="img-icon img-choice travelmode-choice {{ 'hidden' if (form.tr.data or form.tr.default) == mode else '' }}" src="{{ url_for('static', filename='images/icons/travel/' + mode + '-unselected.svg') }}" alt="Moyen de transport : {{ mode }}" data-travelmode='{{ mode }}'>
+              <img class="img-icon img-choice travelmode-choice {{ '' if (form.tr.data or form.tr.default) == mode else 'hidden' }}" src="{{ url_for('static', filename='images/icons/travel/' + mode + '-selected.svg') }}" alt="Moyen de transport : {{ travel_modes_french[mode] }}" title="{{ travel_modes_french[mode] }}">
+              <img class="img-icon img-choice travelmode-choice {{ 'hidden' if (form.tr.data or form.tr.default) == mode else '' }}" src="{{ url_for('static', filename='images/icons/travel/' + mode + '-unselected.svg') }}" alt="Moyen de transport : {{ travel_modes_french[mode] }}" title="{{ travel_modes_french[mode] }}" data-travelmode='{{ mode }}'>
               {% endfor %}
               {{ form.tr }}
             </div>
