@@ -10,3 +10,8 @@ TRAVEL_MODES = (
     CAR_MODE,
     PUBLIC_MODE,
 )
+
+TRAVEL_MODES_FRENCH = {
+    CAR_MODE: 'voiture',
+    PUBLIC_MODE: 'transports en commun',
+}
