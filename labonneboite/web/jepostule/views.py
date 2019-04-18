@@ -26,12 +26,12 @@ def application(siret):
         'candidate_last_name': current_user.last_name,
         'candidate_email': current_user.email.lower(),
         'candidate_peid': current_user.external_id,
+        'candidate_rome_code': request.args.get('rome_code', ''),
         'employer_email': company.email.lower(),
         'employer_description': company.name,
         'siret': siret,
         'client_id': settings.JEPOSTULE_CLIENT_ID,
         'next_url': request.referrer or '',
-        'rome_code': request.args.get('rome_code', ''),
     }
     token, timestamp = get_token(**data)
     data['token'] = token
