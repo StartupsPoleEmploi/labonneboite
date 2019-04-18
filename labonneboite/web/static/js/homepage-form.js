@@ -143,8 +143,17 @@
     });
 
     // Auto-submit the search form when any form element is changed in the sidebar.
-    $('.js-form-search-filters :input').on('change', function () {
+    $('.js-form-search-filters :input').on('change', function (e) {
+      // If duration search is selected then disable distance search
+      if(e.currentTarget.name === "dur" && e.currentTarget.value !== "0") {
+        $("[name='d'][value='3000']").prop('checked', true);
+      }
+      // If distance search is selected then disable distance search
+      if(e.currentTarget.name === "d" && e.currentTarget.value !== "3000") {
+        $("[name='dur'][value='0']").prop('checked', true);
+      }
       searchForm.submit();
+      //e.preventDefault();
     });
 
     // Auto-submit the search form when a link to expand the search results by occupation is clicked.
