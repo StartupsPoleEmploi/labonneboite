@@ -86,13 +86,15 @@ class CompanySearchForm(FlaskForm):
     tr = HiddenField(
         'Mode de transport',
         default=maps_constants.DEFAULT_TRAVEL_MODE,
-        validators=[Optional()])
+        validators=[Optional()]
+    )
 
     dur = RadioField(
         'Durée de trajet',
         choices=DURATION_CHOICES,
         default=DURATION_CHOICES[-1][0],
-        validators=[Optional()])
+        validators=[Optional()]
+    )
 
 
 class ProCompanySearchForm(CompanySearchForm):
