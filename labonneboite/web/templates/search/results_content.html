@@ -43,6 +43,10 @@
               {{ form.naf }}
             </div>
             <div class="lbb-sidebar-item">
+              <p>{{ form.h.label.text }}</p>
+              {{ form.h }}
+            </div>
+            <div class="lbb-sidebar-item">
               <p>{{ form.d.label.text }}</p>
               {{ form.d }}
             </div>
@@ -57,10 +61,6 @@
             <div class="lbb-sidebar-item">
               <p>{{ form.dur.label.text }}</p>
               {{ form.dur }}
-            </div>
-            <div class="lbb-sidebar-item">
-              <p>{{ form.h.label.text }}</p>
-              {{ form.h }}
             </div>
             {% if pro_version_enabled %}
               <div class="lbb-sidebar-item">

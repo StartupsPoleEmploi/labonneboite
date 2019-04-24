@@ -268,7 +268,7 @@ def entreprises():
     if 'occupation' not in form_kwargs:
         form_kwargs['occupation'] = occupation
 
-    if 'l' not in form_kwargs and named_location:
+    if not form_kwargs.get('l') and named_location:
         # Override form location only if it is not available (e.g when user has
         # removed it from the url)
         form_kwargs['l'] = named_location.name

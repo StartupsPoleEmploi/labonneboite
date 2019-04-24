@@ -32,7 +32,7 @@
     // Inputs.
     var inputJob = $("input[name='j']");
     var inputOccupation = $('#occupation');
-    var inputLocation = $("input[name='l']");
+    var inputLocation = $("#l");
     var inputLatitude = $("#lat");
     var inputLongitude = $("#lon");
 
@@ -52,6 +52,11 @@
         inputLongitude.val(item.longitude);
       }
     };
+    if (!inputLocation.val() && inputLocation.attr("value")) {
+        // Believe it or not, an input field with a "value" attr may have an empty
+        // displayed value...
+        inputLocation.val(inputLocation.attr("value"));
+    }
 
     var getLocationsFromLBB = function (request, responseCB) {
       $.getJSON('/autocomplete/locations?term=' + request.term, function (lbb_response) {

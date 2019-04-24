@@ -67,7 +67,8 @@ def isochrone():
         ] for polygon in travel_isochrone
     ]
 
-    return render_template('search/geo.html',
+    return render_template(
+        'search/geo.html',
         latitude=latitude,
         longitude=longitude,
         duration=duration,
@@ -75,15 +76,15 @@ def isochrone():
     )
 
 
-# Note that we should probably do something to prevent just any user from using
-# our API to compute directions to just any location (and fill our cache)
+# This view is a POST (with CSRF token) to prevent just anyone from making too many
+# requests, exceed our API request quota and fill our cache.
 @mapsBlueprint.route('/durations', methods=['POST'])
 def durations():
     request_data = request.get_json(force=True) or {}
     try:
         travel_mode = request_data['travel_mode']
-        origin = tuple(request_data['origin'])
-        destinations = [tuple(dst) for dst in request_data['destinations']]
+        origin = parse_coordinates(request_data['origin'])
+        destinations = [parse_coordinates(dst) for dst in request_data['destinations']]
     except KeyError as e:
         return 'Missing argument: {}'.format(e.message), 400
     except ValueError:

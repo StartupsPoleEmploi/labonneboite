@@ -84,10 +84,15 @@ def get_journey(origin, destination):
 def request_json_api(endpoint, params):
     ign_credentials = settings.IGN_CREDENTIALS
     url = 'https://wxs.ign.fr/{}/{}'.format(ign_credentials['key'], endpoint)
-    auth = HTTPBasicAuth(ign_credentials['username'], ign_credentials['password'])
+    auth = HTTPBasicAuth(
+        ign_credentials['username'], ign_credentials['password']
+    ) if 'username' in ign_credentials else None
+    headers = {
+        "Referer": ign_credentials['referer']
+    } if 'referer' in ign_credentials else None
 
     try:
-        response = requests.get(url, params=params, auth=auth, timeout=TIMEOUT_SECONDS)
+        response = requests.get(url, params=params, auth=auth, timeout=TIMEOUT_SECONDS, headers=headers)
     except requests.exceptions.Timeout:
         current_app.logger.error('IGN API timeout')
         raise BackendUnreachable
