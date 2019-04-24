@@ -31,7 +31,7 @@ class CompanySearchForm(FlaskForm):
         ('10', 'Moins de 10 km'),
         ('30', 'Moins de 30 km'),
         ('50', 'Moins de 50 km'),
-        ('100', 'Moins de 100km'),
+        ('100', 'Moins de 100 km'),
         ('3000', 'France entière'),
     )
 

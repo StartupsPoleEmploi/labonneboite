@@ -155,6 +155,11 @@ function createMap(element, center, zoom) {
           }
       }
       $("input[name='d']").val(newDistance);
+      
+      // Clear the location field so that it gets auto-filled server-side
+      var $location = $('#l');
+      $location.attr('placeholder', $location.val());
+      $location.val('');
 
       $('.js-search-form').trigger('submit', {async: true});
     };

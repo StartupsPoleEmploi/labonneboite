@@ -48,6 +48,8 @@ def directions(origin, destination, mode=None):
 
     Return:
         A list of coordinates that represents the travel line
+
+    TODO remove all code related to directions? After all, we don't need it anymore.
     """
     return backend_cached_func(
         DIRECTIONS_CACHE, 'directions', mode, origin, destination
