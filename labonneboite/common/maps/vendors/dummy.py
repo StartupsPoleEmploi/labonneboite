@@ -4,6 +4,7 @@ def isochrone(origin, duration):
     """
     return None
 
+
 def durations(origin, destinations):
     """
     A dummy duration estimator that answers 'I don't know the durations' all
@@ -13,11 +14,3 @@ def durations(origin, destinations):
     computed. The list has the same length as the destinations argument.
     """
     return [None]*len(destinations)
-
-def directions(origin, destination):
-    """
-    Go in a straight line from origin to destination.
-
-    Returns: list of coordinates
-    """
-    return [origin, destination]

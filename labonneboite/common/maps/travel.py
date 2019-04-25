@@ -1,9 +1,3 @@
-# coding: utf8
-
-"""
-Note: everywhere we deal with coordinates, they are assumed to be float tuples
-of the form (latitude, longitude).
-"""
 
 import logging
 import json
@@ -17,8 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 ISOCHRONE_CACHE = Cache()
-DIRECTIONS_CACHE = Cache()
 DURATIONS_CACHE = Cache()
+
+# Note: everywhere we deal with coordinates, they are assumed to be float tuples of the
+# form (latitude, longitude).
 
 
 def isochrone(location, duration, mode=None):
@@ -37,32 +33,12 @@ def isochrone(location, duration, mode=None):
     return backend_cached_func(ISOCHRONE_CACHE, 'isochrone', mode, location, duration)
 
 
-def directions(origin, destination, mode=None):
-    """
-    Compute the coordinates of the travel line between origin and destination.
-
-    Args:
-        origin (coordinates)
-        destination (coordinates)
-        mode (str)
-
-    Return:
-        A list of coordinates that represents the travel line
-
-    TODO remove all code related to directions? After all, we don't need it anymore.
-    """
-    return backend_cached_func(
-        DIRECTIONS_CACHE, 'directions', mode, origin, destination
-    )
-
-
 def durations(origin, destinations, mode=None):
     """
     Compute the travel durations from one origin to multiple destinations.
 
-    This function works a little different from `directions` and `isochrone`
-    because we do not want to cache a list of result. Instead, we want to cache
-    each result individually.
+    This function works a little different from isochrone` because we do not want to
+    cache a list of result. Instead, we want to cache each result individually.
 
     Args:
         origin (coordinates)

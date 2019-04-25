@@ -175,10 +175,6 @@ TRAVEL_VENDOR_BACKENDS = {
         'car': 'ign',
         'public': 'navitia',
     },
-    'directions': {
-        'car': 'ign',
-        'public': 'navitia',
-    },
 }
 
 # Redis cache (unnecessary if we use local travel cache)
@@ -194,7 +190,7 @@ TRAVEL_CACHE = 'local'
 
 # Google API key for interfacing with diverse services, including the maps API.
 GOOGLE_API_KEY = ''
-# IGN credentials for fetching directions and isochrones
+# IGN credentials for fetching travel durations and isochrones
 IGN_CREDENTIALS = {
     'key': '',
     'username': '',

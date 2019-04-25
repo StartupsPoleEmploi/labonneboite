@@ -94,21 +94,6 @@ def durations():
     return json.dumps(travel_durations)
 
 
-@mapsBlueprint.route('/directions')
-def directions():
-    try:
-        travel_mode = request.args['tr']
-        src = parse_coordinates(request.args['from'])
-        dst = parse_coordinates(request.args['to'])
-    except KeyError as e:
-        return 'Missing argument: {}'.format(e.message), 400
-    except ValueError:
-        return 'Invalid coordinates: proper format is "latitude,longitude"', 400
-
-    travel_directions = travel.directions(src, dst, mode=travel_mode)
-    return json.dumps(travel_directions)
-
-
 def parse_coordinates(point):
     """
     Parse str coordinates of the form "lat,lon". Raise ValueError on invalid

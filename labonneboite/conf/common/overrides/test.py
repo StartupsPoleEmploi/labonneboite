@@ -34,8 +34,4 @@ TRAVEL_VENDOR_BACKENDS = {
         'car': 'dummy',
         'public': 'dummy',
     },
-    'directions': {
-        'car': 'dummy',
-        'public': 'dummy',
-    },
 }

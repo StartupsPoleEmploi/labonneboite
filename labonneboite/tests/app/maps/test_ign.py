@@ -32,7 +32,6 @@ class IgnVendorIsochroneTest(AppTest):
         self.assertEqual(3876, len(isochrone[0]))
         self.assertEqual((48.929064, 6.110025), isochrone[0][0])
 
-
     def test_ign_500_error(self):
         response = mock.Mock(
             status_code=500,
@@ -43,7 +42,6 @@ class IgnVendorIsochroneTest(AppTest):
             with mock.patch.object(ign.requests, 'get', requests_get):
                 self.assertRaises(exceptions.BackendUnreachable,
                                   ign.isochrone, places.vallouise, constants.ISOCHRONE_DURATIONS_MINUTES[0])
-
 
     def test_ign_authentication_error(self):
         response = mock.Mock(
@@ -56,7 +54,6 @@ class IgnVendorIsochroneTest(AppTest):
             with mock.patch.object(ign.requests, 'get', requests_get):
                 self.assertRaises(exceptions.BackendUnreachable,
                                   ign.isochrone, places.metz, constants.ISOCHRONE_DURATIONS_MINUTES[0])
-
 
     def test_ign_timeout(self):
         requests_get = mock.Mock(side_effect=ign.requests.exceptions.Timeout())
@@ -81,19 +78,9 @@ class IgnVendorJourneyTest(unittest.TestCase):
         requests_get = mock.Mock(return_value=response)
         return requests_get
 
-
     def test_durations(self):
         with mock.patch.object(ign.requests, 'get', self.mock_request_get()):
-            # Get directions from Metz downtown to Oxycoupure company
+            # Get travel duration from Metz downtown to Oxycoupure company
             durations = ign.durations(places.metz, [(49.1029, 6.17488)])
 
         self.assertEqual([238.41], durations)
-
-
-    def test_directions(self):
-        with mock.patch.object(ign.requests, 'get', self.mock_request_get()):
-            # Get directions from Metz downtown to Oxycoupure company
-            directions = ign.directions(places.metz, (49.1029, 6.17488))
-
-        self.assertEqual(139, len(directions))
-        self.assertEqual((49.1029, 6.17488), directions[-1])
