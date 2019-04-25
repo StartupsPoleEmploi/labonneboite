@@ -2,7 +2,6 @@
 import json
 
 from flask import url_for
-from flask_wtf.csrf import generate_csrf
 import mock
 
 from labonneboite.common.maps import constants
@@ -64,41 +63,6 @@ class IsochroneTest(AppTest):
                 constants.ISOCHRONE_DURATIONS_MINUTES[0],
             ))
             self.assertEqual(302, rv.status_code)
-
-
-class DirectionsTest(AppTest):
-
-    def test_valid_arguments(self):
-        with mock.patch('labonneboite.common.maps.travel.directions', return_value=[]) as mock_directions:
-            with self.test_request_context:
-                rv = self.app.get(url_for('maps.directions') + '?from={},{}&to={},{}&tr={}'.format(
-                    places.metz[0], places.metz[1],
-                    places.paris[0], places.paris[1],
-                    constants.DEFAULT_TRAVEL_MODE
-                ))
-
-                self.assertEqual(200, rv.status_code)
-                self.assertEqual([], json.loads(rv.data))
-                mock_directions.assert_called_with(places.metz, places.paris, mode=constants.DEFAULT_TRAVEL_MODE)
-
-    def test_invalid_coordinates(self):
-        with self.test_request_context:
-            rv = self.app.get(url_for('maps.directions') + '?from={}&to={},{}&tr={}'.format(
-                "plonk,42",
-                places.paris[0], places.paris[1],
-                constants.DEFAULT_TRAVEL_MODE
-            ))
-
-            self.assertEqual(400, rv.status_code)
-
-        with self.test_request_context:
-            rv = self.app.get(url_for('maps.directions') + '?from={}&to={},{}&tr={}'.format(
-                "plonk",
-                places.paris[0], places.paris[1],
-                constants.DEFAULT_TRAVEL_MODE
-            ))
-
-            self.assertEqual(400, rv.status_code)
 
 
 class DurationsTest(AppTest):

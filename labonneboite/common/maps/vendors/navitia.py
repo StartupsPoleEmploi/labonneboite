@@ -50,24 +50,8 @@ def durations(origin, destinations):
 
     return results
 
-def directions(origin, destination):
-    data = request_location_api('journeys', origin, {
-        'from': '{:.7f};{:.7f}'.format(origin[1], origin[0]),
-        'to': '{:.7f};{:.7f}'.format(destination[1], destination[0])
-    })
 
-    results = []
-    for section in data['journeys'][0]['sections']:
-        if 'geojson' not in section:
-            # This happens for 'waiting' sections
-            continue
-        results += [(coords[1], coords[0]) for coords in section['geojson']['coordinates']]
-
-    return results
-
-
-######### Auxiliary functions
-
+# Auxiliary functions
 
 def request_location_api(endpoint, location, params):
     endpoint = get_coverage_endpoint(endpoint, location)

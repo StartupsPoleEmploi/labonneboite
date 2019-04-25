@@ -46,19 +46,6 @@ def durations(origin, destinations):
     return result
 
 
-def directions(origin, destination):
-    data = get_journey(origin, destination)
-
-    # geometry is a string of the form: 'LINESTRING (6.19403 49.110239, 6.193831 49.110371, ...)'
-    geometry = data['geometryWkt']
-    match = re.match(r'LINESTRING \((?P<coordinates>[0-9. ,]+)\)', geometry)
-    result = []
-    for point in match.groupdict()['coordinates'].split(', '):
-        lon, lat = point.split(' ')
-        result.append((float(lat), float(lon)))
-    return result
-
-
 def get_journey(origin, destination):
     """
     As a rough estimate, the IGN API replies in 1-2s.
