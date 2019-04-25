@@ -359,7 +359,9 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
             romes_alternance_to_boost = office_to_update.as_list(office_to_update.romes_alternance_to_boost)
             romes_alternance_to_remove = office_to_update.as_list(office_to_update.romes_alternance_to_remove)
 
-        rome_codes_alternance = set(naf_rome_codes).union(set(romes_alternance_to_boost)) - set(romes_alternance_to_remove)
+        rome_codes_alternance = (
+            set(naf_rome_codes).union(set(romes_alternance_to_boost)) - set(romes_alternance_to_remove)
+        )
 
         for rome_code in rome_codes_alternance:
             # Manage office boosting - Alternance
@@ -378,7 +380,10 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                 rome_code=rome_code,
                 naf_code=naf)
 
-            if score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM or rome_code in boosted_alternance_romes:
+            if (
+                score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM
+                or rome_code in boosted_alternance_romes
+            ):
                 if rome_code in scores_alternance_by_rome:
                     # this ROME was already computed before for another NAF
                     if score_alternance > scores_alternance_by_rome[rome_code]:
@@ -425,12 +430,21 @@ def create_offices_for_departement(departement):
 
     logger.info("STARTED indexing offices for departement=%s ...", departement)
 
+    # For LBB we apply two thresholds to show an office:
+    # 1) its global all-rome-included score should be at least SCORE_REDUCING_MINIMUM_THRESHOLD
+    # 2) its score adapted to requested rome should be at least SCORE_FOR_ROME_MINIMUM
+    # For LBA we only apply the second threshold (SCORE_ALTERNANCE_FOR_ROME_MINIMUM)
+    # and no longer apply the all-rome-included score threshold, in order to include
+    # more relevant smaller companies.
     all_offices = db_session.query(Office).filter(
         and_(
             Office.departement == departement,
             or_(
                 Office.score >= importer_settings.SCORE_REDUCING_MINIMUM_THRESHOLD,
-                Office.score_alternance >= importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD,
+                # Fetching offices with score lower than SCORE_ALTERNANCE_FOR_ROME_MINIMUM
+                # would be a waste of resources as score-for-rome will always be less or
+                # equal to all-rome-included score.
+                Office.score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM,
             ),
         )
     ).all()
