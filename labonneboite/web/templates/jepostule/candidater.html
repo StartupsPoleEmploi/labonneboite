@@ -17,6 +17,10 @@
                 window.location = data.label;
             } else {
                 ga('send', 'event', 'jepostule', data.action, data.label, data.value);
+                if (data.action === 'navigate') {
+                    // send virtual page view for funnel
+                    ga('send', 'pageview', '/candidat/' + data.label);
+                }
                 if (data.action === 'navigate' && data.label === '#fin' && window.hj !== undefined) {
                     // trigger hotjar scenario
                     hj('trigger', 'sondage-candidat-jepostule');
