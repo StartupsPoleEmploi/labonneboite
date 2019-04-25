@@ -188,8 +188,6 @@ REDIS_PORT = 6379
 # 'dummy, 'local' or 'redis'
 TRAVEL_CACHE = 'local'
 
-# Google API key for interfacing with diverse services, including the maps API.
-GOOGLE_API_KEY = ''
 # IGN credentials for fetching travel durations and isochrones
 IGN_CREDENTIALS = {
     'key': '',
