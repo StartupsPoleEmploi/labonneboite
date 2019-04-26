@@ -89,7 +89,7 @@ def widget():
         'grant_type': 'client_credentials',
         'client_id': settings.PEAM_CLIENT_ID,
         'client_secret': settings.PEAM_CLIENT_SECRET,
-        'scope': 'application_{} api_labonneboitev1'.format(settings.PEAM_CLIENT_ID)
+        'scope': 'application_{} api_labonnealternancev1'.format(settings.PEAM_CLIENT_ID)
     }
 
     try:
