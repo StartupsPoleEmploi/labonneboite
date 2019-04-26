@@ -59,10 +59,6 @@
       });
     };
 
-    if (!inputJob.val()) {
-      inputJob.focus();
-    }
-
     // Configure autocompletes.
     inputJob.autocomplete({
       delay: 200,

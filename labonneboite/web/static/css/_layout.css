@@ -129,11 +129,13 @@ ul.lbb-header {
     font-size: 0.75rem;
     text-transform: uppercase;
     color: #5d5d5d;
+    border: none;
 }
 
 .lbb-header-btn:active,
 .lbb-header-btn:hover {
     background-color: #cbcbcb;
+    cursor: pointer;
 }
 
 .lbb-header-btn img {
@@ -187,7 +189,6 @@ ul.lbb-header {
 .lbb-footer .lbb-sponsor-text {
     grid-area: footer-text;
     margin-top: 0;
-    text-align: justify;
 }
 .lbb-footer center {
     grid-area: footer-update;

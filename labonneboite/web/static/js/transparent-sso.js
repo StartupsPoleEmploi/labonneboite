@@ -45,6 +45,8 @@
           var peamURL = window.location.origin + '/authorize/login/peam-openidconnect-no-prompt/?keep=1&next=' + encodeURIComponent(iframeUrl);
           var ifr = document.createElement("iframe");
           ifr.setAttribute("src", peamURL);
+          ifr.setAttribute('aria-hidden', 'true');
+          ifr.setAttribute('title', 'Dispositif technique (aucun contenu)');
           ifr.setAttribute("style", "display:none;");
           document.body.appendChild(ifr);
           localStorage.setItem(sso_storage_entry, now);

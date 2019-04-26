@@ -17,23 +17,24 @@
 </head>
 
 <body>
+  <a class="escape-link" href="#main-anchor">Passer directement au contenu principal</a>
 
   <div class="rgpd-banner">
     <p>En poursuivant votre navigation sur ce site, vous acceptez nos conditions d'utilisation de vos données personnelles (RGPD).</p>
     <p>
-      <a href="#" class="rgpd-accept"><b>Accepter</b></a>
+      <button class="rgpd-accept"><b>Accepter</b></button>
       -
-      <a href="#" class="rgpd-info">En savoir plus</a>
+      <button class="rgpd-info" aria-haspopup="true" aria-controls="#modal-id">En savoir plus</button>
       -
-      <a href="#" class="rgpd-reject"><b>Refuser</b></a>
+      <button class="rgpd-reject"><b>Refuser</b></button>
     </p>
   </div>
 
-  <header class="lbb-header-wrapper">
+  <header role="banner" class="lbb-header-wrapper">
     <ul class="lbb-header">
       <li class="lbb-header-logo-lbb">
         <a href="/">
-          <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite">
+          <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite - Pôle Emploi">
         </a>
       </li>
 
@@ -48,7 +49,14 @@
       {# PRO ZONE #}
       {% if user_is_pro %}
         <li class="float-right lbb-header-entry">
-          <a class="lbb-header-btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}">
+          <a
+            class="lbb-header-btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}"
+            {% if pro_version_enabled %}
+              title="Désactiver la version pro"
+            {% else %}
+              title="Activer la version pro"
+            {% endif %}
+          >
             <span class="lbb-header-btn no-padding">
               {% if pro_version_enabled %}
                 <img class="no-margin" src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="Version PRO active" data-toggle="tooltip" data-placement="bottom" data-original-title="La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visibles aux conseillers Pôle emploi et à une sélection d'acteurs.">
@@ -57,9 +65,9 @@
               {% endif %}
             </span>
             {% if pro_version_enabled %}
-              <p class="lbb-switch on">
+              <p class="lbb-switch on" aria-hidden="true">
             {% else %}
-              <p class="lbb-switch">
+              <p class="lbb-switch" aria-hidden="true">
             {% endif %}
               <span class="on">On</span>
               <span class="off">Off</span>
@@ -84,16 +92,19 @@
     {% endif %}
   {% endwith %}
 
-  <div id="content">{% block content %}{% endblock %}</div>
+  <main role="main" id="content">
+    <a id="main-anchor" tabindex="-1"></a>
+    {% block content %}{% endblock %}
+  </main>
 
-  <footer class="lbb-footer-wrapper">
+  <footer class="lbb-footer-wrapper" role="contentinfo">
     <div class="lbb-footer">
       <ul>
         <li>
           <a href="{{ url_for('root.lbb_help') }}" title="Conseils pour faire une candidature spontanée">Conseils</a>
         </li>
         <li>
-          <a href="{{ url_for('root.faq') }}" title="Questions fréquentes">F.A.Q</a>
+          <a href="{{ url_for('root.faq') }}" title="F.A.Q -Questions fréquentes">F.A.Q</a>
         </li>
         <li>
           <a href="https://www.emploi-store-dev.fr/portail-developpeur/detailapicatalogue/57909ba23b2b8d019ee6cc5f" title="Documentation de notre API pour développeurs">API</a>
@@ -102,10 +113,10 @@
           <a href="https://github.com/StartupsPoleEmploi/labonneboite" title="Consulter notre code source ouvert sur Github pour développeurs">Code source ouvert</a>
         </li>
         <li>
-          <a href="{{ url_for('root.cgu') }}" title="Conditions générales d'utilisation">C.G.U</a>
+          <a href="{{ url_for('root.cgu') }}" title="C.G.U - Conditions générales d'utilisation">C.G.U</a>
         </li>
         <li>
-          <a href="{{ url_for('root.press') }}" title="Contenu à destination de la presse">Espace Presse</a>
+          <a href="{{ url_for('root.press') }}" title="Espace presse - Contenu à destination de la presse">Espace Presse</a>
         </li>
         <li>
           <a href="#" class="rgpd-info" title="Politique de confidentialité et utilisation de vos données personnelles (R.G.P.D)">R.G.P.D</a>
@@ -122,11 +133,11 @@
         {% if pro_version_enabled %}
           <li>
             <a href="{{ url_for('root.kit') }}" title="Télécharger le kit de présentation de La Bonne Boite">Boîte à outils (fichier <abbr title="Portable Document Format">PDF</abbr>, 400 <abbr title="Kilo octets">ko</abbr>)</a>
-            <small class="badge badge-info">PRO</small>
+            <span class="badge badge-info small">PRO</span>
           </li>
           <li>
             <a href="{{ url_for('root.stats') }}" title="Consulter nos statistiques sur Google Analytics">Statistiques</a>
-            <small class="badge badge-info">PRO</small>
+            <span class="badge badge-info small">PRO</span>
           </li>
         {% endif %}
       </ul>
@@ -144,12 +155,12 @@
   </footer>
 
 
-  <div id="rgpd-modal" class="modal modal-closed">
+  <div id="rgpd-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true" aria-labelledby="#rgpd-modal-title">
     <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
     <div class="modal-content modal-content-inner">
-      <h2 class="text-center">
+      <h1 class="text-center" id="rgpd-modal-title">
         Politique de confidentialité et utilisation de vos données personnelles
-      </h2>
+      </h1>
 
       <p>
         Pour utiliser le service La Bonne Boite, vous devez accepter la Politique de confidentialité de La Bonne Boite.
@@ -193,8 +204,8 @@
     </div>
   </div>
 
-    <div class="modal-overlay modal-closed"></div>
-    <div id="tilkee-modal" class="modal modal-closed">
+  <div class="modal-overlay modal-closed"></div>
+    <div id="tilkee-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true">
         <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
         <div class="modal-content">
             <div class="modal-content-inner text-left text-bold" style="font-size: 140%;">
@@ -204,14 +215,14 @@
       </div>
   </div>
 
-  <div id="jepostule-not-authentified-modal" class="modal modal-closed">
+  <div id="jepostule-not-authentified-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true" aria-labelledby="#je-postule-title">
     <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
     <div class="modal-content">
       <div class="modal-content-inner text-center">
-        <p class="text-bold">Cette fonctionnalité est disponible uniquement aux utilisateurs connectés.</p>
+        <p id="je-postule-title" class="text-bold">Cette fonctionnalité est disponible uniquement aux utilisateurs connectés.</p>
         <p>
             <a class="logo-pe-connect rgpd-consent-required" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ (next_url or request.url) | urlencode }}">
-              <img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Pôle emploi Connect">
+              <img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Se connecter avec Pôle emploi">
             </a>
           </p>
       </div>

@@ -18,11 +18,11 @@
         <p class="text-center">
             {% if use_lba_template %}
             <a class="logo-pe-connect rgpd-consent-required" title="Se connecter avec Pôle Emploi recruteur" href="{{ url_for('auth.peam_recruiter_connect', action_name=action_name, siret=siret, origin='labonnealternance' )}}">
-                <img src="/static/images/logo-pe-connect.svg" alt="Pôle emploi Connect">
+                <img src="/static/images/logo-pe-connect.svg" alt="Se connecter avec Pôle emploi recruteur">
             </a>
             {% else %}
             <a class="logo-pe-connect rgpd-consent-required" title="Se connecter avec Pôle Emploi recruteur" href="{{ url_for('auth.peam_recruiter_connect', action_name=action_name, siret=siret) }}">
-                <img src="/static/images/logo-pe-connect.svg" alt="Pôle emploi Connect">
+                <img src="/static/images/logo-pe-connect.svg" alt="Se connecter avec Pôle emploi recruteur">
             </a>
             {% endif %}
         </p>
