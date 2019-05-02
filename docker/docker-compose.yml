@@ -32,7 +32,7 @@ services:
     image: redis:5
     command: ["redis-server", "/redis.conf"]
     ports:
-      - "6379:6379"
+      - "6389:6389"
     volumes:
       - ./redis.conf:/redis.conf:ro
       - redis:/data

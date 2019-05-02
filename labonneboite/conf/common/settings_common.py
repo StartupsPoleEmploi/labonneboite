@@ -183,7 +183,7 @@ REDIS_SERVICE_NAME = 'redis-lbb' # same as declared by sentinel config file
 # The following are used only if REDIS_SENTINELS is empty. (useful in
 # development where there is no sentinel)
 REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
+REDIS_PORT = 6389
 
 # 'dummy, 'local' or 'redis'
 TRAVEL_CACHE = 'local'
