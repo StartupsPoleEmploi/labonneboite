@@ -106,21 +106,17 @@ class HiddenMarketFetcher(Fetcher):
         self.departments = departments
         self.flag_pmsmp = flag_pmsmp
 
-
     @property
     def flag_handicap(self):
         return self.public == PUBLIC_HANDICAP
-
 
     @property
     def flag_junior(self):
         return self.public == PUBLIC_JUNIOR
 
-
     @property
     def flag_senior(self):
         return self.public == PUBLIC_SENIOR
-
 
     def update_aggregations(self, aggregations):
         if self.headcount and 'headcount' in aggregations:
@@ -129,7 +125,6 @@ class HiddenMarketFetcher(Fetcher):
             aggregations['distance'] = self.get_distance_aggregations()
         if self.naf and 'naf' in aggregations:
             aggregations['naf'] = self.get_naf_aggregations()
-
 
     def _get_office_count(self, rome_codes, distance):
         return count_offices(
@@ -151,17 +146,16 @@ class HiddenMarketFetcher(Fetcher):
             sort=self.sort,
         )
 
-
     def get_naf_aggregations(self):
         _, _, aggregations = fetch_offices(
-            {}, # No naf filter
+            {},  # No naf filter
             self.romes,
             self.location.latitude,
             self.location.longitude,
             self.distance,
             duration=self.duration,
             travel_mode=self.travel_mode,
-            aggregate_by=["naf"], # Only naf aggregate
+            aggregate_by=["naf"],  # Only naf aggregate
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
@@ -172,7 +166,6 @@ class HiddenMarketFetcher(Fetcher):
         )
         return aggregations['naf']
 
-
     def get_headcount_aggregations(self):
         _, _, aggregations = fetch_offices(
             self.naf_codes,
@@ -182,17 +175,16 @@ class HiddenMarketFetcher(Fetcher):
             self.distance,
             duration=self.duration,
             travel_mode=self.travel_mode,
-            aggregate_by=["headcount"], # Only headcount aggregate
+            aggregate_by=["headcount"],  # Only headcount aggregate
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
-            headcount=settings.HEADCOUNT_WHATEVER, # No headcount filter
+            headcount=settings.HEADCOUNT_WHATEVER,  # No headcount filter
             hiring_type=self.hiring_type,
             departments=self.departments,
             flag_pmsmp=self.flag_pmsmp,
         )
         return aggregations['headcount']
-
 
     def get_contract_aggregations(self):
         """
@@ -234,14 +226,13 @@ class HiddenMarketFetcher(Fetcher):
 
         return {'alternance': total_alternance, 'dpae': total_dpae}
 
-
     def get_distance_aggregations(self):
         _, _, aggregations = fetch_offices(
             self.naf_codes,
             self.romes,
             self.location.latitude,
             self.location.longitude,
-            DISTANCE_FILTER_MAX, # France
+            DISTANCE_FILTER_MAX,  # France
             duration=self.duration,
             travel_mode=self.travel_mode,
             aggregate_by=["distance"],
@@ -255,11 +246,9 @@ class HiddenMarketFetcher(Fetcher):
         )
         return aggregations['distance']
 
-
     def compute_office_count(self):
         self.office_count = self._get_office_count(self.romes, self.distance)
         logger.debug("set office_count to %s", self.office_count)
-
 
     def get_offices(self, add_suggestions=False):
         self.compute_office_count()
@@ -319,7 +308,6 @@ class HiddenMarketFetcher(Fetcher):
                     self.alternative_distances[distance] = (distance_label, last_count)
 
         return result, aggregations
-
 
     def get_alternative_rome_descriptions(self):
         alternative_rome_descriptions = []
@@ -381,11 +369,13 @@ def fetch_offices(naf_codes, rome_codes, latitude, longitude, distance, aggregat
 
 
 def aggregate_naf(aggregations_raw):
-    return [{
+    return [
+        {
             "code": naf_aggregate['key'],
             "count": naf_aggregate['doc_count'],
             'label': settings.NAF_CODES.get(naf_aggregate['key']),
-        } for naf_aggregate in aggregations_raw['naf']['buckets']]
+        } for naf_aggregate in aggregations_raw['naf']['buckets']
+    ]
 
 
 def aggregate_headcount(aggregations_raw):
@@ -395,7 +385,7 @@ def aggregate_headcount(aggregations_raw):
     # Count by HEADCOUNT_INSEE values
     for contract_aggregate in aggregations_raw["headcount"]["buckets"]:
         key = contract_aggregate['key']
-        if  key <= settings.HEADCOUNT_SMALL_ONLY_MAXIMUM:
+        if key <= settings.HEADCOUNT_SMALL_ONLY_MAXIMUM:
             small += contract_aggregate['doc_count']
         elif key >= settings.HEADCOUNT_BIG_ONLY_MINIMUM:
             big += contract_aggregate['doc_count']
@@ -436,25 +426,25 @@ def get_boosted_rome_field_name(hiring_type, rome_code):
 
 
 def build_json_body_elastic_search(
-        naf_codes,
-        rome_codes,
-        latitude,
-        longitude,
-        distance,
-        duration=None,
-        travel_mode=None,
-        from_number=None,
-        to_number=None,
-        headcount=settings.HEADCOUNT_WHATEVER,
-        sort=sorting.SORT_FILTER_DEFAULT,
-        hiring_type=None,
-        flag_junior=0,
-        flag_senior=0,
-        flag_handicap=0,
-        aggregate_by=None,
-        departments=None,
-        flag_pmsmp=None,
-    ):
+    naf_codes,
+    rome_codes,
+    latitude,
+    longitude,
+    distance,
+    duration=None,
+    travel_mode=None,
+    from_number=None,
+    to_number=None,
+    headcount=settings.HEADCOUNT_WHATEVER,
+    sort=sorting.SORT_FILTER_DEFAULT,
+    hiring_type=None,
+    flag_junior=0,
+    flag_senior=0,
+    flag_handicap=0,
+    aggregate_by=None,
+    departments=None,
+    flag_pmsmp=None,
+):
 
     hiring_type = hiring_type or hiring_type_util.DEFAULT
 
@@ -663,7 +653,7 @@ def build_json_body_elastic_search(
     boosted_romes_sort = {
         boosted_rome_field_name: {
             # offices without boost (missing field) are showed last
-            "missing" : "_last",
+            "missing": "_last",
             # required, see
             # https://stackoverflow.com/questions/17051709/no-mapping-found-for-field-in-order-to-sort-on-in-elasticsearch
             "ignore_unmapped": True,
@@ -696,9 +686,9 @@ def build_json_body_elastic_search(
             # Distance is not an ES field, so we have to do a specific aggregation.
             if aggregate == 'distance':
                 json_body['aggs']['distance'] = {
-                    'geo_distance' : {
+                    'geo_distance': {
                         "field": "locations",
-                        "origin": "%s,%s"  % (latitude, longitude),
+                        "origin": "%s,%s" % (latitude, longitude),
                         'unit': 'km',
                         'ranges': [{'to': 10}, {'to': 30}, {'to': 50}, {'to': 100}, {'to': 3000}],
                     }
@@ -709,7 +699,7 @@ def build_json_body_elastic_search(
                 pass
             else:
                 json_body['aggs'][aggregate] = {
-                    "terms" : {
+                    "terms": {
                         "field": aggregate,
                     }
                 }
@@ -746,8 +736,6 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         # An API request would have already raised a InvalidFetcherArgument exception,
         # and a Frontend request would have fallbacked to default sorting.
         raise ValueError("unknown sorting : %s" % sort)
-
-
 
     es = Elasticsearch()
     logger.debug("Elastic Search request : %s", json_body)
@@ -835,7 +823,7 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
     return offices, office_count, aggregations
 
 
-@lru_cache(maxsize=8*1024)
+@lru_cache(maxsize=8 * 1024)
 def build_location_suggestions(term):
     term = term.title()
     es = Elasticsearch()
@@ -911,7 +899,7 @@ def build_location_suggestions(term):
     return suggestions
 
 
-@lru_cache(maxsize=8*1024)
+@lru_cache(maxsize=8 * 1024)
 def build_job_label_suggestions(term, size=autocomplete.MAX_JOBS):
 
     es = Elasticsearch()
@@ -925,7 +913,7 @@ def build_job_label_suggestions(term, size=autocomplete.MAX_JOBS):
                 "_all": unidecode.unidecode(term),
             }
         },
-        "aggs":{
+        "aggs": {
             "by_rome_code": {
                 "terms": {
                     "field": "rome_code",
