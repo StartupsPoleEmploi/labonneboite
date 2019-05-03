@@ -20,6 +20,9 @@ Flask-Admin
 Flask-BabelEx
 speaklater
 
+# Asynchronous tasks
+huey
+
 # Development tools.
 Flask-DebugToolbar
 ipdb
