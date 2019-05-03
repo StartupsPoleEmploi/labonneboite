@@ -56,6 +56,10 @@ rebuild-data: rebuild-data-test rebuild-data-dev
 stop-services:
 	cd docker/ && docker-compose stop
 
+consume-tasks:
+	huey_consumer --workers=32 --worker-type=thread labonneboite.common.maps.precompute.huey
+consume-tasks-dev:
+	LBB_ENV=development $(MAKE) consume-tasks
 
 # Cleanup
 # -------

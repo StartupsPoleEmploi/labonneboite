@@ -35,3 +35,5 @@ TRAVEL_VENDOR_BACKENDS = {
         'public': 'dummy',
     },
 }
+
+PROCESS_ASYNC_TASKS = False

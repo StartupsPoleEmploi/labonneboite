@@ -185,6 +185,9 @@ REDIS_SERVICE_NAME = 'redis-lbb' # same as declared by sentinel config file
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6389
 
+# Set this to False to simply trash async tasks (useful in tests)
+PROCESS_ASYNC_TASKS = True
+
 # 'dummy, 'local' or 'redis'
 TRAVEL_CACHE = 'local'
 

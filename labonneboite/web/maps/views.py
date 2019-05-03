@@ -18,6 +18,8 @@ def isochrone():
     Display the isochrone for a given location and travel mode. This is
     useful for debugging and pre-filling the cache in production.
 
+    E.g: /maps/isochrone?zipcode=75010&dur=30&tr=public
+
     Request args:
         dur (int): Isochrone duration, in minutes. Must be one of allowed values.
         zipcode (str)

@@ -16,7 +16,6 @@ DURATIONS_CACHE = Cache()
 # Note: everywhere we deal with coordinates, they are assumed to be float tuples of the
 # form (latitude, longitude).
 
-
 def isochrone(location, duration, mode=None):
     """
     Compute the isochrone around a given location.

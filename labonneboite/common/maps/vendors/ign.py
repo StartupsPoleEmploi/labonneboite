@@ -93,5 +93,6 @@ def request_json_api(endpoint, params):
     elif response.status_code == 500:
         # A 500 error from the IGN API is quite common
         current_app.logger.warning('IGN API 500 error: %s', response.content)
-
+    else:
+        current_app.logger.warning('IGN API %d error', response.status_code)
     raise BackendUnreachable

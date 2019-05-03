@@ -75,7 +75,7 @@ class RedisCache(BaseCache):
     @property
     def __redis(self):
         if self._redis_instance is None:
-            self._redis_instance = self.__connect()
+            self._redis_instance = self.connect()
         return self._redis_instance
 
     def __safe(self, func, *args, **kwargs):
@@ -89,7 +89,7 @@ class RedisCache(BaseCache):
         except redis.ConnectionError:
             # Attempt to reconnect and re-run: this may happen with redis sentinel, when
             # one of the nodes becomes unavailable.
-            self._redis_instance = self.__connect()
+            self._redis_instance = self.connect()
             try:
                 return func(*args, **kwargs)
             except redis.ConnectionError as e:
@@ -98,7 +98,7 @@ class RedisCache(BaseCache):
                 return None
 
     @classmethod
-    def __connect(cls):
+    def connect(cls):
         """
         Connect to either a Redis Sentinel or Redis server, depending on the settings.
         Return the corresponding redis client.
