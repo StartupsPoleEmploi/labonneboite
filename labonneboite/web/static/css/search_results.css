@@ -84,9 +84,7 @@
 }
 
 .lbb-sidebar h3 {
-    font-style: italic;
-    font-size: 14px;  /* Fallback in `px` for browsers that don't support rem. */
-    font-size: 0.875rem;
+    font-size: 18px;
 }
 
 .lbb-sidebar-item {
