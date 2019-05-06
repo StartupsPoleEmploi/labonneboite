@@ -56,19 +56,14 @@ Clone labonneboite repository:
 
     $ git clone https://github.com/StartupsPoleEmploi/labonneboite.git
 
-Create an [isolated Python environment](https://virtualenv.pypa.io/), for example using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
-
-    $ mkvirtualenv --python=`which python3` lbb
-    $ workon lbb
-
 ### Install OS requirements:
 
     # On Debian-based OS:
-    
+
     $ sudo apt-get install -y language-pack-fr git python3 python3-dev python-virtualenv python-pip mysql-server libmysqlclient-dev libncurses5-dev build-essential python-numpy python-scipy python-mysqldb chromium-chromedriver xvfb graphviz htop libblas-dev liblapack-dev libatlas-base-dev gfortran
 
     # On Mac OS:
-    
+
     # dependencies required for selenium tests
     $ brew install selenium-server-standalone
     $ brew tap caskroom/cask && brew install caskroom/cask/chromedriver
@@ -96,15 +91,25 @@ Configure, build and install in local folder:
     make
     make install
 
-Create a virtualenv using this specific version of Python:
+### Create a virtualenv for Python 3.6
 
-    mkvirtualenv --python=./build/bin/python3.6 lbb
+Create an [isolated Python environment](https://virtualenv.pypa.io/), for example using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
 
-And you are good to go!
+    $ mkvirtualenv --python=`which python3.6` lbb
+    $ workon lbb
+
+### Add `labonneboite` base directory to the Python path
+
+This has to be run only once. One way to do it using `virtualenvwrapper`:
+
+    $ add2virtualenv $PWD
 
 ### Install python requirements:
 
-Our requirements are managed with [`pip-tools`](https://github.com/jazzband/pip-tools):
+Our requirements are managed with [`pip-tools`](https://github.com/jazzband/pip-tools).
+
+Note that you will need a local version of MySQL with `mysql_config` to install `mysqlclient`.
+
     pip install --upgrade pip
     pip install pip-tools
     make compile-requirements
@@ -114,7 +119,7 @@ To update your virtualenv, you must then run:
     pip-sync
     python setup.py develop
 
-#### Notes for Mac OS
+#### Notes for macOS
 
 If you get a `ld: library not found for -lintl` error when running `pip-sync`, try this fix: `ln -s /usr/local/Cellar/gettext/0.19.8.1/lib/libintl.* /usr/local/lib/`. For more information see [this post](https://github.com/unbit/uwsgi-docs/issues/363).
 
@@ -134,7 +139,6 @@ latest version.
 #### Known issues
 
 You may have to run `sudo usermod -a -G docker $USER`, then reboot your computer to enable the current user to use docker, as the problem is described [here](https://techoverflow.net/2017/03/01/solving-docker-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket/)
-
 
 ### Create databases and import data
 
@@ -374,4 +378,3 @@ You can perfectly profile methods in other parts of the code than `create_index.
 Here is an example of output:
 
 ![](https://www.evernote.com/l/ABJdN3iVDEJFgLeH2HgHyYOVMjOYK0a30e4B/image.png)
-
