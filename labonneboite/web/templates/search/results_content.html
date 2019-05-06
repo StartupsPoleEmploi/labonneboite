@@ -1,4 +1,4 @@
-<div class="lbb-content-purple-wrapper">
+<div class="lbb-content-wrapper">
   <div class="lbb-content">
     <div class="lbb-content-with-sidebar">
 
@@ -7,16 +7,11 @@
         <h1 class="lbb-result-info">
           {% if page and page != 1 %}<b>Page {{ page }}</b> de{% endif %}
           {% if company_count == 1 %}
-            <b>{{ company_count }} entreprise</b> susceptible
+            {{ company_count }} entreprise est susceptible
           {% else %}
-            <b>{{ company_count }} entreprises</b> susceptibles
+            {{ company_count }} entreprises sont susceptibles
           {% endif %}
-          de recruter en
-          <b>{{ rome_description }}</b>
-          {% if location_name %}
-          autour de
-          <b>{{ location_name }}</b>
-          {% endif %}
+          de recruter en {{ rome_description }}{% if location_name %} autour de {{ location_name }}{% endif %}
         </h1>
       {% endif %}
 
@@ -208,4 +203,4 @@
 
     </div>{# END .lbb-content-with-sidebar #}
   </div>{# END .lbb-content #}
-</div>{# END .lbb-content-purple-wrapper #}
+</div>{# END .lbb-content-wrapper #}

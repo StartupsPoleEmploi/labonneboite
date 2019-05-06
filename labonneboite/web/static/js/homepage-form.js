@@ -153,8 +153,8 @@
         // If duration search is selected then disable distance search
         $("[name='d'][value='3000']").prop('checked', true);
       } else if (e.currentTarget.name === "d") {
-        // If distance search is selected then disable distance search
-        $("[name='dur'][value='0']").prop('checked', true);
+        // If distance search is selected then disable duration search
+        $("[name='dur']").prop('checked', false);
       }
       searchForm.submit();
     });

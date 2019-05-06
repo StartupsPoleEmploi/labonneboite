@@ -173,7 +173,11 @@ var trackOutboundLink = function(url) {
                 duration = Math.floor(duration);
 
                 // Fill html
-                var html = '<img class="img-icon-large" alt="Temps de transport nécessaire pour rejoindre cette société depuis le lieu de recherche" src="/static/images/icons/travel/' + travelMode + '.svg"> <b>' + duration + ' min</b>';
+                var modes = {
+                  'car': "en voiture",
+                  'public': "en transports en commun",
+                }
+                var html = '<img class="img-icon-large" alt="Temps de transport nécessaire pour rejoindre cette société depuis le lieu de recherche" src="/static/images/icons/travel/' + travelMode + '-unselected.svg"> ' + duration + ' min ' + modes[travelMode];
                 $(".travel-duration[data-siret='" + companySirets[i] + "']").html(html);
             }
         }

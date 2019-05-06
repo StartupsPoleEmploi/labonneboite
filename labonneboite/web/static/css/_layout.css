@@ -44,7 +44,7 @@
 
 /*
 This is a wrapper because it can't have a fixed width in order to apply a full color background:
-  <div class="lbb-content-purple-wrapper">
+  <div class="lbb-content-wrapper">
     <div class="lbb-content">
     ...
     </div>
@@ -54,8 +54,8 @@ This is a wrapper because it can't have a fixed width in order to apply a full c
     margin: 0;
 }
 
-.lbb-content-purple-wrapper {
-    background: #7c408b;
+.lbb-content-wrapper {
+    background: #F3F6FA;;
     margin: 0;
 }
 

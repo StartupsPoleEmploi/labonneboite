@@ -234,7 +234,7 @@
     "@tooltip-bg": "#fff",
     "@tooltip-opacity": "1",
     "@tooltip-arrow-width": "20px",
-    "@tooltip-arrow-color": "#7c408b",
+    "@tooltip-arrow-color": "#54108E",
     "@popover-bg": "#fff",
     "@popover-max-width": "276px",
     "@popover-border-color": "rgba(0,0,0,.2)",

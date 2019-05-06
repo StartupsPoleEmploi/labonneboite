@@ -23,22 +23,22 @@ div, h1, h2 {
 }
 
 .company-name {
-  color: #7c408b;
+  color: #54108E;
 }
 
 .company-block {
   font-size: 16px;
   color: #77a2cd;
   text-align: center;
-  border-left: #7c408b 2px dotted;
-  border-right: #7c408b 2px dotted;
-  border-top: #7c408b 2px dashed;
+  border-left: #54108E 2px dotted;
+  border-right: #54108E 2px dotted;
+  border-top: #54108E 2px dashed;
 }
 
 .company-info {
   font-size: 16px;
-  border-left: #7c408b 2px dotted;
-  border-right: #7c408b 2px dotted;
+  border-left: #54108E 2px dotted;
+  border-right: #54108E 2px dotted;
 }
 
 .bigcell {
@@ -49,9 +49,9 @@ div, h1, h2 {
 
 .contact-mode {
   font-size: 18px;
-  background: #7c408b;
+  background: #54108E;
   color: white;
-  border: 2px solid #7c408b;
+  border: 2px solid #54108E;
   text-align: center;
 }
 

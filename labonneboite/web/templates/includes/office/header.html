@@ -20,11 +20,11 @@
   </h3>
 
   <div class="grid-row grid-spacing">
-    <div class="grid-col-7">
+    <div class="grid-col-8">
       <h4 class="company-naf-text">{{ company.naf_text }}</h4>
       <p>{{ company.headcount_text }}</p>
     </div>
-    <div class="grid-col-4">
+    <div class="grid-col-3">
       <h4 class="lbb-green">
         Potentiel d'embauche<br>
         <span class="rating-stars">
@@ -35,11 +35,12 @@
         <span class="rating-value">{{ '%0.1f' % company.get_stars_for_rome_code(rome_code) }}</span>
       </h4>
     </div>
-    <div class="grid-col-7">
+    <div class="grid-col-8">
       {% if distance and zipcode and company.show_multi_geolocations_msg(distance, zipcode) %}
         <h4>Cette entreprise recrute aussi dans votre région.</h4>
       {% elif company.distance %}
-        <p><b>{{ company.distance }} km</b> de votre lieu de recherche
+        <p class="travel-distance-duration">
+          <img class="img-icon-large" alt="" src="{{ url_for('static', filename='images/icons/travel/km.svg') }}"> {{ company.distance }} km de votre lieu de recherche
           <span class="travel-duration" data-siret="{{ company.siret }}" data-latitude="{{ company.latitude }}" data-longitude="{{ company.longitude }}"></span>
         </p>
       {% endif %}
