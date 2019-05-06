@@ -390,6 +390,7 @@ def entreprises():
         'travel_mode': fetcher.travel_mode,
         'travel_modes': maps_constants.TRAVEL_MODES,
         'travel_modes_french': maps_constants.TRAVEL_MODES_FRENCH,
+        'duration_filter_enabled': parameters.get('duration') is not None,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
     }
 

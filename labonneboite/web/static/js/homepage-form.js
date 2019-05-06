@@ -149,18 +149,25 @@
 
     // Auto-submit the search form when any form element is changed in the sidebar.
     $('.js-form-search-filters :input').on('change', function (e) {
-      // If duration search is selected then disable distance search
-      if(e.currentTarget.name === "dur" && e.currentTarget.value !== "0") {
+      if(e.currentTarget.name === "dur") {
+        // If duration search is selected then disable distance search
         $("[name='d'][value='3000']").prop('checked', true);
-      }
-      // If distance search is selected then disable distance search
-      if(e.currentTarget.name === "d" && e.currentTarget.value !== "3000") {
+      } else if (e.currentTarget.name === "d") {
+        // If distance search is selected then disable distance search
         $("[name='dur'][value='0']").prop('checked', true);
       }
       searchForm.submit();
-      //e.preventDefault();
     });
-
+    
+    // Toggle duration/distance switches
+    $('#distance-duration-switch .switch-element').on('click', function (e) {
+        var switchValue = e.currentTarget.attributes["data-switch-value"].value;
+        var currentSwitchValue = $('#distance-duration-switch').attr('data-switch-value-selected');
+        if (currentSwitchValue !== switchValue) {
+          $('#distance-duration-switch').attr('data-switch-value-selected', switchValue);
+        }
+    });
+    
     // Auto-submit the search form when a link to expand the search results by occupation is clicked.
     $('.js-extend-search-occupation').click(function (e) {
       e.preventDefault();
@@ -178,8 +185,13 @@
     // Autosubmit when a transport icon is clicked
     searchForm.find('[data-travelmode]').on('click', function(){
       var travelMode = $(this).attr("data-travelmode");
-      searchForm.find('.travelmode-choice').toggleClass('hidden');
+      searchForm.find('.travelmode-choice .img-choice').toggleClass('hidden');
       searchForm.find("[name='tr']").attr("value", travelMode);
+      if ($("[name='dur'][value='0']").prop('checked')) {
+        // If the default duration is selected, then make a reasonable choice for the user
+        $("[name='dur'][value='30']").prop('checked', true);
+        $("[name='d'][value='3000']").prop('checked', true);
+      }
       searchForm.submit();
     });
   }
