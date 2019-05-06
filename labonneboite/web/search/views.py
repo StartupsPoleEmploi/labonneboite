@@ -253,6 +253,7 @@ def entreprises():
     fix_csrf_session()
     session['search_args'] = request.args
     location, named_location = get_location(request.args)
+    duration_filter_enabled = 'dur' in request.args
 
     occupation = request.args.get('occupation', '')
     if not occupation and 'j' in request.args:
@@ -390,7 +391,7 @@ def entreprises():
         'travel_mode': fetcher.travel_mode,
         'travel_modes': maps_constants.TRAVEL_MODES,
         'travel_modes_french': maps_constants.TRAVEL_MODES_FRENCH,
-        'duration_filter_enabled': parameters.get('duration') is not None,
+        'duration_filter_enabled': duration_filter_enabled,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
     }
 

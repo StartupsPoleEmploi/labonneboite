@@ -2,7 +2,7 @@
 =========================================================================== */
 
 .pagination-wrapper {
-    color: #fff;
+    color: #000;
     text-align: right;
     font-size: 15px;  /* Fallback in `px` for browsers that don't support rem. */
     font-size: 0.9375;
@@ -25,7 +25,7 @@
 }
 
 a.page-link {
-    color: #fff;
+    color: #000;
     text-decoration: none;
 }
 
@@ -37,6 +37,6 @@ a.page-link:hover {
 }
 
 .page-item.active .page-link {
-    color: #7c408b;
+    color: #54108E;
     background: #fff;
 }

@@ -86,7 +86,7 @@ function createMap(element, center, zoom) {
       companies.forEach(function(company) {
         var popup = new mapboxgl.Popup()
           .setHTML(company.link);
-        var marker = new mapboxgl.Marker()
+        var marker = new mapboxgl.Marker({color: "#54108E"})
           .setLngLat(company.coords)
           .setPopup(popup)
           .addTo(map);

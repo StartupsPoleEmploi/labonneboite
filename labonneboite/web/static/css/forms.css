@@ -120,6 +120,7 @@ textarea.form-error,
     width: 50%;
     height: 100%;
     display: inline-block;
+    font-weight: 600;
     text-align: center;
     margin: 0;
     color: #54108E;
@@ -149,7 +150,7 @@ textarea.form-error,
     margin: auto;
 }
 .lbb-sidebar-item .travelmode-choice p {
-    font-weight: normal;
+    font-weight: 600;
     color: #54108E;
     margin-bottom: 0;
 }

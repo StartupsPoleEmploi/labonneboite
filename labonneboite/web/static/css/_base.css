@@ -1,10 +1,18 @@
-/*@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic");
-/* Web Fonts.
-The @import line of code should be the very first line in your CSS file.
-http://stackoverflow.com/a/14676665
-TODO: load local font instead?
-https://calendar.perfplanet.com/2016/no-font-face-bulletproof-syntax/
---------------------------------------------------------------------------- */
+@font-face {
+    font-family: "Open Sans";
+    src: url("/static/fonts/OpenSans-Regular.ttf");
+    font-weight: 400;
+}
+@font-face {
+    font-family: "Open Sans";
+    src: url("/static/fonts/OpenSans-SemiBold.ttf");
+    font-weight: 600;
+}
+@font-face {
+    font-family: "Open Sans";
+    src: url("/static/fonts/OpenSans-Bold.ttf");
+    font-weight: bold;
+}
 
 /* Base global styles.
 =========================================================================== */
@@ -19,7 +27,7 @@ https://github.com/owenversteeg/min
 Colors:
 #0061E6     => blue (links)
 #183152     => dark blue (buttons hover)
-#7c408b     => purple (buttons)
+#54108E     => purple (buttons)
 #5d5d5d     => mid grey (text)
 #222        => dark grey, almost black (text, buttons active)
 #cbcbcb     => light grey
@@ -163,13 +171,12 @@ html {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: #7c408b;
+    color: #54108E;
 }
 
 hr {
     width: 100%;
-    border: 1px solid #cbcbcb;
-    border-width: 1px 0 0 0;
+    border: 1px solid #979797;
 }
 
 iframe {

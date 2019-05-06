@@ -85,6 +85,12 @@
 
 .lbb-sidebar h3 {
     font-size: 18px;
+    font-weight: 600;
+    margin-top: 0;
+}
+
+.lbb-sidebar hr {
+    margin-bottom: 24px;
 }
 
 .lbb-sidebar-item {
@@ -112,7 +118,7 @@
 =========================================================================== */
 
 .lbb-result-info {
-    color: #fff;
+    color: #000;
     font-weight: normal;
     font-size: 24px;  /* Fallback in `px` for browsers that don't support rem. */
     font-size: 1.5rem;
@@ -123,6 +129,8 @@
 
 .lbb-result {
     color: #5d5d5d;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
 }
 
 .lbb-result * + *, #lbb-result-map * + * {
@@ -146,6 +154,14 @@
     padding: 0;
 }
 
+.lbb-result .travel-distance-duration {
+    margin-top: 8px;
+    font-size: 12px;
+}
+.lbb-result .travel-duration {
+    margin-left: 8px;
+}
+  
 /* Actions (after the header): toggle details, add to MEMO, etc.
 =========================================================================== */
 
