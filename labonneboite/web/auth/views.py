@@ -90,6 +90,11 @@ def peam_recruiter_connect():
     if origin:
         session['ORIGIN'] = origin
 
+    # Register action_name in session for later
+    action_name = request.args.get('action_name', '')
+    if action_name:
+        session['ACTION_NAME'] = action_name
+
     # First step : get user token
     state = random_string()
     nonce = random_string()
@@ -117,6 +122,7 @@ def peam_recruiter_connect():
 def peam_recruiter_token_callback():
     siret = session.pop('SIRET', '')
     recruiter_from_lba = session.pop('ORIGIN', '') == 'labonnealternance'
+    action_name = session.pop('ACTION_NAME', '')
 
     # State value
     state = request.args.get('state', '')
@@ -131,9 +137,12 @@ def peam_recruiter_token_callback():
         redirect_params.update({'siret': siret})
     if recruiter_from_lba:
         redirect_params.update({'origin': 'labonnealternance'})
-
+    if action_name:
+        redirect_params.update({'action_name': action_name})
+        
     # Code value
     code = request.args.get('code', '')
+
     try:
         if session_state != state:
             raise PeamRecruiterError('Wrong state value {} - {}'.format(session_state, state))
