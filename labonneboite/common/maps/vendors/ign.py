@@ -81,7 +81,8 @@ def request_json_api(endpoint, params):
     try:
         response = requests.get(url, params=params, auth=auth, timeout=TIMEOUT_SECONDS, headers=headers)
     except requests.exceptions.Timeout:
-        current_app.logger.error('IGN API timeout')
+        # This occurs frequently so we don't trigger a timeout
+        current_app.logger.warning('IGN API timeout')
         raise BackendUnreachable
 
     if response.status_code == 200:
