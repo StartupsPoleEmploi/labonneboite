@@ -1,4 +1,10 @@
 (function($) {
+  function disableDistanceSearch() {
+    $("[name='d'][value='3000']").prop('checked', true);
+  }
+  function disableDurationSearch() {
+    $("[name='dur']").prop('checked', false);
+  }
   function initForm() {
     "use strict";
 
@@ -151,10 +157,10 @@
     $('.js-form-search-filters :input').on('change', function (e) {
       if(e.currentTarget.name === "dur") {
         // If duration search is selected then disable distance search
-        $("[name='d'][value='3000']").prop('checked', true);
+        disableDistanceSearch();
       } else if (e.currentTarget.name === "d") {
         // If distance search is selected then disable duration search
-        $("[name='dur']").prop('checked', false);
+        disableDurationSearch();
       }
       searchForm.submit();
     });
@@ -183,14 +189,15 @@
     });
 
     // Autosubmit when a transport icon is clicked
-    searchForm.find('[data-travelmode]').on('click', function(){
+    searchForm.find('[data-travelmode]').on('click', function() {
       var travelMode = $(this).attr("data-travelmode");
-      searchForm.find('.travelmode-choice .img-choice').toggleClass('hidden');
+      ga('send', 'event', 'Form', 'click', 'travelmode-' + travelMode);
+      searchForm.find('.travelmode-choice a').toggleClass('hidden');
       searchForm.find("[name='tr']").attr("value", travelMode);
       if ($("[name='dur'][value='0']").prop('checked')) {
         // If the default duration is selected, then make a reasonable choice for the user
         $("[name='dur'][value='30']").prop('checked', true);
-        $("[name='d'][value='3000']").prop('checked', true);
+        disableDistanceSearch();
       }
       searchForm.submit();
     });

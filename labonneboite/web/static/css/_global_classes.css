@@ -125,13 +125,7 @@ img.img-icon-large {
     height: 24px;
     vertical-align: middle;
 }
-img.img-icon.img-choice {
-    width: 32px;
-    height: 32px;
-    vertical-align: middle;
-    margin-top: 0;
-    cursor: pointer;
-}
+
 
 /* E-mail obfuscation.
 https://blog.jayway.com/2012/11/30/smart-email-obfuscation-using-css/
