@@ -4,6 +4,7 @@ import contextlib
 import logging
 import glob
 import os
+import time
 
 import multiprocessing as mp
 from cProfile import Profile
@@ -11,6 +12,7 @@ from pyprof2calltree import convert
 from elasticsearch.exceptions import TransportError, NotFoundError
 from elasticsearch.helpers import bulk
 from sqlalchemy import inspect, and_, or_
+from sqlalchemy.exc import OperationalError
 
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common.util import timeit
@@ -551,7 +553,11 @@ def remove_offices():
         # Apply changes in DB.
         office = Office.query.filter_by(siret=siret).first()
         if office:
-            office.delete()
+            try:
+                office.delete()
+            except OperationalError:  # retry once in case of deadlock error
+                time.sleep(10)
+                office.delete()
             # Delete the current PDF.
             pdf_util.delete_file(office)
 
