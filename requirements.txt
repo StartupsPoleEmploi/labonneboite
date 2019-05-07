@@ -59,7 +59,7 @@ pandas==0.22.0
 parso==0.2.1              # via jedi
 pexpect==4.6.0            # via ipython
 pickleshare==0.7.4        # via ipython
-pillow==2.9.0
+pillow==6.0.0             # via reportlab, xhtml2pdf
 pip-tools==2.0.2
 prompt-toolkit==1.0.15    # via ipython
 ptyprocess==0.6.0         # via pexpect
@@ -80,7 +80,7 @@ pyvirtualdisplay==0.2.1
 pyzmq==16.0.2
 raven[flask]==6.9.0
 redis==3.2.1
-reportlab==3.4.0          # via xhtml2pdf
+reportlab==3.5.21         # via xhtml2pdf
 requests-oauthlib==0.8.0  # via social-auth-core
 requests==2.21.0
 scikit-learn==0.16.1
@@ -97,7 +97,7 @@ sqlalchemy-utils==0.32.13
 sqlalchemy==1.3.3
 traitlets==4.3.2          # via ipython
 unidecode==0.4.21         # via python-slugify
-urllib3==1.24.1           # via elasticsearch, requests
+urllib3==1.24.3           # via elasticsearch, requests
 uwsgi==2.0.17
 validators==0.11.2
 wcwidth==0.1.7            # via prompt-toolkit
