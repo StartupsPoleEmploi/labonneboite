@@ -2,7 +2,7 @@
 import json
 
 from flask import url_for
-import mock
+from unittest import mock
 
 from labonneboite.common.maps import constants
 from labonneboite.tests.test_base import AppTest

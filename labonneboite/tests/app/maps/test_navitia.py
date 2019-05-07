@@ -3,7 +3,7 @@ import os
 import json
 import unittest
 
-import mock
+from unittest import mock
 
 from labonneboite.common.maps import constants
 from labonneboite.common.maps import exceptions

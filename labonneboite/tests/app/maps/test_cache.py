@@ -1,7 +1,7 @@
 # coding: utf8
 import unittest
 
-import mock
+from unittest import mock
 import redis.sentinel
 
 from labonneboite.tests.test_base import AppTest
