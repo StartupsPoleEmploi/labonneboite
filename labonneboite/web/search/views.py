@@ -19,6 +19,8 @@ from labonneboite.common import search as search_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common.locations import CityLocation, Location, NamedLocation
+from labonneboite.common.maps import constants as maps_constants
+from labonneboite.common.maps import precompute
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.web.utils import fix_csrf_session
 
@@ -146,6 +148,8 @@ PARAMETER_FIELD_MAPPING = {
     'r': 'rome',
     'j': 'job',
     'd': 'distance',
+    'tr': 'travel_mode',
+    'dur': 'duration',
     'l': 'location',
     'h': 'headcount',
     'naf': 'naf',
@@ -166,6 +170,17 @@ def get_parameters(args):
         kwargs['distance'] = int(kwargs.get('distance'))
     except ValueError:
         kwargs['distance'] = settings.DISTANCE_FILTER_DEFAULT
+
+    kwargs['travel_mode'] = kwargs.get('travel_mode')
+    if kwargs['travel_mode'] not in maps_constants.TRAVEL_MODES:
+        kwargs['travel_mode'] = maps_constants.DEFAULT_TRAVEL_MODE
+
+    try:
+        kwargs['duration'] = int(kwargs.get('duration'))
+        if kwargs['duration'] not in maps_constants.ISOCHRONE_DURATIONS_MINUTES:
+            kwargs['duration'] = None
+    except (ValueError, TypeError):
+        kwargs['duration'] = None
 
     try:
         kwargs['headcount'] = int(kwargs.get('headcount'))
@@ -238,6 +253,7 @@ def entreprises():
     fix_csrf_session()
     session['search_args'] = request.args
     location, named_location = get_location(request.args)
+    duration_filter_enabled = 'dur' in request.args
 
     occupation = request.args.get('occupation', '')
     if not occupation and 'j' in request.args:
@@ -254,7 +270,7 @@ def entreprises():
     if 'occupation' not in form_kwargs:
         form_kwargs['occupation'] = occupation
 
-    if 'l' not in form_kwargs and named_location:
+    if not form_kwargs.get('l') and named_location:
         # Override form location only if it is not available (e.g when user has
         # removed it from the url)
         form_kwargs['l'] = named_location.name
@@ -292,6 +308,8 @@ def entreprises():
         location,
         romes=[rome],
         distance=parameters['distance'],
+        travel_mode=parameters['travel_mode'],
+        duration=parameters['duration'],
         sort=parameters['sort'],
         from_number=parameters['from_number'],
         to_number=parameters['to_number'],
@@ -335,6 +353,10 @@ def entreprises():
     )
     current_page = pagination_manager.get_current_page()
 
+    # Anticipate future calls by pre-computing duration-related searches
+    if location:
+        precompute.isochrones((location.latitude, location.longitude))
+
     form.naf.choices = [('', 'Tous les secteurs')] + sorted(naf_codes_with_descriptions, key=lambda t: t[1])
     form.validate()
 
@@ -366,6 +388,10 @@ def entreprises():
         'show_favorites': True,
         'sort': fetcher.sort,
         'tile_server_url': settings.TILE_SERVER_URL,
+        'travel_mode': fetcher.travel_mode,
+        'travel_modes': maps_constants.TRAVEL_MODES,
+        'travel_modes_french': maps_constants.TRAVEL_MODES_FRENCH,
+        'duration_filter_enabled': duration_filter_enabled,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
     }
 

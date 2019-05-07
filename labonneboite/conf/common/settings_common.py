@@ -162,6 +162,42 @@ GOOGLE_SITE_VERIFICATION_CODE = None
 
 SCAM_EMAILS_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'scripts', 'scam_emails')
 
+# Isochrones
+ENABLE_ISOCHRONES = True
+
+# Available backends: dummy, ign, navitia
+TRAVEL_VENDOR_BACKENDS = {
+    'isochrone': {
+        'car': 'ign',
+        'public': 'navitia',
+    },
+    'durations': {
+        'car': 'ign',
+        'public': 'navitia',
+    },
+}
+
+# Redis cache (unnecessary if we use local travel cache)
+REDIS_SENTINELS = [] # e.g: [('localhost', 26379)]
+REDIS_SERVICE_NAME = 'redis-lbb' # same as declared by sentinel config file
+# The following are used only if REDIS_SENTINELS is empty. (useful in
+# development where there is no sentinel)
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6389
+
+# Set this to False to simply trash async tasks (useful in tests)
+PROCESS_ASYNC_TASKS = True
+
+# 'dummy, 'local' or 'redis'
+TRAVEL_CACHE = 'local'
+
+# IGN credentials for fetching travel durations and isochrones
+IGN_CREDENTIALS = {
+    'key': '',
+    'username': '',
+    'password': ''
+}
+NAVITIA_API_TOKEN = 'setme'
 
 if get_current_env() == ENV_LBBDEV:
     # pylint: disable=wildcard-import,unused-wildcard-import

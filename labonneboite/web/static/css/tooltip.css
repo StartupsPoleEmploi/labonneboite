@@ -1,6 +1,6 @@
 .tooltip-inner {
     padding: 10px 20px;
-    border : solid 1px #7c408b;
+    border : solid 1px #54108E;
     font-size: 120%;
 }
 
@@ -13,7 +13,7 @@
 }
 .tooltip {
 	background: #ffffff;
-	border: 2px solid #7c408b;
+	border: 2px solid #54108E;
 }
 .lbb-tooltip:after, .lbb-tooltip:before {
 	bottom: 100%;
@@ -34,7 +34,7 @@
 }
 .lbb-tooltip:before {
 	border-color: rgba(124, 64, 139, 0);
-	border-bottom-color: #7c408b;
+	border-bottom-color: #54108E;
 	border-width: 33px;
 	margin-left: -33px;
 }

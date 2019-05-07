@@ -100,6 +100,7 @@ def register_blueprints(flask_app):
     from labonneboite.web.auth.views import authBlueprint
     from labonneboite.web.data.views import dataBlueprint
     from labonneboite.web.health.views import healthBlueprint
+    from labonneboite.web.maps.views import mapsBlueprint
     from labonneboite.web.office.views import officeBlueprint
     from labonneboite.web.contact_form.views import contactFormBlueprint
     from labonneboite.web.jepostule.views import jepostuleBlueprint
@@ -112,6 +113,7 @@ def register_blueprints(flask_app):
     flask_app.register_blueprint(authBlueprint, url_prefix='/authentication')
     flask_app.register_blueprint(dataBlueprint, url_prefix='/data')
     flask_app.register_blueprint(healthBlueprint, url_prefix='/health')
+    flask_app.register_blueprint(mapsBlueprint, url_prefix='/maps')
     flask_app.register_blueprint(officeBlueprint)
     flask_app.register_blueprint(contactFormBlueprint)
     flask_app.register_blueprint(jepostuleBlueprint, url_prefix='/jepostule')
@@ -193,6 +195,7 @@ def register_context_processors(flask_app):
             'google_site_verification_code': settings.GOOGLE_SITE_VERIFICATION_CODE,
             'login_url': auth_utils.login_url,
             'jepostule_globally_enabled': settings.JEPOSTULE_QUOTA > 0,
+            'enable_isochrones': settings.ENABLE_ISOCHRONES,
         }
 
     def inject_user():

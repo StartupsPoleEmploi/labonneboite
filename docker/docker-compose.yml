@@ -27,3 +27,15 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
       - 3307:3306
+
+  redis:
+    image: redis:5
+    command: ["redis-server", "/redis.conf"]
+    ports:
+      - "6389:6389"
+    volumes:
+      - ./redis.conf:/redis.conf:ro
+      - redis:/data
+
+volumes:
+  redis:

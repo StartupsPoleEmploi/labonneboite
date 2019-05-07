@@ -32,7 +32,7 @@
     // Inputs.
     var inputJob = $("input[name='j']");
     var inputOccupation = $('#occupation');
-    var inputLocation = $("input[name='l']");
+    var inputLocation = $("#l");
     var inputLatitude = $("#lat");
     var inputLongitude = $("#lon");
 
@@ -52,6 +52,11 @@
         inputLongitude.val(item.longitude);
       }
     };
+    if (!inputLocation.val() && inputLocation.attr("value")) {
+        // Believe it or not, an input field with a "value" attr may have an empty
+        // displayed value...
+        inputLocation.val(inputLocation.attr("value"));
+    }
 
     var getLocationsFromLBB = function (request, responseCB) {
       $.getJSON('/autocomplete/locations?term=' + request.term, function (lbb_response) {
@@ -143,10 +148,26 @@
     });
 
     // Auto-submit the search form when any form element is changed in the sidebar.
-    $('.js-form-search-filters :input').on('change', function () {
+    $('.js-form-search-filters :input').on('change', function (e) {
+      if(e.currentTarget.name === "dur") {
+        // If duration search is selected then disable distance search
+        $("[name='d'][value='3000']").prop('checked', true);
+      } else if (e.currentTarget.name === "d") {
+        // If distance search is selected then disable duration search
+        $("[name='dur']").prop('checked', false);
+      }
       searchForm.submit();
     });
-
+    
+    // Toggle duration/distance switches
+    $('#distance-duration-switch .switch-element').on('click', function (e) {
+        var switchValue = e.currentTarget.attributes["data-switch-value"].value;
+        var currentSwitchValue = $('#distance-duration-switch').attr('data-switch-value-selected');
+        if (currentSwitchValue !== switchValue) {
+          $('#distance-duration-switch').attr('data-switch-value-selected', switchValue);
+        }
+    });
+    
     // Auto-submit the search form when a link to expand the search results by occupation is clicked.
     $('.js-extend-search-occupation').click(function (e) {
       e.preventDefault();
@@ -158,6 +179,19 @@
     $('.js-extend-search-distance').click(function (e) {
       e.preventDefault();
       $(':radio[name=d][value=' + this.dataset.distance + ']').prop('checked', true);
+      searchForm.submit();
+    });
+
+    // Autosubmit when a transport icon is clicked
+    searchForm.find('[data-travelmode]').on('click', function(){
+      var travelMode = $(this).attr("data-travelmode");
+      searchForm.find('.travelmode-choice .img-choice').toggleClass('hidden');
+      searchForm.find("[name='tr']").attr("value", travelMode);
+      if ($("[name='dur'][value='0']").prop('checked')) {
+        // If the default duration is selected, then make a reasonable choice for the user
+        $("[name='dur'][value='30']").prop('checked', true);
+        $("[name='d'][value='3000']").prop('checked', true);
+      }
       searchForm.submit();
     });
   }

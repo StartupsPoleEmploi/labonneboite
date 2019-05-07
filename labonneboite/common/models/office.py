@@ -78,6 +78,14 @@ class OfficeMixin(PrimitiveOfficeMixin):
     x = Column('coordinates_x', Float)  # Longitude.
     y = Column('coordinates_y', Float)  # Latitude.
 
+    @property
+    def longitude(self):
+        return self.x
+
+    @property
+    def latitude(self):
+        return self.y
+
 
 class FinalOfficeMixin(OfficeMixin):
     """

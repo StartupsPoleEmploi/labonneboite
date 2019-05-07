@@ -20,6 +20,9 @@ Flask-Admin
 Flask-BabelEx
 speaklater
 
+# Asynchronous tasks
+huey
+
 # Development tools.
 Flask-DebugToolbar
 ipdb
@@ -37,6 +40,7 @@ alembic
 mysqlclient
 SQLAlchemy-Utils
 SQLAlchemy
+redis
 
 # Elasticsearch
 # as of Jan 2018 we are using Elasticsearch 1.7, a very old version.

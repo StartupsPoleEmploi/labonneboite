@@ -1,0 +1,1484 @@
+{
+  "context": {
+    "car_direct_path": {
+      "co2_emission": {
+        "unit": "gEC", 
+        "value": 377.5279914369
+      }
+    }, 
+    "current_datetime": "20180115T153017", 
+    "timezone": "Europe/Paris"
+  }, 
+  "disruptions": [], 
+  "exceptions": [], 
+  "feed_publishers": [
+    {
+      "id": "fr-ne", 
+      "license": "OpenData", 
+      "name": "France North-East Quarter", 
+      "url": "navitia.io"
+    }, 
+    {
+      "id": "osm", 
+      "license": "ODbL", 
+      "name": "openstreetmap", 
+      "url": "https://www.openstreetmap.org/copyright"
+    }, 
+    {
+      "id": "OMZ", 
+      "license": "LO-OL", 
+      "name": "OMZ - Keolis Metz - Le Met", 
+      "url": "http://data.metzmetropole.fr"
+    }
+  ], 
+  "journeys": [
+    {
+      "arrival_date_time": "20180115T154434", 
+      "calendars": [
+        {
+          "active_periods": [
+            {
+              "begin": "20171205", 
+              "end": "20180324"
+            }
+          ], 
+          "exceptions": [
+            {
+              "datetime": "20171225", 
+              "type": "remove"
+            }, 
+            {
+              "datetime": "20171226", 
+              "type": "remove"
+            }, 
+            {
+              "datetime": "20180101", 
+              "type": "remove"
+            }
+          ], 
+          "id": null, 
+          "week_pattern": {
+            "friday": true, 
+            "monday": true, 
+            "saturday": false, 
+            "sunday": false, 
+            "thursday": true, 
+            "tuesday": true, 
+            "wednesday": true
+          }
+        }
+      ], 
+      "co2_emission": {
+        "unit": "gEC", 
+        "value": 219.7118
+      }, 
+      "departure_date_time": "20180115T153154", 
+      "distances": {
+        "bike": 0, 
+        "car": 0, 
+        "walking": 514
+      }, 
+      "duration": 760, 
+      "durations": {
+        "bike": 0, 
+        "car": 0, 
+        "total": 760, 
+        "walking": 460
+      }, 
+      "fare": {
+        "found": false, 
+        "links": [], 
+        "total": {
+          "value": "0.0"
+        }
+      }, 
+      "links": [
+        {
+          "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?allowed_id%5B%5D=stop_point%3AOMZ%3ASP%3A21342&allowed_id%5B%5D=stop_point%3AOMZ%3ASP%3A21334&from=6.1940299%3B49.1102387&to=6.1731800%3B49.1109000&is_journey_schedules=True&last_section_mode%5B%5D=walking&min_nb_journeys=5&min_nb_transfers=0&direct_path=none&first_section_mode%5B%5D=walking", 
+          "rel": "same_journey_schedules", 
+          "templated": false, 
+          "type": "journeys"
+        }
+      ], 
+      "nb_transfers": 0, 
+      "requested_date_time": "20180115T153016", 
+      "sections": [
+        {
+          "arrival_date_time": "20180115T153700", 
+          "co2_emission": {
+            "unit": "", 
+            "value": 0.0
+          }, 
+          "departure_date_time": "20180115T153154", 
+          "duration": 306, 
+          "from": {
+            "address": {
+              "administrative_regions": [
+                {
+                  "coord": {
+                    "lat": "49.119698", 
+                    "lon": "6.176355"
+                  }, 
+                  "id": "admin:fr:57463", 
+                  "insee": "57463", 
+                  "label": "Metz (57000-57070)", 
+                  "level": 8, 
+                  "name": "Metz", 
+                  "zip_code": "57000;57050;57070"
+                }
+              ], 
+              "coord": {
+                "lat": "49.1102387", 
+                "lon": "6.1940299"
+              }, 
+              "house_number": 22, 
+              "id": "6.1940299;49.1102387", 
+              "label": "22 Rue de Raigecourt (Metz)", 
+              "name": "Rue de Raigecourt"
+            }, 
+            "embedded_type": "address", 
+            "id": "6.1940299;49.1102387", 
+            "name": "22 Rue de Raigecourt (Metz)", 
+            "quality": 0
+          }, 
+          "geojson": {
+            "coordinates": [
+              [
+                6.193988028, 
+                49.110331597
+              ], 
+              [
+                6.193988028, 
+                49.110331597
+              ], 
+              [
+                6.195096, 
+                49.110831
+              ], 
+              [
+                6.19465, 
+                49.111491
+              ], 
+              [
+                6.194268, 
+                49.11205
+              ], 
+              [
+                6.193882, 
+                49.111968
+              ], 
+              [
+                6.193774, 
+                49.111946
+              ], 
+              [
+                6.193616, 
+                49.111915
+              ], 
+              [
+                6.1929418782, 
+                49.111807566
+              ], 
+              [
+                6.192934, 
+                49.111857
+              ]
+            ], 
+            "properties": [
+              {
+                "length": 342
+              }
+            ], 
+            "type": "LineString"
+          }, 
+          "id": "section_0_0", 
+          "links": [], 
+          "mode": "walking", 
+          "path": [
+            {
+              "direction": 0, 
+              "duration": 87, 
+              "length": 97, 
+              "name": "Rue de Raigecourt"
+            }, 
+            {
+              "direction": 0, 
+              "duration": 131, 
+              "length": 147, 
+              "name": "Rue Baudoche"
+            }, 
+            {
+              "direction": -84, 
+              "duration": 43, 
+              "length": 48, 
+              "name": "Avenue de Strasbourg"
+            }, 
+            {
+              "direction": 0, 
+              "duration": 45, 
+              "length": 50, 
+              "name": "Avenue de Planti\u00e8res"
+            }
+          ], 
+          "to": {
+            "embedded_type": "stop_point", 
+            "id": "stop_point:OMZ:SP:21342", 
+            "name": "HOPITAL LEGOUEST (Metz)", 
+            "quality": 0, 
+            "stop_point": {
+              "administrative_regions": [
+                {
+                  "coord": {
+                    "lat": "49.119698", 
+                    "lon": "6.176355"
+                  }, 
+                  "id": "admin:fr:57463", 
+                  "insee": "57463", 
+                  "label": "Metz (57000-57070)", 
+                  "level": 8, 
+                  "name": "Metz", 
+                  "zip_code": "57000;57050;57070"
+                }
+              ], 
+              "codes": [
+                {
+                  "type": "external_code", 
+                  "value": "OMZ21342"
+                }, 
+                {
+                  "type": "gtfs_stop_code", 
+                  "value": "6175"
+                }, 
+                {
+                  "type": "source", 
+                  "value": "21342"
+                }
+              ], 
+              "commercial_modes": [
+                {
+                  "id": "commercial_mode:bus", 
+                  "name": "Bus"
+                }
+              ], 
+              "coord": {
+                "lat": "49.111857", 
+                "lon": "6.192934"
+              }, 
+              "equipments": [], 
+              "id": "stop_point:OMZ:SP:21342", 
+              "label": "HOPITAL LEGOUEST (Metz)", 
+              "links": [], 
+              "name": "HOPITAL LEGOUEST", 
+              "physical_modes": [
+                {
+                  "id": "physical_mode:Bus", 
+                  "name": "Bus"
+                }
+              ], 
+              "stop_area": {
+                "administrative_regions": [
+                  {
+                    "coord": {
+                      "lat": "49.119698", 
+                      "lon": "6.176355"
+                    }, 
+                    "id": "admin:fr:57463", 
+                    "insee": "57463", 
+                    "label": "Metz (57000-57070)", 
+                    "level": 8, 
+                    "name": "Metz", 
+                    "zip_code": "57000;57050;57070"
+                  }
+                ], 
+                "codes": [
+                  {
+                    "type": "external_code", 
+                    "value": "OMZ10675"
+                  }, 
+                  {
+                    "type": "gtfs_stop_code", 
+                    "value": "LEG"
+                  }, 
+                  {
+                    "type": "source", 
+                    "value": "10675"
+                  }
+                ], 
+                "coord": {
+                  "lat": "49.111775", 
+                  "lon": "6.192498"
+                }, 
+                "id": "stop_area:OMZ:SA:10675", 
+                "label": "HOPITAL LEGOUEST (Metz)", 
+                "links": [], 
+                "name": "HOPITAL LEGOUEST", 
+                "timezone": "Europe/Paris"
+              }
+            }
+          }, 
+          "type": "street_network"
+        }, 
+        {
+          "additional_informations": [
+            "regular"
+          ], 
+          "arrival_date_time": "20180115T154200", 
+          "base_arrival_date_time": "20180115T154200", 
+          "base_departure_date_time": "20180115T153700", 
+          "co2_emission": {
+            "unit": "gEC", 
+            "value": 219.7118
+          }, 
+          "data_freshness": "base_schedule", 
+          "departure_date_time": "20180115T153700", 
+          "display_informations": {
+            "code": "M", 
+            "color": "FF5777", 
+            "commercial_mode": "Bus", 
+            "description": "", 
+            "direction": "CITE U (Metz)", 
+            "equipments": [], 
+            "headsign": "CITE U", 
+            "label": "M", 
+            "links": [], 
+            "name": "P+R WOIPPY/CITE U - MICHELET/MATERNITE", 
+            "network": "LE MET' - Metz M\u00e9tropole", 
+            "physical_mode": "Bus", 
+            "text_color": "FFFFFF"
+          }, 
+          "duration": 300, 
+          "from": {
+            "embedded_type": "stop_point", 
+            "id": "stop_point:OMZ:SP:21342", 
+            "name": "HOPITAL LEGOUEST (Metz)", 
+            "quality": 0, 
+            "stop_point": {
+              "administrative_regions": [
+                {
+                  "coord": {
+                    "lat": "49.119698", 
+                    "lon": "6.176355"
+                  }, 
+                  "id": "admin:fr:57463", 
+                  "insee": "57463", 
+                  "label": "Metz (57000-57070)", 
+                  "level": 8, 
+                  "name": "Metz", 
+                  "zip_code": "57000;57050;57070"
+                }
+              ], 
+              "codes": [
+                {
+                  "type": "external_code", 
+                  "value": "OMZ21342"
+                }, 
+                {
+                  "type": "gtfs_stop_code", 
+                  "value": "6175"
+                }, 
+                {
+                  "type": "source", 
+                  "value": "21342"
+                }
+              ], 
+              "coord": {
+                "lat": "49.111857", 
+                "lon": "6.192934"
+              }, 
+              "equipments": [], 
+              "id": "stop_point:OMZ:SP:21342", 
+              "label": "HOPITAL LEGOUEST (Metz)", 
+              "links": [], 
+              "name": "HOPITAL LEGOUEST", 
+              "stop_area": {
+                "codes": [
+                  {
+                    "type": "external_code", 
+                    "value": "OMZ10675"
+                  }, 
+                  {
+                    "type": "gtfs_stop_code", 
+                    "value": "LEG"
+                  }, 
+                  {
+                    "type": "source", 
+                    "value": "10675"
+                  }
+                ], 
+                "coord": {
+                  "lat": "49.111775", 
+                  "lon": "6.192498"
+                }, 
+                "id": "stop_area:OMZ:SA:10675", 
+                "label": "HOPITAL LEGOUEST (Metz)", 
+                "links": [], 
+                "name": "HOPITAL LEGOUEST", 
+                "timezone": "Europe/Paris"
+              }
+            }
+          }, 
+          "geojson": {
+            "coordinates": [
+              [
+                6.192934, 
+                49.111857
+              ], 
+              [
+                6.185613, 
+                49.111661
+              ], 
+              [
+                6.180866, 
+                49.109106
+              ], 
+              [
+                6.17761, 
+                49.110389
+              ], 
+              [
+                6.17162, 
+                49.110662
+              ]
+            ], 
+            "properties": [
+              {
+                "length": 1694
+              }
+            ], 
+            "type": "LineString"
+          }, 
+          "id": "section_1_0", 
+          "links": [
+            {
+              "id": "vehicle_journey:OMZ:5868326-1_dst_1", 
+              "type": "vehicle_journey"
+            }, 
+            {
+              "id": "line:OMZ:96OMZ1", 
+              "type": "line"
+            }, 
+            {
+              "id": "route:OMZ:96_R", 
+              "type": "route"
+            }, 
+            {
+              "id": "commercial_mode:bus", 
+              "type": "commercial_mode"
+            }, 
+            {
+              "id": "physical_mode:Bus", 
+              "type": "physical_mode"
+            }, 
+            {
+              "id": "network:lemet", 
+              "type": "network"
+            }
+          ], 
+          "stop_date_times": [
+            {
+              "additional_informations": [], 
+              "arrival_date_time": "20180115T153700", 
+              "base_arrival_date_time": "20180115T153700", 
+              "base_departure_date_time": "20180115T153700", 
+              "departure_date_time": "20180115T153700", 
+              "links": [], 
+              "stop_point": {
+                "codes": [
+                  {
+                    "type": "external_code", 
+                    "value": "OMZ21342"
+                  }, 
+                  {
+                    "type": "gtfs_stop_code", 
+                    "value": "6175"
+                  }, 
+                  {
+                    "type": "source", 
+                    "value": "21342"
+                  }
+                ], 
+                "coord": {
+                  "lat": "49.111857", 
+                  "lon": "6.192934"
+                }, 
+                "equipments": [], 
+                "id": "stop_point:OMZ:SP:21342", 
+                "label": "HOPITAL LEGOUEST (Metz)", 
+                "links": [], 
+                "name": "HOPITAL LEGOUEST"
+              }
+            }, 
+            {
+              "additional_informations": [], 
+              "arrival_date_time": "20180115T153800", 
+              "base_arrival_date_time": "20180115T153800", 
+              "base_departure_date_time": "20180115T153800", 
+              "departure_date_time": "20180115T153800", 
+              "links": [], 
+              "stop_point": {
+                "codes": [
+                  {
+                    "type": "external_code", 
+                    "value": "OMZ21340"
+                  }, 
+                  {
+                    "type": "gtfs_stop_code", 
+                    "value": "6165"
+                  }, 
+                  {
+                    "type": "source", 
+                    "value": "21340"
+                  }
+                ], 
+                "coord": {
+                  "lat": "49.111661", 
+                  "lon": "6.185613"
+                }, 
+                "equipments": [], 
+                "id": "stop_point:OMZ:SP:21340", 
+                "label": "SEILLE (Metz)", 
+                "links": [], 
+                "name": "SEILLE"
+              }
+            }, 
+            {
+              "additional_informations": [], 
+              "arrival_date_time": "20180115T153900", 
+              "base_arrival_date_time": "20180115T153900", 
+              "base_departure_date_time": "20180115T153900", 
+              "departure_date_time": "20180115T153900", 
+              "links": [], 
+              "stop_point": {
+                "codes": [
+                  {
+                    "type": "external_code", 
+                    "value": "OMZ21338"
+                  }, 
+                  {
+                    "type": "gtfs_stop_code", 
+                    "value": "6155"
+                  }, 
+                  {
+                    "type": "source", 
+                    "value": "21338"
+                  }
+                ], 
+                "coord": {
+                  "lat": "49.109106", 
+                  "lon": "6.180866"
+                }, 
+                "equipments": [], 
+                "id": "stop_point:OMZ:SP:21338", 
+                "label": "CENTRE POMPIDOU METZ (Metz)", 
+                "links": [], 
+                "name": "CENTRE POMPIDOU METZ"
+              }
+            }, 
+            {
+              "additional_informations": [], 
+              "arrival_date_time": "20180115T154100", 
+              "base_arrival_date_time": "20180115T154100", 
+              "base_departure_date_time": "20180115T154100", 
+              "departure_date_time": "20180115T154100", 
+              "links": [], 
+              "stop_point": {
+                "codes": [
+                  {
+                    "type": "external_code", 
+                    "value": "OMZ21336"
+                  }, 
+                  {
+                    "type": "gtfs_stop_code", 
+                    "value": "6145"
+                  }, 
+                  {
+                    "type": "source", 
+                    "value": "21336"
+                  }
+                ], 
+                "coord": {
+                  "lat": "49.110389", 
+                  "lon": "6.17761"
+                }, 
+                "equipments": [], 
+                "id": "stop_point:OMZ:SP:21336", 
+                "label": "GARE (Metz)", 
+                "links": [], 
+                "name": "GARE"
+              }
+            }, 
+            {
+              "additional_informations": [], 
+              "arrival_date_time": "20180115T154200", 
+              "base_arrival_date_time": "20180115T154200", 
+              "base_departure_date_time": "20180115T154200", 
+              "departure_date_time": "20180115T154200", 
+              "links": [], 
+              "stop_point": {
+                "codes": [
+                  {
+                    "type": "external_code", 
+                    "value": "OMZ21334"
+                  }, 
+                  {
+                    "type": "gtfs_stop_code", 
+                    "value": "6135"
+                  }, 
+                  {
+                    "type": "source", 
+                    "value": "21334"
+                  }
+                ], 
+                "coord": {
+                  "lat": "49.110662", 
+                  "lon": "6.17162"
+                }, 
+                "equipments": [], 
+                "id": "stop_point:OMZ:SP:21334", 
+                "label": "ROI GEORGE (Metz)", 
+                "links": [], 
+                "name": "ROI GEORGE"
+              }
+            }
+          ], 
+          "to": {
+            "embedded_type": "stop_point", 
+            "id": "stop_point:OMZ:SP:21334", 
+            "name": "ROI GEORGE (Metz)", 
+            "quality": 0, 
+            "stop_point": {
+              "administrative_regions": [
+                {
+                  "coord": {
+                    "lat": "49.119698", 
+                    "lon": "6.176355"
+                  }, 
+                  "id": "admin:fr:57463", 
+                  "insee": "57463", 
+                  "label": "Metz (57000-57070)", 
+                  "level": 8, 
+                  "name": "Metz", 
+                  "zip_code": "57000;57050;57070"
+                }
+              ], 
+              "codes": [
+                {
+                  "type": "external_code", 
+                  "value": "OMZ21334"
+                }, 
+                {
+                  "type": "gtfs_stop_code", 
+                  "value": "6135"
+                }, 
+                {
+                  "type": "source", 
+                  "value": "21334"
+                }
+              ], 
+              "coord": {
+                "lat": "49.110662", 
+                "lon": "6.17162"
+              }, 
+              "equipments": [], 
+              "id": "stop_point:OMZ:SP:21334", 
+              "label": "ROI GEORGE (Metz)", 
+              "links": [], 
+              "name": "ROI GEORGE", 
+              "stop_area": {
+                "codes": [
+                  {
+                    "type": "external_code", 
+                    "value": "OMZ10671"
+                  }, 
+                  {
+                    "type": "gtfs_stop_code", 
+                    "value": "ROI"
+                  }, 
+                  {
+                    "type": "source", 
+                    "value": "10671"
+                  }
+                ], 
+                "coord": {
+                  "lat": "49.110651", 
+                  "lon": "6.171614"
+                }, 
+                "id": "stop_area:OMZ:SA:10671", 
+                "label": "ROI GEORGE (Metz)", 
+                "links": [], 
+                "name": "ROI GEORGE", 
+                "timezone": "Europe/Paris"
+              }
+            }
+          }, 
+          "type": "public_transport"
+        }, 
+        {
+          "arrival_date_time": "20180115T154434", 
+          "co2_emission": {
+            "unit": "", 
+            "value": 0.0
+          }, 
+          "departure_date_time": "20180115T154200", 
+          "duration": 154, 
+          "from": {
+            "embedded_type": "stop_point", 
+            "id": "stop_point:OMZ:SP:21334", 
+            "name": "ROI GEORGE (Metz)", 
+            "quality": 0, 
+            "stop_point": {
+              "administrative_regions": [
+                {
+                  "coord": {
+                    "lat": "49.119698", 
+                    "lon": "6.176355"
+                  }, 
+                  "id": "admin:fr:57463", 
+                  "insee": "57463", 
+                  "label": "Metz (57000-57070)", 
+                  "level": 8, 
+                  "name": "Metz", 
+                  "zip_code": "57000;57050;57070"
+                }, 
+                {
+                  "coord": {
+                    "lat": "49.119698", 
+                    "lon": "6.176355"
+                  }, 
+                  "id": "admin:fr:57463", 
+                  "insee": "57463", 
+                  "label": "Metz (57000-57070)", 
+                  "level": 8, 
+                  "name": "Metz", 
+                  "zip_code": "57000;57050;57070"
+                }
+              ], 
+              "codes": [
+                {
+                  "type": "external_code", 
+                  "value": "OMZ21334"
+                }, 
+                {
+                  "type": "gtfs_stop_code", 
+                  "value": "6135"
+                }, 
+                {
+                  "type": "source", 
+                  "value": "21334"
+                }, 
+                {
+                  "type": "external_code", 
+                  "value": "OMZ21334"
+                }, 
+                {
+                  "type": "gtfs_stop_code", 
+                  "value": "6135"
+                }, 
+                {
+                  "type": "source", 
+                  "value": "21334"
+                }
+              ], 
+              "commercial_modes": [
+                {
+                  "id": "commercial_mode:bus", 
+                  "name": "Bus"
+                }
+              ], 
+              "coord": {
+                "lat": "49.110662", 
+                "lon": "6.17162"
+              }, 
+              "equipments": [], 
+              "id": "stop_point:OMZ:SP:21334", 
+              "label": "ROI GEORGE (Metz)", 
+              "links": [], 
+              "name": "ROI GEORGE", 
+              "physical_modes": [
+                {
+                  "id": "physical_mode:Bus", 
+                  "name": "Bus"
+                }
+              ], 
+              "stop_area": {
+                "administrative_regions": [
+                  {
+                    "coord": {
+                      "lat": "49.119698", 
+                      "lon": "6.176355"
+                    }, 
+                    "id": "admin:fr:57463", 
+                    "insee": "57463", 
+                    "label": "Metz (57000-57070)", 
+                    "level": 8, 
+                    "name": "Metz", 
+                    "zip_code": "57000;57050;57070"
+                  }
+                ], 
+                "codes": [
+                  {
+                    "type": "external_code", 
+                    "value": "OMZ10671"
+                  }, 
+                  {
+                    "type": "gtfs_stop_code", 
+                    "value": "ROI"
+                  }, 
+                  {
+                    "type": "source", 
+                    "value": "10671"
+                  }, 
+                  {
+                    "type": "external_code", 
+                    "value": "OMZ10671"
+                  }, 
+                  {
+                    "type": "gtfs_stop_code", 
+                    "value": "ROI"
+                  }, 
+                  {
+                    "type": "source", 
+                    "value": "10671"
+                  }
+                ], 
+                "coord": {
+                  "lat": "49.110651", 
+                  "lon": "6.171614"
+                }, 
+                "id": "stop_area:OMZ:SA:10671", 
+                "label": "ROI GEORGE (Metz)", 
+                "links": [], 
+                "name": "ROI GEORGE", 
+                "timezone": "Europe/Paris"
+              }
+            }
+          }, 
+          "geojson": {
+            "coordinates": [
+              [
+                6.17162, 
+                49.110662
+              ], 
+              [
+                6.171968944, 
+                49.1106150832
+              ], 
+              [
+                6.172041, 
+                49.111151
+              ], 
+              [
+                6.17215, 
+                49.111319
+              ], 
+              [
+                6.17218, 
+                49.111294
+              ], 
+              [
+                6.172235, 
+                49.111298
+              ], 
+              [
+                6.172738, 
+                49.111249
+              ], 
+              [
+                6.172742, 
+                49.111267
+              ], 
+              [
+                6.172905, 
+                49.111251
+              ], 
+              [
+                6.1732596469, 
+                49.1110249656
+              ], 
+              [
+                6.1732596469, 
+                49.1110249656
+              ]
+            ], 
+            "properties": [
+              {
+                "length": 172
+              }
+            ], 
+            "type": "LineString"
+          }, 
+          "id": "section_2_0", 
+          "links": [], 
+          "mode": "walking", 
+          "path": [
+            {
+              "direction": 0, 
+              "duration": 53, 
+              "length": 59, 
+              "name": "Place du Roi George"
+            }, 
+            {
+              "direction": 0, 
+              "duration": 18, 
+              "length": 20, 
+              "name": "Place Raymond Mondon"
+            }, 
+            {
+              "direction": 119, 
+              "duration": 3, 
+              "length": 3, 
+              "name": ""
+            }, 
+            {
+              "direction": -58, 
+              "duration": 37, 
+              "length": 41, 
+              "name": ""
+            }, 
+            {
+              "direction": -90, 
+              "duration": 1, 
+              "length": 1, 
+              "name": ""
+            }, 
+            {
+              "direction": 90, 
+              "duration": 42, 
+              "length": 47, 
+              "name": "Rue Gambetta"
+            }
+          ], 
+          "to": {
+            "address": {
+              "administrative_regions": [
+                {
+                  "coord": {
+                    "lat": "49.119698", 
+                    "lon": "6.176355"
+                  }, 
+                  "id": "admin:fr:57463", 
+                  "insee": "57463", 
+                  "label": "Metz (57000-57070)", 
+                  "level": 8, 
+                  "name": "Metz", 
+                  "zip_code": "57000;57050;57070"
+                }
+              ], 
+              "coord": {
+                "lat": "49.1109", 
+                "lon": "6.17318"
+              }, 
+              "house_number": 3, 
+              "id": "6.17318;49.1109", 
+              "label": "3 Rue Gambetta (Metz)", 
+              "name": "Rue Gambetta"
+            }, 
+            "embedded_type": "address", 
+            "id": "6.17318;49.1109", 
+            "name": "3 Rue Gambetta (Metz)", 
+            "quality": 0
+          }, 
+          "type": "street_network"
+        }
+      ], 
+      "status": "", 
+      "tags": [
+        "walking"
+      ], 
+      "type": "best"
+    }, 
+    {
+      "arrival_date_time": "20180115T155633", 
+      "co2_emission": {
+        "unit": "", 
+        "value": 0.0
+      }, 
+      "departure_date_time": "20180115T153016", 
+      "distances": {
+        "bike": 0, 
+        "car": 0, 
+        "walking": 1766
+      }, 
+      "duration": 1577, 
+      "durations": {
+        "bike": 0, 
+        "car": 0, 
+        "total": 1577, 
+        "walking": 1577
+      }, 
+      "fare": {
+        "found": false, 
+        "links": []
+      }, 
+      "nb_transfers": 0, 
+      "requested_date_time": "20180115T153016", 
+      "sections": [
+        {
+          "arrival_date_time": "20180115T155633", 
+          "co2_emission": {
+            "unit": "", 
+            "value": 0.0
+          }, 
+          "departure_date_time": "20180115T153016", 
+          "duration": 1577, 
+          "from": {
+            "address": {
+              "administrative_regions": [
+                {
+                  "coord": {
+                    "lat": "49.119698", 
+                    "lon": "6.176355"
+                  }, 
+                  "id": "admin:fr:57463", 
+                  "insee": "57463", 
+                  "label": "Metz (57000-57070)", 
+                  "level": 8, 
+                  "name": "Metz", 
+                  "zip_code": "57000;57050;57070"
+                }
+              ], 
+              "coord": {
+                "lat": "49.1102387", 
+                "lon": "6.1940299"
+              }, 
+              "house_number": 22, 
+              "id": "6.1940299;49.1102387", 
+              "label": "22 Rue de Raigecourt (Metz)", 
+              "name": "Rue de Raigecourt"
+            }, 
+            "embedded_type": "address", 
+            "id": "6.1940299;49.1102387", 
+            "name": "22 Rue de Raigecourt (Metz)", 
+            "quality": 0
+          }, 
+          "geojson": {
+            "coordinates": [
+              [
+                6.193988028, 
+                49.110331597
+              ], 
+              [
+                6.19333, 
+                49.110035
+              ], 
+              [
+                6.193282, 
+                49.110079
+              ], 
+              [
+                6.19316, 
+                49.110148
+              ], 
+              [
+                6.192957, 
+                49.110282
+              ], 
+              [
+                6.192605, 
+                49.110584
+              ], 
+              [
+                6.191866, 
+                49.111018
+              ], 
+              [
+                6.191093, 
+                49.111399
+              ], 
+              [
+                6.190952, 
+                49.111443
+              ], 
+              [
+                6.190897, 
+                49.111494
+              ], 
+              [
+                6.188402, 
+                49.111699
+              ], 
+              [
+                6.187253, 
+                49.111659
+              ], 
+              [
+                6.187121, 
+                49.111684
+              ], 
+              [
+                6.186364, 
+                49.111865
+              ], 
+              [
+                6.186132, 
+                49.111951
+              ], 
+              [
+                6.185983, 
+                49.111982
+              ], 
+              [
+                6.185403, 
+                49.112115
+              ], 
+              [
+                6.185396, 
+                49.112117
+              ], 
+              [
+                6.185236, 
+                49.112242
+              ], 
+              [
+                6.185196, 
+                49.112495
+              ], 
+              [
+                6.184959, 
+                49.112627
+              ], 
+              [
+                6.184606, 
+                49.112711
+              ], 
+              [
+                6.184284, 
+                49.112939
+              ], 
+              [
+                6.18397, 
+                49.113094
+              ], 
+              [
+                6.182999, 
+                49.112952
+              ], 
+              [
+                6.180792, 
+                49.111925
+              ], 
+              [
+                6.180229, 
+                49.111691
+              ], 
+              [
+                6.180014, 
+                49.111653
+              ], 
+              [
+                6.179716, 
+                49.111654
+              ], 
+              [
+                6.178922, 
+                49.111582
+              ], 
+              [
+                6.178703, 
+                49.111561
+              ], 
+              [
+                6.177273, 
+                49.111458
+              ], 
+              [
+                6.176972, 
+                49.111436
+              ], 
+              [
+                6.176658, 
+                49.111256
+              ], 
+              [
+                6.17659, 
+                49.111218
+              ], 
+              [
+                6.175471, 
+                49.110674
+              ], 
+              [
+                6.17501, 
+                49.110458
+              ], 
+              [
+                6.174902, 
+                49.110414
+              ], 
+              [
+                6.174826, 
+                49.11038
+              ], 
+              [
+                6.174752, 
+                49.110348
+              ], 
+              [
+                6.173912, 
+                49.110499
+              ], 
+              [
+                6.173922, 
+                49.11063
+              ], 
+              [
+                6.173826, 
+                49.110664
+              ], 
+              [
+                6.1732596469, 
+                49.1110249656
+              ]
+            ], 
+            "properties": [
+              {
+                "length": 1766
+              }
+            ], 
+            "type": "LineString"
+          }, 
+          "id": "section_3_0", 
+          "links": [], 
+          "mode": "walking", 
+          "path": [
+            {
+              "direction": 0, 
+              "duration": 51, 
+              "length": 57, 
+              "name": "Rue de Raigecourt"
+            }, 
+            {
+              "direction": 0, 
+              "duration": 70, 
+              "length": 78, 
+              "name": "Rue Ancillon"
+            }, 
+            {
+              "direction": -11, 
+              "duration": 64, 
+              "length": 72, 
+              "name": "Sentier de la Roche"
+            }, 
+            {
+              "direction": -5, 
+              "duration": 73, 
+              "length": 82, 
+              "name": "Rue Ancillon"
+            }, 
+            {
+              "direction": 29, 
+              "duration": 6, 
+              "length": 7, 
+              "name": "Rue des Treize"
+            }, 
+            {
+              "direction": -48, 
+              "duration": 327, 
+              "length": 366, 
+              "name": "Avenue de Planti\u00e8res"
+            }, 
+            {
+              "direction": 2, 
+              "duration": 56, 
+              "length": 63, 
+              "name": "Pont de la Seille"
+            }, 
+            {
+              "direction": 34, 
+              "duration": 47, 
+              "length": 53, 
+              "name": ""
+            }, 
+            {
+              "direction": -20, 
+              "duration": 79, 
+              "length": 88, 
+              "name": "Passage de Planti\u00e8res"
+            }, 
+            {
+              "direction": -50, 
+              "duration": 286, 
+              "length": 320, 
+              "name": "Avenue Jean XXIII"
+            }, 
+            {
+              "direction": 17, 
+              "duration": 211, 
+              "length": 236, 
+              "name": "Avenue Foch"
+            }, 
+            {
+              "direction": -35, 
+              "duration": 171, 
+              "length": 192, 
+              "name": "Rue Charlemagne"
+            }, 
+            {
+              "direction": 1, 
+              "duration": 5, 
+              "length": 6, 
+              "name": "Rue Pasteur"
+            }, 
+            {
+              "direction": 49, 
+              "duration": 60, 
+              "length": 67, 
+              "name": ""
+            }, 
+            {
+              "direction": 78, 
+              "duration": 13, 
+              "length": 15, 
+              "name": ""
+            }, 
+            {
+              "direction": -64, 
+              "duration": 7, 
+              "length": 8, 
+              "name": ""
+            }, 
+            {
+              "direction": 0, 
+              "duration": 51, 
+              "length": 57, 
+              "name": "Rue Gambetta"
+            }
+          ], 
+          "to": {
+            "address": {
+              "administrative_regions": [
+                {
+                  "coord": {
+                    "lat": "49.119698", 
+                    "lon": "6.176355"
+                  }, 
+                  "id": "admin:fr:57463", 
+                  "insee": "57463", 
+                  "label": "Metz (57000-57070)", 
+                  "level": 8, 
+                  "name": "Metz", 
+                  "zip_code": "57000;57050;57070"
+                }
+              ], 
+              "coord": {
+                "lat": "49.1109", 
+                "lon": "6.17318"
+              }, 
+              "house_number": 3, 
+              "id": "6.17318;49.1109", 
+              "label": "3 Rue Gambetta (Metz)", 
+              "name": "Rue Gambetta"
+            }, 
+            "embedded_type": "address", 
+            "id": "6.17318;49.1109", 
+            "name": "3 Rue Gambetta (Metz)", 
+            "quality": 0
+          }, 
+          "type": "street_network"
+        }
+      ], 
+      "status": "", 
+      "tags": [
+        "walking", 
+        "non_pt", 
+        "non_pt_walking", 
+        "ecologic"
+      ], 
+      "type": "non_pt_walk"
+    }
+  ], 
+  "links": [
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1731800;49.1109000&from=6.1940299;49.1102387&datetime_represents=departure&datetime=20180115T153155", 
+      "rel": "next", 
+      "templated": false, 
+      "type": "next"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1731800;49.1109000&from=6.1940299;49.1102387&datetime_represents=arrival&datetime=20180115T154433", 
+      "rel": "prev", 
+      "templated": false, 
+      "type": "prev"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1731800;49.1109000&from=6.1940299;49.1102387&datetime_represents=departure&datetime=20180115T000000", 
+      "rel": "first", 
+      "templated": false, 
+      "type": "first"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1731800;49.1109000&from=6.1940299;49.1102387&datetime_represents=arrival&datetime=20180115T235959", 
+      "rel": "last", 
+      "templated": false, 
+      "type": "last"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/stop_points/{stop_point.id}", 
+      "rel": "stop_points", 
+      "templated": true, 
+      "type": "stop_point"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/commercial_modes/{commercial_modes.id}", 
+      "rel": "commercial_modes", 
+      "templated": true, 
+      "type": "commercial_modes"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/stop_areas/{stop_area.id}", 
+      "rel": "stop_areas", 
+      "templated": true, 
+      "type": "stop_area"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/vehicle_journeys/{vehicle_journey.id}", 
+      "rel": "vehicle_journeys", 
+      "templated": true, 
+      "type": "vehicle_journey"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/physical_modes/{physical_modes.id}", 
+      "rel": "physical_modes", 
+      "templated": true, 
+      "type": "physical_modes"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/routes/{route.id}", 
+      "rel": "routes", 
+      "templated": true, 
+      "type": "route"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/commercial_modes/{commercial_mode.id}", 
+      "rel": "commercial_modes", 
+      "templated": true, 
+      "type": "commercial_mode"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/addresses/{address.id}", 
+      "rel": "addresses", 
+      "templated": true, 
+      "type": "address"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/lines/{line.id}", 
+      "rel": "lines", 
+      "templated": true, 
+      "type": "line"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/physical_modes/{physical_mode.id}", 
+      "rel": "physical_modes", 
+      "templated": true, 
+      "type": "physical_mode"
+    }, 
+    {
+      "href": "https://api.navitia.io/v1/coverage/fr-ne/networks/{network.id}", 
+      "rel": "networks", 
+      "templated": true, 
+      "type": "network"
+    }
+  ], 
+  "notes": [], 
+  "tickets": []
+}

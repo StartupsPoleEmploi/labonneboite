@@ -48,7 +48,7 @@
 }
 
 .lbb-purple {
-    color: #7c408b !important;
+    color: #54108E !important;
 }
 
 .float-left {
@@ -110,6 +110,27 @@
         vertical-align: middle;
         margin: 20px 10px;
     }
+}
+
+/* Images icon.
+=========================================================================== */
+
+img.img-icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+img.img-icon-large {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+img.img-icon.img-choice {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    margin-top: 0;
+    cursor: pointer;
 }
 
 /* E-mail obfuscation.

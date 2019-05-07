@@ -10,6 +10,7 @@ from labonneboite.conf import settings
 from labonneboite.common import pro
 from labonneboite.common import search
 from labonneboite.common import sorting
+from labonneboite.common.maps import constants as maps_constants
 
 
 class CompanySearchForm(FlaskForm):
@@ -26,15 +27,19 @@ class CompanySearchForm(FlaskForm):
     NAF_CHOICES = [('', 'Tous les secteurs')] + [(k, v) for k, v in list(settings.NAF_CODES.items())]
 
     DISTANCE_CHOICES = (
-        ('5', 'Moins de 5 km'),
-        ('10', 'Moins de 10 km'),
-        ('30', 'Moins de 30 km'),
-        ('50', 'Moins de 50 km'),
-        ('100', 'Moins de 100km'),
-        ('3000', 'France entière')
+        ('5', '5 km'),
+        ('10', '10 km'),
+        ('30', '30 km'),
+        ('50', '50 km'),
+        ('100', '100 km'),
+        ('3000', '+ de 100 km'),
     )
-    DISTANCE_S = DISTANCE_CHOICES[2][0]
 
+    DURATION_CHOICES = [
+        (str(dur), 'Moins de {:d} min'.format(dur)) for dur in maps_constants.ISOCHRONE_DURATIONS_MINUTES
+    ] + [
+        ('0', '+ de {} minutes'.format(maps_constants.ISOCHRONE_DURATIONS_MINUTES[-1]))
+    ]
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -79,6 +84,19 @@ class CompanySearchForm(FlaskForm):
         choices=DISTANCE_CHOICES,
         default=settings.DISTANCE_FILTER_DEFAULT,
         validators=[Optional()])
+
+    tr = HiddenField(
+        'Mode de transport',
+        default=maps_constants.DEFAULT_TRAVEL_MODE,
+        validators=[Optional()]
+    )
+
+    dur = RadioField(
+        'Durée du trajet',
+        choices=DURATION_CHOICES,
+        default=DURATION_CHOICES[-1][0],
+        validators=[Optional()]
+    )
 
 
 class ProCompanySearchForm(CompanySearchForm):

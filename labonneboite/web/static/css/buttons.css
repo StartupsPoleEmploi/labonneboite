@@ -11,12 +11,12 @@
     display: inline-block;
     margin: 0 5px 0 0;
 
-    background-color: #7c408b;
+    background-color: #54108E;
     color: #fff;
     text-align: center;
     text-decoration: none;
 
-    border: 1px solid #7c408b;
+    border: 1px solid #54108E;
     border-radius: 2px;
 
     font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
@@ -50,7 +50,7 @@
 .btn.btn-hollow,
 .btn.btn-hollow:link,
 .btn.btn-hollow:visited {
-    color: #7c408b;
+    color: #54108E;
     background-color: #fff;
 }
 
