@@ -13,7 +13,7 @@ TIMEOUT_SECONDS = 5
 def isochrone(origin, duration):
     data = request_location_api('isochrones', origin, {
         'from': '{:.7f};{:.7f}'.format(origin[1], origin[0]),
-        'max_duration': int(duration*60),
+        'max_duration': int(duration * 60),
         # Activate transport by car only (although navitia was clearly not made
         # for car transport)
         # 'first_section_mode[]': 'car',
@@ -43,7 +43,10 @@ def durations(origin, destinations):
 
         try:
             data = request_json_api(endpoint, params=params)
-            duration = data['journeys'][0]['duration']
+            if data.get('error') and data['error']['id'] == 'no_solution':
+                duration = None
+            else:
+                duration = data['journeys'][0]['duration']
         except BackendUnreachable:
             duration = None
         results.append(duration)
