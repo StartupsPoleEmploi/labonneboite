@@ -253,7 +253,6 @@ def entreprises():
     fix_csrf_session()
     session['search_args'] = request.args
     location, named_location = get_location(request.args)
-    duration_filter_enabled = 'dur' in request.args
 
     occupation = request.args.get('occupation', '')
     if not occupation and 'j' in request.args:
@@ -343,6 +342,8 @@ def entreprises():
         for naf_aggregate in aggregations['naf']:
             naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["code"]), naf_aggregate["count"])
             naf_codes_with_descriptions.append((naf_aggregate["code"], naf_description))
+
+    duration_filter_enabled = fetcher.duration is not None
 
     # Pagination.
     pagination_manager = pagination.PaginationManager(
