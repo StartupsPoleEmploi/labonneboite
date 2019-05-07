@@ -191,6 +191,7 @@
     // Autosubmit when a transport icon is clicked
     searchForm.find('[data-travelmode]').on('click', function(){
       var travelMode = $(this).attr("data-travelmode");
+      ga('send', 'event', 'Form', 'click', 'travelmode-' + travelMode);
       searchForm.find('.travelmode-choice .img-choice').toggleClass('hidden');
       searchForm.find("[name='tr']").attr("value", travelMode);
       if ($("[name='dur'][value='0']").prop('checked')) {
