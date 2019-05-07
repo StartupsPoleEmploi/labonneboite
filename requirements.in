@@ -78,11 +78,6 @@ python-slugify
 requests
 validators
 
-# Pillow
-# For now, stick to Pillow 2.9 because later releases for Ubuntu 14.04 requires extra packages.
-# https://askubuntu.com/a/687637
-Pillow==2.9.0
-
 # Deployment and production
 uWSGI
 raven[flask]
