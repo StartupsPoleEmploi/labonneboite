@@ -149,6 +149,13 @@ textarea.form-error,
     float: left;
     margin: auto;
 }
+.lbb-sidebar-item .travelmode-choice img {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    margin-top: 0;
+    cursor: pointer;
+}
 .lbb-sidebar-item .travelmode-choice p {
     font-weight: 600;
     color: #54108E;
