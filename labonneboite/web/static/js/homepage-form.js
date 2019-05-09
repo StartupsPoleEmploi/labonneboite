@@ -5,6 +5,20 @@
   function disableDurationSearch() {
     $("[name='dur']").prop('checked', false);
   }
+  function createFunctionWithTimeout(callback, opt_timeout) {
+    // Inspired by https://developers.google.com/analytics/devguides/collection/analyticsjs/sending-hits
+    // This is useful for sending GA events synchronously
+    var called = false;
+    function fn() {
+      if (!called) {
+        called = true;
+        callback();
+      }
+    }
+    setTimeout(fn, opt_timeout || 1000);
+    return fn;
+  }
+
   function initForm() {
     "use strict";
 
@@ -191,7 +205,6 @@
     // Autosubmit when a transport icon is clicked
     searchForm.find('[data-travelmode]').on('click', function() {
       var travelMode = $(this).attr("data-travelmode");
-      ga('send', 'event', 'Form', 'click', 'travelmode-' + travelMode);
       searchForm.find('.travelmode-choice a').toggleClass('hidden');
       searchForm.find("[name='tr']").attr("value", travelMode);
       if ($("[name='dur'][value='0']").prop('checked')) {
@@ -199,7 +212,11 @@
         $("[name='dur'][value='30']").prop('checked', true);
         disableDistanceSearch();
       }
-      searchForm.submit();
+      ga('send', 'event', 'Form', 'click', 'travelmode-' + travelMode, {
+        hitCallback: createFunctionWithTimeout(function() {
+          searchForm.submit()
+        }, 1000)
+      });
     });
   }
 
