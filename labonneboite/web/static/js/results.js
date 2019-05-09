@@ -17,7 +17,7 @@ var trackOutboundLink = function(url) {
     // has a hard time initializing maps in hidden elements.
     $('.js-map-container:visible').initMap();
     $('.js-result-toggle-details').toggleDetails();
-    loadTravelDurations();
+    updateTravelDurations();
 
     var eventLabel;
     if ($('.ga-no-results').length) {
@@ -134,7 +134,7 @@ var trackOutboundLink = function(url) {
 
   };
   
-  function loadTravelDurations() {
+  function updateTravelDurations() {
     // Compute travel durations asynchronously for each company
     var companySirets = [];
     var companyCoordinates = [];
@@ -148,6 +148,18 @@ var trackOutboundLink = function(url) {
     if (!companySirets.length) {
         return;
     }
+    // Load durations 5 by 5 to avoid timeouts from upstream servers
+    var sampleSize = 5;
+    for (var i=0; i < companyCoordinates.length; i += sampleSize) {
+      loadTravelDurations(
+        travelMode, latitude, longitude,
+        companyCoordinates.slice(i, i+sampleSize),
+        companySirets.slice(i, i+sampleSize)
+      );
+    }
+  }
+  
+  function loadTravelDurations(travelMode, latitude, longitude, companyCoordinates, companySirets) {
     $.ajax({
         url: "/maps/durations",
         method: 'POST',
