@@ -184,6 +184,7 @@
         var switchValue = e.currentTarget.attributes["data-switch-value"].value;
         var currentSwitchValue = $('#distance-duration-switch').attr('data-switch-value-selected');
         if (currentSwitchValue !== switchValue) {
+          ga('send', 'event', 'Form', 'click', switchValue);
           $('#distance-duration-switch').attr('data-switch-value-selected', switchValue);
         }
     });
