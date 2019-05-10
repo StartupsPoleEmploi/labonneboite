@@ -9,7 +9,7 @@
 <div class="lbb-content">
   <div class="lbb-single-column-content">
 
-    <a class="return-btn" href="{{ url_for('contact_form.ask_action') }}?{{ params }}">Retour</a>
+    <a class="return-btn" href="{{ url_for('contact_form.ask_action') }}?{{ params }}" title="Retourner aux choix des actions">Retour</a>
 
     <form class="form-vertical update-jobs-form" action="" method="post">
       <h2>{{ title }}</h2>
@@ -19,48 +19,46 @@
         Notre algorithme se base sur une analyse fine des déclaration préalables à l'embauche faites en fonction du secteur d'activité auquel appartient votre entreprise (votre code Insee NAF).
       </p>
 
-      <table class="jobs">
-        <thead>
-          <th></th>
-          <th>Intéressé par des candidatures</th>
-          <th>Ouvert aux contrats d'alternance</th>
-          <th></th>
-        </thead>
-        <tbody>
+      <table class="jobs" role="presentation">
+        <tr class="header">
+          <td></td>
+          <td>Intéressé par des candidatures</td>
+          <td>Ouvert aux contrats d'alternance</td>
+          <td></td>
+        </tr>
 
-          {% for rome_field in rome_fields %}
-            <tr id="{{ rome_field.code }}" {% if rome_field.current_values[0] == 'hide' %}class="removed"{% endif %}>
-              <td>
-                <label for={{ rome_field.code }}>{{ rome_field.name }}</label>
-              </td>
+        {% for rome_field in rome_fields %}
+          <tr id="{{ rome_field.code }}" {% if rome_field.current_values[0] == 'hide' %}class="removed"{% endif %}>
+            <td class="text-left">
+              <b>{{ rome_field.name }}</b>
+            </td>
 
-              <td class="text-center">
-                  <span class="sr-only">Intéressé par les candidatures</span>
-                  <input
-                    {% if 'lbb' in rome_field.current_values %}checked="checked" {% endif %}
-                    type="checkbox" name="{{ rome_field.code }}" value="lbb" />
-              </td>
+            <td class="text-center">
+                <label for="lbb-{{ rome_field.code }}" class="sr-only">Intéressé par les candidatures pour le métier de {{ rome_field.name }}</label>
+                <input
+                  {% if 'lbb' in rome_field.current_values %}checked="checked" {% endif %}
+                  id="lbb-{{ rome_field.code }}" type="checkbox" name="{{ rome_field.code }}" value="lbb" />
+            </td>
 
-              <td class="text-center">
-                  <span class="sr-only">Métier ouvert à l'alternance</span>
-                  <input
-                    {% if 'lba' in rome_field.current_values %}checked="checked" {% endif %}
-                    type="checkbox" name="{{ rome_field.code }}" value="lba" />
-              </td>
+            <td class="text-center">
+                <label for="lba-{{ rome_field.code }}" class="sr-only">Métier ouvert à l'alternance</label>
+                <input
+                  {% if 'lba' in rome_field.current_values %}checked="checked" {% endif %}
+                  id="lba-{{ rome_field.code }}" type="checkbox" name="{{ rome_field.code }}" value="lba" />
+            </td>
 
-              <td>
-                  <span class="sr-only">Supprimer ce métier</span>
-                  <input class="hide sr-only"
-                    {% if 'hide' in rome_field.current_values %}checked="checked" {% endif %}
-                    type="checkbox" name="{{ rome_field.code }}" value="hide" />
+            <td>
+                <label for="remove-{{ rome_field.code }}" class="sr-only">Supprimer ce métier</label>
+                <input class="hide sr-only"
+                  {% if 'hide' in rome_field.current_values %}checked="checked" {% endif %}
+                  id="remove-{{ rome_field.code }}" type="checkbox" name="{{ rome_field.code }}" value="hide" />
 
-                    <button class="remove btn">
-                      {% if 'hide' in rome_field.current_values %}Restaurer{% else %}Supprimer{% endif %}
-                    </button>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
+                  <button class="remove btn">
+                    {% if 'hide' in rome_field.current_values %}Restaurer{% else %}Supprimer{% endif %}
+                  </button>
+            </td>
+          </tr>
+        {% endfor %}
       </table>
 
       <div class="add-new-jobs">
@@ -68,31 +66,38 @@
         <input class="ui-autocomplete-input" name="new-job" placeholder="" type="text" value="" autocomplete="off">
 
 
-        <table class="{% if not manually_added_jobs %}hidden{% endif %}">
-          <thead>
-            <th></th>
-            <th>Intéressé par des candidatures</th>
-            <th>Ouvert aux contrats d'alternance</th>
-            <th></th>
-          </thead>
-          <tbody>
-            {% for job in manually_added_jobs %}
-              <tr id="{{ job.id }}">
-                <td><span><label for="{{ job.id }}">{{ job.label }}</label></span></td>
-                <td class="text-center">
-                  <span class="sr-only">Intéressé par les candidatures</span>
-                  <input {% if job.lbb %}checked{% endif %} type="checkbox" name="{{ job.id }}" value="lbb" />
-                </td>
-                <td class="text-center">
-                  <span class="sr-only">Ouvert aux contrats d'alternance</span>
-                  <input {% if job.lba %}checked{% endif %} type="checkbox" name="{{ job.id }}" value="lba" />
-                </td>
-                <td class="text-center">
-                  <button class="btn remove" data-rome="{{ job.id }}">Supprimer</button>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
+        <table class="{% if not manually_added_jobs %}hidden{% endif %}" role="presentation">
+          <tr class="header">
+            <td></td>
+            <td>Intéressé par des candidatures</td>
+            <td>Ouvert aux contrats d'alternance</td>
+            <td></td>
+          </tr>
+
+          {% for job in manually_added_jobs %}
+            <tr id="{{ job.id }}">
+              <td class="text-left">
+                <span>
+                  <b>{{ job.label }}</b>
+              </span>
+              </td>
+              <td class="text-center">
+                <label for="lbb-{{ job.id }}" class="sr-only">Intéressé par les candidatures pour le métier de {{ job.label }}</label>
+                <input {% if job.lbb %}checked{% endif %} id="lbb-{{ job.id }}" type="checkbox" name="{{ job.id }}" value="lbb" />
+              </td>
+              <td class="text-center">
+                <label for="lbb-{{ job.id }}" class="sr-only">Ouvert aux contrats d'alternance pour le métier de {{ job.label }}</span>
+                <input {% if job.lba %}checked{% endif %} id="lbb-{{ job.id }}" type="checkbox" name="{{ job.id }}" value="lba" />
+              </td>
+              <td class="text-center">
+                <button class="btn remove" data-rome="{{ job.id }}" title="Supprimer le métier {{ job.label }}">
+                  Supprimer
+                  <span class="sr-only">le métier de {{ job.label }}</span>
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+
         </table>
       </div>
 

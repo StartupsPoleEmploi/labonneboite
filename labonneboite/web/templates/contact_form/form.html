@@ -14,7 +14,7 @@
 <div class="lbb-content">
   <div class="lbb-single-column-content" {% if is_recruiter %}data-esd-recruiter="true"{% endif %}>
 
-    {% if not hide_return %}<a class="return-btn" href="{{ url_for('contact_form.ask_action') }}?{{ params }}">Retour</a>{% endif %}
+    {% if not hide_return %}<a class="return-btn" href="{{ url_for('contact_form.ask_action') }}?{{ params }}" title="Retourner aux choix des actions">Retour</a>{% endif %}
 
     <form class="form-vertical contact-form {{ extra_submit_class }}" action="" method="post">
       <h1>{{ title }}</h1>
@@ -31,7 +31,7 @@
 
         {% include "includes/form_content.html" %}
 
-        {% if show_disclaimer %}
+        {% if show_credentials_disclaimer %}
           <p>* Lors de cette première étape d’identification, vos données personnelles nous permettent de lancer le processus de contrôle et ainsi valider votre légitimité à modifier une fiche entreprise. Vos données personnelles d’identification ne seront pas utilisées à d’autres fins.</p>
         {% endif %}
 

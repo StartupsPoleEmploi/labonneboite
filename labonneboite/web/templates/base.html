@@ -82,7 +82,7 @@
 
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <div class="lbb-flash-alerts">
+      <div class="lbb-flash-alerts" role="alert">
         {% for category, message in messages %}
           <div class="alert alert-{{ category }} js-alert-close">
             <p>{{ message }}</p>
