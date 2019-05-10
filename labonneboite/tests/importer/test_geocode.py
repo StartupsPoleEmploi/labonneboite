@@ -23,25 +23,14 @@ def make_geocoded_office():
 
 class TestGeocode(DatabaseTest):
 
-    def test_one(self):
-        siret = 1234
-        address = "1 rue Marca 64000 Pau"
-        updates = []
-        initial_coordinates = [0, 0]
-        city_code = '64445'
-
-        unit = GeocodeUnit(siret, address, updates, initial_coordinates,city_code)
-        unit.find_coordinates_for_address()
-        self.assertTrue(len(updates), 1)
-        coordinates = updates[0][1]
-        self.assertEqual(int(coordinates[0]), 0)
-        self.assertEqual(int(coordinates[1]), 43)
+    #TODO Question : Do I need to make other tests for geocoding ?
 
     def test_run_geocoding_jobs(self):
         task = GeocodeJob()
         initial_coordinates = [0, 0]
-        jobs = [[1234, "1 rue Marca 64000 Pau", initial_coordinates,'64445']]
-        updates = task.run_geocoding_jobs(jobs)
+        jobs = [[1234, "1 rue Marca 64000 Pau", initial_coordinates, '64445']]
+        task.run_geocoding_jobs(jobs)
+        updates = task.run_missing_geocoding_jobs()
         self.assertTrue(len(updates), 1)
         coordinates = updates[0][1]
         self.assertEqual(int(coordinates[0]), 0)
