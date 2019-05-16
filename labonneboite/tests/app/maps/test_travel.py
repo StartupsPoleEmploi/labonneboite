@@ -1,6 +1,6 @@
 # coding: utf8
 import unittest
-import mock
+from unittest import mock
 
 from labonneboite.common.maps import constants
 from labonneboite.common.maps import travel
