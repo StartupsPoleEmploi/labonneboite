@@ -25,7 +25,7 @@ class TestGeocode(DatabaseTest):
 
     #TODO Question : Do I need to make other tests for geocoding ?
 
-    def test_run_geocoding_jobs(self):
+    def test_run_geocoding_job(self):
         task = GeocodeJob()
         initial_coordinates = [0, 0]
         jobs = [[1234, "1 rue Marca 64000 Pau", initial_coordinates, '64445']]
@@ -35,6 +35,28 @@ class TestGeocode(DatabaseTest):
         coordinates = updates[0][1]
         self.assertEqual(int(coordinates[0]), 0)
         self.assertEqual(int(coordinates[1]), 43)
+
+    def test_run_geocoding_jobs(self):
+        task = GeocodeJob()
+        initial_coordinates = [0, 0]
+        jobs = [[1234, "1 rue Marca 64000 Pau", initial_coordinates, '64445'],
+                [5678, "13 rue de l'hotel de ville 44000 Nantes", initial_coordinates, '44109']]
+        task.run_geocoding_jobs(jobs)
+        updates = task.run_missing_geocoding_jobs(csv_max_rows=1)
+        self.assertTrue(len(updates), 2)
+        coordinates_1 = updates[0]
+        coordinates_2 = updates[1]
+        #Multithreading may switch order of coordinates, so we have to check the fake siret
+        if coordinates_1[0] == 1234:
+            self.assertEqual(int(coordinates_1[1][0]), 0)
+            self.assertEqual(int(coordinates_1[1][1]), 43)
+            self.assertEqual(int(coordinates_2[1][0]), -1)
+            self.assertEqual(int(coordinates_2[1][1]), 47)
+        else:
+            self.assertEqual(int(coordinates_1[1][0]), -1)
+            self.assertEqual(int(coordinates_1[1][1]), 47)
+            self.assertEqual(int(coordinates_2[1][0]), 0)
+            self.assertEqual(int(coordinates_2[1][1]), 43)
 
     def test_create_geocoding_jobs(self):
         task = GeocodeJob()
