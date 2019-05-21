@@ -3,6 +3,7 @@ from functools import wraps
 import collections
 import json
 import os
+import geopy.distance
 
 from slugify import slugify
 
@@ -152,6 +153,17 @@ def get_all_cities_from_departement(departement):
         for commune_id, city in list(CACHE['cities_by_commune_id'].items())
         if commune_id.startswith(departement)
     ]
+
+
+@cities_cache_required
+def get_distance_between_commune_id_and_coordinates(commune_id, latitude, longitude):
+    """
+    Return distance (float, kilometers) from commune_id to gps coordinates
+    """
+    city = get_city_by_commune_id(commune_id)
+    coords_1 = (city['coords']['lat'], city['coords']['lon'])
+    coords_2 = (latitude, longitude)
+    return geopy.distance.vincenty(coords_1, coords_2).km
 
 
 @cities_cache_required

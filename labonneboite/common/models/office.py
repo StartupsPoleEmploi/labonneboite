@@ -134,10 +134,6 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         # by quickly fetching all offices of any given departement.
         Index('_departement', 'departement'),
         
-        # Improve offer-office matching performance. 
-        Index('_raisonsociale_departement', 'raisonsociale', 'departement'),
-        Index('_enseigne_departement', 'enseigne', 'departement'),
-
         # Improve performance of create_index.py remove_scam_emails()
         # by quickly locating offices having a given scam email.
         Index('_email', 'email'),

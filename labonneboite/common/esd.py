@@ -55,8 +55,8 @@ class EsdToken(object):
             ('client_secret', settings.PEAM_CLIENT_SECRET),
             ('scope', "application_%s" % settings.PEAM_CLIENT_ID)
         ])
-        data += "%20api_offresdemploiv1 o2dsoffre"
-        data += " qos_silver_offresdemploiv1 qos_silver_offresdemploiv2"
+        data += "%20api_offresdemploiv2 o2dsoffre"
+        data += " qos_silver_offresdemploiv2"
 
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -64,8 +64,9 @@ class EsdToken(object):
 
         response = _get_response(
             url=ESD_TOKEN_ENDPOINT_URL,
-            data=data,
             headers=headers,
+            method='POST',
+            data=data,
         )
         if 'access_token' in response:
             cls.VALUE = response['access_token']
@@ -75,7 +76,7 @@ class EsdToken(object):
             raise TokenFailure
 
 
-def get_response(url, data):
+def get_response(url, params):
     """
     Get a response for a request to one of the ESD APIs.
     """
@@ -88,25 +89,43 @@ def get_response(url, data):
     response = {'results': []}
     while attempts <= ESD_OFFERS_MAX_ATTEMPTS:
         try:
-            return _get_response(url, data, headers)
+            return _get_response(
+                url=url,
+                params=params,
+                headers=headers,
+                method='GET',
+            )
         except TooManyRequests:
             time.sleep(ESD_OFFERS_THROTTLE_IN_SECONDS)
             attempts += 1
     return response
 
 
-def _get_response(url, data, headers):
+def _get_response(url, headers, params=None, method='GET', data=None):
     """
-    Generic method fetching the response for a POST request to a given
+    Generic method fetching the response for a GET/POST request to a given
     url with a given data object.
     """
     try:
-        response = requests.post(
-            url=url,
-            data=data,
-            headers=headers,
-            timeout=ESD_TIMEOUT,
-        )
+        if method == 'GET':
+            if data:
+                raise ValueError("data should be None for a GET request")
+            response = requests.get(
+                url=url,
+                params=params,
+                headers=headers,
+                timeout=ESD_TIMEOUT,
+            )
+        elif method == 'POST':
+            response = requests.post(
+                url=url,
+                params=params,
+                headers=headers,
+                data=data,
+                timeout=ESD_TIMEOUT,
+            )
+        else:
+            raise ValueError("unknown HTTP method")
     except (ConnectionError, ReadTimeout) as e:
         logger.exception(e)
         raise e
@@ -122,6 +141,6 @@ def _get_response(url, data, headers):
         )
         log_level = logging.WARNING if response.status_code >= 500 else logging.ERROR
         logger.log(log_level, error)
-        raise RequestFailed
+        raise RequestFailed("response={}".format(response.content))
 
     return response.json()

@@ -1,0 +1,762 @@
+{
+    "filtresPossibles": [
+        {
+            "agregation": [
+                {
+                    "nbResultats": 8,
+                    "valeurPossible": "CDD"
+                }
+            ],
+            "filtre": "typeContrat"
+        },
+        {
+            "agregation": [
+                {
+                    "nbResultats": 7,
+                    "valeurPossible": "1"
+                },
+                {
+                    "nbResultats": 1,
+                    "valeurPossible": "2"
+                }
+            ],
+            "filtre": "experience"
+        },
+        {
+            "agregation": [
+                {
+                    "nbResultats": 8,
+                    "valeurPossible": "0"
+                }
+            ],
+            "filtre": "qualification"
+        },
+        {
+            "agregation": [
+                {
+                    "nbResultats": 1,
+                    "valeurPossible": "E2"
+                },
+                {
+                    "nbResultats": 7,
+                    "valeurPossible": "FS"
+                }
+            ],
+            "filtre": "natureContrat"
+        }
+    ],
+    "resultats": [
+        {
+            "accessibleTH": false,
+            "alternance": true,
+            "appellationlibelle": "Vendeur / Vendeuse en bricolage",
+            "competences": [
+                {
+                    "code": "120130",
+                    "exigence": "S",
+                    "libelle": "Accueillir une client\u00e8le"
+                },
+                {
+                    "code": "121698",
+                    "exigence": "S",
+                    "libelle": "Proposer un service, produit adapt\u00e9 \u00e0 la demande client"
+                },
+                {
+                    "code": "117468",
+                    "exigence": "S",
+                    "libelle": "R\u00e9aliser la mise en rayon"
+                },
+                {
+                    "code": "102405",
+                    "exigence": "S",
+                    "libelle": "Techniques de mise en rayon"
+                }
+            ],
+            "contact": {
+                "coordonnees1": "Courriel : iseahrecrut@gmail.com",
+                "courriel": "iseahrecrut@gmail.com",
+                "nom": "ISEAH FORMATION - Mme DELAUZANNE"
+            },
+            "dateActualisation": "2019-05-28T14:45:24+02:00",
+            "dateCreation": "2019-01-23T13:32:22+01:00",
+            "description": "Dans le cadre d'un contrat de professionnalisation, la personne s\u00e9lectionn\u00e9e sera form\u00e9e \u00e0 la caisse, la relation et fid\u00e9lisation clients .en alternance de pratique en magasin et de th\u00e9orie en organisme de formation. ",
+            "dureeTravailLibelle": "35H Horaires normaux",
+            "entreprise": {
+                "nom": "ISEAH FORMATION",
+                "siret": "00000000000007"
+            },
+            "experienceExige": "D",
+            "experienceLibelle": "D\u00e9butant accept\u00e9",
+            "formations": [],
+            "id": "082SGKK",
+            "intitule": "conseiller de vente (H/F)",
+            "langues": [],
+            "lieuTravail": {
+                "codePostal": "57000",
+                "commune": "57463",
+                "latitude": 49.11972222,
+                "libelle": "57 - METZ TECHNOPOLE",
+                "longitude": 6.176944443
+            },
+            "natureContrat": "Cont. professionnalisation",
+            "nombrePostes": 1,
+            "origineOffre": {
+                "origine": "1",
+                "partenaires": [],
+                "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/082SGKK"
+            },
+            "qualificationCode": "5",
+            "romeCode": "D1212",
+            "romeLibelle": "Vente en d\u00e9coration et \u00e9quipement du foyer",
+            "salaire": {
+                "libelle": "Horaire de 10.03 Euros"
+            },
+            "secteurActivite": "47",
+            "secteurActiviteLibelle": "Commerce de d\u00e9tail de quincaillerie, peintures et verres en grandes surfaces (400 m2 et plus)",
+            "trancheEffectifEtab": "50 \u00e0 99 salari\u00e9s",
+            "typeContrat": "CDD",
+            "typeContratLibelle": "Contrat \u00e0 dur\u00e9e d\u00e9termin\u00e9e - 12 Mois"
+        },
+        {
+            "accessibleTH": false,
+            "alternance": true,
+            "appellationlibelle": "Vendeur / Vendeuse en t\u00e9l\u00e9phonie",
+            "competences": [
+                {
+                    "code": "120130",
+                    "exigence": "S",
+                    "libelle": "Accueillir une client\u00e8le"
+                },
+                {
+                    "code": "121698",
+                    "exigence": "S",
+                    "libelle": "Proposer un service, produit adapt\u00e9 \u00e0 la demande client"
+                },
+                {
+                    "code": "117468",
+                    "exigence": "S",
+                    "libelle": "R\u00e9aliser la mise en rayon"
+                },
+                {
+                    "code": "102405",
+                    "exigence": "S",
+                    "libelle": "Techniques de mise en rayon"
+                }
+            ],
+            "contact": {
+                "coordonnees1": "Courriel : h.bouerat@alternance-lorraine.fr",
+                "courriel": "h.bouerat@alternance-lorraine.fr",
+                "nom": "ALTERNANCE LORRAINE - Mme Harmonie BOUERAT"
+            },
+            "dateActualisation": "2019-05-30T10:43:24+02:00",
+            "dateCreation": "2019-05-23T15:54:38+02:00",
+            "description": "Alternance Lorraine, centre de formation professionnelle sp\u00e9cialis\u00e9 dans le commerce, bas\u00e9 \u00e0 Nancy recherche, pour l'une de ses entreprises partenaires dans le domaine de la t\u00e9l\u00e9phonie, une candidature H/F souhaitant effectuer un BTS Management Commercial Op\u00e9rationnel (ancien MUC) en Alternance, d'une dur\u00e9e de 24 mois \u00e0 la rentr\u00e9e 2019.\n\nDans le cadre de cette formation vous serez amen\u00e9 \u00e0 :\n-\tD\u00e9velopper la relation client\n-\tAnimer les offres de produits\n-\tAssurer la gestion \u00e9conomique de l'activit\u00e9\n\nLe comp\u00e9tences recherch\u00e9es sont :\n-\tDynamisme\n-\tint\u00e9r\u00eat pour les nouvelles technologies\n-\tResponsabilit\u00e9\n-\tsens du contact client\n\nR\u00e9mun\u00e9ration : % SMIC (en fonction de l'\u00e2ge et du niveau de formation)\nNiveau : D\u00e9butant avec un niveau Bac",
+            "dureeTravailLibelle": "35H Horaires normaux",
+            "entreprise": {
+                "description": "Alternance Lorraine, Ecole sup\u00e9rieure de l'alternance.\n96 Boulevard d'Austrasie 54000 NANCY\nwww.groupe-alternance.com",
+                "logo": "KlLUv9vRH2cohxIk6d2WAuRXfs6kjn42",
+                "nom": "ALTERNANCE LORRAINE",
+                "siret": "00000000000009",
+                "url": "http://www.groupe-alternance.com"
+            },
+            "experienceExige": "D",
+            "experienceLibelle": "D\u00e9butant accept\u00e9",
+            "formations": [
+                {
+                    "exigence": "E",
+                    "niveauLibelle": "Bac ou \u00e9quivalent"
+                }
+            ],
+            "id": "088KPWY",
+            "intitule": "Vendeur / Vendeuse en t\u00e9l\u00e9phonie",
+            "langues": [],
+            "lieuTravail": {
+                "codePostal": "57160",
+                "commune": "57487",
+                "latitude": 49.10638889,
+                "libelle": "57 - MOULINS LES METZ",
+                "longitude": 6.108888888
+            },
+            "natureContrat": "Cont. professionnalisation",
+            "nombrePostes": 1,
+            "origineOffre": {
+                "origine": "1",
+                "partenaires": [],
+                "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/088KPWY"
+            },
+            "qualificationCode": "5",
+            "qualitesProfessionnelles": [
+                {
+                    "description": "Capacit\u00e9 \u00e0 transmettre clairement des informations, \u00e0 \u00e9changer, \u00e0 \u00e9couter activement, \u00e0 r\u00e9ceptionner des informations et messages et \u00e0 faire preuve d\u2019ouverture d\u2019esprit. Exemple : \u00eatre \u00e0 l\u2019\u00e9coute, \u00eatre attentif aux autres",
+                    "libelle": "Sens de la communication"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 prendre en charge son activit\u00e9 sans devoir \u00eatre encadr\u00e9 de fa\u00e7on continue. Exemple : travailler efficacement sans responsable",
+                    "libelle": "Autonomie"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 r\u00e9agir rapidement face \u00e0 des \u00e9v\u00e8nements et \u00e0 des impr\u00e9vus, en hi\u00e9rarchisant les actions, en fonction de leur degr\u00e9 d\u2019urgence / d\u2019importance. Exemple : faire preuve de dynamisme, vivacit\u00e9, \u00e9nergie, comprendre vite",
+                    "libelle": "R\u00e9activit\u00e9"
+                }
+            ],
+            "romeCode": "D1212",
+            "romeLibelle": "Vente en d\u00e9coration et \u00e9quipement du foyer",
+            "salaire": {
+                "libelle": "Mensuel de 850.00 Euros \u00e0 1217.00 Euros sur 12 mois"
+            },
+            "secteurActivite": "85",
+            "secteurActiviteLibelle": "Formation continue d'adultes",
+            "trancheEffectifEtab": "6 \u00e0 9 salari\u00e9s",
+            "typeContrat": "CDD",
+            "typeContratLibelle": "Contrat \u00e0 dur\u00e9e d\u00e9termin\u00e9e - 24 Mois"
+        },
+        {
+            "accessibleTH": false,
+            "alternance": true,
+            "appellationlibelle": "Vendeur / Vendeuse de cuisines",
+            "competences": [
+                {
+                    "code": "120130",
+                    "exigence": "S",
+                    "libelle": "Accueillir une client\u00e8le"
+                },
+                {
+                    "code": "121188",
+                    "exigence": "S",
+                    "libelle": "Am\u00e9nagement int\u00e9rieur"
+                },
+                {
+                    "code": "121698",
+                    "exigence": "S",
+                    "libelle": "Proposer un service, produit adapt\u00e9 \u00e0 la demande client"
+                },
+                {
+                    "code": "100340",
+                    "exigence": "S",
+                    "libelle": "Techniques de vente"
+                },
+                {
+                    "code": "122183",
+                    "exigence": "S",
+                    "libelle": "Vendre des produits ou services"
+                }
+            ],
+            "contact": {
+                "coordonnees1": "Courriel : claudia.lechenard@darty.fr",
+                "courriel": "claudia.lechenard@darty.fr",
+                "nom": "DARTY - Mme CLAUDIA  LECHENARD"
+            },
+            "dateActualisation": "2019-05-30T10:50:28+02:00",
+            "dateCreation": "2019-05-22T17:01:52+02:00",
+            "description": "Le point de vente \"DARTY\" situ\u00e9 \u00e0 Augny recherche Vendeur (H/F) de cuisines en alternance.\n\nVous serez form\u00e9(e) au sein de l'AFPIA SUD EST pour apprendre les m\u00e9thodes de vente de l'enseigne.\nLa formation d\u00e9butera le 30 septembre jusqu'au 10 juillet 2019. \nLes frais de d\u00e9placement ainsi que les frais d'h\u00e9bergement (logement \u00e9tudiant) seront pris en charge par DARTY. \n\nLe profil recherch\u00e9 est une personne motiv\u00e9(e), curieuse et dynamique. \nUne exp\u00e9rience dans la vente de produits similaires est souhait\u00e9e. ",
+            "dureeTravailLibelle": "35H Horaires normaux",
+            "entreprise": {
+                "nom": "DARTY",
+                "siret": "00000000000001"
+            },
+            "experienceCommentaire": "D\u00e9butant accept\u00e9 domaine similaire",
+            "experienceExige": "E",
+            "experienceLibelle": "1 an - D\u00e9butant accept\u00e9 domaine similaire",
+            "formations": [],
+            "id": "088JJPC",
+            "intitule": "Vendeur / vendeuse de cuisines",
+            "langues": [],
+            "lieuTravail": {
+                "codePostal": "57685",
+                "commune": "57039",
+                "latitude": 49.05888889,
+                "libelle": "57 - AUGNY",
+                "longitude": 6.12111111
+            },
+            "natureContrat": "Cont. professionnalisation",
+            "nombrePostes": 1,
+            "origineOffre": {
+                "origine": "1",
+                "partenaires": [],
+                "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/088JJPC"
+            },
+            "permis": [
+                {
+                    "exigence": "E",
+                    "libelle": "B - V\u00e9hicule l\u00e9ger Exig\u00e9"
+                }
+            ],
+            "qualificationCode": "6",
+            "qualitesProfessionnelles": [
+                {
+                    "description": "Capacit\u00e9 \u00e0 aller chercher au-del\u00e0 de ce qui est donn\u00e9 \u00e0 voir, \u00e0 s\u2019ouvrir sur la nouveaut\u00e9 et \u00e0 investiguer pour comprendre et agir de fa\u00e7on appropri\u00e9e. Exemple : avoir l\u2019envie d\u2019apprendre",
+                    "libelle": "Curiosit\u00e9"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 maintenir son effort jusqu\u2019\u00e0 l\u2019ach\u00e8vement complet d\u2019une t\u00e2che, quels que soient les impr\u00e9vus et les obstacles de r\u00e9alisation rencontr\u00e9s. Exemple : faire preuve de volont\u00e9, d\u2019assiduit\u00e9, de r\u00e9gularit\u00e9, rebondir apr\u00e8s une erreur",
+                    "libelle": "Pers\u00e9v\u00e9rance"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 r\u00e9agir rapidement face \u00e0 des \u00e9v\u00e8nements et \u00e0 des impr\u00e9vus, en hi\u00e9rarchisant les actions, en fonction de leur degr\u00e9 d\u2019urgence / d\u2019importance. Exemple : faire preuve de dynamisme, vivacit\u00e9, \u00e9nergie, comprendre vite",
+                    "libelle": "R\u00e9activit\u00e9"
+                }
+            ],
+            "romeCode": "D1212",
+            "romeLibelle": "Vente en d\u00e9coration et \u00e9quipement du foyer",
+            "salaire": {
+                "commentaire": "% SMIC",
+                "complement1": "% SMIC"
+            },
+            "secteurActivite": "47",
+            "secteurActiviteLibelle": "Commerce de d\u00e9tail d'appareils \u00e9lectrom\u00e9nagers en magasin sp\u00e9cialis\u00e9",
+            "trancheEffectifEtab": "20 \u00e0 49 salari\u00e9s",
+            "typeContrat": "CDD",
+            "typeContratLibelle": "Contrat \u00e0 dur\u00e9e d\u00e9termin\u00e9e - 11 Mois"
+        },
+        {
+            "accessibleTH": false,
+            "alternance": true,
+            "appellationlibelle": "Vendeur / Vendeuse en articles de d\u00e9coration",
+            "competences": [
+                {
+                    "code": "120130",
+                    "exigence": "S",
+                    "libelle": "Accueillir une client\u00e8le"
+                },
+                {
+                    "code": "121698",
+                    "exigence": "S",
+                    "libelle": "Proposer un service, produit adapt\u00e9 \u00e0 la demande client"
+                },
+                {
+                    "code": "117468",
+                    "exigence": "S",
+                    "libelle": "R\u00e9aliser la mise en rayon"
+                },
+                {
+                    "code": "102405",
+                    "exigence": "S",
+                    "libelle": "Techniques de mise en rayon"
+                }
+            ],
+            "contact": {
+                "coordonnees1": "Courriel : h.bouerat@alternance-lorraine.fr",
+                "courriel": "h.bouerat@alternance-lorraine.fr",
+                "nom": "ALTERNANCE LORRAINE - Mme Harmonie BOUERAT"
+            },
+            "dateActualisation": "2019-05-29T19:15:18+02:00",
+            "dateCreation": "2019-05-23T17:10:24+02:00",
+            "description": "Alternance Lorraine, centre de formation professionnelle sp\u00e9cialis\u00e9 dans le commerce, bas\u00e9 \u00e0 Nancy recherche, pour l'une de ses entreprises partenaires, une candidature H/F souhaitant effectuer un BTS Management Commercial Op\u00e9rationnel (ancien MUC) en Alternance, d'une dur\u00e9e de 24 mois \u00e0 la rentr\u00e9e 2019.\nDans le cadre de cette formation vous serez amen\u00e9 \u00e0 :\n-\tD\u00e9velopper la relation Client\n-\tAnimer les offres de produits\n-\tAssurer la gestion \u00e9conomique de l'activit\u00e9\nLe profil recherch\u00e9 est :\n-\tDynamique \n-\tOrganis\u00e9\n-\tResponsable \n-\tGout pour la vente\n-\tSens de l'initiative \n\nR\u00e9mun\u00e9ration : % SMIC (en fonction de ton \u00e2ge et de ton niveau de formation)\nNiveau : D\u00e9butant avec un niveau Bac",
+            "dureeTravailLibelle": "35H Horaires normaux",
+            "entreprise": {
+                "description": "Alternance Lorraine, Ecole sup\u00e9rieure de l'alternance.\n96 Boulevard d'Austrasie 54000 NANCY\nwww.groupe-alternance.com",
+                "logo": "KlLUv9vRH2cohxIk6d2WAuRXfs6kjn42",
+                "nom": "ALTERNANCE LORRAINE",
+                "siret": "00000000000009",
+                "url": "http://www.groupe-alternance.com"
+            },
+            "experienceExige": "D",
+            "experienceLibelle": "D\u00e9butant accept\u00e9",
+            "formations": [
+                {
+                    "exigence": "E",
+                    "niveauLibelle": "Bac ou \u00e9quivalent"
+                }
+            ],
+            "id": "088KTTG",
+            "intitule": "Vendeur / Vendeuse en articles de d\u00e9coration",
+            "langues": [],
+            "lieuTravail": {
+                "codePostal": "57280",
+                "commune": "57645",
+                "latitude": 49.19305556,
+                "libelle": "57 - SEMECOURT",
+                "longitude": 6.134722221
+            },
+            "natureContrat": "Cont. professionnalisation",
+            "nombrePostes": 1,
+            "origineOffre": {
+                "origine": "1",
+                "partenaires": [],
+                "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/088KTTG"
+            },
+            "qualificationCode": "5",
+            "qualitesProfessionnelles": [
+                {
+                    "description": "Capacit\u00e9 \u00e0 travailler et \u00e0 se coordonner avec les autres au sein de l\u2019entreprise en confiance et en transparence pour r\u00e9aliser les objectifs fix\u00e9s. Exemple : aider ses coll\u00e8gues, savoir demander de l\u2019aide",
+                    "libelle": "Travail en \u00e9quipe"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 prendre en charge son activit\u00e9 sans devoir \u00eatre encadr\u00e9 de fa\u00e7on continue. Exemple : travailler efficacement sans responsable",
+                    "libelle": "Autonomie"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 r\u00e9agir rapidement face \u00e0 des \u00e9v\u00e8nements et \u00e0 des impr\u00e9vus, en hi\u00e9rarchisant les actions, en fonction de leur degr\u00e9 d\u2019urgence / d\u2019importance. Exemple : faire preuve de dynamisme, vivacit\u00e9, \u00e9nergie, comprendre vite",
+                    "libelle": "R\u00e9activit\u00e9"
+                }
+            ],
+            "romeCode": "D1212",
+            "romeLibelle": "Vente en d\u00e9coration et \u00e9quipement du foyer",
+            "salaire": {
+                "libelle": "Mensuel de 850.00 Euros \u00e0 1217.00 Euros sur 12 mois"
+            },
+            "secteurActivite": "85",
+            "secteurActiviteLibelle": "Formation continue d'adultes",
+            "trancheEffectifEtab": "6 \u00e0 9 salari\u00e9s",
+            "typeContrat": "CDD",
+            "typeContratLibelle": "Contrat \u00e0 dur\u00e9e d\u00e9termin\u00e9e - 24 Mois"
+        },
+        {
+            "accessibleTH": false,
+            "alternance": true,
+            "appellationlibelle": "Vendeur / Vendeuse en t\u00e9l\u00e9phonie",
+            "competences": [
+                {
+                    "code": "120130",
+                    "exigence": "S",
+                    "libelle": "Accueillir une client\u00e8le"
+                },
+                {
+                    "code": "121698",
+                    "exigence": "S",
+                    "libelle": "Proposer un service, produit adapt\u00e9 \u00e0 la demande client"
+                },
+                {
+                    "code": "117468",
+                    "exigence": "S",
+                    "libelle": "R\u00e9aliser la mise en rayon"
+                },
+                {
+                    "code": "102405",
+                    "exigence": "S",
+                    "libelle": "Techniques de mise en rayon"
+                }
+            ],
+            "contact": {
+                "coordonnees1": "Courriel : h.bouerat@alternance-lorraine.fr",
+                "courriel": "h.bouerat@alternance-lorraine.fr",
+                "nom": "ALTERNANCE LORRAINE - Mme Harmonie BOUERAT"
+            },
+            "dateActualisation": "2019-05-27T15:33:55+02:00",
+            "dateCreation": "2019-05-23T15:59:26+02:00",
+            "description": "Alternance Lorraine, centre de formation professionnelle sp\u00e9cialis\u00e9 dans le commerce, bas\u00e9 \u00e0 Nancy recherche, pour l'une de ses entreprises partenaires dans le domaine de la t\u00e9l\u00e9phonie, une candidature H/F souhaitant effectuer un BTS Management Commercial Op\u00e9rationnel (ancien MUC) en Alternance, d'une dur\u00e9e de 24 mois \u00e0 la rentr\u00e9e 2019.\n\nDans le cadre de cette formation vous serez amen\u00e9 \u00e0 :\n-\tD\u00e9velopper la relation client\n-\tAnimer les offres de produits\n-\tAssurer la gestion \u00e9conomique de l'activit\u00e9\n\nLe comp\u00e9tences recherch\u00e9es sont :\n-\tDynamisme\n-\tint\u00e9r\u00eat pour les nouvelles technologies\n-\tResponsabilit\u00e9\n-\tsens du contact client\n\nR\u00e9mun\u00e9ration : % SMIC (en fonction de l'\u00e2ge et du niveau de formation)\nNiveau : D\u00e9butant avec un niveau Bac",
+            "dureeTravailLibelle": "35H Horaires normaux",
+            "entreprise": {
+                "description": "Alternance Lorraine, Ecole sup\u00e9rieure de l'alternance.\n96 Boulevard d'Austrasie 54000 NANCY\nwww.groupe-alternance.com",
+                "logo": "KlLUv9vRH2cohxIk6d2WAuRXfs6kjn42",
+                "nom": "ALTERNANCE LORRAINE",
+                "siret": "00000000000009",
+                "url": "http://www.groupe-alternance.com"
+            },
+            "experienceExige": "D",
+            "experienceLibelle": "D\u00e9butant accept\u00e9",
+            "formations": [
+                {
+                    "exigence": "E",
+                    "niveauLibelle": "Bac ou \u00e9quivalent"
+                }
+            ],
+            "id": "088KQCN",
+            "intitule": "Vendeur / Vendeuse en t\u00e9l\u00e9phonie",
+            "langues": [],
+            "lieuTravail": {
+                "codePostal": "54390",
+                "commune": "54215",
+                "latitude": 48.76055556,
+                "libelle": "54 - FROUARD",
+                "longitude": 6.128888888
+            },
+            "natureContrat": "Cont. professionnalisation",
+            "nombrePostes": 1,
+            "origineOffre": {
+                "origine": "1",
+                "partenaires": [],
+                "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/088KQCN"
+            },
+            "qualificationCode": "5",
+            "qualitesProfessionnelles": [
+                {
+                    "description": "Capacit\u00e9 \u00e0 travailler et \u00e0 se coordonner avec les autres au sein de l\u2019entreprise en confiance et en transparence pour r\u00e9aliser les objectifs fix\u00e9s. Exemple : aider ses coll\u00e8gues, savoir demander de l\u2019aide",
+                    "libelle": "Travail en \u00e9quipe"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 transmettre clairement des informations, \u00e0 \u00e9changer, \u00e0 \u00e9couter activement, \u00e0 r\u00e9ceptionner des informations et messages et \u00e0 faire preuve d\u2019ouverture d\u2019esprit. Exemple : \u00eatre \u00e0 l\u2019\u00e9coute, \u00eatre attentif aux autres",
+                    "libelle": "Sens de la communication"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 r\u00e9agir rapidement face \u00e0 des \u00e9v\u00e8nements et \u00e0 des impr\u00e9vus, en hi\u00e9rarchisant les actions, en fonction de leur degr\u00e9 d\u2019urgence / d\u2019importance. Exemple : faire preuve de dynamisme, vivacit\u00e9, \u00e9nergie, comprendre vite",
+                    "libelle": "R\u00e9activit\u00e9"
+                }
+            ],
+            "romeCode": "D1212",
+            "romeLibelle": "Vente en d\u00e9coration et \u00e9quipement du foyer",
+            "salaire": {
+                "libelle": "Mensuel de 850.00 Euros \u00e0 1217.00 Euros sur 12 mois"
+            },
+            "secteurActivite": "85",
+            "secteurActiviteLibelle": "Formation continue d'adultes",
+            "trancheEffectifEtab": "6 \u00e0 9 salari\u00e9s",
+            "typeContrat": "CDD",
+            "typeContratLibelle": "Contrat \u00e0 dur\u00e9e d\u00e9termin\u00e9e - 24 Mois"
+        },
+        {
+            "accessibleTH": false,
+            "alternance": true,
+            "appellationlibelle": "Vendeur / Vendeuse en mat\u00e9riaux de construction",
+            "competences": [
+                {
+                    "code": "120130",
+                    "exigence": "S",
+                    "libelle": "Accueillir une client\u00e8le"
+                },
+                {
+                    "code": "121698",
+                    "exigence": "S",
+                    "libelle": "Proposer un service, produit adapt\u00e9 \u00e0 la demande client"
+                },
+                {
+                    "code": "117468",
+                    "exigence": "S",
+                    "libelle": "R\u00e9aliser la mise en rayon"
+                },
+                {
+                    "code": "102405",
+                    "exigence": "S",
+                    "libelle": "Techniques de mise en rayon"
+                }
+            ],
+            "contact": {
+                "coordonnees1": "Courriel : h.bouerat@alternance-lorraine.fr",
+                "courriel": "h.bouerat@alternance-lorraine.fr",
+                "nom": "ALTERNANCE LORRAINE - Mme Harmonie BOUERAT"
+            },
+            "dateActualisation": "2019-05-28T17:50:56+02:00",
+            "dateCreation": "2019-05-24T16:59:05+02:00",
+            "description": "Alternance Lorraine, centre de formation professionnelle sp\u00e9cialis\u00e9 dans le commerce, bas\u00e9 \u00e0 Nancy recherche, pour l'une de ses entreprises partenaires sp\u00e9cialis\u00e9e dans la vente de mat\u00e9riaux de construction, une candidature H/F souhaitant effectuer un BTS N\u00e9gociation et Digitalisation de la Relation Client en Alternance (NDRC), d'une dur\u00e9e de 24 mois \u00e0 la rentr\u00e9e 2019.\nDans le cadre de cette formation, vous serez amen\u00e9 \u00e0 :\n-\tD\u00e9velopper les r\u00e9seaux professionnels\n-\tFid\u00e9liser la client\u00e8le\n-\tUtiliser des outils de marketing\n-\tOrganiser et animer des \u00e9v\u00e9nements commerciaux\n-\tN\u00e9gocier\n-\tVendre\n\nLe profil recherch\u00e9 est :\n-\tDynamique \n-\tOrganis\u00e9\n-\tVolontaire\n-       Int\u00e9ress\u00e9 par le bricolage\n-\tAvoir un bon relationnel\n\nR\u00e9mun\u00e9ration: % SMIC (en fonction de ton \u00e2ge et de ton niveau de formation)\n\nNiveau: D\u00e9butant avec un niveau Bac ",
+            "dureeTravailLibelle": "35H Horaires normaux",
+            "entreprise": {
+                "description": "Alternance Lorraine, Ecole sup\u00e9rieure de l'alternance.\n96 Boulevard d'Austrasie 54000 NANCY\nwww.groupe-alternance.com",
+                "logo": "KlLUv9vRH2cohxIk6d2WAuRXfs6kjn42",
+                "nom": "ALTERNANCE LORRAINE",
+                "siret": "00000000000009",
+                "url": "http://www.groupe-alternance.com"
+            },
+            "experienceExige": "D",
+            "experienceLibelle": "D\u00e9butant accept\u00e9",
+            "formations": [
+                {
+                    "exigence": "E",
+                    "niveauLibelle": "Bac ou \u00e9quivalent"
+                }
+            ],
+            "id": "088MFJG",
+            "intitule": "Vendeur / Vendeuse en mat\u00e9riaux de construction",
+            "langues": [],
+            "lieuTravail": {
+                "codePostal": "54250",
+                "commune": "54115",
+                "latitude": 48.73361111,
+                "libelle": "54 - CHAMPIGNEULLES",
+                "longitude": 6.164444444
+            },
+            "natureContrat": "Cont. professionnalisation",
+            "nombrePostes": 1,
+            "origineOffre": {
+                "origine": "1",
+                "partenaires": [],
+                "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/088MFJG"
+            },
+            "qualificationCode": "5",
+            "qualitesProfessionnelles": [
+                {
+                    "description": "Capacit\u00e9 \u00e0 s\u2019adapter \u00e0 des situations vari\u00e9es et \u00e0 s\u2019ajuster \u00e0 des organisations, des collectifs de travail, des habitudes et des valeurs propres \u00e0 l\u2019entreprise. Exemple : \u00eatre souple, agile, s\u2019adapter \u00e0 une situation impr\u00e9vue",
+                    "libelle": "Capacit\u00e9 d\u2019adaptation"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 prendre en charge son activit\u00e9 sans devoir \u00eatre encadr\u00e9 de fa\u00e7on continue. Exemple : travailler efficacement sans responsable",
+                    "libelle": "Autonomie"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 r\u00e9agir rapidement face \u00e0 des \u00e9v\u00e8nements et \u00e0 des impr\u00e9vus, en hi\u00e9rarchisant les actions, en fonction de leur degr\u00e9 d\u2019urgence / d\u2019importance. Exemple : faire preuve de dynamisme, vivacit\u00e9, \u00e9nergie, comprendre vite",
+                    "libelle": "R\u00e9activit\u00e9"
+                }
+            ],
+            "romeCode": "D1212",
+            "romeLibelle": "Vente en d\u00e9coration et \u00e9quipement du foyer",
+            "salaire": {
+                "libelle": "Mensuel de 850.00 Euros \u00e0 1217.00 Euros sur 12 mois"
+            },
+            "secteurActivite": "85",
+            "secteurActiviteLibelle": "Formation continue d'adultes",
+            "trancheEffectifEtab": "6 \u00e0 9 salari\u00e9s",
+            "typeContrat": "CDD",
+            "typeContratLibelle": "Contrat \u00e0 dur\u00e9e d\u00e9termin\u00e9e - 24 Mois"
+        },
+        {
+            "accessibleTH": false,
+            "alternance": true,
+            "appellationlibelle": "Vendeur / Vendeuse de cuisines",
+            "competences": [
+                {
+                    "code": "120130",
+                    "exigence": "S",
+                    "libelle": "Accueillir une client\u00e8le"
+                },
+                {
+                    "code": "121698",
+                    "exigence": "S",
+                    "libelle": "Proposer un service, produit adapt\u00e9 \u00e0 la demande client"
+                }
+            ],
+            "contact": {
+                "coordonnees1": "Courriel : claudia.lechenard@darty.fr",
+                "courriel": "claudia.lechenard@darty.fr",
+                "nom": "DARTY - Mme CLAUDIA LECHENARD"
+            },
+            "dateActualisation": "2019-05-22T16:22:10+02:00",
+            "dateCreation": "2019-05-22T16:22:10+02:00",
+            "description": "Vous serez form\u00e9(e) au m\u00e9tier de concepteur vendeur de cuisines H/F par le biais d'un contrat de professionnalisation de 10 mois (organisme de formation \u00e0 Lyon). Frais de transport et d'h\u00e9bergement pris en charge par l'entreprise.\n\nVous serez charg\u00e9(e) de concevoir la future cuisine de vos clients. \n\nEn tant que v\u00e9ritable commercial, vous serez responsable de l'accueil, de la conception du projet jusqu'au suivi et \u00e0 la livraison finale. Vous fournirez \u00e0 vos clients un service de qualit\u00e9.\n",
+            "dureeTravailLibelle": "35H Travail le samedi",
+            "entreprise": {
+                "nom": "DARTY",
+                "siret": "00000000000004"
+            },
+            "experienceCommentaire": "dans la vente",
+            "experienceExige": "E",
+            "experienceLibelle": "6 mois - dans la vente",
+            "formations": [
+                {
+                    "exigence": "S",
+                    "niveauLibelle": "Bac ou \u00e9quivalent"
+                }
+            ],
+            "id": "088JGJS",
+            "intitule": "concepteur vendeur de cuisines H/F",
+            "langues": [],
+            "lieuTravail": {
+                "codePostal": "54710",
+                "commune": "54197",
+                "latitude": 48.62527778,
+                "libelle": "54 - FLEVILLE DEVANT NANCY",
+                "longitude": 6.203611111
+            },
+            "natureContrat": "Cont. professionnalisation",
+            "nombrePostes": 1,
+            "origineOffre": {
+                "origine": "1",
+                "partenaires": [],
+                "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/088JGJS"
+            },
+            "qualificationCode": "6",
+            "qualitesProfessionnelles": [
+                {
+                    "description": "Capacit\u00e9 \u00e0 prendre en charge son activit\u00e9 sans devoir \u00eatre encadr\u00e9 de fa\u00e7on continue. Exemple : travailler efficacement sans responsable",
+                    "libelle": "Autonomie"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 respecter les r\u00e8gles et codes de l\u2019entreprise; \u00e0 r\u00e9aliser des t\u00e2ches en suivant avec pr\u00e9cision les proc\u00e9dures et instructions fournies ; \u00e0 transmettre des informations avec exactitude. Exemple : \u00eatre ponctuel, respecter les engagements, r\u00e9sister \u00e0 la distraction",
+                    "libelle": "Rigueur"
+                },
+                {
+                    "description": "Capacit\u00e9 \u00e0 maintenir son effort jusqu\u2019\u00e0 l\u2019ach\u00e8vement complet d\u2019une t\u00e2che, quels que soient les impr\u00e9vus et les obstacles de r\u00e9alisation rencontr\u00e9s. Exemple : faire preuve de volont\u00e9, d\u2019assiduit\u00e9, de r\u00e9gularit\u00e9, rebondir apr\u00e8s une erreur",
+                    "libelle": "Pers\u00e9v\u00e9rance"
+                }
+            ],
+            "romeCode": "D1212",
+            "romeLibelle": "Vente en d\u00e9coration et \u00e9quipement du foyer",
+            "salaire": {
+                "commentaire": "% smic selon l'\u00e2ge",
+                "complement1": "% smic selon l'\u00e2ge"
+            },
+            "secteurActivite": "47",
+            "secteurActiviteLibelle": "Commerce de d\u00e9tail d'appareils \u00e9lectrom\u00e9nagers en magasin sp\u00e9cialis\u00e9",
+            "trancheEffectifEtab": "20 \u00e0 49 salari\u00e9s",
+            "typeContrat": "CDD",
+            "typeContratLibelle": "Contrat \u00e0 dur\u00e9e d\u00e9termin\u00e9e - 10 Mois"
+        },
+        {
+            "accessibleTH": false,
+            "alternance": true,
+            "appellationlibelle": "Vendeur / Vendeuse en t\u00e9l\u00e9phonie",
+            "competences": [
+                {
+                    "code": "120130",
+                    "exigence": "S",
+                    "libelle": "Accueillir une client\u00e8le"
+                },
+                {
+                    "code": "102068",
+                    "exigence": "S",
+                    "libelle": "Encaisser le montant d'une vente"
+                },
+                {
+                    "code": "100341",
+                    "exigence": "S",
+                    "libelle": "Proc\u00e9dures d'encaissement"
+                },
+                {
+                    "code": "121698",
+                    "exigence": "S",
+                    "libelle": "Proposer un service, produit adapt\u00e9 \u00e0 la demande client"
+                },
+                {
+                    "exigence": "S",
+                    "libelle": "Tableur Notions"
+                },
+                {
+                    "exigence": "S",
+                    "libelle": "Traitement de texte Notions"
+                }
+            ],
+            "contact": {
+                "coordonnees1": "https://www.generaledetelephone.com/nous-rejoindre/offres-emploi/detail-offre/?offre-emploi=2019-707",
+                "urlPostulation": "https://www.generaledetelephone.com/nous-rejoindre/offres-emploi/detail-offre/?offre-emploi=2019-707"
+            },
+            "dateActualisation": "2019-05-28T17:01:14+02:00",
+            "dateCreation": "2019-05-28T17:01:11+02:00",
+            "deplacementCode": "1",
+            "deplacementLibelle": "Jamais",
+            "description": "Vos principales missions au sein de votre magasin :\n- Vous accueillez et conseillez nos clients \n- Vous veillez \u00e0 leur satisfaction en proposant des solutions adapt\u00e9es avec un service sur mesure. \nNous comptons sur vous pour :\n- D\u00e9velopper les ventes, \n- Satisfaire nos clients \n- Contribuer \u00e0 la r\u00e9ussite du magasin\nDe formation BAC \u00e0 BAC +2, de type BTS Vente ou Commerce, vous \u00eates naturellement \u00e0  l'aise dans l'univers du digital, avec une exp\u00e9rience r\u00e9ussie dans le domaine de la vente, notamment dans la t\u00e9l\u00e9phonie.   \nDynamique, vous faites preuve de r\u00e9activit\u00e9 et vous avez le go\u00fbt du challenge ainsi que l'esprit d'\u00e9quipe. \nVotre r\u00e9mun\u00e9ration comprend un salaire fixe et une part variable en fonction de l'atteinte des r\u00e9sultats, ainsi qu'une r\u00e9tribution collective (int\u00e9ressement, participation et \u00e9pargne salariale).  .",
+            "dureeTravailLibelle": "35H Horaires normaux",
+            "entreprise": {
+                "description": "G\u00e9n\u00e9rale de t\u00e9l\u00e9phone, filiale du groupe Orange, commercialise dans ses magasins l'ensemble des produits et services de t\u00e9l\u00e9phonie Grand Public et Professionnel. \nLes 1700 conseillers(\u00e8res) de vente donnent chaque jour le meilleur d'eux m\u00eame pour faire vivre une exp\u00e9rience incomparable \u00e0 nos clients. \nTravailler chez G\u00e9n\u00e9rale de T\u00e9l\u00e9phone, c'est vivre une belle exp\u00e9rience professionnelle et une v\u00e9ritable aventure humaine. \nN'h\u00e9sitez plus, rejoignez-nous en cliquant sur le lien ci-dessous.",
+                "nom": "ORANGE",
+                "siret": "00000000000003",
+                "url": "http://www.generaledetelephone.com/la-societe/qui-sommes-nous/"
+            },
+            "experienceExige": "D",
+            "experienceLibelle": "D\u00e9butant accept\u00e9",
+            "formations": [
+                {
+                    "domaineLibelle": "Vente distribution",
+                    "exigence": "S",
+                    "niveauLibelle": "Bac+2 ou \u00e9quivalent"
+                }
+            ],
+            "id": "088QSFQ",
+            "intitule": "Vendeur / Vendeuse en t\u00e9l\u00e9phonie",
+            "langues": [],
+            "lieuTravail": {
+                "codePostal": "54300",
+                "commune": "54329",
+                "latitude": 48.58944444,
+                "libelle": "54 - LUNEVILLE",
+                "longitude": 6.501666666
+            },
+            "natureContrat": "Contrat apprentissage",
+            "nombrePostes": 1,
+            "origineOffre": {
+                "origine": "1",
+                "partenaires": [],
+                "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/088QSFQ"
+            },
+            "qualificationCode": "6",
+            "romeCode": "D1212",
+            "romeLibelle": "Vente en d\u00e9coration et \u00e9quipement du foyer",
+            "salaire": {
+                "complement1": "Primes",
+                "libelle": "Mensuel de 1521.22 Euros sur 12 mois"
+            },
+            "secteurActivite": "47",
+            "secteurActiviteLibelle": "Commerce de d\u00e9tail de mat\u00e9riels de t\u00e9l\u00e9communication en magasin sp\u00e9cialis\u00e9",
+            "trancheEffectifEtab": "100 \u00e0 199 salari\u00e9s",
+            "typeContrat": "CDD",
+            "typeContratLibelle": "Contrat \u00e0 dur\u00e9e d\u00e9termin\u00e9e - 12 Mois"
+        }
+    ]
+}
