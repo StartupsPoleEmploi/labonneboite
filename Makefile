@@ -196,6 +196,7 @@ test-custom:
 	@echo "and you can even run a specific method, here are several examples:"
 	@echo
 	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/api/test_api.py:ApiCompanyListTest.test_query_returns_scores_adjusted_to_rome_code_context"
+	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/api/test_api.py:ApiOffersOfficesListTest"
 	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/front/test_routes.py"
 	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/app/test_suggest_locations.py"
 	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/scripts/test_create_index.py:DeleteOfficeAdminTest.test_office_admin_add"
