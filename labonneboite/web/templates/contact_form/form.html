@@ -36,17 +36,10 @@
         {% endif %}
 
         {% if show_entreprise_page %}
-          <p class="mini-site-promotion">
-            Vous n’avez pas de site Web ou souhaitez être encore plus visible sur Internet, Pôle emploi vous propose de créer gratuitement et facilement un mini-site entreprise !
-            Pour plus d’information cliquez sur ce lien :
-            <a href="https://www.pole-emploi.fr/employeur/nouveaute-pourquoi-creer-une-page-entreprise--@/article.jspz?id=256395" title="Pourquoi créer une page entreprise ? (Ouverture dans une nouvelle fenêtre)" target="_blank">
-              Ma page entreprise
-            </a>
-          </p>
+          {% include "includes/mini_site_promotion.html" %}
         {% endif %}
+
     </form>
-
-
 
   </div>
 </div>

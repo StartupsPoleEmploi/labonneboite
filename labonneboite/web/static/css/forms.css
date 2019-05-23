@@ -46,6 +46,7 @@ textarea.form-error,
 .form-vertical label {
     display: block;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .form-vertical input[type='email'],
@@ -227,34 +228,6 @@ textarea.form-error,
 }
 .mini-site-promotion {
     margin-top: 50px;
-}
-
-/* Update jobs form */
-.update-jobs-form table,
-.update-jobs-form table th,
-.update-jobs-form table td {
-    border: none;
-}
-.update-jobs-form table th {
-    text-align: center;
-}
-
-.update-jobs-form table td {
-    padding: 15px;
-}
-.update-jobs-form table td input[type=checkbox]{
-    zoom: 1.25;
-    vertical-align: middle;
-}
-.update-jobs-form table tr.removed td {
-    background-color: #DDD;
-    opacity: .5;
-}
-.update-jobs-form .remove {
-    font-size: .9em;
-}
-.update-jobs-form .add-new-jobs {
-    margin: 40px 0 60px 0;
 }
 
 .success-message h2 {

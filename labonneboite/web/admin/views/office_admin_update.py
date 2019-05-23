@@ -1,4 +1,3 @@
-# coding: utf
 from collections import namedtuple
 import logging
 
@@ -414,8 +413,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 self.set_update_style('score_alternance')
                 self.set_little_boost(form['score_alternance'], office.score_alternance)
 
-
-
         office_admin_update = models.OfficeAdminUpdate.query.filter(models.OfficeAdminUpdate.id == form_id).first()
 
         # Common behavior
@@ -440,7 +437,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         self.handle_diff('requested_by_phone', recruiter_phone, office_admin_update, form)
         self.handle_diff('certified_recruiter', recruiter_message.certified_recruiter, office_admin_update, form)
         self.handle_diff('recruiter_uid', recruiter_message.recruiter_uid, office_admin_update, form)
-
 
         if recruiter_message_params.type == models.UpdateCoordinatesRecruiterMessage.name:
             new_phone = clean_phone(recruiter_message.new_phone) if recruiter_message.new_phone else None
@@ -469,7 +465,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             self.handle_diff('score_alternance', new_score_alternance, office_admin_update, form)
 
         elif recruiter_message_params.type == models.UpdateJobsRecruiterMessage.name:
-            self.handle_diff('romes_to_boost', self.format(recruiter_message.romes_to_add), office_admin_update, form)
+            self.handle_diff(
+                'romes_to_boost',
+                self.format(recruiter_message.romes_to_add),
+                office_admin_update,
+                form
+            )
             self.handle_diff(
                 'romes_alternance_to_boost',
                 self.format(recruiter_message.romes_alternance_to_add),

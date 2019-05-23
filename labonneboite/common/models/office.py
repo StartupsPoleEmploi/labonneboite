@@ -1,29 +1,29 @@
 # coding: utf8
 
 
-import logging
+from functools import lru_cache
 from urllib.parse import urlencode
+import logging
 
 from babel.dates import format_date
-from slugify import slugify
 from flask import url_for
+from slugify import slugify
 from sqlalchemy import Column, Integer, String, Float, Boolean
-from sqlalchemy.dialects import mysql
 from sqlalchemy import PrimaryKeyConstraint, Index
 from sqlalchemy.dialects import mysql
-
-from functools import lru_cache
+from werkzeug import cached_property
 
 from labonneboite.common import encoding as encoding_util
-from labonneboite.common import scoring as scoring_util
 from labonneboite.common import hiring_type_util
+from labonneboite.common import mapping as mapping_util
+from labonneboite.common import scoring as scoring_util
+from labonneboite.common import util
 from labonneboite.common.database import Base, db_session, DATABASE
 from labonneboite.common.load_data import load_city_codes, load_groupements_employeurs
-from labonneboite.common import util
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
- 
+
 
 logger = logging.getLogger('main')
 
@@ -133,7 +133,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         # Improve performance of create_index.py parallel jobs
         # by quickly fetching all offices of any given departement.
         Index('_departement', 'departement'),
-        
+
         # Improve performance of create_index.py remove_scam_emails()
         # by quickly locating offices having a given scam email.
         Index('_email', 'email'),
@@ -318,6 +318,20 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     def stars(self):
         return self.get_stars_for_rome_code(None)
 
+    @cached_property
+    def romes(self):
+        """
+        Returns a list of named tuples for ROME codes matching the company's NAF code.
+        """
+        return mapping_util.romes_for_naf(self.naf)
+
+    @cached_property
+    def romes_codes(self):
+        """
+        Returns a set of ROME codes matching the company's NAF code.
+        """
+        return set([rome.code for rome in self.romes])
+
     def get_stars_for_rome_code(self, rome_code, hiring_type=None):
         hiring_type = hiring_type or hiring_type_util.DEFAULT
         if hiring_type not in hiring_type_util.VALUES:
@@ -361,8 +375,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         try:
             if rome_code:
                 return url_for('office.details', siret=self.siret, rome_code=rome_code, _external=True, **query_string)
-            else:
-                return url_for('office.details', siret=self.siret, _external=True, **query_string)
+            return url_for('office.details', siret=self.siret, _external=True, **query_string)
         except RuntimeError:
             # RuntimeError is raised when we are outside of a Flask's application context.
             # Here, we cannot properly generate an URL via url_for.

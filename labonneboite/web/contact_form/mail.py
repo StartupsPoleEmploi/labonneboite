@@ -92,44 +92,30 @@ def generate_update_coordinates_mail(form, recruiter_message):
 
 
 def generate_update_jobs_mail(form, recruiter_message):
-    office = Office.query.filter(Office.siret == form.siret.data).first()
-    office_romes = [item.code for item in mapping_util.romes_for_naf(office.naf)]
+    return f"""
+        <div>{common_mail_template(form)}</div>
 
-    all_romes, lbb_romes, lba_romes, hide_romes = forms.compute_romes()
+        <p>Intéressé par des candidatures :</p>
+        <ul>{format_romes(form.romes_to_add)}</ul>
 
-    return """
-        {}
-        <br>
-        Intéressé par des candidatures : <ul>{}</ul><br>
-        Pas intéressé par des candidatures : <ul>{}</ul><br>
-        Romes à ajouter LBB : <ul>{}</ul><br>
+        <p>Pas intéressé par des candidatures :</p>
+        <ul>{format_romes(form.romes_to_remove)}</ul>
+
         <hr>
-        Ouvert aux contrats d'alternance : <ul>{}</ul><br>
-        Non ouvert à l'alternance : <ul>{}</ul><br>
-        Romes à ajouter LBA : <ul>{}</ul><br>
+
+        <p>Ouvert aux contrats d'alternance :</p>
+        <ul>{format_romes(form.romes_alternance_to_add)}</ul>
+
+        <p>Non ouvert à l'alternance :</p>
+        <ul>{format_romes(form.romes_alternance_to_remove)}</ul>
+
         <hr>
-        Romes à retirer : <ul>{}</ul><br>
-        <hr>{}<hr>
-        Cordialement,<br>
-￼        La Bonne Boite & La Bonne alternance
-    """.format(
-        common_mail_template(form),
-        # LBB
-        format_romes(lbb_romes),
-        format_romes(set(all_romes) - set(lba_romes)),
-        format_romes(set(lbb_romes) - set(office_romes)),
-        # LBA
-        format_romes(lba_romes),
-        format_romes(set(all_romes) - set(lbb_romes)),
-        format_romes(set(lba_romes) - set(office_romes)),
-        # Remove
-        format_romes(hide_romes),
-        make_save_suggestion(
-            form,
-            recruiter_message,
-            models.UpdateJobsRecruiterMessage.name
-        ),
-    )
+        {make_save_suggestion(form, recruiter_message, models.UpdateJobsRecruiterMessage.name)}
+        <hr>
+
+        <p>Cordialement,</p>
+        <p>La Bonne Boite & La Bonne alternance</p>
+    """
 
 
 def format_romes(romes):
@@ -180,12 +166,12 @@ def generate_other_mail(form, recruiter_message):
     )
 
 
-
 def make_save_suggestion(form, recruiter_message, recruiter_message_type):
     # Save informations
     company = Office.query.filter_by(siret=form.siret.data).first()
 
     params = {
+        '_external': True,
         'recruiter_message_id': recruiter_message.id,
         'recruiter_message_type': recruiter_message_type,
     }
@@ -194,7 +180,7 @@ def make_save_suggestion(form, recruiter_message, recruiter_message_type):
         # OfficeAdminRemove already exits ?
         office_admin_remove = OfficeAdminRemove.query.filter_by(siret=form.siret.data).first()
         if office_admin_remove:
-            url = url_for("officeadminremove.edit_view", id=office_admin_remove.id, _external=True, **params)
+            url = url_for("officeadminremove.edit_view", id=office_admin_remove.id, **params)
             return "Entreprise retirée via Save : <a href='{}'>Voir la fiche de suppression</a>".format(url)
 
         return 'Aucune entreprise trouvée avec le siret {}'.format(form.siret.data)
@@ -202,18 +188,17 @@ def make_save_suggestion(form, recruiter_message, recruiter_message_type):
     # OfficeAdminAdd already exists ?
     office_admin_add = OfficeAdminAdd.query.filter_by(siret=form.siret.data).first()
     if office_admin_add:
-        url = url_for("officeadminadd.edit_view", id=office_admin_add.id, _external=True, **params)
+        url = url_for("officeadminadd.edit_view", id=office_admin_add.id, **params)
         return "Entreprise créée via Save : <a href='{}'>Voir la fiche d'ajout</a>".format(url)
 
     # OfficeAdminUpdate already exits ?
     office_admin_update = OfficeAdminUpdate.query.filter(
         OfficeAdminUpdate.sirets.like("%{}%".format(form.siret.data))
     ).first()
-
     if office_admin_update:
-        url = url_for("officeadminupdate.edit_view", id=office_admin_update.id, _external=True, **params)
+        url = url_for("officeadminupdate.edit_view", id=office_admin_update.id, **params)
         return "Entreprise modifiée via Save : <a href='{}'>Voir la fiche de modification</a>".format(url)
 
     # No office AdminOffice found : suggest to create an OfficeAdminRemove
-    url = url_for('officeadminupdate.create_view', _external=True, **params)
+    url = url_for('officeadminupdate.create_view', **params)
     return "Entreprise non modifiée via Save : <a href='{}'>Créer une fiche de modification</a>".format(url)

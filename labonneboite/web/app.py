@@ -379,6 +379,7 @@ def social_auth_error(error):
     # Otherwise redirect to the home page.
     return redirect(url_for('root.home'))
 
+
 @app.errorhandler(401)
 def error_401(error):
     return render_template('error/401.html'), 401

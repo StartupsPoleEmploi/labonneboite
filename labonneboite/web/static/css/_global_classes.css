@@ -59,6 +59,10 @@
     float: right;
 }
 
+.full-width {
+    width: 100%;
+}
+
 .easy-copy-paste {
     -webkit-user-select: all;
     -moz-user-select: all;
@@ -77,7 +81,6 @@
 
 /* Lock the scroll position by adding this class to the `<html>` element. */
 .lock-scroll { overflow: hidden !important; }
-
 
 /* A container with a bright background used to wrap content when a dark color is used for the main background. */
 .lbb-bright-container {

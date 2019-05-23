@@ -109,21 +109,7 @@ class UpdateJobsRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
         except NoResultFound:
             raise NoOfficeFoundException('No office found with siret : {}'.format(form.data.siret))
 
-        office_romes = set([item.code for item in mapping_util.romes_for_naf(office.naf)])
-
-        _, lbb_romes, lba_romes, hide_romes = forms.compute_romes()
-        lbb_romes = set(lbb_romes)
-        lba_romes = set(lba_romes)
-        hide_romes = set(hide_romes)
-
-
-        # Remove checkboxes and romes not open to applications
-        romes_to_remove = hide_romes.union(office_romes) - lbb_romes
-
-        # Remove checkboxes and romes not open to alternance
-        romes_alternance_to_remove = hide_romes.union(office_romes) - lba_romes
-
-        self.romes_to_add = ','.join(lbb_romes - office_romes)
-        self.romes_to_remove = ','.join(romes_to_remove)
-        self.romes_alternance_to_add = ','.join(lba_romes - office_romes)
-        self.romes_alternance_to_remove = ','.join(romes_alternance_to_remove)
+        self.romes_alternance_to_add = ','.join(form.romes_alternance_to_add)
+        self.romes_alternance_to_remove = ','.join(form.romes_alternance_to_remove)
+        self.romes_to_add = ','.join(form.romes_to_add)
+        self.romes_to_remove = ','.join(form.romes_to_remove)

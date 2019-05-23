@@ -1,4 +1,3 @@
-# coding: utf8
 from functools import wraps
 from urllib.parse import urlencode
 import logging
@@ -8,22 +7,23 @@ from flask import Blueprint, Markup
 from flask import url_for, request
 from sqlalchemy.orm.exc import NoResultFound
 
-
-from labonneboite.conf import settings
-from labonneboite.web.admin.views.office_admin_update import CONTACT_MODES
-from labonneboite.common import mapping as mapping_util
 from labonneboite.common import models
 from labonneboite.common.email_util import MailNoSendException
+from labonneboite.common.models import OfficeAdminUpdate
+from labonneboite.conf import settings
+from labonneboite.web.admin.views.office_admin_update import CONTACT_MODES
+from labonneboite.web.auth.backends import peam_recruiter
 from labonneboite.web.contact_form import forms, mail
 from labonneboite.web.utils import fix_csrf_session
-from labonneboite.common.load_data import ROME_CODES
-from labonneboite.web.auth.backends import peam_recruiter
+
 
 logger = logging.getLogger('main')
 
 contactFormBlueprint = Blueprint('contact_form', __name__)
 
 ERROR_CONTACT_MODE_MESSAGE = 'Vous avez indiqué vouloir être contacté \'{}\' mais le champ \'{}\' n\'est pas renseigné. Nous vous invitons à le remplir.'
+
+ERROR_MISSING_CONTACT_INFO = "Veuillez tout d'abord renseigner vos informations de contact"
 
 # Get form value from office.contact_mode text
 CONTACT_MODES_LABEL_TO_FORM_VALUE = {v:k for k, v in CONTACT_MODES.items()}
@@ -34,7 +34,8 @@ ACTION_NAMES = [
     'delete',
     'other',
 ]
- 
+
+
 @contactFormBlueprint.route('/verification-informations-entreprise', methods=['GET'])
 @contactFormBlueprint.route('/verification-informations-entreprise/<siret>', methods=['GET'])
 def change_info_or_apply_for_job(siret=None):
@@ -82,6 +83,7 @@ def apply_for_job(siret):
         use_lba_template=is_recruiter_from_lba(),
     )
 
+
 def create_form(form_class):
     """
     A decorator that inject hidden fields from OfficeHiddenIdentificationForm
@@ -95,7 +97,7 @@ def create_form(form_class):
             try:
                 add_identication_data(kwargs['form'])
             except KeyError:
-                flash('Veuillez tout d\'abord renseigner vos informations de contact', 'error')
+                flash(ERROR_MISSING_CONTACT_INFO, 'error')
                 return redirect(url_for('contact_form.change_info'))
 
             return f(*args, **kwargs)
@@ -235,6 +237,7 @@ def update_coordinates_form(form):
                 logger.exception(e)
                 flash(generate_fail_flash_content(), 'error')
             else:
+                # TODO: fix this with a proper POST-REDIRECT-GET.
                 redirect_params = get_success_value()
                 return render_template('contact_form/success_message.html',
                     title="Merci pour votre message",
@@ -260,26 +263,44 @@ def update_coordinates_form(form):
 
 
 @contactFormBlueprint.route('/informations-entreprise/modifier-metiers', methods=['GET', 'POST'])
-@create_form(forms.OfficeUpdateJobsForm)
-def update_jobs_form(form):
+def update_jobs_form():
     try:
         office = get_office_from_siret(request.args['siret'])
     except NoResultFound:
         flash(unknown_siret_message(), 'error')
         return redirect(url_for('contact_form.change_info'))
 
-    office_romes = mapping_util.romes_for_naf(office.naf)
+    # Use POST params if available, GET params otherwise.
+    form_data = request.form or request.args.copy()
 
-    rome_fields = []
-    for rome in office_romes:
-        # Retrieve old values
-        current_values = dict(request.form).get(rome.code, ['lbb', 'lba'])
+    if request.method == 'GET':
 
-        rome_fields.append({
-            'code': rome.code,
-            'name': rome.name,
-            'current_values': current_values
-        })
+        # Prepare form's initial data.
+        romes_to_boost = office.romes_codes
+        romes_alternance_to_boost = office.romes_codes
+        extra_romes_to_add = set()
+        extra_romes_alternance_to_add = set()
+
+        office_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets == office.siret).first()
+        if office_update:
+            romes_to_boost = set(OfficeAdminUpdate.as_list(office_update.romes_to_boost))
+            romes_alternance_to_boost = set(OfficeAdminUpdate.as_list(office_update.romes_alternance_to_boost))
+            extra_romes_to_add = romes_to_boost - office.romes_codes
+            extra_romes_alternance_to_add = romes_alternance_to_boost - office.romes_codes
+
+        form_data['romes_to_keep'] = romes_to_boost
+        form_data['romes_alternance_to_keep'] = romes_alternance_to_boost
+
+    else:
+        # Those form fields are defined outside of the form class, we use `request.form` to get them.
+        extra_romes_to_add = set(request.form.getlist('extra_romes_to_add'))
+        extra_romes_alternance_to_add = set(request.form.getlist('extra_romes_alternance_to_add'))
+
+    form = forms.OfficeUpdateJobsForm(data=form_data, office=office)
+
+    if not form.validate_identification():
+        flash(ERROR_MISSING_CONTACT_INFO, 'error')
+        return redirect(url_for('contact_form.change_info'))
 
     if form.validate_on_submit():
         recruiter_message = models.UpdateJobsRecruiterMessage.create_from_form(
@@ -294,29 +315,37 @@ def update_jobs_form(form):
         except MailNoSendException as e:
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
-        else:
-            redirect_params = get_success_value()
-            return render_template('contact_form/success_message.html',
-                title="Merci pour votre message",
-                use_lba_template=is_recruiter_from_lba(),
-                site_name=redirect_params.get('site_name'),
-                email=redirect_params.get('email'),
-                home_url=redirect_params.get('home_url'),
-                rome_fields=rome_fields,
-                suggest_update_coordinates=True,
-                params=extract_recruiter_data(),
-                action_form_url=url_for('contact_form.ask_action', **request.args),
-                custom_ga_pageview='/recruteur/update_jobs/success',
-            )
 
+        # TODO: fix this with a proper POST-REDIRECT-GET.
+        redirect_params = get_success_value()
+        return render_template('contact_form/success_message.html',
+            title="Merci pour votre message",
+            use_lba_template=is_recruiter_from_lba(),
+            site_name=redirect_params.get('site_name'),
+            email=redirect_params.get('email'),
+            home_url=redirect_params.get('home_url'),
+            suggest_update_coordinates=True,
+            params=extract_recruiter_data(),
+            action_form_url=url_for('contact_form.ask_action', **request.args),
+            custom_ga_pageview='/recruteur/update_jobs/success',
+        )
+
+    extra_added_jobs = [
+        {
+            'rome_code': rome_code,
+            'label': settings.ROME_DESCRIPTIONS[rome_code],
+            'lbb': rome_code in extra_romes_to_add,
+            'lba': rome_code in extra_romes_alternance_to_add,
+        }
+        for rome_code in extra_romes_to_add | extra_romes_alternance_to_add
+    ]
 
     return render_template('contact_form/change_job_infos.html',
         title='Demande de modification des métiers',
         form=form,
         params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
-        manually_added_jobs=extract_manually_added_jobs(office),
-        rome_fields=rome_fields,
+        extra_added_jobs=extra_added_jobs,
         custom_ga_pageview='/recruteur/update_jobs/update_jobs',
     )
 
@@ -338,6 +367,7 @@ def delete_form(form):
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
         else:
+            # TODO: fix this with a proper POST-REDIRECT-GET.
             redirect_params = get_success_value()
             return render_template('contact_form/success_message.html',
                 title="Merci pour votre message",
@@ -348,7 +378,6 @@ def delete_form(form):
                 action_form_url=url_for('contact_form.ask_action', **request.args),
                 custom_ga_pageview='/recruteur/delete/success',
             )
-
 
     return render_template('contact_form/form.html',
         title='Supprimer mon entreprise',
@@ -376,6 +405,7 @@ def other_form(form):
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
         else:
+            # TODO: fix this with a proper POST-REDIRECT-GET.
             redirect_params = get_success_value()
             return render_template('contact_form/success_message.html',
                 title="Merci pour votre message",
@@ -414,12 +444,12 @@ def get_success_value():
             'home_url': 'https://labonnealternance.pole-emploi.fr',
             'email': 'labonnealternance@pole-emploi.fr',
         }
-
     return {
         'site_name': 'La Bonne Boite',
         'home_url': url_for('root.home'),
         'email': 'labonneboite@pole-emploi.fr',
     }
+
 
 def get_subject():
     return 'Nouveau message entreprise depuis LBA' if is_recruiter_from_lba() else 'Nouveau message entreprise depuis LBB'
@@ -435,27 +465,6 @@ def generate_fail_flash_content():
     return Markup(message)
 
 
-def extract_manually_added_jobs(office):
-    """
-    Return manually added_job as a string : rome1,lbb,lba||rome2,lbb||....
-    """
-    values = dict(request.form)
-    office_romes = [item.code for item in mapping_util.romes_for_naf(office.naf)]
-
-    added_romes_codes = [key for key in values if key not in office_romes and key in ROME_CODES]
-    added_romes = []
-
-    for rome_code in added_romes_codes:
-        added_romes.append({
-            'id': rome_code,
-            'label': settings.ROME_DESCRIPTIONS[rome_code],
-            'lbb': True if 'lbb' in values.get(rome_code, []) else False,
-            'lba': True if 'lba' in values.get(rome_code, []) else False,
-        })
-
-    return added_romes
-
-
 def unknown_siret_message():
     email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
     msg = """
@@ -463,7 +472,6 @@ def unknown_siret_message():
         Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>
     """.format(email, email)
     return Markup(msg)
-
 
 
 def extract_recruiter_data():
