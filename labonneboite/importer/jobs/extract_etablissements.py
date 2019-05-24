@@ -16,7 +16,13 @@ from labonneboite.common.chunks import chunks
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
-WRONG_SIRETS = ['50468025700020'] #siret of Oxynel : old siret which has been replaced with this one : 50468025700038
+# This list contains siret that must not be found in datas,
+# we use it as a test : if one of those is found in datas, we stop the importer
+# and need to extract datas again
+WRONG_SIRETS = ['50468025700020', #siret of Oxynel : old siret which has been replaced with this one : 50468025700038
+                '48791579500024', #old siret for "L’entreprise Philippe Murielle a changé de SIRET en avril 2018 suite à un changement d’adresse"
+                '41006536100041', #old siret for equant france sa - cesson sevigne
+]
 
 class WrongSiretException(Exception):
     pass
