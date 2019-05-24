@@ -211,10 +211,14 @@ def register_context_processors(flask_app):
         return {'jepostule_enabled': jepostule_enabled}
 
     def inject_compute_input_attributes():
+        """
+        Template side function to populate 'aria-required' and
+        'aria-describedby' attributes in form fields
+        """
         def compute_input_attributes(field):
             attrs = {}
 
-            if field.validators and field.validators[0].__class__.__name__ == "DataRequired":
+            if field.flags.required:
                 attrs['aria-required'] = 'true'
 
             # aria-describedby are used to link input fields to their description and/or error messages

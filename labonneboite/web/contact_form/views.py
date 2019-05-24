@@ -128,8 +128,6 @@ def change_info():
     fix_csrf_session()
     form = forms.OfficeIdentificationForm()
 
-    form_has_errors = False
-
     # Clear session if user comes from 'I don't have recruiter account'
     if request.args.get('no_pe_connect', ''):
         peam_recruiter.clear_pe_connect_recruiter_session()
@@ -140,7 +138,6 @@ def change_info():
 
     action_name = get_action_name()
     if not action_name:
-        form_has_errors = True
         flash('Une erreur inattendue est survenue, veuillez sélectionner à nouveau une action', 'error')
         return redirect(url_for('contact_form.ask_action'))
 
@@ -155,8 +152,7 @@ def change_info():
     if form.validate_on_submit():
         office = models.Office.query.filter(models.Office.siret == form.siret.data).first()
         if not office:
-            form_has_errors = True
-            flash(unknown_siret_message(), 'error')
+            form.siret.errors.append(unknown_siret_message())
         else:
             params = {key: form.data[key] for key in ['siret', 'last_name', 'first_name', 'phone', 'email']}
             if is_recruiter_from_lba():
@@ -165,11 +161,8 @@ def change_info():
             url = url_for(action_form_url, **params)
             return redirect(url)
 
-    if form.errors and not form_has_errors:
-        form_has_errors = True
-
     return render_template('contact_form/form.html',
-        title='Erreur - Identifiez-vous' if form_has_errors else 'Identifiez-vous',
+        title='Erreur - Identifiez-vous' if form.errors else 'Identifiez-vous',
         submit_text='suivant',
         extra_submit_class='identification-form',
         form=form,
@@ -257,7 +250,7 @@ def update_coordinates_form(form):
                 )
 
     return render_template('contact_form/form.html',
-        title='Modifier ma fiche entreprise',
+        title='Erreur - Modifier ma fiche entreprise' if form.errors else 'Modifier ma fiche entreprise',
         form=form,
         submit_text='Modifier ma fiche entreprise',
         params=extract_recruiter_data(),
@@ -320,7 +313,7 @@ def update_jobs_form(form):
 
 
     return render_template('contact_form/change_job_infos.html',
-        title='Demande de modification des métiers',
+        title='Erreur - Demande de modification des métiers' if form.errors else 'Demande de modification des métiers',
         form=form,
         submit_text='Modifier mes métiers',
         params=extract_recruiter_data(),
@@ -361,7 +354,7 @@ def delete_form(form):
 
 
     return render_template('contact_form/form.html',
-        title='Supprimer mon entreprise',
+        title='Erreur - Supprimer mon entreprise' if form.errors else 'Supprimer mon entreprise',
         form=form,
         submit_text='Supprimer mon entreprise',
         params=extract_recruiter_data(),
@@ -401,8 +394,8 @@ def other_form(form):
 
     return render_template(
         'contact_form/form.html',
+        title='Erreur - Autre demande' if form.errors else 'Autre demande',
         form=form,
-        title='Autre demande',
         submit_text='Envoyer votre message',
         params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
