@@ -210,6 +210,33 @@ def register_context_processors(flask_app):
     def inject_jepostule_enabled():
         return {'jepostule_enabled': jepostule_enabled}
 
+    def inject_compute_input_attributes():
+        """
+        Template side function to populate 'aria-required' and
+        'aria-describedby' attributes in form fields
+        """
+        def compute_input_attributes(field):
+            attrs = {}
+
+            if field.flags.required:
+                attrs['aria-required'] = 'true'
+
+            # aria-describedby are used to link input fields to their description and/or error messages
+            aria_describedby = []
+            if field.description:
+                aria_describedby.append('{}_description'.format(field.id))
+            if field.errors:
+                aria_describedby.append('{}_errors'.format(field.id))
+
+            if aria_describedby:
+                attrs['aria-describedby'] = ' '.join(aria_describedby)
+
+            return attrs
+
+        return dict(compute_input_attributes=compute_input_attributes)
+
+
+    flask_app.context_processor(inject_compute_input_attributes)
     flask_app.context_processor(inject_dict_for_all_templates)
     flask_app.context_processor(inject_user)
     flask_app.context_processor(inject_jepostule_enabled)

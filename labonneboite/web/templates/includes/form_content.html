@@ -17,7 +17,6 @@ If you have multiple forms, you can use the `with` statement, e.g.:
   {% endwith %}
 
 #}
-{% set aria_required = {'aria-required':'true'} %}
 
 {% for field in form if field.widget.input_type != 'hidden' %}
   <div{% if field.errors %} class="form-error"{% endif %}>
@@ -25,17 +24,22 @@ If you have multiple forms, you can use the `with` statement, e.g.:
 
     {% if field.type == 'BooleanField' %}
       <div class="checkbox-container">
-        {{ field(**aria_required) if is_required else field() }}
+        {{ field(**compute_input_attributes(field)) }}
         {{ field.label }}
       </div>
+    {% elif field.type == 'RadioField'%}
+      <fieldset>
+        <legend>{{ field.label.text }}</legend>
+        {{ field(**compute_input_attributes(field)) }}
+      </fieldset>
     {% else %}
       {{ field.label }}
-      {{ field(**aria_required) if is_required else field() }}
+      {{ field(**compute_input_attributes(field)) }}
     {% endif %}
 
-    {% if field.description %}<p class="form-help-text">{{ field.description|safe }}</p>{% endif %}
+    {% if field.description %}<p id="{{ field.id }}_description" class="form-help-text">{{ field.description|safe }}</p>{% endif %}
     {% if field.errors %}
-    <ul class="form-errorlist">
+    <ul class="form-errorlist" id="{{ field.id }}_errors">
       {% for error in field.errors %}
         <li>{{ error }}</li>
       {% endfor %}

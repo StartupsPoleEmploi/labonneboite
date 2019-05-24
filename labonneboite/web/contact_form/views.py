@@ -152,7 +152,7 @@ def change_info():
     if form.validate_on_submit():
         office = models.Office.query.filter(models.Office.siret == form.siret.data).first()
         if not office:
-            flash(unknown_siret_message(), 'error')
+            form.siret.errors.append(unknown_siret_message())
         else:
             params = {key: form.data[key] for key in ['siret', 'last_name', 'first_name', 'phone', 'email']}
             if is_recruiter_from_lba():
@@ -162,14 +162,15 @@ def change_info():
             return redirect(url)
 
     return render_template('contact_form/form.html',
-        title='Identifiez-vous',
+        title='Erreur - Identifiez-vous' if form.errors else 'Identifiez-vous',
         submit_text='suivant',
         extra_submit_class='identification-form',
         form=form,
         is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
         is_recruiter=peam_recruiter.is_recruiter(),
         use_lba_template=is_recruiter_from_lba(),
-        show_disclaimer=True,
+        show_credentials_disclaimer=True,
+        show_required_disclaimer=True,
         hide_return=True,
         custom_ga_pageview='/recruteur/%s/identification' % action_name,
     )
@@ -237,7 +238,7 @@ def update_coordinates_form(form):
             else:
                 redirect_params = get_success_value()
                 return render_template('contact_form/success_message.html',
-                    title="Merci pour votre message",
+                    title="Confirmation - Merci pour votre message",
                     use_lba_template=is_recruiter_from_lba(),
                     site_name=redirect_params.get('site_name'),
                     email=redirect_params.get('email'),
@@ -249,8 +250,9 @@ def update_coordinates_form(form):
                 )
 
     return render_template('contact_form/form.html',
-        title='Modifier ma fiche entreprise',
+        title='Erreur - Modifier ma fiche entreprise' if form.errors else 'Modifier ma fiche entreprise',
         form=form,
+        submit_text='Modifier ma fiche entreprise',
         params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
         show_entreprise_page=True,
@@ -297,7 +299,7 @@ def update_jobs_form(form):
         else:
             redirect_params = get_success_value()
             return render_template('contact_form/success_message.html',
-                title="Merci pour votre message",
+                title="Confirmation - Merci pour votre message",
                 use_lba_template=is_recruiter_from_lba(),
                 site_name=redirect_params.get('site_name'),
                 email=redirect_params.get('email'),
@@ -311,8 +313,9 @@ def update_jobs_form(form):
 
 
     return render_template('contact_form/change_job_infos.html',
-        title='Demande de modification des métiers',
+        title='Erreur - Demande de modification des métiers' if form.errors else 'Demande de modification des métiers',
         form=form,
+        submit_text='Modifier mes métiers',
         params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
         manually_added_jobs=extract_manually_added_jobs(office),
@@ -340,7 +343,7 @@ def delete_form(form):
         else:
             redirect_params = get_success_value()
             return render_template('contact_form/success_message.html',
-                title="Merci pour votre message",
+                title="Confirmation - Merci pour votre message",
                 use_lba_template=is_recruiter_from_lba(),
                 site_name=redirect_params.get('site_name'),
                 email=redirect_params.get('email'),
@@ -351,8 +354,9 @@ def delete_form(form):
 
 
     return render_template('contact_form/form.html',
-        title='Supprimer mon entreprise',
+        title='Erreur - Supprimer mon entreprise' if form.errors else 'Supprimer mon entreprise',
         form=form,
+        submit_text='Supprimer mon entreprise',
         params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
         custom_ga_pageview='/recruteur/delete/delete',
@@ -378,7 +382,7 @@ def other_form(form):
         else:
             redirect_params = get_success_value()
             return render_template('contact_form/success_message.html',
-                title="Merci pour votre message",
+                title="Confirmation - Merci pour votre message",
                 use_lba_template=is_recruiter_from_lba(),
                 site_name=redirect_params.get('site_name'),
                 email=redirect_params.get('email'),
@@ -390,8 +394,9 @@ def other_form(form):
 
     return render_template(
         'contact_form/form.html',
+        title='Erreur - Autre demande' if form.errors else 'Autre demande',
         form=form,
-        title='Autre demande',
+        submit_text='Envoyer votre message',
         params=extract_recruiter_data(),
         use_lba_template=is_recruiter_from_lba(),
         show_required_disclaimer=True,

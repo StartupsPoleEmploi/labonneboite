@@ -25,7 +25,7 @@ class OfficeIdentificationForm(FlaskForm):
         'N° de Siret *',
         validators=[
             DataRequired(),
-            Regexp('[0-9]{14}', message=("Le siret de l'établissement est invalide (14 chiffres)"))
+            Regexp('[0-9]{14}', message=("Le siret de l'établissement est invalide (14 chiffres sans espace)"))
         ],
         description="14 chiffres, sans espace. Exemple: 36252187900034",
     )
@@ -34,13 +34,13 @@ class OfficeIdentificationForm(FlaskForm):
     first_name = StringField('Prénom *', validators=[DataRequired()])
     phone = TelField(
         'Téléphone *',
-        validators=[DataRequired(), Regexp(PHONE_REGEX)],
-        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"}
+        description="Exemple: 01 77 86 39 49 ou +331 77 86 39 49",
+        validators=[DataRequired(), Regexp(PHONE_REGEX, message="Entrée invalide. Exemple valide: 01 77 86 39 49 ou +331 77 86 39 49")],
     )
     email = EmailField(
         'Adresse email *',
-        validators=[DataRequired(), Email()],
-        render_kw={"placeholder": "exemple@domaine.com"}
+        description="Exemple: exemple@domaine.com",
+        validators=[DataRequired(), Email(message="Entrée invalide. Exemple valide: exemple@domaine.com")],
     )
 
 
@@ -48,16 +48,8 @@ class OfficeHiddenIdentificationForm(FlaskForm):
     siret = HiddenField('Siret *', validators=[DataRequired()])
     last_name = HiddenField('Nom *', validators=[DataRequired()])
     first_name = HiddenField('Prénom *', validators=[DataRequired()])
-    phone = HiddenField(
-        'Téléphone *',
-        validators=[DataRequired(), Regexp(PHONE_REGEX)],
-        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"}
-    )
-    email = HiddenField(
-        'Adresse email *',
-        validators=[DataRequired(), Email()],
-        render_kw={"placeholder": "exemple@domaine.com"}
-    )
+    phone = HiddenField('Téléphone *', validators=[DataRequired(), Regexp(PHONE_REGEX)])
+    email = HiddenField('Adresse email *', validators=[DataRequired(), Email()])
 
 
 class OfficeOtherRequestForm(OfficeHiddenIdentificationForm):
@@ -77,27 +69,33 @@ class OfficeUpdateCoordinatesForm(OfficeHiddenIdentificationForm):
     new_contact_mode = RadioField('Mode de contact à privilégier', choices=CONTACT_MODES, default='email')
     new_website = StringField(
         'Site Internet',
-        validators=[URL(), Optional()], render_kw={"placeholder": "http://exemple.com"}
+        description="Exemple: http://exemple.com",
+        validators=[URL(message="Entrée invalide. Exemple: http://exemple.com"), Optional()]
     )
     new_email = EmailField(
         'Email recruteur',
-        validators=[Email(), Optional()], render_kw={"placeholder": "exemple@domaine.com"}
+        description="Exemple: exemple@domaine.com",
+        validators=[Email(message="Entrée invalide. Exemple valide: exemple@domaine.com"), Optional()]
     )
     new_phone = StringField(
         'Téléphone',
-        validators=[Optional(), Regexp(PHONE_REGEX)],
-        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"}
+        description="Exemple: 01 77 86 39 49 ou +331 77 86 39 49",
+        validators=[Optional(), Regexp(PHONE_REGEX, message="Entrée invalide. Exemple valide: 01 77 86 39 49 ou +331 77 86 39 49")]
     )
-    social_network = StringField('Réseau social', validators=[URL(), Optional()])
+    social_network = StringField(
+        'Réseau social',
+        description="Exemple: https://twitter.com/0123456_abcdef",
+        validators=[URL(message="Entrée invalide. Exemple: https://twitter.com/0123456_abcdef"), Optional()]
+    )
     new_email_alternance = EmailField(
         'Email recruteur spécialisé alternance',
-        validators=[validators.optional(), Email()],
-        render_kw={"placeholder": "exemple-alternance@domaine.com"}
+        description="Exemple: exemple@domaine.com",
+        validators=[validators.optional(), Email(message="Entrée invalide. Exemple valide: exemple@domaine.com")]
     )
     new_phone_alternance = StringField(
         'Téléphone du recruteur spécialisé alternance',
-        validators=[validators.optional(), Regexp(PHONE_REGEX)],
-        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"}
+        description="Exemple: 01 77 86 39 49 ou +331 77 86 39 49",
+        validators=[validators.optional(), Regexp(PHONE_REGEX, message="Entrée invalide. Exemple valide: 01 77 86 39 49 ou +331 77 86 39 49")]
     )
     rgpd_consent = BooleanField(
         'En cochant cette case, vous consentez à diffuser des données à caractère personnel sur les services numériques de Pôle emploi.',

@@ -187,7 +187,7 @@ textarea.form-error,
     margin-bottom: 30px;
     font-size: 1.1em;
 }
-.action-chooser-form h2 {
+.action-chooser-form h1 {
     margin-bottom: 50px;
 }
 
@@ -229,14 +229,29 @@ textarea.form-error,
     margin-top: 50px;
 }
 
+/* Fieldset */
+fieldset {
+    padding: 0;
+    border: none;
+}
+fieldset legend {
+    padding: 0;
+    font-weight: bold;
+}
+
+
 /* Update jobs form */
 .update-jobs-form table,
 .update-jobs-form table th,
 .update-jobs-form table td {
     border: none;
 }
-.update-jobs-form table th {
+.update-jobs-form table tr.header td {
     text-align: center;
+    background: #e0e0e0;
+    vertical-align: bottom;
+    font-weight: bold;
+    padding: .625rem 1rem;
 }
 
 .update-jobs-form table td {

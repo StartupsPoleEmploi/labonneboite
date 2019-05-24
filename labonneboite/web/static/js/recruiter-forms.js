@@ -118,10 +118,10 @@
   var $newJobTable = $('.add-new-jobs table');
   var $newJobTbody = $newJobTable.find('tbody');
   var $newJobInput = $('.add-new-jobs input[name=new-job]');
-  var jobRowTemplate = '<tr id="{ROME}"><td><span><label for="{ROME}">{LABEL}</label></span></td>' +
-      '<td class="text-center"><span class="sr-only">Intéressé par les candidatures</span><input checked="checked" type="checkbox" name="{ROME}" value="lbb"></td>' +
-      '<td class="text-center"><span class="sr-only">Ouvert aux contrats d\'alternance</span><input checked="checked" type="checkbox" name="{ROME}" value="lba"></td>' +
-      '<td class="text-center"><button class="btn remove" data-rome="{ROME}">Supprimer</button></td></tr>';
+  var jobRowTemplate = '<tr id="{ROME}"><td class="text-left"><b>{LABEL}</b></td>' +
+      '<td class="text-center"><label for="lbb-{ROME}" class="sr-only">Intéressé par les candidatures pour le métier de {LABEL}</label><input checked="checked" id="lbb-{ROME}" type="checkbox" name="{ROME}" value="lbb" /></td>' +
+      '<td class="text-center"><label for="lbb-{ROME}" class="sr-only">Ouvert aux contrats d\'alternance pour le métier de {LABEL}</span><input checked="checked" id="lbb-{ROME}" type="checkbox" name="{ROME}" value="lba" /></td>' +
+      '<td class="text-center"><button class="btn remove" data-rome="{ROME}" title="Supprimer le métier {LABEL}">Supprimer<span class="sr-only">le métier de {LABEL}</span></button></td></tr>';
 
   $newJobInput.autocomplete({
     delay: 200,
