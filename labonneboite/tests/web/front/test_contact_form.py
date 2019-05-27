@@ -56,7 +56,7 @@ class ContactFormBaseTest(DatabaseTest):
             'siret': self.office.siret,
             'first_name': "John",
             'last_name': "Doe",
-            'phone': "0606060606",
+            'phone': '0601020304',
             'email': "test@test.com",
         }
 

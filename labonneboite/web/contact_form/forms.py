@@ -20,6 +20,7 @@ CONTACT_MODES = (
 )
 CONTACT_MODES_LABELS = dict(CONTACT_MODES)
 PHONE_REGEX = r"^(0|\+33)[1-9]([-. ]?[0-9]{2}){4}$"
+SIRET_REGEX = r'[0-9]{14}'
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -40,7 +41,7 @@ class OfficeIdentificationForm(FlaskForm):
         'N° de Siret *',
         validators=[
             DataRequired(),
-            Regexp('[0-9]{14}', message=("Le siret de l'établissement est invalide (14 chiffres)"))
+            Regexp(SIRET_REGEX, message=("Le siret de l'établissement est invalide (14 chiffres)"))
         ],
         description="14 chiffres, sans espace. Exemple: 36252187900034",
     )
