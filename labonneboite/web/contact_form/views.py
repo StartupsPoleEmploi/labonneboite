@@ -264,8 +264,12 @@ def update_coordinates_form(form):
 
 @contactFormBlueprint.route('/informations-entreprise/modifier-metiers', methods=['GET', 'POST'])
 def update_jobs_form():
+    """
+    Let an employer fill in a form to add or remove ROME codes related to his company.
+    """
     try:
-        office = get_office_from_siret(request.args['siret'])
+        siret = request.form.get('siret') or request.args['siret']
+        office = get_office_from_siret(siret)
     except NoResultFound:
         flash(unknown_siret_message(), 'error')
         return redirect(url_for('contact_form.change_info'))

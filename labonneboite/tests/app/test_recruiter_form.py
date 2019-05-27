@@ -7,15 +7,6 @@ from labonneboite.web.contact_form import forms, mail
 from labonneboite.common import models
 from labonneboite.web.app import app
 
-# We use request.form because some ROME codes can be added manually on the client side
-REQUEST_FORM = [
-    ('D1507', ['lbb', 'lba']),
-    ('D1106', ['lbb']),
-    ('D1505', ['lba']),
-    # Added job on the client side, not related to office NAF
-    ('E1102', ['lbb', 'lba']),
-]
-
 
 # Common helpers
 def create_other_form(overrides=None):
@@ -62,6 +53,7 @@ def create_remove_form(overrides=None):
     )
     return form
 
+
 def get_form_common_fields(overrides):
     overrides = overrides or {}
     return {
@@ -73,19 +65,8 @@ def get_form_common_fields(overrides):
     }
 
 
-def create_office():
-    office = models.Office(
-        siret='00000000000008',
-        naf='4711B',
-        office_name="Test company",
-        company_name="Test company",
-        city_code=44109,
-        zipcode=44000,
-        departement=44,
-    )
-    office.save()
-
 class FormContactMailTest(DatabaseTest):
+
     def test_other_form(self):
         with app.app_context(), self.test_request_context:
             form = create_other_form()
@@ -99,7 +80,6 @@ class FormContactMailTest(DatabaseTest):
             self.assertIn('Nom : Bonaparte', mail_content)
             self.assertIn('E-mail : bonaparte@napoleon.fr', mail_content)
             self.assertIn('Téléphone : 0123456789', mail_content)
-
 
     def test_remove_form(self):
         answers = [
@@ -120,7 +100,6 @@ class FormContactMailTest(DatabaseTest):
                     self.assertIn(lbbExpected, mail_content)
                     self.assertIn(lbaExpected, mail_content)
 
-
     def test_new_coordinates(self):
         with app.app_context(), self.test_request_context:
             form = create_update_coordinates_form()
@@ -139,33 +118,11 @@ class FormContactMailTest(DatabaseTest):
             self.assertIn('Réseau social : https://www.facebook.com/poleemploi/', mail_content)
 
 
-    def test_new_jobs(self):
-        with app.test_request_context():
-            # Make request.form mutable to make it mockable
-            request.form = request.form.to_dict()
-
-            with mock.patch('flask.request.form', REQUEST_FORM):
-                create_office()
-
-                form = create_update_jobs_form()
-                recruiter_message = models.UpdateJobsRecruiterMessage.create_from_form(form)
-                mail_content = mail.generate_update_jobs_mail(form, recruiter_message)
-
-                self.assertIn(
-                    'Romes à ajouter LBB : <ul><li>Ecriture d\'ouvrages, de livres (E1102)</li></ul>',
-                    mail_content
-                )
-                self.assertIn(
-                    'Romes à ajouter LBA : <ul><li>Ecriture d\'ouvrages, de livres (E1102)</li></ul>',
-                    mail_content
-                )
-
-
 class CreateFormContactDatabase(DatabaseTest):
+
     def test_save_other_form(self):
         with app.app_context(), self.test_request_context:
             recruiter_message = models.OtherRecruiterMessage.create_from_form(create_other_form())
-
             self.assertEqual('00000000000008', recruiter_message.siret)
             self.assertEqual('Napoléon', recruiter_message.requested_by_first_name)
             self.assertEqual('Bonaparte', recruiter_message.requested_by_last_name)
@@ -173,19 +130,16 @@ class CreateFormContactDatabase(DatabaseTest):
             self.assertEqual('0123456789', recruiter_message.requested_by_phone)
             self.assertEqual('Bonjour à tous', recruiter_message.comment)
 
-
     def test_save_remove_form(self):
         with app.app_context(), self.test_request_context:
             recruiter_message = models.RemoveRecruiterMessage.create_from_form(create_remove_form())
-
             self.assertTrue(recruiter_message.remove_lbb)
             self.assertTrue(recruiter_message.remove_lba)
 
-
     def test_save_update_coordinates_form(self):
         with app.app_context(), self.test_request_context:
-            recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(create_update_coordinates_form())
-
+            recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(
+                create_update_coordinates_form())
             self.assertEqual('http://exemple.com', recruiter_message.new_website)
             self.assertEqual('exemple@domaine.com', recruiter_message.new_email)
             self.assertEqual('01 77 86 39 49', recruiter_message.new_phone)
@@ -193,22 +147,3 @@ class CreateFormContactDatabase(DatabaseTest):
             self.assertEqual('exemple-alternance@domaine.com', recruiter_message.new_email_alternance)
             self.assertEqual('02 77 86 39 49', recruiter_message.new_phone_alternance)
             self.assertEqual('https://www.facebook.com/poleemploi/', recruiter_message.social_network)
-
-
-    def test_save_update_jobs_form(self):
-        with app.test_request_context():
-            # Make request.form mutable to make it mockable
-            request.form = request.form.to_dict()
-
-            with mock.patch('flask.request.form', REQUEST_FORM):
-                create_office()
-                recruiter_message = models.UpdateJobsRecruiterMessage.create_from_form(create_update_jobs_form())
-
-                self.assertIn('D1505', recruiter_message.romes_to_remove)
-                self.assertIn('D1101', recruiter_message.romes_to_remove)
-
-                self.assertIn('D1106', recruiter_message.romes_alternance_to_remove)
-                self.assertIn('D1101', recruiter_message.romes_alternance_to_remove)
-
-                self.assertIn('E1102', recruiter_message.romes_to_add)
-                self.assertIn('E1102', recruiter_message.romes_alternance_to_add)

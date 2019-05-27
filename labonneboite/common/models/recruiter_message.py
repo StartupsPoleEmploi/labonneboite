@@ -36,7 +36,6 @@ class RecruiterMessageCommon(object):
     def create_from_form(cls, form, is_certified_recruiter=False, uid=''):
         instance = cls()
         instance.siret = form.siret.data
-        instance.siret = form.siret.data
         instance.requested_by_first_name = form.first_name.data
         instance.requested_by_last_name = form.last_name.data
         instance.requested_by_email = form.email.data

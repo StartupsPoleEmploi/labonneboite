@@ -118,7 +118,7 @@
     e.stopPropagation();
     var checkbox = $(this);
     var checkboxSate = checkbox.is(':checked');
-    var targetCheckboxes = $("input[name='" + checkbox.data('target-input-name') + "']");
+    var targetCheckboxes = $("input[name='" + checkbox.data('target') + "']");
     targetCheckboxes.prop('checked', checkboxSate);
   });
 

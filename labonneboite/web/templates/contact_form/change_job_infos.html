@@ -33,18 +33,18 @@
             <th></th>
             <th class="text-center">
               <label>
-                <input type="checkbox" class="js-check-all" data-target-input-name="romes_to_keep">
+                <input type="checkbox" class="js-check-all" data-target="romes_to_keep">
               </label>
             </th>
             <th class="text-center">
               <label>
-                <input type="checkbox" class="js-check-all" data-target-input-name="romes_alternance_to_keep">
+                <input type="checkbox" class="js-check-all" data-target="romes_alternance_to_keep">
               </label>
             </th>
           </tr>
         </thead>
         <tbody>
-          {% for rome, rome_alternance in form.zipped_romes_fields() %}
+          {% for rome, rome_alternance in form.zipped_romes_to_keep() %}
           <tr id="{{ rome.data }}">
               <td>
                 <label>{{ rome.label.text }}</label>
@@ -78,12 +78,12 @@
               <th></th>
               <th class="text-center">
                 <label>
-                  <input type="checkbox" class="js-check-all" data-target-input-name="extra_romes_to_add">
+                  <input type="checkbox" class="js-check-all" data-target="extra_romes_to_add">
                 </label>
               </th>
               <th class="text-center">
                 <label>
-                  <input type="checkbox" class="js-check-all" data-target-input-name="extra_romes_alternance_to_add">
+                  <input type="checkbox" class="js-check-all" data-target="extra_romes_alternance_to_add">
                 </label>
               </th>
             </tr>

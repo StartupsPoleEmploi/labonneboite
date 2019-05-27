@@ -5,10 +5,9 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField, HiddenField, RadioField, SelectMultipleField, StringField, TextAreaField
 from wtforms import validators
 from wtforms.fields.html5 import EmailField, TelField
-from wtforms.validators import DataRequired, Email, Optional, Regexp, URL, Length
+from wtforms.validators import DataRequired, Email, Optional, Regexp, URL
 from wtforms.widgets import ListWidget, CheckboxInput
 
-from labonneboite.common.load_data import ROME_CODES
 from labonneboite.conf import settings
 
 
@@ -20,7 +19,7 @@ CONTACT_MODES = (
     ('website', 'Via votre site internet'),
 )
 CONTACT_MODES_LABELS = dict(CONTACT_MODES)
-PHONE_REGEX = "^(0|\+33)[1-9]([-. ]?[0-9]{2}){4}$"
+PHONE_REGEX = r"^(0|\+33)[1-9]([-. ]?[0-9]{2}){4}$"
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -92,22 +91,36 @@ class OfficeOtherRequestForm(OfficeHiddenIdentificationForm):
 
 
 class OfficeUpdateJobsForm(OfficeHiddenIdentificationForm):
+    """
+    A form that contains a list of checkboxes allowing to keep or remove
+    some ROME codes from the default NAF/ROME mapping of an office.
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    The `office` must be passed in **kwargs:
+    > OfficeUpdateJobsForm(data=form_data, office=office)
 
-        self.office = kwargs.pop('office')
-        self.romes_choices = [(rome.code, rome.name) for rome in self.office.romes]
-
-        # Construct choices properties dynamically, depending on ROME codes
-        # associated with the current office.
-        self.romes_to_keep.choices = self.romes_choices
-        self.romes_alternance_to_keep.choices = self.romes_choices
+    ROME codes not present in the default NAF/ROME mapping can be customized
+    via some `extra_` fields inserted and pupulated via JavaScript but
+    still validated in this form class.
+    """
 
     romes_to_keep = MultiCheckboxField("Intéressé par des candidatures")
     romes_alternance_to_keep = MultiCheckboxField("Métier ouvert à l'alternance")
 
-    def zipped_romes_fields(self):
+    def __init__(self, *args, **kwargs):
+        """
+        Construct choices properties dynamically, depending on ROME codes
+        associated with the current office.
+        """
+        super().__init__(*args, **kwargs)
+        self.office = kwargs.pop('office')
+        self.romes_choices = [(rome.code, rome.name) for rome in self.office.romes]
+        self.romes_to_keep.choices = self.romes_choices
+        self.romes_alternance_to_keep.choices = self.romes_choices
+
+    def zipped_romes_to_keep(self):
+        """
+        Convenient method to iterate on both ROMEs to keep fields.
+        """
         return zip(self.romes_to_keep, self.romes_alternance_to_keep)
 
     def validate(self):
@@ -115,28 +128,30 @@ class OfficeUpdateJobsForm(OfficeHiddenIdentificationForm):
         if not is_valid:
             return False
 
+        # ROME codes not present in the default NAF/ROME mapping that a company wants to use.
+        # `extra_romes_to_add` and `extra_romes_alternance_to_add` are pupulated via JavaScript.
+        # Those fields are defined outside of the form class so we use `request.form` to get them.
+        extra_romes_to_add = [
+            rome for rome in request.form.getlist('extra_romes_to_add')
+            if rome in settings.ROME_DESCRIPTIONS and rome not in self.office.romes
+        ]
+        extra_romes_alternance_to_add = [
+            rome for rome in request.form.getlist('extra_romes_alternance_to_add')
+            if rome in settings.ROME_DESCRIPTIONS and rome not in self.office.romes
+        ]
+
         # Checked ROME codes.
-        romes_to_add = set(self.romes_to_keep.data)
-        romes_alternance_to_add = set(self.romes_alternance_to_keep.data)
+        romes_to_keep = self.romes_to_keep.data or []
+        romes_to_add = set(romes_to_keep + extra_romes_to_add)
+        romes_alternance_to_keep = self.romes_alternance_to_keep.data or []
+        romes_alternance_to_add = set(romes_alternance_to_keep + extra_romes_alternance_to_add)
 
         # Unchecked ROME codes.
         romes_to_remove = self.office.romes_codes - romes_to_add
         romes_alternance_to_remove = self.office.romes_codes - romes_alternance_to_add
 
-        # ROME codes not present in the default NAF/ROME mapping that a company wants to use.
-        # `extra_romes_to_add` and `extra_romes_alternance_to_add` are pupulated via JavaScript.
-        # Those fields are defined outside of the form class so we use `request.form` to get them.
-        extra_romes_to_add = set([
-            rome for rome in request.form.getlist('extra_romes_to_add')
-            if rome in settings.ROME_DESCRIPTIONS
-        ])
-        extra_romes_alternance_to_add = set([
-            rome for rome in request.form.getlist('extra_romes_alternance_to_add')
-            if rome in settings.ROME_DESCRIPTIONS
-        ])
-
-        setattr(self, 'romes_to_add', romes_to_add.union(extra_romes_to_add))
-        setattr(self, 'romes_alternance_to_add', romes_alternance_to_add.union(extra_romes_alternance_to_add))
+        setattr(self, 'romes_to_add', romes_to_add)
+        setattr(self, 'romes_alternance_to_add', romes_alternance_to_add)
         setattr(self, 'romes_to_remove', romes_to_remove)
         setattr(self, 'romes_alternance_to_remove', romes_alternance_to_remove)
 
