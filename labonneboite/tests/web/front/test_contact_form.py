@@ -3,6 +3,7 @@ from unittest import mock
 from labonneboite.common.models import Office
 from labonneboite.common.models import UpdateJobsRecruiterMessage
 from labonneboite.tests.test_base import DatabaseTest
+from labonneboite.web.app import app
 from labonneboite.web.contact_form import forms, mail
 
 
@@ -41,8 +42,8 @@ class ContactFormBaseTest(DatabaseTest):
         super().setUp()
 
         self.office_info = {
-            'siret': '00000000000001',
-            'naf': '4711B',
+            'siret': "00000000000001",
+            'naf': "4711B",
             'office_name': "Test company",
             'company_name': "Test company",
             'city_code': 44109,
@@ -53,48 +54,64 @@ class ContactFormBaseTest(DatabaseTest):
 
         self.recruiter_hidden_identification = {
             'siret': self.office.siret,
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'phone': '0606060606',
-            'email': 'test@test.com',
+            'first_name': "John",
+            'last_name': "Doe",
+            'phone': "0606060606",
+            'email': "test@test.com",
         }
 
 
-class MailTest(ContactFormBaseTest):
-    """
-    Test the mail module.
-    """
+class UpdateJobsFormTest(ContactFormBaseTest):
+
+    def test_office_update_jobs_form(self):
+        """
+        Test form class.
+        """
+        form_data = {
+            'romes_to_keep': ['D1507'],
+            'romes_alternance_to_keep': ['D1106'],
+            'extra_romes_to_add': ['M1805'],
+            'extra_romes_alternance_to_add': ['M1805'],
+        }
+        form_data.update(self.recruiter_hidden_identification)
+
+        # Populate global `request.form` because it's used in `form.validate().
+        with app.test_request_context(method='POST', data=form_data):
+            form = forms.OfficeUpdateJobsForm(data=form_data, office=self.office)
+            form.validate()
+            self.assertCountEqual(form.romes_to_add, {'D1507', 'M1805'})
+            self.assertCountEqual(form.romes_alternance_to_add, {'D1106', 'M1805'})
+            self.assertCountEqual(form.romes_to_remove, self.office.romes_codes - {'D1507', 'M1805'})
+            self.assertCountEqual(form.romes_alternance_to_remove, self.office.romes_codes - {'D1106', 'M1805'})
 
     def test_generate_update_jobs_mail(self):
-
+        """
+        Test `mail.generate_update_jobs_mail()` method.
+        """
         with self.test_request_context:
-
             form_data = {
                 'romes_to_keep': ['D1507', 'D1106', 'D1214', 'D1101', 'D1502'],
                 'romes_alternance_to_keep': ['D1101', 'D1105'],
                 'extra_romes_to_add': ['M1802', 'M1803', 'M1805'],
                 'extra_romes_alternance_to_add': ['M1805'],
             }
-
-            # Add recruiter hidden identification info.
             form_data.update(self.recruiter_hidden_identification)
 
+        # Populate global `request.form` because it's used in `form.validate().
+        with app.test_request_context(method='POST', data=form_data):
             form = forms.OfficeUpdateJobsForm(data=form_data, office=self.office)
             form.validate()
-
             recruiter_message = UpdateJobsRecruiterMessage.create_from_form(form)
-
             mail_content = mail.generate_update_jobs_mail(form, recruiter_message)
-
             self.assertIn(mail.format_romes(form.romes_to_add), mail_content)
             self.assertIn(mail.format_romes(form.romes_alternance_to_add), mail_content)
             self.assertIn(mail.format_romes(form.romes_to_remove), mail_content)
             self.assertIn(mail.format_romes(form.romes_alternance_to_remove), mail_content)
 
 
-class UpdateJobsFormTest(ContactFormBaseTest):
+class UpdateJobsFormViewTest(ContactFormBaseTest):
     """
-    Test the abitlity for a recruiter to add or delete
+    Test the view: allow a recruiter to add or delete
     ROME codes related to his company.
     """
 
@@ -108,14 +125,6 @@ class UpdateJobsFormTest(ContactFormBaseTest):
         url = self.url_for('contact_form.update_jobs_form', **self.recruiter_hidden_identification)
         rv = self.app.get(url)
         self.assertEqual(rv.status_code, 200)
-
-        self.assertIn('name="romes_to_keep"', rv.data.decode())
-        self.assertIn('name="romes_alternance_to_keep"', rv.data.decode())
-        for rome_code in self.office.romes_codes:
-            self.assertIn(rome_code, rv.data.decode())
-
-        self.assertNotIn('name="extra_romes_to_add"', rv.data.decode())
-        self.assertNotIn('name="extra_romes_alternance_to_add"', rv.data.decode())
 
     def test_add_and_remove_romes_codes(self):
 
@@ -133,8 +142,6 @@ class UpdateJobsFormTest(ContactFormBaseTest):
                 'extra_romes_to_add': extra_romes_to_add,
                 'extra_romes_alternance_to_add': extra_romes_alternance_to_add,
             }
-
-            # Add recruiter hidden identification info.
             form_data.update(self.recruiter_hidden_identification)
 
             url = self.url_for('contact_form.update_jobs_form')

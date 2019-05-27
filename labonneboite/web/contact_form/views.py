@@ -267,15 +267,15 @@ def update_jobs_form():
     """
     Let an employer fill in a form to add or remove ROME codes related to his company.
     """
-    try:
-        siret = request.form.get('siret') or request.args['siret']
-        office = get_office_from_siret(siret)
-    except NoResultFound:
-        flash(unknown_siret_message(), 'error')
-        return redirect(url_for('contact_form.change_info'))
 
     # Use POST params if available, GET params otherwise.
     form_data = request.form or request.args.copy()
+
+    try:
+        office = get_office_from_siret(form_data['siret'])
+    except NoResultFound:
+        flash(unknown_siret_message(), 'error')
+        return redirect(url_for('contact_form.change_info'))
 
     if request.method == 'GET':
 
