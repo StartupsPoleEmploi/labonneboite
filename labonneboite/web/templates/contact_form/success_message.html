@@ -8,46 +8,44 @@
 
 {% block content %}
 <div class="lbb-content">
-    <div class="lbb-single-column-content">
+    <div class="lbb-single-column-content success-message text-center">
 
         <h2>Merci</h2>
 
-        <div class="alert alert-success">
-          <p>Votre demande a bien été envoyée !</p>
-        </div>
+        <p>Votre demande a bien été envoyée !</p>
 
-        <div class="alert">
+        <p>Notre équipe reviendra vers vous d'ici quelques jours par mail et/ou téléphone afin de vous confirmer la prise en compte des modifications. Elles seront visibles sur votre fiche entreprise une fois la demande traitée.</p>
 
-          <p>Notre équipe reviendra vers vous d'ici quelques jours par mail et/ou téléphone afin de vous confirmer la prise en compte des modifications</p>
+        {% if suggest_update_jobs %}
+            <p>Nous vous invitons à confirmer les métiers pour lesquels vous souhaitez recevoir  des candidatures spontanées en cliquant sur le lien ci-dessous.</p>
+        {% elif suggest_update_coordinates %}
+            <p>Nous vous invitons à confirmer vos données de contact visibles par les candidats en cliquant sur le lien ci-dessous.</p>
+        {% endif %}
 
+        <p>Nous restons à votre écoute sur <a href="mailto:{{ email }}">{{ email }}</a>.</p>
+
+        <ul class="actions">
+          <li>
+            <a href="{{ home_url }}" title="Retour à la page d'accueil du site">Retour à la {{ site_name }}</a>
+          </li>
           {% if suggest_update_jobs %}
-              <p>Nous vous invitons à confirmer les métiers pour lesquels vous souhaitez recevoir  des candidatures spontanées en cliquant sur le lien ci-dessous.</p>
+            <li>
+              <a class="btn btn-small" href="{{ url_for('contact_form.update_jobs_form') }}?{{ params }}">
+              Mettre à jour les métiers pour lesquels je reçois des candidatures spontanées
+              </a>
+            </li>
           {% elif suggest_update_coordinates %}
-              <p>Nous vous invitons à confirmer vos données de contact visibles par les candidats en cliquant sur le lien ci-dessous.</p>
+            <li>
+              <a class="btn btn-small" href="{{ url_for('contact_form.update_coordinates_form') }}?{{ params }}">
+              Mettre à jour les coordonnées de mon entreprise
+              </a>
+            </li>
+          {% else %}
+            <li>
+              <a class="btn btn-small" href="{{ action_form_url }}">Effectuer de nouvelles modifications</a>
+            </li>
           {% endif %}
-
-          <p>Nous restons à votre écoute sur <a href="mailto:{{ email }}">{{ email }}</a>.</p>
-
-        </div>
-
-        <p class="text-center">
-            <a class="btn" href="{{ home_url }}" title="Retour à la page d'accueil du site">
-              Retour à la {{ site_name }}
-            </a>
-            {% if suggest_update_jobs %}
-                <a class="btn" href="{{ url_for('contact_form.update_jobs_form') }}?{{ params }}">
-                    Mettre à jour les métiers pour lesquels je reçois des candidatures spontanées
-                </a>
-            {% elif suggest_update_coordinates %}
-                <a class="btn" href="{{ url_for('contact_form.update_coordinates_form') }}?{{ params }}">
-                  Mettre à jour les coordonnées de mon entreprise
-                </a>
-            {% else %}
-                <a class="btn" href="{{ action_form_url }}">
-                  Effectuer de nouvelles modifications
-                </a>
-            {% endif %}
-        </p>
+        </ul>
 
     </div>
 </div>
