@@ -30,24 +30,24 @@
 
         </div>
 
-        <ul class='actions'>
-            <li><a href="{{ home_url }}" title="Retour à la page d'accueil du site">Retour à la {{ site_name }}</a></li>
+        <p class="text-center">
+            <a class="btn" href="{{ home_url }}" title="Retour à la page d'accueil du site">
+              Retour à la {{ site_name }}
+            </a>
             {% if suggest_update_jobs %}
-                <li>
-                    <a class="btn btn-small" href="{{ url_for('contact_form.update_jobs_form') }}?{{ params }}">
-                        Mettre à jour les métiers pour lesquels je reçois des candidatures spontanées
-                    </a>
-                </li>
+                <a class="btn" href="{{ url_for('contact_form.update_jobs_form') }}?{{ params }}">
+                    Mettre à jour les métiers pour lesquels je reçois des candidatures spontanées
+                </a>
             {% elif suggest_update_coordinates %}
-                <li>
-                    <a href="{{ url_for('contact_form.update_coordinates_form') }}?{{ params }}">
-                      Mettre à jour les coordonnées de mon entreprise
-                    </a>
-                </li>
+                <a class="btn" href="{{ url_for('contact_form.update_coordinates_form') }}?{{ params }}">
+                  Mettre à jour les coordonnées de mon entreprise
+                </a>
             {% else %}
-                <li><a href="{{ action_form_url }}">Effectuer de nouvelles modifications</a></li>
+                <a class="btn" href="{{ action_form_url }}">
+                  Effectuer de nouvelles modifications
+                </a>
             {% endif %}
-        </ul>
+        </p>
 
     </div>
 </div>
