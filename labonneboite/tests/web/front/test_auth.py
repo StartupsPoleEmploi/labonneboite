@@ -31,7 +31,7 @@ class AuthTest(DatabaseTest):
         db_session.add(user_social_auth)
         db_session.commit()
 
-        with self.test_request_context:
+        with self.test_request_context():
 
             with self.app.session_transaction() as sess:
                 sess['this_should_not_be_deleted'] = 'foo'  # This should not be deleted by a login or logout.
@@ -73,7 +73,7 @@ class AuthTest(DatabaseTest):
         self.assertEqual(user_social_auth.id, expected_user_social_auth.id)
 
     def test_login_url(self):
-        with self.app_context:
+        with self.app_context():
             login_url = auth_utils.login_url()
 
         parsed = urllib.parse.urlsplit(login_url)
@@ -84,7 +84,7 @@ class AuthTest(DatabaseTest):
 
     def test_login_url_with_next(self):
         next_url = 'http://infinityandbeyond.com/subpath?arg=value'
-        with self.app_context:
+        with self.app_context():
             login_url = auth_utils.login_url(next_url=next_url)
 
         parsed = urllib.parse.urlsplit(login_url)

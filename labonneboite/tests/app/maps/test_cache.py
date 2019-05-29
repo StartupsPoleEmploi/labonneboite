@@ -28,7 +28,7 @@ class RedisCacheTest(AppTest):
         self.cache = cache.RedisCache()
 
     def test_access_cache_with_disconnected_redis(self):
-        with self.test_request_context:
+        with self.test_request_context():
             self.assertIsNone(self.cache.get("new key"))
             self.assertIsNone(self.cache.set("new key", 1))
             self.assertIsNone(self.cache.get("new key"))
@@ -48,5 +48,5 @@ class RedisCacheTest(AppTest):
             )
         )
 
-        with self.test_request_context:
+        with self.test_request_context():
             self.assertIsNone(self.cache.get('somekey'))

@@ -25,7 +25,7 @@ class AuthPipelineTest(DatabaseTest):
         }
 
     def run_pipeline(self, BackendClass):
-        with self.test_request_context:
+        with self.test_request_context():
             strategy = load_strategy()
             backend = BackendClass(strategy=strategy)
             pipeline = strategy.get_pipeline(backend)

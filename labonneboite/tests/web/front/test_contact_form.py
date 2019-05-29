@@ -76,7 +76,7 @@ class UpdateJobsFormTest(ContactFormBaseTest):
         form_data.update(self.recruiter_hidden_identification)
 
         # Populate global `request.form` because it's used in `form.validate().
-        with app.test_request_context(method='POST', data=form_data):
+        with self.test_request_context(method='POST', data=form_data):
             form = forms.OfficeUpdateJobsForm(data=form_data, office=self.office)
             form.validate()
             self.assertCountEqual(form.romes_to_add, {'D1507', 'M1805'})
@@ -88,7 +88,7 @@ class UpdateJobsFormTest(ContactFormBaseTest):
         """
         Test `mail.generate_update_jobs_mail()` method.
         """
-        with self.test_request_context:
+        with self.test_request_context():
             form_data = {
                 'romes_to_keep': ['D1507', 'D1106', 'D1214', 'D1101', 'D1502'],
                 'romes_alternance_to_keep': ['D1101', 'D1105'],
@@ -98,7 +98,7 @@ class UpdateJobsFormTest(ContactFormBaseTest):
             form_data.update(self.recruiter_hidden_identification)
 
         # Populate global `request.form` because it's used in `form.validate().
-        with app.test_request_context(method='POST', data=form_data):
+        with self.test_request_context(method='POST', data=form_data):
             form = forms.OfficeUpdateJobsForm(data=form_data, office=self.office)
             form.validate()
             recruiter_message = UpdateJobsRecruiterMessage.create_from_form(form)

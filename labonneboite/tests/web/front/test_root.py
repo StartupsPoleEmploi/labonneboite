@@ -19,7 +19,7 @@ class RootTest(DatabaseTest):
 
     @mock.patch('labonneboite.conf.settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES', ['@pole-emploi.fr'])
     def test_no_kit_if_pro_but_not_enabled(self):
-        with self.test_request_context:
+        with self.test_request_context():
             self.login_as_pro()
 
             rv = self.app.get(self.url_for('root.kit'))
@@ -27,7 +27,7 @@ class RootTest(DatabaseTest):
 
     @mock.patch('labonneboite.conf.settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES', ['@pole-emploi.fr'])
     def test_kit_if_pro_and_enabled(self):
-        with self.test_request_context:
+        with self.test_request_context():
             self.login_as_pro()
 
             # enable pro version

@@ -7,7 +7,7 @@ from labonneboite.tests.test_base import AppTest
 class SlugDetailsTest(AppTest):
 
     def test_error_if_no_slug(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # Job slug
             rv = self.app.get('{}'.format(url_for("search.job_slug_details")))
             self.assertEqual(rv.status_code, 400)
@@ -17,7 +17,7 @@ class SlugDetailsTest(AppTest):
             self.assertEqual(rv.status_code, 400)
 
     def test_error_if_invalid_city_slugs(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get('{}?city-slug={}'.format(
                 url_for("search.city_slug_details"),
                 'INVALID_SLUG',
@@ -26,7 +26,7 @@ class SlugDetailsTest(AppTest):
             self.assertEqual(rv.data, b'no city found associated to the slug INVALID_SLUG')
 
     def test_ok_job_slug(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get('{}?job-slug={}'.format(
                 url_for("search.job_slug_details"),
                 'abattage-et-decoupe-des-viandes',
@@ -37,7 +37,7 @@ class SlugDetailsTest(AppTest):
             self.assertEqual(data[0]['rome_code'], 'H2101')
 
     def test_ok_multiple_job_slug(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get('{}?job-slug={}'.format(
                 url_for("search.job_slug_details"),
                 'maconnerie,realisation-et-restauration-de-facades,construction-en-beton',
@@ -52,7 +52,7 @@ class SlugDetailsTest(AppTest):
             self.assertEqual(data[2]['label'], 'Construction en béton')
 
     def test_ignore_invalid_slug(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get('{}?job-slug={}'.format(
                 url_for("search.job_slug_details"),
                 'maconnerie,INVALID_SLUG,realisation-et-restauration-de-facades',
@@ -66,7 +66,7 @@ class SlugDetailsTest(AppTest):
             self.assertEqual(data[1]['label'], 'Réalisation et restauration de façades')
 
     def test_empty_list_if_invalid_slugs(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get('{}?job-slug={}'.format(
                 url_for("search.job_slug_details"),
                 'INVALID_SLUG_1,INVALID_SLUG_2',
@@ -76,7 +76,7 @@ class SlugDetailsTest(AppTest):
             self.assertEqual(len(data), 0)
 
     def test_ok_city_slug(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get('{}?city-slug={}'.format(
                 url_for("search.city_slug_details"),
                 'nantes-44000',
@@ -91,7 +91,7 @@ class SlugDetailsTest(AppTest):
 class CityCodeDetailsTest(AppTest):
 
     def test_ok_city_code(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get('{}?city-code={}'.format(
                 url_for("search.city_code_details"),
                 '44109',
@@ -105,7 +105,7 @@ class CityCodeDetailsTest(AppTest):
 
 
     def test_error_if_invalid_city_code(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get('{}?city-code={}'.format(
                 url_for("search.city_code_details"),
                 'INVALID_CODE',

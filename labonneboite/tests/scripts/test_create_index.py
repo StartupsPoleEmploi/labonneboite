@@ -122,7 +122,7 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
             "reason": "Demande de mise en avant",
         }
 
-        with self.test_request_context:
+        with self.test_request_context():
             # Create an user admin
             self.user = User(email='john@doe.com', gender='male',
                              first_name='John', last_name='Doe', active=True,
@@ -161,7 +161,7 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
             'initiative': 'office',
         }
 
-        with self.test_request_context:
+        with self.test_request_context():
             # Create an user admin
             self.user = User(email='john@doe.com', gender='male',
                              first_name='John', last_name='Doe', active=True,

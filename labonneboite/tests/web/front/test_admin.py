@@ -41,7 +41,7 @@ class AdminTest(DatabaseTest):
             self.url_for('officeadminextrageolocation.index_view'),
         ]
 
-        with self.test_request_context:
+        with self.test_request_context():
 
             for url in admin_urls:
 

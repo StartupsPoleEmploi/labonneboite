@@ -12,7 +12,7 @@ from labonneboite.tests.app.maps import places
 class IsochroneTest(AppTest):
 
     def test_valid_arguments(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get(url_for('maps.isochrone') + '?zipcode={}&dur={}&tr={}'.format(
                 '75000',
                 constants.ISOCHRONE_DURATIONS_MINUTES[0],
@@ -21,7 +21,7 @@ class IsochroneTest(AppTest):
             self.assertEqual(200, rv.status_code)
 
     def test_invalid_zipcode(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get(url_for('maps.isochrone') + '?zipcode={}&dur={}&tr={}'.format(
                 '195000',
                 constants.ISOCHRONE_DURATIONS_MINUTES[0],
@@ -30,7 +30,7 @@ class IsochroneTest(AppTest):
             self.assertEqual(400, rv.status_code)
 
     def test_invalid_duration(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get(url_for('maps.isochrone') + '?zipcode={}&dur={}&tr={}'.format(
                 '75000',
                 10000,
@@ -39,7 +39,7 @@ class IsochroneTest(AppTest):
             self.assertEqual(400, rv.status_code)
 
     def test_non_integer_duration(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get(url_for('maps.isochrone') + '?zipcode={}&dur={}&tr={}'.format(
                 '75000',
                 'plonk',
@@ -48,7 +48,7 @@ class IsochroneTest(AppTest):
             self.assertEqual(400, rv.status_code)
 
     def test_invalid_travel_mode(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get(url_for('maps.isochrone') + '?zipcode={}&dur={}&tr={}'.format(
                 '75000',
                 constants.ISOCHRONE_DURATIONS_MINUTES[0],
@@ -57,7 +57,7 @@ class IsochroneTest(AppTest):
             self.assertEqual(400, rv.status_code)
 
     def test_missing_argument(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get(url_for('maps.isochrone') + '?zipcode={}&dur={}'.format(
                 '75000',
                 constants.ISOCHRONE_DURATIONS_MINUTES[0],
@@ -79,7 +79,7 @@ class DurationsTest(AppTest):
 
         mock_backend = mock.Mock(durations=durations)
         with mock.patch('labonneboite.common.maps.travel.vendors.backend', return_value=mock_backend):
-            with self.test_request_context:
+            with self.test_request_context():
                 rv = self.app.post(url_for('maps.durations'), data=json.dumps({
                     'origin': [places.metz[0], places.metz[1]],
                     'destinations': [

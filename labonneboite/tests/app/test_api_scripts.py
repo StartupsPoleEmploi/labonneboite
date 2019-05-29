@@ -38,7 +38,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             'contract': 'alternance'
         })
 
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 200)
             data_list = json.loads(rv.data.decode())
@@ -72,7 +72,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             'contract': 'alternance'
         })
 
-        with self.test_request_context:
+        with self.test_request_context():
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 200, msg=rv.data)
             data_list = json.loads(rv.data.decode())

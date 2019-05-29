@@ -32,8 +32,8 @@ class AppTest(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()
-        self.app_context = app.app_context()
-        self.test_request_context = app.test_request_context()
+        self.app_context = app.app_context
+        self.test_request_context = app.test_request_context
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
 
@@ -43,7 +43,7 @@ class AppTest(unittest.TestCase):
         """
         A small helper to generate a URL to the given endpoint in the context of `self.app_context`.
         """
-        with self.app_context:
+        with self.app_context():
             url = flask_url_for(endpoint, **kwargs)
             return url
 

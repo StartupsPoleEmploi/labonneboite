@@ -38,7 +38,7 @@ class IgnVendorIsochroneTest(AppTest):
         )
         requests_get = mock.Mock(return_value=response)
 
-        with self.test_request_context:
+        with self.test_request_context():
             with mock.patch.object(ign.requests, 'get', requests_get):
                 self.assertRaises(exceptions.BackendUnreachable,
                                   ign.isochrone, places.vallouise, constants.ISOCHRONE_DURATIONS_MINUTES[0])
@@ -50,7 +50,7 @@ class IgnVendorIsochroneTest(AppTest):
         )
         requests_get = mock.Mock(return_value=response)
 
-        with self.test_request_context:
+        with self.test_request_context():
             with mock.patch.object(ign.requests, 'get', requests_get):
                 self.assertRaises(exceptions.BackendUnreachable,
                                   ign.isochrone, places.metz, constants.ISOCHRONE_DURATIONS_MINUTES[0])
@@ -58,7 +58,7 @@ class IgnVendorIsochroneTest(AppTest):
     def test_ign_timeout(self):
         requests_get = mock.Mock(side_effect=ign.requests.exceptions.Timeout())
 
-        with self.test_request_context:
+        with self.test_request_context():
             with mock.patch.object(ign.requests, 'get', requests_get):
                 self.assertRaises(exceptions.BackendUnreachable,
                                   ign.isochrone, places.metz, constants.ISOCHRONE_DURATIONS_MINUTES[0])

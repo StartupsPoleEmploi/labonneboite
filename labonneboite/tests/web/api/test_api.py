@@ -98,7 +98,7 @@ class ApiSecurityTest(ApiBaseTest):
     """
 
     def test_wrong_timestamp_format(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405',
@@ -110,7 +110,7 @@ class ApiSecurityTest(ApiBaseTest):
             self.assertEqual(rv.data, b'timestamp format: %Y-%m-%dT%H:%M:%S')
 
     def test_expired_timestamp(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405',
@@ -124,7 +124,7 @@ class ApiSecurityTest(ApiBaseTest):
             self.assertEqual(rv.data, b'timestamp has expired')
 
     def test_invalid_signature(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405',
@@ -136,7 +136,7 @@ class ApiSecurityTest(ApiBaseTest):
             self.assertEqual(rv.data, b'signature is invalid')
 
     def test_missing_user_param(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405,M1801',
@@ -146,7 +146,7 @@ class ApiSecurityTest(ApiBaseTest):
             self.assertEqual(rv.data, b'missing argument: user')
 
     def test_unknown_user(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405,M1801',
@@ -163,7 +163,7 @@ class ApiCompanyListTest(ApiBaseTest):
     """
 
     def test_happy_path(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405',
@@ -173,7 +173,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
 
     def test_unknown_contract(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405',
@@ -187,7 +187,7 @@ class ApiCompanyListTest(ApiBaseTest):
         """
         Deprecated parameter value is no longer supported. Only 'dpae' and 'alternance' are.
         """
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['lille']['commune_id'],
                 'rome_codes': 'D1213',
@@ -198,7 +198,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 400)
 
     def test_contract_dpae(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['lille']['commune_id'],
                 'rome_codes': 'D1213',
@@ -212,7 +212,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 2)
 
     def test_contract_alternance(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['lille']['commune_id'],
                 'rome_codes': 'D1213',
@@ -230,7 +230,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertIn('https://labonnealternance.pole-emploi.fr/details-entreprises/', data['companies'][0]['url'])
 
     def test_missing_communeid_or_latitudelongitude(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'rome_codes': 'D1405',
                 'user': 'labonneboite',
@@ -243,7 +243,7 @@ class ApiCompanyListTest(ApiBaseTest):
             )
 
     def test_invalid_longitude_or_latitude(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'rome_codes': 'D1405',
                 'user': 'labonneboite',
@@ -258,7 +258,7 @@ class ApiCompanyListTest(ApiBaseTest):
             )
 
     def test_unknown_commune_id(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': 'unknown',
                 'distance': 20,
@@ -275,7 +275,7 @@ class ApiCompanyListTest(ApiBaseTest):
             )
 
     def test_correct_headcount_text(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['pau']['commune_id'],
                 'distance': 10,
@@ -290,7 +290,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][0]['headcount_text'], '10 000 salariés et plus')
 
     def test_page_size_too_large(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'page': 2,
@@ -308,7 +308,7 @@ class ApiCompanyListTest(ApiBaseTest):
             )
 
     def test_maximum_page_size_is_ok(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'page': 1,
@@ -320,7 +320,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
 
     def test_exotic_page_size_is_ok(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'page': 1,
@@ -336,7 +336,7 @@ class ApiCompanyListTest(ApiBaseTest):
         A 0 value for `distance` should not trigger an error since MAP/MHP is actively
         using this type of request in production.
         """
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405',
@@ -350,7 +350,7 @@ class ApiCompanyListTest(ApiBaseTest):
         """
         A wrong value for `distance` should trigger an error.
         """
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405',
@@ -361,7 +361,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 400)
 
     def test_missing_rome_codes(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'user': 'labonneboite',
@@ -382,7 +382,7 @@ class ApiCompanyListTest(ApiBaseTest):
         })
         self.es.indices.flush(index=settings.ES_INDEX)
 
-        with self.test_request_context:
+        with self.test_request_context():
             rome_codes = 'D1501'
             rome_codes_keyword_search = 'animateur vente'
 
@@ -419,7 +419,7 @@ class ApiCompanyListTest(ApiBaseTest):
         })
         self.es.indices.flush(index=settings.ES_INDEX)
 
-        with self.test_request_context:
+        with self.test_request_context():
             rome_codes_keyword_search = 'secrétaire'
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
@@ -434,7 +434,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['rome_label'], 'Secrétariat')
 
     def test_rome_codes_search_by_keyword_when_no_match_found(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rome_codes_keyword_search = 'unicorn'
 
             params = self.add_security_params({
@@ -450,7 +450,7 @@ class ApiCompanyListTest(ApiBaseTest):
             )
 
     def test_rome_code_and_label_are_present_in_response(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rome = 'D1501'
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
@@ -466,7 +466,7 @@ class ApiCompanyListTest(ApiBaseTest):
         """
         A wrong value for `distance` should trigger an error.
         """
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405',
@@ -480,7 +480,7 @@ class ApiCompanyListTest(ApiBaseTest):
         """
         If latitude or longitude are empty, throw a Bad Request Error
         """
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'latitude': '',
                 'longitude': '',
@@ -495,7 +495,7 @@ class ApiCompanyListTest(ApiBaseTest):
         """
         If latitude and longitude equal, throw No Error
         """
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'latitude': '0',
                 'longitude': '0',
@@ -510,7 +510,7 @@ class ApiCompanyListTest(ApiBaseTest):
         """
         If latitude or longitude are empty, throw a Bad Request Error
         """
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'latitude': 'xxx',
                 'longitude': 'xxx',
@@ -522,7 +522,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 400)
 
     def test_rome_without_any_naf_should_not_trigger_any_error(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rome_with_naf_mapping = 'K1706'
             rome_without_naf_mapping = 'L1510'
             self.assertIn(rome_with_naf_mapping, mapping_util.MANUAL_ROME_NAF_MAPPING)
@@ -536,7 +536,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
 
     def test_invalid_rome_codes(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'INVALID,INVALID_TOO',
@@ -547,7 +547,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertTrue(rv.data.decode().startswith('Invalid request argument: Unknown rome_code: INVALID'))
 
     def test_count_pagination(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'distance': 10,
                 'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
@@ -564,7 +564,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 2)
 
     def test_query_by_commune_id(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'distance': 20,
@@ -581,7 +581,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
 
     def test_query_returns_urls_with_rome_code_context(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'distance': 20,
@@ -598,7 +598,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertIn('rome_code=D1405', data['companies'][0]['url'])
 
     def test_query_returns_scores_adjusted_to_rome_code_context(self):
-        with self.test_request_context:
+        with self.test_request_context():
             rome_code = 'D1405'
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
@@ -667,7 +667,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 # now get the main idea of how scores are adjusted to a given rome_code.
 
     def test_empty_result_does_not_crash(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'distance': 20,
@@ -683,7 +683,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 0)
 
     def test_sensitive_contact_data_such_as_email_is_not_exposed(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'distance': 20,
                 'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
@@ -699,7 +699,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 self.assertNotIn('email', company)
 
     def test_response_headers(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'distance': 20,
                 'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
@@ -712,7 +712,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.headers['Content-Type'], 'application/json')
 
     def test_multi_romes_search_is_supported_for_both_sort_by_score_and_by_distance(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # 1) Search for `D1405` ROME code only. We should get 1 result.
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
@@ -791,7 +791,7 @@ class ApiCompanyListTest(ApiBaseTest):
             )
 
     def test_wrong_naf_value(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['metz']['commune_id'],
                 'rome_codes': 'D1508',
@@ -803,7 +803,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertTrue(rv.data.decode().startswith('Invalid request argument: NAF code(s): INVALID INVALID_TOO'))
 
     def test_same_rome_with_no_naf_filters(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # 1) No NAF Code => 2 result expected
             params = self.add_security_params({
                 'commune_id': self.positions['metz']['commune_id'],
@@ -818,7 +818,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertNotEqual(data['companies'][0]['naf'], data['companies'][1]['naf'])
 
     def test_same_rome_with_one_naf_filters(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # 1) NAF Code : 4711C => 1 result expected
             params = self.add_security_params({
                 'commune_id': self.positions['metz']['commune_id'],
@@ -848,7 +848,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][0]['siret'], '00000000000007')
 
     def test_same_rome_with_two_naf_filters(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # 1) NAF codes : 5610C,4711C => 2 results expected
             params = self.add_security_params({
                 'commune_id': self.positions['metz']['commune_id'],
@@ -863,7 +863,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 2)
 
     def test_same_rome_with_unrelated_naf_filters(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # NAF Code : 9499Z => 0 result expected
             params = self.add_security_params({
                 'commune_id': self.positions['metz']['commune_id'],
@@ -876,7 +876,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertIn('Invalid request argument: NAF code(s): 9499Z. Possible values : ', rv.data.decode())
 
     def test_wrong_value_in_sort(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['nantes']['commune_id'],
                 'rome_codes': 'D1211',
@@ -888,7 +888,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.data, b'Invalid request argument: sort. Possible values : score, distance')
 
     def test_sort_by_distance(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # Nantes in first place, then Reze
             params = self.add_security_params({
                 'commune_id': self.positions['nantes']['commune_id'],
@@ -906,7 +906,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertLess(data["companies"][0]['distance'], data["companies"][1]['distance'])
 
     def test_sort_by_score(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # Reze in first place, then Nantes
             params = self.add_security_params({
                 'commune_id': self.positions['nantes']['commune_id'],
@@ -923,7 +923,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(sirets, set(['00000000000009', '00000000000008']))
 
     def test_wrong_contract_value(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['lille']['commune_id'],
                 'rome_codes': 'D1213',
@@ -935,7 +935,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.data, b'Invalid request argument: contract. Possible values : alternance, dpae')
 
     def test_wrong_headcount_value(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulouse']['commune_id'],
                 'rome_codes': 'M1202',
@@ -947,7 +947,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.data, b'Invalid request argument: headcount. Possible values : all, big, small')
 
     def test_headcount_all(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulouse']['commune_id'],
                 'rome_codes': 'M1202',
@@ -961,7 +961,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 2)
 
     def test_headcount_small(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulouse']['commune_id'],
                 'rome_codes': 'M1202',
@@ -977,7 +977,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][0]['headcount_text'], '10 à 19 salariés')
 
     def test_headcount_big(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulouse']['commune_id'],
                 'rome_codes': 'M1202',
@@ -993,7 +993,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][0]['headcount_text'], '100 à 199 salariés')
 
     def test_contact_mode(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405',
@@ -1008,7 +1008,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][0]['contact_mode'], 'Envoyer un CV et une lettre de motivation')
 
     def test_flag_alternance(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['poitiers']['commune_id'],
                 'rome_codes': 'B1603',
@@ -1023,7 +1023,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertTrue(sirets['00000000000016']['alternance'])
 
     def test_flag_pmsmp_filter_incorrect_value(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # Invalid flag_pmsmp filter => Expected error message
             with mock.patch.object(settings, 'API_INTERNAL_CONSUMERS', ['labonneboite']):
                 params = self.add_security_params({
@@ -1040,7 +1040,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 )
 
     def test_flag_pmsmp_filter_get_all_companies(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # flag_pmsmp=0 (all companies) => Expected 2 results
             with mock.patch.object(settings, 'API_INTERNAL_CONSUMERS', ['labonneboite']):
                 params = self.add_security_params({
@@ -1057,7 +1057,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
 
     def test_flag_pmsmp_filter_silently_ignored_if_user_is_not_authorized(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # Unauthorized api user => flag_pmsmp=1 silently ignored, still getting 2 results
             params = self.add_security_params({
                 'commune_id': self.positions['paris']['commune_id'],
@@ -1073,7 +1073,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
 
     def test_flag_pmsmp_filter_normal_behavior(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # no flag_pmsmp filter => Expected 2 results
             params = self.add_security_params({
                 'commune_id': self.positions['paris']['commune_id'],
@@ -1102,7 +1102,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 self.assertEqual(data['companies'][0]['siret'], '00000000000017')
 
     def test_department_filters(self):
-        with self.test_request_context:
+        with self.test_request_context():
             # Invalid departments filter => Expected error message
             params = self.add_security_params({
                 'commune_id': self.positions['paris']['commune_id'],
@@ -1168,7 +1168,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][0]['siret'], '00000000000018')
 
     def test_filters_in_api_response(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulon']['commune_id'],
                 'rome_codes': 'N4403',
@@ -1205,7 +1205,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['filters']['contract']['alternance'], 1)
 
     def test_filters_when_filtering_by_naf(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulon']['commune_id'],
                 'rome_codes': 'N4403',
@@ -1227,7 +1227,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 self.assertEqual(naf_expected[2], naf_filter['label'])
 
     def test_filters_when_filtering_by_headcount(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulon']['commune_id'],
                 'rome_codes': 'N4403',
@@ -1253,7 +1253,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['filters']['headcount']['big'], 1)
 
     def test_filters_when_filtering_by_contract(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulon']['commune_id'],
                 'rome_codes': 'N4403',
@@ -1279,7 +1279,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['filters']['contract']['alternance'], 1)
 
     def test_filters_when_filtering_by_distance(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulon']['commune_id'],
                 'rome_codes': 'N4403',
@@ -1312,7 +1312,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['filters']['distance']['france'], 7)
 
     def test_search_url_present_in_response(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulon']['commune_id'],
                 'rome_codes': 'N4403',
@@ -1328,7 +1328,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertIn(expect, data['url'])
 
     def test_search_url_preserves_original_parameters(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulon']['commune_id'],
                 'rome_codes': 'N4403',
@@ -1354,7 +1354,7 @@ class ApiCompanyListTest(ApiBaseTest):
     def test_home_url_instead_of_search_url_when_searching_with_coordinates(self):
         # FIXME at some point we should implement returning a URL with coordinates
         # but for now we just return the home URL
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'latitude': self.positions['toulon']['coords'][0]['lat'],
                 'longitude': self.positions['toulon']['coords'][0]['lon'],
@@ -1371,7 +1371,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertIn(url_for("root.home", _external=True), data['url'])
 
     def test_empty_result_returns_home_url_instead_of_search_url(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['caen']['commune_id'],
                 'distance': 20,
@@ -1393,7 +1393,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertIn(url_for("root.home", _external=True), data['url'])
 
     def test_company_count_endpoint(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['toulon']['commune_id'],
                 'rome_codes': 'N4403',
@@ -1447,7 +1447,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
     """
 
     def test_happy_path(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['metz']['commune_id'],
                 'rome_codes': 'D1212',
@@ -1494,7 +1494,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 self.assertIn('offers', office_json)
 
     def test_multi_rome_is_supported_multi_batch(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
                 'rome_codes': 'D1405,D1507,D1212,A1101',
@@ -1518,7 +1518,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 self.assertIn('offers', office_json)
 
     def test_dpae_scoring_not_supported(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
                 'rome_codes': 'D1405',
@@ -1531,7 +1531,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 400)
             self.assertIn(b'parameter contract is required', rv.data)
 
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
                 'rome_codes': 'D1405',
@@ -1546,7 +1546,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
             self.assertIn(b'only contract=alternance is supported', rv.data)
 
     def test_gps_search_not_supported(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
                 'longitude': self.positions['bayonville_sur_mad']['coords'][0]['lon'],
@@ -1562,7 +1562,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
             self.assertIn(b'parameter longitude is not supported', rv.data)
 
     def test_pagination_not_supported(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
                 'rome_codes': 'D1405',
@@ -1592,7 +1592,7 @@ class ApiCompanyListTrackingCodesTest(ApiBaseTest):
         self.assertEqual([utm_campaign], url_params.get('utm_campaign'))
 
     def test_api_urls_include_google_analytics_tracking(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['pau']['commune_id'],
                 'distance': 10,
@@ -1607,7 +1607,7 @@ class ApiCompanyListTrackingCodesTest(ApiBaseTest):
         self.assertTrackingCodesEqual(company_url, 'web', 'api__labonneboite', 'api__labonneboite')
 
     def test_api_urls_include_google_analytics_tracking_with_origin_user(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['pau']['commune_id'],
                 'distance': 10,
@@ -1623,7 +1623,7 @@ class ApiCompanyListTrackingCodesTest(ApiBaseTest):
             self.assertTrackingCodesEqual(company_url, 'web', 'api__labonneboite', 'api__labonneboite__someuser')
 
     def test_google_analytics_for_labonneboite_search_url(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['pau']['commune_id'],
                 'distance': 10,

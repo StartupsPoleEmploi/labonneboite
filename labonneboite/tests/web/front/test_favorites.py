@@ -129,7 +129,7 @@ class FavoriteTest(FavoriteBaseTest):
         rv = self.app.get(url)
         self.assertEqual(rv.status_code, 401)
 
-        with self.test_request_context:
+        with self.test_request_context():
 
             self.login(self.user)
 
@@ -153,7 +153,7 @@ class FavoriteTest(FavoriteBaseTest):
         rv = self.app.get(url_list)
         self.assertEqual(rv.status_code, 401)
 
-        with self.test_request_context:
+        with self.test_request_context():
 
             self.login(self.user)
 
@@ -183,7 +183,7 @@ class FavoriteTest(FavoriteBaseTest):
         rv = self.app.post(url_add)
         self.assertEqual(rv.status_code, 401)
 
-        with self.test_request_context:
+        with self.test_request_context():
 
             self.login(self.user)
 
@@ -234,7 +234,7 @@ class FavoriteTest(FavoriteBaseTest):
         rv = self.app.post(url_delete)
         self.assertEqual(rv.status_code, 401)
 
-        with self.test_request_context:
+        with self.test_request_context():
 
             self.login(self.user)
 
@@ -270,7 +270,7 @@ class FavoriteTest(FavoriteBaseTest):
         office = Office.query.filter(Office.siret == '00000000000001').one()
         UserFavoriteOffice.create(user_id=self.user.id, office_siret=office.siret)
 
-        with self.test_request_context:
+        with self.test_request_context():
             self.login(self.user)
             rv = self.app.get(url_favorites_download)
 

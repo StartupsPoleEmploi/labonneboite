@@ -64,7 +64,7 @@ class SearchEntreprisesTest(DatabaseTest):
         self.assertIn("La ville que vous avez choisie n'est pas valide", response.data.decode())
 
     def test_canonical_url(self):
-        with self.app_context:
+        with self.app_context():
             url = get_canonical_results_url('05100', 'Cervières', 'Boucherie')
         response = self.app.get(url)
 
@@ -189,7 +189,7 @@ class SearchLegacyResultsTest(DatabaseTest):
     def test_search_with_wrong_zipcode_and_naf_filter(self):
         # Because of a wrong zipcode, the naf filter should not be taken into
         # account
-        with self.test_request_context:
+        with self.test_request_context():
             url = url_for('search.results', city='nancy', zipcode='54100', occupation='strategie-commerciale')
             url += '?naf=8610Z'
             rv = self.app.get(url, follow_redirects=True)

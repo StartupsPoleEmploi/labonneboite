@@ -19,7 +19,7 @@ class ProVersionTest(DatabaseTest):
         user_pro = User.create(email='john.doe@pole-emploi.fr', gender='male', first_name='John', last_name='Doe')
         user_public = User.create(email='john.doe@gmail.com', gender='male', first_name='John', last_name='Doe')
 
-        with self.test_request_context:
+        with self.test_request_context():
             # User which is not logged in should not be considered a pro user.
             self.assertFalse(pro.user_is_pro())
 
@@ -47,7 +47,7 @@ class ProVersionTest(DatabaseTest):
         next_url_with_domain = 'http://labonneboite.pole-emploi.fr' + next_url_without_domain
         url = self.url_for('user.pro_version', **{'next': next_url_without_domain})
 
-        with self.test_request_context:
+        with self.test_request_context():
 
             # Log the user in.
             self.login(user_pro)

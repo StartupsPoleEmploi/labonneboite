@@ -75,7 +75,7 @@ class UserAccountTest(DatabaseTest):
 
         url = self.url_for('user.personal_data_as_csv')
 
-        with self.test_request_context:
+        with self.test_request_context():
 
             self.login(self.user)
 
@@ -92,7 +92,7 @@ class UserAccountTest(DatabaseTest):
 
         url = self.url_for('user.account_delete')
 
-        with self.test_request_context:
+        with self.test_request_context():
 
             self.login(self.user)
 
