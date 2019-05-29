@@ -4,20 +4,18 @@
     {% extends 'base.html' %}
 {% endif %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ title|default("Votre demande a bien été envoyée !") }}{% endblock %}
 
 {% block content %}
 <div class="lbb-content">
     <div class="lbb-single-column-content success-message text-center">
 
-        <h2>Merci</h2>
-
-        <p>Votre demande a bien été envoyée !</p>
+        <h2>{{ title|default("Votre demande a bien été envoyée !") }}</h2>
 
         <p>Notre équipe reviendra vers vous d'ici quelques jours par mail et/ou téléphone afin de vous confirmer la prise en compte des modifications. Elles seront visibles sur votre fiche entreprise une fois la demande traitée.</p>
 
         {% if suggest_update_jobs %}
-            <p>Nous vous invitons à confirmer les métiers pour lesquels vous souhaitez recevoir  des candidatures spontanées en cliquant sur le lien ci-dessous.</p>
+            <p>Nous vous invitons à confirmer les métiers pour lesquels vous souhaitez recevoir  des candidatures spontanées en cliquant sur le bouton ci-dessous.</p>
         {% elif suggest_update_coordinates %}
             <p>Nous vous invitons à confirmer vos données de contact visibles par les candidats en cliquant sur le lien ci-dessous.</p>
         {% endif %}

@@ -35,7 +35,6 @@ ACTION_NAMES = [
     'other',
 ]
 
-
 def office_identification_required(function):
     """
     Decorator that validates office identification info.
@@ -48,6 +47,46 @@ def office_identification_required(function):
             return redirect(url_for('contact_form.change_info'))
         return function(*args, **kwargs)
     return decorated
+
+
+def is_recruiter_from_lba():
+    return request.args.get('origin', '') == 'labonnealternance'
+
+
+def get_action_name():
+    action_name = request.args.get('action_name', None)
+    if action_name not in ACTION_NAMES:
+        action_name = None
+    return action_name
+
+
+def get_subject():
+    source = "LBA" if is_recruiter_from_lba() else "LBB"
+    return f"Nouveau message entreprise depuis {source}"
+
+
+def generate_fail_flash_content():
+    email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
+    message = """
+            <div class="text-center">
+                Erreur lors de l\'envoi de l\'e-mail.
+                Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>
+            </div>
+        """.format(email, email)
+    return Markup(message)
+
+
+def unknown_siret_message():
+    email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
+    msg = """
+        Ce siret n\'est pas connu de notre service.
+        Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>
+    """.format(email, email)
+    return Markup(msg)
+
+
+def get_office_identification_data():
+    return forms.OfficeHiddenIdentificationForm(data=request.args, meta={'csrf': False}).data
 
 
 @contactFormBlueprint.route('/verification-informations-entreprise', methods=['GET'])
@@ -96,13 +135,6 @@ def apply_for_job(siret):
         siret=siret,
         use_lba_template=is_recruiter_from_lba(),
     )
-
-
-def get_action_name():
-    action_name = request.args.get('action_name', None)
-    if action_name not in ACTION_NAMES:
-        action_name = None
-    return action_name
 
 
 @contactFormBlueprint.route('/informations-entreprise', methods=['GET', 'POST'])
@@ -174,6 +206,9 @@ def ask_action():
 @contactFormBlueprint.route('/informations-entreprise/modifier-coordonnees', methods=['GET', 'POST'])
 @office_identification_required
 def update_coordinates_form():
+    """
+    Allow a recruiter to update his company's coordinates.
+    """
     form_data = request.values
 
     try:
@@ -224,25 +259,18 @@ def update_coordinates_form():
             except MailNoSendException as e:
                 logger.exception(e)
                 flash(generate_fail_flash_content(), 'error')
-            else:
-                # TODO: fix this with a proper POST-REDIRECT-GET.
-                redirect_params = get_success_value()
-                return render_template('contact_form/success_message.html',
-                    title="Merci pour votre message",
-                    use_lba_template=is_recruiter_from_lba(),
-                    site_name=redirect_params.get('site_name'),
-                    email=redirect_params.get('email'),
-                    home_url=redirect_params.get('home_url'),
-                    suggest_update_jobs=True,
-                    params=extract_recruiter_data(),
-                    action_form_url=url_for('contact_form.ask_action', **request.args),
-                    custom_ga_pageview='/recruteur/update_coordinates/success',
-                )
+
+            params = request.args.to_dict()
+            params.update({
+                'custom_ga_pageview': '/recruteur/update_coordinates/success',
+                'suggest_update_jobs': '1',
+            })
+            return redirect(url_for('contact_form.success', **params))
 
     return render_template('contact_form/form.html',
         title='Modifier ma fiche entreprise',
         form=form,
-        params=extract_recruiter_data(),
+        params=urlencode(get_office_identification_data()),
         use_lba_template=is_recruiter_from_lba(),
         show_entreprise_page=True,
         show_coordinates_disclaimer=True,
@@ -254,7 +282,7 @@ def update_coordinates_form():
 @office_identification_required
 def update_jobs_form():
     """
-    Let an employer fill in a form to add or remove ROME codes related to his company.
+    Allow a recruiter to add or delete ROME codes related to his company.
     """
     # Use POST params if available, GET params otherwise.
     form_data = request.form or request.args.copy()
@@ -304,19 +332,12 @@ def update_jobs_form():
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
 
-        # TODO: fix this with a proper POST-REDIRECT-GET.
-        redirect_params = get_success_value()
-        return render_template('contact_form/success_message.html',
-            title="Merci pour votre message",
-            use_lba_template=is_recruiter_from_lba(),
-            site_name=redirect_params.get('site_name'),
-            email=redirect_params.get('email'),
-            home_url=redirect_params.get('home_url'),
-            suggest_update_coordinates=True,
-            params=extract_recruiter_data(),
-            action_form_url=url_for('contact_form.ask_action', **request.args),
-            custom_ga_pageview='/recruteur/update_jobs/success',
-        )
+        params = request.args.to_dict()
+        params.update({
+            'custom_ga_pageview': '/recruteur/update_jobs/success',
+            'suggest_update_coordinates': '1',
+        })
+        return redirect(url_for('contact_form.success', **params))
 
     extra_added_jobs = [
         {
@@ -331,7 +352,7 @@ def update_jobs_form():
     return render_template('contact_form/change_job_infos.html',
         title='Demande de modification des métiers',
         form=form,
-        params=extract_recruiter_data(),
+        params=urlencode(get_office_identification_data()),
         use_lba_template=is_recruiter_from_lba(),
         extra_added_jobs=extra_added_jobs,
         custom_ga_pageview='/recruteur/update_jobs/update_jobs',
@@ -341,6 +362,9 @@ def update_jobs_form():
 @contactFormBlueprint.route('/informations-entreprise/supprimer', methods=['GET', 'POST'])
 @office_identification_required
 def delete_form():
+    """
+    Allow a recruiter to remove his company from LBB/LBA.
+    """
     form = forms.OfficeRemoveForm(data=request.values)
 
     if form.validate_on_submit():
@@ -356,23 +380,17 @@ def delete_form():
         except MailNoSendException as e:
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
-        else:
-            # TODO: fix this with a proper POST-REDIRECT-GET.
-            redirect_params = get_success_value()
-            return render_template('contact_form/success_message.html',
-                title="Merci pour votre message",
-                use_lba_template=is_recruiter_from_lba(),
-                site_name=redirect_params.get('site_name'),
-                email=redirect_params.get('email'),
-                home_url=redirect_params.get('home_url'),
-                action_form_url=url_for('contact_form.ask_action', **request.args),
-                custom_ga_pageview='/recruteur/delete/success',
-            )
+
+        params = request.args.to_dict()
+        params.update({
+            'custom_ga_pageview': '/recruteur/delete/success',
+        })
+        return redirect(url_for('contact_form.success', **params))
 
     return render_template('contact_form/form.html',
         title='Supprimer mon entreprise',
         form=form,
-        params=extract_recruiter_data(),
+        params=urlencode(get_office_identification_data()),
         use_lba_template=is_recruiter_from_lba(),
         custom_ga_pageview='/recruteur/delete/delete',
     )
@@ -381,6 +399,9 @@ def delete_form():
 @contactFormBlueprint.route('/informations-entreprise/autre-demande', methods=['GET', 'POST'])
 @office_identification_required
 def other_form():
+    """
+    Allow a recruiter to make another demand.
+    """
     form = forms.OfficeOtherRequestForm(data=request.values)
 
     if form.validate_on_submit():
@@ -396,83 +417,40 @@ def other_form():
         except MailNoSendException as e:
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
-        else:
-            # TODO: fix this with a proper POST-REDIRECT-GET.
-            redirect_params = get_success_value()
-            return render_template('contact_form/success_message.html',
-                title="Merci pour votre message",
-                use_lba_template=is_recruiter_from_lba(),
-                site_name=redirect_params.get('site_name'),
-                email=redirect_params.get('email'),
-                home_url=redirect_params.get('home_url'),
-                action_form_url=url_for('contact_form.ask_action', **request.args),
-                custom_ga_pageview='/recruteur/other/success',
-            )
+
+        params = request.args.to_dict()
+        params.update({
+            'custom_ga_pageview': '/recruteur/other/success',
+        })
+        return redirect(url_for('contact_form.success', **params))
 
     return render_template(
         'contact_form/form.html',
         form=form,
         title='Autre demande',
-        params=extract_recruiter_data(),
+        params=urlencode(get_office_identification_data()),
         use_lba_template=is_recruiter_from_lba(),
         show_required_disclaimer=True,
         custom_ga_pageview='/recruteur/other/other',
     )
 
 
-def is_recruiter_from_lba():
-    return request.args.get('origin', '') == 'labonnealternance'
+@contactFormBlueprint.route('/success', methods=['GET'])
+def success():
+    is_lba = is_recruiter_from_lba()
 
+    params = get_office_identification_data()
+    if is_lba:
+        params.update({'origin': 'labonnealternance'})
 
-def get_success_value():
-    if is_recruiter_from_lba():
-        return {
-            'site_name': 'La Bonne alternance',
-            'home_url': 'https://labonnealternance.pole-emploi.fr',
-            'email': 'labonnealternance@pole-emploi.fr',
-        }
-    return {
-        'site_name': 'La Bonne Boite',
-        'home_url': url_for('root.home'),
-        'email': 'labonneboite@pole-emploi.fr',
-    }
-
-
-def get_subject():
-    if is_recruiter_from_lba():
-        return 'Nouveau message entreprise depuis LBA'
-    return 'Nouveau message entreprise depuis LBB'
-
-
-def generate_fail_flash_content():
-    email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
-    message = """
-            <div class="text-center">
-                Erreur lors de l\'envoi de l\'e-mail.
-                Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>
-            </div>
-        """.format(email, email)
-    return Markup(message)
-
-
-def unknown_siret_message():
-    email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
-    msg = """
-        Ce siret n\'est pas connu de notre service.
-        Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>
-    """.format(email, email)
-    return Markup(msg)
-
-
-def extract_recruiter_data():
-    """
-    We extract from the URL, the data given in the "identifiez-vous" step of the contact process
-    """
-
-    keys = ['siret', 'last_name', 'first_name', 'phone', 'email']
-
-    params = {
-        k: request.args[k] for k in keys if k in request.args
-    }
-
-    return urlencode(params)
+    return render_template('contact_form/success_message.html',
+        use_lba_template=is_lba,
+        email="labonnealternance@pole-emploi.fr" if is_lba else "labonneboite@pole-emploi.fr",
+        home_url="https://labonnealternance.pole-emploi.fr" if is_lba else url_for('root.home'),
+        site_name="La Bonne alternance" if is_lba else "La Bonne Boite",
+        params=urlencode(params),
+        action_form_url=url_for('contact_form.ask_action', **request.args),
+        suggest_update_coordinates='suggest_update_coordinates' in request.args,
+        suggest_update_jobs='suggest_update_jobs' in request.args,
+        custom_ga_pageview=request.args.get('custom_ga_pageview'),
+    )
