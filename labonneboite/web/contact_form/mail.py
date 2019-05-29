@@ -78,7 +78,7 @@ def generate_update_coordinates_mail(form, recruiter_message):
         escape(form.new_email.data),
         escape(form.new_phone.data),
 
-        forms.CONTACT_MODES_LABELS.get(form.new_contact_mode.data, 'Inconnu'),
+        forms.OfficeUpdateCoordinatesForm.CONTACT_MODES_LABELS.get(form.new_contact_mode.data, 'Inconnu'),
 
         escape(form.new_email_alternance.data),
         escape(form.new_phone_alternance.data),

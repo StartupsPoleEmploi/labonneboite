@@ -52,7 +52,7 @@
           {% for rome, rome_alternance in form.zipped_romes_to_keep() %}
           <tr id="{{ rome.data }}">
               <td>
-                <label>{{ rome.label.text }}</label>
+                {{ rome.label.text }}
               </td>
               <td class="text-center">
                   <label>{{ rome }}</label>
@@ -97,7 +97,7 @@
             {% for job in extra_added_jobs %}
               <tr id="{{ job.rome_code }}">
                 <td>
-                  <label>{{ job.label }}</label>
+                  {{ job.label }}
                 </td>
                 <td class="text-center">
                   <label><input {% if job.lbb %}checked{% endif %} type="checkbox" name="extra_romes_to_add" value="{{ job.rome_code }}"></label>

@@ -106,7 +106,7 @@ class FormContactMailTest(DatabaseTest):
             recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(form)
             mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
 
-            contact_mode_label = forms.CONTACT_MODES_LABELS.get(form.new_contact_mode, '')
+            contact_mode_label = forms.OfficeUpdateCoordinatesForm.CONTACT_MODES_LABELS.get(form.new_contact_mode, '')
             contact_mode_expected = 'Mode de contact à privilégier : {}'.format(contact_mode_label)
 
             self.assertIn('Nouveau site Internet : http://exemple.com', mail_content)

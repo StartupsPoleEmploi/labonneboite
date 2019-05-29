@@ -11,15 +11,8 @@ from wtforms.widgets import ListWidget, CheckboxInput
 from labonneboite.conf import settings
 
 
-CONTACT_MODES = (
-    ('mail', 'Par courrier'),
-    ('email', 'Par email'),
-    ('phone', 'Par téléphone'),
-    ('office', 'Sur place'),
-    ('website', 'Via votre site internet'),
-)
-CONTACT_MODES_LABELS = dict(CONTACT_MODES)
 PHONE_REGEX = r"^(0|\+33)[1-9]([-. ]?[0-9]{2}){4}$"
+
 SIRET_REGEX = r'[0-9]{14}'
 
 
@@ -37,6 +30,7 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class OfficeIdentificationForm(FlaskForm):
+
     siret = StringField(
         'N° de Siret *',
         validators=[
@@ -61,6 +55,7 @@ class OfficeIdentificationForm(FlaskForm):
 
 
 class OfficeHiddenIdentificationForm(FlaskForm):
+
     siret = HiddenField('Siret *', validators=[DataRequired()])
     last_name = HiddenField('Nom *', validators=[DataRequired()])
     first_name = HiddenField('Prénom *', validators=[DataRequired()])
@@ -75,15 +70,9 @@ class OfficeHiddenIdentificationForm(FlaskForm):
         render_kw={"placeholder": "exemple@domaine.com"}
     )
 
-    def validate_identification(self):
-        success = True
-        for field in ['siret', 'last_name', 'first_name', 'phone', 'email']:
-            if not self._fields[field].validate(self):
-                success = False
-        return success
-
 
 class OfficeOtherRequestForm(OfficeHiddenIdentificationForm):
+
     comment = TextAreaField(
         'Votre message*',
         validators=[DataRequired(), validators.length(max=15000)],
@@ -160,8 +149,22 @@ class OfficeUpdateJobsForm(OfficeHiddenIdentificationForm):
 
 
 class OfficeUpdateCoordinatesForm(OfficeHiddenIdentificationForm):
+
+    CONTACT_MODES = (
+        ('mail', 'Par courrier'),
+        ('email', 'Par email'),
+        ('phone', 'Par téléphone'),
+        ('office', 'Sur place'),
+        ('website', 'Via votre site internet'),
+    )
+    CONTACT_MODES_LABELS = dict(CONTACT_MODES)
+
     # Note : we add new_ to avoid conflict with request.args
-    new_contact_mode = RadioField('Mode de contact à privilégier', choices=CONTACT_MODES, default='email')
+    new_contact_mode = RadioField(
+        'Mode de contact à privilégier',
+        choices=CONTACT_MODES,
+        default='email'
+    )
     new_website = StringField(
         'Site Internet',
         validators=[URL(), Optional()], render_kw={"placeholder": "http://exemple.com"}
@@ -193,6 +196,7 @@ class OfficeUpdateCoordinatesForm(OfficeHiddenIdentificationForm):
 
 
 class OfficeRemoveForm(OfficeHiddenIdentificationForm):
+
     remove_lbb = BooleanField(
         'Supprimer mon entreprise du service La Bonne Boite puisque je ne suis pas intéressé-e pour recevoir des candidatures spontanées via ce site',
         [validators.optional()]

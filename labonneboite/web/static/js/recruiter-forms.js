@@ -65,7 +65,7 @@
   var $newJobInput = $('.add-new-jobs input[name=new-job]');
   var jobRowTemplate = [
     '<tr id="{ROME}">',
-      '<td><label>{LABEL}</label></td>',
+      '<td>{LABEL}</td>',
       '<td class="text-center">',
         '<label>',
           '<input checked type="checkbox" name="extra_romes_to_add" value="{ROME}">',

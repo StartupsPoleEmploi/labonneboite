@@ -36,6 +36,20 @@ ACTION_NAMES = [
 ]
 
 
+def office_identification_required(function):
+    """
+    Decorator that validates office identification info.
+    """
+    @wraps(function)
+    def decorated(*args, **kwargs):
+        form = forms.OfficeHiddenIdentificationForm(data=request.values, meta={'csrf': False})
+        if not form.validate():
+            flash(ERROR_MISSING_CONTACT_INFO, 'error')
+            return redirect(url_for('contact_form.change_info'))
+        return function(*args, **kwargs)
+    return decorated
+
+
 @contactFormBlueprint.route('/verification-informations-entreprise', methods=['GET'])
 @contactFormBlueprint.route('/verification-informations-entreprise/<siret>', methods=['GET'])
 def change_info_or_apply_for_job(siret=None):
@@ -82,36 +96,6 @@ def apply_for_job(siret):
         siret=siret,
         use_lba_template=is_recruiter_from_lba(),
     )
-
-
-def create_form(form_class):
-    """
-    A decorator that inject hidden fields from OfficeHiddenIdentificationForm
-    """
-    def decorator(f):
-
-        @wraps(f)
-        def decorated_funtion(*args, **kwargs):
-            kwargs['form'] = form_class()
-
-            try:
-                add_identication_data(kwargs['form'])
-            except KeyError:
-                flash(ERROR_MISSING_CONTACT_INFO, 'error')
-                return redirect(url_for('contact_form.change_info'))
-
-            return f(*args, **kwargs)
-        return decorated_funtion
-
-    return decorator
-
-
-def add_identication_data(form):
-    form.siret.data = request.args['siret']
-    form.last_name.data = request.args['last_name']
-    form.first_name.data = request.args['first_name']
-    form.phone.data = request.args['phone']
-    form.email.data = request.args['email']
 
 
 def get_action_name():
@@ -176,6 +160,7 @@ def change_info():
         custom_ga_pageview='/recruteur/%s/identification' % action_name,
     )
 
+
 @contactFormBlueprint.route('/informations-entreprise/action', methods=['GET'])
 def ask_action():
     return render_template('contact_form/ask_action.html',
@@ -187,13 +172,17 @@ def ask_action():
 
 
 @contactFormBlueprint.route('/informations-entreprise/modifier-coordonnees', methods=['GET', 'POST'])
-@create_form(forms.OfficeUpdateCoordinatesForm)
-def update_coordinates_form(form):
+@office_identification_required
+def update_coordinates_form():
+    form_data = request.values
+
     try:
-        office = get_office_from_siret(request.args['siret'])
+        office = models.Office.query.filter(models.Office.siret == form_data['siret']).one()
     except NoResultFound:
         flash(unknown_siret_message(), 'error')
         return redirect(url_for('contact_form.change_info'))
+
+    form = forms.OfficeUpdateCoordinatesForm(data=form_data)
 
     # Fill form with form value (or office value by default)
     form.new_contact_mode.data = request.form.get(
@@ -221,7 +210,6 @@ def update_coordinates_form(form):
         elif contact_mode == 'email' and not form.new_email.data:
             flash(ERROR_CONTACT_MODE_MESSAGE.format('Par email', 'Email recruteur'), 'error')
             form_valid = False
-
 
         if form_valid:
             recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(
@@ -263,16 +251,16 @@ def update_coordinates_form(form):
 
 
 @contactFormBlueprint.route('/informations-entreprise/modifier-metiers', methods=['GET', 'POST'])
+@office_identification_required
 def update_jobs_form():
     """
     Let an employer fill in a form to add or remove ROME codes related to his company.
     """
-
     # Use POST params if available, GET params otherwise.
     form_data = request.form or request.args.copy()
 
     try:
-        office = get_office_from_siret(form_data['siret'])
+        office = models.Office.query.filter(models.Office.siret == form_data['siret']).one()
     except NoResultFound:
         flash(unknown_siret_message(), 'error')
         return redirect(url_for('contact_form.change_info'))
@@ -301,10 +289,6 @@ def update_jobs_form():
         extra_romes_alternance_to_add = set(request.form.getlist('extra_romes_alternance_to_add'))
 
     form = forms.OfficeUpdateJobsForm(data=form_data, office=office)
-
-    if not form.validate_identification():
-        flash(ERROR_MISSING_CONTACT_INFO, 'error')
-        return redirect(url_for('contact_form.change_info'))
 
     if form.validate_on_submit():
         recruiter_message = models.UpdateJobsRecruiterMessage.create_from_form(
@@ -355,8 +339,10 @@ def update_jobs_form():
 
 
 @contactFormBlueprint.route('/informations-entreprise/supprimer', methods=['GET', 'POST'])
-@create_form(forms.OfficeRemoveForm)
-def delete_form(form):
+@office_identification_required
+def delete_form():
+    form = forms.OfficeRemoveForm(data=request.values)
+
     if form.validate_on_submit():
         recruiter_message = models.RemoveRecruiterMessage.create_from_form(
             form,
@@ -393,8 +379,10 @@ def delete_form(form):
 
 
 @contactFormBlueprint.route('/informations-entreprise/autre-demande', methods=['GET', 'POST'])
-@create_form(forms.OfficeOtherRequestForm)
-def other_form(form):
+@office_identification_required
+def other_form():
+    form = forms.OfficeOtherRequestForm(data=request.values)
+
     if form.validate_on_submit():
         recruiter_message = models.OtherRecruiterMessage.create_from_form(
             form,
@@ -421,7 +409,6 @@ def other_form(form):
                 custom_ga_pageview='/recruteur/other/success',
             )
 
-
     return render_template(
         'contact_form/form.html',
         form=form,
@@ -431,10 +418,6 @@ def other_form(form):
         show_required_disclaimer=True,
         custom_ga_pageview='/recruteur/other/other',
     )
-
-
-def get_office_from_siret(siret):
-    return models.Office.query.filter(models.Office.siret == siret).one()
 
 
 def is_recruiter_from_lba():
@@ -456,7 +439,10 @@ def get_success_value():
 
 
 def get_subject():
-    return 'Nouveau message entreprise depuis LBA' if is_recruiter_from_lba() else 'Nouveau message entreprise depuis LBB'
+    if is_recruiter_from_lba():
+        return 'Nouveau message entreprise depuis LBA'
+    return 'Nouveau message entreprise depuis LBB'
+
 
 def generate_fail_flash_content():
     email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
