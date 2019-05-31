@@ -103,7 +103,7 @@ class OfficeUpdateJobsForm(OfficeHiddenIdentificationForm):
         """
         super().__init__(*args, **kwargs)
         self.office = kwargs.pop('office')
-        self.romes_choices = [(rome.code, rome.name) for rome in self.office.romes]
+        self.romes_choices = [(rome.code, rome.name) for rome in self.office.romes_for_naf_mapping]
         self.romes_to_keep.choices = self.romes_choices
         self.romes_alternance_to_keep.choices = self.romes_choices
 
@@ -123,11 +123,11 @@ class OfficeUpdateJobsForm(OfficeHiddenIdentificationForm):
         # Those fields are defined outside of the form class so we use `request.form` to get them.
         extra_romes_to_add = [
             rome for rome in request.form.getlist('extra_romes_to_add')
-            if rome in settings.ROME_DESCRIPTIONS and rome not in self.office.romes
+            if rome in settings.ROME_DESCRIPTIONS and rome not in self.office.romes_codes
         ]
         extra_romes_alternance_to_add = [
             rome for rome in request.form.getlist('extra_romes_alternance_to_add')
-            if rome in settings.ROME_DESCRIPTIONS and rome not in self.office.romes
+            if rome in settings.ROME_DESCRIPTIONS and rome not in self.office.romes_codes
         ]
 
         # Checked ROME codes.

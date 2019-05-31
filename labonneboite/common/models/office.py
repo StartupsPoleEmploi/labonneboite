@@ -319,7 +319,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return self.get_stars_for_rome_code(None)
 
     @cached_property
-    def romes(self):
+    def romes_for_naf_mapping(self):
         """
         Returns a list of named tuples for ROME codes matching the company's NAF code.
         """
@@ -328,9 +328,9 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     @cached_property
     def romes_codes(self):
         """
-        Returns a set of ROME codes matching the company's NAF code.
+        Returns the default set of ROME codes for the current company.
         """
-        return set([rome.code for rome in self.romes])
+        return set([rome.code for rome in self.romes_for_naf_mapping])
 
     def get_stars_for_rome_code(self, rome_code, hiring_type=None):
         hiring_type = hiring_type or hiring_type_util.DEFAULT
