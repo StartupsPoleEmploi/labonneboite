@@ -313,34 +313,33 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     }
 
     def _handle_view(self, name, **kwargs):
-        # This method is executed before calling any view method.
         """
+        This method is executed before calling any view method.
+
         Sometimes, recruiter send two emails at the same time. Both contain
-        a create office_admin_update link.  But, when the first
+        a create office_admin_update link. But, when the first
         office_admin_update is created, the suggestion in the second mail
-        became wrong.  And, on saving, we got a conflict with the recently
+        became wrong. And, on saving, we got a conflict with the recently
         created office_admin_update. To avoid that, we redirect to the edit
         page if, afterall, an office_admin_update already exists for the
         company siret.
         """
         if name == 'create_view':
-            recruiter_message_params = self.get_recruiter_message_params()
-            if recruiter_message_params.id and recruiter_message_params.type:
-                try:
-                    recruiter_message = self.get_recruiter_message(recruiter_message_params)
-                    office_update_conflict = models.OfficeAdminUpdate.query.filter(
-                        models.OfficeAdminUpdate.sirets.like("%{}%".format(recruiter_message.siret))
-                    )
-
-                    if office_update_conflict.count() > 0:
-                        params = {
-                            "recruiter_message_id": recruiter_message_params.id,
-                            "recruiter_message_type": recruiter_message_params.type,
-                        }
-                        url = url_for("officeadminupdate.edit_view", id=office_update_conflict[0].id, **params)
-                        return redirect(url, code=302)
-                except NoResultFound:
-                    pass
+            recruiter_message = self.get_recruiter_message(
+                request.args.get('recruiter_message_type'),
+                request.args.get('recruiter_message_id')
+            )
+            if recruiter_message:
+                office_update_conflict = models.OfficeAdminUpdate.query.filter(
+                    models.OfficeAdminUpdate.sirets.contains(recruiter_message.siret)
+                )
+                if office_update_conflict.count():
+                    params = {
+                        'recruiter_message_id': recruiter_message.id,
+                        'recruiter_message_type': recruiter_message.name,
+                    }
+                    url = url_for('officeadminupdate.edit_view', id=office_update_conflict[0].id, **params)
+                    return redirect(url, code=302)
 
         return super(OfficeAdminUpdateModelView, self)._handle_view(name, **kwargs)
 
@@ -374,15 +373,11 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         # Clean all styles before all
         self.form_widget_args = {}
 
-        recruiter_message_params = self.get_recruiter_message_params()
-        if not recruiter_message_params.id or not recruiter_message_params.type:
-            return form
-
-        try:
-            recruiter_message = self.get_recruiter_message(recruiter_message_params)
-        except NoResultFound as e:
-            # Should not happen
-            logger.exception(e)
+        recruiter_message = self.get_recruiter_message(
+            request.args.get('recruiter_message_type'),
+            request.args.get('recruiter_message_id')
+        )
+        if not recruiter_message:
             return form
 
         # Set sirets and office name fields on creation
@@ -399,7 +394,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         # If recruiter ask for updating his coordinates and job,
         # we assume that he wants to appear on LBB
         # so we improve his score if too low
-        ask_job_or_coordinate_changes = recruiter_message_params.type in [
+        ask_job_or_coordinate_changes = recruiter_message.name in [
             models.UpdateCoordinatesRecruiterMessage.name,
             models.UpdateJobsRecruiterMessage.name
         ]
@@ -438,7 +433,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         self.handle_diff('certified_recruiter', recruiter_message.certified_recruiter, office_admin_update, form)
         self.handle_diff('recruiter_uid', recruiter_message.recruiter_uid, office_admin_update, form)
 
-        if recruiter_message_params.type == models.UpdateCoordinatesRecruiterMessage.name:
+        if recruiter_message.name == models.UpdateCoordinatesRecruiterMessage.name:
             new_phone = clean_phone(recruiter_message.new_phone) if recruiter_message.new_phone else None
 
             new_phone_alternance = recruiter_message.new_phone_alternance
@@ -457,14 +452,14 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 form
             )
 
-        elif recruiter_message_params.type == models.RemoveRecruiterMessage.name:
+        elif recruiter_message.name == models.RemoveRecruiterMessage.name:
             # The field is a boolean in contact form but an integer in the OfficeAdminpdate
             new_score = 0 if recruiter_message.remove_lbb else form.score.data
             new_score_alternance = 0 if recruiter_message.remove_lba else form.score_alternance.data
             self.handle_diff('score', new_score, office_admin_update, form)
             self.handle_diff('score_alternance', new_score_alternance, office_admin_update, form)
 
-        elif recruiter_message_params.type == models.UpdateJobsRecruiterMessage.name:
+        elif recruiter_message.name == models.UpdateJobsRecruiterMessage.name:
             self.handle_diff(
                 'romes_to_boost',
                 self.format(recruiter_message.romes_to_add),
@@ -490,7 +485,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 form
             )
 
-        elif recruiter_message_params.type == models.OtherRecruiterMessage.name:
+        elif recruiter_message.name == models.OtherRecruiterMessage.name:
             self.handle_diff('reason', recruiter_message.comment, office_admin_update, form)
 
         return form
@@ -741,24 +736,16 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
         return ','.join(romes_to_keep)
 
-
-    def get_recruiter_message_params(self):
-        RecruiterMessageParams = namedtuple('RecruiterMessageParams', ['id', 'type'])
-        return RecruiterMessageParams(request.args.get('recruiter_message_id', ''), request.args.get('recruiter_message_type', ''))
-
-
-    def get_recruiter_message(self, recruiter_message_params):
-        MESSAGE_CLASSES = {
+    def get_recruiter_message(self, model_name, id):
+        MODELS_MAPPING = {
             models.UpdateCoordinatesRecruiterMessage.name: models.UpdateCoordinatesRecruiterMessage,
             models.RemoveRecruiterMessage.name: models.RemoveRecruiterMessage,
             models.UpdateJobsRecruiterMessage.name: models.UpdateJobsRecruiterMessage,
             models.OtherRecruiterMessage.name: models.OtherRecruiterMessage,
         }
-
-        recruiter_message = MESSAGE_CLASSES[recruiter_message_params.type].query.filter_by(id=recruiter_message_params.id).one()
-
-        return recruiter_message
-
+        if model_name not in MODELS_MAPPING:
+            return None
+        return MODELS_MAPPING[model_name].get(id)
 
     def set_little_boost(self, form_field, score):
         form_field.data = LITTLE_BOOST_VALUE
