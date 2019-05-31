@@ -65,10 +65,7 @@ def render_favorites(offices):
 
     Return: a file-like object.
     """
-    companies = [
-        (company, util.get_contact_mode_for_rome_and_office(None, company)) for company in offices
-    ]
     pdf_data = render_template(
-        'office/pdf_list.html', companies=companies,
+        'office/pdf_list.html', offices=offices,
     )
     return convert_to_pdf(pdf_data)

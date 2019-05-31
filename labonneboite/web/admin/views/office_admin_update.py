@@ -11,6 +11,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import models
 from labonneboite.common.siret import is_siret
+from labonneboite.common.contact_mode import (CONTACT_MODE_MAIL, CONTACT_MODE_EMAIL,
+        CONTACT_MODE_OFFICE, CONTACT_MODE_WEBSITE, CONTACT_MODE_PHONE)
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
@@ -21,14 +23,14 @@ logger = logging.getLogger('main')
 UPDATE_STYLE = 'border: solid 5px green'
 DESCRIPTION_TEMPLATE = '<strong style="color: red;">Ancienne valeur : {}</strong><br>{}'
 
-CONTACT_MODES_ITEMS = (
-    ('email', 'Envoyez votre candidature par mail'),
-    ('mail', 'Envoyez votre candidature par courrier'),
-    ('office', 'Présentez vous directement à l\'entreprise'),
-    ('website', 'Postulez via le site internet de l\'entreprise'),
-    ('phone', 'Contactez l\'entreprise par téléphone'),
-)
-CONTACT_MODES = dict(CONTACT_MODES_ITEMS)
+# FIXME
+CONTACT_MODES = {
+    'CONTACT_MODE_EMAIL': 'Envoyez votre candidature par email',
+    'CONTACT_MODE_MAIL': 'Envoyez votre candidature par courrier',
+    'CONTACT_MODE_OFFICE': 'Présentez vous directement à l\'entreprise',
+    'CONTACT_MODE_WEBSITE': 'Postulez via le site internet de l\'entreprise',
+    'CONTACT_MODE_PHONE': 'Contactez l\'entreprise par téléphone',
+}
 
 HIDE_CHECKBOXES = {
     'new_email': 'remove_email',

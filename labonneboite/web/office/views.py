@@ -13,8 +13,6 @@ from flask import request
 
 from labonneboite.common import activity
 from labonneboite.common import pdf as pdf_util
-from labonneboite.common import util
-from labonneboite.common.contact_mode import CONTACT_MODE_STAGES
 from labonneboite.web.utils import fix_csrf_session
 from labonneboite.common.models import Office
 
@@ -89,12 +87,7 @@ def office_detail_html(office):
     """
     Return the html corresponding to the office details.
     """
-    contact_mode = util.get_contact_mode_for_rome_and_office(None, office)
-    return render_template('office/pdf_detail.html', **{
-        'company': office,
-        'contact_mode': contact_mode,
-        'stages': CONTACT_MODE_STAGES.get(contact_mode, [contact_mode]),
-    })
+    return render_template('office/pdf_detail.html', **{'office': office,})
 
 
 @officeBlueprint.route('/events/toggle-details/<siret>', methods=['POST'])

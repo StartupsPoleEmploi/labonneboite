@@ -4,22 +4,22 @@
 import logging
 from urllib.parse import urlencode
 
+from functools import lru_cache
 from babel.dates import format_date
 from slugify import slugify
 from flask import url_for
 from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy.dialects import mysql
 from sqlalchemy import PrimaryKeyConstraint, Index
-from sqlalchemy.dialects import mysql
-
-from functools import lru_cache
 
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import hiring_type_util
+from labonneboite.common.contact_mode import (CONTACT_MODE_MAIL, CONTACT_MODE_EMAIL,
+        CONTACT_MODE_OFFICE, CONTACT_MODE_WEBSITE, CONTACT_MODE_PHONE,
+        CONTACT_MODE_LABELS, CONTACT_MODE_STEPS, CONTACT_MODE_KEYWORDS)
 from labonneboite.common.database import Base, db_session, DATABASE
 from labonneboite.common.load_data import load_city_codes, load_groupements_employeurs
-from labonneboite.common import util
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
@@ -195,7 +195,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'siret': self.siret,
             'stars': self.get_stars_for_rome_code(rome_code, hiring_type),
             'url':  self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
-            'contact_mode': util.get_contact_mode_for_rome_and_office(rome_code, self),
+            'contact_mode': self.recommended_contact_mode_label,
+            'contact_mode_code': self.recommended_contact_mode,
             'social_network': self.social_network or '',
             'alternance': self.qualifies_for_alternance(),
         }
@@ -244,7 +245,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     @property
     def phone(self):
-        has_phone = self.tel and not self.tel.isspace()
+        has_phone = self.tel and self.tel.strip()
         if has_phone:
             # not sure why, the import botched the phone number...
             if self.tel[-2] == '.':
@@ -262,6 +263,50 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         else:
             result = 'sans nom'
         return encoding_util.sanitize_string(result)
+
+    @property
+    # pylint: disable=R0911
+    def recommended_contact_mode(self):
+        # Attempt 1 - guess smartly from human input self.contact_mode
+        # pylint: disable=R0101
+        if self.contact_mode and self.contact_mode.strip():
+            for contact_mode, keywords in CONTACT_MODE_KEYWORDS.items():
+                for keyword in keywords:
+                    if keyword in self.contact_mode:
+                        if contact_mode == CONTACT_MODE_EMAIL:
+                            if self.email and self.email.strip():
+                                return contact_mode
+                        elif contact_mode == CONTACT_MODE_PHONE:
+                            if self.tel and self.tel.strip():
+                                return contact_mode
+                        elif contact_mode == CONTACT_MODE_WEBSITE:
+                            if self.website and self.website.strip():
+                                return contact_mode
+                        else:
+                            return contact_mode
+
+        # Attempt 2 - set contact_mode based on available data.
+        # Email has precedence over phone, which has precedence over website.
+        if self.email and self.email.strip():
+            return CONTACT_MODE_EMAIL
+        elif self.tel and self.tel.strip():
+            return CONTACT_MODE_PHONE
+        elif self.website and self.website.strip():
+            return CONTACT_MODE_WEBSITE
+        else:
+            return None
+
+    @property
+    def recommended_contact_mode_label(self):
+        try:
+            return CONTACT_MODE_LABELS[self.recommended_contact_mode]
+        except KeyError:
+            return ''
+
+    @property
+    def recommended_contact_steps(self):
+        contact_mode = self.recommended_contact_mode
+        return CONTACT_MODE_STEPS.get(contact_mode, [self.recommended_contact_mode_label])
 
     @property
     def google_url(self):

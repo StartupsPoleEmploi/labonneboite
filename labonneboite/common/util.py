@@ -9,8 +9,6 @@ from time import time
 
 from flask import request
 
-from labonneboite.common.contact_mode import CONTACT_MODE_DEFAULT
-from labonneboite.common.load_data import load_contact_modes
 from labonneboite.conf import settings
 
 logger = logging.getLogger('main')
@@ -99,22 +97,6 @@ def is_decoded_url_safe(url):
 
     # Allow only relative URLs without host e.g. '/entreprises?j=Boucherie[...]' 
     return not url_info.netloc and not url_info.scheme
-
-
-def get_contact_mode_for_rome_and_office(rome, office):
-    if office.contact_mode:
-        return office.contact_mode
-
-    naf_prefix = office.naf[:2]
-    naf_prefix_to_rome_to_contact_mode = load_contact_modes()
-    try:
-        return naf_prefix_to_rome_to_contact_mode[naf_prefix][rome]
-    except KeyError:
-        pass
-    try:
-        return list(naf_prefix_to_rome_to_contact_mode[naf_prefix].values())[0]
-    except (KeyError, IndexError):
-        return CONTACT_MODE_DEFAULT
 
 
 def unique_elements(iterable, key=None):
