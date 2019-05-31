@@ -1,4 +1,3 @@
-# coding: utf8
 """
 Main app default settings.
 
@@ -42,6 +41,8 @@ SENTRY_DSN = None
 SENTRY_ENVIRONMENT = ""
 
 ADMIN_EMAIL = 'no-reply@labonneboite.pole-emploi.fr'
+LBB_EMAIL = 'labonneboite@pole-emploi.fr'
+LBA_EMAIL = 'labonnealternance@pole-emploi.fr'
 
 SERVER_NAME = 'labonneboite.pole-emploi.fr'
 PREFERRED_URL_SCHEME = 'http'
@@ -209,3 +210,4 @@ elif get_current_env() == ENV_DEVELOPMENT:
 elif get_current_env() == ENV_TEST:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.test import *
+

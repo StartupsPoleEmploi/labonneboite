@@ -66,22 +66,22 @@ def get_subject():
 
 
 def generate_fail_flash_content():
-    email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
-    message = """
-            <div class="text-center">
-                Erreur lors de l\'envoi de l\'e-mail.
-                Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>
-            </div>
-        """.format(email, email)
+    email = settings.LBA_EMAIL if is_recruiter_from_lba() else settings.LBB_EMAIL
+    message = f"""
+        <div class="text-center">
+            Erreur lors de l'envoi de l'e-mail.
+            Vous pouvez nous contacter directement à l'adresse suivante : <a href="mailto:{email}">{email}</a>
+        </div>
+    """
     return Markup(message)
 
 
 def unknown_siret_message():
-    email = 'labonnealternance@pole-emploi.fr' if is_recruiter_from_lba() else 'labonneboite@pole-emploi.fr'
-    msg = """
-        Ce siret n\'est pas connu de notre service.
-        Vous pouvez nous contacter directement à l\'adresse suivante : <a href="mailto:{}">{}</a>
-    """.format(email, email)
+    email = settings.LBA_EMAIL if is_recruiter_from_lba() else settings.LBB_EMAIL
+    msg = f"""
+        Ce siret n'est pas connu de notre service.
+        Vous pouvez nous contacter directement à l'adresse suivante : <a href="mailto:{email}">{email}</a>
+    """
     return Markup(msg)
 
 
@@ -445,7 +445,7 @@ def success():
 
     return render_template('contact_form/success_message.html',
         use_lba_template=is_lba,
-        email="labonnealternance@pole-emploi.fr" if is_lba else "labonneboite@pole-emploi.fr",
+        email=settings.LBA_EMAIL if is_lba else settings.LBB_EMAIL,
         home_url="https://labonnealternance.pole-emploi.fr" if is_lba else url_for('root.home'),
         site_name="La Bonne alternance" if is_lba else "La Bonne Boite",
         params=urlencode(params),
