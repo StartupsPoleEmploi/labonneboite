@@ -1,17 +1,16 @@
 # coding: utf8
-import json
 from collections import defaultdict
 from labonneboite.conf import settings
 from labonneboite.common.models import Office
 from labonneboite.common.fetcher import Fetcher
-from labonneboite.common.load_data import OGR_ROME_CODES
+from labonneboite.common.chunks import chunks
 from labonneboite.common import hiring_type_util
 from labonneboite.common import esd
-from sqlalchemy import tuple_, or_
+from labonneboite.common import geocoding
 
 
-OFFRES_ESD_ENDPOINT_URL = "%s/partenaire/offresdemploi/v1/rechercheroffres" % settings.PEAM_API_BASE_URL
-
+OFFRES_ESD_ENDPOINT_URL = "%s/partenaire/offresdemploi/v2/offres/search" % settings.PEAM_API_BASE_URL
+OFFRES_ESD_MAXIMUM_ROMES = 3
 OFFRES_ESD_MAXIMUM_PAGE_SIZE = 150
 OFFRES_ESD_MAXIMUM_DISTANCE = 200
 
@@ -46,32 +45,20 @@ class VisibleMarketFetcher(Fetcher):
 
 
     def get_offices(self):
-        offers = []
-        for rome in self.romes:
-            offers += self.get_offers_for_rome(rome)
+        offers = self.get_offers_for_romes(self.romes)
 
-        # To identify the office of a given offer, as siret is absent in offers data,
-        # we instead use the couple (company_name, departement) in the offer's data.
-        # It will matched to an office either on (company_name, departement)
-        # or on (office_name, departement).
-        # Let's group offers by their parent office using this office_key. 
         office_key_to_offers = defaultdict(list)
         for offer in offers:
-            if 'departmentCode' in offer and 'companyName' in offer:
-                office_key = (offer['departmentCode'], offer['companyName'])
+            if 'entreprise' in offer and 'siret' in offer['entreprise']:
+                office_key = offer['entreprise']['siret']
                 office_key_to_offers[office_key].append(offer)
 
         # Fetch matching offices from db. Offers without a match
         # will silently be dropped.
         offices = Office.query.filter(
-            or_(
-                tuple_(Office.departement, Office.company_name).in_(
-                    office_key_to_offers.keys()
-                ),
-                tuple_(Office.departement, Office.office_name).in_(
-                    office_key_to_offers.keys()
-                ),                
-            )
+            Office.siret.in_(
+                office_key_to_offers.keys()
+            ),
         ).limit(self.page_size).all()
 
         # Add extra fields to each office to enrich the API JSON response.
@@ -79,60 +66,54 @@ class VisibleMarketFetcher(Fetcher):
         #                in a regular hidden market search.
         # - `offer_count` and `offers` : useful minimalistic information about the offers found
         #                for this office.
+        # - `matched_rome` : rome which matched on the query
         for office in offices:
-            office_possible_keys = [
-                (office.departement, office.company_name),
-                (office.departement, office.office_name),
-            ]
-            first_offer = None
-
-            for office_key in office_possible_keys:
-                if office_key in office_key_to_offers:
-                    office_offers = office_key_to_offers[office_key]
-                    first_offer = office_offers[0]
-                    break
+            office_offers = office_key_to_offers[office.siret]
+            first_offer = office_offers[0]
                     
-            if first_offer is not None:
-                office.distance = first_offer['distance']
-                office.matched_rome = OGR_ROME_CODES[first_offer['romeProfessionCode']]
-                office.offers_count = len(office_offers)
-                office.offers = [{'url': offer['origins'][0]['originUrl']} for offer in office_offers]
-                for offer in office_offers:
-                    if 'companyContactEmail' in offer:
-                        office.email = offer['companyContactEmail']
-                    if 'companyContactPhone' in offer:
-                        office.tel = offer['companyContactPhone']
-                    if 'companyUrl' in offer:
-                        office.website = offer['companyUrl']
+            office_distance = geocoding.get_distance_between_commune_id_and_coordinates(
+                commune_id=self.commune_id,
+                latitude=first_offer['lieuTravail']['latitude'],
+                longitude=first_offer['lieuTravail']['longitude'],
+            )
+            office.distance = round(office_distance, 1)
 
-        # Only keep offices which actually matched an offer.
-        offices = [office for office in offices if hasattr(office, 'offers_count')]
+            office.matched_rome = first_offer['romeCode']
+            office.offers_count = len(office_offers)
+            office.offers = [{'url': offer['origineOffre']['urlOrigine']} for offer in office_offers]
+            # Contact data coming from offers take precedence
+            # over LBB ones.
+            for offer in office_offers:
+                if 'contact' in offer:
+                    if 'courriel' in offer:
+                        office.email = offer['contact']['courriel']
+                    if 'telephone' in offer:
+                        office.tel = offer['contact']['telephone']
+                    if 'urlPostulation' in offer:
+                        office.website = offer['contact']['urlPostulation']
+                    elif 'urlRecruteur' in offer:
+                        office.website = offer['contact']['urlRecruteur']
 
         self.office_count = len(offices)
         return offices
 
 
-    def get_offers_for_rome(self, rome):
-        response = esd.get_response(
-            url=OFFRES_ESD_ENDPOINT_URL,
-            data=json.dumps(self.get_data(rome)),
-        )
-        offers = response['results']
+    def get_offers_for_romes(self, romes):
+        offers = []
+
+        for romes_batch in chunks(romes, OFFRES_ESD_MAXIMUM_ROMES):
+            url = OFFRES_ESD_ENDPOINT_URL
+            params = {
+                'range': "0-{}".format(OFFRES_ESD_MAXIMUM_PAGE_SIZE - 1),
+                'sort': 1,
+                'codeROME': ",".join(romes_batch),
+                'natureContrat': ",".join(self.get_contract_nature_codes()),
+                'commune': self.commune_id,
+                'distance': min(self.distance, OFFRES_ESD_MAXIMUM_DISTANCE),
+            }
+            response = esd.get_response(url, params)
+            # Convenient reminder to dump json to file for test mockups.
+            # json.dump(response, json_file, sort_keys=True, indent=4)
+            offers += response['resultats']
+
         return offers
-
-
-    def get_data(self, rome):
-        data_json = {
-          "technicalParameters" : {
-            "page": 1,
-            "per_page": OFFRES_ESD_MAXIMUM_PAGE_SIZE,
-            "sort": 2
-          },
-          "criterias" : {
-            "cityCode": self.commune_id,
-            "romeProfessionCardCode": rome,
-            "cityDistance": min(self.distance, OFFRES_ESD_MAXIMUM_DISTANCE),
-            "contractNatureCode": self.get_contract_nature_codes()
-          }
-        }
-        return data_json

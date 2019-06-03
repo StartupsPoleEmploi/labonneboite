@@ -125,10 +125,11 @@ PEAM_API_BASE_URL = 'https://api.emploi-store.fr'
 PEAM_TOKEN_BASE_URL = 'https://entreprise.pole-emploi.fr'
 PEAM_VERIFY_SSL = True
 REMEMBER_ME_ARG_NAME = 'keep'
+
 # Settings that need to be overwritten
-# FIXME there should be a default value for these settings in the code whenever the setting is not defined.
 PEAM_CLIENT_ID = '<set it>'
 PEAM_CLIENT_SECRET = '<set it>'
+
 MANDRILL_API_KEY = '<set it>'
 FORM_EMAIL = '<set it>'
 

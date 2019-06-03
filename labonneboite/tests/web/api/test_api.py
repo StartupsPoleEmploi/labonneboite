@@ -1449,42 +1449,69 @@ class ApiOffersOfficesListTest(ApiBaseTest):
     def test_happy_path(self):
         with self.test_request_context:
             params = self.add_security_params({
-                'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
-                'rome_codes': 'D1405',
+                'commune_id': self.positions['metz']['commune_id'],
+                'rome_codes': 'D1212',
                 'contract': 'alternance',
                 'user': 'labonneboite',
                 'distance': 50,
             })
 
-            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
+            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-offres-happypath.json')) as mock_response:
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
+                mock_response.assert_called_once()
 
             self.assertEqual(rv.status_code, 200)
             result = json.loads(rv.data.decode())
-            self.assertEqual(result['companies_count'], 2)
-            self.assertEqual(len(result['companies']), 2)
+            self.assertEqual(result['companies_count'], 5)
+            self.assertEqual(len(result['companies']), 5)
             for office_json in result['companies']:
                 self.assertIn('distance', office_json)
                 self.assertIn('offers_count', office_json)
                 self.assertIn('offers', office_json)
 
-    def test_multi_rome_is_supported(self):
+    def test_multi_rome_is_supported_single_batch(self):
         with self.test_request_context:
             params = self.add_security_params({
                 'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
-                'rome_codes': 'D1405,D1507',
+                'rome_codes': 'D1405,D1507,D1212',
                 'contract': 'alternance',
                 'user': 'labonneboite',
                 'distance': 50,
             })
 
-            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
+            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-offres-happypath.json')) as mock_response:
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
+                # romes are batched by 3 - 3 romes is 1 batch
+                mock_response.assert_called_once()
 
             self.assertEqual(rv.status_code, 200)
             result = json.loads(rv.data.decode())
-            self.assertEqual(result['companies_count'], 2)
-            self.assertEqual(len(result['companies']), 2)
+            self.assertEqual(result['companies_count'], 5)
+            self.assertEqual(len(result['companies']), 5)
+            for office_json in result['companies']:
+                self.assertIn('distance', office_json)
+                self.assertIn('offers_count', office_json)
+                self.assertIn('offers', office_json)
+
+    def test_multi_rome_is_supported_multi_batch(self):
+        with self.test_request_context:
+            params = self.add_security_params({
+                'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
+                'rome_codes': 'D1405,D1507,D1212,A1101',
+                'contract': 'alternance',
+                'user': 'labonneboite',
+                'distance': 50,
+            })
+
+            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-offres-happypath.json')) as mock_response:
+                rv = self.app.get(url_for("api.offers_offices_list", **params))
+                # romes are batched by 3 - 4 romes is 2 batches
+                self.assertEqual(mock_response.call_count, 2)
+
+            self.assertEqual(rv.status_code, 200)
+            result = json.loads(rv.data.decode())
+            self.assertEqual(result['companies_count'], 5)
+            self.assertEqual(len(result['companies']), 5)
             for office_json in result['companies']:
                 self.assertIn('distance', office_json)
                 self.assertIn('offers_count', office_json)
@@ -1499,8 +1526,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 'distance': 50,
             })
 
-            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
-                rv = self.app.get(url_for("api.offers_offices_list", **params))
+            rv = self.app.get(url_for("api.offers_offices_list", **params))
 
             self.assertEqual(rv.status_code, 400)
             self.assertIn(b'parameter contract is required', rv.data)
@@ -1514,8 +1540,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 'distance': 50,
             })
 
-            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
-                rv = self.app.get(url_for("api.offers_offices_list", **params))
+            rv = self.app.get(url_for("api.offers_offices_list", **params))
 
             self.assertEqual(rv.status_code, 400)
             self.assertIn(b'only contract=alternance is supported', rv.data)
@@ -1531,8 +1556,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 'distance': 50,
             })
 
-            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
-                rv = self.app.get(url_for("api.offers_offices_list", **params))
+            rv = self.app.get(url_for("api.offers_offices_list", **params))
 
             self.assertEqual(rv.status_code, 400)
             self.assertIn(b'parameter longitude is not supported', rv.data)
@@ -1548,8 +1572,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 'page': 2,
             })
 
-            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-rechercheroffres.json')):
-                rv = self.app.get(url_for("api.offers_offices_list", **params))
+            rv = self.app.get(url_for("api.offers_offices_list", **params))
 
             self.assertEqual(rv.status_code, 400)
             self.assertIn(b'only page=1 is supported as pagination is not implemented', rv.data)
