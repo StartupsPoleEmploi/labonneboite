@@ -53,7 +53,7 @@ class AppTest(unittest.TestCase):
 
         This method should always be called within the same request context
         as the test that uses it in order to use the same session object:
-            with self.test_request_context:
+            with self.test_request_context():
                 self.login(user)
                 ...
         """
@@ -71,7 +71,7 @@ class AppTest(unittest.TestCase):
 
         This method should always be called within the same request context
         as the test that uses it in order to use the same session object:
-            with self.test_request_context:
+            with self.test_request_context():
                 ...
                 self.logout()
         """

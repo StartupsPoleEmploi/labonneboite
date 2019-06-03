@@ -1470,7 +1470,7 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 self.assertIn('offers', office_json)
 
     def test_multi_rome_is_supported_single_batch(self):
-        with self.test_request_context:
+        with self.test_request_context():
             params = self.add_security_params({
                 'commune_id': self.positions['bayonville_sur_mad']['commune_id'],
                 'rome_codes': 'D1405,D1507,D1212',
