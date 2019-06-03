@@ -303,10 +303,12 @@ def update_jobs_form():
 
         office_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets == office.siret).first()
         if office_update:
-            romes_to_boost = set(OfficeAdminUpdate.as_list(office_update.romes_to_boost))
-            romes_alternance_to_boost = set(OfficeAdminUpdate.as_list(office_update.romes_alternance_to_boost))
-            extra_romes_to_add = romes_to_boost - office.romes_codes
-            extra_romes_alternance_to_add = romes_alternance_to_boost - office.romes_codes
+            if office_update.romes_to_boost:
+                romes_to_boost = set(OfficeAdminUpdate.as_list(office_update.romes_to_boost))
+                extra_romes_to_add = romes_to_boost - office.romes_codes
+            if office_update.romes_alternance_to_boost:
+                romes_alternance_to_boost = set(OfficeAdminUpdate.as_list(office_update.romes_alternance_to_boost))
+                extra_romes_alternance_to_add = romes_alternance_to_boost - office.romes_codes
 
         form_data['romes_to_keep'] = romes_to_boost
         form_data['romes_alternance_to_keep'] = romes_alternance_to_boost
