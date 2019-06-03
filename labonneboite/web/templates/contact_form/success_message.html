@@ -8,19 +8,26 @@
 
 {% block content %}
 <div class="lbb-content">
-    <div class="lbb-single-column-content success-message text-center">
+    <div class="lbb-single-column-content success-message">
 
         <h2>{{ title|default("Votre demande a bien été envoyée !") }}</h2>
 
-        <p>Notre équipe reviendra vers vous d'ici quelques jours par mail et/ou téléphone afin de vous confirmer la prise en compte des modifications. Elles seront visibles sur votre fiche entreprise une fois la demande traitée.</p>
+        <p>
+
+          Notre équipe reviendra vers vous d'ici quelques jours par mail et/ou téléphone afin de vous confirmer la prise en compte des modifications. Elles seront visibles sur votre fiche entreprise une fois la demande traitée.
 
         {% if suggest_update_jobs %}
-            <p>Nous vous invitons à confirmer les métiers pour lesquels vous souhaitez recevoir  des candidatures spontanées en cliquant sur le bouton ci-dessous.</p>
+            <br>
+            Nous vous invitons à confirmer les métiers pour lesquels vous souhaitez recevoir  des candidatures spontanées en cliquant sur le bouton ci-dessous.
         {% elif suggest_update_coordinates %}
-            <p>Nous vous invitons à confirmer vos données de contact visibles par les candidats en cliquant sur le lien ci-dessous.</p>
+            <br>
+            Nous vous invitons à confirmer vos données de contact visibles par les candidats en cliquant sur le lien ci-dessous.
         {% endif %}
 
-        <p>Nous restons à votre écoute sur <a href="mailto:{{ email }}">{{ email }}</a>.</p>
+          <br>
+          Nous restons à votre écoute sur <a href="mailto:{{ email }}">{{ email }}</a>.
+
+        </p>
 
         <ul class="actions">
           <li>
