@@ -163,7 +163,7 @@ def get_distance_between_commune_id_and_coordinates(commune_id, latitude, longit
     city = get_city_by_commune_id(commune_id)
     coords_1 = (city['coords']['lat'], city['coords']['lon'])
     coords_2 = (latitude, longitude)
-    return geopy.distance.vincenty(coords_1, coords_2).km
+    return geopy.distance.geodesic(coords_1, coords_2).km
 
 
 @cities_cache_required
