@@ -37,7 +37,8 @@ class PrimitiveOfficeMixin(object):
 
     Don't forget to create a new migration for each of these models
     each time you add/change/remove a field here to keep all models
-    in sync.    """
+    in sync.
+    """
     siret = Column(String(191))
     company_name = Column('raisonsociale', String(191), nullable=False)
     office_name = Column('enseigne', String(191), default='', nullable=False)
@@ -53,6 +54,7 @@ class PrimitiveOfficeMixin(object):
     website = Column(String(191), default='', nullable=False)
     flag_poe_afpr = Column(Boolean, default=False, nullable=False)
     flag_pmsmp = Column(Boolean, default=False, nullable=False)
+
 
 class OfficeMixin(PrimitiveOfficeMixin):
     """

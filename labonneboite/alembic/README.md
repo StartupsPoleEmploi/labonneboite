@@ -34,5 +34,5 @@ Sometimes you have to add things manually, e.g. some constraints are not auto-ge
 
 You may need to run the migrations manually when developing a new feature:
 
-- `alembic upgrade head` or just `make alembic_migrate`
-- `alembic downgrade -1` or just `make alembic_rollback`
+- `alembic upgrade head` or just `make alembic-migrate`
+- `alembic downgrade -1` or just `make alembic-rollback`

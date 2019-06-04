@@ -11,7 +11,7 @@ from cProfile import Profile
 from pyprof2calltree import convert
 from elasticsearch.exceptions import TransportError, NotFoundError
 from elasticsearch.helpers import bulk
-from sqlalchemy import inspect, and_, or_
+from sqlalchemy import asc, inspect, and_, or_
 from sqlalchemy.exc import OperationalError
 
 from labonneboite.common import encoding as encoding_util
@@ -567,7 +567,12 @@ def update_offices():
     """
     Update offices (overload the data provided by the importer).
     """
-    for office_to_update in db_session.query(OfficeAdminUpdate).all():
+    # Good engineering eliminates users being able to do the wrong thing as much as possible.
+    # But since it is possible to store multiple SIRETs, there is no longer any constraint of uniqueness
+    # on a SIRET. As a result, it shouldn't but there may be `n` entries in `OfficeAdminUpdate`
+    # for the same SIRET. We order the query by creation date ASC so that the most recent changes take
+    # priority over any older ones.
+    for office_to_update in db_session.query(OfficeAdminUpdate).order_by(asc(OfficeAdminUpdate.date_created)).all():
 
         for siret in OfficeAdminUpdate.as_list(office_to_update.sirets):
 
@@ -575,6 +580,8 @@ def update_offices():
 
             if office:
                 # Apply changes in DB.
+                office.company_name = office_to_update.new_company_name or office.company_name
+                office.office_name = office_to_update.new_office_name or office.office_name
                 office.email = '' if office_to_update.remove_email else (office_to_update.new_email or office.email)
                 office.tel = '' if office_to_update.remove_phone else (office_to_update.new_phone or office.tel)
                 office.website = '' if office_to_update.remove_website else (office_to_update.new_website or office.website)

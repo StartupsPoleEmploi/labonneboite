@@ -87,6 +87,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_alternance_to_boost',
         'romes_to_remove',
         'nafs_to_add',
+        'new_company_name',
+        'new_office_name',
         'new_email',
         'new_phone',
 
@@ -133,6 +135,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_alternance_to_boost': "Limiter le boosting du score à certain codes ROME uniquement - Alternance",
         'romes_alternance_to_remove': "Retirer des codes ROME associés à une entreprise - Alternance",
         'nafs_to_add': "Ajouter un ou plusieurs NAF à une entreprise",
+        'new_company_name': "Nouvelle raison sociale",
+        'new_office_name': "Nouvelle enseigne",
         'new_email': "Nouvel email",
         'new_phone': "Nouveau téléphone",
         'new_website': "Nouveau site web",
@@ -169,10 +173,10 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             "<br>"
             "Tous les sirets doivent être associés au même NAF (le premier NAF servant de référence)"
         ),
-        'requested_by_email': "Email de la personne qui demande la suppression.",
-        'requested_by_first_name': "Prénom de la personne qui demande la suppression.",
-        'requested_by_last_name': "Nom de la personne qui demande la suppression.",
-        'requested_by_phone': "Téléphone de la personne qui demande la suppression.",
+        'requested_by_email': "Email de la personne qui demande la modification.",
+        'requested_by_first_name': "Prénom de la personne qui demande la modification.",
+        'requested_by_last_name': "Nom de la personne qui demande la modification.",
+        'requested_by_phone': "Téléphone de la personne qui demande la modification.",
         'boost': "Cocher cette case pour forcer le positionnement en tête des résultats",
         'romes_to_boost': Markup(
             "Veuillez entrer un ROME par ligne."
@@ -199,6 +203,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             "<br>"
             "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
         ),
+        'new_company_name': "Laisser vide s'il n'y a pas de modification à apporter",
+        'new_office_name': "Laisser vide s'il n'y a pas de modification à apporter",
         'new_email': "Laisser vide s'il n'y a pas de modification à apporter",
         'new_phone': "Laisser vide s'il n'y a pas de modification à apporter",
         'new_website': "Laisser vide s'il n'y a pas de modification à apporter",
@@ -226,6 +232,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'romes_alternance_to_boost',
         'romes_alternance_to_remove',
         'nafs_to_add',
+        'new_company_name',
+        'new_office_name',
         'new_email',
         'new_phone',
         'new_website',
@@ -267,6 +275,14 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'nafs_to_add': {
             'filters': [strip_filter],
         },
+        'new_company_name': {
+            'filters': [strip_filter],
+            'validators': [validators.optional()],
+        },
+        'new_office_name': {
+            'filters': [strip_filter],
+            'validators': [validators.optional()],
+        },
         'new_email': {
             'validators': [validators.optional(), validators.Email()],
         },
@@ -279,7 +295,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'website_alternance': {
             'validators': [validators.optional(), validators.URL()],
         },
-
         'new_phone': {
             'filters': [strip_filter, nospace_filter],
             'validators': [validators.optional(), phone_validator],
@@ -387,8 +402,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             self.set_update_style('sirets')
             form.sirets.data = recruiter_message.siret
 
-            if office:
-                self.set_update_style('name')
+            if office and 'name' not in request.form:
                 form.name.data = office.name
 
         # If recruiter ask for updating his coordinates and job,
@@ -572,28 +586,28 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         form['social_network'].data = format_url(form['social_network'].data)
         form['website_alternance'].data = format_url(form['website_alternance'].data)
 
-
         is_valid = super(OfficeAdminUpdateModelView, self).validate_form(form)
+        if not is_valid:
+            return is_valid
 
         # All sirets must be well formed
         sirets = models.OfficeAdminUpdate.as_list(form.data['sirets'])
         only_one_siret = len(sirets) == 1
 
-        if is_valid and not sirets:
+        if not sirets:
             message = "Le champs 'Sirets' est obligatoire. Veuillez le renseigner."
             flash(message, 'error')
             return False
 
-        if is_valid:
-            for siret in sirets:
-                if not is_siret(siret):
-                    message = "Ce siret suivant n'est pas composé de 14 chiffres : {}".format(siret)
-                    flash(message, 'error')
-                    return False
+        for siret in sirets:
+            if not is_siret(siret):
+                message = "Ce siret suivant n'est pas composé de 14 chiffres : {}".format(siret)
+                flash(message, 'error')
+                return False
 
         # If only one siret, we valdate it
         # If more than one siret : no siret validation
-        if is_valid and only_one_siret:
+        if only_one_siret:
             siret = sirets[0]
             office = models.Office.query.filter_by(siret=siret).first()
             if not office:
@@ -601,34 +615,31 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 flash(message, 'error')
                 return False
 
-        if is_valid:
+        # Show old value in description
+        for siret in sirets:
+            if 'id' in request.args:
+                # Avoid conflict with itself if update by adding id != request.args['id']
+                office_update_conflict = models.OfficeAdminUpdate.query.filter(
+                    models.OfficeAdminUpdate.sirets.like("%{}%".format(siret)),
+                    models.OfficeAdminUpdate.id != request.args['id']
+                )
+            else:
+                office_update_conflict = models.OfficeAdminUpdate.query.filter(
+                    models.OfficeAdminUpdate.sirets.like("%{}%".format(siret))
+                )
 
-            # Show old value in description
-            for siret in sirets:
-                if 'id' in request.args:
-                    # Avoid conflict with itself if update by adding id != request.args['id']
-                    office_update_conflict = models.OfficeAdminUpdate.query.filter(
-                        models.OfficeAdminUpdate.sirets.like("%{}%".format(siret)),
-                        models.OfficeAdminUpdate.id != request.args['id']
-                    )
-                else:
-                    office_update_conflict = models.OfficeAdminUpdate.query.filter(
-                        models.OfficeAdminUpdate.sirets.like("%{}%".format(siret))
-                    )
-
-                if office_update_conflict.count() > 0:
-                    message = """"
-                        Le siret {} est déjà présent dans la fiche n°{}
-                    """.format(siret, office_update_conflict[0].id)
-                    flash(message, 'error')
-                    return False
-
+            if office_update_conflict.count() > 0:
+                message = """"
+                    Le siret {} est déjà présent dans la fiche n°{}
+                """.format(siret, office_update_conflict[0].id)
+                flash(message, 'error')
+                return False
 
         # Get company
         first_office = models.Office.query.filter_by(siret=sirets[0]).first() if sirets else None
 
         # Codes ROMES to boost or to add
-        if is_valid and form.data.get('romes_to_boost'):
+        if form.data.get('romes_to_boost'):
             try:
                 self.validate_romes_to_boost(form, 'romes_to_boost', 'boost')
             except (RomeToBoostException, InvalidRome) as e:
@@ -636,16 +647,15 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 return False
 
         # Codes ROMES to boost or to add (for alternance)
-        if is_valid and form.data.get('romes_alternance_to_boost'):
+        if form.data.get('romes_alternance_to_boost'):
             try:
                 self.validate_romes_to_boost(form, 'romes_to_boost', 'boost_alternance')
             except (RomeToBoostException, InvalidRome) as e:
                 flash(e.args[0], 'error')
                 return False
 
-
         # Codes ROMES to remove for LBB
-        if is_valid and form.data.get('romes_to_remove'):
+        if form.data.get('romes_to_remove'):
             try:
                 office_naf = first_office.naf if only_one_siret else None
                 self.validate_romes_to_remove(form, 'romes_to_remove', office_naf)
@@ -654,7 +664,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 return False
 
         # Codes ROMES to remove (for alternance)
-        if is_valid and form.data.get('romes_alternance_to_remove'):
+        if form.data.get('romes_alternance_to_remove'):
             try:
                 office_naf = first_office.naf if only_one_siret else None
                 self.validate_romes_to_remove(form, 'romes_alternance_to_remove', office_naf)
@@ -663,7 +673,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 return False
 
         # Codes NAF to add
-        if is_valid and form.data.get('nafs_to_add'):
+        if form.data.get('nafs_to_add'):
             nafs_to_add = form.data.get('nafs_to_add')
 
             for naf in models.OfficeAdminUpdate.as_list(nafs_to_add):
@@ -677,7 +687,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                     return False
 
         # Identifiant recruteur
-        if is_valid and form.data.get('certified_recruiter') and not form.data.get('recruiter_uid'):
+        if form.data.get('certified_recruiter') and not form.data.get('recruiter_uid'):
             msg = "La case 'Recruteur certifié' est cochée mais aucun identifiant n'est indiqué."
             flash(msg, 'error')
             return False

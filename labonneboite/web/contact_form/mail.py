@@ -193,7 +193,7 @@ def make_save_suggestion(form, recruiter_message, recruiter_message_type):
 
     # OfficeAdminUpdate already exits ?
     office_admin_update = OfficeAdminUpdate.query.filter(
-        OfficeAdminUpdate.sirets.like("%{}%".format(form.siret.data))
+        OfficeAdminUpdate.sirets.contains(form.siret.data)
     ).first()
     if office_admin_update:
         url = url_for("officeadminupdate.edit_view", id=office_admin_update.id, **params)

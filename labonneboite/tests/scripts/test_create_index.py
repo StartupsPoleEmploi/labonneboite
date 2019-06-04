@@ -370,6 +370,9 @@ class RemoveOfficesTest(CreateIndexBaseTest):
 
 
 class UpdateOfficesTest(CreateIndexBaseTest):
+    """
+    Test update_offices().
+    """
 
     def test_no_update_no_company_removal(self):
         """
@@ -392,18 +395,15 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             self.assertTrue(len(romes_for_office), len(res['_source']['scores_by_rome']))
             self.assertTrue(len(romes_for_office), len(res['_source']['scores_alternance_by_rome']))
 
-
-    """
-    Test update_offices().
-    """
-
     def test_update_office_by_updating_contact(self):
         """
-        Test `update_offices` to update an office: update email and website, keep current phone.
+        Test `update_offices` to update an office: update names, email and website, keep current phone.
         """
         office_to_update = OfficeAdminUpdate(
             sirets=self.office1.siret,
-            name=self.office1.company_name,
+            name=self.office1.name,
+            new_company_name="New raison sociale",
+            new_office_name="New enseigne",
             boost=True,
             new_email="foo@pole-emploi.fr",
             new_phone="",  # Leave empty on purpose: it should not be modified.
@@ -417,6 +417,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         script.update_offices()
 
         office = Office.get(self.office1.siret)
+        self.assertEqual(office.company_name, office_to_update.new_company_name)
+        self.assertEqual(office.office_name, office_to_update.new_office_name)
         self.assertEqual(office.email, office_to_update.new_email)
         self.assertEqual(office.score, office.score)  # This value should not be modified.
         self.assertEqual(office.tel, self.office1.tel)  # This value should not be modified.
@@ -447,6 +449,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             remove_email=True,
             remove_phone=True,
             remove_website=True,
+            new_company_name="",
+            new_office_name="",
         )
         office_to_update.save()
 
@@ -456,6 +460,9 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEqual(office.email, '')
         self.assertEqual(office.tel, '')
         self.assertEqual(office.website, '')
+        # Names should still be the same.
+        self.assertEqual(office.company_name, self.office1.company_name)
+        self.assertEqual(office.office_name, self.office1.office_name)
 
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
         self.assertEqual(res['_source']['email'], '')

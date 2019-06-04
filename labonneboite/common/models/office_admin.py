@@ -115,9 +115,12 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     # Stores a list of SIRET as a string separated by `SEPARATORS`
     sirets = Column(Text, default='', nullable=False, unique=False)
 
+    # This name is for internal use only and reserved to the support team.
     name = Column(String(191), default='', nullable=False)
 
     # Info to update.
+    new_company_name = Column(String(191), default='', nullable=False)  # New "raison sociale".
+    new_office_name = Column(String(191), default='', nullable=False)  # New "enseigne".
     new_email = Column(String(191), default='', nullable=False)
     new_phone = Column(String(191), default='', nullable=False)
     new_website = Column(String(191), default='', nullable=False)
