@@ -140,8 +140,13 @@ def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
 
     # fallback to main score in some cases
     # - no rome_code in context (favorites page, office page...)
-    # - rome_code is not related to the naf_code
-    if not rome_code or rome_code not in mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code]:
+    # - orphaned naf_code (no related rome_code)
+    # - rome_code is not related to the naf_code (custom ROME via SAVE)
+    if (
+        not rome_code
+        or naf_code not in mapping_util.MANUAL_NAF_ROME_MAPPING
+        or rome_code not in mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code]
+    ):
         return score
 
     total_office_hirings = get_hirings_from_score(score)

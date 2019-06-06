@@ -49,7 +49,14 @@ class VisibleMarketFetcher(Fetcher):
 
         office_key_to_offers = defaultdict(list)
         for offer in offers:
-            if 'entreprise' in offer and 'siret' in offer['entreprise']:
+            offer_is_valid = (
+                'entreprise' in offer
+                and 'siret' in offer['entreprise']
+                and 'lieuTravail' in offer
+                and 'latitude' in offer['lieuTravail']
+                and 'longitude' in offer['lieuTravail']
+            )
+            if offer_is_valid:
                 office_key = offer['entreprise']['siret']
                 office_key_to_offers[office_key].append(offer)
 
