@@ -2,6 +2,7 @@ import re
 
 from requests.auth import HTTPBasicAuth
 import requests
+from requests.exceptions import ConnectionError, Timeout
 
 from flask import current_app
 
@@ -80,10 +81,16 @@ def request_json_api(endpoint, params):
 
     try:
         response = requests.get(url, params=params, auth=auth, timeout=TIMEOUT_SECONDS, headers=headers)
-    except requests.exceptions.Timeout:
-        # This occurs frequently so we don't trigger a timeout
+    except Timeout:
+        # This occurs frequently so we don't trigger a timeout error
         current_app.logger.warning('IGN API timeout')
         raise BackendUnreachable
+    except ConnectionError as e:
+        if str(e) == "HTTPSConnectionPool(host='wxs.ign.fr', port=443): Read timed out.":
+            # This occurs frequently so we don't trigger a timeout error
+            raise BackendUnreachable
+        else:
+            raise e
 
     if response.status_code == 200:
         return response.json()
