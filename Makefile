@@ -127,6 +127,9 @@ create-index-from-scratch-with-profiling-line-by-line:
 mysql-local-shell:
 	mysql -u root --host 127.0.0.1 --port 3307 labonneboite
 
+rebuild-simplified-rome-naf-mapping:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/rebuild_simplified_rome_naf_mapping.py
+
 rebuild-importer-tests-compressed-files:
 	cd labonneboite/tests/importer/data && \
 	rm -f LBB_XDPDPAE_2016-11-10_2015-10-10.csv.gz && \
