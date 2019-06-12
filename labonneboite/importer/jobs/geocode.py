@@ -10,6 +10,7 @@ https://adresse.data.gouv.fr/faq
 from multiprocessing import Manager, Pool
 import io
 import csv
+import time
 import requests
 from sqlalchemy.exc import IntegrityError
 import pandas as pd
@@ -24,8 +25,8 @@ from labonneboite.importer.models.computing import Geolocation
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
-# maximum 10 requests in parrallel, as can be seen on
-# https://adresse.data.gouv.fr/faq/
+DEBUG_MODE = True
+
 pool_size = 8
 connection_limit = pool_size
 adapter = requests.adapters.HTTPAdapter(pool_connections=connection_limit,
@@ -36,12 +37,12 @@ session.mount('http://', adapter)
 jobs = []
 
 CITY_NAMES = load_city_codes()
-GEOCODING_STATS = {}
 
+#Shared variables between processes for multithreading
 manager = Manager()
-#Shared variables between processes
 adresses_not_geolocated = manager.list() #list to store the geolocations not saved in cache
 coordinates_updates = manager.list() #list to store the coordinates to update
+GEOCODING_STATS = manager.dict()
 
 class IncorrectAdressDataException(Exception):
     pass
@@ -67,17 +68,31 @@ class GeocodeJob(Job):
 
     @timeit
     def create_geocoding_jobs(self):
-        query = """
-            select
-                siret,
-                numerorue,
-                libellerue,
-                codepostal,
-                codecommune,
-                coordinates_x,
-                coordinates_y
-            from %s
-        """ % (settings.SCORE_REDUCING_TARGET_TABLE)
+        if (DEBUG_MODE):
+            query = """
+                select
+                    siret,
+                    numerorue,
+                    libellerue,
+                    codepostal,
+                    codecommune,
+                    coordinates_x,
+                    coordinates_y
+                from %s
+                LIMIT 20000
+            """ % (settings.SCORE_REDUCING_TARGET_TABLE)
+        else:
+            query = """
+                select
+                    siret,
+                    numerorue,
+                    libellerue,
+                    codepostal,
+                    codecommune,
+                    coordinates_x,
+                    coordinates_y
+                from %s
+            """ % (settings.SCORE_REDUCING_TARGET_TABLE)
         con, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
@@ -127,6 +142,7 @@ class GeocodeJob(Job):
             logger.info("geocoding with ban... %i of %i done", count, len(updates))
             cur.executemany(update_query, statements)
             con.commit()
+
         cur.close()
         con.close()
 
@@ -168,7 +184,7 @@ class GeocodeJob(Job):
         return adresses_not_geolocated
 
     @timeit
-    def run_missing_geocoding_jobs(self,csv_max_rows=80000):
+    def run_missing_geocoding_jobs(self, csv_max_rows=50000):
         # The CSV file to send to API must not be > 8mb (https://adresse.data.gouv.fr/api)
         # This line :"03880702000011,2 RUE DE LA TETE NOIRE 14700 FALAISE,14258"
         # was copied 100000 times in a file, and the size was 5.77 MB,
@@ -184,14 +200,21 @@ class GeocodeJob(Job):
                 wr.writerow(("siret", "full_address", "city_code"))
                 wr.writerows(adresses_not_geolocated[start:end])
             csv_files.append(csv_path)
+            GEOCODING_STATS['number created CSV'] = GEOCODING_STATS.get('number created CSV', 0) + 1
             logger.debug("wrote CSV file to %s", csv_path)
 
+        logger.info("GEOCODING_STATS = %s", GEOCODING_STATS)
+
         pool = Pool(processes=pool_size)
+        #pool.map_async(self.get_geocode_from_api, csv_files)
         for csv_path in csv_files:
-            pool.apply_async(self.get_geocode_from_api(csv_path))
+            pool.apply_async(self.get_geocode_from_api, (csv_path,))
+            time.sleep(5)
 
         pool.close()
         pool.join()
+
+        logger.info("GEOCODING_STATS = %s", GEOCODING_STATS)
 
         return coordinates_updates
 
@@ -199,16 +222,30 @@ class GeocodeJob(Job):
         #curl -X POST -F data=@path/to/file.csv -F columns=voie columns=ville -F
         # citycode=ma_colonne_code_insee https://api-adresse.data.gouv.fr/search/csv/
 
+        logger.info("find coordinates on CSV {}".format(csv_path))
+
         BASE = "http://api-adresse.data.gouv.fr/search/csv/"
 
         files = {'data': open(csv_path, 'rb')}
         values = {'columns':'full_address', 'city_code':'city_code'}
 
-        response = session.post(BASE, files=files, data=values)
-        response.close()
+        retry_counter = 7
+        job_done = False
 
-        if response.status_code == 200:
+        while not job_done and retry_counter > 0:
+            response = session.post(BASE, files=files, data=values)
+            response.close()
+            logger.info('STATUS RESPONSE : {} pour le csv {}'.format(response.status_code, csv_path))
+            if response.status_code == 200:
+                job_done = True
+            else:
+                retry_counter -= 1
+                time.sleep(15)
+
+        if job_done:
+            GEOCODING_STATS['API status 200 for CSV'] = GEOCODING_STATS.get('API status 200 for CSV', 0) + 1
             try:
+                logger.info("API addr gouv response on CSV {} OK".format(csv_path))
                 decoded_content = response.content.decode('utf-8')
                 df_geocodes = pd.read_csv(io.StringIO(decoded_content))
 
@@ -244,7 +281,9 @@ class GeocodeJob(Job):
                         GEOCODING_STATS['coordinates_not_found'] = GEOCODING_STATS.get('coordinates_not_found', 0) + 1
             except ValueError:
                 logger.warning('ValueError in json-ing features result %s', response.text)
-
+        else:
+            logger.info("The csv {} did not work".format(csv_path))
+        logger.info("GEOCODING_STATS = {} for CSV {}".format(GEOCODING_STATS, csv_path))
 
     @timeit
     def run(self):
@@ -252,11 +291,13 @@ class GeocodeJob(Job):
         geocoding_jobs = self.create_geocoding_jobs()
         logger.info("requesting BAN for all the adresses we need to geocode for...")
         self.run_geocoding_jobs(geocoding_jobs)
-        self.run_missing_geocoding_jobs()
+        if DEBUG_MODE:
+            self.run_missing_geocoding_jobs(csv_max_rows=500)
+        else:
+            self.run_missing_geocoding_jobs()
         logger.info("updating coordinates...")
         self.update_coordinates(coordinates_updates)
         logger.info("updated %i coordinates !", len(coordinates_updates))
-        logger.info("GEOCODING_STATS = %s", GEOCODING_STATS)
         logger.info("validating coordinates...")
         self.validate_coordinates()
         logger.info("validated coordinates !")
