@@ -1074,7 +1074,6 @@ D1211,"Vente en articles de sport et loisirs",4778C,"Autres commerces de détail
 D1211,"Vente en articles de sport et loisirs",4779Z,"Commerce de détail de biens d'occasion en magasin",91
 D1211,"Vente en articles de sport et loisirs",4799A,"Vente à domicile",70
 D1211,"Vente en articles de sport et loisirs",4939C,"Téléphériques et remontées mécaniques",330
-D1211,"Vente en articles de sport et loisirs",5610C,"Restauration de type rapide",1283
 D1211,"Vente en articles de sport et loisirs",5630Z,"Débits de boissons",571
 D1211,"Vente en articles de sport et loisirs",5811Z,"Édition de livres",65
 D1211,"Vente en articles de sport et loisirs",5914Z,"Projection de films cinématographiques",77
@@ -1244,14 +1243,11 @@ D1214,"Vente en habillement et accessoires de la personne",4791B,"Vente à dista
 D1214,"Vente en habillement et accessoires de la personne",4799A,"Vente à domicile",345
 D1214,"Vente en habillement et accessoires de la personne",4799B,"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a.",72
 D1214,"Vente en habillement et accessoires de la personne",5510Z,"Hôtels et hébergement similaire",3153
-D1214,"Vente en habillement et accessoires de la personne",5610A,"Restauration traditionnelle",8657
-D1214,"Vente en habillement et accessoires de la personne",5610C,"Restauration de type rapide",6469
 D1214,"Vente en habillement et accessoires de la personne",6399Z,"Autres services d'information n.c.a.",6
 D1214,"Vente en habillement et accessoires de la personne",6420Z,"Activités des sociétés holding",324
 D1214,"Vente en habillement et accessoires de la personne",6512Z,"Autres assurances",368
 D1214,"Vente en habillement et accessoires de la personne",6619B,"Autres activités auxiliaires de services financiers, hors assurance et caisses de retraite, n.c.a.",73
 D1214,"Vente en habillement et accessoires de la personne",7010Z,"Activités des sièges sociaux",2440
-D1214,"Vente en habillement et accessoires de la personne",7021Z,"Conseil en relations publiques et communication",91
 D1214,"Vente en habillement et accessoires de la personne",7022Z,"Conseil pour les affaires et autres conseils de gestion",958
 D1214,"Vente en habillement et accessoires de la personne",7490B,"Activités spécialisées, scientifiques et techniques diverses",106
 D1214,"Vente en habillement et accessoires de la personne",7721Z,"Location et location-bail d'articles de loisirs et de sport",55
@@ -4101,7 +4097,6 @@ G1602,"Personnel de cuisine",5630Z,"Débits de boissons",3605
 G1602,"Personnel de cuisine",6420Z,"Activités des sociétés holding",197
 G1602,"Personnel de cuisine",6430Z,"Fonds de placement et entités financières similaires",16
 G1602,"Personnel de cuisine",6820A,"Location de logements",83
-G1602,"Personnel de cuisine",6820B,"Location de terrains et d'autres biens immobiliers",352
 G1602,"Personnel de cuisine",6832A,"Administration d'immeubles et autres biens immobiliers",38
 G1602,"Personnel de cuisine",6832B,"Supports juridiques de gestion de patrimoine immobilier",12
 G1602,"Personnel de cuisine",7010Z,"Activités des sièges sociaux",2830
@@ -4333,9 +4328,7 @@ G1803,"Service en restauration",5629B,"Autres services de restauration n.c.a.",5
 G1803,"Service en restauration",5630Z,"Débits de boissons",5008
 G1803,"Service en restauration",6420Z,"Activités des sociétés holding",220
 G1803,"Service en restauration",6430Z,"Fonds de placement et entités financières similaires",10
-G1803,"Service en restauration",6820B,"Location de terrains et d'autres biens immobiliers",377
 G1803,"Service en restauration",6832A,"Administration d'immeubles et autres biens immobiliers",142
-G1803,"Service en restauration",6832B,"Supports juridiques de gestion de patrimoine immobilier",14
 G1803,"Service en restauration",7010Z,"Activités des sièges sociaux",2948
 G1803,"Service en restauration",7990Z,"Autres services de réservation et activités connexes",59
 G1803,"Service en restauration",8110Z,"Activités combinées de soutien lié aux bâtiments",77
@@ -8182,7 +8175,6 @@ K2501,"Gardiennage de locaux",8121Z,"Nettoyage courant des bâtiments",574
 K2501,"Gardiennage de locaux",8411Z,"Administration publique générale",454
 K2501,"Gardiennage de locaux",8810A,"Aide à domicile",85
 K2501,"Gardiennage de locaux",9499Z,"Autres organisations fonctionnant par adhésion volontaire",238
-K2501,"Gardiennage de locaux",9602A,"Coiffure",17
 K2502,"Management de sécurité privée",7022Z,"Conseil pour les affaires et autres conseils de gestion",32
 K2502,"Management de sécurité privée",7830Z,"Autre mise à disposition de ressources humaines",10
 K2502,"Management de sécurité privée",8010Z,"Activités de sécurité privée",2479
