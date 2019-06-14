@@ -13,6 +13,7 @@ from social_core.backends.open_id_connect import OpenIdConnectAuth
 from labonneboite.conf import settings
 from labonneboite.common import activity
 from labonneboite.common import user_util
+from labonneboite.common.models import User
 from .exceptions import AuthFailedMissingReturnValues
 
 # pylint:disable=abstract-method
@@ -69,6 +70,13 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         for field in required_fields:
             if not user_details[field]:
                 raise AuthFailedMissingReturnValues(self, field)
+        # Sometimes users have updated their PEAM email and we need to reflect
+        # the change in our db on the fly.
+        existing_user_query = User.query.filter_by(external_id=user_details['external_id'])
+        if existing_user_query.count():
+            existing_user = existing_user_query.first()
+            existing_user.email = user_details['email']
+            existing_user.save()
         return user_details
 
     def complete(self, *args, **kwargs):
