@@ -20,8 +20,8 @@ from labonneboite.tests.web.api.test_api_base import ApiBaseTest
 class ApiGenericTest(ApiBaseTest):
 
     def test_happy_path(self):
-        rome_code = 'D1408'
-        naf_codes = ['7320Z']
+        rome_code = 'D1405'
+        naf_codes = ['4646Z']
         latitude = 49.305658  # 15 Avenue François Mitterrand, 57290 Fameck, France.
         longitude = 6.116853
         distance = 100
@@ -39,8 +39,8 @@ class ApiGenericTest(ApiBaseTest):
         self.assertEqual(len(companies), 3)
 
     def test_headcount_filter(self):
-        rome_code = 'D1408'
-        naf_codes = ['7320Z']
+        rome_code = 'D1405'
+        naf_codes = ['4646Z']
         latitude = 49.305658  # 15 Avenue François Mitterrand, 57290 Fameck, France.
         longitude = 6.116853
         distance = 100
@@ -60,8 +60,8 @@ class ApiGenericTest(ApiBaseTest):
         self.assertEqual(len(companies), 1)
 
     def test_office_distance_has_one_digit(self):
-        rome_code = 'D1408'
-        naf_codes = ['7320Z']
+        rome_code = 'D1405'
+        naf_codes = ['4646Z']
         latitude = 49.305658  # 15 Avenue François Mitterrand, 57290 Fameck, France.
         latitude += 0.1  # original coordinates will unfortunately give a distance with 0 digit
         longitude = 6.116853
@@ -78,18 +78,23 @@ class ApiGenericTest(ApiBaseTest):
         # what is important here is that there is one digit
         self.assertEqual(companies[0].distance, 45.9)
 
-    def test_naf_and_rome(self):
+    def test_rome_and_naf_codes_used_in_tests_are_in_actual_mapping(self):
         """
-        Ensure that those ROME codes can be used accurately in other tests.
-        In order to ensure this, they should map to NAF codes used in the documents test data.
+        Ensure that those ROME and NAF codes can be used accurately in tests.
         """
-        rome = 'D1405'
-        naf_codes = mapping_util.map_romes_to_nafs([rome])
-        self.assertIn('7320Z', naf_codes)
-
-        rome = 'M1801'
-        naf_codes = mapping_util.map_romes_to_nafs([rome])
-        self.assertIn('9511Z', naf_codes)
+        self.assertIn('4646Z', mapping_util.map_romes_to_nafs(['D1405']))
+        self.assertIn('9511Z', mapping_util.map_romes_to_nafs(['M1801']))
+        self.assertIn('4771Z', mapping_util.map_romes_to_nafs(['D1508']))
+        self.assertIn('4711F', mapping_util.map_romes_to_nafs(['D1508']))
+        self.assertIn('9529Z', mapping_util.map_romes_to_nafs(['D1211']))
+        self.assertIn('4741Z', mapping_util.map_romes_to_nafs(['D1211']))
+        self.assertIn('4752B', mapping_util.map_romes_to_nafs(['D1213']))
+        self.assertIn('7022Z', mapping_util.map_romes_to_nafs(['M1202']))
+        self.assertIn('3212Z', mapping_util.map_romes_to_nafs(['B1603']))
+        self.assertIn('5229A', mapping_util.map_romes_to_nafs(['N1202']))
+        self.assertIn('4910Z', mapping_util.map_romes_to_nafs(['N4403']))
+        self.assertIn('4920Z', mapping_util.map_romes_to_nafs(['N4403']))
+        self.assertIn('7022Z', mapping_util.map_romes_to_nafs(['M1202']))
 
 
 class ApiSecurityTest(ApiBaseTest):
@@ -642,27 +647,29 @@ class ApiCompanyListTest(ApiBaseTest):
 
                 # now let's see values adjusted for current rome_code
                 stars_for_rome_code = office_json['stars']
+                self.assertEqual(stars_for_rome_code, 3.8)
                 self.assertEqual(stars_for_rome_code, office.get_stars_for_rome_code(rome_code))
-                score_for_rome = scoring_util.get_score_from_stars(stars_for_rome_code)
-                self.assertEqual(round(score_for_rome, 5), 4.0)
-                self.assertEqual(round(scoring_util.get_hirings_from_score(score_for_rome), 5), 0.8)
+
+                score_for_rome = office.get_score_for_rome_code(rome_code)
+                self.assertEqual(score_for_rome, 50.0)
+                self.assertEqual(round(scoring_util.get_hirings_from_score(score_for_rome), 1), 10.0)
 
                 # let's see how adjusting for this rome decreased hirings
                 # from 77.5 (hirings for all rome_codes included)
-                # to 0.8 (hirings for only the current rome_code)
+                # to 10.0 (hirings for only the current rome_code)
                 #
-                # 0.8 is approx 1% of 77.5
-                # which means that on average, companies of this naf_code hire 1% in this rome_code
-                # and 99% in all other rome_codes associated to this naf_code
+                # 10.0 is approx 13% of 77.5
+                # which means that on average, companies of this naf_code hire 13% in this rome_code
+                # and 87% in all other rome_codes associated to this naf_code
                 #
-                # let's check we can find back this 1% ratio in our rome-naf mapping data
+                # let's check we can find back this 13% ratio in our rome-naf mapping data
                 naf_code = office.naf
                 rome_codes = list(mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code].keys())
                 total_naf_hirings = sum(mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome] for rome in rome_codes)
-                self.assertEqual(total_naf_hirings, 7844)
+                self.assertEqual(total_naf_hirings, 2681)
                 current_rome_hirings = mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code][rome_code]
-                self.assertEqual(current_rome_hirings, 52)
-                # 52 hirings for this rome_code only is indeed roughly 1% of 7844 hirings for all rome_codes.
+                self.assertEqual(current_rome_hirings, 329)
+                # 329 hirings for this rome_code only is indeed roughly 12-13% of 2681 hirings for all rome_codes.
                 # The match is not exact because some rounding occur during calculations, but you should
                 # now get the main idea of how scores are adjusted to a given rome_code.
 
@@ -819,11 +826,11 @@ class ApiCompanyListTest(ApiBaseTest):
 
     def test_same_rome_with_one_naf_filters(self):
         with self.test_request_context():
-            # 1) NAF Code : 4711C => 1 result expected
+            # 1) NAF Code : 4771Z => 1 result expected
             params = self.add_security_params({
                 'commune_id': self.positions['metz']['commune_id'],
                 'rome_codes': 'D1508',
-                'naf_codes': '4711C',
+                'naf_codes': '4771Z',
                 'user': 'labonneboite'
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
@@ -833,11 +840,11 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000006')
 
-            # 2) NAF Code : 5610C => 1 result expected
+            # 2) NAF Code : 4711F => 1 result expected
             params = self.add_security_params({
                 'commune_id': self.positions['metz']['commune_id'],
                 'rome_codes': 'D1508',
-                'naf_codes': '5610C',
+                'naf_codes': '4711F',
                 'user': 'labonneboite'
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
@@ -849,11 +856,11 @@ class ApiCompanyListTest(ApiBaseTest):
 
     def test_same_rome_with_two_naf_filters(self):
         with self.test_request_context():
-            # 1) NAF codes : 5610C,4711C => 2 results expected
+            # 1) NAF codes : 4711F,4771Z => 2 results expected
             params = self.add_security_params({
                 'commune_id': self.positions['metz']['commune_id'],
                 'rome_codes': 'D1508',
-                'naf_codes': '5610C,4711C',
+                'naf_codes': '4711F,4771Z',
                 'user': 'labonneboite'
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
@@ -1005,7 +1012,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
-            self.assertEqual(data['companies'][0]['contact_mode'], 'Envoyer un CV et une lettre de motivation')
+            self.assertEqual(data['companies'][0]['contact_mode'], 'Se présenter spontanément')
 
     def test_flag_alternance(self):
         with self.test_request_context():

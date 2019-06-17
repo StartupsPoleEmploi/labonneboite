@@ -334,17 +334,19 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         return set([rome.code for rome in self.romes_for_naf_mapping])
 
-    def get_stars_for_rome_code(self, rome_code, hiring_type=None):
+    def get_score_for_rome_code(self, rome_code, hiring_type=None):
         hiring_type = hiring_type or hiring_type_util.DEFAULT
         if hiring_type not in hiring_type_util.VALUES:
             raise ValueError("Unknown hiring_type")
         raw_score = self.score if hiring_type == hiring_type_util.DPAE else self.score_alternance
-        score = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+        return scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
             score=raw_score,
             rome_code=rome_code,
             naf_code=self.naf
             )
 
+    def get_stars_for_rome_code(self, rome_code, hiring_type=None):
+        score = self.get_score_for_rome_code(rome_code, hiring_type)
         return scoring_util.get_stars_from_score(score)
 
     def get_stars_for_rome_code_as_percentage(self, rome_code):

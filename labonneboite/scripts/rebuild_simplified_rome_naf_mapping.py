@@ -22,7 +22,7 @@ CSV_DELIMITER = ','
 # There might sometimes be a few items more than the wanted maximum,
 # because for example we won't drop the last ROME of a given NAF
 # if this NAF is highly ranked for this ROME.
-# These threshold have been carefull selected so that:
+# These threshold have been carefully selected so that:
 # - approx 90% of romes have less than 10 nafs
 # - approx 90% of nafs have less than 10 romes
 WANTED_MAXIMUM_ROMES_PER_NAF = 4
@@ -35,17 +35,16 @@ class RomeNafMapping:
 
     def __init__(self):
         self.df = pd.read_table(INPUT_FILENAME, sep=CSV_DELIMITER)
-        df = self.df
 
         self.sorted_nafs_for_rome = {}
-        for rome in df.rome_id.unique():
-            self.sorted_nafs_for_rome[rome] = df[df.rome_id == rome].sort_values(
+        for rome in self.df.rome_id.unique():
+            self.sorted_nafs_for_rome[rome] = self.df[self.df.rome_id == rome].sort_values(
                 by='hirings', ascending=False
             ).naf_id.tolist()
 
         self.sorted_romes_for_naf = {}
-        for naf in df.naf_id.unique():
-            self.sorted_romes_for_naf[naf] = df[df.naf_id == naf].sort_values(
+        for naf in self.df.naf_id.unique():
+            self.sorted_romes_for_naf[naf] = self.df[self.df.naf_id == naf].sort_values(
                 by='hirings', ascending=False
             ).rome_id.tolist()
 
@@ -57,7 +56,9 @@ class RomeNafMapping:
 
     def delete_mapping(self, rome, naf):
         # We apply an exception requested by our business developer.
-        # M* romes mappings should stay untouched.
+        # M* romes mappings should stay untouched, as they are generally by
+        # nature relevant for all kinds of companies.
+        # For example, every company needs a secretary... (M1607)
         if rome.startswith('M'):
             return
 

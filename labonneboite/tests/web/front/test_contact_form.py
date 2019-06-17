@@ -124,18 +124,6 @@ class UpdateJobsTest(ContactFormBaseTest):
     D1106 "Vente en alimentation"
     D1505 "Personnel de caisse"
     D1214 "Vente en habillement et accessoires de la personne"
-    N1103 "Magasinage et préparation de commandes"
-    D1101 "Boucherie"
-    G1602 "Personnel de cuisine"
-    G1803 "Service en restauration"
-    D1301 "Management de magasin de détail"
-    N4105 "Conduite et livraison par tournées sur courte distance"
-    G1603 "Personnel polyvalent en restauration"
-    D1502 "Management/gestion de rayon produits alimentaires"
-    D1102 "Boulangerie - viennoiserie"
-    D1504 "Direction de magasin de grande distribution"
-    D1107 "Vente en gros de produits frais"
-    D1105 "Poissonnerie"
 
     Some ROMEs not in the default ROME/NAF mapping for NAF `4711B`:
     -----------------------------------------------------------------
@@ -170,8 +158,8 @@ class UpdateJobsTest(ContactFormBaseTest):
         Test `mail.generate_update_jobs_mail()` method.
         """
         form_data = {
-            'romes_to_keep': ['D1507', 'D1106', 'D1214', 'D1101', 'D1502'],
-            'romes_alternance_to_keep': ['D1101', 'D1105'],
+            'romes_to_keep': ['D1507', 'D1106'],
+            'romes_alternance_to_keep': ['D1214', 'D1106'],
             'extra_romes_to_add': ['M1802', 'M1803', 'M1805'],
             'extra_romes_alternance_to_add': ['M1805'],
         }
@@ -193,8 +181,8 @@ class UpdateJobsTest(ContactFormBaseTest):
         """
         with mock.patch('labonneboite.web.contact_form.mail.send_mail'):
 
-            romes_to_keep = ['D1507', 'D1106', 'D1214', 'D1101', 'D1502']
-            romes_alternance_to_keep = ['D1101', 'D1105']
+            romes_to_keep = ['D1507', 'D1106']
+            romes_alternance_to_keep = ['D1214', 'D1106']
             extra_romes_to_add = ['M1802', 'M1803', 'M1805']
             extra_romes_alternance_to_add = ['M1805']
 

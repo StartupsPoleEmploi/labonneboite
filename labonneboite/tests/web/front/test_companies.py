@@ -20,7 +20,7 @@ class DownloadTest(DatabaseTest):
             headcount='03',
             city_code='75110',
             zipcode='75010',
-            naf='7320Z',
+            naf='4646Z',
             tel='0100000000',
             score=80,
             x=2.3488,
