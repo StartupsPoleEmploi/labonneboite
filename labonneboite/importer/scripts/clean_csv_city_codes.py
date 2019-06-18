@@ -41,11 +41,13 @@ df_old_city_codes = pd.read_csv("../../common/data/old_city_codes.csv",
                             sep='|',
                             header=0)
 
-df_city_codes = pd.concat([df_city_codes,df_old_city_codes])
+df_city_codes = pd.concat([df_city_codes, df_old_city_codes])
 
 df_city_codes = df_city_codes.drop_duplicates(
     subset=['commune_id', 'commune_name']
 )
+
+df_city_codes = df_city_codes.drop_duplicates('commune_id')
 
 df_city_codes = df_city_codes.sort_values('commune_id')
 
