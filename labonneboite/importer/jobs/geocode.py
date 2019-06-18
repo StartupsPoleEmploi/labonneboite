@@ -68,31 +68,19 @@ class GeocodeJob(Job):
 
     @timeit
     def create_geocoding_jobs(self):
-        if (DEBUG_MODE):
-            query = """
-                select
-                    siret,
-                    numerorue,
-                    libellerue,
-                    codepostal,
-                    codecommune,
-                    coordinates_x,
-                    coordinates_y
-                from %s
-                LIMIT 20000
-            """ % (settings.SCORE_REDUCING_TARGET_TABLE)
-        else:
-            query = """
-                select
-                    siret,
-                    numerorue,
-                    libellerue,
-                    codepostal,
-                    codecommune,
-                    coordinates_x,
-                    coordinates_y
-                from %s
-            """ % (settings.SCORE_REDUCING_TARGET_TABLE)
+        query = """
+            select
+                siret,
+                numerorue,
+                libellerue,
+                codepostal,
+                codecommune,
+                coordinates_x,
+                coordinates_y
+            from %s
+        """ % (settings.SCORE_REDUCING_TARGET_TABLE)
+        if DEBUG_MODE:
+            query += "LIMIT 20000"
         con, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
@@ -132,10 +120,13 @@ class GeocodeJob(Job):
         for siret, coordinates in updates:
             count += 1
             statements.append([coordinates[0], coordinates[1], siret])
-            if len(statements) == 1000:
+            if len(statements) == 10:
+                start_time = time.time()
                 logger.info("geocoding with ban... %i of %i done", count, len(updates))
                 cur.executemany(update_query, statements)
                 con.commit()
+                elapsed_time = time.time() - start_time
+                print('TIME : {}'.format(elapsed_time))
                 statements = []
 
         if len(statements) >= 1:
