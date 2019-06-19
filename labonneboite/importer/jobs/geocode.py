@@ -25,7 +25,7 @@ from labonneboite.importer.models.computing import Geolocation
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 pool_size = 8
 connection_limit = pool_size
@@ -80,7 +80,7 @@ class GeocodeJob(Job):
             from %s
         """ % (settings.SCORE_REDUCING_TARGET_TABLE)
         if DEBUG_MODE:
-            query += "LIMIT 20000"
+            query += "LIMIT 1000"
         con, cur = import_util.create_cursor()
         cur.execute(query)
         rows = cur.fetchall()
@@ -120,13 +120,10 @@ class GeocodeJob(Job):
         for siret, coordinates in updates:
             count += 1
             statements.append([coordinates[0], coordinates[1], siret])
-            if len(statements) == 10:
-                start_time = time.time()
+            if len(statements) == 1000:
                 logger.info("geocoding with ban... %i of %i done", count, len(updates))
                 cur.executemany(update_query, statements)
                 con.commit()
-                elapsed_time = time.time() - start_time
-                print('TIME : {}'.format(elapsed_time))
                 statements = []
 
         if len(statements) >= 1:
@@ -175,7 +172,7 @@ class GeocodeJob(Job):
         return adresses_not_geolocated
 
     @timeit
-    def run_missing_geocoding_jobs(self, csv_max_rows=50000):
+    def run_missing_geocoding_jobs(self, csv_max_rows=20000):
         # The CSV file to send to API must not be > 8mb (https://adresse.data.gouv.fr/api)
         # This line :"03880702000011,2 RUE DE LA TETE NOIRE 14700 FALAISE,14258"
         # was copied 100000 times in a file, and the size was 5.77 MB,
@@ -238,7 +235,7 @@ class GeocodeJob(Job):
             try:
                 logger.info("API addr gouv response on CSV {} OK".format(csv_path))
                 decoded_content = response.content.decode('utf-8')
-                df_geocodes = pd.read_csv(io.StringIO(decoded_content))
+                df_geocodes = pd.read_csv(io.StringIO(decoded_content),dtype={'siret':str})
 
                 for index, row in df_geocodes.iterrows():
                     if not numpy.isnan(row.latitude):
