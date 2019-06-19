@@ -3,7 +3,7 @@
 Content:
 - [Introduction](#introduction)
 - [Settings](#settings)
-- [Detailed Flow](#detailed-flow)
+- [High Level Flow](#high-level-flow)
 - [Cache](#cache)
 - [Asynchronous tasks](#asynchronous-tasks)
 - [Endpoints](#endpoints)
@@ -11,7 +11,7 @@ Content:
 
 ## Introduction
 
-Isochronous timing refers to a sequence of events occurring regularly or at equal time intervals. In our project, it adds the possibility to **search firms by commuting time** instead of distance. For example, a user may ask "Find me firms located at 30 minutes by car from Metz city center".
+Isochronous timing refers to a sequence of events occurring regularly or at equal time intervals. In our project, it adds the possibility to **search companies by commuting time** instead of distance. For example, a user may ask "Find me offices located at 30 minutes by car from Metz city center".
 
 
 ### Search area
@@ -37,7 +37,7 @@ Our project allows searching by two transport modes: car or public transports. T
 
 Requirements:
 
-- **Huey**: asynchronous task queue used to cache isochrones and durations.
+- **[Huey](https://huey.readthedocs.io/)**: asynchronous task queue used to cache isochrones and durations.
 - **A Redis server** (_optional_): used as a backend for Huey. Recommended in production. Default to local cache.
 - **Elastic Search** to find firms in a set of polygons.
 - **Flask-assets** to compile Javascript
@@ -173,9 +173,21 @@ def isochrones(location):
             isochrone(location, duration, mode=mode)
 ```
 
-:warning: Isochrone data are polygons, not Elastic Search results!
+:warning: Isochrone data is a list of polygons (a list of lists of coordinates), not Elastic Search results! More precisely, its form is:
 
-:information_source: Data is stored in a cache (see section Cache of this guide for further information). The `isochrone` task checks if there is already data for this location in the cache. If not, it stores it.
+```
+[
+    [
+        ({latitude}, {longitude}),
+        ({latitude}, {longitude})
+    ],
+    [...]
+]
+
+# Example: `[[(3.504869, 45.910195), (3.504860, 45.910194)], [...]]`
+```
+
+:information_source: Data is stored in a cache (see [section Cache](#cache) for further information). The `isochrone` task checks if there is already data for this location in the cache. If not, it stores it.
 
 
 #### 2/ Use this data with Elastic Search
@@ -346,8 +358,3 @@ Arguments:
 Example with `/maps/isochrone?dur=15&tr=public&zipcode=75010`:
 
 ![](readme_images/isochrone_map.png)
-
-
-## Tests
-TODO: Is this section needed?
-
