@@ -32,7 +32,6 @@ class IgnVendorIsochroneTest(AppTest):
         self.assertEqual(3876, len(isochrone[0]))
         self.assertEqual((48.929064, 6.110025), isochrone[0][0])
 
-
     def test_valid_response_negative_latitude(self):
         response_content = open(os.path.join(
             os.path.dirname(__file__), 'fixtures',
@@ -50,7 +49,6 @@ class IgnVendorIsochroneTest(AppTest):
         self.assertEqual(1, len(isochrone))
         self.assertEqual(25, len(isochrone[0]))
         self.assertEqual((-21.054997, 55.342211), isochrone[0][0])
-
 
     def test_valid_response_negative_longitude(self):
         response_content = open(os.path.join(
