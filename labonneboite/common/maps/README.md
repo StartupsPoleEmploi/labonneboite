@@ -38,7 +38,7 @@ Our project allows searching by two transport modes: car or public transports. T
 Requirements:
 
 - **[Huey](https://huey.readthedocs.io/)**: asynchronous task queue used to cache isochrones and durations.
-- **A Redis server** (_optional_): used as a backend for Huey. Recommended in production. Default to local cache.
+- **A Redis server** (_optional_): used as a backend for Huey. If enabled, the Redis server is also used to cache isochrone results. This is important in production, as it takes a long time to compute a single isochrone. **Default to local cache**.
 - **Elastic Search** to find firms in a set of polygons.
 - **Flask-assets** to compile Javascript
 
@@ -252,6 +252,8 @@ def entreprises():
 
 Both are located here: `labonneboite/templates/`
 
+:information_source: This is not specific to isochrone requests. It is necessary to refresh results, for example when a user moves the map with the "refresh results when I move the map" check box enabled.
+
 
 #### 4/ Show commute time for each enterprise
 
@@ -281,15 +283,28 @@ Retrieving results from third-party APIS is expensive and increases the risk of 
 
 Three caches are available, depending on your needs and on your configuration:
 - `LocalCache`: stores data in memory as a dictionary. :warning: This is highly inefficient and can lead to data loss, so it should not be used in production.
-- `DummyCache`: returns None, same as saying "I don't have this data in my cache". Not used for the moment.
+- `DummyCache`: returns None, same as saying "I don't have this data in my cache". Used in tests only.
 - `RedisCache`: stores data in a Redis database. Best option in production but you should have a Redis service available. Note that you can use Redis Sentinel too. Cache auto-expires **30 days** after the last access, as defined in `labonneboite/common/maps/cache.py`.
 
 To switch caches, update the settings:
 
 ```
 # 'dummy, 'local' or 'redis'
-# default to 'local' in development and testing.
+# default to 'local' in development and to 'dummy' in testing.
 TRAVEL_CACHE = 'local'
+
+# or
+# Available backends: dummy, ign, navitia
+TRAVEL_VENDOR_BACKENDS = {
+    'isochrone': {
+        'car': 'ign',
+        'public': 'navitia',
+    },
+    'durations': {
+        'car': 'ign',
+        'public': 'navitia',
+    },
+}
 ```
 
 
@@ -299,9 +314,9 @@ Two kind of data are stored in cache:
 - **isochrone**: a list of polygons used to filter enterprises with Elastic Search.
 - **duration**: a list of durations from an origin to multiple destinations. Used to display commute time next to enterprises details in the search page. Precisely, a list of float values of the same length as `destinations`.
 
-More information here: `labonneboite/common/maps/travel.py`.
+:key: Cached data key follows this format: `[backend_name, func_name, mode] + list(args)`. Example: `["ign", "isochrone", "car", [49.119146, 6.176026], 30]`.
 
-[TODO] les clés utilisées pour retrouver les données sont un peu floues. Je comprends globalement mais je ne pense pas pouvoir en "construire" une moi-même. Par exemple, comment retrouver les durées stockées pour Metz en ligne de commande ? Est-ce faisable ? Quelques éclaircissements seraient les bienvenus. => https://github.com/StartupsPoleEmploi/labonneboite/blob/master/labonneboite/common/maps/travel.py#L141
+More information here: `labonneboite/common/maps/travel.py`.
 
 
 ## Asynchronous tasks
@@ -313,7 +328,7 @@ Here is how isochrone precomputing (see [step 1 above](#1-precompute-isochrone-d
 - Define one tasks per travel mode and per duration. This is sent to Huey which runs them in parallel.
 - Each task checks whether it's needed to call the API and store new data or not.
 
-Retrieving durations is not done using asynchronous tasks. (TODO: check with Régis)
+Retrieving durations is not done using asynchronous tasks.
 
 
 :information_source: By default, asynchronous tasks are enabled with a Redis backend. To turn this off and trash tasks, change this in settings:
