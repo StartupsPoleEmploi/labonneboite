@@ -36,8 +36,6 @@ class CompanySearchForm(FlaskForm):
 
     DURATION_CHOICES = [
         (str(dur), 'Moins de {:d} min'.format(dur)) for dur in maps_constants.ISOCHRONE_DURATIONS_MINUTES
-    ] + [
-        ('0', '+ de {} minutes'.format(maps_constants.ISOCHRONE_DURATIONS_MINUTES[-1]))
     ]
 
     class Meta:
