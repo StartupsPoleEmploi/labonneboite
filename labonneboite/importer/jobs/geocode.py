@@ -25,7 +25,7 @@ from labonneboite.importer.models.computing import Geolocation
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 pool_size = 8
 connection_limit = pool_size
@@ -50,9 +50,8 @@ coordinates_updates = manager.list()
 # dict which will store stats about the current geocoding
 GEOCODING_STATS = manager.dict()
 
-#list which will store names of CSV returned by API and stored
+# list which will store names of CSV returned by API and stored
 csv_api_back = manager.list()
-
 
 
 class IncorrectAdressDataException(Exception):
@@ -93,6 +92,7 @@ class GeocodeJob(Job):
             from %s
         """ % (settings.SCORE_REDUCING_TARGET_TABLE)
         if DEBUG_MODE:
+            #query += "WHERE coordinates_x = 0 and coordinates_y = 0"
             query += "ORDER BY RAND() LIMIT 100000"
         con, cur = import_util.create_cursor()
         cur.execute(query)
@@ -132,6 +132,8 @@ class GeocodeJob(Job):
         statements = []
         update_query = "update %s set coordinates_x=%%s, coordinates_y=%%s where siret=%%s" % \
             settings.SCORE_REDUCING_TARGET_TABLE
+
+        logger.info("Nb of offices to update : {}".format(len(updates)))
 
         for siret, coordinates in updates:
             count += 1
@@ -177,29 +179,54 @@ class GeocodeJob(Job):
         adresses_not_geolocated[:] = []
         coordinates_updates[:] = []
         pool = Pool(processes=pool_size)
+        logger.info("Nombre de geocoding jobs : {}".format(
+            len(geocoding_jobs)))
         for siret, full_address, initial_coordinates, city_code in geocoding_jobs:
-            unit = GeocodeUnit(
-                siret, full_address, coordinates_updates, initial_coordinates, city_code)
-            pool.apply_async(unit.find_coordinates_for_address)
+            pool.apply_async(self.find_coordinates_for_address,
+                             (siret, full_address, initial_coordinates, city_code,))
+        # for siret, full_address, initial_coordinates, city_code in geocoding_jobs:
+        #    self.find_coordinates_for_address(siret,full_address,initial_coordinates,city_code)
         pool.close()
         pool.join()
         logger.info("run geocoding jobs : collected {} coordinates on {} jobs, need to geocode {}".format(
-            len(coordinates_updates),
+            GEOCODING_STATS.get('cache_hits', 0),
             len(geocoding_jobs),
             len(adresses_not_geolocated)
         ))
         return adresses_not_geolocated
 
+    def find_coordinates_for_address(self, siret, full_address, initial_coordinates, city_code):
+        coordinates = None
+        geolocation = Geolocation.get(full_address)
+        if geolocation:
+            # coordinates were already queried and cached before
+            coordinates = [geolocation.x, geolocation.y]
+            GEOCODING_STATS['cache_hits'] = GEOCODING_STATS.get(
+                'cache_hits', 0) + 1
+            if coordinates == initial_coordinates:
+                GEOCODING_STATS['unchanged_coordinates'] = GEOCODING_STATS.get(
+                    'unchanged_coordinates', 0) + 1
+            else:
+                GEOCODING_STATS['existing_coordinates_to_update'] = GEOCODING_STATS.get(
+                    'existing_coordinates_to_update', 0) + 1
+                coordinates_updates.append(
+                    [siret, coordinates])
+        else:
+            adresses_not_geolocated.append(
+                [siret, full_address, city_code])
+            GEOCODING_STATS['cache_misses'] = GEOCODING_STATS.get(
+                'cache_misses', 0) + 1
+
     @timeit
     def run_missing_geocoding_jobs(self, csv_max_rows=5000):
-        # The CSV file to send to API must not be > 8mb (https://adresse.data.gouv.fr/api)
+        # The CSV file to send to API must not be > 6-8mb (https://adresse.data.gouv.fr/api)
         # This line :"03880702000011,2 RUE DE LA TETE NOIRE 14700 FALAISE,14258"
         # was copied 100000 times in a file, and the size was 5.77 MB,
         # it seems ok to set it to ~80000 / 100000
-        # --> After multiple tests, if we want to multithread this, we need to set it to 5000, not more
 
-        csv_path_prefix = '/tmp/csv_geocoding_'
+        csv_path_prefix = '/tmp/csv_geocoding'
         csv_files = []
+        csv_api_back[:] = []
         for start in range(0, len(adresses_not_geolocated), csv_max_rows):
             end = start + csv_max_rows
             csv_path = "{}-{}-{}.csv".format(csv_path_prefix, start, end)
@@ -214,16 +241,11 @@ class GeocodeJob(Job):
 
         logger.info("GEOCODING_STATS = %s", GEOCODING_STATS)
 
-        #2 queries max in parallel
-        pool = Pool(processes=2)
         for csv_path in csv_files:
-            pool.apply_async(self.get_csv_from_api, (csv_path,))
-
-        pool.close()
-        pool.join()
+            self.get_csv_from_api(csv_path)
 
         logger.info("GEOCODING_STATS = %s", GEOCODING_STATS)
-        #self.get_geocode_from_csv(csv_api_back[0])
+
         pool = Pool(processes=pool_size)
         for csv_path in csv_api_back:
             pool.apply_async(self.get_geocode_from_csv, (csv_path,))
@@ -235,6 +257,7 @@ class GeocodeJob(Job):
 
         return coordinates_updates
 
+    # Send one CSV to the API, and save the CSV which is sent back with the coordinates
     def get_csv_from_api(self, csv_path):
         # curl -X POST -F data=@path/to/file.csv -F columns=voie columns=ville -F
         # citycode=ma_colonne_code_insee https://api-adresse.data.gouv.fr/search/csv/
@@ -245,10 +268,6 @@ class GeocodeJob(Job):
 
         files = {'data': open(csv_path, 'rb')}
         values = {'columns': 'full_address', 'city_code': 'city_code'}
-
-        # need to wait between each process for the API :
-        # Les appels sont limités à :
-        #   2 requêtes simultanées par IP pour le géocodage de masse (maximum 6 Mo par envoi de fichier).
 
         # FIXME : Ugly way to wait for the API to be OK with our requests
         retry_counter = 5
@@ -263,7 +282,7 @@ class GeocodeJob(Job):
                 job_done = True
             else:
                 retry_counter -= 1
-                time.sleep(15)
+                time.sleep(5)
 
         if job_done:
             GEOCODING_STATS['API status 200 for CSV'] = GEOCODING_STATS.get(
@@ -275,8 +294,10 @@ class GeocodeJob(Job):
                 df_geocodes = pd.read_csv(io.StringIO(
                     decoded_content), dtype={'siret': str})
                 csv_api_back_path = csv_path + '-api'
-                df_geocodes.to_csv(csv_api_back_path,index=False)
+                df_geocodes.to_csv(csv_api_back_path, index=False)
                 csv_api_back.append(csv_api_back_path)
+                logger.info(
+                    "Wrote CSV sent back by API : {}".format(csv_api_back_path))
             except ValueError:
                 logger.warning(
                     'ValueError in json-ing features result %s', response.text)
@@ -285,43 +306,59 @@ class GeocodeJob(Job):
         logger.info("GEOCODING_STATS = {} for CSV {}".format(
             GEOCODING_STATS, csv_path))
 
-    def get_geocode_from_csv(self,csv_api_path):
+    # Takes the CSV which has been sent by the API with coordinates, and will parse the CSV
+    def get_geocode_from_csv(self, csv_api_path):
+        logger.info("Parsing CSV sent back by API : {}".format(csv_api_path))
         df_geocodes = pd.read_csv(csv_api_path, dtype={'siret': str})
         for index, row in df_geocodes.iterrows():
             if not numpy.isnan(row.latitude):
                 coordinates = [row.longitude, row.latitude]
-                geolocation = Geolocation(
-                    full_address=row.full_address,
-                    x=coordinates[0],
-                    y=coordinates[1]
-                )
-                db_session.add(geolocation)
-                # as this method is run in parallel jobs,
-                # let's commit often so that each job see each other's changes
-                # and rollback in case of rare simultaneous changes on same geolocation
-                try:
-                    db_session.commit()
-                    # usually flush() is called as part of commit()
-                    # however it is not the case in our project
-                    # because autoflush=False
-                    db_session.flush()
-                    GEOCODING_STATS['flushes'] = GEOCODING_STATS.get(
-                        'flushes', 0) + 1
-                except IntegrityError:
-                    # happens when a job tries to insert an already existing full_address
-                    # rollback needed otherwise db_session is left
-                    # in a state unusable by the other parallel jobs
-                    db_session.rollback()
-                    GEOCODING_STATS['rollbacks'] = GEOCODING_STATS.get(
-                        'rollbacks', 0) + 1
-                if coordinates:
+                geolocation = Geolocation.get(row.full_address)
+                # There should not be an already existing geolocation
+                # but working on this job, makes you know that sometimes,
+                # the coordinates related to a siret do not update, but the geolocation is still added
+                # in the database
+                if geolocation:
+                    logger.info("Geolocation already found")
                     GEOCODING_STATS['updatable_coordinates'] = GEOCODING_STATS.get(
                         'updatable_coordinates', 0) + 1
                     coordinates_updates.append(
                         [row.siret, coordinates])
+                else:
+                    logger.info("Geolocation not found")
+                    geolocation = Geolocation(
+                        full_address=row.full_address,
+                        x=coordinates[0],
+                        y=coordinates[1]
+                    )
+                    db_session.add(geolocation)
+                    # as this method is run in parallel jobs,
+                    # let's commit often so that each job see each other's changes
+                    # and rollback in case of rare simultaneous changes on same geolocation
+                    try:
+                        db_session.commit()
+                        # usually flush() is called as part of commit()
+                        # however it is not the case in our project
+                        # because autoflush=False
+                        db_session.flush()
+                        GEOCODING_STATS['flushes'] = GEOCODING_STATS.get(
+                            'flushes', 0) + 1
+                    except IntegrityError:
+                        # happens when a job tries to insert an already existing full_address
+                        # rollback needed otherwise db_session is left
+                        # in a state unusable by the other parallel jobs
+                        db_session.rollback()
+                        GEOCODING_STATS['rollbacks'] = GEOCODING_STATS.get(
+                            'rollbacks', 0) + 1
+                    if coordinates:
+                        GEOCODING_STATS['updatable_coordinates'] = GEOCODING_STATS.get(
+                            'updatable_coordinates', 0) + 1
+                        coordinates_updates.append(
+                            [row.siret, coordinates])
             else:
                 GEOCODING_STATS['coordinates_not_found'] = GEOCODING_STATS.get(
                     'coordinates_not_found', 0) + 1
+
     @timeit
     def run(self):
         logger.info("starting geocoding task...")
@@ -330,7 +367,7 @@ class GeocodeJob(Job):
             "requesting BAN for all the adresses we need to geocode for...")
         self.run_geocoding_jobs(geocoding_jobs)
         if DEBUG_MODE:
-            self.run_missing_geocoding_jobs(csv_max_rows=5000)
+            self.run_missing_geocoding_jobs(csv_max_rows=500)
         else:
             self.run_missing_geocoding_jobs()
         logger.info("updating coordinates...")
@@ -340,41 +377,6 @@ class GeocodeJob(Job):
         self.validate_coordinates()
         logger.info("validated coordinates !")
         logger.info("completed geocoding task.")
-
-
-class GeocodeUnit(object):
-
-    def __init__(self, siret, address, updates, initial_coordinates, city_code):
-        self.siret = siret
-        self.full_address = address
-        self.updates = updates
-        self.initial_coordinates = initial_coordinates
-        self.city_code = city_code
-
-    def find_coordinates_for_address(self):
-        """
-        finding coordinates for an address based on the BAN (base d'adresses nationale),
-        an online governmental service.
-        """
-        coordinates = None
-        # FIXME refer to settings.API_ADRESS_BASE_URL and make sure we don't
-        # make real requests in unit tests
-        # Documentation API adresse data gouv : https://adresse.data.gouv.fr/api
-        geolocation = Geolocation.get(self.full_address)
-        if geolocation:
-            # coordinates were already queried and cached before
-            coordinates = [geolocation.x, geolocation.y]
-            GEOCODING_STATS['cache_hits'] = GEOCODING_STATS.get(
-                'cache_hits', 0) + 1
-        else:
-            adresses_not_geolocated.append(
-                [self.siret, self.full_address, self.city_code])
-            GEOCODING_STATS['cache_misses'] = GEOCODING_STATS.get(
-                'cache_misses', 0) + 1
-        if coordinates:
-            if coordinates == self.initial_coordinates:
-                GEOCODING_STATS['unchanged_coordinates'] = GEOCODING_STATS.get(
-                    'unchanged_coordinates', 0) + 1
 
 
 def run_main():

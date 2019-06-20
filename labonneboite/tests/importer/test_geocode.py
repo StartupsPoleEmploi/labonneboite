@@ -1,6 +1,5 @@
 from labonneboite.importer.models.computing import ExportableOffice
 from labonneboite.importer.jobs.geocode import GeocodeJob
-from labonneboite.importer.jobs.geocode import GeocodeUnit
 from .test_base import DatabaseTest
 
 
@@ -23,8 +22,6 @@ def make_geocoded_office():
 
 class TestGeocode(DatabaseTest):
 
-    #TODO Question : Do I need to make other tests for geocoding ?
-
     def test_run_geocoding_job(self):
         task = GeocodeJob()
         initial_coordinates = [0, 0]
@@ -46,9 +43,9 @@ class TestGeocode(DatabaseTest):
         self.assertTrue(len(updates), 2)
         coordinates_1 = updates[0]
         coordinates_2 = updates[1]
-        #We want to test this because we had an issue, where the pandas dataframes changes types of siret to int, and the '00' at the start of siret was removed
-        self.assertTrue(len(coordinates_1[0]),6)
-        #Multithreading may switch order of coordinates, so we have to check which siret is returned, to see what coordinates we want to check
+        # We want to test this because we had an issue, where the pandas dataframes changes types of siret to int, and the '00' at the start of siret was removed
+        self.assertTrue(len(coordinates_1[0]), 6)
+        # Multithreading may switch order of coordinates, so we have to check which siret is returned, to see what coordinates we want to check
         if coordinates_1[0] == '001234':
             self.assertEqual(int(coordinates_1[1][0]), 0)
             self.assertEqual(int(coordinates_1[1][1]), 43)
@@ -68,7 +65,8 @@ class TestGeocode(DatabaseTest):
         jobs = task.create_geocoding_jobs()
         self.assertEqual(len(jobs), 1)
         self.assertEqual(jobs[0][0], "1234")
-        self.assertEqual(jobs[0][1], "30 rue Edouard Poisson 93300 AUBERVILLIERS")
+        self.assertEqual(
+            jobs[0][1], "30 rue Edouard Poisson 93300 AUBERVILLIERS")
 
     def test_update_coordinates(self):
         make_geocoded_office()

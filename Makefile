@@ -134,6 +134,9 @@ rebuild-importer-tests-compressed-files:
 	rm -f LBB_XDPDPAE_2016-11-10_2015-10-10.csv.bz2 && \
 	bzip2 --keep LBB_XDPDPAE_2016-11-10_2015-10-10.csv
 
+rebuild-city-codes:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python importer/scripts/clean_csv_city_codes.py
+
 # Load testing
 # ------------
 
