@@ -19,7 +19,7 @@
     padding-top: 10px;
     padding-bottom: 10px;
 }
-@media (max-width: 500px) { 
+@media (max-width: 500px) {
     .lbb-header {
         padding-right: 10px;
         padding-left: 10px;
@@ -157,7 +157,7 @@ ul.lbb-header {
     display: grid;
     grid-template-columns: auto 210px 20%;
     grid-template-rows: auto;
-    grid-template-areas: 
+    grid-template-areas:
       "footer-links footer-logos footer-text"
       "footer-update footer-update footer-update";
 }
@@ -165,7 +165,7 @@ ul.lbb-header {
     .lbb-footer {
         grid-template-columns: auto;
         grid-template-rows: 1fr 1fr 1fr;
-        grid-template-areas: 
+        grid-template-areas:
           "footer-links"
           "footer-logos"
           "footer-text"

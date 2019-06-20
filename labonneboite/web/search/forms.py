@@ -59,7 +59,7 @@ class CompanySearchForm(FlaskForm):
 
     # Headcount
     h = RadioField(
-        'Taille d\'entreprise',
+        'Taille de l\'entreprise',
         default=1,
         choices=HEADCOUNT_CHOICES,
         validators=[Optional()])

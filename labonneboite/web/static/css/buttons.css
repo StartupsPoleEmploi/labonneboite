@@ -17,7 +17,7 @@
     text-decoration: none;
 
     border: 1px solid #54108E;
-    border-radius: 2px;
+    border-radius: 5px;
 
     font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
     font-size: 1rem;
@@ -150,4 +150,35 @@
 .btn.btn-info:hover {
     background-color: #1263b5;
     border-color: #1263b5;
+}
+
+/* Utility classes
+=========================================================================== */
+
+.btn.invisible, button.invisible {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #54108E;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* Specific search buttons
+=========================================================================== */
+.rounded-icon {
+    border-radius: 50%;
+    border: 1px solid #54108e;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+}
+
+.rounded-icon > img {
+    vertical-align: middle;
+    padding-left: 0;
+    width: 20px;
+    height: 20px;
 }

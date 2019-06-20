@@ -19,15 +19,15 @@
     {% endif %}
   </h3>
 
-  <div class="grid-row grid-spacing">
+  <div class="grid-row">
     <div class="grid-col-8">
       <h4 class="company-naf-text">{{ company.naf_text }}</h4>
       <p>{{ company.headcount_text }}</p>
     </div>
-    <div class="grid-col-3">
-      <h4 class="lbb-green">
+    <div class="grid-col-4 text-right">
+      <h4>
         Potentiel d'embauche<br>
-        <span class="rating-stars">
+        <span class="rating-stars text-left">
           <b style="width: {{ company.get_stars_for_rome_code_as_percentage(rome_code) }}%;">
             {{ company.get_stars_for_rome_code(rome_code) }}
           </b>
@@ -48,54 +48,93 @@
   </div>
 
   <div class="lbb-result__actions">
+    <div class="grid-row">
+      <div class="grid-col-9">
+        <div class="row">
+          {# Tilkee #}
+          {# if tilkee_enabled #}
+          <a class="tilkee-button no-underline no-margin" href="{{ url_for('tilkee.upload', siret=company.siret) }}" data-toggle="tooltip" title="En postulant, vous pourrez suivre votre candidature ! Découvrez qui a ouvert votre CV et quand. Et relancez le recruteur au bon moment !" data-placement="bottom" data-siret="{{ company.siret }}" onclick="return false;">
+            <button class="invisible no-padding" type="submit">
+              <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/pencil.svg') }}"></span>
+              <span class="btn btn-small invisible">Créer ma candidature</span>
+            </button>
+          </a>
+          {# endif #}
+        </div>
+        <div class="row">
+          {# if jepostule_globally_enabled #}
+            {# if jepostule_enabled(user, company) #}
+              <a class="jepostule-button no-underline" href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}" target="_blank" rel="noopener">
+                <button class="invisible no-padding" type="submit">
+                  <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/envelope.svg') }}"></span>
+                  <span class="btn btn-small invisible">Postuler</span>
+                </button>
+              </a>
+            {# endif #}
 
-    {% if show_more_info %}
-      <a href="#" class="btn btn-small js-result-toggle-details">Plus d'infos</a>
-    {% endif %}
+            {% if not user.is_authenticated and company.email %}
+              <button class="jepostule-not-authentified jepostule-buttoninvisible invisible no-padding" id="">
+                <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/envelope.svg') }}"></span>
+                <span class="btn btn-small invisible">Postuler</span>
+              </button>
+            {% endif %}
+          {# endif #}
+        </div>
+        <div class="row">
+          {# START favorites. #}
+          {# TODO reactivate if block!!! #}
+          {# if show_favorites and user.is_authenticated #}
+            {% if (user_favs_as_sirets is defined) and (company.siret not in user_favs_as_sirets) %}
+              <form action="{{ url_for('user.favorites_add', siret=company.siret) }}" method="post" class="form-inline">
+                <button class="invisible no-padding" type="submit">
+                  <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/heart.svg') }}"></span>
+                  <span class="btn btn-small invisible">Garder pour plus tard</span>
+                </button>
+                <input type="hidden" name="next" value="{{ request.full_path | urlencode }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              </form>
+            {% else %}
+              <form action="{{ url_for('user.favorites_delete', siret=company.siret) }}" method="post" class="form-inline">
+                <button class="invisible no-padding" type="submit">
+                  <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/heart.svg') }}"></span>
+                  <span class="btn btn-small invisible">Supprimer des favoris</span>
+                </button>
+                <input type="hidden" name="next" value="{{ request.full_path | urlencode }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              </form>
+            {% endif %}
+          {# endif #}
+          {# END favorites. #}
+        </div>
+        <div class="row">
+          {# START Memo button. #}
+          <a
+            class="memo-import-button"
+            data-intro-js="1"
+            data-url="{{ url_for('api.office_details', siret=company.siret, _external=True) }}"
+            {% if rome_description %}data-job="{{ rome_description }}"{% endif %}
+            data-height="31"
+            data-width="180">
+            <!-- Empty on purpose. -->
+          </a>
+          {# END Memo button. #}
+        </div>
+      </div> <!-- left buttons -->
 
-    {# START favorites. #}
-    {% if show_favorites and user.is_authenticated %}
-      {% if (user_favs_as_sirets is defined) and (company.siret not in user_favs_as_sirets) %}
-        <form action="{{ url_for('user.favorites_add', siret=company.siret) }}" method="post" class="form-inline">
-          <button class="btn btn-success btn-small" type="submit">Ajouter aux favoris</button>
-          <input type="hidden" name="next" value="{{ request.full_path | urlencode }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        </form>
-      {% else %}
-        <form action="{{ url_for('user.favorites_delete', siret=company.siret) }}" method="post" class="form-inline">
-          <button class="btn btn-error btn-small" type="submit">Supprimer des favoris</button>
-          <input type="hidden" name="next" value="{{ request.full_path | urlencode }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        </form>
-      {% endif %}
-    {% endif %}
-    {# END favorites. #}
+      <div class="grid-col-1">
 
-    {# START Memo button. #}
-    <a
-      class="memo-import-button"
-      data-intro-js="1"
-      data-url="{{ url_for('api.office_details', siret=company.siret, _external=True) }}"
-      {% if rome_description %}data-job="{{ rome_description }}"{% endif %}
-      data-height="31"
-      data-width="180"><!-- Empty on purpose. -->
-    </a>
-    {# END Memo button. #}
+      </div> <!-- empty space -->
 
-    {# Tilkee #}
-    {% if tilkee_enabled %}
-    <a class="tilkee-button btn btn-small" href="{{ url_for('tilkee.upload', siret=company.siret) }}" data-toggle="tooltip" title="En postulant, vous pourrez suivre votre candidature ! Découvrez qui a ouvert votre CV et quand. Et relancez le recruteur au bon moment !" data-placement="bottom" data-siret="{{ company.siret }}" onclick="return false;">Créer ma candidature</a>
-    {% endif %}
+      <div class="grid-col-2 text-right">
+        {% if show_more_info %}
+          <a href="#" class="btn btn-small js-result-toggle-details full-width">Plus d'infos</a>
+        {% endif %}
+      </div> <!-- right buttons -->
+    </div>
 
-    {% if jepostule_globally_enabled %}
-      {% if jepostule_enabled(user, company) %}
-        <a class="jepostule-button btn btn-small" href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}" target="_blank" rel="noopener">Postuler</a>
-      {% endif %}
 
-      {% if not user.is_authenticated and company.email %}
-        <button class="jepostule-not-authentified jepostule-button btn btn-small" id="">Postuler</button>
-      {% endif %}
-    {% endif %}
+
+
 
   </div>
 

@@ -20,6 +20,7 @@
         float: left;
         margin-left: -255px;
         width: 235px;
+        margin-top: 0;
     }
 
     .lbb-sidebar-toggle-wrapper {
@@ -77,15 +78,14 @@
 =========================================================================== */
 
 .lbb-sidebar {
-    background: #fff;
     padding: 20px;
     font-size: 0.90em;
-    color: #5d5d5d;
+    background-color: #f9fafc;
 }
 
 .lbb-sidebar h3 {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 500;
     margin-top: 0;
 }
 
@@ -94,8 +94,8 @@
 }
 
 .lbb-sidebar-item {
-    margin-top: 12px;  /* Fallback in `px` for browsers that don't support rem. */
-    margin-top: 0.75rem;
+    margin-top: 24px;  /* Fallback in `px` for browsers that don't support rem. */
+    margin-top: 1.5rem;
 }
 
 .lbb-sidebar-item p,
@@ -122,6 +122,8 @@
     font-weight: normal;
     font-size: 24px;  /* Fallback in `px` for browsers that don't support rem. */
     font-size: 1.5rem;
+    margin-bottom: 24px;
+    margin-bottom: 1.5rem;
 }
 
 /* Results (offices list).
@@ -147,6 +149,7 @@
     font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
     font-size: 1rem;
     margin-top: 15px;
+    font-weight: 600;
 }
 
 .lbb-result ul {
@@ -161,7 +164,7 @@
 .lbb-result .travel-duration {
     margin-left: 8px;
 }
-  
+
 /* Actions (after the header): toggle details, add to MEMO, etc.
 =========================================================================== */
 
@@ -176,18 +179,47 @@
 .lbb-result__actions .btn-memo {
     vertical-align: middle;
     display: inline-block;
-    margin: 5px 5px 5px 0;
+    margin: 5px 5px 5px -10px;
 }
 
 .lbb-result__actions .btn-memo {
     width: 215px;
     height: 31px;
     background: #fff;
+    color: #54108E;
+    font-size: 13px;
+    font-size: 0.8125rem;
+    font-family: inherit; /*"Open Sans", sans-serif*/
+    padding-left: 18px;
+    margin-left: 0;
 }
 
 @media (min-width: 800px) {
-    .tilkee-button, .jepostule-button {
-        float: right;
+    .lbb-result__actions .row {
+        display: inline;
+    }
+}
+
+/* Media queries for small devices */
+@media (max-width: 800px) {
+    .lbb-result__actions .btn-memo {
+        padding-left: 2px;
+    }
+}
+
+
+@media (min-width: 400px) and (max-width: 800px) {
+    .lbb-result__actions .row {
+        display: block;
+        width: 100%;
+        text-align: left;
+        margin-left: 35%;
+    }
+}
+
+@media (max-width: 400px) {
+    .lbb-result__actions .row {
+        margin-left: 17%;
     }
 }
 
@@ -249,7 +281,7 @@
 
 #lbb-result-map {
     width: 100%;
-    height: 450px;
+    height: 240px;
     margin: 0;
     padding: 0;
 }
