@@ -2,6 +2,7 @@ from social_flask.utils import load_strategy
 
 from labonneboite.web.auth.backends import peam
 from labonneboite.tests.test_base import DatabaseTest
+from labonneboite.common.models import User
 
 
 class AuthPipelineTest(DatabaseTest):
@@ -43,6 +44,19 @@ class AuthPipelineTest(DatabaseTest):
     def test_run_pipeline_with_PEAMOpenIdConnect(self):
         result = self.run_pipeline(peam.PEAMOpenIdConnect)
         self.assertIn('user', result)
+
+    def test_run_pipeline_with_user_email_change(self):
+        user = User(email='preexisting@email.com', external_id='peconnect-userid')
+        user.save()
+        self.assertEqual(
+            User.query.filter_by(external_id='peconnect-userid').first().email,
+            'preexisting@email.com',
+        )
+        result = self.run_pipeline(peam.PEAMOpenIdConnect)
+        self.assertEqual(
+            User.query.filter_by(external_id='peconnect-userid').first().email,
+            'my@email.com',
+        )
 
     def test_run_pipeline_with_PEAMOpenIdConnectNoPrompt(self):
         result = self.run_pipeline(peam.PEAMOpenIdConnectNoPrompt)

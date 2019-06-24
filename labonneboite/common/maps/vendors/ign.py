@@ -28,7 +28,7 @@ def isochrone(origin, duration):
 
     # geometry is a string of the form: 'POLYGON ((3.504869 45.910195, ...), (...))'
     geometry = data['wktGeometry']
-    polygons = re.findall(r'\([0-9. ,]+\)', geometry)
+    polygons = re.findall(r'\([-*0-9. ,]+\)', geometry)
     isochrones = []
     for polygon in polygons:
         coordinates = polygon.strip(')').strip('(').split(', ')

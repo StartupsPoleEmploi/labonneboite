@@ -14,7 +14,7 @@ from . import places
 
 class IgnVendorIsochroneTest(AppTest):
 
-    def test_valid_response(self):
+    def test_valid_response_positive_lat_lon(self):
         response_content = open(os.path.join(
             os.path.dirname(__file__), 'fixtures',
             'ign_metz_isochrone.json'
@@ -31,6 +31,43 @@ class IgnVendorIsochroneTest(AppTest):
         self.assertEqual(1, len(isochrone))
         self.assertEqual(3876, len(isochrone[0]))
         self.assertEqual((48.929064, 6.110025), isochrone[0][0])
+
+    def test_valid_response_negative_latitude(self):
+        response_content = open(os.path.join(
+            os.path.dirname(__file__), 'fixtures',
+            'ign_saint_paul_la_reunion_isochrone.json'
+        )).read()
+        response = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value=json.loads(response_content))
+        )
+        requests_get = mock.Mock(return_value=response)
+
+        with mock.patch.object(ign.requests, 'get', requests_get):
+            isochrone = ign.isochrone(places.metz, constants.ISOCHRONE_DURATIONS_MINUTES[0])
+
+        self.assertEqual(1, len(isochrone))
+        self.assertEqual(25, len(isochrone[0]))
+        self.assertEqual((-21.054997, 55.342211), isochrone[0][0])
+
+    def test_valid_response_negative_longitude(self):
+        response_content = open(os.path.join(
+            os.path.dirname(__file__), 'fixtures',
+            'ign_la_rochelle_isochrone.json'
+        )).read()
+        response = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value=json.loads(response_content))
+        )
+        requests_get = mock.Mock(return_value=response)
+
+        with mock.patch.object(ign.requests, 'get', requests_get):
+            isochrone = ign.isochrone(places.metz, constants.ISOCHRONE_DURATIONS_MINUTES[0])
+
+        self.assertEqual(1, len(isochrone))
+        self.assertEqual(5935, len(isochrone[0]))
+        self.assertEqual((45.921463, -0.971666), isochrone[0][0])
+
 
     def test_ign_500_error(self):
         response = mock.Mock(
