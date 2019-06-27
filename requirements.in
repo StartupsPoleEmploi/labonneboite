@@ -88,3 +88,10 @@ raven[flask]
 locustio
 pyzmq
 remote-pdb
+
+#Impact retour emploi
+matplotlib
+openpyxl
+pygal
+matplotlib
+imgkit
