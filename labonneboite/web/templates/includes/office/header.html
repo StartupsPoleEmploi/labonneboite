@@ -24,7 +24,7 @@
       <h4 class="company-naf-text">{{ company.naf_text }}</h4>
       <p>{{ company.headcount_text }}</p>
     </div>
-    <div class="grid-col-4 text-right">
+    <div class="grid-col-4 md-text-right">
       <h4>
         Potentiel d'embauche<br>
         <span class="rating-stars text-left">
@@ -51,39 +51,25 @@
     <div class="grid-row">
       <div class="grid-col-9">
         <div class="row">
+          {% if show_more_info %}
+            <a href="#" class="btn btn-small js-result-toggle-details">Plus d'infos</a>
+          {% endif %}
+        </div>
+        <div class="row">
           {# Tilkee #}
-          {# if tilkee_enabled #}
+          {% if tilkee_enabled %}
           <a class="tilkee-button no-underline no-margin" href="{{ url_for('tilkee.upload', siret=company.siret) }}" data-toggle="tooltip" title="En postulant, vous pourrez suivre votre candidature ! Découvrez qui a ouvert votre CV et quand. Et relancez le recruteur au bon moment !" data-placement="bottom" data-siret="{{ company.siret }}" onclick="return false;">
             <button class="invisible no-padding" type="submit">
               <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/pencil.svg') }}"></span>
               <span class="btn btn-small invisible">Créer ma candidature</span>
             </button>
           </a>
-          {# endif #}
-        </div>
-        <div class="row">
-          {# if jepostule_globally_enabled #}
-            {# if jepostule_enabled(user, company) #}
-              <a class="jepostule-button no-underline" href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}" target="_blank" rel="noopener">
-                <button class="invisible no-padding" type="submit">
-                  <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/envelope.svg') }}"></span>
-                  <span class="btn btn-small invisible">Postuler</span>
-                </button>
-              </a>
-            {# endif #}
-
-            {% if not user.is_authenticated and company.email %}
-              <button class="jepostule-not-authentified jepostule-buttoninvisible invisible no-padding" id="">
-                <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/envelope.svg') }}"></span>
-                <span class="btn btn-small invisible">Postuler</span>
-              </button>
-            {% endif %}
-          {# endif #}
+          {% endif %}
         </div>
         <div class="row">
           {# START favorites. #}
           {# TODO reactivate if block!!! #}
-          {# if show_favorites and user.is_authenticated #}
+          {% if show_favorites and user.is_authenticated %}
             {% if (user_favs_as_sirets is defined) and (company.siret not in user_favs_as_sirets) %}
               <form action="{{ url_for('user.favorites_add', siret=company.siret) }}" method="post" class="form-inline">
                 <button class="invisible no-padding" type="submit">
@@ -103,7 +89,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               </form>
             {% endif %}
-          {# endif #}
+          {% endif %}
           {# END favorites. #}
         </div>
         <div class="row">
@@ -126,9 +112,23 @@
       </div> <!-- empty space -->
 
       <div class="grid-col-2 text-right">
-        {% if show_more_info %}
-          <a href="#" class="btn btn-small js-result-toggle-details full-width">Plus d'infos</a>
-        {% endif %}
+        <div class="row">
+          {% if jepostule_globally_enabled %}
+            {% if jepostule_enabled(user, company) %}
+              <a class="jepostule-button no-underline" href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}" target="_blank" rel="noopener">
+                <button class="btn btn-small full-width" type="submit">Postuler
+                  <!-- <span class="btn btn-small full-width">Postuler</span> -->
+                </button>
+              </a>
+            {% endif %}
+
+            {% if not user.is_authenticated and company.email %}
+              <button class="jepostule-not-authentified jepostule-buttoninvisible btn btn-small full-width" id="">Postuler
+                <!-- <span class="btn btn-small full-width">Postuler</span> -->
+              </button>
+            {% endif %}
+          {% endif %}
+        </div>
       </div> <!-- right buttons -->
     </div>
 

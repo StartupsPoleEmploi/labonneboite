@@ -1,6 +1,5 @@
-<form action="{{ url_for('search.entreprises') }}" class="js-search-form no-margin no-padding" method="get">
   <div class="lbb-content no-padding">
-    <div class="lbb-bright-container">
+    <div class="lbb-bright-container" id="shown-search-form">
       {% with inline=True %}
         {% include "includes/search_form.html" %}
       {% endwith %}
@@ -13,7 +12,14 @@
   <div class="lbb-content-wrapper">
     <div class="lbb-content">
       <div class="lbb-content-with-sidebar">
-        <h2 class="sr-only lbb-result-info">Trier les résultats de recherche</h2>
+        <form action="{{ url_for('search.entreprises') }}" class="js-search-form no-margin no-padding" method="get">
+
+          <div class="hidden" id="hidden-search-form">
+            <!-- This form will be submitted via Javascript when a new filter is used. -->
+            {% include "includes/search_form.html" %}
+          </div>
+
+          <h2 class="sr-only lbb-result-info">Trier les résultats de recherche</h2>
           <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
             <div class="lbb-sidebar">
               <div id="toggle-map-wrapper">
@@ -101,17 +107,21 @@
           </div> <!-- lbb-sidebar-wrapper -->
           {{ form.hidden_tag() }}
 
-        {% if companies %}
-          <h1 class="lbb-result-info">
-            {% if page and page != 1 %}<b>Page {{ page }}</b> de{% endif %}
-            {% if company_count == 1 %}
-              {{ company_count }} entreprise est susceptible
-            {% else %}
-              {{ company_count }} entreprises sont susceptibles
-            {% endif %}
-            de recruter en {{ rome_description }}{% if location_name %} autour de {{ location_name }}{% endif %}
-          </h1>
-        {% endif %}
+          {% if companies %}
+            <h1 class="lbb-result-info">
+              {% if page and page != 1 %}<b>Page {{ page }}</b> de{% endif %}
+              {% if company_count == 1 %}
+                {{ company_count }} entreprise est susceptible
+              {% else %}
+                {{ company_count }} entreprises sont susceptibles
+              {% endif %}
+              de recruter en {{ rome_description }}{% if location_name %} autour de {{ location_name }}{% endif %}
+            </h1>
+          {% endif %}
+
+        </form>
+
+
         <h2 class="sr-only lbb-result-info">Résultats de la recherche</h2>
         <div id="lbb-result-map" class="lbb-bright-container" aria-hidden="true"></div>
 
@@ -219,4 +229,3 @@
     </div>{# END .lbb-content #}
   </div>{# END .lbb-content-wrapper #}
 
-</form>

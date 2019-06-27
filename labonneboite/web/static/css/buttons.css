@@ -164,6 +164,11 @@
     box-shadow: none;
 }
 
+.text-right .btn {
+    /*If a button is on the right, remove right margin.*/
+    margin-right: 0 !important;
+}
+
 /* Specific search buttons
 =========================================================================== */
 .rounded-icon {

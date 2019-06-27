@@ -89,7 +89,7 @@ class CompanySearchForm(FlaskForm):
     )
 
     dur = RadioField(
-        'Durée du trajet',
+        'Temps de trajet',
         choices=DURATION_CHOICES,
         default=DURATION_CHOICES[-1][0],
         validators=[Optional()]

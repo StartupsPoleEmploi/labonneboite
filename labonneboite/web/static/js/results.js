@@ -18,6 +18,7 @@ var trackOutboundLink = function(url) {
     $('.js-map-container:visible').initMap();
     $('.js-result-toggle-details').toggleDetails();
     updateTravelDurations();
+    // $('#shown-search-form').checkChanges();
 
     var eventLabel;
     if ($('.ga-no-results').length) {
@@ -133,7 +134,7 @@ var trackOutboundLink = function(url) {
     });
 
   };
-  
+
   function updateTravelDurations() {
     // Compute travel durations asynchronously for each company
     var companySirets = [];
@@ -158,7 +159,7 @@ var trackOutboundLink = function(url) {
       );
     }
   }
-  
+
   function loadTravelDurations(travelMode, latitude, longitude, companyCoordinates, companySirets) {
     $.ajax({
         url: "/maps/durations",
@@ -189,7 +190,7 @@ var trackOutboundLink = function(url) {
                   'car': "en voiture",
                   'public': "en transports en commun",
                 }
-                var html = '<img class="img-icon-large" alt="Temps de transport nécessaire pour rejoindre cette société depuis le lieu de recherche" src="/static/images/icons/travel/' + travelMode + '-unselected.svg"> ' + duration + ' min ' + modes[travelMode];
+                var html = '<img class="img-icon-large" alt="Temps de transport nécessaire pour rejoindre cette société depuis le lieu de recherche" src="/static/images/icons/travel/' + travelMode + '-grey.svg"> ' + duration + ' min ' + modes[travelMode];
                 $(".travel-duration[data-siret='" + companySirets[i] + "']").html(html);
             }
         }
@@ -197,4 +198,16 @@ var trackOutboundLink = function(url) {
       // In case of error, don't do anything
     });
   }
+
+
+  // $.fn.checkChanges = function () {
+  //   var form = this;
+  //   var inputs = form.children('input')
+  //   form.on('submit', function(e) {
+  //     e.preventDefault();
+  //     e.stopPropagation();
+
+  //   });
+
+  // }
 })(jQuery);
