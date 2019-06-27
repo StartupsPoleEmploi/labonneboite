@@ -182,3 +182,88 @@
     width: 20px;
     height: 20px;
 }
+
+/* Switch slider button
+=========================================================================== */
+
+ /* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border: 1px solid #54108E;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  background-image: url("/static/images/icons/map-marker.svg");
+  background-size: 22px 22px;
+  background-position: center;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:not(:checked) + .slider:before {
+    background-image: url("/static/images/icons/map-marker-white.svg");
+    background-color: #54108E;
+}
+
+input:checked + .slider {
+  background-color: #54108E;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #54108E;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+  margin-top: 0;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+#toggle-map-wrapper {
+    vertical-align: middle;
+    line-height: 31px;
+}
+
+#toggle-map-wrapper label {
+    padding-left: 5px;
+    cursor: pointer;
+}
