@@ -90,5 +90,14 @@ locustio
 pyzmq
 remote-pdb
 
+<<<<<<< HEAD
 #Fix markupsafe issue 1.0
 markupsafe==1.1.1
+=======
+#Impact retour emploi
+matplotlib
+openpyxl
+pygal
+matplotlib
+imgkit
+>>>>>>> WIP Add Joris work about impact retour emploi
