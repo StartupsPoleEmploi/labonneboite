@@ -1,4 +1,3 @@
-# coding: utf8
 import unittest.mock
 
 from labonneboite.common.models import Office

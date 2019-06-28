@@ -1,4 +1,3 @@
-# coding: utf8
 from flask import flash, url_for
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView

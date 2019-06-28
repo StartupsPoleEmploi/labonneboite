@@ -1,4 +1,3 @@
-# coding: utf8
 from unittest import mock
 import urllib.error
 import urllib.parse

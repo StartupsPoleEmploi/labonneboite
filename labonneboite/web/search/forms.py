@@ -1,4 +1,3 @@
-# coding: utf8
 
 from werkzeug.datastructures import MultiDict
 from flask_wtf import FlaskForm

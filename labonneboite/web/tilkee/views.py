@@ -1,4 +1,3 @@
-# coding: utf8
 import logging
 
 from flask import Blueprint, render_template, request

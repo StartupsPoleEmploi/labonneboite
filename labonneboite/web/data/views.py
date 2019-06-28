@@ -1,4 +1,3 @@
-# coding: utf8
 """
 This blueprint provides ways to easily explore the internal ROME/NAF mapping.
 """

@@ -1,4 +1,3 @@
-# coding: utf8
 
 SCORE_SORTING_LABEL = 'Tri optimisé %s' % (
 	'<span class="badge badge-large badge-info" data-toggle="tooltip" data-placement="right" title="%s">?</span>' % (

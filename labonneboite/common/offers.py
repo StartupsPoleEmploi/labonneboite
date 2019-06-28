@@ -1,4 +1,3 @@
-# coding: utf8
 from collections import defaultdict
 from labonneboite.conf import settings
 from labonneboite.common.models import Office

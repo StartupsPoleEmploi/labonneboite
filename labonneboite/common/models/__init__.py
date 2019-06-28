@@ -1,4 +1,3 @@
-# coding: utf8
 """
 Since model classes are stored in differents files and due to the behavior
 of SQLAlchemy's "declarative" configuration mode, all modules which hold

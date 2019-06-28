@@ -1,4 +1,3 @@
-# coding: utf8
 import distutils.spawn
 import logging
 

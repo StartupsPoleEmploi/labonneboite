@@ -1,4 +1,3 @@
-# coding: utf8
 import errno
 import logging
 import os

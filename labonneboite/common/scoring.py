@@ -1,4 +1,3 @@
-# coding: utf8
 
 import math
 from functools import lru_cache

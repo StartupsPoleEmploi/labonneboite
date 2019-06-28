@@ -1,4 +1,3 @@
-# coding: utf8
 """
 The admin interface is built on top of Flask-Admin:
 - https://flask-admin.readthedocs.io/en/latest/

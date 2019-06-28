@@ -1,4 +1,3 @@
-# coding: utf8
 """
 Add User and Social Auth tables.
 

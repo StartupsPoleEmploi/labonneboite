@@ -1,4 +1,3 @@
-# coding: utf8
 
 from labonneboite.common.models import User
 from labonneboite.common.models import Office

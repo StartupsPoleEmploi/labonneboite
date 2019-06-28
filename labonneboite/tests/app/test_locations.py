@@ -1,4 +1,3 @@
-# coding: utf8
 import unittest
 
 from labonneboite.common import locations

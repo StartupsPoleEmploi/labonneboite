@@ -1,4 +1,3 @@
-# coding: utf8
 from unittest import mock
 
 from social_flask_sqlalchemy.models import UserSocialAuth

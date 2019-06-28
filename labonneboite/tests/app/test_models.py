@@ -1,4 +1,3 @@
-# coding: utf8
 import datetime
 
 from labonneboite.conf import settings

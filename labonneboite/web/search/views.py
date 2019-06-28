@@ -1,4 +1,3 @@
-# coding: utf8
 
 from urllib.parse import urlencode
 import json

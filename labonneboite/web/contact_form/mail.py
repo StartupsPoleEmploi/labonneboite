@@ -1,4 +1,3 @@
-# coding: utf8
 from flask import escape, session
 
 from flask import current_app, url_for

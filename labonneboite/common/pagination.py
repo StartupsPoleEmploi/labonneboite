@@ -1,4 +1,3 @@
-# coding: utf8
 
 from math import ceil
 from urllib.parse import urlencode
