@@ -27,6 +27,9 @@ setup(
             'geocode = labonneboite.importer.jobs.geocode:run_main',
             'populate_flags = labonneboite.importer.jobs.populate_flags:run_main',
             'update_lbb_data = labonneboite.importer.importer:run',
+            'daily_json_activity_parser = labonneboite.scripts.impact_retour_emploi.daily_json_activity_parser:run_main',
+            'tre_dpae = labonneboite.scripts.impact_retour_emploi.tre_dpae:run_main',
+            'clean_tre = labonneboite.scripts.impact_retour_emploi.clean_tre:run_main'
         ],
     },
     classifiers=[
