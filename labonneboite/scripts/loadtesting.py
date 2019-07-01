@@ -1,4 +1,3 @@
-# coding: utf8
 
 """
 Load testing API+Frontend using Locust framework.

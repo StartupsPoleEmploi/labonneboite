@@ -1,4 +1,3 @@
-# coding: utf8
 from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common.database import db_session

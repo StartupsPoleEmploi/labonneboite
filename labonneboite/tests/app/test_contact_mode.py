@@ -1,4 +1,3 @@
-# coding: utf8
 import unittest
 
 from labonneboite.common import util
@@ -26,7 +25,7 @@ class ContactModeTest(unittest.TestCase):
 
         # Case 2 : naf is in contact_mode mapping but rome is not
         office2 = Office()
-        rome = 'D1408'
+        rome = 'D1405'
         office2.naf = '1712Z'
         naf_prefix = office2.naf[:2]
 
@@ -37,7 +36,7 @@ class ContactModeTest(unittest.TestCase):
 
         # Case 3 : naf is not in contact_mode mapping
         office3 = Office()
-        rome = 'D1408'
+        rome = 'D1405'
         office3.naf = '9900Z'
         naf_prefix = office3.naf[:2]
 
@@ -49,7 +48,7 @@ class ContactModeTest(unittest.TestCase):
         custom_contact_mode = 'Send a Fax'
 
         office4 = Office()
-        rome = 'D1408'
+        rome = 'D1405'
         office4.naf = '1712Z'
         office4.contact_mode = custom_contact_mode
 

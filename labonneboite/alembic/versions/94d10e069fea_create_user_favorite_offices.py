@@ -1,4 +1,3 @@
-# coding: utf8
 """
 Add UserFavoriteOffice table.
 

@@ -1,4 +1,3 @@
-# coding: utf8
 import json
 import os
 from unittest import mock, TestCase

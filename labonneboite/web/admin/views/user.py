@@ -1,4 +1,3 @@
-# coding: utf8
 from flask_admin.contrib.sqla import ModelView
 
 from labonneboite.web.admin.utils import AdminModelViewMixin

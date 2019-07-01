@@ -1,4 +1,3 @@
-# coding: utf8
 
 import math
 from functools import lru_cache
@@ -199,6 +198,11 @@ def get_score_from_stars(stars):
     """
     score_min = SCORE_FOR_ROME_MINIMUM
     score_max = 100.0
+
+    # Ensure stars is inside its allowed range.
+    stars = max(stars, STARS_MINIMUM)
+    stars = min(stars, STARS_MAXIMUM)
+
     normalized_score = (stars - STARS_MINIMUM) / (STARS_MAXIMUM - STARS_MINIMUM)
     score = score_min + normalized_score * (score_max - score_min)
     return score

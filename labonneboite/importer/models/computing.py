@@ -1,4 +1,3 @@
-# coding: utf8
 import datetime
 
 from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime

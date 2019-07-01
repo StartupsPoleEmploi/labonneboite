@@ -1,4 +1,3 @@
-# coding: utf8
 import datetime
 
 from labonneboite.conf import settings
@@ -110,7 +109,7 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
             headcount='11',
             city_code='57070',
             zipcode='57070',
-            naf='7320Z',
+            naf='4646Z',
             score=90,
             x=6.166667,
             y=49.133333,

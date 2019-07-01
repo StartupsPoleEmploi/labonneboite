@@ -1,4 +1,3 @@
-# coding: utf8
 from labonneboite.tests.test_base import AppTest
 
 

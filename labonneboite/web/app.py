@@ -1,4 +1,3 @@
-# coding: utf8
 
 # Python standard library.
 from urllib.parse import urlparse

@@ -1,4 +1,3 @@
-# coding: utf8
 import datetime
 
 from flask import abort

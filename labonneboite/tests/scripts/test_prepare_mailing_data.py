@@ -1,4 +1,3 @@
-# coding: utf8
 from labonneboite.scripts import prepare_mailing_data as script
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.common.models import Office

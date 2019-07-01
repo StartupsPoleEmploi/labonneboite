@@ -1,4 +1,3 @@
-# coding: utf8
 import logging
 
 from functools import lru_cache
