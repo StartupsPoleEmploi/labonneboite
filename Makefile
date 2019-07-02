@@ -283,13 +283,13 @@ run-importer-job-08-populate-flags:
 
 
 # Redis useful commands
-# /!\ To be used with Redis running using `make services`.
 # -----
 
 REDIS_DOCKER_COMPOSE = docker-compose -f docker/docker-compose.yml run redis bash -c
 REDIS_CONNECT = redis-cli -h redis -p 6389
 
 redis-get-key:
+	# Eg: $ redis-get-key KEY="huey.results.huey"
 	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) get '$(KEY)'"
 
 redis-count-keys:
