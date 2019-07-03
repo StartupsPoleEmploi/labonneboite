@@ -1,15 +1,12 @@
+import urllib
+import shutil
+from os import makedirs, remove, listdir
+from os.path import abspath, exists
+from datetime import date
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import xlsxwriter
 import openpyxl
 import openpyxl.styles
 from sqlalchemy import create_engine
-import urllib
-import shutil
-from os import *
-from os.path import *
-from datetime import date
 import charts as charts
 import fr_charts as fr
 import grand_public as gd
@@ -33,8 +30,10 @@ month_idpe = idpe_connect['MONTH(dateheure)'].tolist()
 year_idpe = idpe_connect['YEAR(dateheure)'].tolist()
 
 month_year_idpe = []  # Formatting
-for i in range(len(month_idpe)):
+i=0
+while i < len(month_idpe):
     month_year_idpe.append(str(year_idpe[i])+'/'+str(month_idpe[i]))
+    i+=1
 idpe_connect['Date'] = month_year_idpe
 
 # Count all distinct IDPEC
@@ -59,15 +58,15 @@ path = abspath('clean_tre.py')[:-12]
 try:
     shutil.rmtree(path+'images/')
 except:
-    None
+    pass
 try:
     shutil.rmtree(path+'gd_pub/')
 except:
-    None
+    pass
 try:
     shutil.rmtree(path+'Clean/')
 except:
-    None
+    pass
 
 makedirs(path+'images/')
 makedirs(path+'gd_pub/')
@@ -101,8 +100,7 @@ def get_type_contrat(row):
         return 'CDD'
     elif row['dc_typecontrat_id'] == 2:
         return 'CDI'
-    else:
-        return 'CTT'
+    return 'CTT'
 
 
 act_dpae_2['type_contrat'] = act_dpae_2.apply(
@@ -135,8 +133,7 @@ act_dpae_2['diff_activite_embauche_jrs'] = act_dpae_2.apply(
 def get_priv_pub(row):
     if row['dc_privepublic'] == 0:
         return 'Public'
-    else:
-        return 'Prive'
+    return 'Prive'
 
 
 act_dpae_2['dc_privepublic'] = act_dpae_2.apply(
@@ -154,8 +151,7 @@ act_dpae_2['date_embauche'] = act_dpae_2.apply(
 def del_interrogation(row):
     if row['tranche_age'] == 'de 26 ans ? 50 ans':
         return 'entre 26 et 50 ans'
-    else:
-        return row['tranche_age']
+    return row['tranche_age']
 
 
 act_dpae_2['tranche_age'] = act_dpae_2.apply(
@@ -166,8 +162,7 @@ def del_cdd_incoherent(row):
     try:
         if int(row['duree_activite_cdd_jours']) > 1200:
             return 1
-        else:
-            return 0
+        return 0
     except:
         return 0
 
@@ -253,9 +248,9 @@ dict_charts = {('01', "diff_activite_embauche_jrs", "Nombre de Jours entre l'act
                ('08', "type_contrat", "Type de contrat obtenu", "type_cont_gd_public_pie", None): charts.Pie,
                ('10', "tranche_age", "Pourcentage des differentes tranches d'ages dans les DPAE", "age_gd_public_pie", None): charts.Pie,
                ('11', "dc_privepublic", "Pourcentage d'embauche dans le privé et dans le public", "prive_pub_gd_public_pie", None): charts.Pie,
-               ('12', "code_postal", "Part des DPAE par anciennes régions", "old_region_gd_public_svg", "old_region"): fr.map,
-               ('13', "code_postal", "Part des DPAE par nouvelles régions", "new_region_gd_public_svg", "new_region"): fr.map,
-               ('14', "code_postal", "Part des DPAE par département", "dep_gd_public_svg", "departement"): fr.map,
+               ('12', "code_postal", "Part des DPAE par anciennes régions", "old_region_gd_public_svg", "old_region"): fr.map_fr,
+               ('13', "code_postal", "Part des DPAE par nouvelles régions", "new_region_gd_public_svg", "new_region"): fr.map_fr,
+               ('14', "code_postal", "Part des DPAE par département", "dep_gd_public_svg", "departement"): fr.map_fr,
                ('15', 'date_embauche', all_the_names_1, 'cohorte_1_gd_public', 'date_activite'): charts.Stacked_Bar,
                ('16', 'date_activite', all_the_names_2, 'cohorte_2_gd_public', 'date_embauche'): charts.Stacked_Bar}
 
@@ -311,7 +306,7 @@ IDPE_sign_for_gd_pub = [cell_A10.value,
 
 ##################################################################################################
 
-num_image = 1
+num_im = 1
 package_svg = []
 all_stats = []
 
@@ -334,45 +329,45 @@ for args in dict_charts:  # Creation and saving of charts, using charts.py
 
 # Iterate through the created images
 # Pasting of charts from the directory
-for file_name in sorted(listdir(path+'images/')):
+for filename in sorted(listdir(path+'images/')):
 
-    img = openpyxl.drawing.image.Image(path+'images/'+file_name)
+    img = openpyxl.drawing.image.Image(path+'images/'+filename)
 
-    if "gd_public" in file_name:
-        shutil.copyfile(path+'images/'+file_name, path+'gd_pub/'+file_name)
+    if "gd_public" in filename:
+        shutil.copyfile(path+'images/'+filename, path+'gd_pub/'+filename)
 
-    if "table" in file_name:  # it's the table of cohorte --> it's a different size
+    if "table" in filename:  # it's the table of cohorte --> it's a different size
         img.anchor = 'H1'
         img.height = 750
         img.width = 900
     else:
         # using the function location in order to place the charts
-        img.anchor = location(num_image, file_name)
+        img.anchor = location(num_im, filename)
         img.height = 400
         img.width = 500
 
     ws.add_image(img)  # Pasting
 
     # if it's map --> pasting web link below charts
-    if exists(path+file_name[:-3]+'svg'):
-        cells_link = ws[location(num_image, file_name, True)]
-        cells_link.hyperlink = file_name[:-3]+'svg'
+    if exists(path+filename[:-3]+'svg'):
+        cells_link = ws[location(num_im, filename, True)]
+        cells_link.hyperlink = filename[:-3]+'svg'
         cells_link.font = openpyxl.styles.Font(
             size=5.5, italic=True, underline='single')
         cells_link.alignment = openpyxl.styles.Alignment(horizontal="center")
-        package_svg.append((path, file_name[:-3]+'svg'))
+        package_svg.append((path, filename[:-3]+'svg'))
 
-    num_image += 1
+    num_im += 1
 
     # if it's the last charts of the sheet --> change sheet
-    if num_image == (sheet_sizes[num_sheet]+1):
+    if num_im == (sheet_sizes[num_sheet]+1):
         try:
             num_sheet += 1
             book.create_sheet(sheet_names[num_sheet])
             ws = book.worksheets[num_sheet]
-            num_image = 0
+            num_im = 0
         except:
-            None
+            pass
 
 book.save('Impact_lbb_DPAE.xlsx')
 
@@ -392,11 +387,11 @@ shutil.copyfile(path+'Impact_lbb_DPAE.xlsx', path +
                 'Clean/'+'Impact_lbb_DPAE.xlsx')
 for path, svg in package_svg:
     shutil.copyfile(path+svg, path+'Clean/'+svg)
-remove("filename.html")
+remove("table.html")
 for last_files in listdir(path):
     try:
         extension = last_files[last_files.index('.'):]
         if extension == '.svg' or extension == '.xlsx':
             remove(last_files)
     except:
-        None  # It's a directory
+        pass  # It's a directory
