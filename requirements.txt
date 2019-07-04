@@ -5,7 +5,6 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 alembic==0.9.10
-appnope==0.1.0            # via ipython
 astroid==1.6.5            # via pylint
 babel==2.6.0              # via flask-babelex
 backcall==0.1.0           # via ipython
@@ -38,7 +37,7 @@ greenlet==0.4.12          # via gevent
 html5lib==1.0.1
 httplib2==0.11.3          # via xhtml2pdf
 huey==2.0.1
-idna==2.5                 # via requests
+idna==2.5                 # via requests, yarl
 ipdb==0.11
 ipython-genutils==0.2.0   # via traitlets
 ipython==6.4.0
@@ -54,6 +53,7 @@ mako==1.0.7               # via alembic
 markupsafe==1.0           # via jinja2, mako
 mccabe==0.6.1             # via pylint
 msgpack-python==0.5.6     # via locustio
+multidict==4.5.2          # via yarl
 mysqlclient==1.4.2.post1
 nose==1.3.7
 numpy==1.16.1
@@ -80,6 +80,7 @@ python-slugify==1.2.5
 python3-openid==3.1.0     # via social-auth-core
 pytz==2017.2              # via babel, pandas
 pyvirtualdisplay==0.2.1
+pyyaml==5.1.1             # via vcrpy
 pyzmq==16.0.2
 raven[flask]==6.9.0
 redis==3.2.1
@@ -90,7 +91,7 @@ scikit-learn==0.16.1
 scipy==1.2.1
 selenium==2.53.0
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via astroid, flask-cors, html5lib, pip-tools, prompt-toolkit, pyjwkest, pylint, python-dateutil, social-auth-app-flask, social-auth-app-flask-sqlalchemy, social-auth-core, social-auth-storage-sqlalchemy, sqlalchemy-utils, traitlets, validators, xhtml2pdf
+six==1.10.0               # via astroid, flask-cors, html5lib, pip-tools, prompt-toolkit, pyjwkest, pylint, python-dateutil, social-auth-app-flask, social-auth-app-flask-sqlalchemy, social-auth-core, social-auth-storage-sqlalchemy, sqlalchemy-utils, traitlets, validators, vcrpy, xhtml2pdf
 social-auth-app-flask-sqlalchemy==1.0.1
 social-auth-app-flask==1.0.0
 social-auth-core[openidconnect]==1.4.0
@@ -103,10 +104,12 @@ unidecode==0.4.21         # via python-slugify
 urllib3==1.24.3           # via elasticsearch, requests
 uwsgi==2.0.17
 validators==0.11.2
+vcrpy==2.0.1
 wcwidth==0.1.7            # via prompt-toolkit
 webassets==0.12.1         # via flask-assets
 webencodings==0.5.1       # via html5lib
 werkzeug==0.11.10         # via flask, flask-debugtoolbar
-wrapt==1.10.10            # via astroid
+wrapt==1.10.10            # via astroid, vcrpy
 wtforms==2.1
 xhtml2pdf==0.2.2
+yarl==1.3.0               # via vcrpy

@@ -27,8 +27,8 @@ WTF_CSRF_ENABLED = False
 
 TRAVEL_VENDOR_BACKENDS = {
     'isochrone': {
-        'car': 'dummy',
-        'public': 'dummy',
+        'car': 'ign_mock',
+        'public': 'navitia_mock',
     },
     'durations': {
         'car': 'dummy',

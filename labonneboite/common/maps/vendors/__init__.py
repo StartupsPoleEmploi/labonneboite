@@ -10,6 +10,10 @@ def backend(name):
         from . import ign as back
     elif name == 'navitia':
         from . import navitia as back
+    elif name == 'ign_mock':
+        from . import ign_mock as back
+    elif name == 'navitia_mock':
+        from . import navitia_mock as back
     else:
         raise ValueError('Invalid backend name: {}'.format(name))
 
