@@ -144,6 +144,9 @@ rebuild-importer-tests-compressed-files:
 
 rebuild-city-codes:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python importer/scripts/clean_csv_city_codes.py
+	
+daily-json-activity-parser:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/daily_json_activity_parser.py
 
 # Load testing
 # ------------
