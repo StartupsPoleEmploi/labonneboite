@@ -120,11 +120,11 @@ def insert_activity_logs(activity_df):
 
     engine.close()
 
-def main():
+def run_main():
     date_last_recorded_activity = sql_queries()
     activity_df = parse_activity_logs(date_last_recorded_activity)
     insert_id_peconnect(activity_df)
     insert_activity_logs(activity_df)
 
 if __name__ == '__main__':
-    main()
+    run_main()

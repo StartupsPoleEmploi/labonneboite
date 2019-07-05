@@ -90,3 +90,6 @@ for df_dpae in pd.read_csv('/srv/lbb/data/'+bz,
 
     print('nb rows : ', i * chunksize)
     i += 1
+
+def run_main():
+    return 0

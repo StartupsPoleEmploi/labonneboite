@@ -395,3 +395,6 @@ for last_files in listdir(path):
             remove(last_files)
     except:
         pass  # It's a directory
+
+def run_main():
+    return 0
