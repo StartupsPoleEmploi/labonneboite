@@ -7,6 +7,10 @@ from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 
+
+class NoDataException(Exception):
+    pass
+
 def sql_queries():
     create_table_query1 = 'CREATE TABLE IF NOT EXISTS `idpe_connect` ( \
                                 `idutilisateur_peconnect` text, \
@@ -56,13 +60,20 @@ def parse_activity_logs(date_last_recorded_activity):
 
     logger.info('.json files found : {}'.format(json_logs_paths))
 
+    file_used = False
+
     for json_logs_path in json_logs_paths:
         date = json_logs_path.replace('activity-lbb-','').replace('.json','').replace('.','-')
         if date >= date_last_recorded_activity:
+            file_used = True
             logger.info('.json file used : {}'.format(json_logs_path)) 
             with open(json_logs_folder_path+'/'+json_logs_path, 'r') as json_file:
                 for line in json_file:
                     data.append(line)
+
+    if not file_used:
+        logger.info("Did not find/need any data to parse")
+        raise NoDataException
 
     activities = {}
     i = 1
@@ -97,6 +108,9 @@ def insert_id_peconnect(activity_df):
 
     engine = import_util.create_sqlalchemy_engine()
 
+    nb_lines = activity_idpec.shape[0]
+    logger.info('Number of lines to insert into idpec : {}'.format(nb_lines))
+
     activity_idpec.to_sql(
         con=engine, name='idpe_connect', if_exists='append', index=False, chunksize=10000)
 
@@ -123,6 +137,9 @@ def insert_activity_logs(activity_df):
     activity_logs_df = activity_logs_df[cols_of_interest]
 
     engine = import_util.create_sqlalchemy_engine()
+
+    nb_lines = activity_logs_df.shape[0]
+    logger.info('Number of lines to insert into idpec : {}'.format(nb_lines))
 
     activity_logs_df.to_sql(con=engine, name='activity_logs',
                         if_exists='append', index=False, chunksize=10000)
