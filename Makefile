@@ -315,5 +315,5 @@ clean-car-isochrone-and-durations-cache: clean-car-isochrone-cache
 	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '*durations**car*' | tr '\n' '\0' | xargs -L1 -0 $(REDIS_CONNECT) del"
 
 delete-unused-redis-containers:
-    docker ps -f status=restarting -f name=redis --format "{{.ID}}" \
+	docker ps -f status=restarting -f name=redis --format "{{.ID}}" \
     | xargs docker rm -f
