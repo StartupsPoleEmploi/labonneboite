@@ -5,6 +5,7 @@ import pandas as pd
 
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
+from labonneboite.importer.jobs.common import logger
 
 def sql_queries():
     create_table_query1 = 'CREATE TABLE IF NOT EXISTS `idpe_connect` ( \
@@ -34,7 +35,7 @@ def sql_queries():
     engine.execute(create_table_query2)
     row = engine.execute(last_date_query).fetchone()
     date_last_recorded_activity = row[0].split()[0]
-    print('The last recorded activity in database is on : {}'.format(date_last_recorded_activity))
+    logger.info('The last recorded activity in database is on : {}'.format(date_last_recorded_activity))
     engine.close()
     return date_last_recorded_activity
 
@@ -53,9 +54,12 @@ def parse_activity_logs(date_last_recorded_activity):
     json_logs_paths = os.listdir(json_logs_folder_path)
     json_logs_paths = [i for i in json_logs_paths if i.startswith('activity')]
 
+    logger.info('.json files found : {}'.format(json_logs_paths))
+
     for json_logs_path in json_logs_paths:
         date = json_logs_path.replace('activity-lbb-','').replace('.json','').replace('.','-')
         if date >= date_last_recorded_activity:
+            logger.info('.json file used : {}'.format(json_logs_path)) 
             with open(json_logs_folder_path+'/'+json_logs_path, 'r') as json_file:
                 for line in json_file:
                     data.append(line)
@@ -79,6 +83,8 @@ def parse_activity_logs(date_last_recorded_activity):
     activity_df['date'] = activity_df.apply(
         lambda row: get_dateheure(row), axis=1)
 
+    logger.info('activity dataframe OK')
+
     return activity_df
 
 def insert_id_peconnect(activity_df):
@@ -92,9 +98,12 @@ def insert_id_peconnect(activity_df):
     engine = import_util.create_sqlalchemy_engine()
 
     activity_idpec.to_sql(
-        con=engine, name='idpe_connect', if_exists='append', index=False)
+        con=engine, name='idpe_connect', if_exists='append', index=False, chunksize=10000)
 
     engine.close()
+
+    logger.info('insert into idpe_connect OK')
+
 
 def insert_activity_logs(activity_df):
 
@@ -116,9 +125,12 @@ def insert_activity_logs(activity_df):
     engine = import_util.create_sqlalchemy_engine()
 
     activity_logs_df.to_sql(con=engine, name='activity_logs',
-                        if_exists='append', index=False)
+                        if_exists='append', index=False, chunksize=10000)
 
     engine.close()
+
+    logger.info('insert into activity_logs OK')
+
 
 def run_main():
     date_last_recorded_activity = sql_queries()
