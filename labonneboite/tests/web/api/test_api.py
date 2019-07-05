@@ -1473,7 +1473,13 @@ class ApiOffersOfficesListTest(ApiBaseTest):
             for office_json in result['companies']:
                 self.assertIn('distance', office_json)
                 self.assertIn('offers_count', office_json)
+                self.assertTrue(office_json['offers_count'] >= 1)
                 self.assertIn('offers', office_json)
+                self.assertEqual(office_json['offers_count'], len(office_json['offers']))
+                for offer_json in office_json['offers']:
+                    self.assertIn('id', offer_json)
+                    self.assertIn('name', offer_json)
+                    self.assertIn('url', offer_json)
 
     def test_multi_rome_is_supported_single_batch(self):
         with self.test_request_context():
