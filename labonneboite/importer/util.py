@@ -6,8 +6,10 @@ import subprocess
 from datetime import datetime
 import logging
 from functools import lru_cache
+import urllib
 
 import MySQLdb as mdb
+from sqlalchemy import create_engine
 
 from labonneboite.common import departements as dpt
 from labonneboite.common.util import timeit
@@ -38,6 +40,14 @@ def create_cursor():
     cur = con.cursor()
     return con, cur
 
+def create_sqlalchemy_engine():
+    connexion_url = ('mysql://'+DATABASE['USER']+':%s@'+\
+                    DATABASE['HOST']+':'+str(DATABASE['PORT'])+\
+                    '/'+DATABASE['NAME']) % urllib.parse.quote_plus(DATABASE['PASSWORD'])
+
+    engine = create_engine(connexion_url)
+
+    return engine.connect()
 
 def check_for_updates(input_folder):
     """
