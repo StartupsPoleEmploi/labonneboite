@@ -15,7 +15,7 @@ services:
 
 # Launch services and wait until mysql is ready.
 # Wait only if /var/lib/mysql folder is not present yet.
-init-services: services 
+init-services: services
 	cd docker && docker-compose run mysql stat /var/lib/mysql >/dev/null || until docker-compose logs mysql | grep "MySQL init process done. Ready for start up."; do echo "waiting for mysql initialization..."; sleep 4; done
 
 database: database-dev database-test
@@ -218,7 +218,7 @@ alembic-rollback:
 
 alembic-generate-migration:
 	@echo "Run for example:"
-	@echo 
+	@echo
 	@echo "    $$ alembic revision -m 'create account table'"
 
 # Importer jobs
@@ -280,3 +280,40 @@ run-importer-job-07-geocode:
 
 run-importer-job-08-populate-flags:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/populate_flags.py
+
+
+# Redis useful commands
+# -----
+
+REDIS_DOCKER_COMPOSE = docker-compose -f docker/docker-compose.yml run redis bash -c
+REDIS_CONNECT = redis-cli -h redis -p 6389
+
+redis-get-key:
+	# Eg: $ redis-get-key KEY="huey.results.huey"
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) get '$(KEY)'"
+
+redis-count-keys:
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '$(PATTERN)' | wc -l"
+
+redis-show-keys:
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '$(PATTERN)' | head -10"
+
+redis-delete-keys:
+	# Eg: $ redis-delete-keys PATTERN='"mypattern"'
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '$(PATTERN)' | tr '\n' '\0' | xargs -L1 -0 $(REDIS_CONNECT) del"
+
+clean-car-isochrone-cache:
+	@echo '###### Total keys to be deleted \#######'
+	PATTERN='*isochrone**car*' $(MAKE) redis-count-keys
+	@echo '###### EXTERMINATE ISOCHRONE CACHE! \######'
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '*isochrone**car*' | tr '\n' '\0' | xargs -L1 -0 $(REDIS_CONNECT) del"
+
+clean-car-isochrone-and-durations-cache: clean-car-isochrone-cache
+	@echo '###### Total keys to be deleted \#######'
+	PATTERN='*durations**car*' $(MAKE) redis-count-keys
+	@echo '###### EXTERMINATE DURATIONS! \######'
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '*durations**car*' | tr '\n' '\0' | xargs -L1 -0 $(REDIS_CONNECT) del"
+
+delete-unused-redis-containers:
+    docker ps -f status=restarting -f name=redis --format "{{.ID}}" \
+    | xargs docker rm -f
