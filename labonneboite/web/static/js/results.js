@@ -17,7 +17,7 @@ var trackOutboundLink = function(url) {
     // has a hard time initializing maps in hidden elements.
     $('.js-map-container:visible').initMap();
     $('.js-result-toggle-details').toggleDetails();
-    updateTravelDurations();
+    // updateTravelDurations();
 
     var eventLabel;
     if ($('.ga-no-results').length) {
@@ -133,68 +133,68 @@ var trackOutboundLink = function(url) {
     });
 
   };
-  
-  function updateTravelDurations() {
-    // Compute travel durations asynchronously for each company
-    var companySirets = [];
-    var companyCoordinates = [];
-    var latitude = $("#lat").val();
-    var longitude = $("#lon").val();
-    var travelMode = $("#tr").val() || "car";
-    $(".travel-duration").each(function(){
-        companySirets.push($(this).attr("data-siret"));
-        companyCoordinates.push($(this).attr("data-latitude") + "," + $(this).attr("data-longitude"));
-    });
-    if (!companySirets.length) {
-        return;
-    }
-    // Load durations 5 by 5 to avoid timeouts from upstream servers
-    var sampleSize = 5;
-    for (var i=0; i < companyCoordinates.length; i += sampleSize) {
-      loadTravelDurations(
-        travelMode, latitude, longitude,
-        companyCoordinates.slice(i, i+sampleSize),
-        companySirets.slice(i, i+sampleSize)
-      );
-    }
-  }
-  
-  function loadTravelDurations(travelMode, latitude, longitude, companyCoordinates, companySirets) {
-    $.ajax({
-        url: "/maps/durations",
-        method: 'POST',
-        data: JSON.stringify({
-          origin: latitude + "," + longitude,
-          destinations: companyCoordinates,
-          travel_mode: travelMode,
-        }),
-        contentType: 'application/json',
-        dataType: 'json',
-        headers: {
-          "X-CSRFToken": CSRF_TOKEN,
-        }
-    }).success(function(durations) {
-        // Fill durations
-        for(var i = 0; i < durations.length; i += 1) {
-            if(durations[i]) {
-                // Convert duration from seconds to minutes
-                var duration = durations[i] / 60;
-                if(Math.floor(duration) < duration) {
-                  duration += 1;
-                }
-                duration = Math.floor(duration);
 
-                // Fill html
-                var modes = {
-                  'car': "en voiture",
-                  'public': "en transports en commun",
-                }
-                var html = '<img class="img-icon-large" alt="Temps de transport nécessaire pour rejoindre cette société depuis le lieu de recherche" src="/static/images/icons/travel/' + travelMode + '-unselected.svg"> ' + duration + ' min ' + modes[travelMode];
-                $(".travel-duration[data-siret='" + companySirets[i] + "']").html(html);
-            }
-        }
-    }).fail(function(e) {
-      // In case of error, don't do anything
-    });
-  }
+  // function updateTravelDurations() {
+  //   // Compute travel durations asynchronously for each company
+  //   var companySirets = [];
+  //   var companyCoordinates = [];
+  //   var latitude = $("#lat").val();
+  //   var longitude = $("#lon").val();
+  //   var travelMode = $("#tr").val() || "car";
+  //   $(".travel-duration").each(function(){
+  //       companySirets.push($(this).attr("data-siret"));
+  //       companyCoordinates.push($(this).attr("data-latitude") + "," + $(this).attr("data-longitude"));
+  //   });
+  //   if (!companySirets.length) {
+  //       return;
+  //   }
+  //   // Load durations 5 by 5 to avoid timeouts from upstream servers
+  //   var sampleSize = 5;
+  //   for (var i=0; i < companyCoordinates.length; i += sampleSize) {
+  //     loadTravelDurations(
+  //       travelMode, latitude, longitude,
+  //       companyCoordinates.slice(i, i+sampleSize),
+  //       companySirets.slice(i, i+sampleSize)
+  //     );
+  //   }
+  // }
+
+  // function loadTravelDurations(travelMode, latitude, longitude, companyCoordinates, companySirets) {
+  //   $.ajax({
+  //       url: "/maps/durations",
+  //       method: 'POST',
+  //       data: JSON.stringify({
+  //         origin: latitude + "," + longitude,
+  //         destinations: companyCoordinates,
+  //         travel_mode: travelMode,
+  //       }),
+  //       contentType: 'application/json',
+  //       dataType: 'json',
+  //       headers: {
+  //         "X-CSRFToken": CSRF_TOKEN,
+  //       }
+  //   }).success(function(durations) {
+  //       // Fill durations
+  //       for(var i = 0; i < durations.length; i += 1) {
+  //           if(durations[i]) {
+  //               // Convert duration from seconds to minutes
+  //               var duration = durations[i] / 60;
+  //               if(Math.floor(duration) < duration) {
+  //                 duration += 1;
+  //               }
+  //               duration = Math.floor(duration);
+
+  //               // Fill html
+  //               var modes = {
+  //                 'car': "en voiture",
+  //                 'public': "en transports en commun",
+  //               }
+  //               var html = '<img class="img-icon-large" alt="Temps de transport nécessaire pour rejoindre cette société depuis le lieu de recherche" src="/static/images/icons/travel/' + travelMode + '-unselected.svg"> ' + duration + ' min ' + modes[travelMode];
+  //               $(".travel-duration[data-siret='" + companySirets[i] + "']").html(html);
+  //           }
+  //       }
+  //   }).fail(function(e) {
+  //     // In case of error, don't do anything
+  //   });
+  // }
 })(jQuery);
