@@ -2,15 +2,19 @@
 Test search using isochrone filters: public transports.
 """
 
-import time
 import re
 import urllib.parse
 
+from parameterized import parameterized
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from labonneboite.common.maps.constants import ISOCHRONE_DURATIONS_MINUTES
 from .base import LbbSeleniumTestCase
+
+
+DURATIONS = [(duration, ) for duration in ISOCHRONE_DURATIONS_MINUTES]
 
 
 class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
@@ -46,9 +50,10 @@ class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
         self.driver.find_element_by_xpath("//button[@class='rgpd-accept']").click()
 
 
-    def test_15_minutes(self):
+    @parameterized.expand(DURATIONS)
+    def test_isochrone_search(self, duration):
         """
-        Test an isochrone search selecting "public transport" and "15 minutes".
+        Test an isochrone search selecting "public transport" and "{duration} minutes".
         """
 
         # Store current results
@@ -71,14 +76,13 @@ class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
             .until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "#isochrone-durations"))
             )
-        # import ipdb; ipdb.set_trace()
 
         # Filtering by duration should be available now
         durations_options = self.driver.find_element_by_css_selector('#isochrone-durations')
         self.assertTrue(durations_options.is_displayed())
 
         # click on another duration
-        durations_options.find_element_by_css_selector('input[value="15"]').click()
+        durations_options.find_element_by_css_selector(f'input[value="{duration}"]').click()
 
         # The page should reload with a new search. Wait for it.
         WebDriverWait(self.driver, 20)\
@@ -93,7 +97,7 @@ class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
         parameters = dict(urllib.parse.parse_qsl(url.query))
 
         self.assertEqual(parameters['tr'], 'public')
-        self.assertEqual(parameters['dur'], '15')
+        self.assertEqual(parameters['dur'], str(duration))
 
         results_sentence = self.driver.find_element_by_css_selector('h1.lbb-result-info').text
         last_results = re.match(r'(\d+)', results_sentence).group()

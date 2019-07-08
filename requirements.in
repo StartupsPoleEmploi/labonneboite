@@ -61,7 +61,7 @@ nose
 selenium
 PyVirtualDisplay
 Flask-Testing
-vcrpy
+parameterized
 
 # Data and Importer.
 numpy

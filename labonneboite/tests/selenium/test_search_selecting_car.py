@@ -6,11 +6,16 @@ import time
 import re
 import urllib.parse
 
+from parameterized import parameterized
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from labonneboite.common.maps.constants import ISOCHRONE_DURATIONS_MINUTES
 from .base import LbbSeleniumTestCase
+
+
+DURATIONS = [(duration, ) for duration in ISOCHRONE_DURATIONS_MINUTES]
 
 
 class TestSearchSelectingCar(LbbSeleniumTestCase):
@@ -44,9 +49,10 @@ class TestSearchSelectingCar(LbbSeleniumTestCase):
         self.driver.find_element_by_xpath("//button[@class='rgpd-accept']").click()
 
 
-    def test_15_minutes(self):
+    @parameterized.expand(DURATIONS)
+    def test_isochrone_search(self, duration):
         """
-        Test an isochrone search selecting "car" and "30 minutes".
+        Test an isochrone search selecting "car" and "{duration} minutes".
         """
 
         # Store current results
@@ -68,7 +74,7 @@ class TestSearchSelectingCar(LbbSeleniumTestCase):
         self.assertTrue(durations_options.is_displayed())
 
         # click on another duration
-        durations_options.find_element_by_css_selector('input[value="15"]').click()
+        durations_options.find_element_by_css_selector(f'input[value="{duration}"]').click()
 
         # The page should reload with a new search.
         time.sleep(1)
@@ -79,7 +85,7 @@ class TestSearchSelectingCar(LbbSeleniumTestCase):
         parameters = dict(urllib.parse.parse_qsl(url.query))
 
         self.assertEqual(parameters['tr'], 'car')
-        self.assertEqual(parameters['dur'], '15')
+        self.assertEqual(parameters['dur'], str(duration))
 
         results_sentence = self.driver.find_element_by_css_selector('h1.lbb-result-info').text
         last_results = re.match(r'(\d+)', results_sentence).group()
