@@ -18,7 +18,7 @@ def isochrone(origin, duration):
     """
     navitia_response = open(os.path.join(
             os.path.dirname(__file__), 'fixtures',
-            'navitia_metz_isochrone_15_minutes.json'
+            f'navitia_metz_isochrone_{duration}_minutes.json'
         )).read()
 
     response = mock.Mock(

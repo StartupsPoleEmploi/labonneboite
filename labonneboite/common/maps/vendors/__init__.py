@@ -11,9 +11,9 @@ def backend(name):
     elif name == 'navitia':
         from . import navitia as back
     elif name == 'ign_mock':
-        from . import ign_mock as back
+        from .mocks import ign as back
     elif name == 'navitia_mock':
-        from . import navitia_mock as back
+        from .mocks import navitia as back
     else:
         raise ValueError('Invalid backend name: {}'.format(name))
 
