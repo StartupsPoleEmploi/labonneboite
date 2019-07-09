@@ -4,7 +4,7 @@ from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 
-def clean_csv_act_dpae_file(DEBUG=False, existing_sql_table=True):
+def clean_csv_act_dpae_file(existing_sql_table=True):
 
     dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER + '/'
     csv_path = dpae_folder_path+'act_dpae.csv'

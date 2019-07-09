@@ -9,7 +9,7 @@ from labonneboite.importer.jobs.common import logger
 
 # TODO : To improve datas about job sector, to have more informations : use code NAF --> Luc Caffier
 
-DEBUG = True
+DEBUG = False
 
 def get_activity_logs():
     engine = import_util.create_sqlalchemy_engine()
