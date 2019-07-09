@@ -37,6 +37,8 @@ def join_dpae_activity_logs(df_activity):
 
     dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER+'/'
     dpae_paths = os.listdir(dpae_folder_path)
+    # IMPORTANT : Need to copy the DPAE file from /mnt/datalakepe/ to /srv/lbb/data
+    # It is certainly ok, because of the importer which also needs this file
     dpae_paths = [i for i in dpae_paths if i.startswith('LBB_XDPDPAE')]
 
     dpae_paths.sort()
@@ -117,6 +119,7 @@ def join_dpae_activity_logs(df_activity):
         total_rows_kept += df_dpae_act.shape[0]
         logger.info(" --> Nb rows we keep in this sample : {} rows".format(df_dpae_act.shape[0]))
         logger.info(" --> Nb total rows that have been kept : {} rows".format(total_rows_kept))
+        logger.info(" --> Nb total rows of DPAE that has been parsed : {} rows".format((i+1) * chunksize))
         logger.info("-------------------------")
         i += 1
         
