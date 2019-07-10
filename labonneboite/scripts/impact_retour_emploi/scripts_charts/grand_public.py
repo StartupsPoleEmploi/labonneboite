@@ -1,9 +1,6 @@
 import os
-import shutil
-import xlsxwriter
 import openpyxl
-import charts
-import fr_charts
+
 
 stat_name_in_sheet = [
     'Mediane',
@@ -20,7 +17,8 @@ name_stats_in_list = [None, "Population", "Moyenne",
                       "Ecart-Type", 'Min', 'Q1', 'Mediane', 'Q3', 'Max']
 name_stats_useful = ["Moyenne", "Ecart-Type", 'Min', 'Mediane', 'Max']
 name_in_sheet = ["Moyenne :", "La plupart des valeurs se situent dans l'intervalle",
-                 "La plus petite des valeurs est :", "La moitié des valeurs sont inférieures à :", "La plus grande valeur est : "]
+                 "La plus petite des valeurs est :", "La moitié des valeurs sont inférieures à :",
+                 "La plus grande valeur est : "]
 
 
 def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, impact_xlsx, path):
@@ -36,8 +34,8 @@ def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, im
     cell_A1.font = openpyxl.styles.Font(size=12, bold=True, underline='single')
     cell_A1.alignment = openpyxl.styles.Alignment(
         horizontal="center", vertical="center")
-
-    for i in range(len(explication)):
+    i = 0
+    while i < len(explication):
         # Name
         ws.merge_cells('A{}:C{}'.format(i+3, i+3))
         cell_Ax = ws['A{}'.format(i+3)]
@@ -50,6 +48,8 @@ def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, im
         cell_Dx.value = explication[i]
         cell_Dx.font = openpyxl.styles.Font(size=8, italic=True)
 
+        i += 1
+
     # DPAE/IDPEC/IDPEC significative
 
     cells_from_other_sheet = [nbre_DPAE, nbre_IDPE, nbre_IDPE_sign]
@@ -58,7 +58,8 @@ def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, im
 
     # Write on the top the count of DPAE/IDPEC etc...
     for vecteur_indicator in cells_from_other_sheet:
-        for index_vect in range(len(vecteur_indicator)):
+        index_vect = 0
+        while index_vect < len(vecteur_indicator):
             ws.merge_cells('M{}:R{}'.format(
                 abscisses[index_abs], abscisses[index_abs]))
             cell_Mx = ws['M{}'.format(abscisses[index_abs])]
@@ -70,6 +71,7 @@ def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, im
                     size=10, bold=True, underline='double')
             cell_Mx.alignment = openpyxl.styles.Alignment(horizontal="center")
             index_abs += 1
+            index_vect += 1
 
     # Stats BoxPlot -------------------------------------
     y = 10
@@ -108,7 +110,7 @@ def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, im
                 cell_number = ws['Q{}'.format(y)]
                 try:
                     cell_number.value = round(stats_from_boxplot[j], 2)
-                except: #Formatting of the interval
+                except:  # Formatting of the interval
                     cell_number.value = "["+str(round(float(stats_from_boxplot[j][1:stats_from_boxplot[j].index(":")]), 2))+" : "+str(
                         round(float(stats_from_boxplot[j][stats_from_boxplot[j].index(":")+1:-1]), 2))+"]"
                 cell_number.font = openpyxl.styles.Font(size=9, italic=True)

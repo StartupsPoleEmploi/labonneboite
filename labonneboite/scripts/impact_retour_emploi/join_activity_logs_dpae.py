@@ -109,7 +109,7 @@ def join_dpae_activity_logs(df_activity):
         exists = os.path.isfile(path_to_csv)
 
         #We want to rewrite the CSV file after each new execution of DPAE extraction
-        if exists and i == 0:
+        if i == 0:
             os.remove(path_to_csv)
             df_dpae_act.to_csv(path_to_csv, encoding='utf-8', sep='|')
         else:

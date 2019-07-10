@@ -1,9 +1,10 @@
+from os.path import abspath
 import pygal
 import pandas as pd
-from os import *
-from os.path import *
+from labonneboite.importer import settings as importer_settings
 
-path = abspath('charts.py')[:-9]+'images/'
+
+path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/images/'
 
 # Correspondence n° of department with n° of regions in pygal.
 REG_DEP = {'01': '82',
@@ -140,15 +141,14 @@ Type = {'old_region': (lambda x: REG_DEP[x], pygal.maps.fr.Regions()),
         }
 
 
-def map(ordre, columns_code_postal, df, title, name, subdivision):
+def map_fr(ordre, columns_code_postal, df, title, name, subdivision):
     df_copy = pd.DataFrame.copy(df)
 
     # Give department, and the region if it's request
     def get_subdvision(row):
         if row[columns_code_postal][:2] != '97':
             return Type[subdivision][0](row[columns_code_postal][:2])
-        else:
-            return Type[subdivision][0](row[columns_code_postal][:3])
+        return Type[subdivision][0](row[columns_code_postal][:3])
 
     df_copy[columns_code_postal] = df_copy.apply(
         lambda row: get_subdvision(row), axis=1)
