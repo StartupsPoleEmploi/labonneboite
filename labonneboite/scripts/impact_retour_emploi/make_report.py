@@ -267,13 +267,12 @@ def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connec
     shutil.copyfile(root_path+'Impact_lbb_DPAE.xlsx', clean_path+'Impact_lbb_DPAE.xlsx')
     for path, svg in package_svg:
         shutil.copyfile(path+svg, clean_path+svg)
-    import ipdb; ipdb.set_trace()
     remove(root_path + "filename.html")
     for last_files in listdir(root_path):
         try:
             extension = last_files[last_files.index('.'):]
             if extension == '.svg' or extension == '.xlsx':
-                remove(last_files)
+                remove(root_path+last_files)
         except:
             pass  # It's a directory
 
