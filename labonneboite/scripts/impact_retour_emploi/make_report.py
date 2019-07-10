@@ -7,9 +7,9 @@ import pandas as pd
 import openpyxl
 import openpyxl.styles
 from sqlalchemy import create_engine
-from scripts_charts import charts as charts
-from scripts_charts import fr_charts as fr
-from scripts_charts import grand_public as gd
+from labonneboite.scripts.impact_retour_emploi.scripts_charts import charts as charts
+from labonneboite.scripts.impact_retour_emploi.scripts_charts import fr_charts as fr
+from labonneboite.scripts.impact_retour_emploi.scripts_charts import grand_public as gd
 from labonneboite.importer import util as import_util
 from labonneboite.importer.jobs.common import logger
 from labonneboite.scripts.impact_retour_emploi.settings_path_charts import root_path, clean_path, gd_pub_path, images_path
