@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import imgkit
 import datetime
-from labonneboite.importer import settings as importer_settings
+from labonneboite.scripts.impact_retour_emploi.settings_path_charts import root_path, clean_path, gd_pub_path, images_path
 
 MONTHS = [None,
           'Jan',
@@ -21,11 +21,6 @@ MONTHS = [None,
           'Oct',
           'Nov',
           'Dec']
-
-root_path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/'
-images_path = root_path + 'images/'
-gd_pub_path = root_path + 'gd_pub/'
-clean_path = root_path +'Clean/'
 
 
 def Pie(ordre, columns_str, df, title, name, a=None):

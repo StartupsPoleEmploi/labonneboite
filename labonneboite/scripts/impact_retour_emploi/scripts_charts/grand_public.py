@@ -1,6 +1,7 @@
 import os
 import openpyxl
 
+from labonneboite.scripts.impact_retour_emploi.settings_path_charts import root_path, clean_path, gd_pub_path, images_path
 
 stat_name_in_sheet = [
     'Mediane',
@@ -21,7 +22,8 @@ name_in_sheet = ["Moyenne :", "La plupart des valeurs se situent dans l'interval
                  "La plus grande valeur est : "]
 
 
-def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, impact_xlsx, path):
+def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, impact_xlsx):
+
     impact_xlsx.create_sheet("Grand Public")
     ws = impact_xlsx.worksheets[-1]
 
@@ -132,7 +134,7 @@ def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, im
     taille = (250, 300)
 
     # corresponding all files of the directory with their types
-    for files in os.listdir(path):
+    for files in os.listdir(gd_pub_path):
         if 'table' not in files:
             # we need to add the cohorte's table at the directory, but we don't want to show it in gd_pub
             if 'graph' in files:
@@ -145,7 +147,7 @@ def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, im
                 dico_files_types[files] = files[-3:]
 
     for files_pasted in dico_files_types:  # Pasting on the sheet
-        img = openpyxl.drawing.image.Image(path+files_pasted)
+        img = openpyxl.drawing.image.Image(gd_pub_path+files_pasted)
         types = dico_files_types[files_pasted]
         img.anchor = dico_types_location[types][index[types]]
         img.height = taille[0]
@@ -164,4 +166,4 @@ def build_grand_public_sheet(nbre_DPAE, nbre_IDPE, nbre_IDPE_sign, all_stats, im
 
         index[types] += 1
 
-    impact_xlsx.save('Impact_lbb_DPAE.xlsx')
+    impact_xlsx.save(root_path + 'Impact_lbb_DPAE.xlsx')
