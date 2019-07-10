@@ -1,3 +1,4 @@
+
 from collections import Counter
 from os.path import abspath
 import pandas as pd
@@ -5,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import imgkit
 import datetime
+from labonneboite.importer import settings as importer_settings
 
 MONTHS = [None,
           'Jan',
@@ -20,7 +22,8 @@ MONTHS = [None,
           'Nov',
           'Dec']
 
-path = abspath('charts.py')[:-9]+'images/'
+path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/images/'
+
 
 
 def Pie(ordre, columns_str, df, title, name, a=None):
@@ -187,7 +190,6 @@ def Stacked_Bar(ordre, columns_x, df, titles, name, columns_legend):
 
         last_column = {}
         last_row = {}
-        import ipdb; ipdb.set_trace()
         for x_label in corresp_x_y:
             last_column[x_label] = 0
             for y_label in corresp_x_y[x_label]:
@@ -258,7 +260,6 @@ def Stacked_Bar(ordre, columns_x, df, titles, name, columns_legend):
         imgkitoptions = {"format": "png", "xvfb": ""}
         imgkit.from_file("filename.html", '{}_table.png'.format(
             path+ordre+name), options=imgkitoptions)
-        import ipdb; ipdb.set_trace()
         return Table_Final_1
 
     Cohorte = Table(ordre, columns_x, df, name, columns_legend)

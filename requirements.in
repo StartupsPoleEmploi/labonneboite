@@ -93,5 +93,8 @@ remote-pdb
 matplotlib
 openpyxl
 pygal
+pygal_maps_fr
 matplotlib
 imgkit
+xlsxwriter
+cairosvg
