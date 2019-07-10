@@ -1,12 +1,7 @@
 from os.path import abspath
 import pygal
 import pandas as pd
-from labonneboite.importer import settings as importer_settings
-
-root_path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/'
-images_path = root_path + 'images/'
-gd_pub_path = root_path + 'gd_pub/'
-clean_path = root_path +'Clean/'
+from labonneboite.scripts.impact_retour_emploi.settings_path_charts import root_path, clean_path, gd_pub_path, images_path
 
 
 # Correspondence n° of department with n° of regions in pygal.

@@ -11,8 +11,8 @@ from scripts_charts import charts as charts
 from scripts_charts import fr_charts as fr
 from scripts_charts import grand_public as gd
 from labonneboite.importer import util as import_util
-from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
+from labonneboite.scripts.impact_retour_emploi.settings_path_charts import root_path, clean_path, gd_pub_path, images_path
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -66,11 +66,6 @@ def get_infos_from_sql():
 def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connect_sign):
 
     # Creation of all directory needed : We will put everything in /srv/lbb/data
-    root_path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/'
-    images_path = root_path + 'images/'
-    gd_pub_path = root_path + 'gd_pub/'
-    clean_path = root_path +'Clean/'
-
     shutil.rmtree(root_path,ignore_errors=True)
     folders_to_create = [root_path, images_path, gd_pub_path, clean_path]
     for folder in folders_to_create:
@@ -257,8 +252,7 @@ def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connec
                                 IDPE_for_gd_pub,
                                 IDPE_sign_for_gd_pub,
                                 all_stats,
-                                book,
-                                gd_pub_path)
+                                book)
 
     # Remove all files/directory useless and create "Clean" package
     shutil.rmtree(images_path)
