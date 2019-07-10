@@ -66,9 +66,13 @@ def get_infos_from_sql():
 def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connect_sign):
 
     # Creation of all directory needed : We will put everything in /srv/lbb/data
-    path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/'
-    shutil.rmtree(path,ignore_errors=True)
-    folders_to_create = [path,path+'images/',path+'gd_pub/',path+'Clean/']
+    root_path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/'
+    images_path = root_path + 'images/'
+    gd_pub_path = root_path + 'gd_pub/'
+    clean_path = root_path +'Clean/'
+
+    shutil.rmtree(root_path,ignore_errors=True)
+    folders_to_create = [root_path, images_path, gd_pub_path, clean_path]
     for folder in folders_to_create:
         makedirs(folder)
 
@@ -103,11 +107,11 @@ def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connec
 
     # Writes raw data
     wb = openpyxl.Workbook()
-    wb.save('Temporaire.xlsx')
-    temporaire_df = pd.ExcelWriter(path+'Temporaire.xlsx', engine='xlsxwriter')
+    wb.save(root_path+'Temporaire.xlsx')
+    temporaire_df = pd.ExcelWriter(root_path+'Temporaire.xlsx', engine='xlsxwriter')
     df_act_dpae.to_excel(temporaire_df, 'DPAE', index=False)
     temporaire_df.save()
-    book = openpyxl.load_workbook('Temporaire.xlsx', data_only=True)
+    book = openpyxl.load_workbook(root_path+'Temporaire.xlsx', data_only=True)
 
     # Extend columns
     for i in range(len(df_act_dpae.columns.tolist())):
@@ -206,12 +210,12 @@ def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connec
 
     # Iterate through the created images
     # Pasting of charts from the directory
-    for filename in sorted(listdir(path+'images/')):
+    for filename in sorted(listdir(images_path)):
 
-        img = openpyxl.drawing.image.Image(path+'images/'+filename)
+        img = openpyxl.drawing.image.Image(images_path+filename)
 
         if "gd_public" in filename:
-            shutil.copyfile(path+'images/'+filename, path+'gd_pub/'+filename)
+            shutil.copyfile(images_path+filename, gd_pub_path+filename)
 
         if "table" in filename:  # it's the table of cohorte --> it's a different size
             img.anchor = 'H1'
@@ -226,13 +230,13 @@ def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connec
         ws.add_image(img)  # Pasting
 
         # if it's map --> pasting web link below charts
-        if exists(path+filename[:-3]+'svg'):
+        if exists(root_path+filename[:-3]+'svg'):
             cells_link = ws[location(num_im, filename, True)]
             cells_link.hyperlink = filename[:-3]+'svg'
             cells_link.font = openpyxl.styles.Font(
                 size=5.5, italic=True, underline='single')
             cells_link.alignment = openpyxl.styles.Alignment(horizontal="center")
-            package_svg.append((path, filename[:-3]+'svg'))
+            package_svg.append((root_path, filename[:-3]+'svg'))
 
         num_im += 1
 
@@ -246,7 +250,7 @@ def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connec
             except:
                 pass
 
-    book.save(path+'Impact_lbb_DPAE.xlsx')
+    book.save(root_path+'Impact_lbb_DPAE.xlsx')
 
     # gd_pub sheet
     gd.build_grand_public_sheet(DPAE_for_gd_pub,
@@ -254,20 +258,18 @@ def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connec
                                 IDPE_sign_for_gd_pub,
                                 all_stats,
                                 book,
-                                path+'gd_pub/')
+                                gd_pub_path)
 
     # Remove all files/directory useless and create "Clean" package
-    import ipdb; ipdb.set_trace()
-    shutil.rmtree(path+'images/')
-    shutil.rmtree(path+'gd_pub/')
-    remove(path+"Temporaire.xlsx")
-    shutil.copyfile(path+'Impact_lbb_DPAE.xlsx', path +
-                    'Clean/'+'Impact_lbb_DPAE.xlsx')
+    shutil.rmtree(images_path)
+    shutil.rmtree(gd_pub_path)
+    remove(root_path+"Temporaire.xlsx")
+    shutil.copyfile(root_path+'Impact_lbb_DPAE.xlsx', clean_path+'Impact_lbb_DPAE.xlsx')
     for path, svg in package_svg:
-        shutil.copyfile(path+svg, path+'Clean/'+svg)
-    #TODO : TROUVER OU ON ENREGISTRE CE TABLE QUI VEUT PAS SE REMOVE
-    remove(path+"table.html")
-    for last_files in listdir(path):
+        shutil.copyfile(path+svg, clean_path+svg)
+    import ipdb; ipdb.set_trace()
+    remove(root_path + "filename.html")
+    for last_files in listdir(root_path):
         try:
             extension = last_files[last_files.index('.'):]
             if extension == '.svg' or extension == '.xlsx':
