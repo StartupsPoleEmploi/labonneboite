@@ -3,8 +3,11 @@ import pygal
 import pandas as pd
 from labonneboite.importer import settings as importer_settings
 
+root_path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/'
+images_path = root_path + 'images/'
+gd_pub_path = root_path + 'gd_pub/'
+clean_path = root_path +'Clean/'
 
-path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/images/'
 
 # Correspondence n° of department with n° of regions in pygal.
 REG_DEP = {'01': '82',
@@ -177,8 +180,8 @@ def map_fr(ordre, columns_code_postal, df, title, name, subdivision):
     fr_chart = Type[subdivision][1]
     fr_chart.title = title
     fr_chart.add('DPAE', subdivision_nb_dpae)
-    fr_chart.render_to_png(path+ordre+name+'.png')
-    fr_chart.render_to_file(ordre+name+'.svg')
+    fr_chart.render_to_png(images_path+ordre+name+'.png')
+    fr_chart.render_to_file(root_path+ordre+name+'.svg')
 
 
 '''

@@ -22,8 +22,10 @@ MONTHS = [None,
           'Nov',
           'Dec']
 
-path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/images/'
-
+root_path = importer_settings.INPUT_SOURCE_FOLDER + '/impact_retour_emploi/'
+images_path = root_path + 'images/'
+gd_pub_path = root_path + 'gd_pub/'
+clean_path = root_path +'Clean/'
 
 
 def Pie(ordre, columns_str, df, title, name, a=None):
@@ -37,7 +39,7 @@ def Pie(ordre, columns_str, df, title, name, a=None):
         labels.append('{} ({}) '.format(k, str(occurences[k])))
     plt.pie(values, labels=labels, autopct='%1.1f%%')
     plt.title(title, fontweight='bold')
-    plt.savefig(path+ordre+'{}.png'.format(name))
+    plt.savefig(images_path+ordre+'{}.png'.format(name))
     plt.clf()
     return None
 
@@ -57,7 +59,7 @@ def BoxPlot(ordre, columns_int, df, title, name, start=1):
         plt.annotate('{} : {}'.format(
             names_stat[k], round(stats[k], 2)), (x, y))  # 'label : value'
     plt.title(title, fontweight='bold')
-    plt.savefig(path+ordre+'{}.png'.format(name))
+    plt.savefig(images_path+ordre+'{}.png'.format(name))
     plt.clf()
     return [title]+stats
 
@@ -151,7 +153,7 @@ def Graph(ordre, columns_date, df, title, name, time_type='week'):
 
         plt.ylim(0, max(DPAE.values())+100)
         if x != []:
-            plt.savefig(path+ordre+'{}.png'.format(name +
+            plt.savefig(images_path+ordre+'{}.png'.format(name +
                                                    str(year_compt)+str(tri_compt)))
             len_sheet += 1
         plt.clf()
@@ -252,14 +254,14 @@ def Stacked_Bar(ordre, columns_x, df, titles, name, columns_legend):
         }
         </style>
         """
-        with open("filename.html", "w") as text_file:
+        with open(root_path+"filename.html", "w") as text_file:
             # write the CSS
             text_file.write(css)
         # write the HTML-ized Pandas DataFrame
             text_file.write(Table_Final_1.to_html())
         imgkitoptions = {"format": "png", "xvfb": ""}
-        imgkit.from_file("filename.html", '{}_table.png'.format(
-            path+ordre+name), options=imgkitoptions)
+        imgkit.from_file(root_path+"filename.html", '{}_table.png'.format(
+            images_path+ordre+name), options=imgkitoptions)
         return Table_Final_1
 
     Cohorte = Table(ordre, columns_x, df, name, columns_legend)
@@ -287,7 +289,7 @@ def Stacked_Bar(ordre, columns_x, df, titles, name, columns_legend):
     plt.xticks(ind, name_x, rotation=315, fontsize=8)
     plt.xlabel(titles[3], verticalalignment="baseline", fontweight='bold')
     plt.title(titles[4], fontweight='bold')
-    plt.savefig(path+ordre+name+".png")
+    plt.savefig(images_path+ordre+name+".png")
     plt.clf()
 
 
@@ -302,5 +304,5 @@ def graph_sql(ordre, columns_y, df, title, name, columns_x):
     plt.title(title, fontweight='bold')
     plt.xticks(fontsize=8, rotation=315)
     plt.ylim(0, plt.axis()[3])
-    plt.savefig(path+ordre+'{}.png'.format(ordre+name))
+    plt.savefig(images_path+ordre+'{}.png'.format(ordre+name))
     plt.clf()
