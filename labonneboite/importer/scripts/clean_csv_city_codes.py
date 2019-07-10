@@ -14,8 +14,10 @@ def complete_citycodes(citycode):
 
 def format_communename(row):
     commune_name = row['commune_name']
+    commune_name = commune_name.strip()
     commune_name = commune_name.replace(' ', '-')
-    commune_name = commune_name.replace('ST', 'SAINT')
+    commune_name = commune_name.replace('ST-', 'SAINT-')
+    commune_name = commune_name.replace('STE-', 'SAINTE-')
     if commune_name[0:2] == 'L-':
         commune_name = commune_name[2:]
 
@@ -54,7 +56,7 @@ def clean_csv_city_codes():
 
     df_city_codes = df_city_codes.sort_values('commune_id')
 
-    df_city_codes.to_csv('../../common/data/city_codes.csv', encoding='utf-8', sep='|', index=False)
+    df_city_codes.to_csv('common/data/city_codes.csv', encoding='utf-8', sep='|', index=False)
 
 if __name__ == '__main__':
     clean_csv_city_codes()
