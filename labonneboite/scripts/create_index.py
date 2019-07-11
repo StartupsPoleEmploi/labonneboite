@@ -670,7 +670,7 @@ def update_offices_geolocations():
 
 
 def get_latest_scam_emails():
-    list_of_files = glob.glob(os.path.join(settings.SCAM_EMAILS_FOLDER, 'BLACKLIST_EMAILS_FULL_*.csv.bz2'))
+    list_of_files = glob.glob(os.path.join(settings.SCAM_EMAILS_FOLDER, 'lbb_blacklist_full_*.csv.bz2'))
     if not list_of_files:
         raise ValueError("No blacklist file found. Path is most likely incorrect.")
     latest_file = max(list_of_files, key=os.path.getctime)
@@ -679,6 +679,7 @@ def get_latest_scam_emails():
         myfile.readline()  # ignore header
         emails = [email.decode().strip().replace('"', '') for email in myfile]
         emails = [email for email in emails if email != '']
+    logger.info("The emails file contains {} emails".format(len(emails)))
     return emails
 
 
