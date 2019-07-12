@@ -16,6 +16,9 @@ from labonneboite.scripts.impact_retour_emploi.settings_path_charts import root_
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
+# FIXME : Refacto all files about the creation of charts and pasting on sheets (<3 Joris)
+
+
 def get_infos_from_sql():
     #Get all joined activity logs and dpae CLEAN and NO DUPLICATES
     engine = import_util.create_sqlalchemy_engine()
@@ -65,54 +68,35 @@ def get_infos_from_sql():
 
 def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connect_sign):
 
-    # Creation of all directory needed : We will put everything in /srv/lbb/data
+    # Creation of all directory needed : We will put everything in /srv/lbb/data on the server
     shutil.rmtree(root_path,ignore_errors=True)
     folders_to_create = [root_path, images_path, gd_pub_path, clean_path]
     for folder in folders_to_create:
         makedirs(folder)
 
-    # Names of different legend for Cohortes
-    all_the_names_1 = ("Total from activity", "Nbre_Total_DPAE", "Mois d'activité",
-                    "Mois d'embauche", "Origine de l'Activité,  en fonction du mois d'Embauche")
-    all_the_names_2 = ('Nbre_Total_DPAE', "Total from activity", "Mois d'embauche",
-                    "Mois d'activité", "Nombres et Mois d'Embauche,  en fonction du mois d'Activité")
-
-
-    def location(num_image, file_name, link=False):  # Pasting of pictures
-        if link is True:
-            ws.merge_cells("A21:F21")
-            ws.merge_cells("G21:L21")
-            ws.merge_cells("M21:R21")
-
-            num_image += 3
-        list_abscisses = ["A", "G", "M"]
-        if "cohorte" in file_name:
-            list_abscisses = ["A", "G"]
-        y = (((num_image//len(list_abscisses)))*20)+1
-        x = list_abscisses[num_image % len(list_abscisses)]
-        return x+str(y)
-
     # Write Datas and Charts in Excel :
-
-    # Initialisation
+    # -------------------------------------
+    # Initialisation of the excel sheets
     sheet_names = [None, "BoxPlot + Graph",
                 "Détail Embauches", "Pie Charts", "Map", "Cohortes"]
     sheet_sizes = [None, 5, 2, 2, 3]  # Number of files per sheet (start at 0)
     num_sheet = 1
 
-    # Writes raw data
+    # First sheet : paste raw datas of the dataframe
+    # -------------------------------------
     wb = openpyxl.Workbook()
     wb.save(root_path+'Temporaire.xlsx')
-    temporaire_df = pd.ExcelWriter(root_path+'Temporaire.xlsx', engine='xlsxwriter')
-    df_act_dpae.to_excel(temporaire_df, 'DPAE', index=False)
-    temporaire_df.save()
+    df_tmp = pd.ExcelWriter(root_path+'Temporaire.xlsx', engine='xlsxwriter')
+    df_act_dpae.to_excel(df_tmp, 'DPAE', index=False)
+    df_tmp.save()
     book = openpyxl.load_workbook(root_path+'Temporaire.xlsx', data_only=True)
 
-    # Extend columns
+    # Enlarge the columns of the excel document first sheet
     for i in range(len(df_act_dpae.columns.tolist())):
         book.active.column_dimensions[ALPHABET[i]].width = 20
 
-    # Past of graphics/maps/Pie etc...
+    # next sheets : paste different graphics/maps/Pie/charts etc...
+    # ------------------------
     book.create_sheet(sheet_names[num_sheet])
     ws = book.worksheets[num_sheet]
     dict_charts = {('01', "diff_activite_embauche_jrs", "Nombre de Jours entre l'activite sur lbb et la DPAE", "act_emb", 1): charts.BoxPlot,
@@ -127,11 +111,14 @@ def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connec
                 ('12', "code_postal", "Part des DPAE par anciennes régions", "old_region_gd_public_svg", "old_region"): fr.map_fr,
                 ('13', "code_postal", "Part des DPAE par nouvelles régions", "new_region_gd_public_svg", "new_region"): fr.map_fr,
                 ('14', "code_postal", "Part des DPAE par département", "dep_gd_public_svg", "departement"): fr.map_fr,
-                ('15', 'date_embauche', all_the_names_1, 'cohorte_1_gd_public', 'date_activite'): charts.Stacked_Bar,
-                ('16', 'date_activite', all_the_names_2, 'cohorte_2_gd_public', 'date_embauche'): charts.Stacked_Bar}
+                ('15', 'date_embauche', ("Total from activity", "Nbre_Total_DPAE", "Mois d'activité",
+                    "Mois d'embauche", "Origine de l'Activité,  en fonction du mois d'Embauche"), 'cohorte_1_gd_public', 'date_activite'): charts.Stacked_Bar,
+                ('16', 'date_activite', ('Nbre_Total_DPAE', "Total from activity", "Mois d'embauche",
+                    "Mois d'activité", "Nombres et Mois d'Embauche,  en fonction du mois d'Activité"), 'cohorte_2_gd_public', 'date_embauche'): charts.Stacked_Bar}
 
 
-    ####Boucle ? #################################################################################
+    # Add some important numbers on the first sheet
+    #------------------------------------------
     # Add number of DPAE with LBB activity
     nbre_DPAE = df_act_dpae['date_activite'].describe().tolist()[0]
     ws.merge_cells('A4:F4')
@@ -180,13 +167,14 @@ def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connec
     IDPE_sign_for_gd_pub = [cell_A10.value,
                             nbre_IDPE_sign, cell_A11.value]  # for grand_public
 
-    ##################################################################################################
 
     num_im = 1
     package_svg = []
     all_stats = []
 
-    for args in dict_charts:  # Creation and saving of charts, using charts.py
+    # Creation and saving of charts, using charts.py
+    #-----------------------------
+    for args in dict_charts:  
         if 'sql' in dict_charts[args].__name__:  # choose data
             data = idpe_connect
         else:
@@ -194,14 +182,30 @@ def make_charts(df_act_dpae, idpe_connect, total_idpe_connect, total_idpe_connec
 
         # Creation of charts/maps in directory "images/"
         image = dict_charts[args](
-            args[0], args[1], data, args[2], args[3], args[4])  # function
+            args[0], args[1], data, args[2], args[3], args[4])  # a chart function is related to each set of args
 
-        # if sem in args, function return the number of graph by "week". It means that create a new sheet is necessary
+        # FIXME : ??? What ???
+        # if sem in args, function return the number of graph by "week". It means that creating a new sheet is necessary
         # if sem not in args AND image is not None, it means that the function return a list of stats (for gd_pub sheet)
         if "sem" in args[3]:
             sheet_sizes.insert(2, image-1)
         elif image is not None:
             all_stats.append(image)
+
+    # Pasting of pictures
+    def location(num_image, file_name, link=False):  
+        if link is True:
+            ws.merge_cells("A21:F21")
+            ws.merge_cells("G21:L21")
+            ws.merge_cells("M21:R21")
+
+            num_image += 3
+        list_abscisses = ["A", "G", "M"]
+        if "cohorte" in file_name:
+            list_abscisses = ["A", "G"]
+        y = (((num_image//len(list_abscisses)))*20)+1
+        x = list_abscisses[num_image % len(list_abscisses)]
+        return x+str(y)
 
     # Iterate through the created images
     # Pasting of charts from the directory
