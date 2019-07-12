@@ -14,7 +14,7 @@ class TestSimple(LbbSeleniumTestCase):
         """
         self.driver.get(self.url_for('root.home'))
 
-        self.driver.find_element_by_name('j').send_keys('boucher')
+        self.driver.find_element_by_name('j').send_keys('comptabilite')
         time.sleep(3)
         self.driver.find_element_by_id('j').send_keys(Keys.DOWN)
         self.driver.find_element_by_id('j').send_keys(Keys.RETURN)
