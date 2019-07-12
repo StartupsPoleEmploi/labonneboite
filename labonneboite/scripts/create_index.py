@@ -668,9 +668,8 @@ def update_offices_geolocations():
                 params={'ignore': 404},
             )
 
-
 def get_latest_scam_emails():
-    list_of_files = glob.glob(os.path.join(settings.SCAM_EMAILS_FOLDER, 'lbb_blacklist_full_*.csv.bz2'))
+    list_of_files = glob.glob(os.path.join(settings.SCAM_EMAILS_FOLDER, 'lbb_blacklist_full_*.bz2'))
     if not list_of_files:
         raise ValueError("No blacklist file found. Path is most likely incorrect.")
     latest_file = max(list_of_files, key=os.path.getctime)
