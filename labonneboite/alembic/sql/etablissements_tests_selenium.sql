@@ -12,7 +12,6 @@
 SET @PREVIOUS_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;
 SET FOREIGN_KEY_CHECKS = 0;
 
-
 LOCK TABLES `etablissements` WRITE;
 TRUNCATE `etablissements`;
 ALTER TABLE `etablissements` DISABLE KEYS;
@@ -48,7 +47,10 @@ INSERT INTO `etablissements` (`siret`, `raisonsociale`, `enseigne`, `codenaf`, `
     ('99882350427910','MA MOYENNE ENTREPRISE','','6420Z','','RUE LUCIEN CUENOT','54357','54320','','','54','02',98,6.1332809,48.70688,'http://www.dummywebsite.com',1,0,0,0,0,'',62), #  Maxéville
 
     # For test_reset_naf and isochrone tests
-    ('30111709900020','LAVAUX JACQUES','CABINET LAVAUX JACQUES','6622Z','77','RUE MAZELLE','57463','57000','','','57','',91,6.18374,49.1155,'http://www.dummywebsite.com',0,0,1,0,0,'',41);
+    ('30111709900020','LAVAUX JACQUES','CABINET LAVAUX JACQUES','6622Z','77','RUE MAZELLE','57463','57000','','','57','',91,6.18374,49.1155,'http://www.dummywebsite.com',0,0,1,0,0,'',41),
+
+    # For test_make_a_new_search
+    ('99882350427630','LA BOUCHERIE DU PALAIS','','4722Z','1','AVENUE FOCH','57463','57000','','','57','02',98,6.1713958,49.1113618,'http://www.dummywebsite.com',1,0,0,0,0,'',62); # boucher
 
 ALTER TABLE `etablissements` ENABLE KEYS;
 UNLOCK TABLES;
