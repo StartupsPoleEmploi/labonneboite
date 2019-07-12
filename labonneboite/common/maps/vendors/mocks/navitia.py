@@ -6,10 +6,8 @@ from labonneboite.common.maps.vendors import navitia
 from flask import current_app
 
 """
-These functions are used to mock Navitia API responses in Selenium tests.
+These functions are used to mock Navitia API responses.
 """
-from flask import current_app
-
 
 
 def isochrone(origin, duration):
@@ -25,10 +23,16 @@ def isochrone(origin, duration):
         status_code=200,
         json=mock.Mock(return_value=json.loads(navitia_response))
     )
+
     requests_get = mock.Mock(return_value=response)
 
-    with mock.patch.object(navitia.requests, 'get', requests_get):
-        isochrone = navitia.isochrone(origin, duration)
+    # The Navitia module makes two API requests:
+    # one to get a coverage id and a second one to get isochrones.
+    # For more details on the coverage_id, see the full request answer here:
+    # fixtures/navitia_metz_coverage.json
+    with mock.patch.object(navitia, 'get_coverage', return_value='fr-ne'):
+        with mock.patch.object(navitia.requests, 'get', requests_get):
+            isochrone = navitia.isochrone(origin, duration)
 
     return isochrone
 

@@ -6,7 +6,7 @@ from labonneboite.common.maps.vendors import ign
 from flask import current_app
 
 """
-These functions are used to mock IGN API responses in Selenium tests.
+These functions are used to mock IGN API requests.
 """
 
 
