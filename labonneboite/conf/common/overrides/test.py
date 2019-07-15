@@ -31,8 +31,8 @@ TRAVEL_VENDOR_BACKENDS = {
         'public': 'navitia_mock',
     },
     'durations': {
-        'car': 'dummy',
-        'public': 'dummy',
+        'car': 'ign_mock',
+        'public': 'navitia_mock',
     },
 }
 
