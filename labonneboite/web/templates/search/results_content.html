@@ -13,8 +13,7 @@
     <div class="lbb-content">
       <div class="lbb-content-with-sidebar">
         <form action="{{ url_for('search.entreprises') }}" class="js-search-form no-margin no-padding" method="get">
-
-          <div class="hidden" id="hidden-search-form">
+          <div id="hidden-search-form" class="hidden">
             <!-- This form will be submitted via Javascript when a new filter is used. -->
             {% include "includes/search_form.html" %}
           </div>

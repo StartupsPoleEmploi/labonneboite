@@ -54,7 +54,7 @@ class TestResetNaf(LbbSeleniumTestCase):
         # self.driver.find_element_by_id('flHideToolBarButton').click()
 
         # Submit the search form.
-        self.driver.find_element_by_css_selector('form.js-search-form div.form-search button').click()
+        self.driver.find_element_by_css_selector('#shown-search-form button').click()
 
         # The NAF filter should be reset.
         WebDriverWait(self.driver, 10).until(url_has_changed(current_url))

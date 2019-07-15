@@ -1,9 +1,7 @@
 import distutils.spawn
 import logging
-from pathlib import Path
 
 import easyprocess
-import vcr
 from flask import url_for as flask_url_for
 from flask_testing import LiveServerTestCase
 from selenium import webdriver
@@ -45,7 +43,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         self.display = None
         try:
             from pyvirtualdisplay import Display
-            display = Display(visible=0, size=(800, 600))
+            display = Display(visible=0, size=(1600, 1600))
             display.start()
         except easyprocess.EasyProcessCheckInstalledError:
             # On some unreliable and exotic OS (such as Mac OS) installing a
@@ -98,38 +96,3 @@ def url_has_changed(current_url):
     def check(driver):
         return driver.current_url != current_url
     return check
-
-
-"""
-########## VCR configuration for selenium tests ##########
-
-All methods using VCR will have their HTTP requests mocked into a JSON file
-located in the 'fixtures' repository.
-
-To know more, read the documentation: https://vcrpy.readthedocs.io/en/latest/usage.html
-"""
-
-# Return the path to Test directory
-TESTS_DIR = Path(__file__).absolute().parent
-
-# def fixtures_path(filename):
-#     """
-#     Return an absolute path to a desired fixture file.
-#     """
-#     return str(TESTS_DIR / 'fixtures' / filename)
-
-VCR = vcr.VCR(
-    serializer='yaml',
-    cassette_library_dir=str(TESTS_DIR / 'fixtures'),
-
-    # We should NOT record new interactions, as we don't want to make real requests
-    # in a CI environment.
-    record_mode='new_episodes',
-    # record_mode='none',
-
-    # Requests using the same URI and method will not be registered.
-    # match_on=['uri', 'method'],
-
-    # Do not store sensitive information into a JSON file!
-    filter_query_parameters=['key']
-)

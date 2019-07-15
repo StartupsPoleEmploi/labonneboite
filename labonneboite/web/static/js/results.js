@@ -18,7 +18,7 @@ var trackOutboundLink = function(url) {
     $('.js-map-container:visible').initMap();
     $('.js-result-toggle-details').toggleDetails();
     updateTravelDurations();
-    // $('#shown-search-form').checkChanges();
+    $('#shown-search-form').checkChanges();
 
     var eventLabel;
     if ($('.ga-no-results').length) {
@@ -200,14 +200,30 @@ var trackOutboundLink = function(url) {
   }
 
 
-  // $.fn.checkChanges = function () {
-  //   var form = this;
-  //   var inputs = form.children('input')
-  //   form.on('submit', function(e) {
-  //     e.preventDefault();
-  //     e.stopPropagation();
+  $.fn.checkChanges = function () {
+    var shown_form = this;
+    var hidden_form = $('.js-search-form');
+    var send_button = shown_form.find('button[type="submit"]');
 
-  //   });
+    send_button.on('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
 
-  // }
+      // Make sure new fields are displayed in the shown form.
+      var location = shown_form.find('#l');
+      var occupation = shown_form.find('#j');
+      location.attr('value', location.prop('value'));
+      occupation.attr('value', occupation.prop('value'));
+      shown_form.submit();
+    });
+
+    shown_form.on('submit', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var html_form = shown_form.html();
+      hidden_form.find('#hidden-search-form').html(html_form);
+      hidden_form.submit();
+    });
+  }
+
 })(jQuery);
