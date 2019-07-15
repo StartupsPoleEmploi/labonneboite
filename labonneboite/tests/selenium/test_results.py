@@ -9,7 +9,12 @@ class TestResults(LbbSeleniumTestCase):
         """
         Tests the toggle mechanism of the `results` page.
         """
-        url = self.url_for('search.results', city='metz', zipcode='57000', occupation='comptabilite')
+        url = self.url_for(
+            'search.results',
+            city='metz',
+            zipcode='57000',
+            occupation='comptabilite'
+        )
         self.driver.get(url)
 
         # Get the HTML element that contains all company informations.

@@ -112,10 +112,9 @@ class TestSearchSelectingCar(LbbSeleniumTestCase):
         # Find the first element that matches this CSS selector.
         enterprise_details = self.driver.find_element_by_css_selector('.lbb-result')
         travel_duration_text = enterprise_details.find_element_by_css_selector('.travel-duration').text
-        # travel_duration = re.match(r'(\d+)', results_sentence).group()
 
         # Make sure duration is displayed.
-        self.assertRegexpMatches(travel_duration_text, r'(\d+)')
+        self.assertRegex(travel_duration_text, r'(\d+)')
 
         # Make sure travel mode is displayed
         self.assertIn('voiture', travel_duration_text)

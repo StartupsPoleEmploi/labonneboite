@@ -68,7 +68,6 @@
         </div>
         <div class="row">
           {# START favorites. #}
-          {# TODO reactivate if block!!! #}
           {% if show_favorites and user.is_authenticated %}
             {% if (user_favs_as_sirets is defined) and (company.siret not in user_favs_as_sirets) %}
               <form action="{{ url_for('user.favorites_add', siret=company.siret) }}" method="post" class="form-inline">
@@ -117,14 +116,12 @@
             {% if jepostule_enabled(user, company) %}
               <a class="jepostule-button no-underline" href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}" target="_blank" rel="noopener">
                 <button class="btn btn-small full-width" type="submit">Postuler
-                  <!-- <span class="btn btn-small full-width">Postuler</span> -->
                 </button>
               </a>
             {% endif %}
 
             {% if not user.is_authenticated and company.email %}
               <button class="jepostule-not-authentified jepostule-buttoninvisible btn btn-small full-width" id="">Postuler
-                <!-- <span class="btn btn-small full-width">Postuler</span> -->
               </button>
             {% endif %}
           {% endif %}

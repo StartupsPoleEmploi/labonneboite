@@ -1,6 +1,5 @@
 import time
 
-from flask import url_for
 from selenium.webdriver.common.keys import Keys
 
 from .base import LbbSeleniumTestCase

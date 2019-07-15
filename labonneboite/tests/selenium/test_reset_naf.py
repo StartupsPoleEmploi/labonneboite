@@ -15,7 +15,12 @@ class TestResetNaf(LbbSeleniumTestCase):
         Ensure that the NAF filter is reset when a new job search is performed.
         """
         # Search results for `comptabilite` in `Metz`.
-        url = self.url_for('search.results', city='metz', zipcode='57000', occupation='comptabilite')
+        url = self.url_for(
+            'search.results',
+            city='metz',
+            zipcode='57000',
+            occupation='comptabilite'
+        )
         self.driver.get(url)
 
         current_url = self.driver.current_url

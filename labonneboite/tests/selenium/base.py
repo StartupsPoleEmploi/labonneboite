@@ -63,7 +63,10 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         capabilities = DesiredCapabilities.CHROME
         capabilities['loggingPrefs'] = {'browser': 'ALL'}
 
-        self.driver = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_path)
+        self.driver = webdriver.Chrome(
+            desired_capabilities=capabilities,
+            executable_path=chromedriver_path
+        )
 
         # Ensure that the window size is large enough so that HTML elements won't overlap.
         self.driver.set_window_size(1600, 1200)
