@@ -56,7 +56,7 @@ current_app.logger.critical('HEY, SHOW ME!')
 
 ## Isochrone tests
 
-They use custom backends to mock API calls: `ign_mock` and `navitia_mock`. Check that they are activated in your settings:
+They use custom backends to mock API calls: `ign_mock` and `navitia_mock`. Check that they are activated in your test settings:
 
 _conf/common/overrides/test.py_
 ```
@@ -66,11 +66,8 @@ TRAVEL_VENDOR_BACKENDS = {
         'public': 'navitia_mock',
     },
     'durations': {
-        'car': 'dummy',
-        'public': 'dummy',
+        'car': 'ign_mock',
+        'public': 'navitia_mock',
     },
 }
 ```
-
-For the moment, we only test searches using commute duration.
-Displaying commute time in individual office details is not tested.
