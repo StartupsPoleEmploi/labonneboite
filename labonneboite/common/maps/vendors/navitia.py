@@ -33,28 +33,32 @@ def durations(origin, destinations):
     # Endpoint must be computed just once so that we don't make too many
     # coverage requests to navitia
     endpoint = get_coverage_endpoint('journeys', origin)
-
-    params = {
-        'from': '{:.7f};{:.7f}'.format(origin[1], origin[0]),
-    }
     results = []
     for destination in destinations:
-        params['to'] = '{:.7f};{:.7f}'.format(destination[1], destination[0])
-
-        try:
-            data = request_json_api(endpoint, params=params)
-            if data.get('error') and data['error']['id'] == 'no_solution':
-                duration = None
-            else:
-                duration = data['journeys'][0]['duration']
-        except BackendUnreachable:
-            duration = None
+        duration = get_duration(endpoint, origin, destination)
         results.append(duration)
-
     return results
 
 
 # Auxiliary functions
+
+def get_duration(endpoint, origin, destination):
+    params = {
+        'from': '{:.7f};{:.7f}'.format(origin[1], origin[0]),
+        'to': '{:.7f};{:.7f}'.format(destination[1], destination[0]),
+    }
+
+    try:
+        data = request_json_api(endpoint, params=params)
+        if data.get('error') and data['error']['id'] == 'no_solution':
+            duration = None
+        else:
+            duration = data['journeys'][0]['duration']
+    except BackendUnreachable:
+        duration = None
+
+    return duration
+
 
 def request_location_api(endpoint, location, params):
     endpoint = get_coverage_endpoint(endpoint, location)

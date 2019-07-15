@@ -1,0 +1,333 @@
+{
+    "tickets": [],
+    "links": [
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1714000;49.1114000&from=6.1760260;49.1191460&datetime_represents=departure&datetime=20190715T000000",
+            "type": "first",
+            "rel": "first",
+            "templated": false
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1714000;49.1114000&from=6.1760260;49.1191460&datetime_represents=arrival&datetime=20190715T235959",
+            "type": "last",
+            "rel": "last",
+            "templated": false
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/addresses/{address.id}",
+            "type": "address",
+            "rel": "addresses",
+            "templated": true
+        }
+    ],
+    "journeys": [
+        {
+            "status": "",
+            "distances": {
+                "taxi": 0,
+                "car": 0,
+                "walking": 1038,
+                "bike": 0,
+                "ridesharing": 0
+            },
+            "tags": [
+                "walking",
+                "non_pt",
+                "non_pt_walking",
+                "ecologic"
+            ],
+            "nb_transfers": 0,
+            "durations": {
+                "taxi": 0,
+                "walking": 927,
+                "car": 0,
+                "ridesharing": 0,
+                "bike": 0,
+                "total": 927
+            },
+            "arrival_date_time": "20190715T164339",
+            "departure_date_time": "20190715T162812",
+            "requested_date_time": "20190715T162812",
+            "fare": {
+                "found": false,
+                "links": []
+            },
+            "co2_emission": {
+                "value": 0.0,
+                "unit": ""
+            },
+            "type": "best",
+            "duration": 927,
+            "sections": [
+                {
+                    "from": {
+                        "embedded_type": "address",
+                        "distance": "7",
+                        "name": "5 En Fournirue (Metz)",
+                        "address": {
+                            "name": "5 En Fournirue",
+                            "house_number": 5,
+                            "coord": {
+                                "lat": "49.119098",
+                                "lon": "6.175959"
+                            },
+                            "label": "5 En Fournirue (Metz)",
+                            "administrative_regions": [
+                                {
+                                    "insee": "57463",
+                                    "name": "Metz",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.1196964",
+                                        "lon": "6.1763552"
+                                    },
+                                    "label": "Metz (57000-57070)",
+                                    "id": "admin:fr:57463",
+                                    "zip_code": "57000-57070"
+                                }
+                            ],
+                            "id": "6.175959;49.119098"
+                        },
+                        "quality": 0,
+                        "id": "6.175959;49.119098"
+                    },
+                    "links": [],
+                    "arrival_date_time": "20190715T164339",
+                    "departure_date_time": "20190715T162812",
+                    "to": {
+                        "embedded_type": "address",
+                        "distance": "16",
+                        "name": "3 Avenue Joffre (Metz)",
+                        "address": {
+                            "name": "3 Avenue Joffre",
+                            "house_number": 3,
+                            "coord": {
+                                "lat": "49.111521",
+                                "lon": "6.17152"
+                            },
+                            "label": "3 Avenue Joffre (Metz)",
+                            "administrative_regions": [
+                                {
+                                    "insee": "57463",
+                                    "name": "Metz",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.1196964",
+                                        "lon": "6.1763552"
+                                    },
+                                    "label": "Metz (57000-57070)",
+                                    "id": "admin:fr:57463",
+                                    "zip_code": "57000-57070"
+                                }
+                            ],
+                            "id": "6.17152;49.111521"
+                        },
+                        "quality": 0,
+                        "id": "6.17152;49.111521"
+                    },
+                    "co2_emission": {
+                        "value": 0.0,
+                        "unit": ""
+                    },
+                    "geojson": {
+                        "type": "LineString",
+                        "properties": [
+                            {
+                                "length": 1038
+                            }
+                        ],
+                        "coordinates": [
+                            [
+                                6.1759973237,
+                                49.1191728836
+                            ],
+                            [
+                                6.176171,
+                                49.119084
+                            ],
+                            [
+                                6.177011,
+                                49.118722
+                            ],
+                            [
+                                6.176566,
+                                49.118206
+                            ],
+                            [
+                                6.176007,
+                                49.117856
+                            ],
+                            [
+                                6.17533,
+                                49.117065
+                            ],
+                            [
+                                6.175217,
+                                49.116927
+                            ],
+                            [
+                                6.174789,
+                                49.116434
+                            ],
+                            [
+                                6.174528,
+                                49.116139
+                            ],
+                            [
+                                6.174025,
+                                49.115538
+                            ],
+                            [
+                                6.174081,
+                                49.115487
+                            ],
+                            [
+                                6.174015,
+                                49.115422
+                            ],
+                            [
+                                6.172661,
+                                49.114156
+                            ],
+                            [
+                                6.172416,
+                                49.113922
+                            ],
+                            [
+                                6.171494,
+                                49.112948
+                            ],
+                            [
+                                6.171489,
+                                49.112853
+                            ],
+                            [
+                                6.171361,
+                                49.112683
+                            ],
+                            [
+                                6.171028,
+                                49.111858
+                            ],
+                            [
+                                6.171132,
+                                49.111851
+                            ],
+                            [
+                                6.171107,
+                                49.111719
+                            ],
+                            [
+                                6.171084,
+                                49.111631
+                            ],
+                            [
+                                6.1715260542,
+                                49.1115946738
+                            ]
+                        ]
+                    },
+                    "duration": 927,
+                    "path": [
+                        {
+                            "duration": 79,
+                            "direction": 0,
+                            "length": 88,
+                            "name": "En Fournirue"
+                        },
+                        {
+                            "duration": 109,
+                            "direction": 86,
+                            "length": 122,
+                            "name": "Rue Ladoucette"
+                        },
+                        {
+                            "duration": 262,
+                            "direction": -17,
+                            "length": 293,
+                            "name": "Rue Serpenoise"
+                        },
+                        {
+                            "duration": 6,
+                            "direction": -64,
+                            "length": 7,
+                            "name": "Rue du Co\u00ebtlosquet"
+                        },
+                        {
+                            "duration": 302,
+                            "direction": 69,
+                            "length": 338,
+                            "name": "Avenue Robert Schuman"
+                        },
+                        {
+                            "duration": 9,
+                            "direction": -30,
+                            "length": 10,
+                            "name": "Rue Harelle"
+                        },
+                        {
+                            "duration": 19,
+                            "direction": 24,
+                            "length": 21,
+                            "name": "Rue du G\u00e9n\u00e9ral Gaston Dupuis"
+                        },
+                        {
+                            "duration": 86,
+                            "direction": -11,
+                            "length": 96,
+                            "name": ""
+                        },
+                        {
+                            "duration": 6,
+                            "direction": -99,
+                            "length": 7,
+                            "name": "Avenue Joffre"
+                        },
+                        {
+                            "duration": 21,
+                            "direction": 91,
+                            "length": 24,
+                            "name": ""
+                        },
+                        {
+                            "duration": 28,
+                            "direction": 0,
+                            "length": 31,
+                            "name": ""
+                        }
+                    ],
+                    "type": "street_network",
+                    "id": "section_0_0",
+                    "mode": "walking"
+                }
+            ]
+        }
+    ],
+    "disruptions": [],
+    "notes": [],
+    "feed_publishers": [
+        {
+            "url": "navitia.io",
+            "id": "fr-ne",
+            "license": "OpenData",
+            "name": "France North-East Quarter"
+        },
+        {
+            "url": "https://www.openstreetmap.org/copyright",
+            "id": "osm",
+            "license": "ODbL",
+            "name": "openstreetmap"
+        }
+    ],
+    "context": {
+        "timezone": "Europe/Paris",
+        "current_datetime": "20190715T162812",
+        "car_direct_path": {
+            "co2_emission": {
+                "value": 224.2055482359,
+                "unit": "gEC"
+            }
+        }
+    },
+    "exceptions": []
+}

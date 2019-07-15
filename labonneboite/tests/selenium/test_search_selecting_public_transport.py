@@ -5,6 +5,7 @@ docker/alembic/etablissements_tests_selenium.
 """
 
 import re
+import time
 import urllib.parse
 
 from parameterized import parameterized
@@ -112,4 +113,35 @@ class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
         self.assertEqual(last_results, expected_results[duration])
         self.assertLessEqual(int(last_results), int(primitive_results))
 
-    # duration test
+
+    def test_commute_time_is_displayed(self):
+        """
+        Each office details should have a commute time
+        displayed along with other information.
+        As default transport mode is car, we need to switch
+        to public transports to make it appear on details.
+        """
+
+        # Click on "min"
+        self.driver.find_element_by_css_selector('.switch-element[data-switch-value="duration"]')\
+            .click()
+
+        # Travel modes should be visible now
+        public_button = self.driver.find_element_by_css_selector(
+            '.travelmode-choices a.visible[data-travelmode="public"]'
+        ).click()
+
+        # Click on any duration to reload the page
+        self.driver\
+            .find_element_by_css_selector(f'#isochrone-durations input[value="{ISOCHRONE_DURATIONS_MINUTES[-1]}"]')\
+            .click()
+
+        # Find the first element that matches this CSS selector.
+        enterprise_details = self.driver.find_element_by_css_selector('.lbb-result')
+        travel_duration_text = enterprise_details.find_element_by_css_selector('.travel-duration').text
+
+        # Make sure duration is displayed.
+        self.assertRegexpMatches(travel_duration_text, r'(\d+)')
+
+        # Make sure travel mode is displayed
+        self.assertIn('transports en commun', travel_duration_text)
