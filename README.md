@@ -386,3 +386,4 @@ Here is an example of output:
 - [Search using isochrone data](/labonneboite/common/maps)
 - [Database migration system](/labonneboite/alembic)
 - [User Authentication system](/labonneboite/web/auth)
+- [Functional tests](/labonneboite/tests/selenium)
