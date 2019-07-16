@@ -80,9 +80,6 @@ function createMap(element, center, zoom) {
         // https://github.com/mapbox/mapbox-gl-js/pull/5518/files
         map.fitBounds(bounds, { duration: 0 }, { initialZoom: true });
       }
-      var centerMarker = new mapboxgl.Marker({color: "#FF685C"})
-        .setLngLat([$longitude.val(), $latitude.val()])
-        .addTo(map);
       companies.forEach(function(company) {
         var popup = new mapboxgl.Popup()
           .setHTML(company.link);
@@ -155,7 +152,7 @@ function createMap(element, center, zoom) {
           }
       }
       $("input[name='d']").val(newDistance);
-      
+
       // Clear the location field so that it gets auto-filled server-side
       var $location = $('#l');
       $location.attr('placeholder', $location.val());

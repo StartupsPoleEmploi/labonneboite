@@ -15,7 +15,7 @@ services:
 
 # Launch services and wait until mysql is ready.
 # Wait only if /var/lib/mysql folder is not present yet.
-init-services: services 
+init-services: services
 	cd docker && docker-compose run mysql stat /var/lib/mysql >/dev/null || until docker-compose logs mysql | grep "MySQL init process done. Ready for start up."; do echo "waiting for mysql initialization..."; sleep 4; done
 
 database: database-dev database-test
@@ -37,6 +37,11 @@ populate-data-dev:
 populate-data-test:
 	LBB_ENV=test alembic upgrade head
 	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
+	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
+
+populate-data-test-selenium:
+	LBB_ENV=test alembic upgrade head
+	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements_tests_selenium.sql
 	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
 
 clear-data: clear-data-dev clear-data-test
@@ -127,12 +132,18 @@ create-index-from-scratch-with-profiling-line-by-line:
 mysql-local-shell:
 	mysql -u root --host 127.0.0.1 --port 3307 labonneboite
 
+rebuild-simplified-rome-naf-mapping:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/rebuild_simplified_rome_naf_mapping.py
+
 rebuild-importer-tests-compressed-files:
 	cd labonneboite/tests/importer/data && \
 	rm -f LBB_XDPDPAE_2016-11-10_2015-10-10.csv.gz && \
 	gzip --keep LBB_XDPDPAE_2016-11-10_2015-10-10.csv && \
 	rm -f LBB_XDPDPAE_2016-11-10_2015-10-10.csv.bz2 && \
 	bzip2 --keep LBB_XDPDPAE_2016-11-10_2015-10-10.csv
+
+rebuild-city-codes:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python importer/scripts/clean_csv_city_codes.py
 
 # Load testing
 # ------------
@@ -184,7 +195,7 @@ test-scripts:
 test-integration: clear-data-test database-test populate-data-test
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/integration
 
-test-selenium: clear-data-test database-test populate-data-test
+test-selenium: clear-data-test database-test populate-data-test-selenium
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/selenium
 
 # Convenient reminder about how to run a specific test manually.
@@ -212,7 +223,7 @@ alembic-rollback:
 
 alembic-generate-migration:
 	@echo "Run for example:"
-	@echo 
+	@echo
 	@echo "    $$ alembic revision -m 'create account table'"
 
 # Importer jobs
@@ -274,3 +285,40 @@ run-importer-job-07-geocode:
 
 run-importer-job-08-populate-flags:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/populate_flags.py
+
+
+# Redis useful commands
+# -----
+
+REDIS_DOCKER_COMPOSE = docker-compose -f docker/docker-compose.yml run redis bash -c
+REDIS_CONNECT = redis-cli -h redis -p 6389
+
+redis-get-key:
+	# Eg: $ redis-get-key KEY="huey.results.huey"
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) get '$(KEY)'"
+
+redis-count-keys:
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '$(PATTERN)' | wc -l"
+
+redis-show-keys:
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '$(PATTERN)' | head -10"
+
+redis-delete-keys:
+	# Eg: $ redis-delete-keys PATTERN='"mypattern"'
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '$(PATTERN)' | tr '\n' '\0' | xargs -L1 -0 $(REDIS_CONNECT) del"
+
+clean-car-isochrone-cache:
+	@echo '###### Total keys to be deleted \#######'
+	PATTERN='*isochrone**car*' $(MAKE) redis-count-keys
+	@echo '###### EXTERMINATE ISOCHRONE CACHE! \######'
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '*isochrone**car*' | tr '\n' '\0' | xargs -L1 -0 $(REDIS_CONNECT) del"
+
+clean-car-isochrone-and-durations-cache: clean-car-isochrone-cache
+	@echo '###### Total keys to be deleted \#######'
+	PATTERN='*durations**car*' $(MAKE) redis-count-keys
+	@echo '###### EXTERMINATE DURATIONS! \######'
+	$(REDIS_DOCKER_COMPOSE) "$(REDIS_CONNECT) --scan --pattern '*durations**car*' | tr '\n' '\0' | xargs -L1 -0 $(REDIS_CONNECT) del"
+
+delete-unused-redis-containers:
+	docker ps -f status=restarting -f name=redis --format "{{.ID}}" \
+    | xargs docker rm -f

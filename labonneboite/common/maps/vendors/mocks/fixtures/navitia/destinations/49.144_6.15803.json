@@ -1,0 +1,2463 @@
+{
+    "tickets": [],
+    "links": [
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1580300;49.1440000&from=6.1760260;49.1191460&datetime_represents=departure&datetime=20190715T165248",
+            "type": "next",
+            "rel": "next",
+            "templated": false
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1580300;49.1440000&from=6.1760260;49.1191460&datetime_represents=arrival&datetime=20190715T173242",
+            "type": "prev",
+            "rel": "prev",
+            "templated": false
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1580300;49.1440000&from=6.1760260;49.1191460&datetime_represents=departure&datetime=20190715T000000",
+            "type": "first",
+            "rel": "first",
+            "templated": false
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1580300;49.1440000&from=6.1760260;49.1191460&datetime_represents=arrival&datetime=20190715T235959",
+            "type": "last",
+            "rel": "last",
+            "templated": false
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/stop_points/{stop_point.id}",
+            "type": "stop_point",
+            "rel": "stop_points",
+            "templated": true
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/commercial_modes/{commercial_modes.id}",
+            "type": "commercial_modes",
+            "rel": "commercial_modes",
+            "templated": true
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/stop_areas/{stop_area.id}",
+            "type": "stop_area",
+            "rel": "stop_areas",
+            "templated": true
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/vehicle_journeys/{vehicle_journey.id}",
+            "type": "vehicle_journey",
+            "rel": "vehicle_journeys",
+            "templated": true
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/physical_modes/{physical_modes.id}",
+            "type": "physical_modes",
+            "rel": "physical_modes",
+            "templated": true
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/routes/{route.id}",
+            "type": "route",
+            "rel": "routes",
+            "templated": true
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/commercial_modes/{commercial_mode.id}",
+            "type": "commercial_mode",
+            "rel": "commercial_modes",
+            "templated": true
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/addresses/{address.id}",
+            "type": "address",
+            "rel": "addresses",
+            "templated": true
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/lines/{line.id}",
+            "type": "line",
+            "rel": "lines",
+            "templated": true
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/physical_modes/{physical_mode.id}",
+            "type": "physical_mode",
+            "rel": "physical_modes",
+            "templated": true
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/networks/{network.id}",
+            "type": "network",
+            "rel": "networks",
+            "templated": true
+        }
+    ],
+    "journeys": [
+        {
+            "status": "",
+            "distances": {
+                "taxi": 0,
+                "car": 0,
+                "walking": 3939,
+                "bike": 0,
+                "ridesharing": 0
+            },
+            "tags": [
+                "walking",
+                "non_pt",
+                "non_pt_walking",
+                "ecologic"
+            ],
+            "nb_transfers": 0,
+            "durations": {
+                "taxi": 0,
+                "walking": 3517,
+                "car": 0,
+                "ridesharing": 0,
+                "bike": 0,
+                "total": 3517
+            },
+            "arrival_date_time": "20190715T172649",
+            "departure_date_time": "20190715T162812",
+            "requested_date_time": "20190715T162812",
+            "fare": {
+                "found": false,
+                "links": []
+            },
+            "co2_emission": {
+                "value": 0.0,
+                "unit": ""
+            },
+            "type": "best",
+            "duration": 3517,
+            "sections": [
+                {
+                    "from": {
+                        "embedded_type": "address",
+                        "distance": "7",
+                        "name": "5 En Fournirue (Metz)",
+                        "address": {
+                            "name": "5 En Fournirue",
+                            "house_number": 5,
+                            "coord": {
+                                "lat": "49.119098",
+                                "lon": "6.175959"
+                            },
+                            "label": "5 En Fournirue (Metz)",
+                            "administrative_regions": [
+                                {
+                                    "insee": "57463",
+                                    "name": "Metz",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.1196964",
+                                        "lon": "6.1763552"
+                                    },
+                                    "label": "Metz (57000-57070)",
+                                    "id": "admin:fr:57463",
+                                    "zip_code": "57000-57070"
+                                }
+                            ],
+                            "id": "6.175959;49.119098"
+                        },
+                        "quality": 0,
+                        "id": "6.175959;49.119098"
+                    },
+                    "links": [],
+                    "arrival_date_time": "20190715T172649",
+                    "departure_date_time": "20190715T162812",
+                    "to": {
+                        "embedded_type": "address",
+                        "distance": "199",
+                        "name": "20 Rue d'Etretat (Woippy)",
+                        "address": {
+                            "name": "20 Rue d'Etretat",
+                            "house_number": 20,
+                            "coord": {
+                                "lat": "49.142773",
+                                "lon": "6.156036"
+                            },
+                            "label": "20 Rue d'Etretat (Woippy)",
+                            "administrative_regions": [
+                                {
+                                    "insee": "57751",
+                                    "name": "Woippy",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.1515848",
+                                        "lon": "6.1519224"
+                                    },
+                                    "label": "Woippy (57140)",
+                                    "id": "admin:fr:57751",
+                                    "zip_code": "57140"
+                                }
+                            ],
+                            "id": "6.156036;49.142773"
+                        },
+                        "quality": 0,
+                        "id": "6.156036;49.142773"
+                    },
+                    "co2_emission": {
+                        "value": 0.0,
+                        "unit": ""
+                    },
+                    "geojson": {
+                        "type": "LineString",
+                        "properties": [
+                            {
+                                "length": 3939
+                            }
+                        ],
+                        "coordinates": [
+                            [
+                                6.1759973237,
+                                49.1191728836
+                            ],
+                            [
+                                6.175704,
+                                49.119323
+                            ],
+                            [
+                                6.175434,
+                                49.119476
+                            ],
+                            [
+                                6.175322,
+                                49.119382
+                            ],
+                            [
+                                6.175256,
+                                49.119326
+                            ],
+                            [
+                                6.174922,
+                                49.119035
+                            ],
+                            [
+                                6.174536,
+                                49.118686
+                            ],
+                            [
+                                6.174043,
+                                49.118848
+                            ],
+                            [
+                                6.173947,
+                                49.118888
+                            ],
+                            [
+                                6.173525,
+                                49.119089
+                            ],
+                            [
+                                6.173311,
+                                49.119141
+                            ],
+                            [
+                                6.172539,
+                                49.119333
+                            ],
+                            [
+                                6.171981,
+                                49.119467
+                            ],
+                            [
+                                6.171462,
+                                49.119626
+                            ],
+                            [
+                                6.171139,
+                                49.119401
+                            ],
+                            [
+                                6.171074,
+                                49.119352
+                            ],
+                            [
+                                6.17102,
+                                49.119311
+                            ],
+                            [
+                                6.170898,
+                                49.119396
+                            ],
+                            [
+                                6.170259,
+                                49.119791
+                            ],
+                            [
+                                6.170209,
+                                49.119824
+                            ],
+                            [
+                                6.170151,
+                                49.119852
+                            ],
+                            [
+                                6.170077,
+                                49.119863
+                            ],
+                            [
+                                6.169988,
+                                49.120005
+                            ],
+                            [
+                                6.169264,
+                                49.120601
+                            ],
+                            [
+                                6.168643,
+                                49.120991
+                            ],
+                            [
+                                6.168552,
+                                49.121051
+                            ],
+                            [
+                                6.167714,
+                                49.121597
+                            ],
+                            [
+                                6.167611,
+                                49.121668
+                            ],
+                            [
+                                6.16729,
+                                49.121987
+                            ],
+                            [
+                                6.165482,
+                                49.123472
+                            ],
+                            [
+                                6.165396,
+                                49.123577
+                            ],
+                            [
+                                6.165313,
+                                49.12369
+                            ],
+                            [
+                                6.164403,
+                                49.12498
+                            ],
+                            [
+                                6.163842,
+                                49.125704
+                            ],
+                            [
+                                6.163817,
+                                49.125722
+                            ],
+                            [
+                                6.163271,
+                                49.126059
+                            ],
+                            [
+                                6.16302,
+                                49.126213
+                            ],
+                            [
+                                6.162869,
+                                49.126306
+                            ],
+                            [
+                                6.162835,
+                                49.126327
+                            ],
+                            [
+                                6.162569,
+                                49.126449
+                            ],
+                            [
+                                6.161992,
+                                49.126534
+                            ],
+                            [
+                                6.1599,
+                                49.126791
+                            ],
+                            [
+                                6.159624,
+                                49.127039
+                            ],
+                            [
+                                6.160449,
+                                49.12877
+                            ],
+                            [
+                                6.160419,
+                                49.128876
+                            ],
+                            [
+                                6.16037,
+                                49.128961
+                            ],
+                            [
+                                6.160058,
+                                49.129227
+                            ],
+                            [
+                                6.159974,
+                                49.12928
+                            ],
+                            [
+                                6.159534,
+                                49.129549
+                            ],
+                            [
+                                6.159378,
+                                49.129667
+                            ],
+                            [
+                                6.158977,
+                                49.129964
+                            ],
+                            [
+                                6.158928,
+                                49.129994
+                            ],
+                            [
+                                6.157924,
+                                49.130573
+                            ],
+                            [
+                                6.157999,
+                                49.130638
+                            ],
+                            [
+                                6.158108,
+                                49.130721
+                            ],
+                            [
+                                6.158612,
+                                49.131356
+                            ],
+                            [
+                                6.158574,
+                                49.131922
+                            ],
+                            [
+                                6.158794,
+                                49.13237
+                            ],
+                            [
+                                6.1576,
+                                49.133903
+                            ],
+                            [
+                                6.157193,
+                                49.134528
+                            ],
+                            [
+                                6.156206,
+                                49.135724
+                            ],
+                            [
+                                6.156037,
+                                49.136269
+                            ],
+                            [
+                                6.15601,
+                                49.136345
+                            ],
+                            [
+                                6.155095,
+                                49.137643
+                            ],
+                            [
+                                6.15353,
+                                49.13891
+                            ],
+                            [
+                                6.153432,
+                                49.139484
+                            ],
+                            [
+                                6.153333,
+                                49.139825
+                            ],
+                            [
+                                6.153291,
+                                49.140012
+                            ],
+                            [
+                                6.153228,
+                                49.140128
+                            ],
+                            [
+                                6.153181,
+                                49.140295
+                            ],
+                            [
+                                6.153124,
+                                49.140406
+                            ],
+                            [
+                                6.152628,
+                                49.141269
+                            ],
+                            [
+                                6.152614,
+                                49.141292
+                            ],
+                            [
+                                6.152361,
+                                49.142549
+                            ],
+                            [
+                                6.153345,
+                                49.142742
+                            ],
+                            [
+                                6.154934,
+                                49.143187
+                            ],
+                            [
+                                6.156013,
+                                49.142724
+                            ]
+                        ]
+                    },
+                    "duration": 3517,
+                    "path": [
+                        {
+                            "duration": 24,
+                            "direction": 0,
+                            "length": 27,
+                            "name": "En Fournirue"
+                        },
+                        {
+                            "duration": 23,
+                            "direction": 0,
+                            "length": 26,
+                            "name": "Place d'Armes"
+                        },
+                        {
+                            "duration": 96,
+                            "direction": -93,
+                            "length": 108,
+                            "name": "Rue Jacques-Fran\u00e7ois Blondel"
+                        },
+                        {
+                            "duration": 89,
+                            "direction": 81,
+                            "length": 100,
+                            "name": "Rue du Palais"
+                        },
+                        {
+                            "duration": 53,
+                            "direction": 0,
+                            "length": 59,
+                            "name": "Rue de la Pierre-Hardie"
+                        },
+                        {
+                            "duration": 75,
+                            "direction": -1,
+                            "length": 84,
+                            "name": "Rue de la Paix"
+                        },
+                        {
+                            "duration": 41,
+                            "direction": -72,
+                            "length": 46,
+                            "name": "Quai Paul Vautrin"
+                        },
+                        {
+                            "duration": 68,
+                            "direction": 96,
+                            "length": 76,
+                            "name": "Moyen Pont"
+                        },
+                        {
+                            "duration": 290,
+                            "direction": 2,
+                            "length": 325,
+                            "name": "Rue du Pont des Morts"
+                        },
+                        {
+                            "duration": 188,
+                            "direction": -5,
+                            "length": 211,
+                            "name": "Pont des Morts"
+                        },
+                        {
+                            "duration": 246,
+                            "direction": 10,
+                            "length": 276,
+                            "name": "Rue de Paris"
+                        },
+                        {
+                            "duration": 48,
+                            "direction": -4,
+                            "length": 54,
+                            "name": "Pont du Canal"
+                        },
+                        {
+                            "duration": 97,
+                            "direction": 0,
+                            "length": 109,
+                            "name": "Rue de Paris"
+                        },
+                        {
+                            "duration": 138,
+                            "direction": -2,
+                            "length": 155,
+                            "name": "Pont de Fer"
+                        },
+                        {
+                            "duration": 31,
+                            "direction": 43,
+                            "length": 35,
+                            "name": ""
+                        },
+                        {
+                            "duration": 425,
+                            "direction": 53,
+                            "length": 476,
+                            "name": "Route de Lorry"
+                        },
+                        {
+                            "duration": 8,
+                            "direction": 86,
+                            "length": 9,
+                            "name": ""
+                        },
+                        {
+                            "duration": 189,
+                            "direction": 4,
+                            "length": 212,
+                            "name": "Rue Marguerite Durrmeyer"
+                        },
+                        {
+                            "duration": 238,
+                            "direction": -45,
+                            "length": 267,
+                            "name": "Rue Ren\u00e9 Paquet"
+                        },
+                        {
+                            "duration": 600,
+                            "direction": -5,
+                            "length": 672,
+                            "name": "Rue de la Folie"
+                        },
+                        {
+                            "duration": 19,
+                            "direction": 2,
+                            "length": 21,
+                            "name": ""
+                        },
+                        {
+                            "duration": 28,
+                            "direction": -11,
+                            "length": 31,
+                            "name": "Rue de Metz"
+                        },
+                        {
+                            "duration": 233,
+                            "direction": -8,
+                            "length": 261,
+                            "name": "Rue de Metz"
+                        },
+                        {
+                            "duration": 67,
+                            "direction": 81,
+                            "length": 75,
+                            "name": ""
+                        },
+                        {
+                            "duration": 113,
+                            "direction": -6,
+                            "length": 127,
+                            "name": "Rue de F\u00e9camp"
+                        },
+                        {
+                            "duration": 90,
+                            "direction": 56,
+                            "length": 101,
+                            "name": "Rue d'\u00c9tretat"
+                        }
+                    ],
+                    "type": "street_network",
+                    "id": "section_3_0",
+                    "mode": "walking"
+                }
+            ]
+        },
+        {
+            "status": "",
+            "distances": {
+                "taxi": 0,
+                "car": 0,
+                "walking": 2212,
+                "bike": 0,
+                "ridesharing": 0
+            },
+            "links": [
+                {
+                    "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?allowed_id%5B%5D=stop_point%3ASTE%3ASP%3AOCETrainTER-87192088&allowed_id%5B%5D=stop_point%3ASTE%3ASP%3AOCETrainTER-87192039&from=6.1760260%3B49.1191460&to=6.1580300%3B49.1440000&is_journey_schedules=True&last_section_mode%5B%5D=walking&min_nb_journeys=5&min_nb_transfers=0&direct_path=none&first_section_mode%5B%5D=walking",
+                    "type": "journeys",
+                    "rel": "same_journey_schedules",
+                    "templated": false
+                }
+            ],
+            "tags": [
+                "walking",
+                "ecologic"
+            ],
+            "nb_transfers": 0,
+            "durations": {
+                "taxi": 0,
+                "walking": 1976,
+                "car": 0,
+                "ridesharing": 0,
+                "bike": 0,
+                "total": 2396
+            },
+            "arrival_date_time": "20190715T173243",
+            "calendars": [
+                {
+                    "active_periods": [
+                        {
+                            "begin": "20190715",
+                            "end": "20190722"
+                        },
+                        {
+                            "begin": "20190819",
+                            "end": "20190824"
+                        }
+                    ],
+                    "week_pattern": {
+                        "monday": true,
+                        "tuesday": true,
+                        "friday": true,
+                        "wednesday": true,
+                        "thursday": true,
+                        "sunday": false,
+                        "saturday": false
+                    }
+                }
+            ],
+            "departure_date_time": "20190715T165247",
+            "requested_date_time": "20190715T162812",
+            "fare": {
+                "found": false,
+                "total": {
+                    "value": "0.0"
+                },
+                "links": []
+            },
+            "co2_emission": {
+                "value": 55.1684,
+                "unit": "gEC"
+            },
+            "type": "fastest",
+            "duration": 2396,
+            "sections": [
+                {
+                    "from": {
+                        "embedded_type": "address",
+                        "distance": "7",
+                        "name": "5 En Fournirue (Metz)",
+                        "address": {
+                            "name": "5 En Fournirue",
+                            "house_number": 5,
+                            "coord": {
+                                "lat": "49.119098",
+                                "lon": "6.175959"
+                            },
+                            "label": "5 En Fournirue (Metz)",
+                            "administrative_regions": [
+                                {
+                                    "insee": "57463",
+                                    "name": "Metz",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.1196964",
+                                        "lon": "6.1763552"
+                                    },
+                                    "label": "Metz (57000-57070)",
+                                    "id": "admin:fr:57463",
+                                    "zip_code": "57000-57070"
+                                }
+                            ],
+                            "id": "6.175959;49.119098"
+                        },
+                        "quality": 0,
+                        "id": "6.175959;49.119098"
+                    },
+                    "links": [],
+                    "arrival_date_time": "20190715T171200",
+                    "departure_date_time": "20190715T165247",
+                    "to": {
+                        "embedded_type": "stop_point",
+                        "stop_point": {
+                            "commercial_modes": [
+                                {
+                                    "id": "commercial_mode:bus",
+                                    "name": "Bus"
+                                },
+                                {
+                                    "id": "commercial_mode:train",
+                                    "name": "Train"
+                                }
+                            ],
+                            "name": "Gare de Metz-Ville",
+                            "links": [],
+                            "physical_modes": [
+                                {
+                                    "id": "physical_mode:Bus",
+                                    "name": "Bus"
+                                },
+                                {
+                                    "id": "physical_mode:Train",
+                                    "name": "Train"
+                                }
+                            ],
+                            "coord": {
+                                "lat": "49.109787",
+                                "lon": "6.177198"
+                            },
+                            "label": "Gare de Metz-Ville (Metz)",
+                            "equipments": [],
+                            "administrative_regions": [
+                                {
+                                    "insee": "57463",
+                                    "name": "Metz",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.119696",
+                                        "lon": "6.176355"
+                                    },
+                                    "label": "Metz (57000-57070)",
+                                    "id": "admin:fr:57463",
+                                    "zip_code": "57000;57050;57070"
+                                }
+                            ],
+                            "fare_zone": {
+                                "name": "0"
+                            },
+                            "id": "stop_point:STE:SP:OCETrainTER-87192039",
+                            "stop_area": {
+                                "name": "Gare de Metz-Ville",
+                                "links": [],
+                                "coord": {
+                                    "lat": "49.109787",
+                                    "lon": "6.177198"
+                                },
+                                "label": "Gare de Metz-Ville (Metz)",
+                                "administrative_regions": [
+                                    {
+                                        "insee": "57463",
+                                        "name": "Metz",
+                                        "level": 8,
+                                        "coord": {
+                                            "lat": "49.119696",
+                                            "lon": "6.176355"
+                                        },
+                                        "label": "Metz (57000-57070)",
+                                        "id": "admin:fr:57463",
+                                        "zip_code": "57000;57050;57070"
+                                    }
+                                ],
+                                "timezone": "Europe/Paris",
+                                "id": "stop_area:SIN:SA:OCE87192039"
+                            }
+                        },
+                        "quality": 0,
+                        "name": "Gare de Metz-Ville (Metz)",
+                        "id": "stop_point:STE:SP:OCETrainTER-87192039"
+                    },
+                    "co2_emission": {
+                        "value": 0.0,
+                        "unit": ""
+                    },
+                    "geojson": {
+                        "type": "LineString",
+                        "properties": [
+                            {
+                                "length": 1291
+                            }
+                        ],
+                        "coordinates": [
+                            [
+                                6.1759973237,
+                                49.1191728836
+                            ],
+                            [
+                                6.1759973237,
+                                49.1191728836
+                            ],
+                            [
+                                6.176171,
+                                49.119084
+                            ],
+                            [
+                                6.177011,
+                                49.118722
+                            ],
+                            [
+                                6.177228,
+                                49.118624
+                            ],
+                            [
+                                6.177852,
+                                49.118345
+                            ],
+                            [
+                                6.178392,
+                                49.118124
+                            ],
+                            [
+                                6.178675,
+                                49.118004
+                            ],
+                            [
+                                6.178848,
+                                49.117935
+                            ],
+                            [
+                                6.178856,
+                                49.11759
+                            ],
+                            [
+                                6.178904,
+                                49.11752
+                            ],
+                            [
+                                6.178929,
+                                49.11752
+                            ],
+                            [
+                                6.178949,
+                                49.117475
+                            ],
+                            [
+                                6.178956,
+                                49.11745
+                            ],
+                            [
+                                6.178951,
+                                49.117449
+                            ],
+                            [
+                                6.178952,
+                                49.117438
+                            ],
+                            [
+                                6.178958,
+                                49.117437
+                            ],
+                            [
+                                6.178958,
+                                49.11743
+                            ],
+                            [
+                                6.178954,
+                                49.117429
+                            ],
+                            [
+                                6.178958,
+                                49.117393
+                            ],
+                            [
+                                6.178966,
+                                49.117393
+                            ],
+                            [
+                                6.178967,
+                                49.117384
+                            ],
+                            [
+                                6.178964,
+                                49.117384
+                            ],
+                            [
+                                6.178963,
+                                49.117381
+                            ],
+                            [
+                                6.178957,
+                                49.11738
+                            ],
+                            [
+                                6.178957,
+                                49.117368
+                            ],
+                            [
+                                6.178961,
+                                49.117368
+                            ],
+                            [
+                                6.178962,
+                                49.117361
+                            ],
+                            [
+                                6.178967,
+                                49.11736
+                            ],
+                            [
+                                6.178967,
+                                49.117354
+                            ],
+                            [
+                                6.178968,
+                                49.117351
+                            ],
+                            [
+                                6.17896,
+                                49.11735
+                            ],
+                            [
+                                6.17896,
+                                49.117329
+                            ],
+                            [
+                                6.178972,
+                                49.117328
+                            ],
+                            [
+                                6.178974,
+                                49.117319
+                            ],
+                            [
+                                6.178962,
+                                49.117319
+                            ],
+                            [
+                                6.178961,
+                                49.117298
+                            ],
+                            [
+                                6.178973,
+                                49.117298
+                            ],
+                            [
+                                6.178973,
+                                49.117295
+                            ],
+                            [
+                                6.178972,
+                                49.117289
+                            ],
+                            [
+                                6.17896,
+                                49.117289
+                            ],
+                            [
+                                6.178958,
+                                49.117264
+                            ],
+                            [
+                                6.178967,
+                                49.117263
+                            ],
+                            [
+                                6.178966,
+                                49.11726
+                            ],
+                            [
+                                6.178966,
+                                49.117257
+                            ],
+                            [
+                                6.178957,
+                                49.117257
+                            ],
+                            [
+                                6.178956,
+                                49.11723
+                            ],
+                            [
+                                6.178966,
+                                49.117229
+                            ],
+                            [
+                                6.178965,
+                                49.117224
+                            ],
+                            [
+                                6.178952,
+                                49.117224
+                            ],
+                            [
+                                6.178948,
+                                49.117198
+                            ],
+                            [
+                                6.178954,
+                                49.117197
+                            ],
+                            [
+                                6.178954,
+                                49.117195
+                            ],
+                            [
+                                6.178954,
+                                49.117192
+                            ],
+                            [
+                                6.178945,
+                                49.117192
+                            ],
+                            [
+                                6.17894,
+                                49.11717
+                            ],
+                            [
+                                6.178948,
+                                49.11717
+                            ],
+                            [
+                                6.178948,
+                                49.117167
+                            ],
+                            [
+                                6.178939,
+                                49.117167
+                            ],
+                            [
+                                6.178933,
+                                49.117148
+                            ],
+                            [
+                                6.178942,
+                                49.117147
+                            ],
+                            [
+                                6.178941,
+                                49.117144
+                            ],
+                            [
+                                6.178933,
+                                49.117107
+                            ],
+                            [
+                                6.178921,
+                                49.117041
+                            ],
+                            [
+                                6.178921,
+                                49.117038
+                            ],
+                            [
+                                6.178905,
+                                49.117038
+                            ],
+                            [
+                                6.178897,
+                                49.117004
+                            ],
+                            [
+                                6.178905,
+                                49.117003
+                            ],
+                            [
+                                6.178905,
+                                49.117
+                            ],
+                            [
+                                6.178905,
+                                49.116997
+                            ],
+                            [
+                                6.178894,
+                                49.116997
+                            ],
+                            [
+                                6.178887,
+                                49.116969
+                            ],
+                            [
+                                6.178898,
+                                49.116968
+                            ],
+                            [
+                                6.178896,
+                                49.116961
+                            ],
+                            [
+                                6.178884,
+                                49.116961
+                            ],
+                            [
+                                6.178877,
+                                49.116915
+                            ],
+                            [
+                                6.178888,
+                                49.116914
+                            ],
+                            [
+                                6.178887,
+                                49.116911
+                            ],
+                            [
+                                6.178885,
+                                49.116909
+                            ],
+                            [
+                                6.178877,
+                                49.11691
+                            ],
+                            [
+                                6.178863,
+                                49.116867
+                            ],
+                            [
+                                6.17887,
+                                49.116866
+                            ],
+                            [
+                                6.178869,
+                                49.116864
+                            ],
+                            [
+                                6.178832,
+                                49.116749
+                            ],
+                            [
+                                6.178823,
+                                49.116716
+                            ],
+                            [
+                                6.178813,
+                                49.116676
+                            ],
+                            [
+                                6.178823,
+                                49.116676
+                            ],
+                            [
+                                6.178822,
+                                49.116674
+                            ],
+                            [
+                                6.178821,
+                                49.11667
+                            ],
+                            [
+                                6.178812,
+                                49.116671
+                            ],
+                            [
+                                6.178799,
+                                49.116636
+                            ],
+                            [
+                                6.178814,
+                                49.116634
+                            ],
+                            [
+                                6.178813,
+                                49.116631
+                            ],
+                            [
+                                6.178813,
+                                49.116629
+                            ],
+                            [
+                                6.178798,
+                                49.11663
+                            ],
+                            [
+                                6.178788,
+                                49.116591
+                            ],
+                            [
+                                6.178777,
+                                49.116552
+                            ],
+                            [
+                                6.178783,
+                                49.116551
+                            ],
+                            [
+                                6.178783,
+                                49.116549
+                            ],
+                            [
+                                6.178767,
+                                49.116456
+                            ],
+                            [
+                                6.178765,
+                                49.116451
+                            ],
+                            [
+                                6.178756,
+                                49.116451
+                            ],
+                            [
+                                6.17875,
+                                49.116417
+                            ],
+                            [
+                                6.178765,
+                                49.116416
+                            ],
+                            [
+                                6.178764,
+                                49.116412
+                            ],
+                            [
+                                6.178762,
+                                49.116408
+                            ],
+                            [
+                                6.178749,
+                                49.116409
+                            ],
+                            [
+                                6.178734,
+                                49.116375
+                            ],
+                            [
+                                6.178751,
+                                49.116372
+                            ],
+                            [
+                                6.178751,
+                                49.116369
+                            ],
+                            [
+                                6.178721,
+                                49.116284
+                            ],
+                            [
+                                6.178721,
+                                49.116278
+                            ],
+                            [
+                                6.178702,
+                                49.11628
+                            ],
+                            [
+                                6.178695,
+                                49.116249
+                            ],
+                            [
+                                6.178699,
+                                49.116247
+                            ],
+                            [
+                                6.178696,
+                                49.116237
+                            ],
+                            [
+                                6.17869,
+                                49.116237
+                            ],
+                            [
+                                6.178687,
+                                49.116226
+                            ],
+                            [
+                                6.178702,
+                                49.116225
+                            ],
+                            [
+                                6.178701,
+                                49.116223
+                            ],
+                            [
+                                6.1787,
+                                49.116219
+                            ],
+                            [
+                                6.178684,
+                                49.11622
+                            ],
+                            [
+                                6.178678,
+                                49.116197
+                            ],
+                            [
+                                6.178689,
+                                49.116196
+                            ],
+                            [
+                                6.178686,
+                                49.116189
+                            ],
+                            [
+                                6.178673,
+                                49.11619
+                            ],
+                            [
+                                6.178668,
+                                49.116168
+                            ],
+                            [
+                                6.178664,
+                                49.116144
+                            ],
+                            [
+                                6.17867,
+                                49.116144
+                            ],
+                            [
+                                6.178669,
+                                49.116141
+                            ],
+                            [
+                                6.178669,
+                                49.116137
+                            ],
+                            [
+                                6.178662,
+                                49.116138
+                            ],
+                            [
+                                6.178654,
+                                49.116106
+                            ],
+                            [
+                                6.178664,
+                                49.116105
+                            ],
+                            [
+                                6.178664,
+                                49.116104
+                            ],
+                            [
+                                6.178662,
+                                49.116101
+                            ],
+                            [
+                                6.178654,
+                                49.116101
+                            ],
+                            [
+                                6.17865,
+                                49.116091
+                            ],
+                            [
+                                6.178656,
+                                49.11609
+                            ],
+                            [
+                                6.178651,
+                                49.116071
+                            ],
+                            [
+                                6.178656,
+                                49.11607
+                            ],
+                            [
+                                6.178656,
+                                49.116068
+                            ],
+                            [
+                                6.178656,
+                                49.116063
+                            ],
+                            [
+                                6.178648,
+                                49.116063
+                            ],
+                            [
+                                6.178648,
+                                49.116058
+                            ],
+                            [
+                                6.178643,
+                                49.116059
+                            ],
+                            [
+                                6.178639,
+                                49.116035
+                            ],
+                            [
+                                6.178648,
+                                49.116035
+                            ],
+                            [
+                                6.178649,
+                                49.116032
+                            ],
+                            [
+                                6.178649,
+                                49.116028
+                            ],
+                            [
+                                6.178638,
+                                49.116028
+                            ],
+                            [
+                                6.178634,
+                                49.116001
+                            ],
+                            [
+                                6.178645,
+                                49.116
+                            ],
+                            [
+                                6.178645,
+                                49.115998
+                            ],
+                            [
+                                6.178644,
+                                49.115993
+                            ],
+                            [
+                                6.17863,
+                                49.115993
+                            ],
+                            [
+                                6.178625,
+                                49.115957
+                            ],
+                            [
+                                6.178645,
+                                49.115955
+                            ],
+                            [
+                                6.178643,
+                                49.115947
+                            ],
+                            [
+                                6.178624,
+                                49.115948
+                            ],
+                            [
+                                6.17862,
+                                49.115908
+                            ],
+                            [
+                                6.178637,
+                                49.115907
+                            ],
+                            [
+                                6.178636,
+                                49.115904
+                            ],
+                            [
+                                6.178635,
+                                49.115901
+                            ],
+                            [
+                                6.178618,
+                                49.1159
+                            ],
+                            [
+                                6.178612,
+                                49.115883
+                            ],
+                            [
+                                6.178616,
+                                49.115879
+                            ],
+                            [
+                                6.178612,
+                                49.115865
+                            ],
+                            [
+                                6.178608,
+                                49.115842
+                            ],
+                            [
+                                6.178607,
+                                49.115841
+                            ],
+                            [
+                                6.178603,
+                                49.11583
+                            ],
+                            [
+                                6.178613,
+                                49.115829
+                            ],
+                            [
+                                6.178613,
+                                49.115826
+                            ],
+                            [
+                                6.178613,
+                                49.115823
+                            ],
+                            [
+                                6.178603,
+                                49.115823
+                            ],
+                            [
+                                6.178599,
+                                49.115796
+                            ],
+                            [
+                                6.178603,
+                                49.115795
+                            ],
+                            [
+                                6.178602,
+                                49.115791
+                            ],
+                            [
+                                6.178602,
+                                49.115788
+                            ],
+                            [
+                                6.178598,
+                                49.115788
+                            ],
+                            [
+                                6.178594,
+                                49.115763
+                            ],
+                            [
+                                6.178602,
+                                49.115762
+                            ],
+                            [
+                                6.178602,
+                                49.115755
+                            ],
+                            [
+                                6.178591,
+                                49.115756
+                            ],
+                            [
+                                6.178575,
+                                49.115731
+                            ],
+                            [
+                                6.178579,
+                                49.115729
+                            ],
+                            [
+                                6.178577,
+                                49.115727
+                            ],
+                            [
+                                6.178575,
+                                49.115722
+                            ],
+                            [
+                                6.178613,
+                                49.115716
+                            ],
+                            [
+                                6.178539,
+                                49.115661
+                            ],
+                            [
+                                6.178491,
+                                49.115625
+                            ],
+                            [
+                                6.178519,
+                                49.11539
+                            ],
+                            [
+                                6.178473,
+                                49.115358
+                            ],
+                            [
+                                6.178423,
+                                49.115323
+                            ],
+                            [
+                                6.178453,
+                                49.115309
+                            ],
+                            [
+                                6.178549,
+                                49.115271
+                            ],
+                            [
+                                6.178597,
+                                49.115253
+                            ],
+                            [
+                                6.178662,
+                                49.115228
+                            ],
+                            [
+                                6.178717,
+                                49.115207
+                            ],
+                            [
+                                6.178789,
+                                49.11518
+                            ],
+                            [
+                                6.178828,
+                                49.115162
+                            ],
+                            [
+                                6.178302,
+                                49.114276
+                            ],
+                            [
+                                6.178122,
+                                49.113977
+                            ],
+                            [
+                                6.178244,
+                                49.113638
+                            ],
+                            [
+                                6.178346,
+                                49.113569
+                            ],
+                            [
+                                6.178376,
+                                49.113398
+                            ],
+                            [
+                                6.178513,
+                                49.112654
+                            ],
+                            [
+                                6.178489,
+                                49.112533
+                            ],
+                            [
+                                6.17848,
+                                49.112283
+                            ],
+                            [
+                                6.178656,
+                                49.111734
+                            ],
+                            [
+                                6.178703,
+                                49.111561
+                            ],
+                            [
+                                6.17892,
+                                49.11101
+                            ],
+                            [
+                                6.178129,
+                                49.110555
+                            ],
+                            [
+                                6.178155,
+                                49.11054
+                            ],
+                            [
+                                6.178238,
+                                49.110492
+                            ],
+                            [
+                                6.178321,
+                                49.110444
+                            ],
+                            [
+                                6.178399,
+                                49.110398
+                            ],
+                            [
+                                6.178076,
+                                49.110241
+                            ],
+                            [
+                                6.177789,
+                                49.110101
+                            ],
+                            [
+                                6.177541,
+                                49.109979
+                            ],
+                            [
+                                6.177441,
+                                49.110067
+                            ],
+                            [
+                                6.177317,
+                                49.110007
+                            ],
+                            [
+                                6.177381,
+                                49.109951
+                            ],
+                            [
+                                6.177316,
+                                49.109919
+                            ],
+                            [
+                                6.177352,
+                                49.109889
+                            ],
+                            [
+                                6.177197,
+                                49.109811
+                            ],
+                            [
+                                6.1772095077,
+                                49.1097992561
+                            ],
+                            [
+                                6.177198,
+                                49.109787
+                            ]
+                        ]
+                    },
+                    "duration": 1153,
+                    "path": [
+                        {
+                            "duration": 221,
+                            "direction": 0,
+                            "length": 248,
+                            "name": "En Fournirue"
+                        },
+                        {
+                            "duration": 66,
+                            "direction": 58,
+                            "length": 74,
+                            "name": "Place des Paraiges"
+                        },
+                        {
+                            "duration": 24,
+                            "direction": -23,
+                            "length": 27,
+                            "name": "Rue du Change"
+                        },
+                        {
+                            "duration": 151,
+                            "direction": 6,
+                            "length": 169,
+                            "name": "Place Saint-Louis"
+                        },
+                        {
+                            "duration": 24,
+                            "direction": -46,
+                            "length": 27,
+                            "name": "Rue du Grand Cerf"
+                        },
+                        {
+                            "duration": 36,
+                            "direction": 48,
+                            "length": 40,
+                            "name": "Place du Quarteau"
+                        },
+                        {
+                            "duration": 125,
+                            "direction": 76,
+                            "length": 140,
+                            "name": "Rue de la Fontaine"
+                        },
+                        {
+                            "duration": 44,
+                            "direction": -35,
+                            "length": 49,
+                            "name": "Place Saint-Nicolas"
+                        },
+                        {
+                            "duration": 91,
+                            "direction": 38,
+                            "length": 102,
+                            "name": "Rue des Augustins"
+                        },
+                        {
+                            "duration": 36,
+                            "direction": 14,
+                            "length": 40,
+                            "name": "Place Saint-Thi\u00e9bault"
+                        },
+                        {
+                            "duration": 128,
+                            "direction": -13,
+                            "length": 143,
+                            "name": "Rue des Augustins"
+                        },
+                        {
+                            "duration": 69,
+                            "direction": 63,
+                            "length": 77,
+                            "name": "Rue Vauban"
+                        },
+                        {
+                            "duration": 111,
+                            "direction": -97,
+                            "length": 124,
+                            "name": "Place du G\u00e9n\u00e9ral de Gaulle"
+                        },
+                        {
+                            "duration": 6,
+                            "direction": -90,
+                            "length": 7,
+                            "name": ""
+                        },
+                        {
+                            "duration": 8,
+                            "direction": 90,
+                            "length": 9,
+                            "name": ""
+                        },
+                        {
+                            "duration": 12,
+                            "direction": 91,
+                            "length": 13,
+                            "name": ""
+                        },
+                        {
+                            "duration": 1,
+                            "direction": 0,
+                            "length": 1,
+                            "name": ""
+                        }
+                    ],
+                    "type": "street_network",
+                    "id": "section_0_0",
+                    "mode": "walking"
+                },
+                {
+                    "from": {
+                        "embedded_type": "stop_point",
+                        "stop_point": {
+                            "name": "Gare de Metz-Ville",
+                            "links": [],
+                            "coord": {
+                                "lat": "49.109787",
+                                "lon": "6.177198"
+                            },
+                            "label": "Gare de Metz-Ville (Metz)",
+                            "equipments": [],
+                            "administrative_regions": [
+                                {
+                                    "insee": "57463",
+                                    "name": "Metz",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.119696",
+                                        "lon": "6.176355"
+                                    },
+                                    "label": "Metz (57000-57070)",
+                                    "id": "admin:fr:57463",
+                                    "zip_code": "57000;57050;57070"
+                                }
+                            ],
+                            "fare_zone": {
+                                "name": "0"
+                            },
+                            "id": "stop_point:STE:SP:OCETrainTER-87192039",
+                            "stop_area": {
+                                "name": "Gare de Metz-Ville",
+                                "links": [],
+                                "coord": {
+                                    "lat": "49.109787",
+                                    "lon": "6.177198"
+                                },
+                                "label": "Gare de Metz-Ville (Metz)",
+                                "timezone": "Europe/Paris",
+                                "id": "stop_area:SIN:SA:OCE87192039"
+                            }
+                        },
+                        "quality": 0,
+                        "name": "Gare de Metz-Ville (Metz)",
+                        "id": "stop_point:STE:SP:OCETrainTER-87192039"
+                    },
+                    "links": [
+                        {
+                            "type": "vehicle_journey",
+                            "id": "vehicle_journey:STE:OCESN088756F0800828787-1"
+                        },
+                        {
+                            "type": "line",
+                            "id": "line:STE:OCE323"
+                        },
+                        {
+                            "type": "route",
+                            "id": "route:STE:OCE323"
+                        },
+                        {
+                            "type": "commercial_mode",
+                            "id": "commercial_mode:train"
+                        },
+                        {
+                            "type": "physical_mode",
+                            "id": "physical_mode:Train"
+                        },
+                        {
+                            "type": "network",
+                            "id": "network:sncf"
+                        }
+                    ],
+                    "arrival_date_time": "20190715T171900",
+                    "additional_informations": [
+                        "regular"
+                    ],
+                    "departure_date_time": "20190715T171200",
+                    "display_informations": {
+                        "direction": "Gare de Bettembourg (Bettembourg)",
+                        "code": "",
+                        "network": "SNCF",
+                        "links": [],
+                        "color": "",
+                        "name": "Luxembourg-Metz-Nancy",
+                        "physical_mode": "Train",
+                        "headsign": "88756",
+                        "label": "Luxembourg-Metz-Nancy",
+                        "equipments": [],
+                        "text_color": "",
+                        "commercial_mode": "Train",
+                        "description": ""
+                    },
+                    "to": {
+                        "embedded_type": "stop_point",
+                        "stop_point": {
+                            "name": "Gare de Woippy",
+                            "links": [],
+                            "coord": {
+                                "lat": "49.148358",
+                                "lon": "6.155677"
+                            },
+                            "label": "Gare de Woippy (Woippy)",
+                            "equipments": [],
+                            "administrative_regions": [
+                                {
+                                    "insee": "57751",
+                                    "name": "Woippy",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.151584",
+                                        "lon": "6.151922"
+                                    },
+                                    "label": "Woippy (57140)",
+                                    "id": "admin:fr:57751",
+                                    "zip_code": "57140"
+                                }
+                            ],
+                            "fare_zone": {
+                                "name": "0"
+                            },
+                            "id": "stop_point:STE:SP:OCETrainTER-87192088",
+                            "stop_area": {
+                                "name": "Gare de Woippy",
+                                "links": [],
+                                "coord": {
+                                    "lat": "49.148358",
+                                    "lon": "6.155677"
+                                },
+                                "label": "Gare de Woippy (Woippy)",
+                                "timezone": "Europe/Paris",
+                                "id": "stop_area:SIN:SA:OCE87192088"
+                            }
+                        },
+                        "quality": 0,
+                        "name": "Gare de Woippy (Woippy)",
+                        "id": "stop_point:STE:SP:OCETrainTER-87192088"
+                    },
+                    "base_arrival_date_time": "20190715T171900",
+                    "base_departure_date_time": "20190715T171200",
+                    "co2_emission": {
+                        "value": 55.1684,
+                        "unit": "gEC"
+                    },
+                    "geojson": {
+                        "type": "LineString",
+                        "properties": [
+                            {
+                                "length": 4636
+                            }
+                        ],
+                        "coordinates": [
+                            [
+                                6.177198,
+                                49.109787
+                            ],
+                            [
+                                6.167576,
+                                49.136868
+                            ],
+                            [
+                                6.155677,
+                                49.148358
+                            ]
+                        ]
+                    },
+                    "duration": 420,
+                    "type": "public_transport",
+                    "id": "section_1_0",
+                    "data_freshness": "base_schedule",
+                    "stop_date_times": [
+                        {
+                            "stop_point": {
+                                "name": "Gare de Metz-Ville",
+                                "links": [],
+                                "coord": {
+                                    "lat": "49.109787",
+                                    "lon": "6.177198"
+                                },
+                                "label": "Gare de Metz-Ville (Metz)",
+                                "equipments": [],
+                                "fare_zone": {
+                                    "name": "0"
+                                },
+                                "id": "stop_point:STE:SP:OCETrainTER-87192039"
+                            },
+                            "links": [],
+                            "arrival_date_time": "20190715T171200",
+                            "additional_informations": [],
+                            "departure_date_time": "20190715T171200",
+                            "base_arrival_date_time": "20190715T171200",
+                            "base_departure_date_time": "20190715T171200"
+                        },
+                        {
+                            "stop_point": {
+                                "name": "Gare de Metz-Nord",
+                                "links": [],
+                                "coord": {
+                                    "lat": "49.136868",
+                                    "lon": "6.167576"
+                                },
+                                "label": "Gare de Metz-Nord (Metz)",
+                                "equipments": [],
+                                "fare_zone": {
+                                    "name": "0"
+                                },
+                                "id": "stop_point:STE:SP:OCETrainTER-87192070"
+                            },
+                            "links": [],
+                            "arrival_date_time": "20190715T171700",
+                            "additional_informations": [],
+                            "departure_date_time": "20190715T171700",
+                            "base_arrival_date_time": "20190715T171700",
+                            "base_departure_date_time": "20190715T171700"
+                        },
+                        {
+                            "stop_point": {
+                                "name": "Gare de Woippy",
+                                "links": [],
+                                "coord": {
+                                    "lat": "49.148358",
+                                    "lon": "6.155677"
+                                },
+                                "label": "Gare de Woippy (Woippy)",
+                                "equipments": [],
+                                "fare_zone": {
+                                    "name": "0"
+                                },
+                                "id": "stop_point:STE:SP:OCETrainTER-87192088"
+                            },
+                            "links": [],
+                            "arrival_date_time": "20190715T171900",
+                            "additional_informations": [],
+                            "departure_date_time": "20190715T172000",
+                            "base_arrival_date_time": "20190715T171900",
+                            "base_departure_date_time": "20190715T172000"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "embedded_type": "stop_point",
+                        "stop_point": {
+                            "commercial_modes": [
+                                {
+                                    "id": "commercial_mode:train",
+                                    "name": "Train"
+                                }
+                            ],
+                            "name": "Gare de Woippy",
+                            "links": [],
+                            "physical_modes": [
+                                {
+                                    "id": "physical_mode:Train",
+                                    "name": "Train"
+                                }
+                            ],
+                            "coord": {
+                                "lat": "49.148358",
+                                "lon": "6.155677"
+                            },
+                            "label": "Gare de Woippy (Woippy)",
+                            "equipments": [],
+                            "administrative_regions": [
+                                {
+                                    "insee": "57751",
+                                    "name": "Woippy",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.151584",
+                                        "lon": "6.151922"
+                                    },
+                                    "label": "Woippy (57140)",
+                                    "id": "admin:fr:57751",
+                                    "zip_code": "57140"
+                                },
+                                {
+                                    "insee": "57751",
+                                    "name": "Woippy",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.151584",
+                                        "lon": "6.151922"
+                                    },
+                                    "label": "Woippy (57140)",
+                                    "id": "admin:fr:57751",
+                                    "zip_code": "57140"
+                                }
+                            ],
+                            "fare_zone": {
+                                "name": "0"
+                            },
+                            "id": "stop_point:STE:SP:OCETrainTER-87192088",
+                            "stop_area": {
+                                "name": "Gare de Woippy",
+                                "links": [],
+                                "coord": {
+                                    "lat": "49.148358",
+                                    "lon": "6.155677"
+                                },
+                                "label": "Gare de Woippy (Woippy)",
+                                "administrative_regions": [
+                                    {
+                                        "insee": "57751",
+                                        "name": "Woippy",
+                                        "level": 8,
+                                        "coord": {
+                                            "lat": "49.151584",
+                                            "lon": "6.151922"
+                                        },
+                                        "label": "Woippy (57140)",
+                                        "id": "admin:fr:57751",
+                                        "zip_code": "57140"
+                                    }
+                                ],
+                                "timezone": "Europe/Paris",
+                                "id": "stop_area:SIN:SA:OCE87192088"
+                            }
+                        },
+                        "quality": 0,
+                        "name": "Gare de Woippy (Woippy)",
+                        "id": "stop_point:STE:SP:OCETrainTER-87192088"
+                    },
+                    "links": [],
+                    "arrival_date_time": "20190715T173243",
+                    "departure_date_time": "20190715T171900",
+                    "to": {
+                        "embedded_type": "address",
+                        "distance": "199",
+                        "name": "20 Rue d'Etretat (Woippy)",
+                        "address": {
+                            "name": "20 Rue d'Etretat",
+                            "house_number": 20,
+                            "coord": {
+                                "lat": "49.142773",
+                                "lon": "6.156036"
+                            },
+                            "label": "20 Rue d'Etretat (Woippy)",
+                            "administrative_regions": [
+                                {
+                                    "insee": "57751",
+                                    "name": "Woippy",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.1515848",
+                                        "lon": "6.1519224"
+                                    },
+                                    "label": "Woippy (57140)",
+                                    "id": "admin:fr:57751",
+                                    "zip_code": "57140"
+                                }
+                            ],
+                            "id": "6.156036;49.142773"
+                        },
+                        "quality": 0,
+                        "id": "6.156036;49.142773"
+                    },
+                    "co2_emission": {
+                        "value": 0.0,
+                        "unit": ""
+                    },
+                    "geojson": {
+                        "type": "LineString",
+                        "properties": [
+                            {
+                                "length": 921
+                            }
+                        ],
+                        "coordinates": [
+                            [
+                                6.155677,
+                                49.148358
+                            ],
+                            [
+                                6.1556766207,
+                                49.1483367568
+                            ],
+                            [
+                                6.155383,
+                                49.148342
+                            ],
+                            [
+                                6.153213,
+                                49.147146
+                            ],
+                            [
+                                6.15347,
+                                49.147137
+                            ],
+                            [
+                                6.153524,
+                                49.146885
+                            ],
+                            [
+                                6.153614,
+                                49.146639
+                            ],
+                            [
+                                6.153658,
+                                49.14654
+                            ],
+                            [
+                                6.153717,
+                                49.146408
+                            ],
+                            [
+                                6.153778,
+                                49.146271
+                            ],
+                            [
+                                6.153844,
+                                49.146116
+                            ],
+                            [
+                                6.153235,
+                                49.145976
+                            ],
+                            [
+                                6.15348,
+                                49.145538
+                            ],
+                            [
+                                6.153973,
+                                49.145197
+                            ],
+                            [
+                                6.153709,
+                                49.145127
+                            ],
+                            [
+                                6.154268,
+                                49.144675
+                            ],
+                            [
+                                6.154548,
+                                49.144086
+                            ],
+                            [
+                                6.154511,
+                                49.143775
+                            ],
+                            [
+                                6.154934,
+                                49.143187
+                            ],
+                            [
+                                6.156013,
+                                49.142724
+                            ],
+                            [
+                                6.156013,
+                                49.142724
+                            ]
+                        ]
+                    },
+                    "duration": 823,
+                    "path": [
+                        {
+                            "duration": 19,
+                            "direction": 0,
+                            "length": 21,
+                            "name": ""
+                        },
+                        {
+                            "duration": 216,
+                            "direction": 0,
+                            "length": 242,
+                            "name": "Rue de la Gare"
+                        },
+                        {
+                            "duration": 16,
+                            "direction": -137,
+                            "length": 18,
+                            "name": "Rue de la Maison Neuve"
+                        },
+                        {
+                            "duration": 102,
+                            "direction": 79,
+                            "length": 114,
+                            "name": "Place de l'Olympium"
+                        },
+                        {
+                            "duration": 42,
+                            "direction": 86,
+                            "length": 47,
+                            "name": "All\u00e9e Jean Bouin"
+                        },
+                        {
+                            "duration": 46,
+                            "direction": -91,
+                            "length": 52,
+                            "name": ""
+                        },
+                        {
+                            "duration": 56,
+                            "direction": -23,
+                            "length": 63,
+                            "name": "Impasse du Calvaire"
+                        },
+                        {
+                            "duration": 169,
+                            "direction": 111,
+                            "length": 189,
+                            "name": "Rue de Brest"
+                        },
+                        {
+                            "duration": 157,
+                            "direction": -30,
+                            "length": 176,
+                            "name": "Rue d'\u00c9tretat"
+                        }
+                    ],
+                    "type": "street_network",
+                    "id": "section_2_0",
+                    "mode": "walking"
+                }
+            ]
+        }
+    ],
+    "disruptions": [],
+    "notes": [],
+    "feed_publishers": [
+        {
+            "url": "navitia.io",
+            "id": "fr-ne",
+            "license": "OpenData",
+            "name": "France North-East Quarter"
+        },
+        {
+            "url": "https://www.openstreetmap.org/copyright",
+            "id": "osm",
+            "license": "ODbL",
+            "name": "openstreetmap"
+        },
+        {
+            "url": "https://ressources.data.sncf.com",
+            "id": "SIN",
+            "license": "SNCF Open Data",
+            "name": "SIN - SNCF INTERCITE OPEN DATA"
+        },
+        {
+            "url": "https://ressources.data.sncf.com",
+            "id": "STE",
+            "license": "SNCF Open Data",
+            "name": "STE - SNCF TER OPEN DATA"
+        }
+    ],
+    "context": {
+        "timezone": "Europe/Paris",
+        "current_datetime": "20190715T162812",
+        "car_direct_path": {
+            "co2_emission": {
+                "value": 746.7140102672,
+                "unit": "gEC"
+            }
+        }
+    },
+    "exceptions": []
+}

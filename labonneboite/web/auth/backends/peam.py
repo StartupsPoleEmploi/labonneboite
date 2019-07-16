@@ -1,4 +1,3 @@
-# coding: utf8
 """
 Provides user registration and login using PEAM (Pôle Emploi Access Management).
 

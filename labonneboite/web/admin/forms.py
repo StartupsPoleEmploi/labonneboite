@@ -1,4 +1,3 @@
-# coding: utf8
 
 from wtforms import ValidationError
 from labonneboite.common.siret import is_siret

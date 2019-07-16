@@ -116,7 +116,7 @@ textarea.form-error,
     border-radius: 4px;
     border: 1px solid #5D0094;
 }
-    
+
 .form-switch .switch-element {
     width: 50%;
     height: 100%;
@@ -251,3 +251,28 @@ textarea.form-error,
     margin-right: 40px;
     margin-bottom: 30px;
 }
+
+
+/* Inline search form for results page.
+=========================================================================== */
+
+@media (min-width: 800px) {
+    .inline-form.form-search div input {
+        width: 44%;
+    }
+
+    .inline-form.form-search button {
+        width: 15%;
+    }
+
+    .inline-form.form-search button img {
+        width: 24%;
+        margin: 0 auto;
+    }
+
+    .inline-form.form-search div input:not(:last-child) {
+        margin-bottom: 0;
+    }
+
+}
+

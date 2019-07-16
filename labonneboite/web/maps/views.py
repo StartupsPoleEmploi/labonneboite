@@ -1,4 +1,3 @@
-# coding: utf8
 import json
 
 from flask import abort, redirect, render_template, request, url_for

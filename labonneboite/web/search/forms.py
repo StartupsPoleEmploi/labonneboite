@@ -1,4 +1,3 @@
-# coding: utf8
 
 from werkzeug.datastructures import MultiDict
 from flask_wtf import FlaskForm
@@ -37,8 +36,6 @@ class CompanySearchForm(FlaskForm):
 
     DURATION_CHOICES = [
         (str(dur), 'Moins de {:d} min'.format(dur)) for dur in maps_constants.ISOCHRONE_DURATIONS_MINUTES
-    ] + [
-        ('0', '+ de {} minutes'.format(maps_constants.ISOCHRONE_DURATIONS_MINUTES[-1]))
     ]
 
     class Meta:
@@ -62,7 +59,7 @@ class CompanySearchForm(FlaskForm):
 
     # Headcount
     h = RadioField(
-        'Taille d\'entreprise',
+        'Taille de l\'entreprise',
         default=1,
         choices=HEADCOUNT_CHOICES,
         validators=[Optional()])
@@ -92,9 +89,8 @@ class CompanySearchForm(FlaskForm):
     )
 
     dur = RadioField(
-        'Durée du trajet',
+        'Temps de trajet',
         choices=DURATION_CHOICES,
-        default=DURATION_CHOICES[-1][0],
         validators=[Optional()]
     )
 

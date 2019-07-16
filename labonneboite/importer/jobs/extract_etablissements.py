@@ -16,6 +16,16 @@ from labonneboite.common.chunks import chunks
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
+# This list contains siret that must not be found in data,
+# we use it as a test : if one of those is found in data, we stop the importer
+# and need to extract data again
+WRONG_SIRETS = ['50468025700020', #siret of Oxynel : old siret which has been replaced with this one : 50468025700038
+                '48791579500024', #old siret for "L’entreprise Philippe Murielle a changé de SIRET en avril 2018 suite à un changement d’adresse"
+                '41006536100041', #old siret for equant france sa - cesson sevigne
+]
+
+class WrongSiretException(Exception):
+    pass
 
 def has_text_content(s):
     return s is not None and len(s) > 0 and not s.isspace()
@@ -324,6 +334,10 @@ class EtablissementExtractJob(Job):
                         logger.exception("wrong siret : %s", siret)
                         raise ValueError
 
+                    if siret in WRONG_SIRETS:
+                        logger.exception("wrong siret : %s, should not be here - need other extract from datalake", siret)
+                        raise WrongSiretException
+
                 except ValueError:
                     logger.exception("exception in line %s", line)
                     format_errors += 1
@@ -334,11 +348,11 @@ class EtablissementExtractJob(Job):
                 if has_text_content(better_tel):
                     tel = better_tel
                 flag_pmsmp = 0
-                if contrat_pmsmp == "O" :
+                if contrat_pmsmp == "O":
                     flag_pmsmp = 1
 
                 flag_poe_afpr = 0
-                if contrat_poe == "O" or contrat_afpr == "O" :
+                if contrat_poe == "O" or contrat_afpr == "O":
                     flag_poe_afpr = 1
                 
                 email = encoding_util.strip_french_accents(email)

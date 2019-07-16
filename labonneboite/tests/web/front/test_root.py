@@ -1,4 +1,3 @@
-# coding: utf8
 from unittest import mock
 
 from labonneboite.tests.test_base import DatabaseTest

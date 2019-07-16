@@ -1,4 +1,3 @@
-# coding: utf8
 import unittest
 
 from labonneboite.common.pagination import Page, PaginationManager, OFFICES_PER_PAGE

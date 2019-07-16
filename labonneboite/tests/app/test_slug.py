@@ -1,4 +1,3 @@
-# coding: utf8
 import json, unittest
 
 from flask import url_for

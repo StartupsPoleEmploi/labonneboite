@@ -178,7 +178,7 @@
       }
       searchForm.submit();
     });
-    
+
     // Toggle duration/distance switches
     $('#distance-duration-switch .switch-element').on('click', function (e) {
         var switchValue = e.currentTarget.attributes["data-switch-value"].value;
@@ -188,7 +188,7 @@
           $('#distance-duration-switch').attr('data-switch-value-selected', switchValue);
         }
     });
-    
+
     // Auto-submit the search form when a link to expand the search results by occupation is clicked.
     $('.js-extend-search-occupation').click(function (e) {
       e.preventDefault();
@@ -203,21 +203,21 @@
       searchForm.submit();
     });
 
-    // Autosubmit when a transport icon is clicked
-    searchForm.find('[data-travelmode]').on('click', function() {
+    // Toggle transport icon on click and uncheck already checked duration.
+    searchForm.find('[data-travelmode]').on('click', function (e) {
+      e.preventDefault();
       var travelMode = $(this).attr("data-travelmode");
       searchForm.find('.travelmode-choice a').toggleClass('hidden');
       searchForm.find("[name='tr']").attr("value", travelMode);
-      if ($("[name='dur'][value='0']").prop('checked')) {
-        // If the default duration is selected, then make a reasonable choice for the user
-        $("[name='dur'][value='30']").prop('checked', true);
-        disableDistanceSearch();
+      ga('send', 'event', 'Form', 'click', 'travelmode-' + travelMode);
+      if (searchForm.find('#isochrone-durations input').is(':checked')) {
+        searchForm.find('#isochrone-durations input').prop('checked', false);
       }
-      ga('send', 'event', 'Form', 'click', 'travelmode-' + travelMode, {
-        hitCallback: createFunctionWithTimeout(function() {
-          searchForm.submit()
-        }, 1000)
-      });
+    });
+
+    // Submit form when a checked duration is clicked.
+    searchForm.find('#isochrone-durations input').on('click', function(){
+      searchForm.submit();
     });
   }
 

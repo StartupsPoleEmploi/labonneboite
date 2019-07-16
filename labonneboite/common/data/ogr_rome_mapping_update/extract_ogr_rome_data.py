@@ -1,4 +1,3 @@
-# coding: utf8
 """
 This is a one shot script used by @vermeer on Dec 2017
 to extract and update the latest OGR ROME mapping.

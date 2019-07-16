@@ -1,4 +1,3 @@
-# coding: utf8
 
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError

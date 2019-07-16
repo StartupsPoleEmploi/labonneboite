@@ -1,4 +1,3 @@
-# coding: utf8
 
 # http://flask.pocoo.org/docs/0.12/patterns/sqlalchemy/#declarative
 # http://docs.sqlalchemy.org/en/rel_1_1/

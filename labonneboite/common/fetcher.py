@@ -1,4 +1,3 @@
-# coding: utf8
 
 
 class InvalidFetcherArgument(Exception):

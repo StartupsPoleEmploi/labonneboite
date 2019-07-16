@@ -1,4 +1,3 @@
-# coding: utf8
 
 import os
 import json
@@ -158,7 +157,7 @@ class ApiBaseTest(DatabaseTest):
         # Insert test data into Elasticsearch.
         docs = [
             {
-                'naf': '7320Z',  # Map to ROME D1405.
+                'naf': '4646Z',  # Map to ROME D1405.
                 'siret': '00000000000001',
                 'company_name': 'Raison sociale 1',
                 'score': 68,
@@ -171,7 +170,7 @@ class ApiBaseTest(DatabaseTest):
                 'department': self.positions['bayonville_sur_mad']['zip_code'][0:2],
             },
             {
-                'naf': '7320Z',  # Map to ROME D1405.
+                'naf': '4646Z',  # Map to ROME D1405.
                 'siret': '00000000000002',
                 'company_name': 'Raison sociale 2',
                 'score': 69,
@@ -184,7 +183,7 @@ class ApiBaseTest(DatabaseTest):
                 'department': self.positions['bayonville_sur_mad']['zip_code'][0:2],
             },
             {
-                'naf': '7320Z',  # Map to ROME D1405.
+                'naf': '4646Z',  # Map to ROME D1405.
                 'siret': '00000000000003',
                 'score': 70,
                 'score_alternance': 18,
@@ -196,7 +195,7 @@ class ApiBaseTest(DatabaseTest):
                 'department': self.positions['bayonville_sur_mad']['zip_code'][0:2],
             },
             {
-                'naf': '7320Z',  # Map to ROME D1405.
+                'naf': '4646Z',  # Map to ROME D1405.
                 'siret': '00000000000004',
                 'score': 71,
                 'score_alternance': 18,
@@ -221,7 +220,7 @@ class ApiBaseTest(DatabaseTest):
             },
             # For NAF filter
             {
-                'naf': '4711C',  # Map to ROME D1508.
+                'naf': '4771Z',  # Map to ROME D1508.
                 'siret': '00000000000006',
                 'score': 75,
                 'score_alternance': 18,
@@ -233,7 +232,7 @@ class ApiBaseTest(DatabaseTest):
                 'department': self.positions['metz']['zip_code'][0:2],
             },
             {
-                'naf': '5610C',  # Map to ROME D1508.
+                'naf': '4711F',  # Map to ROME D1508.
                 'siret': '00000000000007',
                 'score': 70,
                 'score_alternance': 18,
@@ -246,7 +245,7 @@ class ApiBaseTest(DatabaseTest):
             },
             # For result sort
             {
-                'naf': '9103Z', # Map to ROME D1211
+                'naf': '9529Z', # Map to ROME D1211
                 'siret': '00000000000008',
                 'score': 75,
                 'score_alternance': 51,
@@ -258,7 +257,7 @@ class ApiBaseTest(DatabaseTest):
                 'department': self.positions['nantes']['zip_code'][0:2],
             },
             {
-                'naf': '7010Z', # Map to ROME D1211
+                'naf': '4741Z', # Map to ROME D1211
                 'siret': '00000000000009',
                 'score': 99,
                 'score_alternance': 51,
@@ -271,7 +270,7 @@ class ApiBaseTest(DatabaseTest):
             },
             # For contract filter
             {
-                'naf': '4669A', # Map to Rome D1213
+                'naf': '4752B', # Map to Rome D1213
                 'siret': '00000000000010',
                 'score': 78,
                 'score_alternance': 0,
@@ -283,7 +282,7 @@ class ApiBaseTest(DatabaseTest):
                 'department': self.positions['lille']['zip_code'][0:2],
             },
             {
-                'naf': '4669A', # Map to Rome D1213
+                'naf': '4752B', # Map to Rome D1213
                 'siret': '00000000000011',
                 'score': 82,
                 'score_alternance': 80,
@@ -308,7 +307,7 @@ class ApiBaseTest(DatabaseTest):
                 'department': self.positions['toulouse']['zip_code'][0:2],
             },
             {
-                'naf': '7010Z',  # Map to Rome M1202
+                'naf': '7022Z',  # Map to Rome M1202
                 'siret': '00000000000013',
                 'score': 82,
                 'score_alternance': 18,
@@ -321,7 +320,7 @@ class ApiBaseTest(DatabaseTest):
             },
             # For headcount_text
             {
-                'naf': '4648Z',  # Map to Rome B1603
+                'naf': '3212Z',  # Map to Rome B1603
                 'siret': '00000000000014',
                 'score': 80,
                 'score_alternance': 18,
@@ -334,7 +333,7 @@ class ApiBaseTest(DatabaseTest):
             },
             # For flag_alternance in response
             {
-                'naf': '4648Z',  # Map to Rome B1603
+                'naf': '3212Z',  # Map to Rome B1603
                 'siret': '00000000000015',
                 'score': 80,
                 'score_alternance': 18,
@@ -346,7 +345,7 @@ class ApiBaseTest(DatabaseTest):
                 'department': self.positions['poitiers']['zip_code'][0:2],
             },
             {
-                'naf': '4648Z',  # Map to Rome B1603
+                'naf': '3212Z',  # Map to Rome B1603
                 'siret': '00000000000016',
                 'score': 70,
                 'score_alternance': 80,

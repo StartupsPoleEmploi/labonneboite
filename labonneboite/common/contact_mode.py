@@ -1,4 +1,3 @@
-# coding: utf8
 
 # Contact modes
 CONTACT_MODE_STAGES = {

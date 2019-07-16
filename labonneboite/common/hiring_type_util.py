@@ -1,4 +1,3 @@
-# coding: utf8
 
 DPAE = 'dpae'
 ALTERNANCE = 'alt'

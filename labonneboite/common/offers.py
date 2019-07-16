@@ -1,4 +1,3 @@
-# coding: utf8
 from collections import defaultdict
 from labonneboite.conf import settings
 from labonneboite.common.models import Office
@@ -87,7 +86,13 @@ class VisibleMarketFetcher(Fetcher):
 
             office.matched_rome = first_offer['romeCode']
             office.offers_count = len(office_offers)
-            office.offers = [{'url': offer['origineOffre']['urlOrigine']} for offer in office_offers]
+            office.offers = [
+                {
+                    'id': offer['id'],
+                    'name': offer['intitule'],
+                    'url': offer['origineOffre']['urlOrigine'],
+                } for offer in office_offers
+            ]
             # Contact data coming from offers take precedence
             # over LBB ones.
             for offer in office_offers:

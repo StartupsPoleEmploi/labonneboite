@@ -1,4 +1,3 @@
-# coding: utf8
 import urllib.parse
 
 from social_flask_sqlalchemy.models import UserSocialAuth

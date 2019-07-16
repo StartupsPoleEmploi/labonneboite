@@ -1,4 +1,3 @@
-# coding: utf8
 from labonneboite.common import search
 from labonneboite.conf import settings
 from labonneboite.scripts import create_index
