@@ -39,6 +39,10 @@
     text-decoration: underline;
 }
 
+.no-underline {
+    text-decoration: transparent !important;
+}
+
 .lbb-green {
     color: #10863c !important;
 }
@@ -88,6 +92,17 @@
     padding: 20px;
     color: #222;
 }
+
+/* Responsive utilities.
+=========================================================================== */
+
+@media (min-width: 800px) {
+    .md-text-right {
+        text-align: right !important;
+    }
+}
+
+
 
 /* Images list.
 =========================================================================== */

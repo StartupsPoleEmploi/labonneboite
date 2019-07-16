@@ -43,7 +43,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         self.display = None
         try:
             from pyvirtualdisplay import Display
-            display = Display(visible=0, size=(800, 600))
+            display = Display(visible=0, size=(1600, 1600))
             display.start()
         except easyprocess.EasyProcessCheckInstalledError:
             # On some unreliable and exotic OS (such as Mac OS) installing a
@@ -63,7 +63,10 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         capabilities = DesiredCapabilities.CHROME
         capabilities['loggingPrefs'] = {'browser': 'ALL'}
 
-        self.driver = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_path)
+        self.driver = webdriver.Chrome(
+            desired_capabilities=capabilities,
+            executable_path=chromedriver_path
+        )
 
         # Ensure that the window size is large enough so that HTML elements won't overlap.
         self.driver.set_window_size(1600, 1200)

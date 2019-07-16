@@ -44,6 +44,7 @@ Examples:
         display: inline-block;
         margin-top: 0;
         vertical-align: top;
+        margin-right: -4px; /* Grid is broken in Firefox. This is a fix to make it work. */
     }
 
     .grid-spacing [class^="grid-col-"] {

@@ -39,6 +39,11 @@ populate-data-test:
 	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
 	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
 
+populate-data-test-selenium:
+	LBB_ENV=test alembic upgrade head
+	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements_tests_selenium.sql
+	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
+
 clear-data: clear-data-dev clear-data-test
 
 clear-data-dev: services
@@ -190,7 +195,7 @@ test-scripts:
 test-integration: clear-data-test database-test populate-data-test
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/integration
 
-test-selenium: clear-data-test database-test populate-data-test
+test-selenium: clear-data-test database-test populate-data-test-selenium
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/selenium
 
 # Convenient reminder about how to run a specific test manually.

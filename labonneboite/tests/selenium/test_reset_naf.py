@@ -15,7 +15,12 @@ class TestResetNaf(LbbSeleniumTestCase):
         Ensure that the NAF filter is reset when a new job search is performed.
         """
         # Search results for `comptabilite` in `Metz`.
-        url = self.url_for('search.results', city='metz', zipcode='57000', occupation='comptabilite')
+        url = self.url_for(
+            'search.results',
+            city='metz',
+            zipcode='57000',
+            occupation='comptabilite',
+        )
         self.driver.get(url)
 
         current_url = self.driver.current_url
@@ -54,7 +59,7 @@ class TestResetNaf(LbbSeleniumTestCase):
         # self.driver.find_element_by_id('flHideToolBarButton').click()
 
         # Submit the search form.
-        self.driver.find_element_by_css_selector('form.js-search-form div.form-search button').click()
+        self.driver.find_element_by_css_selector('#shown-search-form button').click()
 
         # The NAF filter should be reset.
         WebDriverWait(self.driver, 10).until(url_has_changed(current_url))

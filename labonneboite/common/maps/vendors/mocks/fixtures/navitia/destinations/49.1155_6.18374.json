@@ -1,0 +1,293 @@
+{
+    "tickets": [],
+    "links": [
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1837400;49.1155000&from=6.1760260;49.1191460&datetime_represents=departure&datetime=20190715T000000",
+            "type": "first",
+            "rel": "first",
+            "templated": false
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/journeys?to=6.1837400;49.1155000&from=6.1760260;49.1191460&datetime_represents=arrival&datetime=20190715T235959",
+            "type": "last",
+            "rel": "last",
+            "templated": false
+        },
+        {
+            "href": "https://api.navitia.io/v1/coverage/fr-ne/addresses/{address.id}",
+            "type": "address",
+            "rel": "addresses",
+            "templated": true
+        }
+    ],
+    "journeys": [
+        {
+            "status": "",
+            "distances": {
+                "taxi": 0,
+                "car": 0,
+                "walking": 721,
+                "bike": 0,
+                "ridesharing": 0
+            },
+            "tags": [
+                "walking",
+                "non_pt",
+                "non_pt_walking",
+                "ecologic"
+            ],
+            "nb_transfers": 0,
+            "durations": {
+                "taxi": 0,
+                "walking": 644,
+                "car": 0,
+                "ridesharing": 0,
+                "bike": 0,
+                "total": 644
+            },
+            "arrival_date_time": "20190715T163856",
+            "departure_date_time": "20190715T162812",
+            "requested_date_time": "20190715T162812",
+            "fare": {
+                "found": false,
+                "links": []
+            },
+            "co2_emission": {
+                "value": 0.0,
+                "unit": ""
+            },
+            "type": "best",
+            "duration": 644,
+            "sections": [
+                {
+                    "from": {
+                        "embedded_type": "address",
+                        "distance": "7",
+                        "name": "5 En Fournirue (Metz)",
+                        "address": {
+                            "name": "5 En Fournirue",
+                            "house_number": 5,
+                            "coord": {
+                                "lat": "49.119098",
+                                "lon": "6.175959"
+                            },
+                            "label": "5 En Fournirue (Metz)",
+                            "administrative_regions": [
+                                {
+                                    "insee": "57463",
+                                    "name": "Metz",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.1196964",
+                                        "lon": "6.1763552"
+                                    },
+                                    "label": "Metz (57000-57070)",
+                                    "id": "admin:fr:57463",
+                                    "zip_code": "57000-57070"
+                                }
+                            ],
+                            "id": "6.175959;49.119098"
+                        },
+                        "quality": 0,
+                        "id": "6.175959;49.119098"
+                    },
+                    "links": [],
+                    "arrival_date_time": "20190715T163856",
+                    "departure_date_time": "20190715T162812",
+                    "to": {
+                        "embedded_type": "address",
+                        "distance": "14",
+                        "name": "79 Rue Mazelle (Metz)",
+                        "address": {
+                            "name": "79 Rue Mazelle",
+                            "house_number": 79,
+                            "coord": {
+                                "lat": "49.115367",
+                                "lon": "6.183734"
+                            },
+                            "label": "79 Rue Mazelle (Metz)",
+                            "administrative_regions": [
+                                {
+                                    "insee": "57463",
+                                    "name": "Metz",
+                                    "level": 8,
+                                    "coord": {
+                                        "lat": "49.1196964",
+                                        "lon": "6.1763552"
+                                    },
+                                    "label": "Metz (57000-57070)",
+                                    "id": "admin:fr:57463",
+                                    "zip_code": "57000-57070"
+                                }
+                            ],
+                            "id": "6.183734;49.115367"
+                        },
+                        "quality": 0,
+                        "id": "6.183734;49.115367"
+                    },
+                    "co2_emission": {
+                        "value": 0.0,
+                        "unit": ""
+                    },
+                    "geojson": {
+                        "type": "LineString",
+                        "properties": [
+                            {
+                                "length": 721
+                            }
+                        ],
+                        "coordinates": [
+                            [
+                                6.1759973237,
+                                49.1191728836
+                            ],
+                            [
+                                6.176171,
+                                49.119084
+                            ],
+                            [
+                                6.177011,
+                                49.118722
+                            ],
+                            [
+                                6.177228,
+                                49.118624
+                            ],
+                            [
+                                6.177852,
+                                49.118345
+                            ],
+                            [
+                                6.178392,
+                                49.118124
+                            ],
+                            [
+                                6.178675,
+                                49.118004
+                            ],
+                            [
+                                6.178848,
+                                49.117935
+                            ],
+                            [
+                                6.178963,
+                                49.11789
+                            ],
+                            [
+                                6.179092,
+                                49.11785
+                            ],
+                            [
+                                6.179258,
+                                49.117814
+                            ],
+                            [
+                                6.179404,
+                                49.117774
+                            ],
+                            [
+                                6.179498,
+                                49.117747
+                            ],
+                            [
+                                6.179551,
+                                49.117737
+                            ],
+                            [
+                                6.179953,
+                                49.117848
+                            ],
+                            [
+                                6.180961,
+                                49.117403
+                            ],
+                            [
+                                6.181307,
+                                49.11721
+                            ],
+                            [
+                                6.182177,
+                                49.116779
+                            ],
+                            [
+                                6.182645,
+                                49.11651
+                            ],
+                            [
+                                6.183005,
+                                49.116259
+                            ],
+                            [
+                                6.183233,
+                                49.116076
+                            ],
+                            [
+                                6.183448,
+                                49.115844
+                            ],
+                            [
+                                6.183623,
+                                49.115655
+                            ],
+                            [
+                                6.1838083015,
+                                49.1154275265
+                            ]
+                        ]
+                    },
+                    "duration": 644,
+                    "path": [
+                        {
+                            "duration": 268,
+                            "direction": 0,
+                            "length": 300,
+                            "name": "En Fournirue"
+                        },
+                        {
+                            "duration": 28,
+                            "direction": -39,
+                            "length": 31,
+                            "name": "Place des Paraiges"
+                        },
+                        {
+                            "duration": 348,
+                            "direction": 57,
+                            "length": 390,
+                            "name": "Rue Mazelle"
+                        }
+                    ],
+                    "type": "street_network",
+                    "id": "section_0_0",
+                    "mode": "walking"
+                }
+            ]
+        }
+    ],
+    "disruptions": [],
+    "notes": [],
+    "feed_publishers": [
+        {
+            "url": "navitia.io",
+            "id": "fr-ne",
+            "license": "OpenData",
+            "name": "France North-East Quarter"
+        },
+        {
+            "url": "https://www.openstreetmap.org/copyright",
+            "id": "osm",
+            "license": "ODbL",
+            "name": "openstreetmap"
+        }
+    ],
+    "context": {
+        "timezone": "Europe/Paris",
+        "current_datetime": "20190715T162812",
+        "car_direct_path": {
+            "co2_emission": {
+                "value": 174.3378050626,
+                "unit": "gEC"
+            }
+        }
+    },
+    "exceptions": []
+}
