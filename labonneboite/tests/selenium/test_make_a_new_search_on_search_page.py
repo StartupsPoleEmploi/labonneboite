@@ -20,7 +20,7 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
             occupation='comptabilite',
             tr='car',
             lat='49.119146',
-            lon='6.176026'
+            lon='6.176026',
         )
         self.driver.get(url)
 

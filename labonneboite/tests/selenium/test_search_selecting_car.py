@@ -30,7 +30,7 @@ class TestSearchSelectingCar(LbbSeleniumTestCase):
             occupation='comptabilite',
             tr='car',
             lat='49.119146',
-            lon='6.176026'
+            lon='6.176026',
         )
         self.driver.get(url)
 
@@ -92,13 +92,13 @@ class TestSearchSelectingCar(LbbSeleniumTestCase):
         results_sentence = self.driver.find_element_by_css_selector('h1.lbb-result-info').text
         last_results = re.match(r'(\d+)', results_sentence).group()
 
-        results_expected = {
+        expected_results = {
             '15': '10',
             '30': '13',
-            '45': '16'
+            '45': '16',
         }
 
-        self.assertEqual(last_results, results_expected[duration])
+        self.assertEqual(last_results, expected_results[duration])
         self.assertGreaterEqual(int(last_results), int(primitive_results))
 
 

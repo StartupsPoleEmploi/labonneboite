@@ -19,7 +19,7 @@ class TestResetNaf(LbbSeleniumTestCase):
             'search.results',
             city='metz',
             zipcode='57000',
-            occupation='comptabilite'
+            occupation='comptabilite',
         )
         self.driver.get(url)
 

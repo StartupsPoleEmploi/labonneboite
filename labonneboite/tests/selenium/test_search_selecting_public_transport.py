@@ -31,7 +31,7 @@ class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
             occupation='comptabilite',
             tr='car',
             lat='49.119146',
-            lon='6.176026'
+            lon='6.176026',
         )
         self.driver.get(url)
 
@@ -106,7 +106,7 @@ class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
         expected_results = {
             '15': '3',
             '30': '4',
-            '45': '6'
+            '45': '6',
         }
 
         self.assertEqual(last_results, expected_results[duration])
