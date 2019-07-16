@@ -3,12 +3,14 @@ These functions are used to mock Navitia API responses.
 """
 
 import os
-import json
 from unittest import mock
 
 from labonneboite.common.maps.vendors import navitia
+from .utils import mock_response_from_json
+
 
 FIXTURES_ROOT = os.path.join(os.path.dirname(__file__), 'fixtures', 'navitia')
+
 
 def isochrone(origin, duration):
     """
@@ -23,7 +25,7 @@ def isochrone(origin, duration):
         f'metz_{duration}_minutes.json'
     )).read()
 
-    response = _mock_response_from_json(file)
+    response = mock_response_from_json(file)
 
     # The Navitia module makes two API requests:
     # one to get a coverage id and a second one to get isochrones.
@@ -40,8 +42,8 @@ def isochrone(origin, duration):
 def durations(origin, destinations):
     """
     Return commute time from an origin to several destinations.
-    /!\ This only works in test mode, not in local, as we load one JSON file
-    per office.
+    /!\ This only works in test mode, not in development, as we load one JSON file
+    per office and we have too many in dev to make it possible.
 
     Input:
         - origin: coordinates (tuple(latitude, longitude))
@@ -55,7 +57,7 @@ def durations(origin, destinations):
         f'metz_coverage.json'
     )).read()
 
-    coverage_response = _mock_response_from_json(coverage_response_file)
+    coverage_response = mock_response_from_json(coverage_response_file)
 
     with mock.patch.object(navitia.requests, 'get', coverage_response):
         endpoint = navitia.get_coverage_endpoint('journeys', origin)
@@ -68,7 +70,7 @@ def durations(origin, destinations):
             f'{destination[0]}_{destination[1]}.json'
         )).read()
 
-        response = _mock_response_from_json(file)
+        response = mock_response_from_json(file)
 
         with mock.patch.object(navitia.requests, 'get', response):
             duration = navitia.get_duration(endpoint, origin, destination)
@@ -76,15 +78,3 @@ def durations(origin, destinations):
         results.append(duration)
 
     return results
-
-
-def _mock_response_from_json(file):
-    """
-    Mock an HTTP request based on a JSON file.
-    Return a 200 status code and the response.
-    """
-    response = mock.Mock(
-        status_code=200,
-        json=mock.Mock(return_value=json.loads(file))
-    )
-    return mock.Mock(return_value=response)
