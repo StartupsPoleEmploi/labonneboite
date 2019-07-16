@@ -5,8 +5,10 @@ Content:
 - [Settings](#settings)
 - [High Level Flow](#high-level-flow)
 - [Cache](#cache)
+- [Available backends to interact with APIs](#available-backends-to-interact-with-apis)
 - [Asynchronous tasks](#asynchronous-tasks)
 - [Endpoints](#endpoints)
+- [Tests](#tests)
 
 
 ## Introduction
@@ -66,7 +68,7 @@ A global switch is available in the settings: `ENABLE_ISOCHRONES`. If turned off
 
 ```
 # Services called to get isochrone polygons.
-# Available backends: dummy, ign, navitia
+# Available backends: dummy, ign, navitia, navitia_mock, ign_mock
 TRAVEL_VENDOR_BACKENDS = {
     'isochrone': {
         'car': 'ign',
@@ -90,10 +92,11 @@ REDIS_PORT = 6389
 # Set this to False to simply trash async tasks (useful in tests)
 PROCESS_ASYNC_TASKS = True
 
+# Cache backend
 # 'dummy, 'local' or 'redis'
 TRAVEL_CACHE = 'local'
 
-# IGN credentials for fetching travel durations and isochrones
+# Credentials for fetching travel durations and isochrones
 IGN_CREDENTIALS = {
     'key': '',
     'username': '',
@@ -251,7 +254,7 @@ def entreprises():
 
 Both are located here: `labonneboite/templates/`
 
-:information_source: This is not specific to isochrone requests. It is necessary to refresh results, for example when a user moves the map with the "refresh results when I move the map" check box enabled.
+:information_source: This is not specific to isochrone requests. It may be useful to refresh results using Ajax calls, for example when a user moves the map with the "refresh results when I move the map" check box enabled.
 
 
 #### 4/ Show commute time for each office
@@ -280,20 +283,74 @@ Retrieving results from third-party APIS is expensive and increases the risk of 
 
 ### Available caches
 
-Three caches are available, depending on your needs and on your configuration:
-- `LocalCache`: stores data in memory as a dictionary. :warning: This is highly inefficient and can lead to data loss, so it should not be used in production.
-- `DummyCache`: returns None, same as saying "I don't have this data in my cache". Used in tests only.
+Several caches are available, depending on your needs and on your configuration:
+- `LocalCache` (default): stores data in memory as a dictionary. :warning: This is highly inefficient and can lead to data loss, so it should not be used in production.
+- `DummyCache`: returns None, same as saying "I don't have this data in my cache". Not used for the moment.
 - `RedisCache`: stores data in a Redis database. Best option in production but you should have a Redis service available. Note that you can use Redis Sentinel too. Cache auto-expires **30 days** after the last access, as defined in `labonneboite/common/maps/cache.py`.
 
 To switch caches, update the settings:
 
 ```
 # 'dummy, 'local' or 'redis'
-# default to 'local' in development and to 'dummy' in testing.
+# default to 'local' in development.
 TRAVEL_CACHE = 'local'
+```
 
-# or
-# Available backends: dummy, ign, navitia
+### Cached data
+
+Two kind of data are stored in cache:
+- **isochrone**: a list of polygons used to filter offices with Elastic Search.
+- **duration**: a list of durations from an origin to multiple destinations. Used to display commute time next to offices details in the search page. Precisely, a list of float values of the same length as `destinations`.
+
+:key: Cached data key follows this format: `[backend_name, func_name, mode] + list(args)`. Example: `["ign", "isochrone", "car", [49.119146, 6.176026], 30]`.
+
+More information here: `labonneboite/common/maps/travel.py`.
+
+
+### Cleaning cached data
+
+You may want to clear the Redis cache in production or locally to force an update.
+
+#### Locally
+
+Start services to make sure Redis is available.
+
+Then use one of the commands available in the general Makefile depending on your needs (see _Redis useful commands_ section):
+
+```
+# ...
+# Redis useful commands
+# -----
+
+clean-car-isochrone-cache:
+    # ...
+```
+
+#### In production
+
+:information_source: This is only for authorized La Bonne Boite developers as they need access to private files.
+
+Go to our private repository, open the Makefile and look for the 'Redis useful commands' section. Then run the command matching your criteria.
+
+
+## Available backends to interact with APIs
+
+We use APIs to compute commute duration and to get isochrones. They are located in this folder: `labonneboite/common/maps/vendors`.
+
+- **ign** (default): sends HTTP requests to the IGN API. Requires credentials (see [settings](#settings) section).
+- **navitia** (default): sends HTTP requests to the Navitia API. Requires credentials (see [settings](#settings) section).
+- **dummy**: a backend that returns None.
+- **ign_mock**: based on real HTTP requests to the IGN API and stored as JSON files, this backend returns registered data matching the Metz area. Useful for tests or in development mode.
+- **navitia_mock**: based on real HTTP requests to the Navitia API and stored as JSON files, this backend returns registered data matching the Metz area. Useful for tests or in development mode.
+
+:warning: **In development mode**, it is only possible to use the **isochrone features** for the Metz area in search results page (ie searching offices by travel mode or by duration). **Commute time** in office details is **not displayed** as we would need too many JSON files to match all the offices available in our development database. Nevertheless, it is available for tests.
+
+
+_configuration_file_
+```
+# Available backends: dummy, ign, navitia, ign_mock, navitia_mock
+# isochrone: to filter search results.
+# durations: to display commute time in offices details.
 TRAVEL_VENDOR_BACKENDS = {
     'isochrone': {
         'car': 'ign',
@@ -305,17 +362,6 @@ TRAVEL_VENDOR_BACKENDS = {
     },
 }
 ```
-
-
-### Cached data
-
-Two kind of data are stored in cache:
-- **isochrone**: a list of polygons used to filter offices with Elastic Search.
-- **duration**: a list of durations from an origin to multiple destinations. Used to display commute time next to offices details in the search page. Precisely, a list of float values of the same length as `destinations`.
-
-:key: Cached data key follows this format: `[backend_name, func_name, mode] + list(args)`. Example: `["ign", "isochrone", "car", [49.119146, 6.176026], 30]`.
-
-More information here: `labonneboite/common/maps/travel.py`.
 
 
 ## Asynchronous tasks
@@ -372,3 +418,10 @@ Arguments:
 Example with `/maps/isochrone?dur=15&tr=public&zipcode=75010`:
 
 ![](readme_images/isochrone_map.png)
+
+
+## Tests
+
+Unit and functional tests are available:
+- [Functional (high-level) tests using Selenium](/labonneboite/tests/selenium).
+- [Unit tests](/tests/app/maps)
