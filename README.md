@@ -50,6 +50,25 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 
 # Development
 
+Table of contents:
+
+- [Installation](#install)
+- [Launch web app in development](#launch-web-app)
+- [Run asynchronous tasks](#run-asynchronous-tasks)
+- [Run tests](#run-tests)
+- [Access your local MySQL](#access-your-local-mysql)
+- [Elastic Search](#elasticsearch)
+- [DB content in the development environment](#db-content-in-the-development-environment)
+- [Running scripts](#running-scripts)
+- [Running Pylint](#running-pylint)
+- [Debugging safely in development, staging or production](#debugging-safely-in-a-development-staging-or-production-environment)
+- [Importer](#importer)
+- [Single ROME versus multi-ROME search](#single-rome-vs-multi-rome-search)
+- [Load testing (API and front end)](#load-testing-apifrontend)
+- [Profiling](#profiling)
+- [Further documentation](#further-documentation)
+
+
 ## Install
 
 Clone labonneboite repository:
@@ -254,7 +273,10 @@ We recommend you use a pylint git pre-commit hook:
     # add the following line at the end of your pre-commit hook file
     git-pylint-commit-hook
 
-## Debugging
+
+## Debugging safely in a development, staging or production environment
+
+### Development
 
     # anywhere in the code
     logger.info("message")
@@ -273,6 +295,94 @@ We recommend you use a pylint git pre-commit hook:
     from IPython import embed; embed()
     # and/or
     import ipdb; ipdb.set_trace()
+
+
+### Staging or production
+
+Debugging **safely** in staging and in production is hard but not impossible! Here is how you can do.
+
+
+#### Set a breaking point and target it
+Add a breaking point in your code.
+
+:warning: This will of course block each incoming request, so make sure you know what you do.
+
+Example:
+
+```
+# views.py
+import requests
+
+app.route('/armstrong')
+def armstrong():
+    if request.args('pdb'):
+        from remote_pdb import RemotePdb
+        RemotePdb('0.0.0.0', 4444).set_trace()
+    return redirect(url_for('root.home'))
+```
+
+Then target your breaking point making a request to your route. Example:
+
+```
+import requests
+requests.get('http://wonderful.world/armstrong?pdb=true')
+```
+
+Nothing happens, it's normal! Time for step two.
+
+
+#### Getting the IP address if you're using Docker
+
+Connect to the server via ssh.
+
+Then get the container IP:
+
+```
+$ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name_or_id
+# to get the container name, do a `docker ps`
+
+176.3.33.3
+```
+
+Connect to your breaking point with telnet :
+
+```
+$ telnet 176.3.33.3 4444
+Trying 176.3.33.3...
+Connected to 176.3.33.3.
+Escape character is '^]'.
+>
+```
+
+#### If you're not using Docker
+
+Connect to the server via ssh.
+
+Then enter your breaking point with telnet :
+
+```
+$ telnet 0.0.0.0 4444
+Trying 0.0.0.0...
+Connected to 0.0.0.0.
+Escape character is '^]'.
+>
+```
+
+#### Exiting pdb and telnet
+
+To exit pdb, type 'c' in pdb and then `ctrl+]`.
+
+Then type `quit` to exit telnet.
+
+```
+(Pdb) c
+# Then type 'ctrl + ]'
+^]
+# And type 'quit'
+telnet> quit
+Connection closed.
+```
+
 
 ## Importer
 
@@ -380,7 +490,10 @@ Here is an example of output:
 ![](https://www.evernote.com/l/ABJdN3iVDEJFgLeH2HgHyYOVMjOYK0a30e4B/image.png)
 
 
-## Documentation
+
+
+
+## Further documentation
 
 - [Data management](/ROME_NAF)
 - [Search using isochrone data](/labonneboite/common/maps)
