@@ -87,3 +87,4 @@ raven[flask]
 # Load testing.
 locustio
 pyzmq
+remote-pdb
