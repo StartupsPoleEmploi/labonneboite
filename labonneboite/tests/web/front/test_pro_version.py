@@ -1,55 +1,77 @@
 from unittest import mock
 
+from flask import current_app
+
 from labonneboite.common import pro
 from labonneboite.common.models import User
 from labonneboite.tests.test_base import DatabaseTest
+from labonneboite.conf import settings
 
 
 class ProVersionTest(DatabaseTest):
 
-    @mock.patch('labonneboite.conf.settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES', ['@pole-emploi.fr'])
+    def setUp(self):
+        super().setUp()
+        self.pro_user = User.create(
+            email='john.doe@pole-emploi.fr',
+            gender='male',
+            first_name='John',
+            last_name='Doe',
+        )
+        self.public_user = User.create(
+            email='john.doe@gmail.com',
+            gender='male',
+            first_name='John',
+            last_name='Doe',
+        )
+        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0"
+        allowed_ip = settings.VERSION_PRO_ALLOWED_IPS[0]
+        self.headers = {
+            'X-Forwarded-For': allowed_ip,
+            'User_Agent': user_agent,
+        }
+
+
     def test_user_is_pro(self):
         """
         Test that the Pro user is correctly detected in various cases.
-
-        Note : A pro user can be defined by his IP address too but it's not possible to test.
-        So, only tests by email are provided
         """
-        user_pro = User.create(email='john.doe@pole-emploi.fr', gender='male', first_name='John', last_name='Doe')
-        user_public = User.create(email='john.doe@gmail.com', gender='male', first_name='John', last_name='Doe')
 
+        # Email detection, without IP detection
         with self.test_request_context():
             # User which is not logged in should not be considered a pro user.
             self.assertFalse(pro.user_is_pro())
 
-            # User with a pro email should be considered as a pro user.
-            self.login(user_pro)
+            # # User with a pro email should be considered as a pro user.
+            self.login(self.pro_user)
             self.assertTrue(pro.user_is_pro())
             self.logout()
             self.assertFalse(pro.user_is_pro())
 
             # User with a non pro email should not be considered a pro user.
-            self.login(user_public)
+            self.login(self.public_user)
             self.assertFalse(pro.user_is_pro())
             self.logout()
             self.assertFalse(pro.user_is_pro())
 
-    @mock.patch('labonneboite.conf.settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES', ['@pole-emploi.fr'])
+        # a public user logging in with the right IP address
+        # and NOT from a Pila machine should be considered a pro user.
+        with self.test_request_context(headers=self.headers):
+            self.assertTrue(pro.user_is_pro())
+
+
     def test_enable_disable_pro_version_view(self):
         """
         Test that the Pro Version is correctly enabled/disabled.
         """
-        # Create a user.
-        user_pro = User.create(email='x@pole-emploi.fr', gender='male', first_name='John', last_name='Doe')
 
         next_url_without_domain = '/entreprises/metz-57000/boucherie?sort=score&d=10&h=1&p=0&f_a=0'
         next_url_with_domain = 'http://labonneboite.pole-emploi.fr' + next_url_without_domain
         url = self.url_for('user.pro_version', **{'next': next_url_without_domain})
 
-        with self.test_request_context():
-
+        with self.test_request_context(headers=self.headers):
             # Log the user in.
-            self.login(user_pro)
+            self.login(self.pro_user)
             self.assertTrue(pro.user_is_pro())
             self.assertFalse(pro.pro_version_enabled())
 
@@ -79,3 +101,15 @@ class ProVersionTest(DatabaseTest):
 
             with self.app.session_transaction() as sess:
                 self.assertNotIn(pro.PRO_VERSION_SESSION_KEY, sess)
+
+
+    def test_pro_version_in_a_pila_machine(self):
+        """
+        Pila machines are used publicly by job seekers in Pole Emploi offices.
+        Of course, job seekers should not be able to see pro features.
+        """
+        self.headers['User_Agent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0 Pila/1.0"
+
+        with self.test_request_context(headers=self.headers):
+            self.assertFalse(pro.user_is_pro())
+            self.assertFalse(pro.pro_version_enabled())

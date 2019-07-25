@@ -1,6 +1,6 @@
 import re
 
-from flask import session
+from flask import session, request
 from flask_login import current_user
 
 from labonneboite.conf import settings
@@ -26,7 +26,9 @@ def user_is_pro():
 
     # Check user IP (no need to be authenticated)
     user_ip = get_user_ip()
-    if user_ip in settings.VERSION_PRO_ALLOWED_IPS:
+    user_agent = request.headers.get('User-Agent')
+
+    if user_ip in settings.VERSION_PRO_ALLOWED_IPS and 'Pila' not in user_agent:
         return True
 
     # Check user e-mail by plain_value, suffix or regex (@see local_settings.py)
