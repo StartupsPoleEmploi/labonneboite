@@ -12,6 +12,9 @@ from labonneboite.conf import settings
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
 from labonneboite.web.auth.backends.peam_recruiter import SessionKeys
 from labonneboite.web.auth.backends.peam_recruiter import get_token_data, get_recruiter_data, PeamRecruiterError, PeamRecruiterLoginCancelled
+from labonneboite.web.search.forms import CompanySearchForm
+from labonneboite.web.utils import fix_csrf_session
+
 
 authBlueprint = Blueprint('auth', __name__)
 
@@ -69,6 +72,15 @@ def logout_from_peam_callback():
     """
     The route where a user is redirected after a log out through the PEAM website.
     """
+
+    # Quick ugly but useful fix
+    referer = request.referrer
+    if referer and len(referer) > 1700:
+        # If the referer is too long, the redirect will return a 502 status code.
+        # I did not find how to change the referrer. See https://github.com/pallets/flask/issues/3310
+        fix_csrf_session()
+        return render_template('home.html', form=CompanySearchForm())
+
     return redirect(url_for('root.home'))
 
 
@@ -138,7 +150,7 @@ def peam_recruiter_token_callback():
         redirect_params.update({'origin': 'labonnealternance'})
     if action_name:
         redirect_params.update({'action_name': action_name})
-        
+
     # Code value
     code = request.args.get('code', '')
 
