@@ -192,9 +192,49 @@ textarea.form-error,
     margin-bottom: 50px;
 }
 
-.verification-form .logo-pe-connect img {
-    width: 500px;
+/* ################################## */
+/* ##### Recruiter access form ###### */
+/* ################################## */
+
+.verification-form #button-container {
+    margin: 3rem auto;
+    width: 48%;
+    height: 100%;
 }
+
+@media (max-width: 400px) {
+    .verification-form #button-container {
+        width: 100%;
+    }
+}
+
+.verification-form #button-container > p {
+    margin: 0 auto;
+}
+
+/* PE connect button */
+.verification-form .logo-pe-connect img {
+    width: 100%;
+}
+
+.verification-form .btn {
+    /* Same look as PE connect button which is an image */
+    width: 97%; /* The PE connect image contains transparent margins... */
+    color: white;
+    background-color: #1b2e57;
+    font-size: 1rem;
+    border-radius: 39px;
+    margin: 0 auto;
+
+    /* Children will be vertically centered thanks to the following: */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+
+
 .contact-form > div {
     margin-top: 30px;
 }

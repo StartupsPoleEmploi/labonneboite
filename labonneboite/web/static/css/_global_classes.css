@@ -93,6 +93,10 @@
     color: #222;
 }
 
+.inline-block {
+    display: inline-block;
+}
+
 /* Responsive utilities.
 =========================================================================== */
 

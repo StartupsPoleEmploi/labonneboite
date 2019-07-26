@@ -35,6 +35,21 @@ ACTION_NAMES = [
     'other',
 ]
 
+ACTION_NAME_TO_TITLE = {
+    'update_coordinates':
+        "Demande de modification des informations d'une entreprise",
+    'update_jobs':
+        """
+            Demande de modification des métiers pour lesquels
+            une entreprise reçoit des candidatures spontanées
+        """,
+    'delete':
+        "Demande de suppression d'une entreprise",
+    'other':
+        "Autre demande",
+}
+
+
 def office_identification_required(function):
     """
     Decorator that validates office identification info.
@@ -108,18 +123,21 @@ def change_info_or_apply_for_job(siret=None):
 def ask_recruiter_pe_connect():
     """
     Ask recruiters if they wants to be connected with their Pole Emploi recruiter account
-    in order to validate their identity more quickly/easely
+    in order to validate their identity more quickly/easily.
     """
     action_name = get_action_name()
     if not action_name:
         flash('Une erreur inattendue est survenue, veuillez sélectionner à nouveau une action', 'error')
         return redirect(url_for('contact_form.ask_action'))
 
+    title = ACTION_NAME_TO_TITLE.get(action_name, '')
+
     return render_template(
         'contact_form/ask_recruiter_pe_connect.html',
         use_lba_template=is_recruiter_from_lba(),
         siret=request.args.get('siret', ''),
         action_name=action_name,
+        title=title,
         custom_ga_pageview='/recruteur/%s/connexion' % action_name,
     )
 

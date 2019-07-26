@@ -235,8 +235,10 @@
       window.CSRF_TOKEN = "{{ csrf_token() }}";
   </script>
 
-  {% block scripts %}{% endblock %}
+  {# Load libraries before template scripts to make jQuery and co available. #}
   {% assets "js_all" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+
+  {% block scripts %}{% endblock %}
 
   {% if tilkee_enabled %}
   <script>
