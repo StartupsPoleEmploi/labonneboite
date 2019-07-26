@@ -537,14 +537,18 @@ def get_office_details(siret, alternance=False):
     if not office:
         abort(404)
 
-    # If a office.score_alternance=0 (meaning removed for alternance),
-    # it should not be accessible by siret on alternance context
-    if alternance and not office.score_alternance:
+    # If an office score equals 0 it means it is not supposed
+    # to be shown on LBB frontend/api
+    # and/or it was specifically removed via SAVE,
+    # and thus it should not be accessible by siret.
+    if not alternance and not office.score:
         abort(404)
 
-    # If a office.score=0 (meaning removed),
-    # it should not be accessible by siret
-    if not alternance and not office.score:
+    # Offices having score_alternance equal 0 may still be accessed
+    # by siret in case of LBA offices from the visible market (i.e. having
+    # at least one job offer obtained from the API Offers V2).
+    # However we should not show them if they were specifically removed via SAVE.
+    if alternance and office.is_removed_from_lba:
         abort(404)
 
     # If alternance flag, we use an other URL

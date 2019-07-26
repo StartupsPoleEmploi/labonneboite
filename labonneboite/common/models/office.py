@@ -1,5 +1,3 @@
-
-
 from functools import lru_cache
 from urllib.parse import urlencode
 import logging
@@ -7,9 +5,7 @@ import logging
 from babel.dates import format_date
 from flask import url_for
 from slugify import slugify
-from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy import PrimaryKeyConstraint, Index
-from sqlalchemy.dialects import mysql
 from werkzeug import cached_property
 
 from labonneboite.common import encoding as encoding_util
@@ -23,81 +19,12 @@ from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
 
+from labonneboite.common.models import FinalOfficeMixin, OfficeAdminUpdate
 
 logger = logging.getLogger('main')
 
 
 CITY_NAMES = load_city_codes()
-
-
-class PrimitiveOfficeMixin(object):
-    """
-    Mixin providing fields shared by models: RawOffice, ExportableOffice, Office, OfficeAdminAdd.
-
-    Don't forget to create a new migration for each of these models
-    each time you add/change/remove a field here to keep all models
-    in sync.
-    """
-    siret = Column(String(191))
-    company_name = Column('raisonsociale', String(191), nullable=False)
-    office_name = Column('enseigne', String(191), default='', nullable=False)
-    naf = Column('codenaf', String(8), nullable=False)
-    street_number = Column('numerorue', String(191), default='', nullable=False)
-    street_name = Column('libellerue', String(191), default='', nullable=False)
-    city_code = Column('codecommune', String(191), nullable=False)
-    zipcode = Column('codepostal', String(8), nullable=False)
-    email = Column(String(191), default='', nullable=False)
-    tel = Column(String(191), default='', nullable=False)
-    departement = Column(String(8), nullable=False)
-    headcount = Column('trancheeffectif', String(2))
-    website = Column(String(191), default='', nullable=False)
-    flag_poe_afpr = Column(Boolean, default=False, nullable=False)
-    flag_pmsmp = Column(Boolean, default=False, nullable=False)
-
-
-class OfficeMixin(PrimitiveOfficeMixin):
-    """
-    Mixin providing fields shared by models: ExportableOffice, Office, OfficeAdminAdd.
-
-    Don't forget to create a new migration for each of these models
-    each time you add/change/remove a field here to keep all models
-    in sync.
-    """
-    social_network = Column(mysql.TINYTEXT, nullable=True)
-
-    email_alternance = Column('email_alternance', mysql.TINYTEXT, default='', nullable=True)
-    phone_alternance = Column('phone_alternance', mysql.TINYTEXT, nullable=True)
-    website_alternance = Column('website_alternance', mysql.TINYTEXT, nullable=True)
-    contact_mode = Column('contact_mode', mysql.TINYTEXT, nullable=True)
-
-    flag_alternance = Column(Boolean, default=False, nullable=False)
-    flag_junior = Column(Boolean, default=False, nullable=False)
-    flag_senior = Column(Boolean, default=False, nullable=False)
-    flag_handicap = Column(Boolean, default=False, nullable=False)
-    score = Column(Integer, default=0, nullable=False)
-    score_alternance = Column(Integer, default=0, nullable=False)
-    x = Column('coordinates_x', Float)  # Longitude.
-    y = Column('coordinates_y', Float)  # Latitude.
-
-    @property
-    def longitude(self):
-        return self.x
-
-    @property
-    def latitude(self):
-        return self.y
-
-
-class FinalOfficeMixin(OfficeMixin):
-    """
-    Mixin providing fields shared by models: ExportableOffice, Office.
-
-    Don't forget to create a new migration for each of these models
-    each time you add/change/remove a field here to keep all models
-    in sync.
-    """
-    # A flag that is True if the office also recruits beyond the boundaries of its primary geolocation.
-    has_multi_geolocations = Column(Boolean, default=False, nullable=False)
 
 
 class Office(FinalOfficeMixin, CRUDMixin, Base):
@@ -276,6 +203,24 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         which is basically a collection of offices.
         """
         return self.siret in load_groupements_employeurs()
+
+    @property
+    def is_removed_from_lba(self):
+        """
+        Returns True if the company has explicitly asked via SAVE
+        to be removed from LBA.
+        """
+        if self.score_alternance > 0:
+            return False
+        # office.score_alternance == 0 does not guarantee the office has
+        # been removed via SAVE from LBA as many offices "naturally" have
+        # such a score.
+        # We still have to check that there actually is a SAVE record
+        # specifically asking for this removal.
+        office_admin_update = OfficeAdminUpdate.query.filter(
+            OfficeAdminUpdate.sirets.like("%{}%".format(self.siret))
+        ).filter_by(score_alternance=0).first()
+        return bool(office_admin_update)
 
     @property
     def headcount_text(self):
