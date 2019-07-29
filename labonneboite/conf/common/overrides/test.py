@@ -38,6 +38,10 @@ TRAVEL_VENDOR_BACKENDS = {
 
 PROCESS_ASYNC_TASKS = False
 
-# Dummy IP address for test only
-VERSION_PRO_ALLOWED_IPS = ['173.2.3.1']
+# Dummy IP addresses for test only
+VERSION_PRO_ALLOWED_IPS = [
+    '198.49.0.0/30',
+    '198.49.23.144'
+]
+
 VERSION_PRO_ALLOWED_EMAIL_SUFFIXES = ['@pole-emploi.fr']
