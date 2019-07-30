@@ -39,7 +39,11 @@
     {% block content %}{% endblock %}
   </main>
 
+  {# Load libraries before template scripts to make jQuery and co available. #}
   {% assets "js_all" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+
+  {% block scripts %}{% endblock %}
+
   {% assets "recruiter_form" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 
   {% include "includes/ga.html" %}

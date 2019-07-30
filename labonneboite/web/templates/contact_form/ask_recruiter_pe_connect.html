@@ -4,37 +4,56 @@
     {% extends 'base.html' %}
 {% endif %}
 
-{% block title %}Demande de modification des informations de mon entreprise{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="lbb-content">
-    <div class="lbb-single-column-content verification-form">
+    {% if use_lba_template %}
+        {% set origin='labonnealternance' %}
+    {% else %}
+        {% set origin=None %}
+    {% endif %}
 
-        <h2>Demande de modification des informations de mon entreprise</h2>
+    <div class="lbb-content">
+        <div class="lbb-single-column-content verification-form">
 
-        <p class="text-center">Veuillez utiliser vos identifiants Pôle emploi “accès recruteur” pour une prise en
-            compte plus rapide de vos modifications.</p>
+            <h2>{{ title }}</h2>
 
-        <p class="text-center">
-            {% if use_lba_template %}
-            <a class="logo-pe-connect rgpd-consent-required" title="Se connecter avec Pôle Emploi recruteur" href="{{ url_for('auth.peam_recruiter_connect', action_name=action_name, siret=siret, origin='labonnealternance' )}}">
-                <img src="/static/images/logo-pe-connect.svg" alt="Se connecter avec Pôle emploi recruteur">
-            </a>
-            {% else %}
-            <a class="logo-pe-connect rgpd-consent-required" title="Se connecter avec Pôle Emploi recruteur" href="{{ url_for('auth.peam_recruiter_connect', action_name=action_name, siret=siret) }}">
-                <img src="/static/images/logo-pe-connect.svg" alt="Se connecter avec Pôle emploi recruteur">
-            </a>
-            {% endif %}
-        </p>
-        <p class="text-center">
-            {% if use_lba_template %}
-            <a class="btn btn-small" href="{{ url_for('contact_form.change_info', action_name=action_name, siret=siret, no_pe_connect=1, origin='labonnealternance') }}">Je
-                n'ai pas d'identifiants Pôle emploi</a>
-            {% else %}
-            <a class="btn btn-small" href="{{ url_for('contact_form.change_info', action_name=action_name, siret=siret, no_pe_connect=1) }}">Je
-                n'ai pas d'identifiants Pôle emploi</a>
-            {% endif %}
-        </p>
+            <div id="button-container">
+                <p class="text-center">
+                    <a class="logo-pe-connect rgpd-consent-required" title="Se connecter avec Pôle Emploi recruteur" href="{{ url_for('auth.peam_recruiter_connect', action_name=action_name, siret=siret, origin=origin )}}">
+                        <img src="/static/images/logo-pe-connect.svg" alt="Se connecter avec Pôle emploi recruteur">
+                    </a>
+                </p>
+                <p class="text-center">
+                    <a class="btn" href="{{ url_for('contact_form.change_info', action_name=action_name, siret=siret, no_pe_connect=1, origin=origin) }}">
+                        <span class="inline-block">Je n'ai pas d'identifiants Pôle Emploi</span>
+                    </a>
+                </p>
+            </div>
+        </div>
     </div>
-</div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        (function($) {
+
+          $(window).load( function () {
+            $('#button-container .btn').resizeButton();
+          });
+
+          $.fn.resizeButton = function () {
+            var buttons = $(this);
+            var pe_connect_button = $('#button-container .logo-pe-connect img');
+
+            // The PE connect button has transparent margins so we need
+            // to remove them to get its real height.
+            var height = pe_connect_button.innerHeight() - 23;
+            if (height > 0) {
+                buttons.height(height);
+            }
+          };
+        })(jQuery)
+    </script>
 {% endblock %}
