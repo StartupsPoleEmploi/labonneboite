@@ -287,7 +287,6 @@ def get_office_as_es_doc(office):
 
     return doc
 
-
 def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
 
     ## 0 - Get all romes related to the company
@@ -299,14 +298,12 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
     if office_to_update:
         office_nafs += office_to_update.as_list(office_to_update.nafs_to_add)
 
-
     scores_by_rome = {}
     scores_alternance_by_rome = {}
     # elasticsearch does not understand sets, so we use a dict of 'key => True' instead
     boosted_romes = {}
     boosted_alternance_romes = {}
-
-
+    
     for naf in office_nafs:
         try:
             naf_rome_codes = mapping_util.get_romes_for_naf(naf)
@@ -325,6 +322,7 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
         # Add unrelated rome for indexing (with boost) and remove unwanted romes
         rome_codes = set(naf_rome_codes).union(set(romes_to_boost)) - set(romes_to_remove)
 
+
         for rome_code in rome_codes:
             # Manage office boosting - DPAE
             if office_to_update and office_to_update.boost:
@@ -341,7 +339,10 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                 rome_code=rome_code,
                 naf_code=naf)
 
-            if score_dpae >= scoring_util.SCORE_FOR_ROME_MINIMUM or rome_code in boosted_romes:
+            # Get the score minimum for a rome code with metiers en tension
+            score_minimum_for_rome = scoring_util.get_score_minimum_for_rome(rome_code)
+
+            if score_dpae >= score_minimum_for_rome or rome_code in boosted_romes:
                 if rome_code in scores_by_rome:
                     # this ROME was already computed before for another NAF
                     if score_dpae > scores_by_rome[rome_code]:
@@ -380,6 +381,8 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                 score=office.score_alternance,
                 rome_code=rome_code,
                 naf_code=naf)
+
+            #TODO : VOIR AVEC JULIE SI ON GERE LE SEUIL EGALEMENT POUR LBA OU NON ??
 
             if (
                 score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM

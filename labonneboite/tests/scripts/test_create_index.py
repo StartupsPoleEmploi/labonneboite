@@ -13,6 +13,7 @@ from labonneboite.common import es
 from labonneboite.scripts import create_index as script
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
+from labonneboite.common import scoring as scoring_util
 
 
 
@@ -327,7 +328,6 @@ class AddOfficesTest(CreateIndexBaseTest):
         self.assertEqual(res['_source']['siret'], office.siret)
         self.assertEqual(res['_source']['score'], office.score)
 
-
 class RemoveOfficesTest(CreateIndexBaseTest):
     """
     Test remove_offices().
@@ -387,7 +387,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         for office in [self.office1, self.office2]:
             romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(office.naf)]
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
-
+            
             self.assertIn('scores_by_rome', res['_source'])
             self.assertIn('scores_alternance_by_rome', res['_source'])
 
@@ -424,6 +424,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertEqual(office.website, office_to_update.new_website)
 
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
+
         self.assertEqual(res['_source']['email'], office.email)
         self.assertEqual(res['_source']['phone'], office.tel)
         self.assertEqual(res['_source']['website'], office.website)
@@ -522,6 +523,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
+
         self.assertTrue(res['_source']['boosted_romes']['D1506'])
         self.assertTrue(res['_source']['boosted_romes']['D1507'])
 
@@ -643,7 +645,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         # Use a mock to temporarily adjust scoring_util.SCORE_FOR_ROME_MINIMUM
         # and avoid removing romes if their score is too low.
-        with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0):
+        with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0),\
+                mock.patch.object(script.scoring_util, 'MINIMUM_POSSIBLE_SCORE', 0):
             script.update_offices()
 
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office1.siret)
@@ -760,8 +763,10 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         # Use a mock to temporarily adjust scoring_util.SCORE_FOR_ROME_MINIMUM
         # and avoid removing romes if their score is too low.
-        with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0):
+        with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0),\
+                mock.patch.object(script.scoring_util, 'MINIMUM_POSSIBLE_SCORE', 0):
             script.update_offices()
+
 
         for siret in sirets:
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
@@ -940,6 +945,26 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         # Check contact mode
         self.assertEqual("Come with his driver license", office.contact_mode)
 
+    def test_minimum_score_for_rome(self):
+        """
+        Test `get_score_minimum_for_rome` to get a score threshold that a company must have at least
+        """
+        #In the metiers_tension csv file
+        # This row with rome K1401 should give the maximum possible threshold
+        # P2Z90	#N/A	#N/A	K1401	CONCEPTION ET PILOTAGE DE LA POLITIQUE DES POUVOIRS PUBLICS 
+        score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('K1401')
+        self.assertEqual(score_minimum_for_rome, scoring_util.SCORE_FOR_ROME_MINIMUM)
+        
+        # This row with rome K1401 has 46.2% tension
+        # A0Z43	Conducteurs d'engins agricoles ou forestiers	46.2	A1101	CONDUITE D'ENGINS AGRICOLES ET FORESTIERS
+        score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('A1101')
+        result = ((scoring_util.SCORE_FOR_ROME_MINIMUM - scoring_util.MINIMUM_POSSIBLE_SCORE) * ((100 - 46.2)/100)) + scoring_util.MINIMUM_POSSIBLE_SCORE
+        self.assertEqual(score_minimum_for_rome, result)
+        self.assertTrue(scoring_util.MINIMUM_POSSIBLE_SCORE <= score_minimum_for_rome <= scoring_util.SCORE_FOR_ROME_MINIMUM)        
+
+        # Test with the only rome not in the metiers en tension csv file : L1510|Films d'animation et effets spéciaux
+        score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('L1510')
+        self.assertEqual(score_minimum_for_rome, scoring_util.SCORE_FOR_ROME_MINIMUM)
 
 
 class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):

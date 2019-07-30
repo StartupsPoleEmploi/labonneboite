@@ -4,6 +4,7 @@ from functools import lru_cache
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.conf import settings
+from labonneboite.common.load_data import load_metiers_tension
 
 # scores between 0 and 100
 SCORE_FOR_ROME_MINIMUM = 20
@@ -12,6 +13,11 @@ SCORE_ALTERNANCE_FOR_ROME_MINIMUM = 20
 # stars between 0.0 and 5.0
 STARS_MINIMUM = 2.5
 STARS_MAXIMUM = 5.0
+
+
+# The threshold for the score, that defines if a company is "Bonne boîte" 
+# can't be below this value.
+MINIMUM_POSSIBLE_SCORE = 5
 
 # ############### WARNING about matching scores vs hirings ################
 # Methods scoring_util.get_hirings_from_score
@@ -206,3 +212,33 @@ def get_score_from_stars(stars):
     normalized_score = (stars - STARS_MINIMUM) / (STARS_MAXIMUM - STARS_MINIMUM)
     score = score_min + normalized_score * (score_max - score_min)
     return score
+
+def get_score_minimum_for_rome(rome_code):
+    """
+        rome_code : the rome code for which we want to have the minimum threshold
+
+        return score between `MINIMUM_POSSIBLE_SCORE` and the parameter `scoring_util.SCORE_FOR_ROME_MINIMUM` 
+
+        if the companies have 0% tension, the returned score will be : 
+                 `scoring_util.SCORE_FOR_ROME_MINIMUM`
+
+        if the companies have 100% tension, the returned score will be : 
+                 `MINIMUM_POSSIBLE_SCORE`
+    """
+    # https://trello.com/c/QvfphuOY/1468-m%C3%A9tiers-en-tension 
+    # 
+    # We want to increase the number of company, for code rome matching to 
+    # "métiers en tension" : jobs which has more offers, than appliers
+    # To increase the number of these companies, we have to lower 
+    # the threshold : score for rome minimum
+    rome_to_tension = load_metiers_tension()
+    score_minimum_for_rome = SCORE_FOR_ROME_MINIMUM
+
+    interval = SCORE_FOR_ROME_MINIMUM - MINIMUM_POSSIBLE_SCORE
+
+    if rome_code in rome_to_tension:
+        tension = rome_to_tension[rome_code]
+        score_minimum_for_rome = (interval * ((100 - tension)/100)) + MINIMUM_POSSIBLE_SCORE
+    
+    return score_minimum_for_rome
+
