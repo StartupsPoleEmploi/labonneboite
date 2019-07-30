@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 from labonneboite.conf import settings
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest
 from labonneboite.scripts import create_index as script
-from labonneboite.common.models import OfficeAdminUpdate
+from labonneboite.common.models import OfficeAdminUpdate, Office
 
 
 class ApiOfficeDetailsTest(ApiBaseTest):
@@ -66,6 +66,21 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         self.assertNotIn('phone', data)
         self.assertNotIn('website', data)
 
+    def test_office_with_score_alternance_zero_is_still_shown_via_details(self):
+        """
+        Test that an office with score_alternance == 0 is still shown
+        via the API details endpoint. This is very important because
+        some offices on LBA come from the API Offers V2 (visible market)
+        and often have a score_alternance == 0.
+        """
+        # Note : we use 00000000000010 because score>50 & score_alternance == 0
+        siret = '00000000000010'
+        self.assertEqual(Office.query.filter_by(siret=siret).first().score_alternance, 0)
+
+        # Available for LBA
+        params = self.add_security_params({'user': 'emploi_store_dev', 'contract':'alternance'})
+        rv = self.app.get('/api/v1/office/%s/details?%s' % (siret, urlencode(params)))
+        self.assertEqual(rv.status_code, 200)
 
     def test_update_office_remove_alternance_details(self):
         """
