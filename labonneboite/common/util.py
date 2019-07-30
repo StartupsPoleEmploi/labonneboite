@@ -1,4 +1,5 @@
 
+import ipaddress
 from urllib.parse import urlparse
 import logging
 import unicodedata
@@ -60,13 +61,17 @@ def get_search_url(base_url, request_args, naf=None):
 
 
 def get_user_ip():
+    """
+    Return the current user_ip as an ipaddress.IPv4Address object.
+    """
     logger.debug("request.remote_addr = %s", request.remote_addr)
     logger.debug('request.headers.getlist("X-Forwarded-For") = %s', request.headers.getlist("X-Forwarded-For"))
     logger.debug("request.access_route = %s", request.access_route)
     # If a forwarded header exists, get its first ip (it's the client one),
     # otherwise, fallback to remote_addr.
     # http://werkzeug.pocoo.org/docs/0.10/wrappers/#werkzeug.wrappers.BaseRequest.access_route
-    return request.access_route[0] if request.access_route else request.remote_addr
+    ip = request.access_route[0] if request.access_route else request.remote_addr
+    return ipaddress.ip_address(ip) if ip else None
 
 
 def sanitize_string(s):
@@ -96,7 +101,7 @@ def is_decoded_url_safe(url):
     if not url_info.netloc and url_info.scheme:
         return False
 
-    # Allow only relative URLs without host e.g. '/entreprises?j=Boucherie[...]' 
+    # Allow only relative URLs without host e.g. '/entreprises?j=Boucherie[...]'
     return not url_info.netloc and not url_info.scheme
 
 

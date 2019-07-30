@@ -1,4 +1,5 @@
 import re
+import ipaddress
 
 from flask import session, request
 from flask_login import current_user
@@ -8,6 +9,31 @@ from .util import get_user_ip
 
 
 PRO_VERSION_SESSION_KEY = 'pro_version'
+
+
+def ips_from_ip_ranges(ip_ranges):
+    """
+    Return a list of IP addresses from a list of IP ranges.
+
+    Usage example:
+        ips_from_ip_ranges(['192.168.0.0', '192.168.0.0/22'])
+
+    Input:
+        ip_ranges: list of strings
+
+    Output:
+        list of ipaddress.IPv4Address objects
+
+    """
+    ips = []
+
+    for ip_range in ip_ranges:
+        for ip in ipaddress.IPv4Network(ip_range):
+            ips.append(ip)
+
+    return ips
+
+
 
 def user_is_pro():
     """
@@ -28,7 +54,9 @@ def user_is_pro():
     user_ip = get_user_ip()
     user_agent = request.headers.get('User-Agent')
 
-    if user_ip in settings.VERSION_PRO_ALLOWED_IPS and 'Pila' not in user_agent:
+    whitelisted_ips = ips_from_ip_ranges(settings.VERSION_PRO_ALLOWED_IPS)
+
+    if user_ip in whitelisted_ips and 'Pila' not in user_agent:
         return True
 
     # Check user e-mail by plain_value, suffix or regex (@see local_settings.py)

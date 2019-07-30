@@ -1,3 +1,4 @@
+import ipaddress
 from unittest import mock
 
 from flask import current_app
@@ -25,7 +26,7 @@ class ProVersionTest(DatabaseTest):
             last_name='Doe',
         )
         user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0"
-        allowed_ip = settings.VERSION_PRO_ALLOWED_IPS[0]
+        allowed_ip = settings.VERSION_PRO_ALLOWED_IPS[1] # IP address // should not be a range
         self.headers = {
             'X-Forwarded-For': allowed_ip,
             'User_Agent': user_agent,
@@ -110,6 +111,74 @@ class ProVersionTest(DatabaseTest):
         """
         self.headers['User_Agent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0 Pila/1.0"
 
+        self.assert_pro_version_is_not_enabled()
+
+
+    def test_ip_range(self):
+        """
+        IP specified in settings can be a range of addresses.
+        Check that our program whitelists IP addresses in this range.
+        """
+
+        ips = pro.ips_from_ip_ranges(settings.VERSION_PRO_ALLOWED_IPS)
+
+        for ip in ips:
+            self.headers['X-Forwarded-For'] = ip
+            self.assert_pro_version_is_enabled()
+
+
+        blacklisted_ips = ["173.192.6.0", "173.192.2.0"]
+        for ip in blacklisted_ips:
+            self.headers['X-Forwarded-For'] = ip
+            self.assert_pro_version_is_not_enabled()
+
+
+
+    def test_ips_from_ip_ranges(self):
+        """
+        Unit test for pro.ips_from_ip_ranges method.
+        It should return a list of ip addresses.
+        """
+        whitelisted_ips = pro.ips_from_ip_ranges(settings.VERSION_PRO_ALLOWED_IPS)
+        self.assertIsInstance(whitelisted_ips, list)
+        self.assertIsInstance(whitelisted_ips[0], ipaddress.IPv4Address)
+
+        # Check that our method accepts single IP addresses.
+        test_ip = '129.132.2.1'
+        ips = pro.ips_from_ip_ranges([test_ip])
+        self.assertIn(ipaddress.ip_address(test_ip), ips)
+        self.assertEqual(len(ips), 1)
+
+        # Check that our method accepts IP ranges.
+        test_ip_range = '198.49.0.0/30'
+        ips = pro.ips_from_ip_ranges([test_ip_range])
+        self.assertIn(ipaddress.ip_address('198.49.0.1'), ips)
+        self.assertEqual(len(ips), 4)
+
+        # Check that our method accepts many addresses.
+        self.assertIn(
+            ipaddress.ip_address(test_ip),
+            pro.ips_from_ip_ranges([test_ip, test_ip_range])
+        )
+
+
+
+    ##################################
+    ######### Utility methods ########
+    ##################################
+
+    def assert_pro_version_is_enabled(self):
+        """
+        Utility method to assert pro version is visible.
+        """
+        with self.test_request_context(headers=self.headers):
+            self.assertTrue(pro.user_is_pro())
+
+
+    def assert_pro_version_is_not_enabled(self):
+        """
+        Utility method to assert pro version is not visible.
+        """
         with self.test_request_context(headers=self.headers):
             self.assertFalse(pro.user_is_pro())
             self.assertFalse(pro.pro_version_enabled())
