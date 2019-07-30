@@ -69,7 +69,9 @@ class EsdToken(object):
         )
         if 'access_token' in response:
             cls.VALUE = response['access_token']
-            expires_in = response['expires_in']
+            # Wait slightly less than instructed before requesting a new token,
+            # to avoid random 401 errors.
+            expires_in = int(0.75 * response['expires_in'])
             cls.EXPIRATION_DATE = datetime.datetime.now() + datetime.timedelta(seconds=expires_in)
         else:
             raise TokenFailure
