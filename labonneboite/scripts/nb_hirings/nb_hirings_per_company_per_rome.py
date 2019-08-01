@@ -7,8 +7,11 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 
-#TODO : Rajouter des logs
-#TODO : Faire des filtres sur les scores, sans forcément parler de seuil, au moins dégager les entreprises qui sont à 0 en hirings
+#TODO : Uncomment these lines when the metiers en tension new threshold will be in prod
+#from labonneboite.common.load_data import load_metiers_tension
+#from labonneboite.scripts.create_index import get_score_minimum_for_rome
+
+DEV_LOCAL = True
 
 def get_total_hirings_per_company():
     engine = import_util.create_sqlalchemy_engine()
@@ -21,8 +24,10 @@ def get_total_hirings_per_company():
                 trancheeffectif, \
                 greatest(0, floor(score_regr)) as total_hirings \
              from \
-                etablissements_backoffice\
-            where greatest(0, floor(score_regr)) > 0;"
+                etablissements_backoffice"
+    
+    if not DEV_LOCAL:
+        query += "where greatest(0, floor(score_regr)) > 0;"
 
     df_total_hirings = pd.read_sql_query(query, engine)
 
@@ -60,8 +65,8 @@ def get_score_from_hirings(df_total_hirings):
 
     logger.info("Total score just has been computed for each row")
 
-    # FIXME : oneliner which does the same thing than above, but does not work hehehehe
-    # df_total_hirings['score bis'] = df_total_hirings.apply(lambda row: scoring_util._get_score_from_hirings(row.total_hirings))
+    # FIXME : oneliner which does the same thing than above, but does not work hehehehe --> SHOULD WORK NOW
+    # df_total_hirings['total_score'] = df_total_hirings['total_hirings'].apply(lambda x: scoring_util._get_score_from_hirings(x))
 
     def get_romes(row):
         try:
@@ -77,7 +82,6 @@ def get_score_from_hirings(df_total_hirings):
 
     logger.info("We got all romes related to each NAF and stored a list in a cell")
 
-    # FIXME : Will create a huuuuuuge dataframe, not a nice way to do
     df_total_hirings = splitDataFrameList(df_total_hirings, 'rome', ',')
 
     logger.info("We split each row from 1 naf multiple romes --> 1 naf 1 row")
@@ -93,9 +97,6 @@ def get_score_from_hirings(df_total_hirings):
         lambda row: get_true_score(row), axis=1)
 
     logger.info("We compute the true score for each row")
-
-    # TODO : Filter on low scores, or the dataset will really be huge
-    # df_total_hirings = df_total_hirings[df_total_hirings['score'] >= 20]
 
     def get_true_hirings(row):
         return scoring_util.get_hirings_from_score(row['score'])
@@ -116,10 +117,25 @@ def get_score_from_hirings(df_total_hirings):
 
     df_total_hirings = df_total_hirings[cols_of_interest]
 
+    def is_a_bonne_boite(row,METIERS_TENSION):
+        if not METIERS_TENSION:
+            bonne_boite = row['score'] >= scoring_util.SCORE_FOR_ROME_MINIMUM
+        else:
+            #TODO : Remove comments
+            #score_minimum = get_score_minimum_for_rome(df_metiers_tension,row['rome'])
+            #bonne_boite = row['score'] >= score_minimum
+            bonne_boite = False
+        
+        return 1 if bonne_boite else 0
 
-    #TODO : This threshold will have to be computed using the metiers en tension file
+    METIERS_TENSION = False
+    if METIERS_TENSION:
+        #TODO : Remove comments
+        #df_metiers_tension = load_metiers_tension()
+        pass
 
-    df_total_hirings['is a bonne boite ?'] = df_total_hirings['score'].apply(lambda x: 1 if x >= scoring_util.SCORE_FOR_ROME_MINIMUM else 0)
+    df_total_hirings['is a bonne boite ?'] = df_total_hirings.apply(
+        lambda row: is_a_bonne_boite(row,METIERS_TENSION), axis=1)
 
     logger.info("We added a column to tell if its a bonne boite or no")
 
