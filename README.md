@@ -66,6 +66,7 @@ Table of contents:
 - [Single ROME versus multi-ROME search](#single-rome-vs-multi-rome-search)
 - [Load testing (API and front end)](#load-testing-apifrontend)
 - [Profiling](#profiling)
+- [Je Postule](#je-postule)
 - [Further documentation](#further-documentation)
 
 
@@ -490,7 +491,15 @@ Here is an example of output:
 ![](https://www.evernote.com/l/ABJdN3iVDEJFgLeH2HgHyYOVMjOYK0a30e4B/image.png)
 
 
+## Je Postule
 
+[_Je Postule_](https://github.com/StartupsPoleEmploi/jepostule) ("I apply") allows job seekers to apply directly and quickly to companies, which in turn can provide quick answers to applications. It can be integrated to many applications, like we did in La Bonne Boite.
+
+:point_up: If you want to disable Je Postule features in La Bonne Boite, you can do it pretty easily editing the `JEPOSTULE_QUOTA` setting:
+
+```
+JEPOSTULE_QUOTA = 0 # put 1 if you want to enable it.
+```
 
 
 ## Further documentation
