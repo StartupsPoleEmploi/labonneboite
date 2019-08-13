@@ -2,11 +2,11 @@
 
 {% block content %}
 <main class="lbb-content">
-    Widget ESD / Production / access_token={{ access_token }}
+    Widget ESD / Staging / access_token={{ access_token }}
     <labonnealternance-widget
         style="width: 600px; border: solid 1px lightgray; display: block; min-height: 30px; margin: 30px auto 0 auto"
         data-esd-widget-name="test-lbb" data-esd-widget-token="{{ access_token }}"
     ></labonnealternance-widget>
-    <script src="https://labonnealternance.pole-emploi.fr/widget-lba.js" async></script>
+    <script src="https://labonnealternance.beta.pole-emploi.fr/widget-lba.js" async></script>
 </main>
 {% endblock %}
