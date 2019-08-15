@@ -82,6 +82,21 @@ def stats():
 
 @rootBlueprint.route('/widget-esd')
 def widget():
+    try:
+        return render_template('root/widget-esd.html', access_token=get_widget_access_token())
+    except Exception as e:
+        print(e)
+        abort(418)
+
+@rootBlueprint.route('/widget-esd-staging')
+def widget_staging():
+    try:
+        return render_template('root/widget-esd-staging.html', access_token=get_widget_access_token())
+    except Exception as e:
+        print(e)
+        abort(418)
+
+def get_widget_access_token():
     ACCESS_TOKEN_URL = "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Fpartenaire"
 
     data = {
@@ -91,15 +106,20 @@ def widget():
         'scope': 'application_{} api_labonnealternancev1'.format(settings.PEAM_CLIENT_ID)
     }
 
-    try:
-        resp = requests.post(ACCESS_TOKEN_URL, data=data, headers={'Content-Type':'application/x-www-form-urlencoded'}, verify=False)
-        response = resp.json()
-        return render_template('root/widget-esd.html', access_token=response['access_token'])
-    except Exception as e:
-        print(e)
-        abort(418)
+    resp = requests.post(
+        ACCESS_TOKEN_URL,
+        data=data,
+        headers={'Content-Type':'application/x-www-form-urlencoded'},
+        verify=False,
+    )
+    response = resp.json()
+    return response['access_token']
 
 
 @rootBlueprint.route('/widget-no-esd')
 def widget_no_esd():
     return render_template('root/widget-no-esd.html')
+
+@rootBlueprint.route('/widget-no-esd-staging')
+def widget_no_esd_staging():
+    return render_template('root/widget-no-esd-staging.html')
