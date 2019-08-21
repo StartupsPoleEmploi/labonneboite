@@ -176,10 +176,16 @@ def load_metiers_tension():
         if tension_pct != '#N/A':
             tension_pct = float(tension_pct)
             if 0 <= tension_pct <= 100:
-                # TODO : VOIR AVEC JULIE LE PROBLEME DES TENSIONS DIFFERENTES POUR LE MÊME ROME
-                # ici, on écrase la tension avec le dernier rome rencontré à chaque fois, comment faire une distinction par fap...
-                # gros problème en vue :)
-                rome_to_tension[rome_code] = tension_pct
+                # As a single ROME can have multiple tensions, 
+                # It has been decided to take the higher tension for a rome
+
+                # If a tension is already assigned to a rome, we change it
+                # ONLY if it's higher
+                if rome_code in rome_to_tension:
+                    if tension_pct > rome_to_tension[rome_code]:
+                        rome_to_tension[rome_code] = tension_pct
+                else:
+                    rome_to_tension[rome_code] = tension_pct
             else:
                 raise ValueError
     return rome_to_tension
