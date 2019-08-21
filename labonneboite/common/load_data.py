@@ -184,16 +184,6 @@ def load_metiers_tension():
             else:
                 raise ValueError
     return rome_to_tension
-
-@lru_cache(maxsize=None)
-def load_metiers_tension_2():
-    csv_metiers_tension = load_csv_file("metiers_tension.csv", ',')
-    rome = []
-    for row in csv_metiers_tension:
-        rome_code = row[3]
-        rome.append(rome_code)
-
-    return rome
     
 OGR_ROME_CODES = load_ogr_rome_mapping()
 ROME_CODES = list(OGR_ROME_CODES.values())

@@ -1,548 +1,576 @@
 fap_code,fap,tension_pct,rome_code,rome_label
-J5Z61,Agents administratifs des transports,48.50,N1201,AFFRÈTEMENT TRANSPORT
-J5Z61,Agents administratifs des transports,48.50,N1202,GESTION DES OPÉRATIONS DE CIRCULATION INTERNATIONALE DES MARCHANDISES
-L2Z61,Agents administratifs divers,26.30,M1401,CONDUITE D'ENQUÊTES
-L2Z61,Agents administratifs divers,26.30,M1501,ASSISTANAT EN RESSOURCES HUMAINES
-L2Z61,Agents administratifs divers,26.30,M1602,OPÉRATIONS ADMINISTRATIVES
-L2Z61,Agents administratifs divers,26.30,M1605,ASSISTANAT TECHNIQUE ET ADMINISTRATIF
-L2Z61,Agents administratifs divers,26.30,M1606,SAISIE DE DONNÉES
-L2Z60,Agents d'accueil et d'information,30.90,M1601,ACCUEIL ET RENSEIGNEMENTS
-G1Z80,Agents de maîtrise en entretien,49.20,I1203,MAINTENANCE DES BÂTIMENTS ET DES LOCAUX
-E2Z80,Agents de maîtrise et assimilés des industries de process,56.60,H2504,ENCADREMENT D'ÉQUIPE EN INDUSTRIE DE TRANSFORMATION
-C2Z80,"Agents de maîtrise et assimilés en fabrication de matériel élec., électron.",46.80,H2501,ENCADREMENT DE PRODUCTION DE MATÉRIEL ÉLECTRIQUE ET ÉLECTRONIQUE
-D6Z80,Agents de maîtrise et assimilés en fabrication mécanique,73.20,H2503,PILOTAGE D'UNITÉ ÉLÉMENTAIRE DE PRODUCTION MÉCANIQUE OU DE TRAVAIL DES MÉTAUX
-D6Z80,Agents de maîtrise et assimilés en fabrication mécanique,73.20,H2912,RÉGLAGE D'ÉQUIPEMENT DE PRODUCTION INDUSTRIELLE
-T3Z61,Agents de sécurité et de surveillance,41.90,K2502,MANAGEMENT DE SÉCURITÉ PRIVÉE
-T3Z61,Agents de sécurité et de surveillance,41.90,K2503,SÉCURITÉ ET SURVEILLANCE PRIVÉES
-T4Z61,Agents de services hospitaliers,24.60,J1301,PERSONNEL POLYVALENT DES SERVICES HOSPITALIERS
-T4Z60,Agents d'entretien de locaux,35.10,I1501,INTERVENTION EN GRANDE HAUTEUR
-T4Z60,Agents d'entretien de locaux,35.10,K2202,LAVAGE DE VITRES
-T4Z60,Agents d'entretien de locaux,35.10,K2203,MANAGEMENT ET INSPECTION EN PROPRETÉ DE LOCAUX
-T4Z60,Agents d'entretien de locaux,35.10,K2204,NETTOYAGE DE LOCAUX
-J4Z40,Agents d'exploitation des transports,44.90,N4401,CIRCULATION DU RÉSEAU FERRÉ
-J4Z40,Agents d'exploitation des transports,44.90,N4403,MANOEUVRE DU RÉSEAU FERRÉ
-J5Z60,Agents et hôtesses d'accompagnement,26.50,G1201,"ACCOMPAGNEMENT DE VOYAGES, D'ACTIVITÉS CULTURELLES OU SPORTIVES"
-J5Z60,Agents et hôtesses d'accompagnement,26.50,N2101,NAVIGATION COMMERCIALE AÉRIENNE
-R4Z93,"Agents immobiliers, syndics",60.50,C1501,GÉRANCE IMMOBILIÈRE
-R4Z93,"Agents immobiliers, syndics",60.50,C1502,GESTION LOCATIVE IMMOBILIÈRE
-R4Z93,"Agents immobiliers, syndics",60.50,C1503,MANAGEMENT DE PROJET IMMOBILIER
-R4Z93,"Agents immobiliers, syndics",60.50,C1504,TRANSACTION IMMOBILIÈRE
-E1Z46,Agents qualifiés de laboratoire,37.70,H1201,EXPERTISE TECHNIQUE COULEUR EN INDUSTRIE
-E1Z46,Agents qualifiés de laboratoire,37.70,H1503,INTERVENTION TECHNIQUE EN LABORATOIRE D'ANALYSE INDUSTRIELLE
-D4Z41,Agents qualifiés de traitement thermique et de surface,65.80,H3401,CONDUITE DE TRAITEMENT D'ABRASION DE SURFACE
-D4Z41,Agents qualifiés de traitement thermique et de surface,65.80,H3402,CONDUITE DE TRAITEMENT PAR DÉPÔT DE SURFACE
-D4Z41,Agents qualifiés de traitement thermique et de surface,65.80,H3403,CONDUITE DE TRAITEMENT THERMIQUE
-D4Z41,Agents qualifiés de traitement thermique et de surface,65.80,H3404,PEINTURE INDUSTRIELLE
-A0Z40,Agriculteurs salariés,36.40,A1416,"POLYCULTURE, ÉLEVAGE"
-T2A60,Aides à domicile et aides ménagères,76.80,K1302,ASSISTANCE AUPRÈS D'ADULTES
-T2A60,Aides à domicile et aides ménagères,76.80,K1305,INTERVENTION SOCIALE ET FAMILIALE
-S1Z20,"Aides et apprentis de cuisine, employés polyvalents de la restauration",43.10,G1603,PERSONNEL POLYVALENT EN RESTAURATION
-S1Z20,"Aides et apprentis de cuisine, employés polyvalents de la restauration",43.10,G1604,FABRICATION DE CRÊPES OU PIZZAS
-S1Z20,"Aides et apprentis de cuisine, employés polyvalents de la restauration",43.10,G1605,PLONGE EN RESTAURATION
-V0Z60,Aides-soignants,48.00,A1501,AIDE AUX SOINS ANIMAUX
-V0Z60,Aides-soignants,48.00,J1303,ASSISTANCE MÉDICO-TECHNIQUE
-V0Z60,Aides-soignants,48.00,J1304,AIDE EN PUÉRICULTURE
-V0Z60,Aides-soignants,48.00,J1501,"SOINS D'HYGIÈNE, DE CONFORT DU PATIENT"
-V0Z60,Aides-soignants,48.00,K1301,ACCOMPAGNEMENT MÉDICOSOCIAL
-S0Z20,Apprentis et ouvriers non qualifiés de l'alimentation (hors industries agro-alimentaires),54.30,D1101,BOUCHERIE
-S0Z20,Apprentis et ouvriers non qualifiés de l'alimentation (hors industries agro-alimentaires),54.30,D1102,BOULANGERIE - VIENNOISERIE
-S0Z20,Apprentis et ouvriers non qualifiés de l'alimentation (hors industries agro-alimentaires),54.30,D1103,CHARCUTERIE - TRAITEUR
-S0Z20,Apprentis et ouvriers non qualifiés de l'alimentation (hors industries agro-alimentaires),54.30,D1104,"PÂTISSERIE, CONFISERIE, CHOCOLATERIE ET GLACERIE"
-B7Z90,Architectes,48.30,F1101,ARCHITECTURE DU BTP ET DU PAYSAGE
-B7Z90,Architectes,48.30,F1102,CONCEPTION - AMÉNAGEMENT D'ESPACES INTÉRIEURS
-U1Z93,Artistes plasticiens,43.20,B1101,CRÉATION EN ARTS PLASTIQUES
-T2B60,Assistantes maternelles,50.70,K1303,ASSISTANCE AUPRÈS D'ENFANTS
-U0Z80,Assistants de communication,40.40,E1101,ANIMATION DE SITE MULTIMÉDIA
-U0Z80,Assistants de communication,40.40,E1103,COMMUNICATION
-U0Z80,Assistants de communication,40.40,E1107,ORGANISATION D'ÉVÈNEMENTIEL
-U0Z80,Assistants de communication,40.40,E1401,DÉVELOPPEMENT ET PROMOTION PUBLICITAIRE
-U0Z80,Assistants de communication,40.40,E1402,ÉLABORATION DE PLAN MÉDIA
-R2Z80,Attachés commerciaux,51.70,D1402,RELATION COMMERCIALE GRANDS COMPTES ET ENTREPRISES
-R2Z80,Attachés commerciaux,51.70,D1405,CONSEIL EN INFORMATION MÉDICALE
-R2Z80,Attachés commerciaux,51.70,D1407,RELATION TECHNICO-COMMERCIALE
-E0Z24,Autres ouvriers non qualifiés de type industriel,41.00,H3301,CONDUITE D'ÉQUIPEMENT DE CONDITIONNEMENT
-E0Z24,Autres ouvriers non qualifiés de type industriel,41.00,H3302,"OPÉRATIONS MANUELLES D'ASSEMBLAGE, TRI OU EMBALLAGE"
-E0Z24,Autres ouvriers non qualifiés de type industriel,41.00,H3303,"PRÉPARATION DE MATIÈRES ET PRODUITS INDUSTRIELS (BROYAGE, MÉLANGE, ...)"
-E1Z47,Autres ouvriers non qualifiés de type industriel,41.00,H3301,CONDUITE D'ÉQUIPEMENT DE CONDITIONNEMENT
-E1Z47,Autres ouvriers non qualifiés de type industriel,41.00,H3303,"PRÉPARATION DE MATIÈRES ET PRODUITS INDUSTRIELS (BROYAGE, MÉLANGE, ...)"
-V3Z80,Autres professionnels para-médicaux,73.40,J1402,DIÉTÉTIQUE
-V3Z80,Autres professionnels para-médicaux,73.40,J1403,ERGOTHÉRAPIE
-V3Z80,Autres professionnels para-médicaux,73.40,J1404,KINÉSITHÉRAPIE
-V3Z80,Autres professionnels para-médicaux,73.40,J1406,ORTHOPHONIE
-V3Z80,Autres professionnels para-médicaux,73.40,J1407,ORTHOPTIQUE
-V3Z80,Autres professionnels para-médicaux,73.40,J1408,OSTÉOPATHIE ET CHIROPRAXIE
-V3Z80,Autres professionnels para-médicaux,73.40,J1409,PÉDICURIE ET PODOLOGIE
-V3Z80,Autres professionnels para-médicaux,73.40,J1412,RÉÉDUCATION EN PSYCHOMOTRICITÉ
-S0Z40,Bouchers,74.00,D1101,BOUCHERIE
-S0Z40,Bouchers,74.00,H2101,ABATTAGE ET DÉCOUPE DES VIANDES
-S0Z42,"Boulangers, pâtissiers",67.00,D1102,BOULANGERIE - VIENNOISERIE
-S0Z42,"Boulangers, pâtissiers",67.00,D1104,"PÂTISSERIE, CONFISERIE, CHOCOLATERIE ET GLACERIE"
-A0Z42,"Bûcherons, sylviculteurs salariés et agents forestiers",46.70,A1201,BÛCHERONNAGE ET ÉLAGAGE
-A0Z42,"Bûcherons, sylviculteurs salariés et agents forestiers",46.70,A1204,PROTECTION DU PATRIMOINE NATUREL
-A0Z42,"Bûcherons, sylviculteurs salariés et agents forestiers",46.70,A1205,SYLVICULTURE
-L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1201,ANALYSE ET INGÉNIERIE FINANCIÈRE
-L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1202,AUDIT ET CONTRÔLE COMPTABLES ET FINANCIERS
-L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1203,COMPTABILITÉ
-L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1204,CONTRÔLE DE GESTION
-L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1205,DIRECTION ADMINISTRATIVE ET FINANCIÈRE
-L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1206,MANAGEMENT DE GROUPE OU DE SERVICE COMPTABLE
-L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1207,TRÉSORERIE ET FINANCEMENT
-L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1402,CONSEIL EN ORGANISATION ET MANAGEMENT D'ENTREPRISE
-L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1403,ÉTUDES ET PROSPECTIVES SOCIO-ÉCONOMIQUES
-R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,D1406,MANAGEMENT EN FORCE DE VENTE
-R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,D1506,MARCHANDISAGE
-R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1101,ACHATS
-R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1102,DIRECTION DES ACHATS
-R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1701,ADMINISTRATION DES VENTES
-R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1702,ANALYSE DE TENDANCE
-R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1703,MANAGEMENT ET GESTION DE PRODUIT
-R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1704,MANAGEMENT RELATION CLIENTÈLE
-R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1705,MARKETING
-R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1707,STRATÉGIE COMMERCIALE
-Q2Z90,Cadres de la banque,33.20,C1202,ANALYSE DE CRÉDITS ET RISQUES BANCAIRES
-Q2Z90,Cadres de la banque,33.20,C1203,RELATION CLIENTS BANQUE/FINANCE
-Q2Z90,Cadres de la banque,33.20,C1204,CONCEPTION ET EXPERTISE PRODUITS BANCAIRES ET FINANCIERS
-Q2Z90,Cadres de la banque,33.20,C1205,CONSEIL EN GESTION DE PATRIMOINE FINANCIER
-Q2Z90,Cadres de la banque,33.20,C1207,MANAGEMENT EN EXPLOITATION BANCAIRE
-Q2Z90,Cadres de la banque,33.20,C1301,FRONT OFFICE MARCHÉS FINANCIERS
-Q2Z90,Cadres de la banque,33.20,C1302,GESTION BACK ET MIDDLE-OFFICE MARCHÉS FINANCIERS
-Q2Z90,Cadres de la banque,33.20,C1303,GESTION DE PORTEFEUILLES SUR LES MARCHÉS FINANCIERS
-U0Z90,Cadres de la communication,41.80,E1101,ANIMATION DE SITE MULTIMÉDIA
-U0Z90,Cadres de la communication,41.80,E1103,COMMUNICATION
-U0Z90,Cadres de la communication,41.80,E1107,ORGANISATION D'ÉVÈNEMENTIEL
-U0Z90,Cadres de la communication,41.80,E1401,DÉVELOPPEMENT ET PROMOTION PUBLICITAIRE
-U0Z90,Cadres de la communication,41.80,E1402,ÉLABORATION DE PLAN MÉDIA
-U0Z90,Cadres de la communication,41.80,L1303,PROMOTION D'ARTISTES ET DE SPECTACLES
-Q2Z91,Cadres des assurances,23.70,C1101,CONCEPTION - DÉVELOPPEMENT PRODUITS D'ASSURANCES
-Q2Z91,Cadres des assurances,23.70,C1103,COURTAGE EN ASSURANCES
-Q2Z91,Cadres des assurances,23.70,C1104,DIRECTION D'EXPLOITATION EN ASSURANCES
-Q2Z91,Cadres des assurances,23.70,C1105,ÉTUDES ACTUARIELLES EN ASSURANCES
-Q2Z91,Cadres des assurances,23.70,C1106,EXPERTISE RISQUES EN ASSURANCES
-Q2Z91,Cadres des assurances,23.70,C1107,INDEMNISATIONS EN ASSURANCES
-Q2Z91,Cadres des assurances,23.70,C1108,MANAGEMENT DE GROUPE ET DE SERVICE EN ASSURANCES
-R4Z92,Cadres des magasins,53.10,D1301,MANAGEMENT DE MAGASIN DE DÉTAIL
-R4Z92,Cadres des magasins,53.10,D1504,DIRECTION DE MAGASIN DE GRANDE DISTRIBUTION
-R4Z92,Cadres des magasins,53.10,D1509,MANAGEMENT DE DÉPARTEMENT EN GRANDE DISTRIBUTION
-L5Z92,Cadres des ressources humaines et du recrutement,38.90,K2101,CONSEIL EN FORMATION
-L5Z92,Cadres des ressources humaines et du recrutement,38.90,K2102,COORDINATION PÉDAGOGIQUE
-L5Z92,Cadres des ressources humaines et du recrutement,38.90,M1502,DÉVELOPPEMENT DES RESSOURCES HUMAINES
-L5Z92,Cadres des ressources humaines et du recrutement,38.90,M1503,MANAGEMENT DES RESSOURCES HUMAINES
-J6Z90,Cadres des transports,56.30,N2202,CONTRÔLE DE LA NAVIGATION AÉRIENNE
-J6Z90,Cadres des transports,56.30,N2205,DIRECTION D'ESCALE ET EXPLOITATION AÉROPORTUAIRE
-J6Z90,Cadres des transports,56.30,N3201,EXPLOITATION DES OPÉRATIONS PORTUAIRES ET DU TRANSPORT MARITIME
-J6Z90,Cadres des transports,56.30,N3202,EXPLOITATION DU TRANSPORT FLUVIAL
-J6Z90,Cadres des transports,56.30,N4201,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
-J6Z90,Cadres des transports,56.30,N4202,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
-J6Z90,Cadres des transports,56.30,N4203,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
-J6Z90,Cadres des transports,56.30,N4204,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
-L6Z90,Cadres dirigeants des grandes entreprises,43.10,M1301,DIRECTION DE GRANDE ENTREPRISE OU D'ÉTABLISSEMENT PUBLIC
-A3Z90,Cadres et maîtres d'équipage de la marine,43.90,A1406,ENCADREMENT ÉQUIPAGE DE LA PÊCHE
-A3Z90,Cadres et maîtres d'équipage de la marine,43.90,N3101,ENCADREMENT DE LA NAVIGATION MARITIME
-A3Z90,Cadres et maîtres d'équipage de la marine,43.90,N3102,EQUIPAGE DE LA NAVIGATION MARITIME
-U0Z91,Cadres et techniciens de la documentation,27.20,K1601,GESTION DE L'INFORMATION ET DE LA DOCUMENTATION
-S3Z90,Cadres de l'hôtellerie et de la restauration,49.10,G1401,ASSISTANCE DE DIRECTION D'HÔTEL-RESTAURANT
-S3Z90,Cadres de l'hôtellerie et de la restauration,49.10,G1402,MANAGEMENT D'HÔTEL-RESTAURANT
-S3Z90,Cadres de l'hôtellerie et de la restauration,49.10,G1403,GESTION DE STRUCTURE DE LOISIRS OU D'HÉBERGEMENT TOURISTIQUE
-S3Z90,Cadres de l'hôtellerie et de la restauration,49.10,G1404,MANAGEMENT D'ÉTABLISSEMENT DE RESTAURATION COLLECTIVE
-H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,A1204,PROTECTION DU PATRIMOINE NATUREL
-H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,H1101,ASSISTANCE ET SUPPORT TECHNIQUE CLIENT
-H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,H1302,MANAGEMENT ET INGÉNIERIE HYGIÈNE SÉCURITÉ ENVIRONNEMENT -HSE- INDUSTRIELS
-H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,I1102,MANAGEMENT ET INGÉNIERIE DE MAINTENANCE INDUSTRIELLE
-H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,K2302,MANAGEMENT ET INSPECTION EN ENVIRONNEMENT URBAIN
-H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,K2306,SUPERVISION D'EXPLOITATION ÉCO-INDUSTRIELLE
-R0Z61,Caissiers,20.20,D1505,PERSONNEL DE CAISSE
-G0B40,Carrossiers automobiles,78.10,I1606,RÉPARATION DE CARROSSERIE
-S0Z41,"Charcutiers, traiteurs",72.90,D1103,CHARCUTERIE - TRAITEUR
-B2Z43,Charpentiers (bois),86.30,F1501,MONTAGE DE STRUCTURES ET DE CHARPENTES BOIS
-B2Z43,Charpentiers (bois),86.30,F1503,RÉALISATION - INSTALLATION D'OSSATURES BOIS
-B2Z42,Charpentiers (métal),71.70,F1502,MONTAGE DE STRUCTURES MÉTALLIQUES
-D2Z40,"Chaudronniers, tôliers, traceurs, serruriers, métalliers, forgerons",78.50,H2902,CHAUDRONNERIE - TÔLERIE
-D2Z40,"Chaudronniers, tôliers, traceurs, serruriers, métalliers, forgerons",78.50,H2904,CONDUITE D'ÉQUIPEMENT DE DÉFORMATION DES MÉTAUX
-D2Z40,"Chaudronniers, tôliers, traceurs, serruriers, métalliers, forgerons",78.50,H2911,RÉALISATION DE STRUCTURES MÉTALLIQUES
-S1Z80,Chefs cuisiniers,67.60,G1601,MANAGEMENT DU PERSONNEL DE CUISINE
-B6Z73,"Chefs de chantier, conducteurs de travaux (non cadres)",71.80,F1201,CONDUITE DE TRAVAUX DU BTP ET DE TRAVAUX PAYSAGERS
-B6Z73,"Chefs de chantier, conducteurs de travaux (non cadres)",71.80,F1202,DIRECTION DE CHANTIER DU BTP
-N0Z91,Chercheurs (sauf industrie et enseignement supérieur),22.70,K2401,RECHERCHE EN SCIENCES DE L'HOMME ET DE LA SOCIÉTÉ
-N0Z91,Chercheurs (sauf industrie et enseignement supérieur),22.70,K2402,"RECHERCHE EN SCIENCES DE L'UNIVERS, DE LA MATIÈRE ET DU VIVANT"
-T0Z60,"Coiffeurs, esthéticiens",66.50,D1202,COIFFURE
-T0Z60,"Coiffeurs, esthéticiens",66.50,D1203,HYDROTHÉRAPIE
-T0Z60,"Coiffeurs, esthéticiens",66.50,D1208,SOINS ESTHÉTIQUES ET CORPORELS
-T3Z60,Concierges,28.50,K2501,GARDIENNAGE DE LOCAUX
-J3Z41,Conducteurs de transport en commun sur route,53.50,N4103,CONDUITE DE TRANSPORT EN COMMUN SUR ROUTE
-J3Z40,Conducteurs de véhicules légers,59.00,J1305,CONDUITE DE VÉHICULES SANITAIRES
-J3Z40,Conducteurs de véhicules légers,59.00,N4102,CONDUITE DE TRANSPORT DE PARTICULIERS
 A0Z43,Conducteurs d'engins agricoles ou forestiers,46.20,A1101,CONDUITE D'ENGINS AGRICOLES ET FORESTIERS
-B5Z40,Conducteurs d'engins du BTP,65.40,F1301,CONDUITE DE GRUE
-B5Z40,Conducteurs d'engins du BTP,65.40,F1302,CONDUITE D'ENGINS DE TERRASSEMENT ET DE CARRIÈRE
-B5Z40,Conducteurs d'engins du BTP,65.40,N1104,MANOEUVRE ET CONDUITE D'ENGINS LOURDS DE MANUTENTION
-J3Z42,Conducteurs et livreurs sur courte distance,42.20,M1603,DISTRIBUTION DE DOCUMENTS
-J3Z42,Conducteurs et livreurs sur courte distance,42.20,N4104,COURSES ET LIVRAISONS EXPRESS
-J3Z42,Conducteurs et livreurs sur courte distance,42.20,N4105,CONDUITE ET LIVRAISON PAR TOURNÉES SUR COURTE DISTANCE
-J3Z43,Conducteurs routiers,71.50,N4101,CONDUITE DE TRANSPORT DE MARCHANDISES SUR LONGUE DISTANCE
-J3Z44,Conducteurs sur rails et d'engins de traction,16.60,N4301,CONDUITE SUR RAILS
-J3Z44,Conducteurs sur rails et d'engins de traction,16.60,N4402,EXPLOITATION ET MANOEUVRE DES REMONTÉES MÉCANIQUES
-J4Z60,Contrôleurs des transports,51.50,N4302,CONTRÔLE DES TRANSPORTS EN COMMUN
-B2Z44,Couvreurs,79.50,F1610,POSE ET RESTAURATION DE COUVERTURES
-S1Z40,Cuisiniers,61.00,G1602,PERSONNEL DE CUISINE
-V2Z91,Dentistes,78.40,J1103,MÉDECINE DENTAIRE
-B6Z72,Dessinateurs en BTP,74.40,F1104,DESSIN BTP ET PAYSAGE
-C2Z71,Dessinateurs en électricité et en électronique,77.80,H1202,CONCEPTION ET DESSIN DE PRODUITS ÉLECTRIQUES ET ÉLECTRONIQUES
-D6Z71,Dessinateurs en mécanique et travail des métaux,72.10,H1203,CONCEPTION ET DESSIN PRODUITS MÉCANIQUES
-W0Z91,Directeurs d'établissement scolaire et inspecteurs,70.90,K2103,DIRECTION D'ÉTABLISSEMENT ET D'ENSEIGNEMENT
-U1Z92,Ecrivains,47.50,E1102,"ECRITURE D'OUVRAGES, DE LIVRES"
-V4Z83,Educateurs spécialisés,41.70,K1202,ÉDUCATION DE JEUNES ENFANTS
-V4Z83,Educateurs spécialisés,41.70,K1203,ENCADREMENT TECHNIQUE EN INSERTION PROFESSIONNELLE
-V4Z83,Educateurs spécialisés,41.70,K1204,MÉDIATION SOCIALE ET FACILITATION DE LA VIE EN SOCIÉTÉ
-V4Z83,Educateurs spécialisés,41.70,K1207,INTERVENTION SOCIOÉDUCATIVE
-B4Z43,Electriciens du bâtiment,64.00,F1602,ÉLECTRICITÉ BÂTIMENT
-B4Z43,Electriciens du bâtiment,64.00,F1605,MONTAGE DE RÉSEAUX ÉLECTRIQUES ET TÉLÉCOMS
+A0Z42,"Bûcherons, sylviculteurs salariés et agents forestiers",46.70,A1201,BÛCHERONNAGE ET ÉLAGAGE
+A1Z41,Jardiniers salariés,36.00,A1202,ENTRETIEN DES ESPACES NATURELS
+A1Z41,Jardiniers salariés,36.00,A1203,AMÉNAGEMENT ET ENTRETIEN DES ESPACES VERTS
+A0Z42,"Bûcherons, sylviculteurs salariés et agents forestiers",46.70,A1204,PROTECTION DU PATRIMOINE NATUREL
+H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,A1204,PROTECTION DU PATRIMOINE NATUREL
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,A1204,PROTECTION DU PATRIMOINE NATUREL
+A0Z42,"Bûcherons, sylviculteurs salariés et agents forestiers",46.70,A1205,SYLVICULTURE
+A2Z90,"Ingénieurs, cadres techniques de l'agriculture",70.70,A1301,CONSEIL ET ASSISTANCE TECHNIQUE EN AGRICULTURE
+A2Z70,Techn. et agents d'encadrement d'exploitations agricoles,45.00,A1301,CONSEIL ET ASSISTANCE TECHNIQUE EN AGRICULTURE
+A2Z90,"Ingénieurs, cadres techniques de l'agriculture",70.70,A1302,CONTRÔLE ET DIAGNOSTIC TECHNIQUE EN AGRICULTURE
+A2Z70,Techn. et agents d'encadrement d'exploitations agricoles,45.00,A1302,CONTRÔLE ET DIAGNOSTIC TECHNIQUE EN AGRICULTURE
+A2Z90,"Ingénieurs, cadres techniques de l'agriculture",70.70,A1303,INGÉNIERIE EN AGRICULTURE ET ENVIRONNEMENT NATUREL
+A2Z70,Techn. et agents d'encadrement d'exploitations agricoles,45.00,A1303,INGÉNIERIE EN AGRICULTURE ET ENVIRONNEMENT NATUREL
+A1Z42,"Viticulteurs, arboriculteurs salariés",26.40,A1401,AIDE AGRICOLE DE PRODUCTION FRUITIÈRE OU VITICOLE
+A1Z40,"Maraîchers, horticulteurs salariés",38.10,A1402,AIDE AGRICOLE DE PRODUCTION LÉGUMIÈRE OU VÉGÉTALE
 A0Z41,Eleveurs salariés,45.80,A1403,AIDE D'ÉLEVAGE AGRICOLE ET AQUACOLE
+A3Z40,"Pêcheurs, aquaculteurs salariés",58.80,A1404,AQUACULTURE
+A1Z42,"Viticulteurs, arboriculteurs salariés",26.40,A1405,ARBORICULTURE ET VITICULTURE
+A3Z90,Cadres et maîtres d'équipage de la marine,43.90,A1406,ENCADREMENT ÉQUIPAGE DE LA PÊCHE
 A0Z41,Eleveurs salariés,45.80,A1407,ÉLEVAGE BOVIN OU ÉQUIN
 A0Z41,Eleveurs salariés,45.80,A1408,ÉLEVAGE D'ANIMAUX SAUVAGES OU DE COMPAGNIE
 A0Z41,Eleveurs salariés,45.80,A1409,ÉLEVAGE DE LAPINS ET VOLAILLES
 A0Z41,Eleveurs salariés,45.80,A1410,ÉLEVAGE OVIN OU CAPRIN
 A0Z41,Eleveurs salariés,45.80,A1411,ÉLEVAGE PORCIN
+E0Z21,Ouvriers non qualifiés des industries agro-alimentaires,43.30,A1412,FABRICATION ET AFFINAGE DE FROMAGES
+E1Z42,Ouvriers qualifiés des industries agroalimentaires (hors viandes),51.50,A1412,FABRICATION ET AFFINAGE DE FROMAGES
+E0Z21,Ouvriers non qualifiés des industries agro-alimentaires,43.30,A1413,FERMENTATION DE BOISSONS ALCOOLISÉES
+E1Z42,Ouvriers qualifiés des industries agroalimentaires (hors viandes),51.50,A1413,FERMENTATION DE BOISSONS ALCOOLISÉES
+A1Z40,"Maraîchers, horticulteurs salariés",38.10,A1414,HORTICULTURE ET MARAÎCHAGE
+A3Z40,"Pêcheurs, aquaculteurs salariés",58.80,A1415,EQUIPAGE DE LA PÊCHE
+A0Z40,Agriculteurs salariés,36.40,A1416,"POLYCULTURE, ÉLEVAGE"
+A2Z70,Techn. et agents d'encadrement d'exploitations agricoles,45.00,A1416,"POLYCULTURE, ÉLEVAGE"
+A3Z40,"Pêcheurs, aquaculteurs salariés",58.80,A1417,SALICULTURE
+V0Z60,Aides-soignants,48.00,A1501,AIDE AUX SOINS ANIMAUX
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,A1502,PODOLOGIE ANIMALE
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,A1502,PODOLOGIE ANIMALE
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,A1503,TOILETTAGE DES ANIMAUX
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,A1503,TOILETTAGE DES ANIMAUX
+V2Z92,Vétérinaires,71.60,A1504,SANTÉ ANIMALE
+U1Z93,Artistes plasticiens,43.20,B1101,CRÉATION EN ARTS PLASTIQUES
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1302,DÉCORATION D'OBJETS D'ART ET ARTISANAUX
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1302,DÉCORATION D'OBJETS D'ART ET ARTISANAUX
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1303,GRAVURE - CISELURE
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1303,GRAVURE - CISELURE
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1401,"RÉALISATION D'OBJETS EN LIANES, FIBRES ET BRINS VÉGÉTAUX"
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1401,"RÉALISATION D'OBJETS EN LIANES, FIBRES ET BRINS VÉGÉTAUX"
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1402,RELIURE ET RESTAURATION DE LIVRES ET ARCHIVES
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1402,RELIURE ET RESTAURATION DE LIVRES ET ARCHIVES
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1501,FABRICATION ET RÉPARATION D'INSTRUMENTS DE MUSIQUE
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1501,FABRICATION ET RÉPARATION D'INSTRUMENTS DE MUSIQUE
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1601,MÉTALLERIE D'ART
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1601,MÉTALLERIE D'ART
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1603,"RÉALISATION D'OUVRAGES EN BIJOUTERIE, JOAILLERIE ET ORFÈVRERIE"
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1603,"RÉALISATION D'OUVRAGES EN BIJOUTERIE, JOAILLERIE ET ORFÈVRERIE"
+G0A40,Ouvriers qualifiés de la maintenance en mécanique,70.80,B1604,RÉPARATION - MONTAGE EN SYSTÈMES HORLOGERS
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,B1604,RÉPARATION - MONTAGE EN SYSTÈMES HORLOGERS
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1701,CONSERVATION ET RECONSTITUTION D'ESPÈCES ANIMALES
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1701,CONSERVATION ET RECONSTITUTION D'ESPÈCES ANIMALES
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,B1801,RÉALISATION D'ARTICLES DE CHAPELLERIE
+F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,B1801,RÉALISATION D'ARTICLES DE CHAPELLERIE
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,B1802,RÉALISATION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES (HORS VÊTEMENT)
+F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,B1802,RÉALISATION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES (HORS VÊTEMENT)
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,B1803,RÉALISATION DE VÊTEMENTS SUR MESURE OU EN PETITE SÉRIE
+F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,B1803,RÉALISATION DE VÊTEMENTS SUR MESURE OU EN PETITE SÉRIE
+F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,B1804,RÉALISATION D'OUVRAGES D'ART EN FILS
+F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,B1806,TAPISSERIE - DÉCORATION EN AMEUBLEMENT
+Q2Z91,Cadres des assurances,23.70,C1101,CONCEPTION - DÉVELOPPEMENT PRODUITS D'ASSURANCES
 Q0Z60,Employés de la banque et des assurances,30.00,C1102,CONSEIL CLIENTÈLE EN ASSURANCES
+Q1Z81,Techniciens des assurances,48.10,C1102,CONSEIL CLIENTÈLE EN ASSURANCES
+Q2Z91,Cadres des assurances,23.70,C1103,COURTAGE EN ASSURANCES
+Q1Z81,Techniciens des assurances,48.10,C1103,COURTAGE EN ASSURANCES
+Q2Z91,Cadres des assurances,23.70,C1104,DIRECTION D'EXPLOITATION EN ASSURANCES
+Q2Z91,Cadres des assurances,23.70,C1105,ÉTUDES ACTUARIELLES EN ASSURANCES
+Q1Z81,Techniciens des assurances,48.10,C1105,ÉTUDES ACTUARIELLES EN ASSURANCES
+Q2Z91,Cadres des assurances,23.70,C1106,EXPERTISE RISQUES EN ASSURANCES
+Q1Z81,Techniciens des assurances,48.10,C1106,EXPERTISE RISQUES EN ASSURANCES
+Q2Z91,Cadres des assurances,23.70,C1107,INDEMNISATIONS EN ASSURANCES
+Q1Z81,Techniciens des assurances,48.10,C1107,INDEMNISATIONS EN ASSURANCES
+Q2Z91,Cadres des assurances,23.70,C1108,MANAGEMENT DE GROUPE ET DE SERVICE EN ASSURANCES
 Q0Z60,Employés de la banque et des assurances,30.00,C1109,RÉDACTION ET GESTION EN ASSURANCES
+Q1Z81,Techniciens des assurances,48.10,C1109,RÉDACTION ET GESTION EN ASSURANCES
+Q1Z81,Techniciens des assurances,48.10,C1110,SOUSCRIPTION D'ASSURANCES
 Q0Z60,Employés de la banque et des assurances,30.00,C1201,ACCUEIL ET SERVICES BANCAIRES
+Q1Z80,Techniciens de la banque,23.30,C1201,ACCUEIL ET SERVICES BANCAIRES
+Q2Z90,Cadres de la banque,33.20,C1202,ANALYSE DE CRÉDITS ET RISQUES BANCAIRES
+Q1Z80,Techniciens de la banque,23.30,C1202,ANALYSE DE CRÉDITS ET RISQUES BANCAIRES
+Q2Z90,Cadres de la banque,33.20,C1203,RELATION CLIENTS BANQUE/FINANCE
+Q1Z80,Techniciens de la banque,23.30,C1203,RELATION CLIENTS BANQUE/FINANCE
+Q2Z90,Cadres de la banque,33.20,C1204,CONCEPTION ET EXPERTISE PRODUITS BANCAIRES ET FINANCIERS
+Q2Z90,Cadres de la banque,33.20,C1205,CONSEIL EN GESTION DE PATRIMOINE FINANCIER
+Q1Z80,Techniciens de la banque,23.30,C1205,CONSEIL EN GESTION DE PATRIMOINE FINANCIER
 Q0Z60,Employés de la banque et des assurances,30.00,C1206,GESTION DE CLIENTÈLE BANCAIRE
+Q1Z80,Techniciens de la banque,23.30,C1206,GESTION DE CLIENTÈLE BANCAIRE
+Q2Z90,Cadres de la banque,33.20,C1207,MANAGEMENT EN EXPLOITATION BANCAIRE
+Q2Z90,Cadres de la banque,33.20,C1301,FRONT OFFICE MARCHÉS FINANCIERS
+Q2Z90,Cadres de la banque,33.20,C1302,GESTION BACK ET MIDDLE-OFFICE MARCHÉS FINANCIERS
+Q1Z80,Techniciens de la banque,23.30,C1302,GESTION BACK ET MIDDLE-OFFICE MARCHÉS FINANCIERS
+Q2Z90,Cadres de la banque,33.20,C1303,GESTION DE PORTEFEUILLES SUR LES MARCHÉS FINANCIERS
 Q0Z60,Employés de la banque et des assurances,30.00,C1401,GESTION EN BANQUE ET ASSURANCE
-L1Z60,Employés de la comptabilité,46.20,M1203,COMPTABILITÉ
-S2Z60,Employés de l'hôtellerie,50.20,G1501,PERSONNEL D'ÉTAGE
-S2Z60,Employés de l'hôtellerie,50.20,G1502,PERSONNEL POLYVALENT D'HÔTELLERIE
-S2Z60,Employés de l'hôtellerie,50.20,G1702,PERSONNEL DU HALL
-S2Z60,Employés de l'hôtellerie,50.20,G1703,RÉCEPTION EN HÔTELLERIE
-R0Z60,Employés de libre service,21.90,D1501,ANIMATION DE VENTE
-R0Z60,Employés de libre service,21.90,D1507,MISE EN RAYON LIBRE-SERVICE
-T1Z60,Employés de maison et personnels de ménage,62.20,K1304,SERVICES DOMESTIQUES
+R4Z93,"Agents immobiliers, syndics",60.50,C1501,GÉRANCE IMMOBILIÈRE
+R4Z93,"Agents immobiliers, syndics",60.50,C1502,GESTION LOCATIVE IMMOBILIÈRE
+R4Z93,"Agents immobiliers, syndics",60.50,C1503,MANAGEMENT DE PROJET IMMOBILIER
+R4Z93,"Agents immobiliers, syndics",60.50,C1504,TRANSACTION IMMOBILIÈRE
+S0Z20,Apprentis et ouvriers non qualifiés de l'alimentation (hors industries agro-alimentaires),54.30,D1101,BOUCHERIE
+S0Z40,Bouchers,74.00,D1101,BOUCHERIE
+S0Z20,Apprentis et ouvriers non qualifiés de l'alimentation (hors industries agro-alimentaires),54.30,D1102,BOULANGERIE - VIENNOISERIE
+S0Z42,"Boulangers, pâtissiers",67.00,D1102,BOULANGERIE - VIENNOISERIE
+S0Z20,Apprentis et ouvriers non qualifiés de l'alimentation (hors industries agro-alimentaires),54.30,D1103,CHARCUTERIE - TRAITEUR
+S0Z41,"Charcutiers, traiteurs",72.90,D1103,CHARCUTERIE - TRAITEUR
+S0Z20,Apprentis et ouvriers non qualifiés de l'alimentation (hors industries agro-alimentaires),54.30,D1104,"PÂTISSERIE, CONFISERIE, CHOCOLATERIE ET GLACERIE"
+S0Z42,"Boulangers, pâtissiers",67.00,D1104,"PÂTISSERIE, CONFISERIE, CHOCOLATERIE ET GLACERIE"
+R1Z60,Vendeurs en produits alimentaires,40.60,D1105,POISSONNERIE
+R1Z60,Vendeurs en produits alimentaires,40.60,D1106,VENTE EN ALIMENTATION
+R1Z60,Vendeurs en produits alimentaires,40.60,D1107,VENTE EN GROS DE PRODUITS FRAIS
+R1Z62,"Vendeurs en habillement et accessoires (luxe, sport, loisirs et culturels)",31.40,D1201,"ACHAT VENTE D'OBJETS D'ART, ANCIENS OU D'OCCASION"
+T0Z60,"Coiffeurs, esthéticiens",66.50,D1202,COIFFURE
+T0Z60,"Coiffeurs, esthéticiens",66.50,D1203,HYDROTHÉRAPIE
 J5Z62,Employés des transports et du tourisme,37.80,D1204,LOCATION DE VÉHICULES OU DE MATÉRIEL DE LOISIRS
+J5Z80,Techniciens des transports et du tourisme,35.50,D1204,LOCATION DE VÉHICULES OU DE MATÉRIEL DE LOISIRS
+K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,D1205,NETTOYAGE D'ARTICLES TEXTILES OU CUIRS
+K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,D1205,NETTOYAGE D'ARTICLES TEXTILES OU CUIRS
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,D1206,RÉPARATION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES
+F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,D1206,RÉPARATION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,D1207,RETOUCHES EN HABILLEMENT
+F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,D1207,RETOUCHES EN HABILLEMENT
+T0Z60,"Coiffeurs, esthéticiens",66.50,D1208,SOINS ESTHÉTIQUES ET CORPORELS
+R1Z62,"Vendeurs en habillement et accessoires (luxe, sport, loisirs et culturels)",31.40,D1209,VENTE DE VÉGÉTAUX
+R1Z62,"Vendeurs en habillement et accessoires (luxe, sport, loisirs et culturels)",31.40,D1210,VENTE EN ANIMALERIE
+R1Z62,"Vendeurs en habillement et accessoires (luxe, sport, loisirs et culturels)",31.40,D1211,VENTE EN ARTICLES DE SPORT ET LOISIRS
+R1Z61,"Vendeurs en ameublement, équipement du foyer, bricolage",39.60,D1212,VENTE EN DÉCORATION ET ÉQUIPEMENT DU FOYER
+R1Z63,Vendeurs en gros de matériel et équipements,44.60,D1213,VENTE EN GROS DE MATÉRIEL ET ÉQUIPEMENT
+R1Z62,"Vendeurs en habillement et accessoires (luxe, sport, loisirs et culturels)",31.40,D1214,VENTE EN HABILLEMENT ET ACCESSOIRES DE LA PERSONNE
+R4Z92,Cadres des magasins,53.10,D1301,MANAGEMENT DE MAGASIN DE DÉTAIL
+L0Z60,Secrétaires bureautiques et assimilés,33.80,D1401,ASSISTANAT COMMERCIAL
+L3Z80,Secrétaires de direction,40.50,D1401,ASSISTANAT COMMERCIAL
+R2Z80,Attachés commerciaux,51.70,D1402,RELATION COMMERCIALE GRANDS COMPTES ET ENTREPRISES
+R2Z83,Représentants auprès des particuliers,64.80,D1403,RELATION COMMERCIALE AUPRÈS DE PARTICULIERS
+R2Z83,Représentants auprès des particuliers,64.80,D1404,RELATION COMMERCIALE EN VENTE DE VÉHICULES
+R2Z80,Attachés commerciaux,51.70,D1405,CONSEIL EN INFORMATION MÉDICALE
+R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,D1406,MANAGEMENT EN FORCE DE VENTE
+R2Z80,Attachés commerciaux,51.70,D1407,RELATION TECHNICO-COMMERCIALE
+R4Z91,Ingénieurs et cadres technico-commerciaux,54.30,D1407,RELATION TECHNICO-COMMERCIALE
+R1Z67,Télévendeurs,66.60,D1408,TÉLÉCONSEIL ET TÉLÉVENTE
+R0Z60,Employés de libre service,21.90,D1501,ANIMATION DE VENTE
+R2Z83,Représentants auprès des particuliers,64.80,D1501,ANIMATION DE VENTE
+R3Z80,Maîtrise des magasins,42.30,D1502,MANAGEMENT/GESTION DE RAYON PRODUITS ALIMENTAIRES
+R3Z80,Maîtrise des magasins,42.30,D1503,MANAGEMENT/GESTION DE RAYON PRODUITS NON ALIMENTAIRES
+R4Z92,Cadres des magasins,53.10,D1504,DIRECTION DE MAGASIN DE GRANDE DISTRIBUTION
+R0Z61,Caissiers,20.20,D1505,PERSONNEL DE CAISSE
+R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,D1506,MARCHANDISAGE
+R3Z80,Maîtrise des magasins,42.30,D1506,MARCHANDISAGE
+R0Z60,Employés de libre service,21.90,D1507,MISE EN RAYON LIBRE-SERVICE
+R3Z80,Maîtrise des magasins,42.30,D1508,ENCADREMENT DU PERSONNEL DE CAISSES
+R4Z92,Cadres des magasins,53.10,D1509,MANAGEMENT DE DÉPARTEMENT EN GRANDE DISTRIBUTION
+U0Z80,Assistants de communication,40.40,E1101,ANIMATION DE SITE MULTIMÉDIA
+U0Z90,Cadres de la communication,41.80,E1101,ANIMATION DE SITE MULTIMÉDIA
+U1Z92,Ecrivains,47.50,E1102,"ECRITURE D'OUVRAGES, DE LIVRES"
+U0Z80,Assistants de communication,40.40,E1103,COMMUNICATION
+U0Z90,Cadres de la communication,41.80,E1103,COMMUNICATION
+U0Z92,Journalistes et cadres de l'édition,20.10,E1105,COORDINATION D'ÉDITION
+U0Z92,Journalistes et cadres de l'édition,20.10,E1106,JOURNALISME ET INFORMATION MÉDIA
+U0Z80,Assistants de communication,40.40,E1107,ORGANISATION D'ÉVÈNEMENTIEL
+U0Z90,Cadres de la communication,41.80,E1107,ORGANISATION D'ÉVÈNEMENTIEL
+U0Z81,Interprètes,50.10,E1108,"TRADUCTION, INTERPRÉTARIAT"
+U1Z81,Photographes,60.10,E1201,PHOTOGRAPHIE
+F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1202,PRODUCTION EN LABORATOIRE CINÉMATOGRAPHIQUE
+F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1202,PRODUCTION EN LABORATOIRE CINÉMATOGRAPHIQUE
+F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1203,PRODUCTION EN LABORATOIRE PHOTOGRAPHIQUE
+F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1203,PRODUCTION EN LABORATOIRE PHOTOGRAPHIQUE
+U1Z80,Professionnels des spectacles,16.30,E1204,PROJECTION CINÉMA
+F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1301,CONDUITE DE MACHINES D'IMPRESSION
+F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1301,CONDUITE DE MACHINES D'IMPRESSION
+F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1302,CONDUITE DE MACHINES DE FAÇONNAGE ROUTAGE
+F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1302,CONDUITE DE MACHINES DE FAÇONNAGE ROUTAGE
+F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,E1303,ENCADREMENT DES INDUSTRIES GRAPHIQUES
+F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1304,FAÇONNAGE ET ROUTAGE
+F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1304,FAÇONNAGE ET ROUTAGE
+F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,E1305,PRÉPARATION ET CORRECTION EN ÉDITION ET PRESSE
+F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1306,PRÉPRESSE
+F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1306,PRÉPRESSE
+F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1307,REPROGRAPHIE
+F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1307,REPROGRAPHIE
+F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,E1308,INTERVENTION TECHNIQUE EN INDUSTRIE GRAPHIQUE
+U0Z80,Assistants de communication,40.40,E1401,DÉVELOPPEMENT ET PROMOTION PUBLICITAIRE
+U0Z90,Cadres de la communication,41.80,E1401,DÉVELOPPEMENT ET PROMOTION PUBLICITAIRE
+U0Z80,Assistants de communication,40.40,E1402,ÉLABORATION DE PLAN MÉDIA
+U0Z90,Cadres de la communication,41.80,E1402,ÉLABORATION DE PLAN MÉDIA
+B7Z90,Architectes,48.30,F1101,ARCHITECTURE DU BTP ET DU PAYSAGE
+A1Z41,Jardiniers salariés,36.00,F1101,ARCHITECTURE DU BTP ET DU PAYSAGE
+B7Z90,Architectes,48.30,F1102,CONCEPTION - AMÉNAGEMENT D'ESPACES INTÉRIEURS
+B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1103,CONTRÔLE ET DIAGNOSTIC TECHNIQUE DU BÂTIMENT
+B6Z71,Techniciens et chargés d'études du BTP,61.50,F1103,CONTRÔLE ET DIAGNOSTIC TECHNIQUE DU BÂTIMENT
+B6Z72,Dessinateurs en BTP,74.40,F1104,DESSIN BTP ET PAYSAGE
+B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1105,ÉTUDES GÉOLOGIQUES
+B6Z71,Techniciens et chargés d'études du BTP,61.50,F1105,ÉTUDES GÉOLOGIQUES
+B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1106,INGÉNIERIE ET ÉTUDES DU BTP
+B6Z71,Techniciens et chargés d'études du BTP,61.50,F1106,INGÉNIERIE ET ÉTUDES DU BTP
+B6Z70,Géomètres,71.30,F1107,MESURES TOPOGRAPHIQUES
+B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1108,MÉTRÉ DE LA CONSTRUCTION
+B6Z71,Techniciens et chargés d'études du BTP,61.50,F1108,MÉTRÉ DE LA CONSTRUCTION
+B6Z73,"Chefs de chantier, conducteurs de travaux (non cadres)",71.80,F1201,CONDUITE DE TRAVAUX DU BTP ET DE TRAVAUX PAYSAGERS
+B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1201,CONDUITE DE TRAVAUX DU BTP ET DE TRAVAUX PAYSAGERS
+B6Z73,"Chefs de chantier, conducteurs de travaux (non cadres)",71.80,F1202,DIRECTION DE CHANTIER DU BTP
+B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1202,DIRECTION DE CHANTIER DU BTP
+B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1203,DIRECTION ET INGÉNIERIE D'EXPLOITATION DE GISEMENTS ET DE CARRIÈRES
+B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1204,QUALITÉ SÉCURITÉ ENVIRONNEMENT ET PROTECTION SANTÉ DU BTP
+B6Z71,Techniciens et chargés d'études du BTP,61.50,F1204,QUALITÉ SÉCURITÉ ENVIRONNEMENT ET PROTECTION SANTÉ DU BTP
+B5Z40,Conducteurs d'engins du BTP,65.40,F1301,CONDUITE DE GRUE
+B5Z40,Conducteurs d'engins du BTP,65.40,F1302,CONDUITE D'ENGINS DE TERRASSEMENT ET DE CARRIÈRE
+B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1401,EXTRACTION LIQUIDE ET GAZEUSE
+B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,F1401,EXTRACTION LIQUIDE ET GAZEUSE
+B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1402,EXTRACTION SOLIDE
+B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,F1402,EXTRACTION SOLIDE
+B2Z43,Charpentiers (bois),86.30,F1501,MONTAGE DE STRUCTURES ET DE CHARPENTES BOIS
+B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1501,MONTAGE DE STRUCTURES ET DE CHARPENTES BOIS
+B2Z42,Charpentiers (métal),71.70,F1502,MONTAGE DE STRUCTURES MÉTALLIQUES
+B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1502,MONTAGE DE STRUCTURES MÉTALLIQUES
+B2Z43,Charpentiers (bois),86.30,F1503,RÉALISATION - INSTALLATION D'OSSATURES BOIS
+B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1503,RÉALISATION - INSTALLATION D'OSSATURES BOIS
+B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1601,"APPLICATION ET DÉCORATION EN PLÂTRE, STUC ET STAFF"
+B4Z44,Ouvriers qualifiés de la peinture et de la finition du bâtiment,63.10,F1601,"APPLICATION ET DÉCORATION EN PLÂTRE, STUC ET STAFF"
+B4Z43,Electriciens du bâtiment,64.00,F1602,ÉLECTRICITÉ BÂTIMENT
+B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1602,ÉLECTRICITÉ BÂTIMENT
+B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1603,INSTALLATION D'ÉQUIPEMENTS SANITAIRES ET THERMIQUES
+B4Z41,"Plombiers, chauffagistes",74.90,F1603,INSTALLATION D'ÉQUIPEMENTS SANITAIRES ET THERMIQUES
+B4Z42,Menuisiers et ouvriers de l'agencement et de l'isolation,69.10,F1604,MONTAGE D'AGENCEMENTS
+B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1604,MONTAGE D'AGENCEMENTS
+B4Z43,Electriciens du bâtiment,64.00,F1605,MONTAGE DE RÉSEAUX ÉLECTRIQUES ET TÉLÉCOMS
+B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1605,MONTAGE DE RÉSEAUX ÉLECTRIQUES ET TÉLÉCOMS
+B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1606,PEINTURE EN BÂTIMENT
+B4Z44,Ouvriers qualifiés de la peinture et de la finition du bâtiment,63.10,F1606,PEINTURE EN BÂTIMENT
+B4Z42,Menuisiers et ouvriers de l'agencement et de l'isolation,69.10,F1607,POSE DE FERMETURES MENUISÉES
+B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1607,POSE DE FERMETURES MENUISÉES
+B2Z40,Maçons,58.70,F1608,POSE DE REVÊTEMENTS RIGIDES
+B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1608,POSE DE REVÊTEMENTS RIGIDES
+B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1609,POSE DE REVÊTEMENTS SOUPLES
+B4Z44,Ouvriers qualifiés de la peinture et de la finition du bâtiment,63.10,F1609,POSE DE REVÊTEMENTS SOUPLES
+B2Z44,Couvreurs,79.50,F1610,POSE ET RESTAURATION DE COUVERTURES
+B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1610,POSE ET RESTAURATION DE COUVERTURES
+B2Z40,Maçons,58.70,F1611,RÉALISATION ET RESTAURATION DE FAÇADES
+B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1611,RÉALISATION ET RESTAURATION DE FAÇADES
+B2Z41,Professionnels du travail de la pierre et des matériaux associés,65.80,F1612,TAILLE ET DÉCORATION DE PIERRES
+B2Z40,Maçons,58.70,F1613,TRAVAUX D'ÉTANCHÉITÉ ET D'ISOLATION
+B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1613,TRAVAUX D'ÉTANCHÉITÉ ET D'ISOLATION
+B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1701,CONSTRUCTION EN BÉTON
+B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,F1701,CONSTRUCTION EN BÉTON
+B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1702,CONSTRUCTION DE ROUTES ET VOIES
+B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,F1702,CONSTRUCTION DE ROUTES ET VOIES
+B2Z40,Maçons,58.70,F1703,MAÇONNERIE
+B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1703,MAÇONNERIE
+B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1704,PRÉPARATION DU GROS OEUVRE ET DES TRAVAUX PUBLICS
+B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1705,POSE DE CANALISATIONS
+B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,F1705,POSE DE CANALISATIONS
+E0Z22,"Ouvriers non qualifiés en métallurgie, verre, céramique et matériaux de construction",44.20,F1706,PRÉFABRICATION EN BÉTON INDUSTRIEL
 J5Z62,Employés des transports et du tourisme,37.80,G1101,ACCUEIL TOURISTIQUE
-J5Z62,Employés des transports et du tourisme,37.80,G1303,VENTE DE VOYAGES
-J5Z62,Employés des transports et du tourisme,37.80,N2201,PERSONNEL D'ESCALE AÉROPORTUAIRE
-M0Z60,Employés et opérateurs en informatique,49.40,M1801,ADMINISTRATION DE SYSTÈMES D'INFORMATION
-M0Z60,Employés et opérateurs en informatique,49.40,M1805,ÉTUDES ET DÉVELOPPEMENT INFORMATIQUE
-M0Z60,Employés et opérateurs en informatique,49.40,M1810,PRODUCTION ET EXPLOITATION DE SYSTÈMES D'INFORMATION
+J5Z80,Techniciens des transports et du tourisme,35.50,G1102,PROMOTION DU TOURISME LOCAL
+J5Z60,Agents et hôtesses d'accompagnement,26.50,G1201,"ACCOMPAGNEMENT DE VOYAGES, D'ACTIVITÉS CULTURELLES OU SPORTIVES"
+V5Z81,Professionnels de l'animation socioculturelle,37.40,G1202,ANIMATION D'ACTIVITÉS CULTURELLES OU LUDIQUES
+V5Z81,Professionnels de l'animation socioculturelle,37.40,G1203,ANIMATION DE LOISIRS AUPRÈS D'ENFANTS OU D'ADOLESCENTS
+V5Z82,Sportifs et animateurs sportifs,45.00,G1204,ÉDUCATION EN ACTIVITÉS SPORTIVES
 T6Z61,Employés des services divers,33.70,G1205,PERSONNEL D'ATTRACTIONS OU DE STRUCTURES DE LOISIRS
 T6Z61,Employés des services divers,33.70,G1206,PERSONNEL TECHNIQUE DES JEUX
-T6Z61,Employés des services divers,33.70,K1103,DÉVELOPPEMENT PERSONNEL ET BIEN-ÊTRE DE LA PERSONNE
-T6Z61,Employés des services divers,33.70,K2601,CONDUITE D'OPÉRATIONS FUNÉRAIRES
-T6Z61,Employés des services divers,33.70,K2602,CONSEIL EN SERVICES FUNÉRAIRES
-T6Z61,Employés des services divers,33.70,K2603,THANATOPRAXIE
-W1Z80,Formateurs,45.20,K2110,FORMATION EN CONDUITE DE VÉHICULES
-W1Z80,Formateurs,45.20,K2111,FORMATION PROFESSIONNELLE
-B6Z70,Géomètres,71.30,F1107,MESURES TOPOGRAPHIQUES
+J5Z80,Techniciens des transports et du tourisme,35.50,G1301,CONCEPTION DE PRODUITS TOURISTIQUES
+J6Z92,"Ingén. et cadres de la logistique, du planning et de l'ordonnancement",41.90,G1302,OPTIMISATION DE PRODUITS TOURISTIQUES
+J5Z62,Employés des transports et du tourisme,37.80,G1303,VENTE DE VOYAGES
+J5Z80,Techniciens des transports et du tourisme,35.50,G1303,VENTE DE VOYAGES
+S3Z90,Cadres de l'hôtellerie et de la restauration,49.10,G1401,ASSISTANCE DE DIRECTION D'HÔTEL-RESTAURANT
+S3Z90,Cadres de l'hôtellerie et de la restauration,49.10,G1402,MANAGEMENT D'HÔTEL-RESTAURANT
+S3Z90,Cadres de l'hôtellerie et de la restauration,49.10,G1403,GESTION DE STRUCTURE DE LOISIRS OU D'HÉBERGEMENT TOURISTIQUE
+S3Z90,Cadres de l'hôtellerie et de la restauration,49.10,G1404,MANAGEMENT D'ÉTABLISSEMENT DE RESTAURATION COLLECTIVE
+S2Z60,Employés de l'hôtellerie,50.20,G1501,PERSONNEL D'ÉTAGE
+S2Z60,Employés de l'hôtellerie,50.20,G1502,PERSONNEL POLYVALENT D'HÔTELLERIE
+S2Z81,Maîtrise de l'hôtellerie,43.20,G1503,MANAGEMENT DU PERSONNEL D'ÉTAGE
+S1Z80,Chefs cuisiniers,67.60,G1601,MANAGEMENT DU PERSONNEL DE CUISINE
+S1Z40,Cuisiniers,61.00,G1602,PERSONNEL DE CUISINE
+S1Z20,"Aides et apprentis de cuisine, employés polyvalents de la restauration",43.10,G1603,PERSONNEL POLYVALENT EN RESTAURATION
+S1Z20,"Aides et apprentis de cuisine, employés polyvalents de la restauration",43.10,G1604,FABRICATION DE CRÊPES OU PIZZAS
+S1Z20,"Aides et apprentis de cuisine, employés polyvalents de la restauration",43.10,G1605,PLONGE EN RESTAURATION
+S2Z81,Maîtrise de l'hôtellerie,43.20,G1701,CONCIERGERIE EN HÔTELLERIE
+S2Z60,Employés de l'hôtellerie,50.20,G1702,PERSONNEL DU HALL
+S2Z60,Employés de l'hôtellerie,50.20,G1703,RÉCEPTION EN HÔTELLERIE
+S2Z61,Serveurs de cafés restaurants,49.30,G1801,"CAFÉ, BAR BRASSERIE"
+S2Z80,Maîtres d'hôtel,66.10,G1802,MANAGEMENT DU SERVICE EN RESTAURATION
+S2Z61,Serveurs de cafés restaurants,49.30,G1803,SERVICE EN RESTAURATION
+S2Z80,Maîtres d'hôtel,66.10,G1804,SOMMELLERIE
+H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,H1101,ASSISTANCE ET SUPPORT TECHNIQUE CLIENT
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,H1101,ASSISTANCE ET SUPPORT TECHNIQUE CLIENT
+R4Z91,Ingénieurs et cadres technico-commerciaux,54.30,H1102,MANAGEMENT ET INGÉNIERIE D'AFFAIRES
+E1Z46,Agents qualifiés de laboratoire,37.70,H1201,EXPERTISE TECHNIQUE COULEUR EN INDUSTRIE
+C2Z71,Dessinateurs en électricité et en électronique,77.80,H1202,CONCEPTION ET DESSIN DE PRODUITS ÉLECTRIQUES ET ÉLECTRONIQUES
+D6Z71,Dessinateurs en mécanique et travail des métaux,72.10,H1203,CONCEPTION ET DESSIN PRODUITS MÉCANIQUES
 U1Z82,"Graphistes, dessinateurs, stylistes, décorateurs, créateurs supports…",74.40,H1204,DESIGN INDUSTRIEL
+F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,H1205,ÉTUDES - MODÈLES EN INDUSTRIE DES MATÉRIAUX SOUPLES
+N0Z90,"Ingén. et cadres d'étude, R&D (industrie)",55.00,H1206,"MANAGEMENT ET INGÉNIERIE ÉTUDES, RECHERCHE ET DÉVELOPPEMENT INDUSTRIEL"
+C2Z70,Techniciens en électricité et en électronique,64.90,H1207,RÉDACTION TECHNIQUE
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,H1208,INTERVENTION TECHNIQUE EN ÉTUDES ET CONCEPTION EN AUTOMATISME
+C2Z70,Techniciens en électricité et en électronique,64.90,H1209,INTERVENTION TECHNIQUE EN ÉTUDES ET DÉVELOPPEMENT ÉLECTRONIQUE
+E2Z70,Techniciens des industries de process,42.40,H1210,"INTERVENTION TECHNIQUE EN ÉTUDES, RECHERCHE ET DÉVELOPPEMENT"
+H0Z90,Ingénieurs et cadres de fabrication et de la production,58.40,H1301,INSPECTION DE CONFORMITÉ
+G1Z71,Techniciens experts,49.80,H1301,INSPECTION DE CONFORMITÉ
+H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,H1302,MANAGEMENT ET INGÉNIERIE HYGIÈNE SÉCURITÉ ENVIRONNEMENT -HSE- INDUSTRIELS
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,H1303,INTERVENTION TECHNIQUE EN HYGIÈNE SÉCURITÉ ENVIRONNEMENT -HSE- INDUSTRIEL
+H0Z92,"Ingénieurs des méthodes de production, du contrôle qualité",53.00,H1401,MANAGEMENT ET INGÉNIERIE GESTION INDUSTRIELLE ET LOGISTIQUE
+H0Z92,"Ingénieurs des méthodes de production, du contrôle qualité",53.00,H1402,MANAGEMENT ET INGÉNIERIE MÉTHODES ET INDUSTRIALISATION
+J4Z80,Responsables logistiques (non cadres),44.00,H1403,INTERVENTION TECHNIQUE EN GESTION INDUSTRIELLE ET LOGISTIQUE
+E2Z70,Techniciens des industries de process,42.40,H1404,INTERVENTION TECHNIQUE EN MÉTHODES ET INDUSTRIALISATION
+H0Z92,"Ingénieurs des méthodes de production, du contrôle qualité",53.00,H1501,DIRECTION DE LABORATOIRE D'ANALYSE INDUSTRIELLE
+H0Z92,"Ingénieurs des méthodes de production, du contrôle qualité",53.00,H1502,MANAGEMENT ET INGÉNIERIE QUALITÉ INDUSTRIELLE
+E1Z46,Agents qualifiés de laboratoire,37.70,H1503,INTERVENTION TECHNIQUE EN LABORATOIRE D'ANALYSE INDUSTRIELLE
+E2Z70,Techniciens des industries de process,42.40,H1503,INTERVENTION TECHNIQUE EN LABORATOIRE D'ANALYSE INDUSTRIELLE
+C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H1504,INTERVENTION TECHNIQUE EN CONTRÔLE ESSAI QUALITÉ EN ÉLECTRICITÉ ET ÉLECTRONIQUE
+C2Z70,Techniciens en électricité et en électronique,64.90,H1504,INTERVENTION TECHNIQUE EN CONTRÔLE ESSAI QUALITÉ EN ÉLECTRICITÉ ET ÉLECTRONIQUE
+H0Z90,Ingénieurs et cadres de fabrication et de la production,58.40,H1505,INTERVENTION TECHNIQUE EN FORMULATION ET ANALYSE SENSORIELLE
+E2Z70,Techniciens des industries de process,42.40,H1505,INTERVENTION TECHNIQUE EN FORMULATION ET ANALYSE SENSORIELLE
+D4Z40,"Monteurs, ajusteurs et autres ouvriers qualifiés de la mécanique",43.60,H1506,INTERVENTION TECHNIQUE QUALITÉ EN MÉCANIQUE ET TRAVAIL DES MÉTAUX
+D6Z70,Techniciens en mécanique et travail des métaux,69.30,H1506,INTERVENTION TECHNIQUE QUALITÉ EN MÉCANIQUE ET TRAVAIL DES MÉTAUX
+S0Z40,Bouchers,74.00,H2101,ABATTAGE ET DÉCOUPE DES VIANDES
+E0Z21,Ouvriers non qualifiés des industries agro-alimentaires,43.30,H2101,ABATTAGE ET DÉCOUPE DES VIANDES
+E0Z21,Ouvriers non qualifiés des industries agro-alimentaires,43.30,H2102,CONDUITE D'ÉQUIPEMENT DE PRODUCTION ALIMENTAIRE
+E1Z42,Ouvriers qualifiés des industries agroalimentaires (hors viandes),51.50,H2102,CONDUITE D'ÉQUIPEMENT DE PRODUCTION ALIMENTAIRE
+F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,H2201,ASSEMBLAGE D'OUVRAGES EN BOIS
+F3Z41,Ouvriers qualifiés du travail du bois et de l'ameublement,72.90,H2201,ASSEMBLAGE D'OUVRAGES EN BOIS
+F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,H2202,CONDUITE D'ÉQUIPEMENT DE FABRICATION DE L'AMEUBLEMENT ET DU BOIS
+F3Z41,Ouvriers qualifiés du travail du bois et de l'ameublement,72.90,H2202,CONDUITE D'ÉQUIPEMENT DE FABRICATION DE L'AMEUBLEMENT ET DU BOIS
+E0Z23,Ouvriers non qualifiés du papier-carton et du bois,45.50,H2203,CONDUITE D'INSTALLATION DE PRODUCTION DE PANNEAUX BOIS
+E1Z44,Ouvriers qualifiés des industries lourdes du bois et de la fabrication de papier-carton,56.40,H2203,CONDUITE D'INSTALLATION DE PRODUCTION DE PANNEAUX BOIS
+F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,H2204,ENCADREMENT DES INDUSTRIES DE L'AMEUBLEMENT ET DU BOIS
+F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,H2205,PREMIÈRE TRANSFORMATION DE BOIS D'OEUVRE
+F3Z41,Ouvriers qualifiés du travail du bois et de l'ameublement,72.90,H2205,PREMIÈRE TRANSFORMATION DE BOIS D'OEUVRE
+B4Z42,Menuisiers et ouvriers de l'agencement et de l'isolation,69.10,H2206,RÉALISATION DE MENUISERIE BOIS ET TONNELLERIE
+B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,H2206,RÉALISATION DE MENUISERIE BOIS ET TONNELLERIE
+F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,H2207,RÉALISATION DE MEUBLES EN BOIS
+F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,H2208,RÉALISATION D'OUVRAGES DÉCORATIFS EN BOIS
+F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,H2209,INTERVENTION TECHNIQUE EN AMEUBLEMENT ET BOIS
+E0Z20,Ouvriers non qualifiés des industries chimiques et plastiques,44.40,H2301,CONDUITE D'ÉQUIPEMENT DE PRODUCTION CHIMIQUE OU PHARMACEUTIQUE
+E1Z41,Ouvriers qualifiés des industries chimiques et plastiques,44.40,H2301,CONDUITE D'ÉQUIPEMENT DE PRODUCTION CHIMIQUE OU PHARMACEUTIQUE
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2401,"ASSEMBLAGE - MONTAGE D'ARTICLES EN CUIRS, PEAUX"
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2401,"ASSEMBLAGE - MONTAGE D'ARTICLES EN CUIRS, PEAUX"
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2402,ASSEMBLAGE - MONTAGE DE VÊTEMENTS ET PRODUITS TEXTILES
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2402,ASSEMBLAGE - MONTAGE DE VÊTEMENTS ET PRODUITS TEXTILES
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2403,CONDUITE DE MACHINE DE FABRICATION DE PRODUITS TEXTILES
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2403,CONDUITE DE MACHINE DE FABRICATION DE PRODUITS TEXTILES
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2404,CONDUITE DE MACHINE DE PRODUCTION ET TRANSFORMATION DES FILS
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2404,CONDUITE DE MACHINE DE PRODUCTION ET TRANSFORMATION DES FILS
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2405,CONDUITE DE MACHINE DE TEXTILES NONTISSÉS
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2405,CONDUITE DE MACHINE DE TEXTILES NONTISSÉS
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2406,CONDUITE DE MACHINE DE TRAITEMENT TEXTILE
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2406,CONDUITE DE MACHINE DE TRAITEMENT TEXTILE
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2407,CONDUITE DE MACHINE DE TRANSFORMATION ET DE FINITION DES CUIRS ET PEAUX
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2407,CONDUITE DE MACHINE DE TRANSFORMATION ET DE FINITION DES CUIRS ET PEAUX
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2408,CONDUITE DE MACHINE D'IMPRESSION TEXTILE
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2408,CONDUITE DE MACHINE D'IMPRESSION TEXTILE
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2409,"COUPE CUIR, TEXTILE ET MATÉRIAUX SOUPLES"
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2409,"COUPE CUIR, TEXTILE ET MATÉRIAUX SOUPLES"
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2410,"MISE EN FORME, REPASSAGE ET FINITIONS EN INDUSTRIE TEXTILE"
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2410,"MISE EN FORME, REPASSAGE ET FINITIONS EN INDUSTRIE TEXTILE"
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2411,MONTAGE DE PROTOTYPE CUIR ET MATÉRIAUX SOUPLES
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2411,MONTAGE DE PROTOTYPE CUIR ET MATÉRIAUX SOUPLES
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2412,PATRONNAGE - GRADATION
+F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,H2412,PATRONNAGE - GRADATION
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2413,"PRÉPARATION DE FILS, MONTAGE DE MÉTIERS TEXTILES"
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2413,"PRÉPARATION DE FILS, MONTAGE DE MÉTIERS TEXTILES"
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2414,PRÉPARATION ET FINITION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2414,PRÉPARATION ET FINITION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2415,CONTRÔLE EN INDUSTRIE DU CUIR ET DU TEXTILE
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2415,CONTRÔLE EN INDUSTRIE DU CUIR ET DU TEXTILE
+C2Z80,"Agents de maîtrise et assimilés en fabrication de matériel élec., électron.",46.80,H2501,ENCADREMENT DE PRODUCTION DE MATÉRIEL ÉLECTRIQUE ET ÉLECTRONIQUE
+H0Z90,Ingénieurs et cadres de fabrication et de la production,58.40,H2502,MANAGEMENT ET INGÉNIERIE DE PRODUCTION
+D6Z80,Agents de maîtrise et assimilés en fabrication mécanique,73.20,H2503,PILOTAGE D'UNITÉ ÉLÉMENTAIRE DE PRODUCTION MÉCANIQUE OU DE TRAVAIL DES MÉTAUX
+E2Z80,Agents de maîtrise et assimilés des industries de process,56.60,H2504,ENCADREMENT D'ÉQUIPE EN INDUSTRIE DE TRANSFORMATION
+F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,H2505,ENCADREMENT D'ÉQUIPE OU D'ATELIER EN MATÉRIAUX SOUPLES
+C0Z20,Ouvriers non qualifiés de l'électricité et de l'électronique,39.90,H2601,BOBINAGE ÉLECTRIQUE
+C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H2601,BOBINAGE ÉLECTRIQUE
+C0Z20,Ouvriers non qualifiés de l'électricité et de l'électronique,39.90,H2602,CÂBLAGE ÉLECTRIQUE ET ÉLECTROMÉCANIQUE
+C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H2602,CÂBLAGE ÉLECTRIQUE ET ÉLECTROMÉCANIQUE
+C0Z20,Ouvriers non qualifiés de l'électricité et de l'électronique,39.90,H2603,"CONDUITE D'INSTALLATION AUTOMATISÉE DE PRODUCTION ÉLECTRIQUE, ÉLECTRONIQUE ET MICROÉLECTRONIQUE"
+C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H2603,"CONDUITE D'INSTALLATION AUTOMATISÉE DE PRODUCTION ÉLECTRIQUE, ÉLECTRONIQUE ET MICROÉLECTRONIQUE"
+C0Z20,Ouvriers non qualifiés de l'électricité et de l'électronique,39.90,H2604,MONTAGE DE PRODUITS ÉLECTRIQUES ET ÉLECTRONIQUES
+C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H2604,MONTAGE DE PRODUITS ÉLECTRIQUES ET ÉLECTRONIQUES
+C0Z20,Ouvriers non qualifiés de l'électricité et de l'électronique,39.90,H2605,MONTAGE ET CÂBLAGE ÉLECTRONIQUE
+C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H2605,MONTAGE ET CÂBLAGE ÉLECTRONIQUE
+E1Z40,Pilotes d'installations lourdes des industries de transformation,49.90,H2701,PILOTAGE D'INSTALLATION ÉNERGÉTIQUE ET PÉTROCHIMIQUE
+E0Z22,"Ouvriers non qualifiés en métallurgie, verre, céramique et matériaux de construction",44.20,H2801,CONDUITE D'ÉQUIPEMENT DE TRANSFORMATION DU VERRE
+E0Z22,"Ouvriers non qualifiés en métallurgie, verre, céramique et matériaux de construction",44.20,H2803,FAÇONNAGE ET ÉMAILLAGE EN INDUSTRIE CÉRAMIQUE
+E1Z40,Pilotes d'installations lourdes des industries de transformation,49.90,H2804,"PILOTAGE DE CENTRALE À BÉTON PRÊT À L'EMPLOI, CIMENT, ENROBÉS ET GRANULATS"
+E1Z40,Pilotes d'installations lourdes des industries de transformation,49.90,H2805,PILOTAGE D'INSTALLATION DE PRODUCTION VERRIÈRE
+D4Z40,"Monteurs, ajusteurs et autres ouvriers qualifiés de la mécanique",43.60,H2901,AJUSTEMENT ET MONTAGE DE FABRICATION
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H2901,AJUSTEMENT ET MONTAGE DE FABRICATION
+D2Z40,"Chaudronniers, tôliers, traceurs, serruriers, métalliers, forgerons",78.50,H2902,CHAUDRONNERIE - TÔLERIE
+D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2902,CHAUDRONNERIE - TÔLERIE
+D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2903,CONDUITE D'ÉQUIPEMENT D'USINAGE
+D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2903,CONDUITE D'ÉQUIPEMENT D'USINAGE
+D2Z40,"Chaudronniers, tôliers, traceurs, serruriers, métalliers, forgerons",78.50,H2904,CONDUITE D'ÉQUIPEMENT DE DÉFORMATION DES MÉTAUX
+D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2904,CONDUITE D'ÉQUIPEMENT DE DÉFORMATION DES MÉTAUX
+D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2905,CONDUITE D'ÉQUIPEMENT DE FORMAGE ET DÉCOUPAGE DES MATÉRIAUX
+D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2905,CONDUITE D'ÉQUIPEMENT DE FORMAGE ET DÉCOUPAGE DES MATÉRIAUX
+D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2906,CONDUITE D'INSTALLATION AUTOMATISÉE OU ROBOTISÉE DE FABRICATION MÉCANIQUE
+D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2906,CONDUITE D'INSTALLATION AUTOMATISÉE OU ROBOTISÉE DE FABRICATION MÉCANIQUE
+E0Z22,"Ouvriers non qualifiés en métallurgie, verre, céramique et matériaux de construction",44.20,H2907,CONDUITE D'INSTALLATION DE PRODUCTION DES MÉTAUX
+D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2908,MODELAGE DE MATÉRIAUX NON MÉTALLIQUES
+D6Z70,Techniciens en mécanique et travail des métaux,69.30,H2908,MODELAGE DE MATÉRIAUX NON MÉTALLIQUES
+D4Z40,"Monteurs, ajusteurs et autres ouvriers qualifiés de la mécanique",43.60,H2909,MONTAGE-ASSEMBLAGE MÉCANIQUE
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H2909,MONTAGE-ASSEMBLAGE MÉCANIQUE
+D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2910,MOULAGE SABLE
+D6Z70,Techniciens en mécanique et travail des métaux,69.30,H2910,MOULAGE SABLE
+D2Z40,"Chaudronniers, tôliers, traceurs, serruriers, métalliers, forgerons",78.50,H2911,RÉALISATION DE STRUCTURES MÉTALLIQUES
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H2911,RÉALISATION DE STRUCTURES MÉTALLIQUES
+D6Z80,Agents de maîtrise et assimilés en fabrication mécanique,73.20,H2912,RÉGLAGE D'ÉQUIPEMENT DE PRODUCTION INDUSTRIELLE
+D1Z40,Régleurs qualifiés,79.60,H2912,RÉGLAGE D'ÉQUIPEMENT DE PRODUCTION INDUSTRIELLE
+D6Z70,Techniciens en mécanique et travail des métaux,69.30,H2912,RÉGLAGE D'ÉQUIPEMENT DE PRODUCTION INDUSTRIELLE
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H2913,SOUDAGE MANUEL
+D2Z42,Soudeurs qualifiés,70.50,H2913,SOUDAGE MANUEL
+D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2914,RÉALISATION ET MONTAGE EN TUYAUTERIE
+D2Z41,Tuyauteurs,78.30,H2914,RÉALISATION ET MONTAGE EN TUYAUTERIE
+E0Z23,Ouvriers non qualifiés du papier-carton et du bois,45.50,H3101,CONDUITE D'ÉQUIPEMENT DE FABRICATION DE PAPIER OU DE CARTON
+E1Z44,Ouvriers qualifiés des industries lourdes du bois et de la fabrication de papier-carton,56.40,H3101,CONDUITE D'ÉQUIPEMENT DE FABRICATION DE PAPIER OU DE CARTON
+E0Z23,Ouvriers non qualifiés du papier-carton et du bois,45.50,H3102,CONDUITE D'INSTALLATION DE PÂTE À PAPIER
+E1Z44,Ouvriers qualifiés des industries lourdes du bois et de la fabrication de papier-carton,56.40,H3102,CONDUITE D'INSTALLATION DE PÂTE À PAPIER
+E0Z20,Ouvriers non qualifiés des industries chimiques et plastiques,44.40,H3201,CONDUITE D'ÉQUIPEMENT DE FORMAGE DES PLASTIQUES ET CAOUTCHOUCS
+E1Z41,Ouvriers qualifiés des industries chimiques et plastiques,44.40,H3201,CONDUITE D'ÉQUIPEMENT DE FORMAGE DES PLASTIQUES ET CAOUTCHOUCS
+E1Z41,Ouvriers qualifiés des industries chimiques et plastiques,44.40,H3202,RÉGLAGE D'ÉQUIPEMENT DE FORMAGE DES PLASTIQUES ET CAOUTCHOUCS
+E2Z70,Techniciens des industries de process,42.40,H3202,RÉGLAGE D'ÉQUIPEMENT DE FORMAGE DES PLASTIQUES ET CAOUTCHOUCS
+D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H3203,FABRICATION DE PIÈCES EN MATÉRIAUX COMPOSITES
+D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H3203,FABRICATION DE PIÈCES EN MATÉRIAUX COMPOSITES
+E0Z24,Autres ouvriers non qualifiés de type industriel,41.00,H3301,CONDUITE D'ÉQUIPEMENT DE CONDITIONNEMENT
+E1Z47,Autres ouvriers non qualifiés de type industriel,41.00,H3301,CONDUITE D'ÉQUIPEMENT DE CONDITIONNEMENT
+E0Z24,Autres ouvriers non qualifiés de type industriel,41.00,H3302,"OPÉRATIONS MANUELLES D'ASSEMBLAGE, TRI OU EMBALLAGE"
+E0Z24,Autres ouvriers non qualifiés de type industriel,41.00,H3303,"PRÉPARATION DE MATIÈRES ET PRODUITS INDUSTRIELS (BROYAGE, MÉLANGE, ...)"
+E1Z47,Autres ouvriers non qualifiés de type industriel,41.00,H3303,"PRÉPARATION DE MATIÈRES ET PRODUITS INDUSTRIELS (BROYAGE, MÉLANGE, ...)"
+D4Z41,Agents qualifiés de traitement thermique et de surface,65.80,H3401,CONDUITE DE TRAITEMENT D'ABRASION DE SURFACE
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H3401,CONDUITE DE TRAITEMENT D'ABRASION DE SURFACE
+D4Z41,Agents qualifiés de traitement thermique et de surface,65.80,H3402,CONDUITE DE TRAITEMENT PAR DÉPÔT DE SURFACE
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H3402,CONDUITE DE TRAITEMENT PAR DÉPÔT DE SURFACE
+D4Z41,Agents qualifiés de traitement thermique et de surface,65.80,H3403,CONDUITE DE TRAITEMENT THERMIQUE
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H3403,CONDUITE DE TRAITEMENT THERMIQUE
+D4Z41,Agents qualifiés de traitement thermique et de surface,65.80,H3404,PEINTURE INDUSTRIELLE
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H3404,PEINTURE INDUSTRIELLE
+B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,I1101,DIRECTION ET INGÉNIERIE EN ENTRETIEN INFRASTRUCTURE ET BÂTI
+H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,I1102,MANAGEMENT ET INGÉNIERIE DE MAINTENANCE INDUSTRIELLE
+G1Z71,Techniciens experts,49.80,I1103,SUPERVISION D'ENTRETIEN ET GESTION DE VÉHICULES
+T4Z62,Ouvriers de l'assainissement et du traitement des déchets,26.30,I1201,ENTRETIEN D'AFFICHAGE ET MOBILIER URBAIN
+T4Z62,Ouvriers de l'assainissement et du traitement des déchets,26.30,I1202,ENTRETIEN ET SURVEILLANCE DU TRACÉ ROUTIER
+G1Z80,Agents de maîtrise en entretien,49.20,I1203,MAINTENANCE DES BÂTIMENTS ET DES LOCAUX
+G0A43,Ouvriers qualifiés polyvalents d'entretien du bâtiment,38.50,I1203,MAINTENANCE DES BÂTIMENTS ET DES LOCAUX
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1301,INSTALLATION ET MAINTENANCE D'ASCENSEURS
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1302,INSTALLATION ET MAINTENANCE D'AUTOMATISMES
+G0A41,Ouvriers qualifiés de la maintenance en électricité et en électronique,72.90,I1303,INSTALLATION ET MAINTENANCE DE DISTRIBUTEURS AUTOMATIQUES
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1304,INSTALLATION ET MAINTENANCE D'ÉQUIPEMENTS INDUSTRIELS ET D'EXPLOITATION
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1305,INSTALLATION ET MAINTENANCE ÉLECTRONIQUE
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1306,"INSTALLATION ET MAINTENANCE EN FROID, CONDITIONNEMENT D'AIR"
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1307,INSTALLATION ET MAINTENANCE TÉLÉCOMS ET COURANTS FAIBLES
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1308,MAINTENANCE D'INSTALLATION DE CHAUFFAGE
+G0A41,Ouvriers qualifiés de la maintenance en électricité et en électronique,72.90,I1309,MAINTENANCE ÉLECTRIQUE
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1309,MAINTENANCE ÉLECTRIQUE
+G0A40,Ouvriers qualifiés de la maintenance en mécanique,70.80,I1310,MAINTENANCE MÉCANIQUE INDUSTRIELLE
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1310,MAINTENANCE MÉCANIQUE INDUSTRIELLE
+M2Z91,"Ingén. et cadres d'administration, maintenance en informatique",66.70,I1401,MAINTENANCE INFORMATIQUE ET BUREAUTIQUE
+M1Z81,Techniciens d'étude et de développement en informatique,51.80,I1401,MAINTENANCE INFORMATIQUE ET BUREAUTIQUE
+G0A42,Mainteniciens en biens électrodomestiques,30.70,I1402,RÉPARATION DE BIENS ÉLECTRODOMESTIQUES ET MULTIMÉDIA
+T4Z60,Agents d'entretien de locaux,35.10,I1501,INTERVENTION EN GRANDE HAUTEUR
+B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,I1502,INTERVENTION EN MILIEU SUBAQUATIQUE
+B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,I1502,INTERVENTION EN MILIEU SUBAQUATIQUE
+T4Z62,Ouvriers de l'assainissement et du traitement des déchets,26.30,I1503,INTERVENTION EN MILIEUX ET PRODUITS NOCIFS
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1503,INTERVENTION EN MILIEUX ET PRODUITS NOCIFS
+G0A40,Ouvriers qualifiés de la maintenance en mécanique,70.80,I1601,INSTALLATION ET MAINTENANCE EN NAUTISME
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1601,INSTALLATION ET MAINTENANCE EN NAUTISME
+G0A40,Ouvriers qualifiés de la maintenance en mécanique,70.80,I1602,MAINTENANCE D'AÉRONEFS
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1602,MAINTENANCE D'AÉRONEFS
+G0B41,Mécaniciens et électroniciens de véhicules,72.90,I1603,"MAINTENANCE D'ENGINS DE CHANTIER, LEVAGE, MANUTENTION ET DE MACHINES AGRICOLES"
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,I1603,"MAINTENANCE D'ENGINS DE CHANTIER, LEVAGE, MANUTENTION ET DE MACHINES AGRICOLES"
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1603,"MAINTENANCE D'ENGINS DE CHANTIER, LEVAGE, MANUTENTION ET DE MACHINES AGRICOLES"
+G0B41,Mécaniciens et électroniciens de véhicules,72.90,I1604,MÉCANIQUE AUTOMOBILE ET ENTRETIEN DE VÉHICULES
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,I1604,MÉCANIQUE AUTOMOBILE ET ENTRETIEN DE VÉHICULES
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1604,MÉCANIQUE AUTOMOBILE ET ENTRETIEN DE VÉHICULES
+G0A40,Ouvriers qualifiés de la maintenance en mécanique,70.80,I1605,MÉCANIQUE DE MARINE
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1605,MÉCANIQUE DE MARINE
+G0B40,Carrossiers automobiles,78.10,I1606,RÉPARATION DE CARROSSERIE
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,I1606,RÉPARATION DE CARROSSERIE
+G0B41,Mécaniciens et électroniciens de véhicules,72.90,I1607,"RÉPARATION DE CYCLES, MOTOCYCLES ET MOTOCULTEURS DE LOISIRS"
+D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,I1607,"RÉPARATION DE CYCLES, MOTOCYCLES ET MOTOCULTEURS DE LOISIRS"
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1607,"RÉPARATION DE CYCLES, MOTOCYCLES ET MOTOCULTEURS DE LOISIRS"
+V2Z90,Médecins,70.20,J1101,MÉDECINE DE PRÉVENTION
+V2Z90,Médecins,70.20,J1102,MÉDECINE GÉNÉRALISTE ET SPÉCIALISÉE
+V2Z91,Dentistes,78.40,J1103,MÉDECINE DENTAIRE
+V1Z81,Sages-femmes,26.90,J1104,SUIVI DE LA GROSSESSE ET DE L'ACCOUCHEMENT
+V2Z93,Pharmaciens,62.80,J1201,BIOLOGIE MÉDICALE
+V2Z93,Pharmaciens,62.80,J1202,PHARMACIE
+T4Z61,Agents de services hospitaliers,24.60,J1301,PERSONNEL POLYVALENT DES SERVICES HOSPITALIERS
+V3Z70,Techniciens médicaux et préparateurs,59.20,J1302,ANALYSES MÉDICALES
+V0Z60,Aides-soignants,48.00,J1303,ASSISTANCE MÉDICO-TECHNIQUE
+V0Z60,Aides-soignants,48.00,J1304,AIDE EN PUÉRICULTURE
+J3Z40,Conducteurs de véhicules légers,59.00,J1305,CONDUITE DE VÉHICULES SANITAIRES
+V3Z70,Techniciens médicaux et préparateurs,59.20,J1306,IMAGERIE MÉDICALE
+V3Z70,Techniciens médicaux et préparateurs,59.20,J1307,PRÉPARATION EN PHARMACIE
+V3Z71,Spécialistes de l'appareillage médical,61.40,J1401,AUDIOPROTHÈSES
+V3Z80,Autres professionnels para-médicaux,73.40,J1402,DIÉTÉTIQUE
+V3Z80,Autres professionnels para-médicaux,73.40,J1403,ERGOTHÉRAPIE
+V3Z80,Autres professionnels para-médicaux,73.40,J1404,KINÉSITHÉRAPIE
+V3Z71,Spécialistes de l'appareillage médical,61.40,J1405,OPTIQUE - LUNETTERIE
+V3Z80,Autres professionnels para-médicaux,73.40,J1406,ORTHOPHONIE
+V3Z80,Autres professionnels para-médicaux,73.40,J1407,ORTHOPTIQUE
+V3Z80,Autres professionnels para-médicaux,73.40,J1408,OSTÉOPATHIE ET CHIROPRAXIE
+V3Z80,Autres professionnels para-médicaux,73.40,J1409,PÉDICURIE ET PODOLOGIE
+V3Z71,Spécialistes de l'appareillage médical,61.40,J1410,PROTHÈSES DENTAIRES
+V3Z71,Spécialistes de l'appareillage médical,61.40,J1411,PROTHÈSES ET ORTHÈSES
+V3Z80,Autres professionnels para-médicaux,73.40,J1412,RÉÉDUCATION EN PSYCHOMOTRICITÉ
+V0Z60,Aides-soignants,48.00,J1501,"SOINS D'HYGIÈNE, DE CONFORT DU PATIENT"
 V1Z80,Infirmiers,36.10,J1502,COORDINATION DE SERVICES MÉDICAUX OU PARAMÉDICAUX
 V1Z80,Infirmiers,36.10,J1503,SOINS INFIRMIERS SPÉCIALISÉS EN ANESTHÉSIE
 V1Z80,Infirmiers,36.10,J1504,SOINS INFIRMIERS SPÉCIALISÉS EN BLOC OPÉRATOIRE
 V1Z80,Infirmiers,36.10,J1505,SOINS INFIRMIERS SPÉCIALISÉS EN PRÉVENTION
 V1Z80,Infirmiers,36.10,J1506,SOINS INFIRMIERS GÉNÉRALISTES
 V1Z80,Infirmiers,36.10,J1507,SOINS INFIRMIERS SPÉCIALISÉS EN PUÉRICULTURE
-H0Z92,"Ingénieurs des méthodes de production, du contrôle qualité",53.00,H1401,MANAGEMENT ET INGÉNIERIE GESTION INDUSTRIELLE ET LOGISTIQUE
-H0Z92,"Ingénieurs des méthodes de production, du contrôle qualité",53.00,H1402,MANAGEMENT ET INGÉNIERIE MÉTHODES ET INDUSTRIALISATION
-H0Z92,"Ingénieurs des méthodes de production, du contrôle qualité",53.00,H1501,DIRECTION DE LABORATOIRE D'ANALYSE INDUSTRIELLE
-H0Z92,"Ingénieurs des méthodes de production, du contrôle qualité",53.00,H1502,MANAGEMENT ET INGÉNIERIE QUALITÉ INDUSTRIELLE
-B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1103,CONTRÔLE ET DIAGNOSTIC TECHNIQUE DU BÂTIMENT
-B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1105,ÉTUDES GÉOLOGIQUES
-B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1106,INGÉNIERIE ET ÉTUDES DU BTP
-B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1108,MÉTRÉ DE LA CONSTRUCTION
-B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1201,CONDUITE DE TRAVAUX DU BTP ET DE TRAVAUX PAYSAGERS
-B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1202,DIRECTION DE CHANTIER DU BTP
-B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1203,DIRECTION ET INGÉNIERIE D'EXPLOITATION DE GISEMENTS ET DE CARRIÈRES
-B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,F1204,QUALITÉ SÉCURITÉ ENVIRONNEMENT ET PROTECTION SANTÉ DU BTP
-B7Z91,"Ingénieurs du BTP, chefs de chantier et conducteurs de travaux (cadres)",63.10,I1101,DIRECTION ET INGÉNIERIE EN ENTRETIEN INFRASTRUCTURE ET BÂTI
-M2Z91,"Ingén. et cadres d'administration, maintenance en informatique",66.70,I1401,MAINTENANCE INFORMATIQUE ET BUREAUTIQUE
-H0Z90,Ingénieurs et cadres de fabrication et de la production,58.40,H1301,INSPECTION DE CONFORMITÉ
-H0Z90,Ingénieurs et cadres de fabrication et de la production,58.40,H1505,INTERVENTION TECHNIQUE EN FORMULATION ET ANALYSE SENSORIELLE
-H0Z90,Ingénieurs et cadres de fabrication et de la production,58.40,H2502,MANAGEMENT ET INGÉNIERIE DE PRODUCTION
-M2Z92,Ingén. et cadres des télécommunications,67.70,M1804,ÉTUDES ET DÉVELOPPEMENT DE RÉSEAUX DE TÉLÉCOMS
-M2Z92,Ingén. et cadres des télécommunications,67.70,M1807,EXPLOITATION DE SYSTÈMES DE COMMUNICATION ET DE COMMANDEMENT
-N0Z90,"Ingén. et cadres d'étude, R&D (industrie)",55.00,H1206,"MANAGEMENT ET INGÉNIERIE ÉTUDES, RECHERCHE ET DÉVELOPPEMENT INDUSTRIEL"
-N0Z90,"Ingén. et cadres d'étude, R&D (industrie)",55.00,M1808,INFORMATION GÉOGRAPHIQUE
-N0Z90,"Ingén. et cadres d'étude, R&D (industrie)",55.00,M1809,INFORMATION MÉTÉOROLOGIQUE
-J6Z92,"Ingén. et cadres de la logistique, du planning et de l'ordonnancement",41.90,G1302,OPTIMISATION DE PRODUITS TOURISTIQUES
-J6Z92,"Ingén. et cadres de la logistique, du planning et de l'ordonnancement",41.90,N1301,CONCEPTION ET ORGANISATION DE LA CHAÎNE LOGISTIQUE
-J6Z92,"Ingén. et cadres de la logistique, du planning et de l'ordonnancement",41.90,N1302,DIRECTION DE SITE LOGISTIQUE
-R4Z91,Ingénieurs et cadres technico-commerciaux,54.30,D1407,RELATION TECHNICO-COMMERCIALE
-R4Z91,Ingénieurs et cadres technico-commerciaux,54.30,H1102,MANAGEMENT ET INGÉNIERIE D'AFFAIRES
-R4Z91,Ingénieurs et cadres technico-commerciaux,54.30,M1706,PROMOTION DES VENTES
-M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1801,ADMINISTRATION DE SYSTÈMES D'INFORMATION
-M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1802,EXPERTISE ET SUPPORT EN SYSTÈMES D'INFORMATION
-M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1803,DIRECTION DES SYSTÈMES D'INFORMATION
-M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1805,ÉTUDES ET DÉVELOPPEMENT INFORMATIQUE
-M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1806,CONSEIL ET MAÎTRISE D'OUVRAGE EN SYSTÈMES D'INFORMATION
-M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1810,PRODUCTION ET EXPLOITATION DE SYSTÈMES D'INFORMATION
-A2Z90,"Ingénieurs, cadres techniques de l'agriculture",70.70,A1301,CONSEIL ET ASSISTANCE TECHNIQUE EN AGRICULTURE
-A2Z90,"Ingénieurs, cadres techniques de l'agriculture",70.70,A1302,CONTRÔLE ET DIAGNOSTIC TECHNIQUE EN AGRICULTURE
-A2Z90,"Ingénieurs, cadres techniques de l'agriculture",70.70,A1303,INGÉNIERIE EN AGRICULTURE ET ENVIRONNEMENT NATUREL
-U0Z81,Interprètes,50.10,E1108,"TRADUCTION, INTERPRÉTARIAT"
-A1Z41,Jardiniers salariés,36.00,A1202,ENTRETIEN DES ESPACES NATURELS
-A1Z41,Jardiniers salariés,36.00,A1203,AMÉNAGEMENT ET ENTRETIEN DES ESPACES VERTS
-A1Z41,Jardiniers salariés,36.00,F1101,ARCHITECTURE DU BTP ET DU PAYSAGE
-U0Z92,Journalistes et cadres de l'édition,20.10,E1105,COORDINATION D'ÉDITION
-U0Z92,Journalistes et cadres de l'édition,20.10,E1106,JOURNALISME ET INFORMATION MÉDIA
-L5Z91,Juristes,48.30,K1903,DÉFENSE ET CONSEIL JURIDIQUE
-B2Z40,Maçons,58.70,F1608,POSE DE REVÊTEMENTS RIGIDES
-B2Z40,Maçons,58.70,F1611,RÉALISATION ET RESTAURATION DE FAÇADES
-B2Z40,Maçons,58.70,F1613,TRAVAUX D'ÉTANCHÉITÉ ET D'ISOLATION
-B2Z40,Maçons,58.70,F1703,MAÇONNERIE
-G0A42,Mainteniciens en biens électrodomestiques,30.70,I1402,RÉPARATION DE BIENS ÉLECTRODOMESTIQUES ET MULTIMÉDIA
-S2Z80,Maîtres d'hôtel,66.10,G1802,MANAGEMENT DU SERVICE EN RESTAURATION
-S2Z80,Maîtres d'hôtel,66.10,G1804,SOMMELLERIE
-S2Z81,Maîtrise de l'hôtellerie,43.20,G1503,MANAGEMENT DU PERSONNEL D'ÉTAGE
-S2Z81,Maîtrise de l'hôtellerie,43.20,G1701,CONCIERGERIE EN HÔTELLERIE
-R3Z80,Maîtrise des magasins,42.30,D1502,MANAGEMENT/GESTION DE RAYON PRODUITS ALIMENTAIRES
-R3Z80,Maîtrise des magasins,42.30,D1503,MANAGEMENT/GESTION DE RAYON PRODUITS NON ALIMENTAIRES
-R3Z80,Maîtrise des magasins,42.30,D1506,MARCHANDISAGE
-R3Z80,Maîtrise des magasins,42.30,D1508,ENCADREMENT DU PERSONNEL DE CAISSES
-A1Z40,"Maraîchers, horticulteurs salariés",38.10,A1402,AIDE AGRICOLE DE PRODUCTION LÉGUMIÈRE OU VÉGÉTALE
-A1Z40,"Maraîchers, horticulteurs salariés",38.10,A1414,HORTICULTURE ET MARAÎCHAGE
-A3Z41,Marins salariés,26.60,N3102,EQUIPAGE DE LA NAVIGATION MARITIME
-A3Z41,Marins salariés,26.60,N3103,NAVIGATION FLUVIALE
-G0B41,Mécaniciens et électroniciens de véhicules,72.90,I1603,"MAINTENANCE D'ENGINS DE CHANTIER, LEVAGE, MANUTENTION ET DE MACHINES AGRICOLES"
-G0B41,Mécaniciens et électroniciens de véhicules,72.90,I1604,MÉCANIQUE AUTOMOBILE ET ENTRETIEN DE VÉHICULES
-G0B41,Mécaniciens et électroniciens de véhicules,72.90,I1607,"RÉPARATION DE CYCLES, MOTOCYCLES ET MOTOCULTEURS DE LOISIRS"
-V2Z90,Médecins,70.20,J1101,MÉDECINE DE PRÉVENTION
-V2Z90,Médecins,70.20,J1102,MÉDECINE GÉNÉRALISTE ET SPÉCIALISÉE
+V4Z85,Professionnels de l'action sociale,41.30,K1101,ACCOMPAGNEMENT ET MÉDIATION FAMILIALE
+V4Z85,Professionnels de l'action sociale,41.30,K1102,AIDE AUX BÉNÉFICIAIRES D'UNE MESURE DE PROTECTION JURIDIQUE
+T6Z61,Employés des services divers,33.70,K1103,DÉVELOPPEMENT PERSONNEL ET BIEN-ÊTRE DE LA PERSONNE
+V3Z90,"Psychologues, psychothérapeutes",36.80,K1104,PSYCHOLOGIE
+V4Z85,Professionnels de l'action sociale,41.30,K1201,ACTION SOCIALE
+V4Z83,Educateurs spécialisés,41.70,K1202,ÉDUCATION DE JEUNES ENFANTS
+V4Z83,Educateurs spécialisés,41.70,K1203,ENCADREMENT TECHNIQUE EN INSERTION PROFESSIONNELLE
+V4Z83,Educateurs spécialisés,41.70,K1204,MÉDIATION SOCIALE ET FACILITATION DE LA VIE EN SOCIÉTÉ
+V4Z85,Professionnels de l'action sociale,41.30,K1205,INFORMATION SOCIALE
+V5Z81,Professionnels de l'animation socioculturelle,37.40,K1206,INTERVENTION SOCIOCULTURELLE
+V4Z83,Educateurs spécialisés,41.70,K1207,INTERVENTION SOCIOÉDUCATIVE
+V0Z60,Aides-soignants,48.00,K1301,ACCOMPAGNEMENT MÉDICOSOCIAL
+T2A60,Aides à domicile et aides ménagères,76.80,K1302,ASSISTANCE AUPRÈS D'ADULTES
+T2B60,Assistantes maternelles,50.70,K1303,ASSISTANCE AUPRÈS D'ENFANTS
+T1Z60,Employés de maison et personnels de ménage,62.20,K1304,SERVICES DOMESTIQUES
+T2A60,Aides à domicile et aides ménagères,76.80,K1305,INTERVENTION SOCIALE ET FAMILIALE
 V2Z90,Médecins,70.20,K1402,CONSEIL EN SANTÉ PUBLIQUE
-B4Z42,Menuisiers et ouvriers de l'agencement et de l'isolation,69.10,F1604,MONTAGE D'AGENCEMENTS
-B4Z42,Menuisiers et ouvriers de l'agencement et de l'isolation,69.10,F1607,POSE DE FERMETURES MENUISÉES
-B4Z42,Menuisiers et ouvriers de l'agencement et de l'isolation,69.10,H2206,RÉALISATION DE MENUISERIE BOIS ET TONNELLERIE
-D4Z40,"Monteurs, ajusteurs et autres ouvriers qualifiés de la mécanique",43.60,H1506,INTERVENTION TECHNIQUE QUALITÉ EN MÉCANIQUE ET TRAVAIL DES MÉTAUX
-D4Z40,"Monteurs, ajusteurs et autres ouvriers qualifiés de la mécanique",43.60,H2901,AJUSTEMENT ET MONTAGE DE FABRICATION
-D4Z40,"Monteurs, ajusteurs et autres ouvriers qualifiés de la mécanique",43.60,H2909,MONTAGE-ASSEMBLAGE MÉCANIQUE
-T4Z62,Ouvriers de l'assainissement et du traitement des déchets,26.30,I1201,ENTRETIEN D'AFFICHAGE ET MOBILIER URBAIN
-T4Z62,Ouvriers de l'assainissement et du traitement des déchets,26.30,I1202,ENTRETIEN ET SURVEILLANCE DU TRACÉ ROUTIER
-T4Z62,Ouvriers de l'assainissement et du traitement des déchets,26.30,I1503,INTERVENTION EN MILIEUX ET PRODUITS NOCIFS
+U0Z91,Cadres et techniciens de la documentation,27.20,K1601,GESTION DE L'INFORMATION ET DE LA DOCUMENTATION
+V4Z80,Professionnels de l'orientation,42.90,K1801,CONSEIL EN EMPLOI ET INSERTION SOCIOPROFESSIONNELLE
+P3Z90,Professionnels du droit,46.90,K1901,AIDE ET MÉDIATION JUDICIAIRE
+P3Z90,Professionnels du droit,46.90,K1902,COLLABORATION JURIDIQUE
+L5Z91,Juristes,48.30,K1903,DÉFENSE ET CONSEIL JURIDIQUE
+L5Z92,Cadres des ressources humaines et du recrutement,38.90,K2101,CONSEIL EN FORMATION
+L5Z92,Cadres des ressources humaines et du recrutement,38.90,K2102,COORDINATION PÉDAGOGIQUE
+W0Z91,Directeurs d'établissement scolaire et inspecteurs,70.90,K2103,DIRECTION D'ÉTABLISSEMENT ET D'ENSEIGNEMENT
+V5Z84,Surveillants d'établissements scolaires,28.90,K2104,ÉDUCATION ET SURVEILLANCE AU SEIN D'ÉTABLISSEMENTS D'ENSEIGNEMENT
+W0Z80,Professeurs des écoles,35.40,K2106,ENSEIGNEMENT DES ÉCOLES
+W0Z90,Professeurs du secondaire,60.20,K2107,ENSEIGNEMENT GÉNÉRAL DU SECOND DEGRÉ
+W0Z92,Professeurs du supérieur,34.00,K2108,ENSEIGNEMENT SUPÉRIEUR
+W0Z90,Professeurs du secondaire,60.20,K2109,ENSEIGNEMENT TECHNIQUE ET PROFESSIONNEL
+W1Z80,Formateurs,45.20,K2110,FORMATION EN CONDUITE DE VÉHICULES
+W1Z80,Formateurs,45.20,K2111,FORMATION PROFESSIONNELLE
+V4Z80,Professionnels de l'orientation,42.90,K2112,ORIENTATION SCOLAIRE ET PROFESSIONNELLE
+F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,K2201,BLANCHISSERIE INDUSTRIELLE
+F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,K2201,BLANCHISSERIE INDUSTRIELLE
+T4Z60,Agents d'entretien de locaux,35.10,K2202,LAVAGE DE VITRES
+T4Z60,Agents d'entretien de locaux,35.10,K2203,MANAGEMENT ET INSPECTION EN PROPRETÉ DE LOCAUX
+T4Z60,Agents d'entretien de locaux,35.10,K2204,NETTOYAGE DE LOCAUX
 T4Z62,Ouvriers de l'assainissement et du traitement des déchets,26.30,K2301,DISTRIBUTION ET ASSAINISSEMENT D'EAU
+G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,K2301,DISTRIBUTION ET ASSAINISSEMENT D'EAU
+H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,K2302,MANAGEMENT ET INSPECTION EN ENVIRONNEMENT URBAIN
 T4Z62,Ouvriers de l'assainissement et du traitement des déchets,26.30,K2303,NETTOYAGE DES ESPACES URBAINS
 T4Z62,Ouvriers de l'assainissement et du traitement des déchets,26.30,K2304,REVALORISATION DE PRODUITS INDUSTRIELS
 T4Z62,Ouvriers de l'assainissement et du traitement des déchets,26.30,K2305,SALUBRITÉ ET TRAITEMENT DE NUISIBLES
-E0Z22,"Ouvriers non qualifiés en métallurgie, verre, céramique et matériaux de construction",44.20,F1706,PRÉFABRICATION EN BÉTON INDUSTRIEL
-E0Z22,"Ouvriers non qualifiés en métallurgie, verre, céramique et matériaux de construction",44.20,H2801,CONDUITE D'ÉQUIPEMENT DE TRANSFORMATION DU VERRE
-E0Z22,"Ouvriers non qualifiés en métallurgie, verre, céramique et matériaux de construction",44.20,H2803,FAÇONNAGE ET ÉMAILLAGE EN INDUSTRIE CÉRAMIQUE
-E0Z22,"Ouvriers non qualifiés en métallurgie, verre, céramique et matériaux de construction",44.20,H2907,CONDUITE D'INSTALLATION DE PRODUCTION DES MÉTAUX
-C0Z20,Ouvriers non qualifiés de l'électricité et de l'électronique,39.90,H2601,BOBINAGE ÉLECTRIQUE
-C0Z20,Ouvriers non qualifiés de l'électricité et de l'électronique,39.90,H2602,CÂBLAGE ÉLECTRIQUE ET ÉLECTROMÉCANIQUE
-C0Z20,Ouvriers non qualifiés de l'électricité et de l'électronique,39.90,H2603,"CONDUITE D'INSTALLATION AUTOMATISÉE DE PRODUCTION ÉLECTRIQUE, ÉLECTRONIQUE ET MICROÉLECTRONIQUE"
-C0Z20,Ouvriers non qualifiés de l'électricité et de l'électronique,39.90,H2604,MONTAGE DE PRODUITS ÉLECTRIQUES ET ÉLECTRONIQUES
-C0Z20,Ouvriers non qualifiés de l'électricité et de l'électronique,39.90,H2605,MONTAGE ET CÂBLAGE ÉLECTRONIQUE
-J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N1101,CONDUITE D'ENGINS DE DÉPLACEMENT DES CHARGES
-J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N1102,DÉMÉNAGEMENT
-J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N1103,MAGASINAGE ET PRÉPARATION DE COMMANDES
-J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N1105,MANUTENTION MANUELLE DE CHARGES
-J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N2203,EXPLOITATION DES PISTES AÉROPORTUAIRES
-J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N3203,MANUTENTION PORTUAIRE
-F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1202,PRODUCTION EN LABORATOIRE CINÉMATOGRAPHIQUE
-F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1203,PRODUCTION EN LABORATOIRE PHOTOGRAPHIQUE
-F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1301,CONDUITE DE MACHINES D'IMPRESSION
-F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1302,CONDUITE DE MACHINES DE FAÇONNAGE ROUTAGE
-F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1304,FAÇONNAGE ET ROUTAGE
-F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1306,PRÉPRESSE
-F4Z20,"Ouvriers non qualifiés de l'imprimerie, de la presse et de l'édition",38.10,E1307,REPROGRAPHIE
-E0Z21,Ouvriers non qualifiés des industries agro-alimentaires,43.30,A1412,FABRICATION ET AFFINAGE DE FROMAGES
-E0Z21,Ouvriers non qualifiés des industries agro-alimentaires,43.30,A1413,FERMENTATION DE BOISSONS ALCOOLISÉES
-E0Z21,Ouvriers non qualifiés des industries agro-alimentaires,43.30,H2101,ABATTAGE ET DÉCOUPE DES VIANDES
-E0Z21,Ouvriers non qualifiés des industries agro-alimentaires,43.30,H2102,CONDUITE D'ÉQUIPEMENT DE PRODUCTION ALIMENTAIRE
-E0Z20,Ouvriers non qualifiés des industries chimiques et plastiques,44.40,H2301,CONDUITE D'ÉQUIPEMENT DE PRODUCTION CHIMIQUE OU PHARMACEUTIQUE
-E0Z20,Ouvriers non qualifiés des industries chimiques et plastiques,44.40,H3201,CONDUITE D'ÉQUIPEMENT DE FORMAGE DES PLASTIQUES ET CAOUTCHOUCS
-B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1401,EXTRACTION LIQUIDE ET GAZEUSE
-B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1402,EXTRACTION SOLIDE
-B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1701,CONSTRUCTION EN BÉTON
-B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1702,CONSTRUCTION DE ROUTES ET VOIES
-B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1704,PRÉPARATION DU GROS OEUVRE ET DES TRAVAUX PUBLICS
-B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,F1705,POSE DE CANALISATIONS
-B0Z20,"Ouvriers non qualifiés des travaux publics, du béton et de l'extraction",41.20,I1502,INTERVENTION EN MILIEU SUBAQUATIQUE
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,A1502,PODOLOGIE ANIMALE
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,A1503,TOILETTAGE DES ANIMAUX
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1302,DÉCORATION D'OBJETS D'ART ET ARTISANAUX
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1303,GRAVURE - CISELURE
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1401,"RÉALISATION D'OBJETS EN LIANES, FIBRES ET BRINS VÉGÉTAUX"
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1402,RELIURE ET RESTAURATION DE LIVRES ET ARCHIVES
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1501,FABRICATION ET RÉPARATION D'INSTRUMENTS DE MUSIQUE
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1601,MÉTALLERIE D'ART
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1603,"RÉALISATION D'OUVRAGES EN BIJOUTERIE, JOAILLERIE ET ORFÈVRERIE"
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,B1701,CONSERVATION ET RECONSTITUTION D'ESPÈCES ANIMALES
-K0Z20,Ouvriers non qualifiés divers de type artisanal,51.70,D1205,NETTOYAGE D'ARTICLES TEXTILES OU CUIRS
-B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1501,MONTAGE DE STRUCTURES ET DE CHARPENTES BOIS
-B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1502,MONTAGE DE STRUCTURES MÉTALLIQUES
-B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1503,RÉALISATION - INSTALLATION D'OSSATURES BOIS
-B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1608,POSE DE REVÊTEMENTS RIGIDES
-B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1610,POSE ET RESTAURATION DE COUVERTURES
-B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1611,RÉALISATION ET RESTAURATION DE FAÇADES
-B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1613,TRAVAUX D'ÉTANCHÉITÉ ET D'ISOLATION
-B0Z21,Ouvriers non qualifiés du gros œuvre du bâtiment,51.30,F1703,MAÇONNERIE
-E0Z23,Ouvriers non qualifiés du papier-carton et du bois,45.50,H2203,CONDUITE D'INSTALLATION DE PRODUCTION DE PANNEAUX BOIS
-E0Z23,Ouvriers non qualifiés du papier-carton et du bois,45.50,H3101,CONDUITE D'ÉQUIPEMENT DE FABRICATION DE PAPIER OU DE CARTON
-E0Z23,Ouvriers non qualifiés du papier-carton et du bois,45.50,H3102,CONDUITE D'INSTALLATION DE PÂTE À PAPIER
-B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1601,"APPLICATION ET DÉCORATION EN PLÂTRE, STUC ET STAFF"
-B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1602,ÉLECTRICITÉ BÂTIMENT
-B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1603,INSTALLATION D'ÉQUIPEMENTS SANITAIRES ET THERMIQUES
-B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1604,MONTAGE D'AGENCEMENTS
-B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1605,MONTAGE DE RÉSEAUX ÉLECTRIQUES ET TÉLÉCOMS
-B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1606,PEINTURE EN BÂTIMENT
-B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1607,POSE DE FERMETURES MENUISÉES
-B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,F1609,POSE DE REVÊTEMENTS SOUPLES
-B3Z20,Ouvriers non qualifiés du second œuvre du bâtiment,52.20,H2206,RÉALISATION DE MENUISERIE BOIS ET TONNELLERIE
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,B1801,RÉALISATION D'ARTICLES DE CHAPELLERIE
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,B1802,RÉALISATION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES (HORS VÊTEMENT)
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,B1803,RÉALISATION DE VÊTEMENTS SUR MESURE OU EN PETITE SÉRIE
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,D1206,RÉPARATION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,D1207,RETOUCHES EN HABILLEMENT
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2401,"ASSEMBLAGE - MONTAGE D'ARTICLES EN CUIRS, PEAUX"
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2402,ASSEMBLAGE - MONTAGE DE VÊTEMENTS ET PRODUITS TEXTILES
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2403,CONDUITE DE MACHINE DE FABRICATION DE PRODUITS TEXTILES
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2404,CONDUITE DE MACHINE DE PRODUCTION ET TRANSFORMATION DES FILS
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2405,CONDUITE DE MACHINE DE TEXTILES NONTISSÉS
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2406,CONDUITE DE MACHINE DE TRAITEMENT TEXTILE
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2407,CONDUITE DE MACHINE DE TRANSFORMATION ET DE FINITION DES CUIRS ET PEAUX
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2408,CONDUITE DE MACHINE D'IMPRESSION TEXTILE
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2409,"COUPE CUIR, TEXTILE ET MATÉRIAUX SOUPLES"
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2410,"MISE EN FORME, REPASSAGE ET FINITIONS EN INDUSTRIE TEXTILE"
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2411,MONTAGE DE PROTOTYPE CUIR ET MATÉRIAUX SOUPLES
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2413,"PRÉPARATION DE FILS, MONTAGE DE MÉTIERS TEXTILES"
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2414,PRÉPARATION ET FINITION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,H2415,CONTRÔLE EN INDUSTRIE DU CUIR ET DU TEXTILE
-F0Z20,Ouvriers non qualifiés du textile et du cuir,45.60,K2201,BLANCHISSERIE INDUSTRIELLE
-F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,B1806,TAPISSERIE - DÉCORATION EN AMEUBLEMENT
-F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,H2201,ASSEMBLAGE D'OUVRAGES EN BOIS
-F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,H2202,CONDUITE D'ÉQUIPEMENT DE FABRICATION DE L'AMEUBLEMENT ET DU BOIS
-F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,H2205,PREMIÈRE TRANSFORMATION DE BOIS D'OEUVRE
-F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,H2207,RÉALISATION DE MEUBLES EN BOIS
-F2Z20,Ouvriers non qualifiés du travail du bois et de l'ameublement,51.00,H2208,RÉALISATION D'OUVRAGES DÉCORATIFS EN BOIS
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H2901,AJUSTEMENT ET MONTAGE DE FABRICATION
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H2909,MONTAGE-ASSEMBLAGE MÉCANIQUE
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H2911,RÉALISATION DE STRUCTURES MÉTALLIQUES
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H2913,SOUDAGE MANUEL
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H3401,CONDUITE DE TRAITEMENT D'ABRASION DE SURFACE
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H3402,CONDUITE DE TRAITEMENT PAR DÉPÔT DE SURFACE
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H3403,CONDUITE DE TRAITEMENT THERMIQUE
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,H3404,PEINTURE INDUSTRIELLE
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,I1603,"MAINTENANCE D'ENGINS DE CHANTIER, LEVAGE, MANUTENTION ET DE MACHINES AGRICOLES"
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,I1604,MÉCANIQUE AUTOMOBILE ET ENTRETIEN DE VÉHICULES
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,I1606,RÉPARATION DE CARROSSERIE
-D3Z20,"Ouvriers non qualifiés métallerie, serrurerie, montage",46.10,I1607,"RÉPARATION DE CYCLES, MOTOCYCLES ET MOTOCULTEURS DE LOISIRS"
-D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2902,CHAUDRONNERIE - TÔLERIE
-D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2903,CONDUITE D'ÉQUIPEMENT D'USINAGE
-D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2904,CONDUITE D'ÉQUIPEMENT DE DÉFORMATION DES MÉTAUX
-D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2905,CONDUITE D'ÉQUIPEMENT DE FORMAGE ET DÉCOUPAGE DES MATÉRIAUX
-D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2906,CONDUITE D'INSTALLATION AUTOMATISÉE OU ROBOTISÉE DE FABRICATION MÉCANIQUE
-D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H2914,RÉALISATION ET MONTAGE EN TUYAUTERIE
-D0Z20,Ouvriers non qualifiés travaillant par enlèvement ou formage de métal,51.70,H3203,FABRICATION DE PIÈCES EN MATÉRIAUX COMPOSITES
-E1Z44,Ouvriers qualifiés des industries lourdes du bois et de la fabrication de papier-carton,56.40,H2203,CONDUITE D'INSTALLATION DE PRODUCTION DE PANNEAUX BOIS
-E1Z44,Ouvriers qualifiés des industries lourdes du bois et de la fabrication de papier-carton,56.40,H3101,CONDUITE D'ÉQUIPEMENT DE FABRICATION DE PAPIER OU DE CARTON
-E1Z44,Ouvriers qualifiés des industries lourdes du bois et de la fabrication de papier-carton,56.40,H3102,CONDUITE D'INSTALLATION DE PÂTE À PAPIER
-J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N1101,CONDUITE D'ENGINS DE DÉPLACEMENT DES CHARGES
-J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N1102,DÉMÉNAGEMENT
-J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N1103,MAGASINAGE ET PRÉPARATION DE COMMANDES
-J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N1105,MANUTENTION MANUELLE DE CHARGES
-J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N2203,EXPLOITATION DES PISTES AÉROPORTUAIRES
-J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N3203,MANUTENTION PORTUAIRE
-G0A41,Ouvriers qualifiés de la maintenance en électricité et en électronique,72.90,I1303,INSTALLATION ET MAINTENANCE DE DISTRIBUTEURS AUTOMATIQUES
-G0A41,Ouvriers qualifiés de la maintenance en électricité et en électronique,72.90,I1309,MAINTENANCE ÉLECTRIQUE
-G0A40,Ouvriers qualifiés de la maintenance en mécanique,70.80,B1604,RÉPARATION - MONTAGE EN SYSTÈMES HORLOGERS
-G0A40,Ouvriers qualifiés de la maintenance en mécanique,70.80,I1310,MAINTENANCE MÉCANIQUE INDUSTRIELLE
-G0A40,Ouvriers qualifiés de la maintenance en mécanique,70.80,I1601,INSTALLATION ET MAINTENANCE EN NAUTISME
-G0A40,Ouvriers qualifiés de la maintenance en mécanique,70.80,I1602,MAINTENANCE D'AÉRONEFS
-G0A40,Ouvriers qualifiés de la maintenance en mécanique,70.80,I1605,MÉCANIQUE DE MARINE
-B4Z44,Ouvriers qualifiés de la peinture et de la finition du bâtiment,63.10,F1601,"APPLICATION ET DÉCORATION EN PLÂTRE, STUC ET STAFF"
-B4Z44,Ouvriers qualifiés de la peinture et de la finition du bâtiment,63.10,F1606,PEINTURE EN BÂTIMENT
-B4Z44,Ouvriers qualifiés de la peinture et de la finition du bâtiment,63.10,F1609,POSE DE REVÊTEMENTS SOUPLES
-C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H1504,INTERVENTION TECHNIQUE EN CONTRÔLE ESSAI QUALITÉ EN ÉLECTRICITÉ ET ÉLECTRONIQUE
-C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H2601,BOBINAGE ÉLECTRIQUE
-C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H2602,CÂBLAGE ÉLECTRIQUE ET ÉLECTROMÉCANIQUE
-C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H2603,"CONDUITE D'INSTALLATION AUTOMATISÉE DE PRODUCTION ÉLECTRIQUE, ÉLECTRONIQUE ET MICROÉLECTRONIQUE"
-C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H2604,MONTAGE DE PRODUITS ÉLECTRIQUES ET ÉLECTRONIQUES
-C1Z40,Ouvriers qualifiés de l'électricité et de l'électronique,55.60,H2605,MONTAGE ET CÂBLAGE ÉLECTRONIQUE
-F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1202,PRODUCTION EN LABORATOIRE CINÉMATOGRAPHIQUE
-F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1203,PRODUCTION EN LABORATOIRE PHOTOGRAPHIQUE
-F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1301,CONDUITE DE MACHINES D'IMPRESSION
-F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1302,CONDUITE DE MACHINES DE FAÇONNAGE ROUTAGE
-F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1304,FAÇONNAGE ET ROUTAGE
-F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1306,PRÉPRESSE
-F4Z41,Ouvriers qualifiés de l'impression et du façonnage des industries graphiques,73.80,E1307,REPROGRAPHIE
-E1Z42,Ouvriers qualifiés des industries agroalimentaires (hors viandes),51.50,A1412,FABRICATION ET AFFINAGE DE FROMAGES
-E1Z42,Ouvriers qualifiés des industries agroalimentaires (hors viandes),51.50,A1413,FERMENTATION DE BOISSONS ALCOOLISÉES
-E1Z42,Ouvriers qualifiés des industries agroalimentaires (hors viandes),51.50,H2102,CONDUITE D'ÉQUIPEMENT DE PRODUCTION ALIMENTAIRE
-E1Z41,Ouvriers qualifiés des industries chimiques et plastiques,44.40,H2301,CONDUITE D'ÉQUIPEMENT DE PRODUCTION CHIMIQUE OU PHARMACEUTIQUE
-E1Z41,Ouvriers qualifiés des industries chimiques et plastiques,44.40,H3201,CONDUITE D'ÉQUIPEMENT DE FORMAGE DES PLASTIQUES ET CAOUTCHOUCS
-E1Z41,Ouvriers qualifiés des industries chimiques et plastiques,44.40,H3202,RÉGLAGE D'ÉQUIPEMENT DE FORMAGE DES PLASTIQUES ET CAOUTCHOUCS
-B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,F1401,EXTRACTION LIQUIDE ET GAZEUSE
-B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,F1402,EXTRACTION SOLIDE
-B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,F1701,CONSTRUCTION EN BÉTON
-B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,F1702,CONSTRUCTION DE ROUTES ET VOIES
-B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,F1705,POSE DE CANALISATIONS
-B1Z40,"Ouvriers qualifiés des travaux publics, du béton et de l'extraction",50.80,I1502,INTERVENTION EN MILIEU SUBAQUATIQUE
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,A1502,PODOLOGIE ANIMALE
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,A1503,TOILETTAGE DES ANIMAUX
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1302,DÉCORATION D'OBJETS D'ART ET ARTISANAUX
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1303,GRAVURE - CISELURE
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1401,"RÉALISATION D'OBJETS EN LIANES, FIBRES ET BRINS VÉGÉTAUX"
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1402,RELIURE ET RESTAURATION DE LIVRES ET ARCHIVES
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1501,FABRICATION ET RÉPARATION D'INSTRUMENTS DE MUSIQUE
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1601,MÉTALLERIE D'ART
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1603,"RÉALISATION D'OUVRAGES EN BIJOUTERIE, JOAILLERIE ET ORFÈVRERIE"
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,B1701,CONSERVATION ET RECONSTITUTION D'ESPÈCES ANIMALES
-K0Z40,"Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d'art…)",73.00,D1205,NETTOYAGE D'ARTICLES TEXTILES OU CUIRS
-F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,B1801,RÉALISATION D'ARTICLES DE CHAPELLERIE
-F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,B1802,RÉALISATION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES (HORS VÊTEMENT)
-F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,B1803,RÉALISATION DE VÊTEMENTS SUR MESURE OU EN PETITE SÉRIE
-F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,B1804,RÉALISATION D'OUVRAGES D'ART EN FILS
-F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,D1206,RÉPARATION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES
-F1Z41,Ouvriers qualifiés du travail artisanal du textile et du cuir,52.90,D1207,RETOUCHES EN HABILLEMENT
-F3Z41,Ouvriers qualifiés du travail du bois et de l'ameublement,72.90,H2201,ASSEMBLAGE D'OUVRAGES EN BOIS
-F3Z41,Ouvriers qualifiés du travail du bois et de l'ameublement,72.90,H2202,CONDUITE D'ÉQUIPEMENT DE FABRICATION DE L'AMEUBLEMENT ET DU BOIS
-F3Z41,Ouvriers qualifiés du travail du bois et de l'ameublement,72.90,H2205,PREMIÈRE TRANSFORMATION DE BOIS D'OEUVRE
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2401,"ASSEMBLAGE - MONTAGE D'ARTICLES EN CUIRS, PEAUX"
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2402,ASSEMBLAGE - MONTAGE DE VÊTEMENTS ET PRODUITS TEXTILES
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2403,CONDUITE DE MACHINE DE FABRICATION DE PRODUITS TEXTILES
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2404,CONDUITE DE MACHINE DE PRODUCTION ET TRANSFORMATION DES FILS
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2405,CONDUITE DE MACHINE DE TEXTILES NONTISSÉS
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2406,CONDUITE DE MACHINE DE TRAITEMENT TEXTILE
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2407,CONDUITE DE MACHINE DE TRANSFORMATION ET DE FINITION DES CUIRS ET PEAUX
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2408,CONDUITE DE MACHINE D'IMPRESSION TEXTILE
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2409,"COUPE CUIR, TEXTILE ET MATÉRIAUX SOUPLES"
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2410,"MISE EN FORME, REPASSAGE ET FINITIONS EN INDUSTRIE TEXTILE"
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2411,MONTAGE DE PROTOTYPE CUIR ET MATÉRIAUX SOUPLES
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2412,PATRONNAGE - GRADATION
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2413,"PRÉPARATION DE FILS, MONTAGE DE MÉTIERS TEXTILES"
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2414,PRÉPARATION ET FINITION D'ARTICLES EN CUIR ET MATÉRIAUX SOUPLES
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2415,CONTRÔLE EN INDUSTRIE DU CUIR ET DU TEXTILE
-F1Z40,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,K2201,BLANCHISSERIE INDUSTRIELLE
-G0A43,Ouvriers qualifiés polyvalents d'entretien du bâtiment,38.50,I1203,MAINTENANCE DES BÂTIMENTS ET DES LOCAUX
-D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2903,CONDUITE D'ÉQUIPEMENT D'USINAGE
-D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2905,CONDUITE D'ÉQUIPEMENT DE FORMAGE ET DÉCOUPAGE DES MATÉRIAUX
-D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2906,CONDUITE D'INSTALLATION AUTOMATISÉE OU ROBOTISÉE DE FABRICATION MÉCANIQUE
-D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2908,MODELAGE DE MATÉRIAUX NON MÉTALLIQUES
-D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H2910,MOULAGE SABLE
-D1Z41,Ouvriers qualifiés du travail industriel du textile et du cuir,64.40,H3203,FABRICATION DE PIÈCES EN MATÉRIAUX COMPOSITES
-A3Z40,"Pêcheurs, aquaculteurs salariés",58.80,A1404,AQUACULTURE
-A3Z40,"Pêcheurs, aquaculteurs salariés",58.80,A1415,EQUIPAGE DE LA PÊCHE
-A3Z40,"Pêcheurs, aquaculteurs salariés",58.80,A1417,SALICULTURE
-J6Z91,Personnels navigants de l'aviation,76.90,N2102,PILOTAGE ET NAVIGATION TECHNIQUE AÉRIENNE
-V2Z93,Pharmaciens,62.80,J1201,BIOLOGIE MÉDICALE
-V2Z93,Pharmaciens,62.80,J1202,PHARMACIE
-U1Z81,Photographes,60.10,E1201,PHOTOGRAPHIE
-E1Z40,Pilotes d'installations lourdes des industries de transformation,49.90,H2701,PILOTAGE D'INSTALLATION ÉNERGÉTIQUE ET PÉTROCHIMIQUE
-E1Z40,Pilotes d'installations lourdes des industries de transformation,49.90,H2804,"PILOTAGE DE CENTRALE À BÉTON PRÊT À L'EMPLOI, CIMENT, ENROBÉS ET GRANULATS"
-E1Z40,Pilotes d'installations lourdes des industries de transformation,49.90,H2805,PILOTAGE D'INSTALLATION DE PRODUCTION VERRIÈRE
-B4Z41,"Plombiers, chauffagistes",74.90,F1603,INSTALLATION D'ÉQUIPEMENTS SANITAIRES ET THERMIQUES
-W0Z80,Professeurs des écoles,35.40,K2106,ENSEIGNEMENT DES ÉCOLES
-W0Z90,Professeurs du secondaire,60.20,K2107,ENSEIGNEMENT GÉNÉRAL DU SECOND DEGRÉ
-W0Z90,Professeurs du secondaire,60.20,K2109,ENSEIGNEMENT TECHNIQUE ET PROFESSIONNEL
-W0Z92,Professeurs du supérieur,34.00,K2108,ENSEIGNEMENT SUPÉRIEUR
-V4Z85,Professionnels de l'action sociale,41.30,K1101,ACCOMPAGNEMENT ET MÉDIATION FAMILIALE
-V4Z85,Professionnels de l'action sociale,41.30,K1102,AIDE AUX BÉNÉFICIAIRES D'UNE MESURE DE PROTECTION JURIDIQUE
-V4Z85,Professionnels de l'action sociale,41.30,K1201,ACTION SOCIALE
-V4Z85,Professionnels de l'action sociale,41.30,K1205,INFORMATION SOCIALE
-V5Z81,Professionnels de l'animation socioculturelle,37.40,G1202,ANIMATION D'ACTIVITÉS CULTURELLES OU LUDIQUES
-V5Z81,Professionnels de l'animation socioculturelle,37.40,G1203,ANIMATION DE LOISIRS AUPRÈS D'ENFANTS OU D'ADOLESCENTS
-V5Z81,Professionnels de l'animation socioculturelle,37.40,K1206,INTERVENTION SOCIOCULTURELLE
-V4Z80,Professionnels de l'orientation,42.90,K1801,CONSEIL EN EMPLOI ET INSERTION SOCIOPROFESSIONNELLE
-V4Z80,Professionnels de l'orientation,42.90,K2112,ORIENTATION SCOLAIRE ET PROFESSIONNELLE
-U1Z80,Professionnels des spectacles,16.30,E1204,PROJECTION CINÉMA
+H0Z91,Cadres techniques de la maintenance et de l'environnement,52.80,K2306,SUPERVISION D'EXPLOITATION ÉCO-INDUSTRIELLE
+G1Z71,Techniciens experts,49.80,K2306,SUPERVISION D'EXPLOITATION ÉCO-INDUSTRIELLE
+N0Z91,Chercheurs (sauf industrie et enseignement supérieur),22.70,K2401,RECHERCHE EN SCIENCES DE L'HOMME ET DE LA SOCIÉTÉ
+N0Z91,Chercheurs (sauf industrie et enseignement supérieur),22.70,K2402,"RECHERCHE EN SCIENCES DE L'UNIVERS, DE LA MATIÈRE ET DU VIVANT"
+T3Z60,Concierges,28.50,K2501,GARDIENNAGE DE LOCAUX
+T3Z61,Agents de sécurité et de surveillance,41.90,K2502,MANAGEMENT DE SÉCURITÉ PRIVÉE
+T3Z61,Agents de sécurité et de surveillance,41.90,K2503,SÉCURITÉ ET SURVEILLANCE PRIVÉES
+T6Z61,Employés des services divers,33.70,K2601,CONDUITE D'OPÉRATIONS FUNÉRAIRES
+T6Z61,Employés des services divers,33.70,K2602,CONSEIL EN SERVICES FUNÉRAIRES
+T6Z61,Employés des services divers,33.70,K2603,THANATOPRAXIE
 U1Z80,Professionnels des spectacles,16.30,L1302,"PRODUCTION ET ADMINISTRATION SPECTACLE, CINÉMA ET AUDIOVISUEL"
+U0Z90,Cadres de la communication,41.80,L1303,PROMOTION D'ARTISTES ET DE SPECTACLES
 U1Z80,Professionnels des spectacles,16.30,L1304,RÉALISATION CINÉMATOGRAPHIQUE ET AUDIOVISUELLE
+V5Z82,Sportifs et animateurs sportifs,45.00,L1401,SPORTIF PROFESSIONNEL
 U1Z80,Professionnels des spectacles,16.30,L1501,COIFFURE ET MAQUILLAGE SPECTACLE
 U1Z80,Professionnels des spectacles,16.30,L1502,COSTUME ET HABILLAGE SPECTACLE
 U1Z80,Professionnels des spectacles,16.30,L1503,DÉCOR ET ACCESSOIRES SPECTACLE
@@ -552,151 +580,123 @@ U1Z80,Professionnels des spectacles,16.30,L1506,MACHINERIE SPECTACLE
 U1Z80,Professionnels des spectacles,16.30,L1507,MONTAGE AUDIOVISUEL ET POST-PRODUCTION
 U1Z80,Professionnels des spectacles,16.30,L1508,PRISE DE SON ET SONORISATION
 U1Z80,Professionnels des spectacles,16.30,L1509,RÉGIE GÉNÉRALE
-P3Z90,Professionnels du droit,46.90,K1901,AIDE ET MÉDIATION JUDICIAIRE
-P3Z90,Professionnels du droit,46.90,K1902,COLLABORATION JURIDIQUE
-B2Z41,Professionnels du travail de la pierre et des matériaux associés,65.80,F1612,TAILLE ET DÉCORATION DE PIERRES
+R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1101,ACHATS
 R3Z82,Professions intermédiaires commerciales,32.70,M1101,ACHATS
+R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1102,DIRECTION DES ACHATS
 R3Z82,Professions intermédiaires commerciales,32.70,M1102,DIRECTION DES ACHATS
-V3Z90,"Psychologues, psychothérapeutes",36.80,K1104,PSYCHOLOGIE
-D1Z40,Régleurs qualifiés,79.60,H2912,RÉGLAGE D'ÉQUIPEMENT DE PRODUCTION INDUSTRIELLE
-R2Z83,Représentants auprès des particuliers,64.80,D1403,RELATION COMMERCIALE AUPRÈS DE PARTICULIERS
-R2Z83,Représentants auprès des particuliers,64.80,D1404,RELATION COMMERCIALE EN VENTE DE VÉHICULES
-R2Z83,Représentants auprès des particuliers,64.80,D1501,ANIMATION DE VENTE
-J1Z80,Responsables logistiques (non cadres),44.00,N1103,MAGASINAGE ET PRÉPARATION DE COMMANDES
-J1Z80,Responsables logistiques (non cadres),44.00,N1302,DIRECTION DE SITE LOGISTIQUE
-J4Z80,Responsables logistiques (non cadres),44.00,H1403,INTERVENTION TECHNIQUE EN GESTION INDUSTRIELLE ET LOGISTIQUE
-J4Z80,Responsables logistiques (non cadres),44.00,N1201,AFFRÈTEMENT TRANSPORT
-J4Z80,Responsables logistiques (non cadres),44.00,N1202,GESTION DES OPÉRATIONS DE CIRCULATION INTERNATIONALE DES MARCHANDISES
-J4Z80,Responsables logistiques (non cadres),44.00,N1301,CONCEPTION ET ORGANISATION DE LA CHAÎNE LOGISTIQUE
-J4Z80,Responsables logistiques (non cadres),44.00,N1303,INTERVENTION TECHNIQUE D'EXPLOITATION LOGISTIQUE
-J4Z80,Responsables logistiques (non cadres),44.00,N2204,PRÉPARATION DES VOLS
-J4Z80,Responsables logistiques (non cadres),44.00,N3201,EXPLOITATION DES OPÉRATIONS PORTUAIRES ET DU TRANSPORT MARITIME
-J4Z80,Responsables logistiques (non cadres),44.00,N3202,EXPLOITATION DU TRANSPORT FLUVIAL
-J4Z80,Responsables logistiques (non cadres),44.00,N4201,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
-J4Z80,Responsables logistiques (non cadres),44.00,N4202,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
-J4Z80,Responsables logistiques (non cadres),44.00,N4203,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
-J4Z80,Responsables logistiques (non cadres),44.00,N4204,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
-V1Z81,Sages-femmes,26.90,J1104,SUIVI DE LA GROSSESSE ET DE L'ACCOUCHEMENT
-L0Z60,Secrétaires bureautiques et assimilés,33.80,D1401,ASSISTANAT COMMERCIAL
-L0Z60,Secrétaires bureautiques et assimilés,33.80,M1607,SECRÉTARIAT
-L0Z60,Secrétaires bureautiques et assimilés,33.80,M1608,SECRÉTARIAT COMPTABLE
-L0Z60,Secrétaires bureautiques et assimilés,33.80,M1609,SECRÉTARIAT ET ASSISTANAT MÉDICAL OU MÉDICO-SOCIAL
-L3Z80,Secrétaires de direction,40.50,D1401,ASSISTANAT COMMERCIAL
-L3Z80,Secrétaires de direction,40.50,M1604,ASSISTANAT DE DIRECTION
-L3Z80,Secrétaires de direction,40.50,M1607,SECRÉTARIAT
-L3Z80,Secrétaires de direction,40.50,M1608,SECRÉTARIAT COMPTABLE
-L3Z80,Secrétaires de direction,40.50,M1609,SECRÉTARIAT ET ASSISTANAT MÉDICAL OU MÉDICO-SOCIAL
-S2Z61,Serveurs de cafés restaurants,49.30,G1801,"CAFÉ, BAR BRASSERIE"
-S2Z61,Serveurs de cafés restaurants,49.30,G1803,SERVICE EN RESTAURATION
-D2Z42,Soudeurs qualifiés,70.50,H2913,SOUDAGE MANUEL
-V3Z71,Spécialistes de l'appareillage médical,61.40,J1401,AUDIOPROTHÈSES
-V3Z71,Spécialistes de l'appareillage médical,61.40,J1405,OPTIQUE - LUNETTERIE
-V3Z71,Spécialistes de l'appareillage médical,61.40,J1410,PROTHÈSES DENTAIRES
-V3Z71,Spécialistes de l'appareillage médical,61.40,J1411,PROTHÈSES ET ORTHÈSES
-V5Z82,Sportifs et animateurs sportifs,45.00,G1204,ÉDUCATION EN ACTIVITÉS SPORTIVES
-V5Z82,Sportifs et animateurs sportifs,45.00,L1401,SPORTIF PROFESSIONNEL
-V5Z84,Surveillants d'établissements scolaires,28.90,K2104,ÉDUCATION ET SURVEILLANCE AU SEIN D'ÉTABLISSEMENTS D'ENSEIGNEMENT
-Q1Z80,Techniciens de la banque,23.30,C1201,ACCUEIL ET SERVICES BANCAIRES
-Q1Z80,Techniciens de la banque,23.30,C1202,ANALYSE DE CRÉDITS ET RISQUES BANCAIRES
-Q1Z80,Techniciens de la banque,23.30,C1203,RELATION CLIENTS BANQUE/FINANCE
-Q1Z80,Techniciens de la banque,23.30,C1205,CONSEIL EN GESTION DE PATRIMOINE FINANCIER
-Q1Z80,Techniciens de la banque,23.30,C1206,GESTION DE CLIENTÈLE BANCAIRE
-Q1Z80,Techniciens de la banque,23.30,C1302,GESTION BACK ET MIDDLE-OFFICE MARCHÉS FINANCIERS
-Q1Z81,Techniciens des assurances,48.10,C1102,CONSEIL CLIENTÈLE EN ASSURANCES
-Q1Z81,Techniciens des assurances,48.10,C1103,COURTAGE EN ASSURANCES
-Q1Z81,Techniciens des assurances,48.10,C1105,ÉTUDES ACTUARIELLES EN ASSURANCES
-Q1Z81,Techniciens des assurances,48.10,C1106,EXPERTISE RISQUES EN ASSURANCES
-Q1Z81,Techniciens des assurances,48.10,C1107,INDEMNISATIONS EN ASSURANCES
-Q1Z81,Techniciens des assurances,48.10,C1109,RÉDACTION ET GESTION EN ASSURANCES
-Q1Z81,Techniciens des assurances,48.10,C1110,SOUSCRIPTION D'ASSURANCES
-E2Z70,Techniciens des industries de process,42.40,H1210,"INTERVENTION TECHNIQUE EN ÉTUDES, RECHERCHE ET DÉVELOPPEMENT"
-E2Z70,Techniciens des industries de process,42.40,H1404,INTERVENTION TECHNIQUE EN MÉTHODES ET INDUSTRIALISATION
-E2Z70,Techniciens des industries de process,42.40,H1503,INTERVENTION TECHNIQUE EN LABORATOIRE D'ANALYSE INDUSTRIELLE
-E2Z70,Techniciens des industries de process,42.40,H1505,INTERVENTION TECHNIQUE EN FORMULATION ET ANALYSE SENSORIELLE
-E2Z70,Techniciens des industries de process,42.40,H3202,RÉGLAGE D'ÉQUIPEMENT DE FORMAGE DES PLASTIQUES ET CAOUTCHOUCS
+L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1201,ANALYSE ET INGÉNIERIE FINANCIÈRE
+L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1202,AUDIT ET CONTRÔLE COMPTABLES ET FINANCIERS
+L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1203,COMPTABILITÉ
+L1Z60,Employés de la comptabilité,46.20,M1203,COMPTABILITÉ
 L4Z81,Techniciens des services comptables et financiers,57.90,M1203,COMPTABILITÉ
-J5Z80,Techniciens des transports et du tourisme,35.50,D1204,LOCATION DE VÉHICULES OU DE MATÉRIEL DE LOISIRS
-J5Z80,Techniciens des transports et du tourisme,35.50,G1102,PROMOTION DU TOURISME LOCAL
-J5Z80,Techniciens des transports et du tourisme,35.50,G1301,CONCEPTION DE PRODUITS TOURISTIQUES
-J5Z80,Techniciens des transports et du tourisme,35.50,G1303,VENTE DE VOYAGES
-J5Z80,Techniciens des transports et du tourisme,35.50,N1301,CONCEPTION ET ORGANISATION DE LA CHAÎNE LOGISTIQUE
-J5Z80,Techniciens des transports et du tourisme,35.50,N3201,EXPLOITATION DES OPÉRATIONS PORTUAIRES ET DU TRANSPORT MARITIME
-J5Z80,Techniciens des transports et du tourisme,35.50,N3202,EXPLOITATION DU TRANSPORT FLUVIAL
-J5Z80,Techniciens des transports et du tourisme,35.50,N4201,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
-J5Z80,Techniciens des transports et du tourisme,35.50,N4202,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
-J5Z80,Techniciens des transports et du tourisme,35.50,N4203,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
-J5Z80,Techniciens des transports et du tourisme,35.50,N4204,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
-M1Z80,Techniciens d'étude et de développement en informatique,51.80,M1805,ÉTUDES ET DÉVELOPPEMENT INFORMATIQUE
-C2Z70,Techniciens en électricité et en électronique,64.90,H1207,RÉDACTION TECHNIQUE
-C2Z70,Techniciens en électricité et en électronique,64.90,H1209,INTERVENTION TECHNIQUE EN ÉTUDES ET DÉVELOPPEMENT ÉLECTRONIQUE
-C2Z70,Techniciens en électricité et en électronique,64.90,H1504,INTERVENTION TECHNIQUE EN CONTRÔLE ESSAI QUALITÉ EN ÉLECTRICITÉ ET ÉLECTRONIQUE
-D6Z70,Techniciens en mécanique et travail des métaux,69.30,H1506,INTERVENTION TECHNIQUE QUALITÉ EN MÉCANIQUE ET TRAVAIL DES MÉTAUX
-D6Z70,Techniciens en mécanique et travail des métaux,69.30,H2908,MODELAGE DE MATÉRIAUX NON MÉTALLIQUES
-D6Z70,Techniciens en mécanique et travail des métaux,69.30,H2910,MOULAGE SABLE
-D6Z70,Techniciens en mécanique et travail des métaux,69.30,H2912,RÉGLAGE D'ÉQUIPEMENT DE PRODUCTION INDUSTRIELLE
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,A1204,PROTECTION DU PATRIMOINE NATUREL
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,B1604,RÉPARATION - MONTAGE EN SYSTÈMES HORLOGERS
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,H1101,ASSISTANCE ET SUPPORT TECHNIQUE CLIENT
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,H1208,INTERVENTION TECHNIQUE EN ÉTUDES ET CONCEPTION EN AUTOMATISME
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,H1303,INTERVENTION TECHNIQUE EN HYGIÈNE SÉCURITÉ ENVIRONNEMENT -HSE- INDUSTRIEL
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1301,INSTALLATION ET MAINTENANCE D'ASCENSEURS
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1302,INSTALLATION ET MAINTENANCE D'AUTOMATISMES
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1304,INSTALLATION ET MAINTENANCE D'ÉQUIPEMENTS INDUSTRIELS ET D'EXPLOITATION
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1305,INSTALLATION ET MAINTENANCE ÉLECTRONIQUE
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1306,"INSTALLATION ET MAINTENANCE EN FROID, CONDITIONNEMENT D'AIR"
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1307,INSTALLATION ET MAINTENANCE TÉLÉCOMS ET COURANTS FAIBLES
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1308,MAINTENANCE D'INSTALLATION DE CHAUFFAGE
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1309,MAINTENANCE ÉLECTRIQUE
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1310,MAINTENANCE MÉCANIQUE INDUSTRIELLE
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1503,INTERVENTION EN MILIEUX ET PRODUITS NOCIFS
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1601,INSTALLATION ET MAINTENANCE EN NAUTISME
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1602,MAINTENANCE D'AÉRONEFS
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1603,"MAINTENANCE D'ENGINS DE CHANTIER, LEVAGE, MANUTENTION ET DE MACHINES AGRICOLES"
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1604,MÉCANIQUE AUTOMOBILE ET ENTRETIEN DE VÉHICULES
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1605,MÉCANIQUE DE MARINE
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,I1607,"RÉPARATION DE CYCLES, MOTOCYCLES ET MOTOCULTEURS DE LOISIRS"
-G1Z70,Techn. et agents de maîtrise de la maintenance et de l'environnement,61.10,K2301,DISTRIBUTION ET ASSAINISSEMENT D'EAU
-F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,E1303,ENCADREMENT DES INDUSTRIES GRAPHIQUES
-F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,E1305,PRÉPARATION ET CORRECTION EN ÉDITION ET PRESSE
-F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,E1308,INTERVENTION TECHNIQUE EN INDUSTRIE GRAPHIQUE
-F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,H1205,ÉTUDES - MODÈLES EN INDUSTRIE DES MATÉRIAUX SOUPLES
-F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,H2204,ENCADREMENT DES INDUSTRIES DE L'AMEUBLEMENT ET DU BOIS
-F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,H2209,INTERVENTION TECHNIQUE EN AMEUBLEMENT ET BOIS
-F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,H2412,PATRONNAGE - GRADATION
-F5Z70,"Techn. et agents de maîtrise des matériaux souples, du bois et des indust. graphiques",54.80,H2505,ENCADREMENT D'ÉQUIPE OU D'ATELIER EN MATÉRIAUX SOUPLES
-A2Z70,Techn. et agents d'encadrement d'exploitations agricoles,45.00,A1301,CONSEIL ET ASSISTANCE TECHNIQUE EN AGRICULTURE
-A2Z70,Techn. et agents d'encadrement d'exploitations agricoles,45.00,A1302,CONTRÔLE ET DIAGNOSTIC TECHNIQUE EN AGRICULTURE
-A2Z70,Techn. et agents d'encadrement d'exploitations agricoles,45.00,A1303,INGÉNIERIE EN AGRICULTURE ET ENVIRONNEMENT NATUREL
-A2Z70,Techn. et agents d'encadrement d'exploitations agricoles,45.00,A1416,"POLYCULTURE, ÉLEVAGE"
-B6Z71,Techniciens et chargés d'études du BTP,61.50,F1103,CONTRÔLE ET DIAGNOSTIC TECHNIQUE DU BÂTIMENT
-B6Z71,Techniciens et chargés d'études du BTP,61.50,F1105,ÉTUDES GÉOLOGIQUES
-B6Z71,Techniciens et chargés d'études du BTP,61.50,F1106,INGÉNIERIE ET ÉTUDES DU BTP
-B6Z71,Techniciens et chargés d'études du BTP,61.50,F1108,MÉTRÉ DE LA CONSTRUCTION
-B6Z71,Techniciens et chargés d'études du BTP,61.50,F1204,QUALITÉ SÉCURITÉ ENVIRONNEMENT ET PROTECTION SANTÉ DU BTP
-G1Z71,Techniciens experts,49.80,H1301,INSPECTION DE CONFORMITÉ
-G1Z71,Techniciens experts,49.80,I1103,SUPERVISION D'ENTRETIEN ET GESTION DE VÉHICULES
-G1Z71,Techniciens experts,49.80,K2306,SUPERVISION D'EXPLOITATION ÉCO-INDUSTRIELLE
-V3Z70,Techniciens médicaux et préparateurs,59.20,J1302,ANALYSES MÉDICALES
-V3Z70,Techniciens médicaux et préparateurs,59.20,J1306,IMAGERIE MÉDICALE
-V3Z70,Techniciens médicaux et préparateurs,59.20,J1307,PRÉPARATION EN PHARMACIE
-M1Z81,Techniciens d'étude et de développement en informatique,51.80,I1401,MAINTENANCE INFORMATIQUE ET BUREAUTIQUE
-M1Z81,Techniciens d'étude et de développement en informatique,51.80,M1801,ADMINISTRATION DE SYSTÈMES D'INFORMATION
-M1Z81,Techniciens d'étude et de développement en informatique,51.80,M1810,PRODUCTION ET EXPLOITATION DE SYSTÈMES D'INFORMATION
+L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1204,CONTRÔLE DE GESTION
+L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1205,DIRECTION ADMINISTRATIVE ET FINANCIÈRE
+L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1206,MANAGEMENT DE GROUPE OU DE SERVICE COMPTABLE
+L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1207,TRÉSORERIE ET FINANCEMENT
+L6Z90,Cadres dirigeants des grandes entreprises,43.10,M1301,DIRECTION DE GRANDE ENTREPRISE OU D'ÉTABLISSEMENT PUBLIC
+L2Z61,Agents administratifs divers,26.30,M1401,CONDUITE D'ENQUÊTES
+L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1402,CONSEIL EN ORGANISATION ET MANAGEMENT D'ENTREPRISE
+L5Z90,"Cadres administratifs, comptables et financiers (hors juristes)",51.60,M1403,ÉTUDES ET PROSPECTIVES SOCIO-ÉCONOMIQUES
 L4Z80,Techniciens des services administratifs,43.60,M1404,MANAGEMENT ET GESTION D'ENQUÊTES
+L2Z61,Agents administratifs divers,26.30,M1501,ASSISTANAT EN RESSOURCES HUMAINES
 L4Z80,Techniciens des services administratifs,43.60,M1501,ASSISTANAT EN RESSOURCES HUMAINES
+L5Z92,Cadres des ressources humaines et du recrutement,38.90,M1502,DÉVELOPPEMENT DES RESSOURCES HUMAINES
+L5Z92,Cadres des ressources humaines et du recrutement,38.90,M1503,MANAGEMENT DES RESSOURCES HUMAINES
+L2Z60,Agents d'accueil et d'information,30.90,M1601,ACCUEIL ET RENSEIGNEMENTS
+L2Z61,Agents administratifs divers,26.30,M1602,OPÉRATIONS ADMINISTRATIVES
+J3Z42,Conducteurs et livreurs sur courte distance,42.20,M1603,DISTRIBUTION DE DOCUMENTS
+L3Z80,Secrétaires de direction,40.50,M1604,ASSISTANAT DE DIRECTION
+L2Z61,Agents administratifs divers,26.30,M1605,ASSISTANAT TECHNIQUE ET ADMINISTRATIF
 L4Z80,Techniciens des services administratifs,43.60,M1605,ASSISTANAT TECHNIQUE ET ADMINISTRATIF
-R1Z67,Télévendeurs,66.60,D1408,TÉLÉCONSEIL ET TÉLÉVENTE
-D2Z41,Tuyauteurs,78.30,H2914,RÉALISATION ET MONTAGE EN TUYAUTERIE
-R1Z61,"Vendeurs en ameublement, équipement du foyer, bricolage",39.60,D1212,VENTE EN DÉCORATION ET ÉQUIPEMENT DU FOYER
-R1Z63,Vendeurs en gros de matériel et équipements,44.60,D1213,VENTE EN GROS DE MATÉRIEL ET ÉQUIPEMENT
-R1Z62,"Vendeurs en habillement et accessoires (luxe, sport, loisirs et culturels)",31.40,D1201,"ACHAT VENTE D'OBJETS D'ART, ANCIENS OU D'OCCASION"
-R1Z62,"Vendeurs en habillement et accessoires (luxe, sport, loisirs et culturels)",31.40,D1209,VENTE DE VÉGÉTAUX
-R1Z62,"Vendeurs en habillement et accessoires (luxe, sport, loisirs et culturels)",31.40,D1210,VENTE EN ANIMALERIE
-R1Z62,"Vendeurs en habillement et accessoires (luxe, sport, loisirs et culturels)",31.40,D1211,VENTE EN ARTICLES DE SPORT ET LOISIRS
-R1Z62,"Vendeurs en habillement et accessoires (luxe, sport, loisirs et culturels)",31.40,D1214,VENTE EN HABILLEMENT ET ACCESSOIRES DE LA PERSONNE
-R1Z60,Vendeurs en produits alimentaires,40.60,D1105,POISSONNERIE
-R1Z60,Vendeurs en produits alimentaires,40.60,D1106,VENTE EN ALIMENTATION
-R1Z60,Vendeurs en produits alimentaires,40.60,D1107,VENTE EN GROS DE PRODUITS FRAIS
-V2Z92,Vétérinaires,71.60,A1504,SANTÉ ANIMALE
-A1Z42,"Viticulteurs, arboriculteurs salariés",26.40,A1401,AIDE AGRICOLE DE PRODUCTION FRUITIÈRE OU VITICOLE
-A1Z42,"Viticulteurs, arboriculteurs salariés",26.40,A1405,ARBORICULTURE ET VITICULTURE
+L2Z61,Agents administratifs divers,26.30,M1606,SAISIE DE DONNÉES
+L0Z60,Secrétaires bureautiques et assimilés,33.80,M1607,SECRÉTARIAT
+L3Z80,Secrétaires de direction,40.50,M1607,SECRÉTARIAT
+L0Z60,Secrétaires bureautiques et assimilés,33.80,M1608,SECRÉTARIAT COMPTABLE
+L3Z80,Secrétaires de direction,40.50,M1608,SECRÉTARIAT COMPTABLE
+L0Z60,Secrétaires bureautiques et assimilés,33.80,M1609,SECRÉTARIAT ET ASSISTANAT MÉDICAL OU MÉDICO-SOCIAL
+L3Z80,Secrétaires de direction,40.50,M1609,SECRÉTARIAT ET ASSISTANAT MÉDICAL OU MÉDICO-SOCIAL
+R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1701,ADMINISTRATION DES VENTES
+R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1702,ANALYSE DE TENDANCE
+R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1703,MANAGEMENT ET GESTION DE PRODUIT
+R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1704,MANAGEMENT RELATION CLIENTÈLE
+R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1705,MARKETING
+R4Z91,Ingénieurs et cadres technico-commerciaux,54.30,M1706,PROMOTION DES VENTES
+R4Z90,"Cadres commerciaux, acheteurs et cadres de la mercatique",44.70,M1707,STRATÉGIE COMMERCIALE
+M0Z60,Employés et opérateurs en informatique,49.40,M1801,ADMINISTRATION DE SYSTÈMES D'INFORMATION
+M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1801,ADMINISTRATION DE SYSTÈMES D'INFORMATION
+M1Z81,Techniciens d'étude et de développement en informatique,51.80,M1801,ADMINISTRATION DE SYSTÈMES D'INFORMATION
+M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1802,EXPERTISE ET SUPPORT EN SYSTÈMES D'INFORMATION
+M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1803,DIRECTION DES SYSTÈMES D'INFORMATION
+M2Z92,Ingén. et cadres des télécommunications,67.70,M1804,ÉTUDES ET DÉVELOPPEMENT DE RÉSEAUX DE TÉLÉCOMS
+M0Z60,Employés et opérateurs en informatique,49.40,M1805,ÉTUDES ET DÉVELOPPEMENT INFORMATIQUE
+M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1805,ÉTUDES ET DÉVELOPPEMENT INFORMATIQUE
+M1Z80,Techniciens d'étude et de développement en informatique,51.80,M1805,ÉTUDES ET DÉVELOPPEMENT INFORMATIQUE
+M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1806,CONSEIL ET MAÎTRISE D'OUVRAGE EN SYSTÈMES D'INFORMATION
+M2Z92,Ingén. et cadres des télécommunications,67.70,M1807,EXPLOITATION DE SYSTÈMES DE COMMUNICATION ET DE COMMANDEMENT
+N0Z90,"Ingén. et cadres d'étude, R&D (industrie)",55.00,M1808,INFORMATION GÉOGRAPHIQUE
+N0Z90,"Ingén. et cadres d'étude, R&D (industrie)",55.00,M1809,INFORMATION MÉTÉOROLOGIQUE
+M0Z60,Employés et opérateurs en informatique,49.40,M1810,PRODUCTION ET EXPLOITATION DE SYSTÈMES D'INFORMATION
+M2Z90,"Ingén. et cadres d'étude, R&D en informatique, chefs de projets informatiques",62.00,M1810,PRODUCTION ET EXPLOITATION DE SYSTÈMES D'INFORMATION
+M1Z81,Techniciens d'étude et de développement en informatique,51.80,M1810,PRODUCTION ET EXPLOITATION DE SYSTÈMES D'INFORMATION
+J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N1101,CONDUITE D'ENGINS DE DÉPLACEMENT DES CHARGES
+J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N1101,CONDUITE D'ENGINS DE DÉPLACEMENT DES CHARGES
+J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N1102,DÉMÉNAGEMENT
+J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N1102,DÉMÉNAGEMENT
+J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N1103,MAGASINAGE ET PRÉPARATION DE COMMANDES
+J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N1103,MAGASINAGE ET PRÉPARATION DE COMMANDES
+J1Z80,Responsables logistiques (non cadres),44.00,N1103,MAGASINAGE ET PRÉPARATION DE COMMANDES
+B5Z40,Conducteurs d'engins du BTP,65.40,N1104,MANOEUVRE ET CONDUITE D'ENGINS LOURDS DE MANUTENTION
+J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N1105,MANUTENTION MANUELLE DE CHARGES
+J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N1105,MANUTENTION MANUELLE DE CHARGES
+J5Z61,Agents administratifs des transports,48.50,N1201,AFFRÈTEMENT TRANSPORT
+J4Z80,Responsables logistiques (non cadres),44.00,N1201,AFFRÈTEMENT TRANSPORT
+J5Z61,Agents administratifs des transports,48.50,N1202,GESTION DES OPÉRATIONS DE CIRCULATION INTERNATIONALE DES MARCHANDISES
+J4Z80,Responsables logistiques (non cadres),44.00,N1202,GESTION DES OPÉRATIONS DE CIRCULATION INTERNATIONALE DES MARCHANDISES
+J6Z92,"Ingén. et cadres de la logistique, du planning et de l'ordonnancement",41.90,N1301,CONCEPTION ET ORGANISATION DE LA CHAÎNE LOGISTIQUE
+J4Z80,Responsables logistiques (non cadres),44.00,N1301,CONCEPTION ET ORGANISATION DE LA CHAÎNE LOGISTIQUE
+J5Z80,Techniciens des transports et du tourisme,35.50,N1301,CONCEPTION ET ORGANISATION DE LA CHAÎNE LOGISTIQUE
+J6Z92,"Ingén. et cadres de la logistique, du planning et de l'ordonnancement",41.90,N1302,DIRECTION DE SITE LOGISTIQUE
+J1Z80,Responsables logistiques (non cadres),44.00,N1302,DIRECTION DE SITE LOGISTIQUE
+J4Z80,Responsables logistiques (non cadres),44.00,N1303,INTERVENTION TECHNIQUE D'EXPLOITATION LOGISTIQUE
+J5Z60,Agents et hôtesses d'accompagnement,26.50,N2101,NAVIGATION COMMERCIALE AÉRIENNE
+J6Z91,Personnels navigants de l'aviation,76.90,N2102,PILOTAGE ET NAVIGATION TECHNIQUE AÉRIENNE
+J5Z62,Employés des transports et du tourisme,37.80,N2201,PERSONNEL D'ESCALE AÉROPORTUAIRE
+J6Z90,Cadres des transports,56.30,N2202,CONTRÔLE DE LA NAVIGATION AÉRIENNE
+J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N2203,EXPLOITATION DES PISTES AÉROPORTUAIRES
+J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N2203,EXPLOITATION DES PISTES AÉROPORTUAIRES
+J4Z80,Responsables logistiques (non cadres),44.00,N2204,PRÉPARATION DES VOLS
+J6Z90,Cadres des transports,56.30,N2205,DIRECTION D'ESCALE ET EXPLOITATION AÉROPORTUAIRE
+A3Z90,Cadres et maîtres d'équipage de la marine,43.90,N3101,ENCADREMENT DE LA NAVIGATION MARITIME
+A3Z90,Cadres et maîtres d'équipage de la marine,43.90,N3102,EQUIPAGE DE LA NAVIGATION MARITIME
+A3Z41,Marins salariés,26.60,N3102,EQUIPAGE DE LA NAVIGATION MARITIME
+A3Z41,Marins salariés,26.60,N3103,NAVIGATION FLUVIALE
+J6Z90,Cadres des transports,56.30,N3201,EXPLOITATION DES OPÉRATIONS PORTUAIRES ET DU TRANSPORT MARITIME
+J4Z80,Responsables logistiques (non cadres),44.00,N3201,EXPLOITATION DES OPÉRATIONS PORTUAIRES ET DU TRANSPORT MARITIME
+J5Z80,Techniciens des transports et du tourisme,35.50,N3201,EXPLOITATION DES OPÉRATIONS PORTUAIRES ET DU TRANSPORT MARITIME
+J6Z90,Cadres des transports,56.30,N3202,EXPLOITATION DU TRANSPORT FLUVIAL
+J4Z80,Responsables logistiques (non cadres),44.00,N3202,EXPLOITATION DU TRANSPORT FLUVIAL
+J5Z80,Techniciens des transports et du tourisme,35.50,N3202,EXPLOITATION DU TRANSPORT FLUVIAL
+J0Z20,Ouvriers non qualifiés de l'emballage et manutentionnaires,32.80,N3203,MANUTENTION PORTUAIRE
+J1Z40,Ouvriers qualifiés du magasinage et de la manutention,42.40,N3203,MANUTENTION PORTUAIRE
+J3Z43,Conducteurs routiers,71.50,N4101,CONDUITE DE TRANSPORT DE MARCHANDISES SUR LONGUE DISTANCE
+J3Z40,Conducteurs de véhicules légers,59.00,N4102,CONDUITE DE TRANSPORT DE PARTICULIERS
+J3Z41,Conducteurs de transport en commun sur route,53.50,N4103,CONDUITE DE TRANSPORT EN COMMUN SUR ROUTE
+J3Z42,Conducteurs et livreurs sur courte distance,42.20,N4104,COURSES ET LIVRAISONS EXPRESS
+J3Z42,Conducteurs et livreurs sur courte distance,42.20,N4105,CONDUITE ET LIVRAISON PAR TOURNÉES SUR COURTE DISTANCE
+J6Z90,Cadres des transports,56.30,N4201,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
+J4Z80,Responsables logistiques (non cadres),44.00,N4201,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
+J5Z80,Techniciens des transports et du tourisme,35.50,N4201,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
+J6Z90,Cadres des transports,56.30,N4202,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
+J4Z80,Responsables logistiques (non cadres),44.00,N4202,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
+J5Z80,Techniciens des transports et du tourisme,35.50,N4202,DIRECTION D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
+J6Z90,Cadres des transports,56.30,N4203,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
+J4Z80,Responsables logistiques (non cadres),44.00,N4203,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
+J5Z80,Techniciens des transports et du tourisme,35.50,N4203,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE MARCHANDISES
+J6Z90,Cadres des transports,56.30,N4204,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
+J4Z80,Responsables logistiques (non cadres),44.00,N4204,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
+J5Z80,Techniciens des transports et du tourisme,35.50,N4204,INTERVENTION TECHNIQUE D'EXPLOITATION DES TRANSPORTS ROUTIERS DE PERSONNES
+J3Z44,Conducteurs sur rails et d'engins de traction,16.60,N4301,CONDUITE SUR RAILS
+J4Z60,Contrôleurs des transports,51.50,N4302,CONTRÔLE DES TRANSPORTS EN COMMUN
+J4Z40,Agents d'exploitation des transports,44.90,N4401,CIRCULATION DU RÉSEAU FERRÉ
+J3Z44,Conducteurs sur rails et d'engins de traction,16.60,N4402,EXPLOITATION ET MANOEUVRE DES REMONTÉES MÉCANIQUES
+J4Z40,Agents d'exploitation des transports,44.90,N4403,MANOEUVRE DU RÉSEAU FERRÉ
