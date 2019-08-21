@@ -382,10 +382,11 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                 rome_code=rome_code,
                 naf_code=naf)
 
-            #TODO : VOIR AVEC JULIE SI ON GERE LE SEUIL EGALEMENT POUR LBA OU NON ??
+            # Get the score minimum for a rome code with metiers en tension
+            score_minimum_for_rome_alternance = scoring_util.get_score_minimum_for_rome(rome_code, alternance=True)
 
             if (
-                score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM
+                score_alternance >= score_minimum_for_rome_alternance
                 or rome_code in boosted_alternance_romes
             ):
                 if rome_code in scores_alternance_by_rome:

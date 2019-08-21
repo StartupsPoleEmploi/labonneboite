@@ -213,7 +213,7 @@ def get_score_from_stars(stars):
     score = score_min + normalized_score * (score_max - score_min)
     return score
 
-def get_score_minimum_for_rome(rome_code):
+def get_score_minimum_for_rome(rome_code, alternance=False):
     """
         rome_code : the rome code for which we want to have the minimum threshold
 
@@ -231,10 +231,16 @@ def get_score_minimum_for_rome(rome_code):
     # "métiers en tension" : jobs which has more offers, than appliers
     # To increase the number of these companies, we have to lower 
     # the threshold : score for rome minimum
-    rome_to_tension = load_metiers_tension()
-    score_minimum_for_rome = SCORE_FOR_ROME_MINIMUM
+    
+    if not alternance:
+        score_for_rome_minimum = SCORE_FOR_ROME_MINIMUM
+    else:
+        score_for_rome_minimum = SCORE_ALTERNANCE_FOR_ROME_MINIMUM
 
-    interval = SCORE_FOR_ROME_MINIMUM - MINIMUM_POSSIBLE_SCORE
+    rome_to_tension = load_metiers_tension()
+    score_minimum_for_rome = score_for_rome_minimum
+
+    interval = score_for_rome_minimum - MINIMUM_POSSIBLE_SCORE
 
     if rome_code in rome_to_tension:
         tension = rome_to_tension[rome_code]

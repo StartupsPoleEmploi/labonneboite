@@ -3,6 +3,7 @@ import pickle
 import csv
 
 from functools import lru_cache
+from collections import defaultdict
 
 USE_ROME_SLICING_DATASET = False  # Rome slicing dataset is not ready yet
 
@@ -168,7 +169,8 @@ def load_rome_naf_mapping():
 @lru_cache(maxsize=None)
 def load_metiers_tension():
     csv_metiers_tension = load_csv_file("metiers_tension.csv", ',')
-    rome_to_tension = {}
+    rome_to_tension = defaultdict(int)
+
     for row in csv_metiers_tension:
         tension_pct = row[2]
         rome_code = row[3]
@@ -178,14 +180,7 @@ def load_metiers_tension():
             if 0 <= tension_pct <= 100:
                 # As a single ROME can have multiple tensions, 
                 # It has been decided to take the higher tension for a rome
-
-                # If a tension is already assigned to a rome, we change it
-                # ONLY if it's higher
-                if rome_code in rome_to_tension:
-                    if tension_pct > rome_to_tension[rome_code]:
-                        rome_to_tension[rome_code] = tension_pct
-                else:
-                    rome_to_tension[rome_code] = tension_pct
+                rome_to_tension[rome_code] = max(rome_to_tension[rome_code], tension_pct)
             else:
                 raise ValueError
     return rome_to_tension
