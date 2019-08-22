@@ -219,10 +219,11 @@ class GeocodeJob(Job):
 
     @timeit
     def run_missing_geocoding_jobs(self, csv_max_rows=5000):
-        # The CSV file to send to API must not be > 6-8mb (https://adresse.data.gouv.fr/api)
+        # The CSV file to send to API must not be > 8mb (https://adresse.data.gouv.fr/api)
         # This line :"03880702000011,2 RUE DE LA TETE NOIRE 14700 FALAISE,14258"
         # was copied 100000 times in a file, and the size was 5.77 MB,
         # it seems ok to set it to ~80000 / 100000
+        # --> After multiple tests, if we want to multithread this, we need to set it to 5000, not more
 
         csv_path_prefix = '/tmp/csv_geocoding'
         csv_files = []

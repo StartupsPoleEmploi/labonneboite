@@ -3,6 +3,7 @@ import pickle
 import csv
 
 from functools import lru_cache
+from collections import defaultdict
 
 USE_ROME_SLICING_DATASET = False  # Rome slicing dataset is not ready yet
 
@@ -17,7 +18,8 @@ else:
 
 
 def load_file(func, filename):
-    full_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/%s" % filename)
+    full_filename = os.path.join(os.path.dirname(
+        os.path.realpath(__file__)), "data/%s" % filename)
     return func(full_filename)
 
 
@@ -44,7 +46,8 @@ def load_csv_file(filename, delimiter='|'):
                 # skip empty rows
                 continue
             elif len(row) != len_previous_row:
-                raise IndexError("found row with abnormal number of fields : %s" % row)
+                raise IndexError(
+                    "found row with abnormal number of fields : %s" % row)
             rows.append(row)
         else:
             # first line of CSV file: headers should be ignored
@@ -162,5 +165,25 @@ def load_naf_labels():
 def load_rome_naf_mapping():
     return load_csv_file(ROME_NAF_FILE, delimiter=',')
 
+
+@lru_cache(maxsize=None)
+def load_metiers_tension():
+    csv_metiers_tension = load_csv_file("metiers_tension.csv", ',')
+    rome_to_tension = defaultdict(int)
+
+    for row in csv_metiers_tension:
+        tension_pct = row[2]
+        rome_code = row[3]
+        # FIXME : remove rows where tension is #N/A in the dataset, to remove this ugly check ?
+        if tension_pct != '#N/A':
+            tension_pct = float(tension_pct)
+            if 0 <= tension_pct <= 100:
+                # As a single ROME can have multiple tensions, 
+                # It has been decided to take the higher tension for a rome
+                rome_to_tension[rome_code] = max(rome_to_tension[rome_code], tension_pct)
+            else:
+                raise ValueError
+    return rome_to_tension
+    
 OGR_ROME_CODES = load_ogr_rome_mapping()
 ROME_CODES = list(OGR_ROME_CODES.values())
