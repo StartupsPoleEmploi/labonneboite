@@ -898,8 +898,27 @@ def build_location_suggestions(term):
     return suggestions
 
 
+def enrich_job_term_with_thesaurus(term):
+    """
+    This thesaurus is an attempt at improving job autocompletion quality
+    for specific keywords which give poor results otherwise.
+    For example "ios" would match "Vendeur en kiosque".
+    """
+    thesaurus = {
+        'ios': 'informatique',
+        'android': 'informatique',
+    }
+    words = term.split(' ')
+    for idx, word in enumerate(words):
+        if word in thesaurus:
+            words[idx] = thesaurus[word]
+    term = ' '.join(words)
+    return term
+
+
 @lru_cache(maxsize=8 * 1024)
 def build_job_label_suggestions(term, size=autocomplete.MAX_JOBS):
+    term = enrich_job_term_with_thesaurus(term)
 
     es = Elasticsearch()
 
