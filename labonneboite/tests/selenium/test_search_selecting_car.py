@@ -35,14 +35,14 @@ class TestSearchSelectingCar(LbbSeleniumTestCase):
         self.driver.get(url)
 
         # Click on the Memo button.
-        memo_button = WebDriverWait(self.driver, 20)\
+        memo_button = WebDriverWait(self.driver, 60)\
             .until(
                 EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "J'ai compris"))
             )
         memo_button.click()
 
         # Wait until the Memo overlay is invisible.
-        WebDriverWait(self.driver, 20)\
+        WebDriverWait(self.driver, 60)\
             .until(
                 EC.invisibility_of_element_located((By.XPATH, "//div[@class='introjs-overlay']"))
             )
