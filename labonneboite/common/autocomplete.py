@@ -9,6 +9,8 @@ MAX_LOCATIONS = 10
 
 @lru_cache(maxsize=8 * 1024)
 def build_location_suggestions(term):
+    if term.strip() == '':
+        return []
     term = term.title()
     es = Elasticsearch()
     zipcode_match = [{
