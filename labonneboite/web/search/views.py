@@ -33,14 +33,14 @@ searchBlueprint = Blueprint('search', __name__)
 @searchBlueprint.route('/suggest_job_labels')
 def suggest_job_labels():
     term = request.args.get('term', '')
-    suggestions = search_util.build_job_label_suggestions(term)
+    suggestions = autocomplete.build_job_label_suggestions(term)
     return make_response(json.dumps(suggestions))
 
 
 @searchBlueprint.route('/suggest_locations')
 def suggest_locations():
     term = request.args.get('term', '')
-    suggestions = search_util.build_location_suggestions(term)
+    suggestions = autocomplete.build_location_suggestions(term)
     return make_response(json.dumps(suggestions))
 
 
@@ -56,7 +56,7 @@ def autocomplete_locations():
     if term:
         suggestions = geocoding.get_coordinates(term, limit=autocomplete.MAX_LOCATIONS)
     if not suggestions:
-        suggestions = search_util.build_location_suggestions(term)
+        suggestions = autocomplete.build_location_suggestions(term)
         if suggestions:
             pass  # FIXME log BAN LIKELY DOWN event
     for suggestion in suggestions:
@@ -255,7 +255,7 @@ def entreprises():
 
     occupation = request.args.get('occupation', '')
     if not occupation and 'j' in request.args:
-        suggestion = search_util.build_job_label_suggestions(request.args['j'], size=1)
+        suggestion = autocomplete.build_job_label_suggestions(request.args['j'], size=1)
         occupation = suggestion[0]['occupation'] if suggestion else None
 
     rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)

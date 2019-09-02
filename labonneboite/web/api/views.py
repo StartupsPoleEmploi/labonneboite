@@ -4,6 +4,7 @@ from functools import wraps
 from flask import abort, Blueprint, current_app, jsonify, request, url_for
 
 from labonneboite.common import activity
+from labonneboite.common import autocomplete
 from labonneboite.common import geocoding
 from labonneboite.common import search
 from labonneboite.common import offers
@@ -377,7 +378,7 @@ def create_hidden_market_fetcher(location, request_args):
             raise InvalidFetcherArgument('you must either use rome_codes or rome_codes_keyword_search but not both')
         else:
             # ROME keyword search : select first match of what the autocomplete result would be
-            suggestions = search.build_job_label_suggestions(rome_codes_keyword_search, size=1)
+            suggestions = autocomplete.build_job_label_suggestions(rome_codes_keyword_search, size=1)
             if len(suggestions) >= 1:
                 rome_codes = suggestions[0]['id']
             else:

@@ -36,7 +36,7 @@ class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
         self.driver.get(url)
 
         # Click on the Memo button.
-        memo_button = WebDriverWait(self.driver, 20)\
+        memo_button = WebDriverWait(self.driver, 60)\
             .until(
                 EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "J'ai compris"))
             )
@@ -74,7 +74,7 @@ class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
         public_button.click()
 
         # The page should reload with a new search. Wait for it.
-        durations_options = WebDriverWait(self.driver, 20)\
+        durations_options = WebDriverWait(self.driver, 60)\
             .until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "#isochrone-durations"))
             )
@@ -87,7 +87,7 @@ class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
         durations_options.find_element_by_css_selector(f'input[value="{duration}"]').click()
 
         # The page should reload with a new search. Wait for it.
-        WebDriverWait(self.driver, 40)\
+        WebDriverWait(self.driver, 60)\
             .until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "#isochrone-durations"))
             )

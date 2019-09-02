@@ -5,13 +5,13 @@ from unittest import mock
 import urllib.parse
 
 from flask import url_for
-from labonneboite.common import scoring as scoring_util
-from labonneboite.common import mapping as mapping_util
-from labonneboite.common import search as search_util
+from labonneboite.common import autocomplete
 from labonneboite.common import hiring_type_util
+from labonneboite.common import mapping as mapping_util
+from labonneboite.common import pagination
+from labonneboite.common import scoring as scoring_util
 from labonneboite.common.models import Office
 from labonneboite.common.search import fetch_offices
-from labonneboite.common import pagination
 from labonneboite.conf import settings
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest
 
@@ -391,7 +391,7 @@ class ApiCompanyListTest(ApiBaseTest):
             rome_codes_keyword_search = 'animateur vente'
 
             # ensure the keyword search matches the right rome_code
-            suggestions = search_util.build_job_label_suggestions(rome_codes_keyword_search)
+            suggestions = autocomplete.build_job_label_suggestions(rome_codes_keyword_search)
             self.assertEqual(suggestions[0]['id'], rome_codes)
 
             params = self.add_security_params({

@@ -25,14 +25,14 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
         self.driver.get(url)
 
         # Click on the Memo button.
-        memo_button = WebDriverWait(self.driver, 20)\
+        memo_button = WebDriverWait(self.driver, 60)\
             .until(
                 EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "J'ai compris"))
             )
         memo_button.click()
 
         # Wait until the Memo overlay is invisible.
-        WebDriverWait(self.driver, 20)\
+        WebDriverWait(self.driver, 60)\
             .until(
                 EC.invisibility_of_element_located((By.XPATH, "//div[@class='introjs-overlay']"))
             )
@@ -61,7 +61,7 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
 
         shown_search_form.find_element_by_css_selector('button').click()
 
-        WebDriverWait(self.driver, 20)\
+        WebDriverWait(self.driver, 60)\
             .until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, "h1.lbb-result-info"))
             )
@@ -95,7 +95,7 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
 
         shown_search_form.find_element_by_css_selector('button').click()
 
-        WebDriverWait(self.driver, 20)\
+        WebDriverWait(self.driver, 60)\
             .until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, "h1.lbb-result-info"))
             )
@@ -126,7 +126,7 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
 
         shown_search_form.find_element_by_css_selector('button').click()
 
-        WebDriverWait(self.driver, 20)\
+        WebDriverWait(self.driver, 60)\
             .until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, "h1.lbb-result-info"))
             )
@@ -147,7 +147,7 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
 
         durations_options.find_element_by_css_selector(f'input[value="45"]').click()
 
-        WebDriverWait(self.driver, 20)\
+        WebDriverWait(self.driver, 60)\
             .until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, "h1.lbb-result-info"))
             )

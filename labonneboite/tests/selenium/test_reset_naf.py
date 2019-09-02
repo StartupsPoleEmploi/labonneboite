@@ -35,7 +35,7 @@ class TestResetNaf(LbbSeleniumTestCase):
         # Filter by NAF `Activités des agents et courtiers d'assurances` (`6622Z`).
         select = Select(self.driver.find_element_by_id('naf'))
         select.select_by_value('6622Z')
-        WebDriverWait(self.driver, 10).until(url_has_changed(current_url))
+        WebDriverWait(self.driver, 60).until(url_has_changed(current_url))
 
         # The form should be auto-submitted after an option has been selected.
         current_url = self.driver.current_url
@@ -62,7 +62,7 @@ class TestResetNaf(LbbSeleniumTestCase):
         self.driver.find_element_by_css_selector('#shown-search-form button').click()
 
         # The NAF filter should be reset.
-        WebDriverWait(self.driver, 10).until(url_has_changed(current_url))
+        WebDriverWait(self.driver, 60).until(url_has_changed(current_url))
         current_url = self.driver.current_url
         url = urllib.parse.urlparse(current_url)
         parameters = dict(urllib.parse.parse_qsl(url.query))
