@@ -97,8 +97,8 @@ def enrich_job_term_with_thesaurus(term):
     }
     words = term.split(' ')
     for idx, word in enumerate(words):
-        if word in thesaurus:
-            words[idx] = thesaurus[word]
+        if word.lower() in thesaurus:
+            words[idx] = thesaurus[word.lower()]
     term = ' '.join(words)
     return term
 
