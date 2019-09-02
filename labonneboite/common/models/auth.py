@@ -1,5 +1,7 @@
 
 import datetime
+import requests
+import time
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Unicode
 from sqlalchemy import desc
@@ -7,11 +9,17 @@ from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
 
 from flask_login import UserMixin
+from social_flask.utils import load_strategy
 from social_flask_sqlalchemy.models import UserSocialAuth
 
+from labonneboite.conf import settings
 from labonneboite.common.database import Base, db_session
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.common import constants
+
+
+class TokenRefreshFailure(Exception):
+    pass
 
 
 class User(CRUDMixin, UserMixin, Base):
@@ -51,6 +59,28 @@ class User(CRUDMixin, UserMixin, Base):
 
     def is_active(self):
         return self.active
+
+    def get_peam_access_token(self):
+        self.refresh_peam_access_token_if_needed()
+        user_social_auth = get_user_social_auth(self.id)
+        peam_access_token = user_social_auth.extra_data['access_token']
+        return peam_access_token
+
+    def refresh_peam_access_token_if_needed(self):
+        user_social_auth = get_user_social_auth(self.id)
+        # FTR there is no extra_data['expires'] nor extra_data['expires_in'] :-(
+        token_age_in_seconds = int(time.time()) - user_social_auth.extra_data['auth_time']
+        # The PEAMU token is valid for 6 months supposedly.
+        # We refresh it no more than once every few hours to avoid flooding the PEAM API with too many requests.
+        # This way the user will only get disconnected when he did not use LBB for at least 6 months.
+        if token_age_in_seconds >= settings.REFRESH_PEAM_TOKEN_NO_MORE_THAN_ONCE_EVERY_SECONDS:
+            try:
+                strategy = load_strategy()
+                user_social_auth.refresh_token(strategy)
+            except requests.HTTPError as e:
+                if e.response.status_code == 400:
+                    raise TokenRefreshFailure
+                raise
 
 
 def get_user_social_auth(user_id):

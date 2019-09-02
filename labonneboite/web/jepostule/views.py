@@ -1,12 +1,14 @@
 import logging
 from urllib.parse import urlencode
 
-from flask import abort, Blueprint, render_template, request
+from flask import abort, Blueprint, render_template, request, flash, url_for, redirect
 from flask_login import current_user
 import requests
 
 from labonneboite.conf import settings
+from labonneboite.common import crypto
 from labonneboite.common.models.office import Office
+from labonneboite.common.models.auth import TokenRefreshFailure
 
 from .utils import jepostule_enabled
 
@@ -20,6 +22,16 @@ def application(siret):
     if not jepostule_enabled(current_user, company):
         abort(404)
 
+    try:
+        candidate_peam_access_token = current_user.get_peam_access_token()
+    except TokenRefreshFailure:
+        message = "Votre session PE Connect a expiré. Veuillez vous reconnecter."
+        flash(message, 'warning')
+        return_url = url_for('auth.logout')
+        return redirect(return_url)
+
+    encrypted_candidate_peam_access_token = crypto.encrypt(candidate_peam_access_token)
+
     data = {
         'candidate_first_name': current_user.first_name,
         'candidate_last_name': current_user.last_name,
@@ -32,6 +44,10 @@ def application(siret):
         'client_id': settings.JEPOSTULE_CLIENT_ID,
         'next_url': request.referrer or '',
     }
+
+    if settings.FORWARD_PEAM_TOKEN_TO_JP_FOR_AMI:
+        data['candidate_peam_access_token'] = encrypted_candidate_peam_access_token
+
     token, timestamp = get_token(**data)
     data['token'] = token
     data['timestamp'] = timestamp

@@ -1,4 +1,3 @@
-
 import unidecode
 
 def sanitize_string(s):
