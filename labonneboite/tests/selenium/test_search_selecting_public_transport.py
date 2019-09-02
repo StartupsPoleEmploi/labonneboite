@@ -43,7 +43,7 @@ class TestSearchSelectingPublicTransport(LbbSeleniumTestCase):
         memo_button.click()
 
         # Wait until the Memo overlay is invisible.
-        WebDriverWait(self.driver, 20)\
+        WebDriverWait(self.driver, 60)\
             .until(
                 EC.invisibility_of_element_located((By.XPATH, "//div[@class='introjs-overlay']"))
             )

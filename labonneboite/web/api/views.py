@@ -18,7 +18,7 @@ from labonneboite.common.fetcher import InvalidFetcherArgument
 from labonneboite.conf import settings
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
-from flask.ext.cors import cross_origin
+from flask_cors import cross_origin
 
 
 apiBlueprint = Blueprint('api', __name__)
