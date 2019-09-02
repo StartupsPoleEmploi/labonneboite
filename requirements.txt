@@ -11,8 +11,10 @@ babel==2.6.0              # via flask-babelex
 backcall==0.1.0           # via ipython
 blinker==1.4              # via flask-debugtoolbar, raven
 certifi==2017.4.17        # via requests
+cffi==1.13.1              # via cryptography
 chardet==3.0.4            # via requests
 click==6.7                # via flask, pip-tools
+cryptography==2.8
 cssmin==0.2.0
 decorator==4.3.0          # via ipython, traitlets, validators
 defusedxml==0.5.0         # via python3-openid, social-auth-core
@@ -68,6 +70,7 @@ pip-tools==2.0.2
 prompt-toolkit==1.0.15    # via ipython
 ptyprocess==0.6.0         # via pexpect
 pycallgraph==1.0.1
+pycparser==2.19           # via cffi
 pycryptodomex==3.6.3      # via pyjwkest
 pygments==2.2.0           # via ipython
 pyjwkest==1.4.0           # via social-auth-core
@@ -92,7 +95,7 @@ scikit-learn==0.16.1
 scipy==1.2.1
 selenium==3.141.0
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via astroid, flask-cors, html5lib, pip-tools, prompt-toolkit, pyjwkest, pylint, python-dateutil, social-auth-app-flask, social-auth-app-flask-sqlalchemy, social-auth-core, social-auth-storage-sqlalchemy, sqlalchemy-utils, traitlets, validators, xhtml2pdf
+six==1.10.0               # via astroid, cryptography, flask-cors, html5lib, pip-tools, prompt-toolkit, pyjwkest, pylint, python-dateutil, social-auth-app-flask, social-auth-app-flask-sqlalchemy, social-auth-core, social-auth-storage-sqlalchemy, sqlalchemy-utils, traitlets, validators, xhtml2pdf
 social-auth-app-flask-sqlalchemy==1.0.1
 social-auth-app-flask==1.0.0
 social-auth-core[openidconnect]==1.4.0

@@ -1,5 +1,4 @@
 # Authentication system
-
 User instances are stored in the `labonneboite.common.models.auth.User` model.
 
 To handle registration and login of users, we rely on the following tools:

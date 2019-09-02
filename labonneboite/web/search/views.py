@@ -5,7 +5,7 @@ import json
 from slugify import slugify
 
 from flask import abort, make_response, redirect, render_template, request, session, url_for
-from flask import Blueprint
+from flask import Blueprint, flash
 from flask_login import current_user
 
 from labonneboite.common import activity
@@ -21,6 +21,7 @@ from labonneboite.common.locations import CityLocation, Location, NamedLocation
 from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.maps import precompute
 from labonneboite.common.models import UserFavoriteOffice
+from labonneboite.common.models.auth import TokenRefreshFailure
 from labonneboite.web.utils import fix_csrf_session
 
 from labonneboite.conf import settings
@@ -250,6 +251,16 @@ def entreprises():
     selected office search form.
     """
     fix_csrf_session()
+
+    if current_user.is_authenticated:
+        try:
+            current_user.refresh_peam_access_token()
+        except TokenRefreshFailure:
+            message = "Votre session PE Connect a expiré. Veuillez vous reconnecter."
+            flash(message, 'warning')
+            return_url = url_for('auth.logout')
+            return redirect(return_url)
+
     session['search_args'] = request.args
     location, named_location = get_location(request.args)
 

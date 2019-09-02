@@ -1,5 +1,6 @@
 
 import datetime
+import requests
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Unicode
 from sqlalchemy import desc
@@ -7,11 +8,16 @@ from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
 
 from flask_login import UserMixin
+from social_flask.utils import load_strategy
 from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common.database import Base, db_session
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.common import user_util
+
+
+class TokenRefreshFailure(Exception):
+    pass
 
 
 class User(CRUDMixin, UserMixin, Base):
@@ -51,6 +57,36 @@ class User(CRUDMixin, UserMixin, Base):
 
     def is_active(self):
         return self.active
+
+    def get_peam_access_token(self):
+        self.refresh_peam_access_token()
+        user_social_auth = get_user_social_auth(self.id)
+        peam_access_token = user_social_auth.extra_data['access_token']
+        return peam_access_token
+
+    def refresh_peam_access_token(self):
+        user_social_auth = get_user_social_auth(self.id)
+        strategy = load_strategy()
+        # FIXME waiting for ESD approval
+        # FIXME refresh only if older than X minutes
+        # FTR there is no extra_data['expires'] nor extra_data['expires_in'] :-(
+        # pp social.extra_data['auth_time'], int(time.time())
+        # social.refresh_token(strategy)
+        # pp social.extra_data['auth_time'], int(time.time())
+
+        # ipdb> pp user_social_auth.extra_data
+        # {'access_token': 'b3ad2afb-ce83-4834-aac2-8fa9d7c228cb',
+        #  'auth_time': 1567775007,
+        #  'id': '2bd4848d-a903-4afe-9756-2cdfb1eb773c',
+        #  'id_token': 'eyJ0eXAiOiJXXXXXXXXXXXXXXX',
+        #  'refresh_token': 'f5e1c77e-ebc9-4ca2-a168-1f79a12cd7d6',
+        #  'token_type': 'Bearer'}
+        try:
+            user_social_auth.refresh_token(strategy)
+        except requests.HTTPError as e:
+            if e.response.status_code == 400:
+                raise TokenRefreshFailure
+            raise
 
 
 def get_user_social_auth(user_id):

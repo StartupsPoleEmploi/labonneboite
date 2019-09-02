@@ -211,3 +211,8 @@ elif get_current_env() == ENV_TEST:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.test import *
 
+# Encryption of user PEAM-U token between LBB and JePostule.
+# Dummy key used everywhere but in production.
+CRYPTOGRAPHY_SECRET_KEY = b'gj6ouKvodK6PCAz4mt5tdTMUnVPHFFYWjh_P-O-IMqU='
+
+

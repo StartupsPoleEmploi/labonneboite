@@ -22,16 +22,18 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     """
     name = 'peam-openidconnect'
 
-    AUTHORIZATION_URL = '%s/connexion/oauth2/authorize' % settings.PEAM_AUTH_BASE_URL
-    ACCESS_TOKEN_URL = '%s/connexion/oauth2/access_token' % settings.PEAM_AUTH_BASE_URL
-    REFRESH_TOKEN_URL = '%s/connexion/oauth2/access_token' % settings.PEAM_AUTH_BASE_URL
-    USERINFO_URL = '%s/partenaire/peconnect-individu/v1/userinfo' % settings.PEAM_API_BASE_URL
+    AUTHORIZATION_URL = "{}/connexion/oauth2/authorize".format(settings.PEAM_AUTH_BASE_URL)
+    ACCESS_TOKEN_URL = "{}/connexion/oauth2/access_token".format(settings.PEAM_AUTH_BASE_URL)
+    REFRESH_TOKEN_URL = "{}/connexion/oauth2/access_token?realm=%2Findividu".format(settings.PEAM_AUTH_BASE_URL)
+    USERINFO_URL = "{}/partenaire/peconnect-individu/v1/userinfo".format(settings.PEAM_API_BASE_URL)
 
     # as documented in https://python-social-auth.readthedocs.io/en/latest/use_cases.html#multiple-scopes-per-provider
     def get_scope(self):
         scope = super(PEAMOpenIdConnect, self).get_scope()
         # enable higher quota of req/s to avoid 429 HTTP errors
-        scope = scope + ['qos_silver_peconnect-individuv1']
+        # FIXME setting empty for ESD recette
+        #scope = scope + ['qos_silver_peconnect-individuv1']
+        scope = scope + ['api_candidaturespontaneev1', 'ami', 'amiW']
         return scope
 
     def request_access_token(self, *args, **kwargs):
