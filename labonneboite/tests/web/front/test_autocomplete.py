@@ -93,6 +93,14 @@ class AutocompleteJobLabels(AppTest):
         self.assertEqual(result[0]['id'], 'M1805')
         self.assertEqual(result[0]['occupation'], 'etudes-et-developpement-informatique')
 
+    def test_autocomplete_thesaurus_ios_uppercase(self):
+        response = self.app.get(self.url_for('search.suggest_job_labels', term='iOS'))
+        self.assertEqual(200, response.status_code)
+        result = json.loads(response.data.decode())
+        self.assertEqual(len(result), 10)
+        self.assertEqual(result[0]['id'], 'M1805')
+        self.assertEqual(result[0]['occupation'], 'etudes-et-developpement-informatique')
+
     def test_autocomplete_thesaurus_android(self):
         response = self.app.get(self.url_for('search.suggest_job_labels', term='android'))
         self.assertEqual(200, response.status_code)
