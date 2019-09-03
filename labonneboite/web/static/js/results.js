@@ -17,7 +17,7 @@ var trackOutboundLink = function(url) {
     // has a hard time initializing maps in hidden elements.
     $('.js-map-container:visible').initMap();
     $('.js-result-toggle-details').toggleDetails();
-    updateTravelDurations();
+    //updateTravelDurations();
     $('#shown-search-form').checkChanges();
 
     var eventLabel;
