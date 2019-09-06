@@ -1,4 +1,3 @@
-
 from flask import Blueprint
 from flask import make_response
 
@@ -11,17 +10,22 @@ healthBlueprint = Blueprint('health', __name__)
 @healthBlueprint.route('')
 def health_all():
     """
-    Health check route designed to be regularly monitored in production (e.g. UptimeRobot)
-    `yes` if Elastic Search and Database are ok
+    Health check route designed to be regularly monitored in production (e.g. UptimeRobot).
+    Returns `yes` if internal dependencies (Elastic Search, Database, Uwsgi) are all ok.
+    Does not check external dependencies (IGN).    
     """
-    return health_response(health_util.is_db_alive() and health_util.is_elasticsearch_alive())
+    return health_response(
+        health_util.is_db_alive()
+        and health_util.is_elasticsearch_alive()
+        and health_util.is_uwsgi_alive()
+    )
 
 
 @healthBlueprint.route('/db')
 def health_db():
     """
-    Health check route designed to be regularly monitored in production (e.g. UptimeRobot)
-    `yes` if Database is ok
+    Health check route designed to be regularly monitored in production (e.g. UptimeRobot).
+    Returns `yes` if Database is ok.
     """
     return health_response(health_util.is_db_alive())
 
@@ -29,8 +33,8 @@ def health_db():
 @healthBlueprint.route('/es')
 def health_es():
     """
-    Health check route designed to be regularly monitored in production (e.g. UptimeRobot)
-    `yes` if Elastic Search is ok
+    Health check route designed to be regularly monitored in production (e.g. UptimeRobot).
+    Returns `yes` if Elastic Search is ok.
     """
     return health_response(health_util.is_elasticsearch_alive())
 
@@ -38,10 +42,25 @@ def health_es():
 @healthBlueprint.route('/uwsgi')
 def health_uwsgi():
     """
-    Dummy health check to test if uwsgi is up. If this part of the code is reached,
-    it obviously means uwsgi is up, so there is nothing to test.
+    Health check to test if uwsgi is up.
     """
-    return health_response(True)
+    return health_response(health_util.is_uwsgi_alive())
+
+
+@healthBlueprint.route('/ign/duration')
+def health_ign_duration():
+    """
+    Health check to test if IGN API duration is up.
+    """
+    return health_response(health_util.is_ign_duration_alive())
+
+
+@healthBlueprint.route('/ign/isochrone')
+def health_ign_isochrone():
+    """
+    Health check to test if IGN API isochrone is up.
+    """
+    return health_response(health_util.is_ign_isochrone_alive())
 
 
 def health_response(is_healthy):
