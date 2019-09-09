@@ -41,7 +41,7 @@
       {% elif company.distance %}
         <p class="travel-distance-duration">
           <img class="img-icon-large" alt="" src="{{ url_for('static', filename='images/icons/travel/km.svg') }}"> {{ company.distance }} km de votre lieu de recherche
-          <span class="travel-duration" data-siret="{{ company.siret }}" data-latitude="{{ company.latitude }}" data-longitude="{{ company.longitude }}"></span>
+          <span class="travel-duration {% if not enable_isochrones %}hidden{% endif %}" data-siret="{{ company.siret }}" data-latitude="{{ company.latitude }}" data-longitude="{{ company.longitude }}"></span>
         </p>
       {% endif %}
     </div>
