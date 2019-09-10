@@ -13,7 +13,6 @@ import sys
 from sqlalchemy.exc import OperationalError
 
 from labonneboite.importer import settings
-from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
 from labonneboite.common.util import timeit
 from labonneboite.importer.util import parse_dpae_line, InvalidRowException
@@ -177,11 +176,10 @@ class DpaeExtractJob(Job):
         logger.info("finished importing dpae...")
         return something_new
 
-
 def run_main():
     import logging
     logging.basicConfig(level=logging.DEBUG)
-    dpae_filename = jenkins.get_dpae_filename()
+    dpae_filename = import_util.detect_runnable_file("dpae")
     task = DpaeExtractJob(dpae_filename)
     task.run()
 

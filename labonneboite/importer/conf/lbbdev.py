@@ -4,11 +4,9 @@ import os
 INPUT_SOURCE_FOLDER = '/srv/lbb/data'
 
 # --- job 1/8 & 2/8 : check_etablissements & extract_etablissements
-JENKINS_ETAB_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties.jenkins")
 MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 10000
 
 # --- job 3/8 & 4/8 : check_dpae & extract_dpae
-JENKINS_DPAE_PROPERTIES_FILENAME = os.path.join(os.environ["WORKSPACE"], "properties_dpae.jenkins")
 MAXIMUM_ZIPCODE_ERRORS = 100
 MAXIMUM_INVALID_ROWS = 100
 

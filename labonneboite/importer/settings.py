@@ -29,12 +29,10 @@ INPUT_SOURCE_FOLDER = os.path.join(IMPORTER_ROOT_FOLDER, 'data')
 
 # --- job 1/8 & 2/8 : check_etablissements & extract_etablissements
 dirname = os.path.dirname(os.path.realpath(__file__))
-JENKINS_ETAB_PROPERTIES_FILENAME = os.path.join(dirname, "jenkins/properties.jenkins")
 DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 96
 MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 1
 
 # --- job 3/8 & 4/8 : check_dpae & extract_dpae
-JENKINS_DPAE_PROPERTIES_FILENAME = os.path.join(dirname, "jenkins/properties_dpae.jenkins")
 DPAE_ERROR_RATE_MAX = 0.1
 OLDEST_POSSIBLE_DPAE_DATE = datetime(2011, 12, 31)
 MAXIMUM_ZIPCODE_ERRORS = 0
