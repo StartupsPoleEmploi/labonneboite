@@ -3,7 +3,6 @@ import pandas as pd
 import validators
 
 from labonneboite.importer import settings
-from labonneboite.importer import jenkins
 from labonneboite.importer import util as import_util
 from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import ImportTask
@@ -421,7 +420,7 @@ class EtablissementExtractJob(Job):
 
 
 def run():
-    etablissement_filename = jenkins.get_etablissement_filename()
+    etablissement_filename = import_util.detect_runnable_file("etablissements")
     task = EtablissementExtractJob(etablissement_filename)
     task.run()
 
