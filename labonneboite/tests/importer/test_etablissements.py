@@ -17,37 +17,38 @@ def make_raw_office():
     )
     office.save()
 
+ETABLISSEMENT_FILE = "lbb_etablissement_full_201612192300.csv"
 
 class TestEtablissements(DatabaseTest):
 
     def test_get_sirets_from_database(self):
-        filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
+        filename = self.get_data_file_path(ETABLISSEMENT_FILE)
         task = EtablissementExtractJob(filename)
         etabs = task.get_sirets_from_database()
         self.assertEqual(len(etabs), 0)
         make_raw_office()
         etabs = task.get_sirets_from_database()
         self.assertEqual(len(etabs), 1)
-        self.assertEqual(etabs[0], "12345678901234") 
+        self.assertEqual(etabs[0], "12345678901234")
 
     def test_get_offices_from_file(self):
-        filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
+        filename = self.get_data_file_path(ETABLISSEMENT_FILE)
         task = EtablissementExtractJob(filename)
         etabs = task.get_offices_from_file()
         self.assertEqual(len(list(etabs.keys())), 26)
-        siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
-        codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-        website, flag_poe_afpr, flag_pmsmp = etabs.get('26560004900167').get('create_fields')
+        _, raisonsociale, _, _, _, _, \
+        _, _, email, _, _, _, \
+        _, _, _ = etabs.get('26560004900167').get('create_fields')
         self.assertEqual(raisonsociale, 'CTRE HOSPITALIER JOSSELIN')
         self.assertEqual(email, '')
-        siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
-        codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-        website, flag_poe_afpr, flag_pmsmp = etabs.get('26560004900267').get('create_fields')
+        _, raisonsociale, _, _, _, _, \
+        _, _, email, _, _, _, \
+        _, _, _ = etabs.get('26560004900267').get('create_fields')
         self.assertEqual(raisonsociale, 'POLE EMPLOI')
         self.assertEqual(email, 'origin_email@pole-emploi.fr')
 
     def test_create_new_offices(self):
-        filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
+        filename = self.get_data_file_path(ETABLISSEMENT_FILE)
         task = EtablissementExtractJob(filename)
         task.csv_offices = task.get_offices_from_file()
         task.creatable_sirets = [
@@ -57,7 +58,7 @@ class TestEtablissements(DatabaseTest):
         self.assertEqual(len(RawOffice.query.all()), 2)
 
     def test_delete_offices(self):
-        filename = self.get_data_file_path("LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv")
+        filename = self.get_data_file_path(ETABLISSEMENT_FILE)
         task = EtablissementExtractJob(filename)
         task.csv_offices = task.get_offices_from_file()
         task.creatable_sirets = [
@@ -79,3 +80,22 @@ class TestEtablissements(DatabaseTest):
         self.assertEqual(normalize_website_url('https://abc.fr'), 'https://abc.fr')
         self.assertEqual(normalize_website_url('abc@def.fr'), None)
 
+    def test_emails_rgpd(self):
+        filename = self.get_data_file_path(ETABLISSEMENT_FILE)
+        task = EtablissementExtractJob(filename)
+        etabs = task.get_offices_from_file()
+
+        _, _, _, _, _, _, \
+        _, _, email, _, _, _, \
+        _, _, _ = etabs.get('00565014800033').get('create_fields')
+        self.assertEqual(email, 'laf2@example.eu') #The office has 2 emails, and the rgpd email is the main
+
+        _, _, _, _, _, _, \
+        _, _, email, _, _, _, \
+        _, _, _ = etabs.get('48874364200024').get('create_fields')
+        self.assertEqual(email, 'f.renier@abcdef.tm.fr') #The office has only one email, no rgpd
+
+        _, _, _, _, _, _, \
+        _, _, email, _, _, _, \
+        _, _, _ = etabs.get('42086672500021').get('create_fields')
+        self.assertEqual(email, 'frederic.fleury@abcdef.fr') #The office has only one email, rgpd

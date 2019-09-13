@@ -234,6 +234,11 @@ def get_fields_from_csv_line(line, delimiter='|'):
     # get rid of invisible space characters (\xc2) if present
     line = line.strip().replace('\xc2', '')
     fields = [encoding_util.sanitize_string(f) for f in line.split(delimiter)]
+
+    # The CSV files which are now extracted can contain either '' OR 'NULL' when there are null values.
+    # We need to replace 'NULL' values with an empty string
+    fields = ['' if field=='NULL' else field for field in fields]
+
     return fields
 
 

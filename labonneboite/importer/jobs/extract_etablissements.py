@@ -303,11 +303,12 @@ class EtablissementExtractJob(Job):
         no_zipcode_count = 0
         unprocessable_departement_errors = 0
         format_errors = 0
-        # KPI attendus avec l’ajout des mails clean:
-        emails_here_before_count = 0 # % et Nombre d’entreprise qui n’avaient  pas de mail et qui en ont à présent.
-        emails_not_here_before_count = 0 # % et Nombre d’entreprises pour lesquelles l’adresse mail a été mise à jour.
+        # KPI expected after the add of the RGPD email column
+        emails_here_before_rgpd = 0 # Number of offices who did not have email before, and now have one
+        emails_not_here_before_rgpd = 0 # Number of offices who had an existing email, which has been replaced by the new rgpd mail clean
         departement_counter_dic = {}
         offices = {}
+
 
         with import_util.get_reader(self.input_filename) as myfile:
             header_line = myfile.readline().strip()  # FIXME detect column positions from header
@@ -322,12 +323,13 @@ class EtablissementExtractJob(Job):
 
                 try:
                     fields = import_util.get_fields_from_csv_line(line)
+
                     if len(fields) != 23:
                         logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
 
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
-                        libellerue, codecommune, codepostal, email, rgpd_email, \
+                        libellerue, codecommune, codepostal, first_email, rgpd_email, \
                         tel, trancheeffectif_etablissement, _, _, _, \
                         website1, website2, better_tel, \
                         website3, _, contrat_afpr, contrat_poe, contrat_pmsmp = fields
@@ -359,12 +361,12 @@ class EtablissementExtractJob(Job):
 
                 if has_text_content(rgpd_email):
                     email = encoding_util.strip_french_accents(rgpd_email)
-                    if not has_text_content(email):
-                        emails_here_before_count += 1
+                    if has_text_content(first_email):
+                        emails_here_before_rgpd += 1
                     else:
-                        emails_not_here_before_count += 1
+                        emails_not_here_before_rgpd += 1
                 else:
-                    email = encoding_util.strip_french_accents(email)
+                    email = encoding_util.strip_french_accents(first_email)
 
                 if codecommune.strip():
                     departement = import_util.get_departement_from_zipcode(codepostal)
@@ -401,8 +403,8 @@ class EtablissementExtractJob(Job):
                     no_zipcode_count += 1
 
         logger.info("%i offices total", count)
-        logger.info("%i nb offices without email before and have now thanks to RGPD mails", emails_not_here_before_count)
-        logger.info("%i nb offices with emails before and have been replaced by RGPD mails", emails_here_before_count)
+        logger.info("%i offices without email before and have now thanks to RGPD mails", emails_not_here_before_rgpd)
+        logger.info("%i offices with emails before and have been replaced by RGPD mails", emails_here_before_rgpd)
         logger.info("%i offices with unprocessable departement", unprocessable_departement_errors)
         logger.info("%i offices with no zipcodes", no_zipcode_count)
         logger.info("%i offices not read because of format error", format_errors)
