@@ -4,8 +4,8 @@ from labonneboite.importer.models.computing import Hiring
 from labonneboite.importer.util import get_departement_from_zipcode
 from .test_base import DatabaseTest
 
-FIRST_DPAE_FILE_NAME = "LBB_XDPDPAE_2016-11-10_2015-10-10.csv"
-SECOND_DPAE_FILE_NAME = "LBB_XDPDPAE_2016-12-10_2015-11-10.csv"
+FIRST_DPAE_FILE_NAME = "lbb_xdpdpae_delta_201611102200.csv"
+SECOND_DPAE_FILE_NAME = "lbb_xdpdpae_delta_201612102200.csv"
 
 class TestDpae(DatabaseTest):
 

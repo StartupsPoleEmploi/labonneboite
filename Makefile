@@ -137,10 +137,10 @@ rebuild-simplified-rome-naf-mapping:
 
 rebuild-importer-tests-compressed-files:
 	cd labonneboite/tests/importer/data && \
-	rm -f LBB_XDPDPAE_2016-11-10_2015-10-10.csv.gz && \
-	gzip --keep LBB_XDPDPAE_2016-11-10_2015-10-10.csv && \
-	rm -f LBB_XDPDPAE_2016-11-10_2015-10-10.csv.bz2 && \
-	bzip2 --keep LBB_XDPDPAE_2016-11-10_2015-10-10.csv
+	rm -f lbb_xdpdpae_delta_201611102200.csv.gz && \
+	gzip --keep lbb_xdpdpae_delta_201611102200.csv && \
+	rm -f lbb_xdpdpae_delta_201611102200.csv.bz2 && \
+	bzip2 --keep lbb_xdpdpae_delta_201611102200.csv
 
 rebuild-city-codes:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python importer/scripts/clean_csv_city_codes.py
@@ -253,8 +253,8 @@ run-importer-job-00-prepare-all: alembic-migrate
 		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
-		cp ../tests/importer/data/LBB_XDPDPAE_2016-11-10_2015-10-10.csv data/ && \
-		cp ../tests/importer/data/LBB_ETABLISSEMENT_2016-12-19_2015-11-19.csv data/ && \
+		cp ../tests/importer/data/lbb_xdpdpae_delta_201611102200.csv data/ && \
+		cp ../tests/importer/data/lbb_etablissement_full_201612192300.csv data/ && \
 		echo "completed importer run preparation."
 
 run-importer-job-01-check-etablissements:
