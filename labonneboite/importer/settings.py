@@ -7,11 +7,11 @@ Environment-specific values of these parameters are overriden in files:
 
 conf/development.py
 conf/test.py
-conf/lbbdev.py
+conf/bonaparte.py
 """
 import os
 from datetime import datetime
-from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
+from labonneboite.common.env import get_current_env, ENV_BONAPARTE, ENV_DEVELOPMENT, ENV_TEST
 from labonneboite.common import departements as dpt
 
 # Folder that contains the repo
@@ -62,9 +62,9 @@ MINIMUM_GEOCODING_RATIO = 0.75
 BACKUP_OUTPUT_FOLDER = os.path.join(IMPORTER_ROOT_FOLDER, 'output')
 BACKUP_FOLDER = os.path.join(IMPORTER_ROOT_FOLDER, 'output')
 
-if get_current_env() == ENV_LBBDEV:
+if get_current_env() == ENV_BONAPARTE:
     # pylint: disable=wildcard-import,unused-wildcard-import
-    from .conf.lbbdev import *
+    from .conf.bonaparte import *
 elif get_current_env() == ENV_DEVELOPMENT:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .conf.development import *
