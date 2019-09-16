@@ -9,6 +9,7 @@ Content:
 - [Asynchronous tasks](#asynchronous-tasks)
 - [Endpoints](#endpoints)
 - [Tests](#tests)
+- [Production monitoring](#monitoring)
 
 
 ## Introduction
@@ -425,3 +426,10 @@ Example with `/maps/isochrone?dur=15&tr=public&zipcode=75010`:
 Unit and functional tests are available:
 - [Functional (high-level) tests using Selenium](/labonneboite/tests/selenium).
 - [Unit tests](/tests/app/maps)
+
+## Monitoring
+
+Useful links
+- https://labonneboite.pole-emploi.fr/health/ign/duration
+- https://labonneboite.pole-emploi.fr/health/ign/isochrone
+- Global IGN dashboard: https://stats.uptimerobot.com/28xBxu6Q9
