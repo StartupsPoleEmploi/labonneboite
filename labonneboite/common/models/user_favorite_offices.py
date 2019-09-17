@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship
 from labonneboite.common.database import Base
 from labonneboite.common.database import db_session
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.common.env import get_current_env, ENV_LBBDEV
+from labonneboite.common.env import get_current_env, ENV_BONAPARTE
 
 
 class UserFavoriteOffice(CRUDMixin, Base):
@@ -37,7 +37,7 @@ class UserFavoriteOffice(CRUDMixin, Base):
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
 
     user = relationship('User')
-    if get_current_env() == ENV_LBBDEV:
+    if get_current_env() == ENV_BONAPARTE:
         # Disable relationship which mysteriously breaks on lbbdev only, not needed there anyway.
         # FIXME very ugly, try again to fix this bug. Bug happens in lbbdev environment only.
         pass

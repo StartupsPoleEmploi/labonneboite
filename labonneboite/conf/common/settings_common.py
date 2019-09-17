@@ -7,12 +7,12 @@ Environment-specific values of these parameters are overriden in files:
 
 overrides/development.py
 overrides/test.py
-overrides/lbbdev.py
+overrides/bonaparte.py
 """
 import logging
 import os
 
-from labonneboite.common.env import get_current_env, ENV_LBBDEV, ENV_DEVELOPMENT, ENV_TEST
+from labonneboite.common.env import get_current_env, ENV_BONAPARTE, ENV_DEVELOPMENT, ENV_TEST
 from labonneboite.common.load_data import load_rome_labels, load_naf_labels
 
 DEBUG = False
@@ -201,9 +201,9 @@ IGN_CREDENTIALS = {
 }
 NAVITIA_API_TOKEN = 'setme'
 
-if get_current_env() == ENV_LBBDEV:
+if get_current_env() == ENV_BONAPARTE:
     # pylint: disable=wildcard-import,unused-wildcard-import
-    from .overrides.lbbdev import *
+    from .overrides.bonaparte import *
 elif get_current_env() == ENV_DEVELOPMENT:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.development import *

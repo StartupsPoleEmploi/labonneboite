@@ -5,9 +5,9 @@ import os
 
 ENV_DEVELOPMENT = 'development'
 ENV_TEST = 'test'
-ENV_LBBDEV = 'lbbdev'
+ENV_BONAPARTE = 'bonaparte'
 
-ENVS = [ENV_DEVELOPMENT, ENV_TEST, ENV_LBBDEV]
+ENVS = [ENV_DEVELOPMENT, ENV_TEST, ENV_BONAPARTE]
 
 
 def get_current_env():
