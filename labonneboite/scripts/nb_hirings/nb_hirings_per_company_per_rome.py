@@ -7,8 +7,6 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 
-DEV_LOCAL = False
-
 def get_total_hirings_per_company():
     engine = import_util.create_sqlalchemy_engine()
 
@@ -22,8 +20,8 @@ def get_total_hirings_per_company():
              from \
                 etablissements_backoffice"
     
-    if not DEV_LOCAL:
-        query += "where greatest(0, floor(score_regr)) > 0;"
+    #TODO : Filter on score etablissements ? 
+    query += " where greatest(0, floor(score_regr)) > 0;"
 
     df_total_hirings = pd.read_sql_query(query, engine)
 
