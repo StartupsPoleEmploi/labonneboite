@@ -7,11 +7,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 
-#TODO : Uncomment these lines when the metiers en tension new threshold will be in prod
-#from labonneboite.common.load_data import load_metiers_tension
-#from labonneboite.scripts.create_index import get_score_minimum_for_rome
-
-DEV_LOCAL = True
+DEV_LOCAL = False
 
 def get_total_hirings_per_company():
     engine = import_util.create_sqlalchemy_engine()
@@ -33,6 +29,7 @@ def get_total_hirings_per_company():
 
     engine.close()
     logger.info("Datas selected from etablissements_backoffice")
+    print(df_total_hirings)
     return df_total_hirings
 
 # function found on gist.github : https://gist.github.com/jlln/338b4b0b55bd6984f883
@@ -117,25 +114,15 @@ def get_score_from_hirings(df_total_hirings):
 
     df_total_hirings = df_total_hirings[cols_of_interest]
 
-    def is_a_bonne_boite(row,METIERS_TENSION):
-        if not METIERS_TENSION:
-            bonne_boite = row['score'] >= scoring_util.SCORE_FOR_ROME_MINIMUM
-        else:
-            #TODO : Remove comments
-            #score_minimum = get_score_minimum_for_rome(df_metiers_tension,row['rome'])
-            #bonne_boite = row['score'] >= score_minimum
-            bonne_boite = False
-        
-        return 1 if bonne_boite else 0
+    df_total_hirings['seuil'] = df_total_hirings['rome'].apply(lambda x: scoring_util.get_score_minimum_for_rome(x))
 
-    METIERS_TENSION = False
-    if METIERS_TENSION:
-        #TODO : Remove comments
-        #df_metiers_tension = load_metiers_tension()
-        pass
+    logger.info("We compute the threshold, related to the score column. If a score is >= to thris threshold, it's considered as a company")
+
+    def is_a_bonne_boite(row):
+        return row['score'] >= row['seuil']
 
     df_total_hirings['is a bonne boite ?'] = df_total_hirings.apply(
-        lambda row: is_a_bonne_boite(row,METIERS_TENSION), axis=1)
+        lambda row: is_a_bonne_boite(row), axis=1)
 
     logger.info("We added a column to tell if its a bonne boite or no")
 
