@@ -11,24 +11,28 @@ from labonneboite.importer.jobs.common import logger
 
 DEBUG = False
 
+
 def get_activity_logs():
     engine = import_util.create_sqlalchemy_engine()
 
     query = "select * from activity_logs"
-    if DEBUG: 
+    if DEBUG:
         query += " ORDER BY RAND() LIMIT 1000000"
     df_activity = pd.read_sql_query(query, engine)
 
     engine.close()
 
-    # TODO : Défninir une durée pour laquelle on considère qu'une activité sur LBB n'a pas d'impacts sur le retour à l'emploi
-    # Cela permettra de ne pas recharger tous les logs d'activité à chaque fois, mais uniquement sur une certaine période
-    # https://valodata.slack.com/archives/C0QR8RYL8/p1562319224015200 
+    # TODO : Défninir une durée pour laquelle on considère qu'une activité sur LBB 
+    # n'a pas d'impacts sur le retour à l'emploi
+    # Cela permettra de ne pas recharger tous les logs d'activité à chaque fois,
+    #  mais uniquement sur une certaine période
+    # https://valodata.slack.com/archives/C0QR8RYL8/p1562319224015200
     # df_activity = df_activity[df_activity.dateheure > duree_activity_not_prise_en_compte]
 
     logger.info('Activities logs are loaded')
 
     return df_activity
+
 
 def join_dpae_activity_logs(df_activity):
     # function used to create a new column from dateheure column in dpae
@@ -39,21 +43,23 @@ def join_dpae_activity_logs(df_activity):
     dpae_paths = os.listdir(dpae_folder_path)
     # IMPORTANT : Need to copy the DPAE file from /mnt/datalakepe/ to /srv/lbb/data
     # It is certainly ok, because of the importer which also needs this file
-    dpae_paths = [i for i in dpae_paths if i.startswith('LBB_XDPDPAE')]
+    dpae_paths = [i for i in dpae_paths if i.startswith('lbb_xdpdpae_delta')]
 
     dpae_paths.sort()
     most_recent_dpae_file = dpae_paths[-1]
 
-    logger.info("the DPAE file which will be used is : {}".format(most_recent_dpae_file))
+    logger.info("the DPAE file which will be used is : {}".format(
+        most_recent_dpae_file))
 
-    #We select the last DPAE date that has been used in the last joined dpae
+    # We select the last DPAE date that has been used in the last joined dpae
     engine = import_util.create_sqlalchemy_engine()
 
     query = "select date_embauche from act_dpae_clean order by date_embauche DESC LIMIT 1 "
     row = engine.execute(query).fetchone()
     date_last_recorded_activity = row[0].split()[0]
 
-    logger.info("the most recent date found is {} ".format(date_last_recorded_activity))
+    logger.info("the most recent date found is {} ".format(
+        date_last_recorded_activity))
 
     engine.close()
 
@@ -75,40 +81,45 @@ def join_dpae_activity_logs(df_activity):
     total_rows_kept = 0
 
     for df_dpae in pd.read_csv(dpae_folder_path+most_recent_dpae_file,
-                            header=None,
-                            compression='bz2',
-                            names=column_names,
-                            sep='|',
-                            index_col=False,
-                            chunksize=chunksize):
+                               header=None,
+                               compression='bz2',
+                               names=column_names,
+                               sep='|',
+                               index_col=False,
+                               chunksize=chunksize):
 
         logger.info("Sample of DPAE has : {} rows".format(df_dpae.shape[0]))
 
         # remove rows where the data is > to the 11 10 2018 (dont have activity dates after this)
         df_dpae['kd_dateembauche_bis'] = df_dpae.apply(
             lambda row: get_date(row), axis=1)
-        df_dpae = df_dpae[df_dpae.kd_dateembauche_bis > date_last_recorded_activity]
-        logger.info("Sample of DPAE minus old dates has : {} rows".format(df_dpae.shape[0]))
+        df_dpae = df_dpae[df_dpae.kd_dateembauche_bis >
+                          date_last_recorded_activity]
+        logger.info(
+            "Sample of DPAE minus old dates has : {} rows".format(df_dpae.shape[0]))
 
         # convert df dpae columns to 'object'
         df_dpae = df_dpae.astype(str)
 
         df_dpae_act = pd.merge(df_dpae,
-                        df_activity,
-                        how='left', 
-                        left_on=['dc_ididentiteexterne', 'kc_siret'],
-                        right_on=['idutilisateur_peconnect', 'siret'])
-        logger.info("Sample of merged activity/DPAE has : {} rows".format(df_dpae_act.shape[0]))
+                               df_activity,
+                               how='left',
+                               left_on=['dc_ididentiteexterne', 'kc_siret'],
+                               right_on=['idutilisateur_peconnect', 'siret'])
+        logger.info(
+            "Sample of merged activity/DPAE has : {} rows".format(df_dpae_act.shape[0]))
 
         # filter on the fact that dateheure activity must be inferior to kd_dateembauche
-        df_dpae_act = df_dpae_act[df_dpae_act.kd_dateembauche_bis > df_dpae_act.dateheure]
+        df_dpae_act = df_dpae_act[df_dpae_act.kd_dateembauche_bis >
+                                  df_dpae_act.dateheure]
         df_dpae_act = df_dpae_act.drop(['kd_dateembauche_bis'], axis=1)
-        logger.info("Sample of merged activity/DPAE with the good dates has : {} rows".format(df_dpae_act.shape[0]))
+        logger.info(
+            "Sample of merged activity/DPAE with the good dates has : {} rows".format(df_dpae_act.shape[0]))
 
         path_to_csv = dpae_folder_path+'act_dpae.csv'
         exists = os.path.isfile(path_to_csv)
 
-        #We want to rewrite the CSV file after each new execution of DPAE extraction
+        # We want to rewrite the CSV file after each new execution of DPAE extraction
         if i == 0:
             os.remove(path_to_csv)
             df_dpae_act.to_csv(path_to_csv, encoding='utf-8', sep='|')
@@ -117,21 +128,26 @@ def join_dpae_activity_logs(df_activity):
                 df_dpae_act.to_csv(f, header=False, sep='|')
 
         total_rows_kept += df_dpae_act.shape[0]
-        logger.info(" --> Nb rows we keep in this sample : {} rows".format(df_dpae_act.shape[0]))
-        logger.info(" --> Nb total rows that have been kept : {} rows".format(total_rows_kept))
-        logger.info(" --> Nb total rows of DPAE that has been parsed : {} rows".format((i+1) * chunksize))
+        logger.info(
+            " --> Nb rows we keep in this sample : {} rows".format(df_dpae_act.shape[0]))
+        logger.info(
+            " --> Nb total rows that have been kept : {} rows".format(total_rows_kept))
+        logger.info(
+            " --> Nb total rows of DPAE that has been parsed : {} rows".format((i+1) * chunksize))
         logger.info("-------------------------")
         i += 1
-        
-        #In debug mode, we stop parsing the DPAE file when we reach (10 ** 5) * 20 = 2 000 000 lines
+
+        # In debug mode, we stop parsing the DPAE file when we reach (10 ** 5) * 20 = 2 000 000 lines
         if DEBUG and i == 20:
             break
-    
+
     return path_to_csv
+
 
 def run_main():
     df_activity = get_activity_logs()
     join_dpae_activity_logs(df_activity)
+
 
 if __name__ == '__main__':
     run_main()
