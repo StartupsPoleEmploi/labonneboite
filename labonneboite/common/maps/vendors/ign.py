@@ -1,4 +1,5 @@
 import re
+from timeit import default_timer as timer
 
 from requests.auth import HTTPBasicAuth
 import requests
@@ -10,7 +11,8 @@ from labonneboite.conf import settings
 from ..exceptions import BackendUnreachable
 
 
-TIMEOUT_SECONDS = 8
+BATCH_TIMEOUT_SECONDS = 8
+REQUEST_TIMEOUT_SECONDS = 5
 
 
 def isochrone(origin, duration):
@@ -24,7 +26,7 @@ def isochrone(origin, duration):
         # debug. Also, requires more data transfer.
         # 'holes': 'true',
     }
-    data = request_json_api(endpoint, params)
+    data = request_json_api(endpoint, params, timeout=REQUEST_TIMEOUT_SECONDS)
 
     # geometry is a string of the form: 'POLYGON ((3.504869 45.910195, ...), (...))'
     geometry = data['wktGeometry']
@@ -41,13 +43,19 @@ def isochrone(origin, duration):
 
 def durations(origin, destinations):
     result = []
+    time_left = BATCH_TIMEOUT_SECONDS
     for destination in destinations:
-        data = get_journey(origin, destination)
-        result.append(float(data['durationSeconds']))
+        if time_left > 0:
+            start = timer()
+            data = get_journey(origin, destination, timeout=min(REQUEST_TIMEOUT_SECONDS, time_left))
+            end = timer()
+            time_spent = end - start
+            time_left -= time_spent
+            result.append(float(data['durationSeconds']))
     return result
 
 
-def get_journey(origin, destination):
+def get_journey(origin, destination, timeout):
     """
     As a rough estimate, the IGN API replies in 1-2s.
 
@@ -65,11 +73,11 @@ def get_journey(origin, destination):
         'destination': '{:.7f},{:.7f}'.format(destination[1], destination[0]),
         'graphName': 'Voiture'
     }
-    data = request_json_api(endpoint, params)
+    data = request_json_api(endpoint, params, timeout=timeout)
     return data
 
 
-def request_json_api(endpoint, params):
+def request_json_api(endpoint, params, timeout):
     ign_credentials = settings.IGN_CREDENTIALS
     url = 'https://wxs.ign.fr/{}/{}'.format(ign_credentials['key'], endpoint)
     auth = HTTPBasicAuth(
@@ -80,7 +88,7 @@ def request_json_api(endpoint, params):
     } if 'referer' in ign_credentials else None
 
     try:
-        response = requests.get(url, params=params, auth=auth, timeout=TIMEOUT_SECONDS, headers=headers)
+        response = requests.get(url, params=params, auth=auth, timeout=REQUEST_TIMEOUT_SECONDS, headers=headers)
     except Timeout:
         # This occurs frequently so we don't trigger a timeout error
         current_app.logger.warning('IGN API timeout')
