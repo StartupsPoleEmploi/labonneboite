@@ -47,6 +47,9 @@ class TestSearchSelectingCar(LbbSeleniumTestCase):
                 EC.invisibility_of_element_located((By.XPATH, "//div[@class='introjs-overlay']"))
             )
 
+        # Wait a little bit more to ensure things are less flaky
+        time.sleep(3)
+
         # Accept RGPD, otherwise selecting isochrone filters is not possible. ¯\_(ツ)_/¯
         self.driver.find_element_by_xpath("//button[@class='rgpd-accept']").click()
 
