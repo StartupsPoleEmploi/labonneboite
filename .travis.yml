@@ -30,7 +30,7 @@ script:
   - nosetests --nologcapture labonneboite/tests/app
   - nosetests --nologcapture labonneboite/tests/web
   - nosetests --nologcapture labonneboite/tests/scripts
-  - nosetests --nologcapture labonneboite/tests/importer
+  - travis_wait nosetests --nologcapture labonneboite/tests/importer
   # Integration
   - mysql -u travis -e 'DROP DATABASE IF EXISTS lbb_test;'
   - mysql -u travis -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
