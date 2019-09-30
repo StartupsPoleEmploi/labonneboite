@@ -106,7 +106,7 @@ class TestSearchSelectingCar(LbbSeleniumTestCase):
         """
         Each office details should have a commute time
         displayed along with other information.
-        As default transport mode is car, it's not needed to select it again.
+        As default transport mode is car, it is not needed to select it again.
         """
 
         # Find the first element that matches this CSS selector.
