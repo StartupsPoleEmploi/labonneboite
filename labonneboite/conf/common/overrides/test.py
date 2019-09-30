@@ -4,6 +4,7 @@ import os
 TESTING = True
 
 ES_INDEX = 'labonneboite_unit_test'
+ES_TIMEOUT = int(os.environ.get('ES_TIMEOUT', 60)) or None
 
 DB_HOST = os.environ.get('DB_HOST', '127.0.0.1')
 DB_PORT = int(os.environ.get('DB_PORT', 3307))
