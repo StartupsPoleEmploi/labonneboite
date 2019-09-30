@@ -5,7 +5,6 @@ import easyprocess
 from flask import url_for as flask_url_for
 from flask_testing import LiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from labonneboite.conf import settings
@@ -64,15 +63,9 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         capabilities = DesiredCapabilities.CHROME
         capabilities['loggingPrefs'] = {'browser': 'ALL'}
 
-        chrome_options = Options()
-        #chrome_options.add_argument("--disable-extensions")
-        #chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--headless")
-
         self.driver = webdriver.Chrome(
             desired_capabilities=capabilities,
-            executable_path=chromedriver_path,
-            options=chrome_options,
+            executable_path=chromedriver_path
         )
 
         # Ensure that the window size is large enough so that HTML elements won't overlap.
