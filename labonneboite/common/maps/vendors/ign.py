@@ -55,7 +55,7 @@ def durations(origin, destinations):
     return result
 
 
-def get_journey(origin, destination, timeout):
+def get_journey(origin, destination, timeout=REQUEST_TIMEOUT_SECONDS):
     """
     As a rough estimate, the IGN API replies in 1-2s.
 
@@ -88,7 +88,7 @@ def request_json_api(endpoint, params, timeout):
     } if 'referer' in ign_credentials else None
 
     try:
-        response = requests.get(url, params=params, auth=auth, timeout=REQUEST_TIMEOUT_SECONDS, headers=headers)
+        response = requests.get(url, params=params, auth=auth, timeout=timeout, headers=headers)
     except Timeout:
         # This occurs frequently so we don't trigger a timeout error
         current_app.logger.warning('IGN API timeout')
