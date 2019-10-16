@@ -45,7 +45,7 @@ def is_ign_duration_alive():
     }
 
     try:
-        return ign.request_json_api(endpoint, params)["status"] == 'OK'
+        return ign.request_json_api(endpoint, params, timeout=ign.REQUEST_TIMEOUT_SECONDS)["status"] == 'OK'
     # pylint: disable=W0703
     except Exception as e:
         logger.exception(e)
@@ -61,7 +61,7 @@ def is_ign_isochrone_alive():
     }
 
     try:
-        return ign.request_json_api(endpoint, params)["status"] == 'OK'
+        return ign.request_json_api(endpoint, params, timeout=ign.REQUEST_TIMEOUT_SECONDS)["status"] == 'OK'
     # pylint: disable=W0703
     except Exception as e:
         logger.exception(e)
