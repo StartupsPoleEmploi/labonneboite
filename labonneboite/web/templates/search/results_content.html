@@ -190,6 +190,7 @@
         {% if pagination and pagination.should_show() %}
           <nav class="pagination-wrapper" aria-label="Page navigation">
             <b>Plus d'entreprises</b>
+            <!-- search-successful-monitoring-tag -->
             <ul class="pagination">
               {% if pagination.show_first_page() %}
                 {% set first_page = pagination.get_first_page() %}
