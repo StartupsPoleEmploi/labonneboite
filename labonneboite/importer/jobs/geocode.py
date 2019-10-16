@@ -175,19 +175,25 @@ class GeocodeJob(Job):
         con.close()
 
     @timeit
-    def run_geocoding_jobs(self, geocoding_jobs):
+    def run_geocoding_jobs(self, geocoding_jobs, disable_multithreading=False):
         adresses_not_geolocated[:] = []
         coordinates_updates[:] = []
-        pool = Pool(processes=pool_size)
+
         logger.info("Nombre de geocoding jobs : {}".format(
             len(geocoding_jobs)))
-        for siret, full_address, initial_coordinates, city_code in geocoding_jobs:
-            pool.apply_async(self.find_coordinates_for_address,
-                             (siret, full_address, initial_coordinates, city_code,))
-        # for siret, full_address, initial_coordinates, city_code in geocoding_jobs:
-        #    self.find_coordinates_for_address(siret,full_address,initial_coordinates,city_code)
-        pool.close()
-        pool.join()
+
+        if disable_multithreading:
+            for siret, full_address, initial_coordinates, city_code in geocoding_jobs:
+                self.find_coordinates_for_address(
+                    siret, full_address, initial_coordinates, city_code)
+        else:
+            pool = Pool(processes=pool_size)
+            for siret, full_address, initial_coordinates, city_code in geocoding_jobs:
+                pool.apply_async(self.find_coordinates_for_address,
+                                 (siret, full_address, initial_coordinates, city_code,))
+            pool.close()
+            pool.join()
+
         logger.info("run geocoding jobs : collected {} coordinates on {} jobs, need to geocode {}".format(
             GEOCODING_STATS.get('cache_hits', 0),
             len(geocoding_jobs),
@@ -218,7 +224,7 @@ class GeocodeJob(Job):
                 'cache_misses', 0) + 1
 
     @timeit
-    def run_missing_geocoding_jobs(self, csv_max_rows=5000):
+    def run_missing_geocoding_jobs(self, csv_max_rows=5000, disable_multithreading=False):
         # The CSV file to send to API must not be > 8mb (https://adresse.data.gouv.fr/api)
         # This line :"03880702000011,2 RUE DE LA TETE NOIRE 14700 FALAISE,14258"
         # was copied 100000 times in a file, and the size was 5.77 MB,
@@ -247,12 +253,15 @@ class GeocodeJob(Job):
 
         logger.info("GEOCODING_STATS = %s", GEOCODING_STATS)
 
-        pool = Pool(processes=pool_size)
-        for csv_path in csv_api_back:
-            pool.apply_async(self.get_geocode_from_csv, (csv_path,))
-
-        pool.close()
-        pool.join()
+        if disable_multithreading:
+            for csv_path in csv_api_back:
+                self.get_geocode_from_csv(csv_path)
+        else:
+            pool = Pool(processes=pool_size)
+            for csv_path in csv_api_back:
+                pool.apply_async(self.get_geocode_from_csv, (csv_path,))
+            pool.close()
+            pool.join()
 
         logger.info("GEOCODING_STATS = %s", GEOCODING_STATS)
 
