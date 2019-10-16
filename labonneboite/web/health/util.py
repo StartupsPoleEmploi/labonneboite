@@ -2,6 +2,7 @@ import logging
 from labonneboite.common.database import db_session
 from labonneboite.common.es import Elasticsearch
 from labonneboite.common.maps.vendors import ign
+from labonneboite.common.maps import cache
 
 
 logger = logging.getLogger('main')
@@ -22,6 +23,19 @@ def is_elasticsearch_alive():
         es = Elasticsearch()
         es.ping()
         return True
+    # pylint: disable=W0703
+    except Exception as e:
+        logger.exception(e)
+        return False
+
+
+def is_redis_alive():
+    try:
+        redis_cache = cache.RedisCache()
+        redis_cache.set('redis_is_alive', 'yes')
+        result = redis_cache.get('redis_is_alive')
+        redis_cache.set('redis_is_alive', 'no')
+        return result == 'yes'
     # pylint: disable=W0703
     except Exception as e:
         logger.exception(e)

@@ -11,13 +11,14 @@ healthBlueprint = Blueprint('health', __name__)
 def health_all():
     """
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot).
-    Returns `yes` if internal dependencies (Elastic Search, Database, Uwsgi) are all ok.
+    Returns `yes` if internal dependencies (Elastic Search, Database, Uwsgi, Redis) are all ok.
     Does not check external dependencies (IGN).    
     """
     return health_response(
         health_util.is_db_alive()
         and health_util.is_elasticsearch_alive()
         and health_util.is_uwsgi_alive()
+        and health_util.is_redis_alive()
     )
 
 
@@ -37,6 +38,15 @@ def health_es():
     Returns `yes` if Elastic Search is ok.
     """
     return health_response(health_util.is_elasticsearch_alive())
+
+
+@healthBlueprint.route('/redis')
+def health_redis():
+    """
+    Health check route designed to be regularly monitored in production (e.g. UptimeRobot).
+    Returns `yes` if Redis is ok.
+    """
+    return health_response(health_util.is_redis_alive())
 
 
 @healthBlueprint.route('/uwsgi')
