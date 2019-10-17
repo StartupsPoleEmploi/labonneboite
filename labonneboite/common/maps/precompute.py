@@ -1,4 +1,6 @@
+from flask import current_app
 from huey import RedisHuey
+import redis
 
 from labonneboite.conf import settings
 
@@ -41,4 +43,10 @@ def isochrones(location):
     """
     for mode in travel.TRAVEL_MODES:
         for duration in constants.ISOCHRONE_DURATIONS_MINUTES:
-            isochrone(location, duration, mode=mode)
+            try:
+                isochrone(location, duration, mode=mode)
+            except redis.ConnectionError as e:
+                # Ignore redis connection errors -- precompute is temporarily
+                # unavailable, deal with it
+                current_app.logger.exception(e)
+                return
