@@ -40,7 +40,14 @@ def details(siret):
         'company': company,
         'rome_code': rome_code,
     }
-    activity.log('details', siret=siret)
+    activity.log(
+        event_name='details',
+        siret=siret,
+        # GA tracking is used in PSE 2019-2020 experiment
+        utm_medium=request.args.get('utm_medium', ''),
+        utm_source=request.args.get('utm_source', ''),
+        utm_campaign=request.args.get('utm_campaign', ''),
+    )
     return render_template('office/details.html', **context)
 
 
