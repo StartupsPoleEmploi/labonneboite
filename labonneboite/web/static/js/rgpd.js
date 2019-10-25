@@ -29,7 +29,6 @@ function userHasNotYetDecidedRGPD() {
     }
 
     $('.rgpd-accept').on('click', function (e) {
-      e.preventDefault();
       Cookies.set(cookieName, true, { expires: 365 });
       bannerElement.hide();
       closeModals();
@@ -46,6 +45,7 @@ function userHasNotYetDecidedRGPD() {
 
     $('.rgpd-info').on('click', function (e) {
       e.preventDefault();
+      closeModals();
       showModal("#rgpd-modal");
       ga('send', 'event', 'RGPD', 'info');
     });
