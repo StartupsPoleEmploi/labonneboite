@@ -37,11 +37,6 @@
           <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite - Pôle Emploi">
         </a>
       </li>
-      <li>
-        <a href="#" id="moisdescompetencespartagees">
-          <img src="{{ url_for('static', filename='images/moisdescompetencespartagees/evenement.jpg') }}" alt="Le mois des compétences partagées">
-        </a>
-      </li>
 
       <li class="float-right lbb-header-logo-pole-emploi">
         <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
@@ -159,7 +154,6 @@
     </div>
   </footer>
 
-
   <div id="rgpd-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true" aria-labelledby="#rgpd-modal-title">
     <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
     <div class="modal-content modal-content-inner">
@@ -209,28 +203,14 @@
     </div>
   </div>
 
-  <div class="modal-overlay modal-closed"></div>
-    <div id="tilkee-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true">
-      <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
-      <div class="modal-content">
-        <div class="modal-content-inner text-left text-bold" style="font-size: 140%;">
-          <p><img class="tilkee-cv" src="{{ url_for('static', filename='images/cv.png')}}" alt="">Envie de savoir si votre candidature a intéressé l'entreprise ? <br /><br />La Bonne Boite vous propose de suivre la consultation de votre CV par le recruteur.</p>
-          <p><button class="btn modal-close-button">C'est parti !</button></p>
-        </div>
-      </div>
-    </div>
+  <div class="modal-overlay modal-closed">
   </div>
-  
-  <div id="moisdescompetencespartagees-modal" class="modal modal-closed">
+  <div id="tilkee-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true">
     <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
     <div class="modal-content">
-      <div class="modal-content-inner text-center">
-        <p class="text-bold">Le mois des compétences partagées : c'est parti !</p>
-        <p>En octobre, les groupements d’employeurs vous proposent des événements partout en France pour découvrir les atouts du travail à temps partagé !</p>
-        <p><a href="https://www.rhinfoge.fr/mois-des-competences-partagees-candidat/" class="outbound-link" target="_blank" rel="noopener">Profitez-en et venez nombreux !</a></p>
-        <a href="https://www.rhinfoge.fr/mois-des-competences-partagees-candidat/" class="outbound-link" target="_blank" rel="noopener">
-            <img src="{{ url_for('static', filename='images/moisdescompetencespartagees/logos.jpg') }}" alt="Le mois des compétences partagées">
-        </a>
+      <div class="modal-content-inner text-left text-bold" style="font-size: 140%;">
+        <p><img class="tilkee-cv" src="{{ url_for('static', filename='images/cv.png')}}" alt="">Envie de savoir si votre candidature a intéressé l'entreprise ? <br /><br />La Bonne Boite vous propose de suivre la consultation de votre CV par le recruteur.</p>
+        <p><button class="btn modal-close-button">C'est parti !</button></p>
       </div>
     </div>
   </div>
@@ -244,7 +224,7 @@
             <a class="logo-pe-connect rgpd-consent-required" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ (next_url or request.url) | urlencode }}">
               <img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Se connecter avec Pôle emploi">
             </a>
-          </p>
+        </p>
       </div>
     </div>
   </div>
@@ -265,15 +245,6 @@
     $(document).on('lbbready', showTilkeeIntro);
   </script>
   {% endif %}
-  <script>
-    $("#moisdescompetencespartagees").on('click', function() {
-      ga('send', 'event', 'Modal', 'open', 'moisdescompetencespartagees');
-      showModal("#moisdescompetencespartagees-modal");
-    });
-    $("a.outbound-link").on('click', function(event) {
-      ga('send', 'event', 'outbound', 'click', event.target.href);
-    });
-  </script>
 
   <script>
     $(".jepostule-not-authentified").on('click', function() {
