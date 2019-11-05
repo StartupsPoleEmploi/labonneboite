@@ -154,7 +154,6 @@
     </div>
   </footer>
 
-
   <div id="rgpd-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true" aria-labelledby="#rgpd-modal-title">
     <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
     <div class="modal-content modal-content-inner">
@@ -204,15 +203,16 @@
     </div>
   </div>
 
-  <div class="modal-overlay modal-closed"></div>
-    <div id="tilkee-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true">
-        <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
-        <div class="modal-content">
-            <div class="modal-content-inner text-left text-bold" style="font-size: 140%;">
-                <p><img class="tilkee-cv" src="{{ url_for('static', filename='images/cv.png')}}" alt="">Envie de savoir si votre candidature a intéressé l'entreprise ? <br /><br />La Bonne Boite vous propose de suivre la consultation de votre CV par le recruteur.</p>
-              <p><button class="btn modal-close-button">C'est parti !</button></p>
-          </div>
+  <div class="modal-overlay modal-closed">
+  </div>
+  <div id="tilkee-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true">
+    <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
+    <div class="modal-content">
+      <div class="modal-content-inner text-left text-bold" style="font-size: 140%;">
+        <p><img class="tilkee-cv" src="{{ url_for('static', filename='images/cv.png')}}" alt="">Envie de savoir si votre candidature a intéressé l'entreprise ? <br /><br />La Bonne Boite vous propose de suivre la consultation de votre CV par le recruteur.</p>
+        <p><button class="btn modal-close-button">C'est parti !</button></p>
       </div>
+    </div>
   </div>
 
   <div id="jepostule-not-authentified-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true" aria-labelledby="#je-postule-title">
@@ -224,7 +224,7 @@
             <a class="logo-pe-connect rgpd-consent-required" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ (next_url or request.url) | urlencode }}">
               <img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Se connecter avec Pôle emploi">
             </a>
-          </p>
+        </p>
       </div>
     </div>
   </div>
