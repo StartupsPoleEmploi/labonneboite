@@ -292,8 +292,10 @@
   {# Memo button code #}
   <script>
     (function(d,s,id) {
-        {% if tilkee_enabled %}
-        // Temporarily disable memo intro to display tilkee intro
+        {% if tilkee_enabled or hide_memo_introjs %}
+        // Disable memo introjs in some situations
+        // => on company page (e.g. for PSE experiment mailing)
+        // => when tilkee is enabled (legacy)
         localStorage.setItem("lastMemoIntroJs", new Date().getTime() - 13*24*60*60*1000);
         {% endif %}
         var js, fjs = d.getElementsByTagName(s)[0];

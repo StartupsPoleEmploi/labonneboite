@@ -39,6 +39,7 @@ def details(siret):
     context = {
         'company': company,
         'rome_code': rome_code,
+        'hide_memo_introjs': True,
     }
     activity.log(
         event_name='details',

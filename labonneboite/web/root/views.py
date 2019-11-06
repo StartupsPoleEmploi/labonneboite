@@ -4,6 +4,7 @@ import requests
 from flask import Blueprint, current_app
 from flask import abort, send_from_directory, redirect, render_template, request
 
+from labonneboite.common import activity
 from labonneboite.common import doorbell
 from labonneboite.common import pro
 from labonneboite.conf import settings
@@ -17,6 +18,13 @@ rootBlueprint = Blueprint('root', __name__)
 @rootBlueprint.route('/')
 def home():
     fix_csrf_session()
+    activity.log(
+        event_name='home',
+        # GA tracking is used in PSE 2019-2020 experiment
+        utm_medium=request.args.get('utm_medium', ''),
+        utm_source=request.args.get('utm_source', ''),
+        utm_campaign=request.args.get('utm_campaign', ''),
+    )
     return render_template('home.html', form=CompanySearchForm())
 
 @rootBlueprint.route('/favicon.ico')
