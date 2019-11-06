@@ -115,7 +115,7 @@ def peam_recruiter_connect():
 
     scope = "application_{} api_peconnect-entreprisev1 openid profile email habilitation".format(settings.PEAM_CLIENT_ID)
 
-    url = settings.PEAM_AUTH_RECRUITER_BASE_URL + "/connexion/oauth2/authorize?" + urlencode({
+    url = settings.PEAM_AUTH_RECRUITER_BASE_URL + "connexion/oauth2/authorize?" + urlencode({
         'realm': '/employeur',
         'response_type': 'code',
         'client_id': settings.PEAM_CLIENT_ID,
