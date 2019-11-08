@@ -10,18 +10,18 @@ from labonneboite.importer.jobs.common import logger
 def get_total_hirings_per_company():
     engine = import_util.create_sqlalchemy_engine()
 
-    query = "select \
-                siret, \
-                raisonsociale, \
-                enseigne, \
-                email, \
-                tel, \
-                website, \
-                codenaf, \
-                codepostal, \
-                codecommune, \
-                trancheeffectif, \
-                greatest(0, floor(score_regr)) as total_hirings \
+    query = "select\
+                siret,\
+                raisonsociale,\
+                enseigne,\
+                email,\
+                tel,\
+                website,\
+                codenaf,\
+                codepostal,\
+                codecommune,\
+                trancheeffectif,\
+                greatest(0, floor(score_regr)) as total_hirings\
              from \
                 etablissements_backoffice"
     
