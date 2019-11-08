@@ -107,6 +107,11 @@ def get_score_from_hirings(df_total_hirings):
     logger.info("We compute the true hirings for each row")
 
     cols_of_interest = ['siret',
+                        'raisonsociale',
+                        'enseigne',
+                        'email',
+                        'tel',
+                        'website',
                         'codenaf',
                         'rome',
                         'codepostal',
