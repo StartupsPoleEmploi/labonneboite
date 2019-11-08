@@ -6,6 +6,11 @@ For the PSE school study, some datas were needed :
 
 First version of this dataset contains multiple columns: 
 - **siret** : the siret of the company
+- **raisonsociale** : the name of the company
+- **enseigne** : the name ? of the company
+- **email** : the email of the company
+- **tel** : the tel of the company
+- **website** : the website of the company
 - **codenaf** : the naf code of the company (activity sector)
 - **rome** : the rome code for this specific row (which has been found, from the naf code)
 - **codepostal** : the zipcode
