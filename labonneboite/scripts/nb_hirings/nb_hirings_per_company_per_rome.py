@@ -12,8 +12,13 @@ def get_total_hirings_per_company():
 
     query = "select \
                 siret, \
-                codenaf, \
+                raisonsociale, \
+                enseigne, \
+                email, \
                 codepostal, \
+                tel, \
+                website, \
+                codenaf, \
                 codecommune, \
                 trancheeffectif, \
                 greatest(0, floor(score_regr)) as total_hirings \
