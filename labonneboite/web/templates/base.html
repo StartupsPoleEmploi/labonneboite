@@ -222,7 +222,7 @@
         <p id="je-postule-title" class="text-bold">Cette fonctionnalité est disponible uniquement aux utilisateurs connectés.</p>
         <p>
           En poursuivant vous acceptez nos conditions d'utilisation de vos données personnelles (RGPD).
-          <button class="rgpd-info" aria-haspopup="true" aria-controls="#modal-id">En savoir plus</button>
+          <button class="btn btn-small rgpd-info" aria-haspopup="true" aria-controls="#modal-id">En savoir plus</button>
         </p>
         <p>
             <a class="logo-pe-connect rgpd-accept" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ (next_url or request.url) | urlencode }}">
