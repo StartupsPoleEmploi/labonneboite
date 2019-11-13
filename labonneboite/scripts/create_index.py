@@ -25,7 +25,7 @@ from labonneboite.common import es
 from labonneboite.common.chunks import chunks
 from labonneboite.common.search import fetch_offices
 from labonneboite.common.database import db_session
-from labonneboite.common.load_data import load_ogr_labels, OGR_ROME_CODES
+from labonneboite.common.load_data import load_ogr_labels, OGR_ROME_CODES, load_siret_to_remove
 from labonneboite.common.models import Office
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
@@ -41,6 +41,7 @@ VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main'
 
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 
+PSE_STUDY_IS_ENABLED = True
 
 class Profiling(object):
     ACTIVATED = False
@@ -303,7 +304,13 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
     # elasticsearch does not understand sets, so we use a dict of 'key => True' instead
     boosted_romes = {}
     boosted_alternance_romes = {}
-    
+
+    if PSE_STUDY_IS_ENABLED:
+        sirets_to_remove_pse = load_siret_to_remove()
+        office_to_remove_pse = (office.siret in sirets_to_remove_pse)
+    else:
+        office_to_remove_pse = False
+
     for naf in office_nafs:
         try:
             naf_rome_codes = mapping_util.get_romes_for_naf(naf)
@@ -342,7 +349,9 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
             # Get the score minimum for a rome code with metiers en tension
             score_minimum_for_rome = scoring_util.get_score_minimum_for_rome(rome_code)
 
-            if score_dpae >= score_minimum_for_rome or rome_code in boosted_romes:
+            if (score_dpae >= score_minimum_for_rome or rome_code in boosted_romes):
+                if office_to_remove_pse:
+                    score_dpae = score_minimum_for_rome
                 if rome_code in scores_by_rome:
                     # this ROME was already computed before for another NAF
                     if score_dpae > scores_by_rome[rome_code]:
