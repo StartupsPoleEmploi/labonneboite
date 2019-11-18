@@ -1,14 +1,25 @@
 # coding: utf-8
 """Machine learning module.
 
-The outside world uses the "run" function which will predict how many hirings a company will make in the next period
-(i.e. 6 months for DPAE and 6 months for Alternance as well).
-and we use a regression model to do so. The predicted number of hirings is then transformed into a "score" value
+The outside world uses the "run" function which will predict how many hirings
+a company will make in the next period
+(i.e. 6 months for DPAE and 6 months for Alternance as well)
+and we use a regression model to do so.
+
+The predicted number of hirings is
+then transformed and obfuscated into a "score" value
 between 0 and 100 for each office ("etablissement").
 
-We train a machine learning algorithm on companies and employment data to create this score.
+We do this because we consider the predicted number of hirings to be a 
+sensitive confidential data, this way, by storing only the obfuscated score in db,
+even if our db gets hacked you cannot transform the score back into their
+corresponding predicted number of hirings.
 
-We use the scikit-learn library : more info http://scikit-learn.org/stable/documentation.html
+We train a machine learning algorithm on companies and employment data to predict
+the number of hirings.
+
+We use the scikit-learn library: more info at
+http://scikit-learn.org/stable/documentation.html
 """
 from calendar import monthrange
 import math
@@ -286,7 +297,9 @@ def get_df_etab_with_hiring_monthly_aggregates(departement, prediction_beginning
 
 
 def compute_prediction_beginning_date():
-    # We predict hirings starting from the 1st of the current month.
+    """
+    We predict hirings starting from the 1st of the current month.
+    """
     now = datetime.now()
     prediction_beginning_date = now.replace(day=1)  # get 1st of the month
     logger.info("prediction_beginning_date = %s", prediction_beginning_date)
@@ -385,7 +398,16 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     """
     Edits in place df_etab by adding final score columns
     (e.g. score and score_regr for DPAE/LBB, or score_alternance and score_alternance_regr for LBA).
-    At this moment df_etab has one row per siret and one column per hiring_type and
+    
+    TODO we should trash the score and score_alternance legacy columns
+    since they come from legacy binary classification model and are no longer
+    used. We now only use score_regr and score_alternance_regr computed
+    by the regression model.
+
+    At the beginning of this method, df_etab has one row per siret and one column per month and
+    per hiring_type.
+
+    At the end of this method df_etab has one row per siret and one column per hiring_type and
     per period (hirings total for given period).
     """
     check_prediction_beginning_date(prediction_beginning_date)
@@ -409,7 +431,12 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
         if data_gap_in_periods <= 0:
             raise ValueError("alternance data should have at least one month of gap")
 
-    total_periods = training_periods + 24 // months_per_period + data_gap_in_periods
+    # Training set is moved 2 years back in time relative to live set,
+    # and testing set is moved 1 year back in time relative to live set.
+    # To understand why check
+    # https://docs.google.com/document/d/1-UqC8wZBhHEgMvzMi0SQamnXvkU6itLwubZiI00yH6E/edit
+    periods_per_year = 12 // months_per_period
+    total_periods = training_periods + 2 * periods_per_year + data_gap_in_periods
 
     # add in place hiring aggregates per period
     compute_hiring_aggregates(
@@ -424,7 +451,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     # We model the problem as a linear regression.
     regr = linear_model.LinearRegression()
 
-    y_train_period = '%s-period-%s' % (prefix_for_fields, 24 // months_per_period)
+    y_train_period = '%s-period-%s' % (prefix_for_fields, 2 * periods_per_year)
     y_train_regr = df_etab.apply(total_hired_period(y_train_period), axis=1)
 
     X_train, X_train_feature_names = get_features_for_lag(
@@ -432,7 +459,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
         prefix_for_fields,
         training_periods,
         data_gap_in_periods,
-        periods_back_in_time=24/months_per_period,
+        periods_back_in_time=2 * periods_per_year,
         debug_msg="X_train",
     )
 
@@ -455,7 +482,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
         prefix_for_fields,
         training_periods,
         data_gap_in_periods,
-        periods_back_in_time=12/months_per_period,
+        periods_back_in_time=periods_per_year,
         debug_msg="X_test",
     )
 
@@ -474,7 +501,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
 
     # --- compute regression metrics
     y_train_regr_pred = regr.predict(X_train)
-    y_test_period = '%s-period-%s' % (prefix_for_fields, 12 // months_per_period)
+    y_test_period = '%s-period-%s' % (prefix_for_fields, periods_per_year)
     y_test_regr = df_etab.apply(total_hired_period(y_test_period), axis=1)
     y_test_regr_pred = regr.predict(X_test)
     rmse_train = mean_squared_error(y_train_regr, y_train_regr_pred)
@@ -591,7 +618,7 @@ def run(
 
     check_prediction_beginning_date(prediction_beginning_date)
     # get df_etab with monthly hirings for each hiring_type
-    # hirings are not yet grouped by period (i.e. 6 months for DPAE / 1 month for Alternance)
+    # hirings are not yet grouped by period (i.e. 6 months for DPAE / 6 months for Alternance)
     df_etab = get_df_etab_with_hiring_monthly_aggregates(departement, prediction_beginning_date)
     logger.debug("df_etab_with_hiring_monthly_aggregates loaded for departement %s", departement)
 
@@ -599,7 +626,7 @@ def run(
         logger.warning("no etab/hiring data found for departement %s", departement)
         return False # failed computation (e.g. no data)
 
-    # DPAE
+    # LBB / DPAE.
 
     train(
         df_etab,
@@ -613,7 +640,7 @@ def run(
     )
     logger.debug("DPAE/LBB training done for departement %s", departement)
 
-    # ALTERNANCE
+    # LBA / Alternance.
 
     train(
         df_etab,
@@ -627,7 +654,7 @@ def run(
     )
     logger.debug("Alternance/LBA training done for departement %s", departement)
 
-    # FINAL
+    # Final data export.
 
     export_df_etab_to_db(df_etab, departement)
     if return_df_etab_if_successful:
