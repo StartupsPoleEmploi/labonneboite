@@ -351,7 +351,10 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
 
             if (score_dpae >= score_minimum_for_rome or rome_code in boosted_romes):
                 if office_to_remove_pse:
-                    score_dpae = score_minimum_for_rome
+                    # 0 as a special score for PSE companies ensures they
+                    # always show up *last* in the results, even after
+                    # results randomization
+                    score_dpae = 0
                 if rome_code in scores_by_rome:
                     # this ROME was already computed before for another NAF
                     if score_dpae > scores_by_rome[rome_code]:
