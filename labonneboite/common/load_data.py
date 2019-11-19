@@ -178,12 +178,20 @@ def load_metiers_tension():
         if tension_pct != '#N/A':
             tension_pct = float(tension_pct)
             if 0 <= tension_pct <= 100:
-                # As a single ROME can have multiple tensions, 
+                # As a single ROME can have multiple tensions,
                 # It has been decided to take the higher tension for a rome
                 rome_to_tension[rome_code] = max(rome_to_tension[rome_code], tension_pct)
             else:
                 raise ValueError
     return rome_to_tension
-    
+
+#Used for PSE study, it returns a list of SIRET that must not b be seen on LBB
+@lru_cache(maxsize=None)
+def load_siret_to_remove():
+    rows = load_csv_file("untreated_BB.csv", ',')
+    sirets_to_remove = load_rows_as_set(rows)
+
+    return sirets_to_remove
+
 OGR_ROME_CODES = load_ogr_rome_mapping()
 ROME_CODES = list(OGR_ROME_CODES.values())
