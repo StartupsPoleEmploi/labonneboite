@@ -33,11 +33,6 @@ def sql_queries():
                             `utm_campaign` text\
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 
-    last_date_query = 'SELECT dateheure \
-                    FROM idpe_connect \
-                    ORDER BY dateheure DESC \
-                    LIMIT 1'
-
     # If a problem occurs during insertion of idpe_connect rows, just drop rows after the last recorded activity :
     #    DELETE
     #    FROM idpe_connect
@@ -47,15 +42,10 @@ def sql_queries():
     engine.execute(create_table_query1)
     engine.execute(create_table_query2)
     engine.execute(create_table_query3)
-    row = engine.execute(last_date_query).fetchone()
-    date_last_recorded_activity = row[0].split()[0]
-    logger.info('The last recorded activity in database is on : {}'.format(
-        date_last_recorded_activity))
     engine.close()
-    return date_last_recorded_activity
 
 
-def parse_activity_logs(date_last_recorded_activity):
+def parse_activity_logs():
     def format_dateheure(row):
         return row['dateheure'].replace('T', ' ').split('.')[0]
 
@@ -74,15 +64,36 @@ def parse_activity_logs(date_last_recorded_activity):
 
     file_used = False
 
+    engine = import_util.create_sqlalchemy_engine()
+
     for json_logs_path in json_logs_paths:
         date = json_logs_path.replace(
             'activity-lbb-', '').replace('.json', '').replace('.', '-')
-        if date >= date_last_recorded_activity:
+
+        date_in_db_query = 'select dateheure\
+                        from activity_logs\
+                        where date(dateheure) = "{}"\
+                        ORDER BY dateheure desc\
+                        LIMIT 1'.format(date)
+
+        row = engine.execute(date_in_db_query).fetchone()
+        
+        logs_in_db = True
+        if row is None:
+            logs_in_db = False
+        else:
+            hour_recorded_activity = int(row[0].split()[1].split(':')[0])
+            if hour_recorded_activity <= 3: #Complètement arbitraire, mais si les logs les plus récents de la journée sont avant 3h du matin, on estime que les logs n'ont pas été parsés 
+                logs_in_db = False
+
+        if not logs_in_db:
             file_used = True
             logger.info('.json file used : {}'.format(json_logs_path))
             with open(json_logs_folder_path+'/'+json_logs_path, 'r') as json_file:
                 for line in json_file:
                     data.append(line)
+
+    engine.close()
 
     if not file_used:
         logger.info("Did not find/need any data to parse")
@@ -214,8 +225,8 @@ def insert_activity_logs_pse(activity_df):
 
 
 def run_main():
-    date_last_recorded_activity = sql_queries()
-    activity_df = parse_activity_logs(date_last_recorded_activity)
+    sql_queries()
+    activity_df = parse_activity_logs()
     insert_activity_logs_pse(activity_df)
     insert_id_peconnect(activity_df)
     insert_activity_logs(activity_df)
