@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 import json
 import types
 
+from functools import wraps
 from slugify import slugify
 
 from flask import abort, make_response, redirect, render_template, request, session, url_for
@@ -32,18 +33,27 @@ searchBlueprint = Blueprint('search', __name__)
 
 
 def js_route(self, rule, **options):
+    """
+    Alternative Bleuprint route, specifically for json responses.
+    Wether this approach is preferable to a simple decorator is debatable,
+    but it's probably the less obtrusive one.
+
+    The decorator factory creates wrappers able to serialize the raw
+    json output and prepare a response with the right json mimetype.
+    """
     def decorator(function):
         endpoint = options.pop("endpoint", function.__name__)
 
-        def decorated_function(*args, **kwargs):
+        @wraps(function)
+        def wrapper(*args, **kwargs):
             raw_response = function(*args, **kwargs)
             response = make_response(json.dumps(raw_response))
             response.mimetype = 'application/json'
             return response
 
-        self.add_url_rule(rule, endpoint, decorated_function, **options)
+        self.add_url_rule(rule, endpoint, wrapper, **options)
 
-        return decorated_function
+        return wrapper
     return decorator
 
 
