@@ -50,43 +50,46 @@
                  {{ form.h }}
                </div>
                <div id="distance-duration-switch"
-                 class="{{ "hidden" if not enable_isochrones else "" }}"
                  data-switch-value-selected="{{ "duration" if duration_filter_enabled else "distance"}}">
-                 <div class="lbb-sidebar-item">
-                   <p>Rayon de recherche</p>
 
-                 </div>
-                 <div class="form-switch">
-                   <div class="switch-element" data-switch-value="distance">km</div><!--
-                    --><div class="switch-element" data-switch-value="duration">min</div>
-                 </div>
+                 {% if enable_isochrones %}
+                   <div class="lbb-sidebar-item">
+                     <p>Rayon de recherche</p>
+                   </div>
+                   <div class="form-switch">
+                     <div class="switch-element" data-switch-value="distance">km</div><!-- This comment should not be removed unless you want to break the switch element.
+                      --><div class="switch-element" data-switch-value="duration">min</div>
+                   </div>
+                   <div class="lbb-sidebar-item" data-switch-display-on="duration">
+                     <p>{{ form.tr.label.text }}</p>
+                     <div class="travelmode-choices">
+                       {% for mode in travel_modes %}
+                         <div class="travelmode-choice">
+                           <a href="#" class="{{ 'visible' if (form.tr.data or form.tr.default) == mode else 'hidden' }}"
+                           data-travelmode='{{ mode }}'>
+                             <img class="img-icon" src="{{ url_for('static', filename='images/icons/travel/' + mode + '-selected.svg') }}" alt="Moyen de transport : {{ travel_modes_french[mode] }}" title="{{ travel_modes_french[mode] }}">
+                           </a>
+                           <a href="#" class="{{ 'hidden' if (form.tr.data or form.tr.default) == mode else 'visible' }}" data-travelmode='{{ mode }}' alt="Sélectionner le mode de transport : {{ travel_modes_french[mode] }}">
+                             <img class="img-icon" src="{{ url_for('static', filename='images/icons/travel/' + mode + '-unselected.svg') }}" alt="Moyen de transport : {{ travel_modes_french[mode] }}" title="{{ travel_modes_french[mode] }}">
+                           </a>
+                           <p>{{ travel_modes_french[mode] }}</p>
+                         </div>
+                       {% endfor %}
+                     </div>
+                     {{ form.tr }}
+                   </div>
+                   <div class="lbb-sidebar-item" data-switch-display-on="duration" id="isochrone-durations">
+                     <p>{{ form.dur.label.text }}</p>
+                     {{ form.dur }}
+                   </div>
+                {% endif %} {# endif enable_isochrones #}
+
                  <div class="lbb-sidebar-item" data-switch-display-on="distance">
                    <p>{{ form.d.label.text }}</p>
                    {{ form.d }}
                  </div>
-                 <div class="lbb-sidebar-item {{ "hidden" if not enable_isochrones else "" }}" data-switch-display-on="duration">
-                   <p>{{ form.tr.label.text }}</p>
-                   <div class="travelmode-choices">
-                     {% for mode in travel_modes %}
-                       <div class="travelmode-choice">
-                         <a href="#" class="{{ 'visible' if (form.tr.data or form.tr.default) == mode else 'hidden' }}"
-                         data-travelmode='{{ mode }}'>
-                           <img class="img-icon" src="{{ url_for('static', filename='images/icons/travel/' + mode + '-selected.svg') }}" alt="Moyen de transport : {{ travel_modes_french[mode] }}" title="{{ travel_modes_french[mode] }}">
-                         </a>
-                         <a href="#" class="{{ 'hidden' if (form.tr.data or form.tr.default) == mode else 'visible' }}" data-travelmode='{{ mode }}' alt="Sélectionner le mode de transport : {{ travel_modes_french[mode] }}">
-                           <img class="img-icon" src="{{ url_for('static', filename='images/icons/travel/' + mode + '-unselected.svg') }}" alt="Moyen de transport : {{ travel_modes_french[mode] }}" title="{{ travel_modes_french[mode] }}">
-                         </a>
-                         <p>{{ travel_modes_french[mode] }}</p>
-                       </div>
-                     {% endfor %}
-                   </div>
-                   {{ form.tr }}
-                 </div>
-                 <div class="lbb-sidebar-item {{ "hidden" if not enable_isochrones else "" }}" data-switch-display-on="duration" id="isochrone-durations">
-                   <p>{{ form.dur.label.text }}</p>
-                   {{ form.dur }}
-                 </div>
                </div>
+               <!-- END DISTANCE DURATION SWITCH -->
                {% if pro_version_enabled %}
                  <div class="lbb-sidebar-item">
                    <p>
@@ -164,7 +167,7 @@
 
         {% for company in companies %}
         <div id="company-{{ company.siret }}" class="lbb-bright-container lbb-result">
-            {% with show_more_info=1 %}
+            {% with show_more_info=1, enable_isochrones=enable_isochrones %}
               {% include "includes/office/header.html" %}
               {% include "includes/office/content.html" %}
             {% endwith %}

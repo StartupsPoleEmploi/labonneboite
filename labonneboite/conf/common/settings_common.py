@@ -165,7 +165,7 @@ GOOGLE_SITE_VERIFICATION_CODE = None
 SCAM_EMAILS_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'scripts', 'scam_emails')
 
 # Isochrones
-ENABLE_ISOCHRONES = True
+ENABLE_ISOCHRONES = False
 
 # Available backends: dummy, ign, navitia
 TRAVEL_VENDOR_BACKENDS = {
