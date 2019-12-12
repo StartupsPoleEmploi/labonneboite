@@ -366,7 +366,11 @@ def social_auth_error(error):
             social_exceptions.AuthStateForbidden,
             social_exceptions.AuthStateMissing,
     )):
-        app.logger.exception(error)
+        pass
+
+    # Temporarily log *all* errors to figure out wth is going on.
+    app.logger.exception(error)
+
     flash(flash_message, 'error')
 
     # If there us a next url in session and it's safe, redirect to it.
