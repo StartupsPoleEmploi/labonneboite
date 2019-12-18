@@ -5,5 +5,5 @@ images_path = root_path + 'images/'
 gd_pub_path = root_path + 'gd_pub/'
 clean_path = root_path +'Clean/'
 
-DEBUG = True
+DEBUG = False
 JOIN_ON_SIREN = True # If False, we join on SIRET
