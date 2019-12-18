@@ -350,7 +350,6 @@ def social_auth_error(error):
     """
     flash_message = "Une erreur est survenue lors de votre connexion. Veuillez réessayer."
 
-    # Don't log errors that are not our responsibility
     if isinstance(error, social_exceptions.AuthFailed) and error.args[0] == 'The request requires some interaction that is not allowed.':
         # We thought user was connected on PE.fr, but in fact he wasn't, so we
         # can't log the user in without interaction
@@ -374,9 +373,8 @@ def social_auth_error(error):
         flash_message += " [Code erreur 008]"
     else:
         flash_message += " [Code erreur 019]"
-
-    # Temporarily log *all* errors to figure out wth is going on.
-    app.logger.exception(error)
+        # Only log errors which are under our responsibility
+        app.logger.exception(error)
 
     flash(flash_message, 'error')
 
