@@ -12,8 +12,7 @@ from labonneboite.scripts.impact_retour_emploi.scripts_charts import fr_charts a
 from labonneboite.scripts.impact_retour_emploi.scripts_charts import grand_public as gd
 from labonneboite.importer import util as import_util
 from labonneboite.importer.jobs.common import logger
-from labonneboite.scripts.impact_retour_emploi.settings_path_charts import root_path, clean_path, gd_pub_path, images_path
-from settings_path_charts import DEBUG, JOIN_ON_SIREN
+from labonneboite.scripts.impact_retour_emploi.settings_path_charts import root_path, clean_path, gd_pub_path, images_path, DEBUG, JOIN_ON_SIREN
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
