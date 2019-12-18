@@ -6,10 +6,15 @@ import pandas as pd
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
+import time
+from settings_path_charts import DEBUG, JOIN_ON_SIREN
+
 
 # TODO : To improve datas about job sector, to have more informations : use code NAF --> Luc Caffier
 
-DEBUG = False
+
+def get_siren(row, id_siret):
+    return row[id_siret][0:8]
 
 
 def get_activity_logs():
@@ -17,12 +22,12 @@ def get_activity_logs():
 
     query = "select * from activity_logs"
     if DEBUG:
-        query += " ORDER BY RAND() LIMIT 1000000"
+        query += " ORDER BY RAND() LIMIT 100"
     df_activity = pd.read_sql_query(query, engine)
 
     engine.close()
 
-    # TODO : Défninir une durée pour laquelle on considère qu'une activité sur LBB 
+    # TODO : Défninir une durée pour laquelle on considère qu'une activité sur LBB
     # n'a pas d'impacts sur le retour à l'emploi
     # Cela permettra de ne pas recharger tous les logs d'activité à chaque fois,
     #  mais uniquement sur une certaine période
@@ -31,14 +36,14 @@ def get_activity_logs():
 
     logger.info('Activities logs are loaded')
 
+    if JOIN_ON_SIREN:
+        df_activity['siren'] = df_activity.apply(
+            lambda row: get_siren(row, 'siret'), axis=1)
+
     return df_activity
 
 
-def join_dpae_activity_logs(df_activity):
-    # function used to create a new column from dateheure column in dpae
-    def get_date(row):
-        return row['kd_dateembauche'][:10]
-
+def get_most_recent_dpae_file():
     dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER+'/'
     dpae_paths = os.listdir(dpae_folder_path)
     # IMPORTANT : Need to copy the DPAE file from /mnt/datalakepe/ to /srv/lbb/data
@@ -51,12 +56,28 @@ def join_dpae_activity_logs(df_activity):
     logger.info("the DPAE file which will be used is : {}".format(
         most_recent_dpae_file))
 
+    return dpae_folder_path, most_recent_dpae_file
+
+
+def join_dpae_activity_logs(df_activity):
+    # function used to create a new column from dateheure column in dpae
+    def get_date(row):
+        return row['kd_dateembauche'][:10]
+
+    dpae_folder_path, most_recent_dpae_file = get_most_recent_dpae_file()
+
     # We select the last DPAE date that has been used in the last joined dpae
     engine = import_util.create_sqlalchemy_engine()
 
-    query = "select date_embauche from act_dpae_clean order by date_embauche DESC LIMIT 1 "
-    row = engine.execute(query).fetchone()
-    date_last_recorded_activity = row[0].split()[0]
+    table_name_act_dpae = 'act_dpae_clean_siren' if JOIN_ON_SIREN is True else 'act_dpae_clean'
+    query = f"SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{table_name_act_dpae}'"
+
+    if engine.execute(query).fetchone()[0] == 1:  # Table existe
+        query = f"select date_embauche from {table_name_act_dpae} order by date_embauche DESC LIMIT 1"
+        row = engine.execute(query).fetchone()
+        date_last_recorded_activity = row[0].split()[0]
+    else:
+        date_last_recorded_activity = "2018-08-31"
 
     logger.info("the most recent date found is {} ".format(
         date_last_recorded_activity))
@@ -65,7 +86,7 @@ def join_dpae_activity_logs(df_activity):
 
     # We use the datas in csv using smaller chunks
     if DEBUG:
-        chunksize = 10 ** 5
+        chunksize = 10 ** 2
     else:
         chunksize = 10 ** 6
     i = 0
@@ -80,9 +101,18 @@ def join_dpae_activity_logs(df_activity):
 
     total_rows_kept = 0
 
-    for df_dpae in pd.read_csv(dpae_folder_path+most_recent_dpae_file,
+    # TODO : remove this line, tmp to try with all data on siren
+    most_recent_dpae_file = "lbb_xdpdpae_delta_201909102200.bz2"
+
+    dpae_file_extension = most_recent_dpae_file.split('.')[-1]
+    if dpae_file_extension == 'csv':
+        compression = 'infer'
+    else:
+        compression = 'bz2'
+
+    for df_dpae in pd.read_csv(dpae_folder_path + most_recent_dpae_file,
                                header=None,
-                               compression='bz2',
+                               compression=compression,
                                names=column_names,
                                sep='|',
                                index_col=False,
@@ -101,11 +131,22 @@ def join_dpae_activity_logs(df_activity):
         # convert df dpae columns to 'object'
         df_dpae = df_dpae.astype(str)
 
+        if JOIN_ON_SIREN:
+            df_dpae['siren'] = df_dpae.apply(
+                lambda row: get_siren(row, 'kc_siret'), axis=1)
+            column_id_join_dpae = 'siren'
+            column_id_join_activity = 'siren'
+        else:
+            column_id_join_dpae = 'kc_siret'
+            column_id_join_activity = 'siret'
+
         df_dpae_act = pd.merge(df_dpae,
                                df_activity,
                                how='left',
-                               left_on=['dc_ididentiteexterne', 'kc_siret'],
-                               right_on=['idutilisateur_peconnect', 'siret'])
+                               left_on=['dc_ididentiteexterne',
+                                        column_id_join_dpae],
+                               right_on=['idutilisateur_peconnect', column_id_join_activity])
+
         logger.info(
             "Sample of merged activity/DPAE has : {} rows".format(df_dpae_act.shape[0]))
 
@@ -116,8 +157,9 @@ def join_dpae_activity_logs(df_activity):
         logger.info(
             "Sample of merged activity/DPAE with the good dates has : {} rows".format(df_dpae_act.shape[0]))
 
-        path_to_csv = dpae_folder_path+'act_dpae.csv'
-        exists = os.path.isfile(path_to_csv)
+        timestr = time.strftime("%Y-%m-%d")
+        path_to_csv = f"{dpae_folder_path}act_dpae-{timestr}.csv"
+        #file_exists = os.path.isfile(path_to_csv)
 
         # We want to rewrite the CSV file after each new execution of DPAE extraction
         if i == 0:
