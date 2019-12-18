@@ -4,7 +4,7 @@ import pandas as pd
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
-from settings_path_charts import DEBUG, JOIN_ON_SIREN
+from labonneboite.scripts.impact_retour_emploi.settings_path_charts import DEBUG, JOIN_ON_SIREN
 
 
 def clean_csv_act_dpae_file():

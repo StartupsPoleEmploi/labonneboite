@@ -7,7 +7,7 @@ from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 import time
-from settings_path_charts import DEBUG, JOIN_ON_SIREN
+from labonneboite.scripts.impact_retour_emploi.settings_path_charts import DEBUG, JOIN_ON_SIREN
 
 
 # TODO : To improve datas about job sector, to have more informations : use code NAF --> Luc Caffier
