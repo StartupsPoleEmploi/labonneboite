@@ -13,21 +13,23 @@ from labonneboite.scripts.impact_retour_emploi.scripts_charts import grand_publi
 from labonneboite.importer import util as import_util
 from labonneboite.importer.jobs.common import logger
 from labonneboite.scripts.impact_retour_emploi.settings_path_charts import root_path, clean_path, gd_pub_path, images_path
+from settings_path_charts import DEBUG, JOIN_ON_SIREN
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 # FIXME : Refacto all files about the creation of charts and pasting on sheets (<3 Joris)
-
+table_name_act_dpae = 'act_dpae_clean_siren' if JOIN_ON_SIREN is True else 'act_dpae_clean'
 
 def get_infos_from_sql():
     #Get all joined activity logs and dpae CLEAN and NO DUPLICATES
     engine = import_util.create_sqlalchemy_engine()
-    query = 'SELECT date_activite, date_embauche, type_contrat, \
+    query = f'SELECT date_activite, date_embauche, type_contrat, \
                     duree_activite_cdd_mois, duree_activite_cdd_jours,\
                     diff_activite_embauche_jrs, dc_lblprioritede,\
                     tranche_age, dc_privepublic, duree_prise_en_charge,\
                     dn_tailleetablissement, code_postal\
-             FROM act_dpae_clean'
+             FROM {table_name_act_dpae}'
+
     df_act_dpae = pd.read_sql_query(query, engine)
 
     # Get the evolution of number of IDPEC which log into LBB
