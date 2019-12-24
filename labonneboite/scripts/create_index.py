@@ -41,7 +41,7 @@ VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main'
 
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 
-PSE_STUDY_IS_ENABLED = True
+PSE_STUDY_IS_ENABLED = False
 
 class Profiling(object):
     ACTIVATED = False
