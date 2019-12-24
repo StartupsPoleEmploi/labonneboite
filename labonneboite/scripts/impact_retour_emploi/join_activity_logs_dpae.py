@@ -14,7 +14,7 @@ from labonneboite.scripts.impact_retour_emploi.settings_path_charts import DEBUG
 
 
 def get_siren(row, id_siret):
-    return row[id_siret][0:8]
+    return str(row[id_siret][0:9])
 
 
 def get_activity_logs():
@@ -24,7 +24,7 @@ def get_activity_logs():
     if DEBUG:
         query += " ORDER BY RAND() LIMIT 100"
     df_activity = pd.read_sql_query(query, engine)
-
+    
     engine.close()
 
     # TODO : Défninir une durée pour laquelle on considère qu'une activité sur LBB
@@ -40,7 +40,8 @@ def get_activity_logs():
         df_activity['siren'] = df_activity.apply(
             lambda row: get_siren(row, 'siret'), axis=1)
 
-    return df_activity
+    return df_activity.astype(str)
+
 
 
 def get_most_recent_dpae_file():
@@ -139,7 +140,7 @@ def join_dpae_activity_logs(df_activity):
         else:
             column_id_join_dpae = 'kc_siret'
             column_id_join_activity = 'siret'
-
+        
         df_dpae_act = pd.merge(df_dpae,
                                df_activity,
                                how='left',
@@ -160,6 +161,8 @@ def join_dpae_activity_logs(df_activity):
         timestr = time.strftime("%Y-%m-%d")
         path_to_csv = f"{dpae_folder_path}act_dpae-{timestr}.csv"
         file_exists = os.path.isfile(path_to_csv)
+
+        df_dpae_act = df_dpae_act.astype(str)
 
         # We want to rewrite the CSV file after each new execution of DPAE extraction
         if i == 0:
