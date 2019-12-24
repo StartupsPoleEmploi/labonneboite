@@ -11,12 +11,15 @@ def clean_csv_act_dpae_file():
 
     dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER + '/'
 
+    #FIXME : trouver le fichier généré d'une autre manière
     timestr = time.strftime("%Y-%m-%d")
     csv_path = f"{dpae_folder_path}act_dpae-{timestr}.csv"
 
     df_dpae_act = pd.read_csv(csv_path,
                               sep='|',
                               header=0)
+
+    df_dpae_act = df_dpae_act.astype(str)
 
     logger.info("The .csv file generated to clean has {} rows".format(
         df_dpae_act.shape[0]))
@@ -134,10 +137,9 @@ def clean_csv_act_dpae_file():
     table_name_act_dpae = 'act_dpae_clean_siren' if JOIN_ON_SIREN is True else 'act_dpae_clean'
     query = f"SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{table_name_act_dpae}'"
 
+    existing_sql_table = False
     if engine.execute(query).fetchone()[0] == 1:  # Table existe
         existing_sql_table = True
-    else:
-        existing_sql_table = False
 
     if existing_sql_table:
 
@@ -146,6 +148,7 @@ def clean_csv_act_dpae_file():
 
         # In case a problem appear in the script, we save old datas under .csv extension
         # because we will rewrite the whole table after each execution, we have to remove duplicates
+        df_dpae_act_existing = df_dpae_act_existing.astype(str)
         df_dpae_act_existing.to_csv(
             f"{dpae_folder_path}backup_sql_{table_name_act_dpae}", encoding='utf-8', sep='|')
         logger.info(
