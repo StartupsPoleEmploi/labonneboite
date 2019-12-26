@@ -6,4 +6,4 @@ gd_pub_path = root_path + 'gd_pub/'
 clean_path = root_path +'Clean/'
 
 DEBUG = False
-JOIN_ON_SIREN = True # If False, we join on SIRET
+JOIN_ON_SIREN = False # If False, we join on SIRET
