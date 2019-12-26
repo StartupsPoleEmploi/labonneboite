@@ -350,23 +350,32 @@ def social_auth_error(error):
     """
     flash_message = "Une erreur est survenue lors de votre connexion. Veuillez réessayer."
 
-    # Don't log errors that are not our responsibility
     if isinstance(error, social_exceptions.AuthFailed) and error.args[0] == 'The request requires some interaction that is not allowed.':
         # We thought user was connected on PE.fr, but in fact he wasn't, so we
         # can't log the user in without interaction
-        pass
+        flash_message += " [Code erreur 001]"
     elif isinstance(error, social_exceptions.AuthForbidden):
         # "Your credentials aren't allowed"
-        pass
-    elif isinstance(error, (social_exceptions.AuthMissingParameter, AuthFailedMissingReturnValues)):
+        flash_message += " [Code erreur 002]"
+    elif isinstance(error, social_exceptions.AuthMissingParameter):
         flash_message = "Veuillez vérifier vos emails et procéder à la validation de votre compte Pôle Emploi."
-    elif not isinstance(error, (
-            social_exceptions.AuthCanceled,
-            social_exceptions.AuthUnreachableProvider,
-            social_exceptions.AuthStateForbidden,
-            social_exceptions.AuthStateMissing,
-    )):
+        flash_message += " [Code erreur 003]"
+    elif isinstance(error, AuthFailedMissingReturnValues):
+        flash_message = "Veuillez vérifier vos emails et procéder à la validation de votre compte Pôle Emploi."
+        flash_message += " [Code erreur 004]"
+    elif isinstance(error, social_exceptions.AuthCanceled):
+        flash_message += " [Code erreur 005]"
+    elif isinstance(error, social_exceptions.AuthUnreachableProvider):
+        flash_message += " [Code erreur 006]"
+    elif isinstance(error, social_exceptions.AuthStateForbidden):
+        flash_message += " [Code erreur 007]"
+    elif isinstance(error, social_exceptions.AuthStateMissing):
+        flash_message += " [Code erreur 008]"
+    else:
+        flash_message += " [Code erreur 019]"
+        # Only log errors which are under our responsibility
         app.logger.exception(error)
+
     flash(flash_message, 'error')
 
     # If there us a next url in session and it's safe, redirect to it.
