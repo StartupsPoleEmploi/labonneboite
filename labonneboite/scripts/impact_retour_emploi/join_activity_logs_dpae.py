@@ -103,7 +103,7 @@ def join_dpae_activity_logs(df_activity):
     total_rows_kept = 0
 
     # TODO : remove this line, tmp to try with all data on siren
-    most_recent_dpae_file = "lbb_xdpdpae_delta_201909102200.bz2"
+    #most_recent_dpae_file = "lbb_xdpdpae_delta_201909102200.bz2"
 
     dpae_file_extension = most_recent_dpae_file.split('.')[-1]
     if dpae_file_extension == 'csv':
