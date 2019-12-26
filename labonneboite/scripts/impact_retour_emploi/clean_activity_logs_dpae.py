@@ -19,7 +19,8 @@ def clean_csv_act_dpae_file():
                               sep='|',
                               header=0)
 
-    df_dpae_act = df_dpae_act.astype(str)
+    df_dpae_act = df_dpae_act.siren.astype(str)
+    df_dpae_act = df_dpae_act.siret.astype(str)
 
     logger.info("The .csv file generated to clean has {} rows".format(
         df_dpae_act.shape[0]))
@@ -148,7 +149,9 @@ def clean_csv_act_dpae_file():
 
         # In case a problem appear in the script, we save old datas under .csv extension
         # because we will rewrite the whole table after each execution, we have to remove duplicates
-        df_dpae_act_existing = df_dpae_act_existing.astype(str)
+        df_dpae_act_existing = df_dpae_act_existing.siren.astype(str)
+        df_dpae_act_existing = df_dpae_act_existing.siret.astype(str)
+
         df_dpae_act_existing.to_csv(
             f"{dpae_folder_path}backup_sql_{table_name_act_dpae}", encoding='utf-8', sep='|')
         logger.info(
