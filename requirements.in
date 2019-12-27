@@ -54,7 +54,7 @@ elasticsearch<2.0.0
 Flask-Login
 social-auth-app-flask-sqlalchemy
 social-auth-app-flask
-social-auth-core[openidconnect]
+social-auth-core[openidconnect]==2.0.0  # 1.4.0 has "AuthCanceled" bug
 
 # Unit tests.
 nose
