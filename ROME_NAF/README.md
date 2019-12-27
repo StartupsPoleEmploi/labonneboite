@@ -1,12 +1,12 @@
 # Rejouer les traitements
 
-Les codes sources de ce répertoires sont écrit en python 3.5.2.
+Les codes sources de ce répertoire sont écrits en python 3.5.2.
 
-Les traitements de ce répertoires font un large usage de notebooks jupyter écrits en python. Un [notebook jupyter](http://jupyter.org/) est un environnement de développement intégré dans un navigateur web, permettant d'exécuter du code par étapes et d'en partager facilement les résultats.
+Les traitements de ce répertoire font un large usage de notebooks jupyter écrits en python. Un [notebook jupyter](http://jupyter.org/) est un environnement de développement intégré dans un navigateur web, permettant d'exécuter du code par étapes et d'en partager facilement les résultats.
 
 Pour installer un serveur jupyter : `pip install jupyter`
 
-Le serveur se lance avec la commande `jupyter notebook`. Le serveur est accessible par défaut à l'adresse `localhost:8888` et il est possible de naviger dans l'arborescence pour atteindre un notebook.
+Le serveur se lance avec la commande `jupyter notebook`. Le serveur est accessible par défaut à l'adresse `localhost:8888` et il est possible de naviguer dans l'arborescence pour atteindre un notebook.
 
 Il est souvent préférable de procéder à l'installation au sein d'un environnement virtuel. Voir par exemple [pew](https://github.com/berdario/pew).
 
@@ -35,7 +35,7 @@ Le script `clean.sh` décompresse, supprime les guillemets, remplace le séparat
 
 Les notebooks `DPAE.ipynb`, `ETT.ipynb`, `offres.ipynb` permettent d'examiner les échantillons des fichiers préparés.
 
-Les notebooks `clean_DPAE.ipynb`, `clean_ETT.ipynb` et `clean_offres.ipynb` ne conservent que les informations utilisées par la suite.  Les fichiers créés `*_clean.csv` contiennent des informations réidentifiantes mais moins sensibles que les fichiers originaux. Une copie de ces fichiers est conservées sur lbbdev:/home/michel/data.
+Les notebooks `clean_DPAE.ipynb`, `clean_ETT.ipynb` et `clean_offres.ipynb` ne conservent que les informations utilisées par la suite.  Les fichiers créés `*_clean.csv` contiennent des informations réidentifiantes mais moins sensibles que les fichiers originaux. Une copie de ces fichiers est conservée sur lbbdev:/home/michel/data.
 
 # Agrégation par code ROME, OGR, NAF
 
@@ -53,7 +53,7 @@ Les tableaux pickles sont examinés dans les notebooks `analyses_*.ipynb`.
 
 # Publication de données en opendata
 
-Les données utilisées ici, les codes sources ainsi que les données produites relèvent pour leur communication et leur réutilisation du cadre juridique établi par le code des relations entre le public et l'administration. En raison du caractère potentiellement utile pour d'autre acteurs, ces travaux font l'objet d'une publication sur la plateforme data.gouv.fr : https://www.data.gouv.fr/fr/datasets/nombre-dembauches-par-code-ape-et-code-rome/
+Les données utilisées ici, les codes sources ainsi que les données produites relèvent pour leur communication et leur réutilisation du cadre juridique établi par le code des relations entre le public et l'administration. En raison du caractère potentiellement utile pour d'autres acteurs, ces travaux font l'objet d'une publication sur la plateforme data.gouv.fr : https://www.data.gouv.fr/fr/datasets/nombre-dembauches-par-code-ape-et-code-rome/
 
 Le notebook `opendata.ipynb` produit un fichier CSV expurgé des données permettant une réidentification d'une entreprise. Pour cela, le notebook `count_SIRENE.ipynb` récupère dans le fichier SIRENE le nombre d'entreprises répertoriées pour chaque code NAF.
 
