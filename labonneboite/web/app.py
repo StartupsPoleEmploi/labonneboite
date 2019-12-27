@@ -364,6 +364,7 @@ def social_auth_error(error):
         flash_message = "Veuillez vérifier vos emails et procéder à la validation de votre compte Pôle Emploi."
         flash_message += " [Code erreur 004]"
     elif isinstance(error, social_exceptions.AuthCanceled):
+        app.logger.exception(error)
         flash_message += " [Code erreur 005]"
     elif isinstance(error, social_exceptions.AuthUnreachableProvider):
         flash_message += " [Code erreur 006]"
