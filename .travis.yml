@@ -9,6 +9,7 @@ addons:
       - libblas-dev
       - liblapack-dev
       - gfortran
+      - libssl-dev
       # chrome is required for selenium testing
       - chromium-chromedriver
 env:
