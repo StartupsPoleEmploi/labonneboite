@@ -14,6 +14,8 @@ RUN apt update && \
         language-pack-fr \
         python3 python3-dev python3-pip \
         tzdata \
+        # dependency required for travis
+        libssl-dev \
         # scipy
         gfortran libblas-dev liblapack-dev libatlas-base-dev \
     && pip3 install virtualenv
