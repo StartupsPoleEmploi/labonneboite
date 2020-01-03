@@ -205,13 +205,18 @@
 
     // Toggle transport icon on click and uncheck already checked duration.
     searchForm.find('[data-travelmode]').on('click', function (e) {
+      // Is Navitia enabled? If not we only have a single travel mode (car)
+      // and thus no switching should ever happen.
+      var publicTravelModeIsEnabled = false;
       e.preventDefault();
-      var travelMode = $(this).attr("data-travelmode");
-      searchForm.find('.travelmode-choice a').toggleClass('hidden');
-      searchForm.find("[name='tr']").attr("value", travelMode);
-      ga('send', 'event', 'Form', 'click', 'travelmode-' + travelMode);
-      if (searchForm.find('#isochrone-durations input').is(':checked')) {
-        searchForm.find('#isochrone-durations input').prop('checked', false);
+      if (publicTravelModeIsEnabled === true) {
+        var travelMode = $(this).attr("data-travelmode");
+        searchForm.find('.travelmode-choice a').toggleClass('hidden');
+        searchForm.find("[name='tr']").attr("value", travelMode);
+        ga('send', 'event', 'Form', 'click', 'travelmode-' + travelMode);
+        if (searchForm.find('#isochrone-durations input').is(':checked')) {
+          searchForm.find('#isochrone-durations input').prop('checked', false);
+        }
       }
     });
 
