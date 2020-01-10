@@ -84,9 +84,9 @@ Clone labonneboite repository:
 
     # On Mac OS:
 
-    # dependencies required for selenium tests
-    $ brew install selenium-server-standalone
-    $ brew tap caskroom/cask && brew install caskroom/cask/chromedriver
+    $ brew install openssl selenium-server-standalone
+    $ brew switch openssl 1.0.2s  # fixes error about libssl 1.0.0 missing
+    $ brew cask install chromedriver
 
 You will also need to install docker and docker-compose. Follow the instructions related to your particular OS from the [official Docker documentation](https://docs.docker.com/install/).
 
