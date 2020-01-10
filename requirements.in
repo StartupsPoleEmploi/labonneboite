@@ -82,6 +82,7 @@ geopy
 
 # Deployment and production
 uWSGI
+uwsgitop
 raven[flask]
 
 # Load testing.
