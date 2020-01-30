@@ -13,7 +13,7 @@ from labonneboite.scripts.impact_retour_emploi.scripts_charts import fr_charts a
 from labonneboite.scripts.impact_retour_emploi.scripts_charts import grand_public as gd
 from labonneboite.importer import util as import_util
 from labonneboite.importer.jobs.common import logger
-from labonneboite.scripts.impact_retour_emploi.settings_path_charts import JOIN_ON_SIREN, SPREADSHEET_ID, ORDERING_COLUMN, TITLE_GOOGLE_SHEET
+from labonneboite.scripts.impact_retour_emploi.settings_path_charts import JOIN_ON_SIREN, SPREADSHEET_ID, ORDERING_COLUMN
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -263,19 +263,19 @@ def write_data_into_sheet(google_service, sheet, df_data):
     df_data = df_data.replace(numpy.nan, '', regex=True)
 
     # Clear sheet
-    range_all = '{0}!A1:Z'.format(sheet['title'])
+    range_all = '{0}!A2:Z'.format(sheet['title'])
     google_service.spreadsheets().values().clear(
         spreadsheetId=SPREADSHEET_ID, range=range_all, body={}).execute()
 
     # Generate title
-    # Calculate range data
-    range_ = sheet['title'] + '!'+'A1:H1'
-    # Define ValueJSON body
-    value_range_body = {'values': TITLE_GOOGLE_SHEET}
-    # Execute update
-    request = google_service.spreadsheets().values().update(
-        spreadsheetId=SPREADSHEET_ID, range=range_, valueInputOption='USER_ENTERED', body=value_range_body)
-    request.execute()
+    # # Calculate range data
+    # range_ = sheet['title'] + '!'+'A1:H1'
+    # # Define ValueJSON body
+    # value_range_body = {'values': TITLE_GOOGLE_SHEET}
+    # # Execute update
+    # request = google_service.spreadsheets().values().update(
+    #     spreadsheetId=SPREADSHEET_ID, range=range_, valueInputOption='USER_ENTERED', body=value_range_body)
+    # request.execute()
 
     # Insert Data
     # Calculate range data

@@ -13,5 +13,3 @@ SPREADSHEET_ID = '1kx-mxCaXIkys3hU4El4K7a6JBwzrdF75X4U8igqLB4I'
 
 ORDERING_COLUMN = ['date_begin', 'date_end', 'count_distinct_idpe',
                    'count_distinct_activity', 'count_postule', 'count_dpae_lbb', 'tre_min', 'tre_max']
-TITLE_GOOGLE_SHEET = [['Date de début', 'Date de fin', 'Nb IDPE unique ayant accédé à LBB', 'Nb IDPE unique ayant cliqué sur Favoris, Télécharger PDF ou déplié une fiche entreprise',
-                       'Nb IDPE ayant candidaté via Je postule', 'Nb DPAE ayant pour origine une activité LBB', 'TRE min', 'TRE max']]
