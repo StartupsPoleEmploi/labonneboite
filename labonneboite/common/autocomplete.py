@@ -7,6 +7,8 @@ from labonneboite.conf import settings
 MAX_JOBS = 10
 MAX_LOCATIONS = 10
 
+# This file is a fallback which uses ES, we normally use the "address API" from beta.gouv.fr
+
 @lru_cache(maxsize=8 * 1024)
 def build_location_suggestions(term):
     if term.strip() == '':
