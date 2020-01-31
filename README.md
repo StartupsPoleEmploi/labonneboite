@@ -133,6 +133,12 @@ This last command will upgrade `mypackagename` and its dependencies to the lates
 
 If needed, run `make clear-data` to clear any old/partial data you might already have.
 
+### Populate Elastic Search
+
+This is required for autocomplete and search to work
+
+    $ make create-index
+
 #### Known issues
 
 You may have to run `sudo usermod -a -G docker $USER`, then reboot your computer to enable the current user to use docker, as the problem is described [here](https://techoverflow.net/2017/03/01/solving-docker-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket/)
@@ -473,6 +479,8 @@ We are also open to comments, questions and contributions from devs outside the 
 ## Je Postule
 
 [_Je Postule_](https://github.com/StartupsPoleEmploi/jepostule) ("I apply") allows job seekers to apply directly and quickly to companies, which in turn can provide quick answers to applications. It can be integrated to many applications, like we did in La Bonne Boite.
+
+In order to link your local instance of labonneboite with a local instance of jepostule, you will need to edit the file `labonneboite/conf/local_settings.py` to override the settings of the section "Je postule" from the file `labonneboite/conf/common/settings_common.py`. In particular you will need to set the client ID and client secret provided by jepostule when you create a client platform as explained in the README section "Create a client platform".
 
 :point_up: If you want to disable Je Postule features in La Bonne Boite, you can do it pretty easily editing the `JEPOSTULE_QUOTA` setting:
 
