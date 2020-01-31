@@ -43,7 +43,7 @@ def load_cities_cache():
     """
     Populates the cities cache with all cities in France (with their geographical coordinates and more).
 
-    The data source is a JSON file that comes from api.gouv.fr's GeoAPI: https://docs.geo.api.gouv.fr
+    The data source is a JSON file that comes from api.gouv.fr's GeoAPI: https://geo.api.gouv.fr/
     The JSON file is generated with the following bash command:
         export URL="https://geo.api.gouv.fr/communes?fields=nom,code,codesPostaux,centre,population&boost=population"
         wget $URL -O cities-`date +%Y-%m-%d`.json
