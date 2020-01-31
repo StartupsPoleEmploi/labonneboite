@@ -66,19 +66,16 @@ Table of contents:
 - [Single ROME versus multi-ROME search](#single-rome-vs-multi-rome-search)
 - [Load testing (API and front end)](#load-testing-apifrontend)
 - [Profiling](#profiling)
+- [How to contribute](#how-to-contribute)
 - [Je Postule](#je-postule)
 - [Further documentation](#further-documentation)
 
 
 ## Install
 
-Clone labonneboite repository:
-
-    $ git clone https://github.com/StartupsPoleEmploi/labonneboite.git
-
 ### Install OS requirements:
 
-    # On Debian-based OS:
+On Debian-based OS:
 
     $ sudo apt-get install -y language-pack-fr git python3 python3-dev python-virtualenv python-pip mysql-server libmysqlclient-dev libncurses5-dev build-essential python-numpy python-scipy python-mysqldb chromium-chromedriver xvfb graphviz htop libblas-dev liblapack-dev libatlas-base-dev gfortran
 
@@ -90,37 +87,16 @@ Clone labonneboite repository:
 
 You will also need to install docker and docker-compose. Follow the instructions related to your particular OS from the [official Docker documentation](https://docs.docker.com/install/).
 
-### Build Python 3.6.8 from source
-
-For now, La Bonne Boite runs in production under Python 3.6.8. You might now have this specific version on your own computer, so you are going to have to create a virtualenv that runs this specific version of Python. Here is the procedure to build python 3.6.8 from source.
-
-Install system requirements for building python from source with all features:
-
-    # On ubuntu
-    sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
-
-Download Python 3.6.8 and decompress the archive:
-
-    wget https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
-    tar xzf Python-3.6.8.tgz
-    cd Python-3.6.8/
-
-Configure, build and install in local folder:
-
-    ./configure --prefix=$(pwd)/build
-    make
-    make install
-
 ### Create a virtualenv for Python 3.6
+
+For now, La Bonne Boite runs in production under Python 3.6.8. You are going to have to create a virtualenv that runs this specific version of Python.
 
 Create an [isolated Python environment](https://virtualenv.pypa.io/), for example using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
 
     $ mkvirtualenv --python=`which python3.6` lbb
     $ workon lbb
 
-### Add `labonneboite` base directory to the Python path
-
-This has to be run only once. One way to do it using `virtualenvwrapper`:
+You might need to add `labonneboite` base directory to the Python path. This has to be run only once. One way to do it using `virtualenvwrapper`:
 
     $ add2virtualenv $PWD
 
@@ -139,32 +115,29 @@ To update your virtualenv, you must then run:
     pip-sync
     python setup.py develop
 
-#### Notes for macOS
-
-If you get a `ld: library not found for -lintl` error when running `pip-sync`, try this fix: `ln -s /usr/local/Cellar/gettext/0.19.8.1/lib/libintl.* /usr/local/lib/`. For more information see [this post](https://github.com/unbit/uwsgi-docs/issues/363).
-
 #### How to upgrade a specific package
 
 To upgrade a package DO NOT EDIT `requirements.txt` DIRECTLY! Instead, run:
 
     pip-compile -o requirements.txt --upgrade-package mypackagename requirements.in
 
-This last command will upgrade `mypackagename` and its dependencies to the
-latest version.
+This last command will upgrade `mypackagename` and its dependencies to the latest version.
 
 ### Start required services (MySQL and Elasticsearch)
 
     $ make services
-
-#### Known issues
-
-You may have to run `sudo usermod -a -G docker $USER`, then reboot your computer to enable the current user to use docker, as the problem is described [here](https://techoverflow.net/2017/03/01/solving-docker-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket/)
 
 ### Create databases and import data
 
     $ make data
 
 If needed, run `make clear-data` to clear any old/partial data you might already have.
+
+#### Known issues
+
+You may have to run `sudo usermod -a -G docker $USER`, then reboot your computer to enable the current user to use docker, as the problem is described [here](https://techoverflow.net/2017/03/01/solving-docker-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket/)
+
+MacOS users, if you get a `ld: library not found for -lintl` error when running `pip-sync`, try this fix: `ln -s /usr/local/Cellar/gettext/0.19.8.1/lib/libintl.* /usr/local/lib/`. For more information see [this post](https://github.com/unbit/uwsgi-docs/issues/363).
 
 ## Launch web app
 
@@ -490,6 +463,12 @@ Here is an example of output:
 
 ![](https://www.evernote.com/l/ABJdN3iVDEJFgLeH2HgHyYOVMjOYK0a30e4B/image.png)
 
+
+## How to contribute
+
+For devs in the core team, this repo follows the [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow). 
+
+We are also open to comments, questions and contributions from devs outside the core dev team! Here is [a document about contributions to this project (in french)](/CONTRIBUTING.md)
 
 ## Je Postule
 
