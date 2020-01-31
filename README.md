@@ -474,6 +474,10 @@ We are also open to comments, questions and contributions from devs outside the 
 
 [_Je Postule_](https://github.com/StartupsPoleEmploi/jepostule) ("I apply") allows job seekers to apply directly and quickly to companies, which in turn can provide quick answers to applications. It can be integrated to many applications, like we did in La Bonne Boite.
 
+In order to link your local instance of labonneboite with a local instance of jepostule, you will need to edit the file `labonneboite/conf/local_settings.py` to override the settings of the section "Je postule" from the file `labonneboite/conf/common/settings_common.py`. In particular you will need to set the client ID and client secret provided by jepostule when you create a client platform as explained in the README section "Create a client platform".
+
+You will also need to populate your Elastic Search local DB with the `make create-index` command.
+
 :point_up: If you want to disable Je Postule features in La Bonne Boite, you can do it pretty easily editing the `JEPOSTULE_QUOTA` setting:
 
 ```
