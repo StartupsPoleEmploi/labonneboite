@@ -64,6 +64,30 @@ def get_infos_from_sql():
 
 def make_google_sheet_data(df_evol_dpae, df_evol_idpe_connect, df_evol_idpe_connect_sign):
 
+    # Brepare main df needed by other df
+    df_by_month = prepare_main_data_frame(
+        df_evol_dpae, df_evol_idpe_connect, df_evol_idpe_connect_sign)
+
+    # Get count by semester
+    df_by_semester = make_google_sheet_data_by_semester(df_by_month)
+
+    # Get count by year
+    df_by_year = make_google_sheet_data_by_year(df_by_month)
+
+    # Get cumulative sum by month
+    df_cumulative_by_month = make_google_sheet_data_cumulative_by_month(
+        df_by_month)
+
+    # Clean df by month
+    df_by_month = clean_main_data_frame(df_by_month)
+
+    return df_by_month, df_by_semester, df_by_year, df_cumulative_by_month
+
+# Build  the main dataframe by month need by the other dataframes
+
+
+def prepare_main_data_frame(df_evol_dpae, df_evol_idpe_connect, df_evol_idpe_connect_sign):
+
     # Join all the data we need
     df_by_month_x1 = df_evol_dpae.set_index('date_month').join(
         df_evol_idpe_connect.set_index('date_month'), how='outer')
@@ -90,35 +114,20 @@ def make_google_sheet_data(df_evol_dpae, df_evol_idpe_connect, df_evol_idpe_conn
 
     df_by_month = df_by_month.sort_values(by=['year', 'month'])
     df_by_month = df_by_month.reset_index(drop=True)
+
+    return df_by_month
+
+# build and format the dataframe for the google sheet by semester
+
+
+def make_google_sheet_data_by_semester(df_by_month):
     # Get count by semester
     df_by_semester = df_by_month.set_index('semester').sum(level='semester')
 
     # Add additionnal column
     df_by_semester.reset_index(inplace=True)
-    date_begin = []
-    date_end = []
-    tre_min = []
-    tre_max = []
-    date_semester = df_by_semester['semester']
-    i = 0
-    while i < len(date_semester):
-        sem, year = date_semester[i].split('-')
-        if sem == '1':  # first semester
-            date_begin.append('01/01/'+year)
-            date_end.append('30/06/'+year)
-        else:
-            date_begin.append('01/07/'+year)
-            date_end.append('31/12/'+year)
-        i += 1
-        gline = str(i+1)
-        tre_min.append('=F'+gline+'/D'+gline)  # Calulating TRE
-        tre_max.append('=F'+gline+'/E'+gline)
-
-    df_by_semester['date_begin'] = date_begin
-    df_by_semester['date_end'] = date_end
-    df_by_semester['tre_min'] = tre_min
-    df_by_semester['tre_max'] = tre_max
-    df_by_semester['count_postule'] = ""  # TODO find a way to get the value
+    df_by_semester = create_columns(
+        'semester', df_by_semester, df_by_semester['semester'])
 
     # Clean unecessary column
     df_by_semester = df_by_semester.drop(columns=['month', 'year', 'semester'])
@@ -126,31 +135,19 @@ def make_google_sheet_data(df_evol_dpae, df_evol_idpe_connect, df_evol_idpe_conn
     # Ordering column
     df_by_semester = df_by_semester.loc[:, ORDERING_COLUMN]
 
+    return df_by_semester
+
+# build and format the dataframe for the google sheet by year
+
+
+def make_google_sheet_data_by_year(df_by_month):
+
     # Get count by year
     df_by_year = df_by_month.set_index('year').sum(level='year')
 
+    # Add additionnal column
     df_by_year.reset_index(inplace=True)
-    date_begin = []
-    date_end = []
-    tre_min = []
-    tre_max = []
-    date_year = df_by_year['year']
-    i = 0
-
-    while i < len(date_year):
-        year = str(date_year[i])
-        i += 1
-        gline = str(i+1)
-        date_begin.append('01/01/'+year)
-        date_end.append('31/12/'+year)
-        tre_min.append('=F'+gline+'/D'+gline)  # Calulating TRE
-        tre_max.append('=F'+gline+'/E'+gline)
-
-    df_by_year['date_begin'] = date_begin
-    df_by_year['date_end'] = date_end
-    df_by_year['tre_min'] = tre_min
-    df_by_year['tre_max'] = tre_max
-    df_by_year['count_postule'] = ""  # TODO find a way to get the value
+    df_by_year = create_columns('year', df_by_year, df_by_year['year'])
 
     # Clean unecessary column
     df_by_year = df_by_year.drop(columns=['year', 'month'])
@@ -158,34 +155,18 @@ def make_google_sheet_data(df_evol_dpae, df_evol_idpe_connect, df_evol_idpe_conn
     # Ordering column
     df_by_year = df_by_year.loc[:, ORDERING_COLUMN]
 
+    return df_by_year
+
+# build and format the dataframe for the google sheet cumulative count by month
+
+
+def make_google_sheet_data_cumulative_by_month(df_by_month):
     # Get cumulative sum by month
     df_cumulative_by_month = df_by_month.set_index('date_month').cumsum()
 
     df_cumulative_by_month.reset_index(inplace=True)
-    date_begin = []
-    date_end = []
-    tre_min = []
-    tre_max = []
-    date_month = df_cumulative_by_month['date_month']
-    i = 0
-    first_month, firt_year = date_month[0].split('-')
-    first_date = '01/'+first_month+'/'+firt_year
-    while i < len(date_month):
-        month, year = date_month[i].split('-')
-        i += 1
-        gline = str(i+1)
-        date_begin.append(first_date)
-        date_end.append(str(calendar.monthrange(
-            int(year), int(month))[1])+'/'+month+'/'+year)
-        tre_min.append('=F'+gline+'/D'+gline)  # Calulating TRE
-        tre_max.append('=F'+gline+'/E'+gline)
-
-    df_cumulative_by_month['date_begin'] = date_begin
-    df_cumulative_by_month['date_end'] = date_end
-    df_cumulative_by_month['tre_min'] = tre_min
-    df_cumulative_by_month['tre_max'] = tre_max
-    # TODO find a way to get the value
-    df_cumulative_by_month['count_postule'] = ""
+    df_cumulative_by_month = create_columns(
+        'cumulative_month', df_cumulative_by_month, df_cumulative_by_month['date_month'])
 
     # Clean unecessary column
     df_cumulative_by_month = df_cumulative_by_month.drop(
@@ -194,35 +175,126 @@ def make_google_sheet_data(df_evol_dpae, df_evol_idpe_connect, df_evol_idpe_conn
     # Ordering column
     df_cumulative_by_month = df_cumulative_by_month.loc[:, ORDERING_COLUMN]
 
+    return df_cumulative_by_month
+
+# Create the colum needed for any sheet (date_begin, date_end, tre_max, and 'count_postule for the moment )
+
+
+def create_columns(type_, df_initial, df_date):
+
+    df_ = df_initial
+
     date_begin = []
     date_end = []
     tre_min = []
     tre_max = []
-    date_month = df_by_month['date_month']
+
     i = 0
-    while i < len(date_month):
-        month, year = date_month[i].split('-')
+    while i < len(df_date):
+        j = i if type_ != 'cumulative_month' else 0
+        date_begin.append(calculate_date_begin(type_, df_date[j]))
+        date_end.append(calculate_date_end(type_, df_date[i]))
         i += 1
         gline = str(i+1)
-        date_begin.append('01/'+month+'/'+year)
-        date_end.append(str(calendar.monthrange(
-            int(year), int(month))[1])+'/'+month+'/'+year)
         tre_min.append('=F'+gline+'/D'+gline)  # Calulating TRE
         tre_max.append('=F'+gline+'/E'+gline)
 
-    df_by_month['date_begin'] = date_begin
-    df_by_month['date_end'] = date_end
-    df_by_month['tre_min'] = tre_min
-    df_by_month['tre_max'] = tre_max
-    df_by_month['count_postule'] = ""  # TODO find a way to get the value
+    df_['date_begin'] = date_begin
+    df_['date_end'] = date_end
+    df_['tre_min'] = tre_min
+    df_['tre_max'] = tre_max
+    # TODO find a way to get the value
+    df_['count_postule'] = ""
+
+    return df_
+
+# Switch to calculat the date of begin depends of type of df
+
+
+def calculate_date_begin(type_, date_):
+
+    switcher = {
+        'semester': switch_semester_begin,
+        'year': swich_year_begin,
+        'cumulative_month': swich_month_begin,
+        'month': swich_month_begin
+    }
+
+    return switcher.get(type_)(type_, date_)
+
+# Rule for calulate the first date of semester
+
+
+def switch_semester_begin(type_, date_):
+    sem, year = date_.split('-')
+    if sem == '1':  # first semester
+        return '01/01/'+year
+    else:
+        return '01/07/'+year
+
+# Rule for calulate the first date of month
+
+
+def swich_month_begin(type_, date_):
+    month, year = date_.split('-')
+    return '01/'+month+'/'+year
+
+# Rule for calulate the first date of year
+
+
+def swich_year_begin(type_, date_):
+    return '01/01/'+str(date_)
+
+# Switch to calculat the date of end depends of type of df
+
+
+def calculate_date_end(type_, date_):
+
+    switcher = {
+        'semester': switch_semester_end,
+        'year': swich_year_end,
+        'cumulative_month': swich_month_end,
+        'month': swich_month_end
+    }
+
+    return switcher.get(type_)(type_, date_)
+
+# Rule for calulate the last date of semester
+
+
+def switch_semester_end(type_, date_):
+    sem, year = date_.split('-')
+    if sem == '1':  # first semester
+        return '30/06/'+year
+    else:
+        return '31/12/'+year
+
+# Rule for calulate the last date of month
+
+
+def swich_month_end(type_, date_):
+    month, year = date_.split('-')
+    return str(calendar.monthrange(int(year), int(month))[1])+'/'+month+'/'+year
+
+# Rule for calulate the last date of year
+
+
+def swich_year_end(type_, date_):
+    return '31/12/'+str(date_)
+
+
+# Clean and format df_by_month
+def clean_main_data_frame(df_by_month):
+
+    df_ = create_columns('month', df_by_month, df_by_month['date_month'])
 
     # Clean unecessary column
-    df_by_month = df_by_month.drop(
+    df_ = df_.drop(
         columns=['semester', 'date_month', 'month', 'year'])
     # Ordering column
-    df_by_month = df_by_month.loc[:, ORDERING_COLUMN]
+    df_ = df_.loc[:, ORDERING_COLUMN]
 
-    return df_by_month, df_by_semester, df_by_year, df_cumulative_by_month
+    return df_
 
 
 def generate_google_sheet_service():
