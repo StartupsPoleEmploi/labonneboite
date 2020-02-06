@@ -1,4 +1,5 @@
-# Authentication system
+# Authentication system (PE Connect / PEAM / SSO)
+
 User instances are stored in the `labonneboite.common.models.auth.User` model.
 
 To handle registration and login of users, we rely on the following tools:
@@ -35,7 +36,7 @@ The whole mecanism is based on Flask sessions:
 - [Flask Quickstart - Sessions](http://flask.pocoo.org/docs/0.12/quickstart/#sessions)
 - [Flask API - Sessions](http://flask.pocoo.org/docs/0.12/api/#sessions)
 
-## PEAM
+## PE Connect / PEAM
 
 PEAM stands for *Pôle Emploi Access Management*. See the [documentation](https://www-r.es-qvr-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/utiliser-les-api/authorization-code-flow.html).
 
@@ -46,6 +47,13 @@ PEAM is built on top of the [OAuth2](https://oauth.net/2/) and [OpenIdConnect](h
 - [OAuth 2 Simplified](https://aaronparecki.com/oauth-2-simplified/)
 - [An Introduction to OAuth 2](https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2)
 - [OpenID Connect explained](https://connect2id.com/learn/openid-connect)
+
+## SSO
+
+If a user visiting LBB is already logged in www.pole-emploi.fr we will detect it via the presence of a `idutkes` cookie. LBB can detect this cookie since the LBB website is technically hosted on a subdomain of pole.emploi.fr (https://labonneboite.pole-emploi.fr/).
+
+We then transparently login this user without any user interaction. See [this code](https://github.com/StartupsPoleEmploi/labonneboite/blob/master/labonneboite/web/static/js/transparent-sso.js). A different non interactive `peam-openidconnect-no-prompt` backend is used for this purpose. A maximum of one SSO attempt per user is made every two hours.
+
 
 ## The PEAM backend for `Python Social Auth`
 
@@ -136,3 +144,4 @@ def register_extensions(flask_app):
 ```
 
 Once the tables were created, a migration file was generated and the code above could be removed.
+
