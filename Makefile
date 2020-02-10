@@ -187,7 +187,7 @@ test-api:
 test-front:
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/web/front
 
-test-web: test-api test-front
+test-web: test-api test-front test-web-integration
 
 test-scripts:
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/scripts

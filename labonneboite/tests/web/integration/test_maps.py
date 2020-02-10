@@ -80,10 +80,10 @@ class DurationsTest(AppTest):
         with mock.patch('labonneboite.common.maps.travel.vendors.backend', return_value=mock_backend):
             with self.test_request_context():
                 rv = self.app.post(url_for('maps.durations'), data=json.dumps({
-                    'origin': [places.metz[0], places.metz[1]],
+                    'origin': str(places.metz[0]) + ',' + str(places.metz[1]),
                     'destinations': [
-                        [places.paris[0], places.paris[1]],
-                        [places.vallouise[0], places.vallouise[1]],
+                        str(places.paris[0]) + ',' + str(places.paris[1]),
+                        str(places.vallouise[0]) + ',' + str(places.vallouise[1]),
                     ],
                     'travel_mode': constants.DEFAULT_TRAVEL_MODE,
                 }), content_type='application/json')
