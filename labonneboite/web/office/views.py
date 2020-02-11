@@ -16,6 +16,8 @@ from labonneboite.common import util
 from labonneboite.common.contact_mode import CONTACT_MODE_STAGES
 from labonneboite.web.utils import fix_csrf_session
 from labonneboite.common.models import Office
+from labonneboite.conf import settings
+from flask import url_for
 
 officeBlueprint = Blueprint('office', __name__)
 
@@ -40,6 +42,7 @@ def details(siret):
         'company': company,
         'rome_code': rome_code,
         'hide_memo_introjs': True,
+        'next_url_modal': url_for('jepostule.application', siret=siret, rome_code=rome_code),
     }
     activity.log(
         event_name='details',
