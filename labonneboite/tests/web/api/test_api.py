@@ -584,6 +584,23 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
 
+    def test_query_by_departement(self):
+        import ipdb; ipdb.set_trace()
+        with self.test_request_context():
+            params = self.add_security_params({
+                'departement': '92',
+                'page': 1,
+                'page_size': 2,
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data.decode())
+            self.assertEqual(data['companies_count'], 1)
+            self.assertEqual(len(data['companies']), 1)
+            self.assertEqual(data['companies'][0]['siret'], '00000000000004')
+
     def test_query_returns_urls_with_rome_code_context(self):
         with self.test_request_context():
             params = self.add_security_params({
