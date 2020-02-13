@@ -521,15 +521,16 @@ def build_json_body_elastic_search(
         }
     })
 
-    filters.append({
-        "geo_distance": {
-            "distance": "%skm" % distance,
-            "locations": {
-                "lat": latitude,
-                "lon": longitude,
+    if latitude is not None and longitude is not None:
+        filters.append({
+            "geo_distance": {
+                "distance": "%skm" % distance,
+                "locations": {
+                    "lat": latitude,
+                    "lon": longitude,
+                }
             }
-        }
-    })
+        })
 
     if departments:
         filters.append({
@@ -545,7 +546,7 @@ def build_json_body_elastic_search(
             }
         })
 
-    if duration is not None:
+    if duration is not None and latitude is not None and longitude is not None:
         isochrone = travel.isochrone((latitude, longitude), duration, mode=travel_mode)
         if isochrone:
             for polygon in isochrone:
@@ -663,7 +664,15 @@ def build_json_body_elastic_search(
         # always show boosted offices first then sort by randomized score
         sort_attrs.append(boosted_romes_sort)
         sort_attrs.append(randomized_score_sort)
-        sort_attrs.append(distance_sort)  # required so that office distance can be extracted and displayed on frontend
+        if latitude is not None and longitude is not None:
+            sort_attrs.append(distance_sort)  # required so that office distance can be extracted and displayed on frontend
+        else:
+            sort_attrs.append({
+                "department": {
+                    "order": "asc",
+                }
+            })
+
     elif sort == sorting.SORT_FILTER_DISTANCE:
         # no randomization nor boosting happens when sorting by distance
         sort_attrs.append(distance_sort)
@@ -674,7 +683,7 @@ def build_json_body_elastic_search(
     }
 
     # Add aggregate
-    if aggregate_by:
+    if aggregate_by and latitude is not None and longitude is not None:
 
         json_body['aggs'] = {}
         for aggregate in aggregate_by:
@@ -708,6 +717,7 @@ def build_json_body_elastic_search(
                 logger.exception("to_number < from_number : %s < %s", to_number, from_number)
                 raise Exception("to_number < from_number")
             json_body["size"] = to_number - from_number + 1
+
 
     return json_body
 
@@ -780,7 +790,7 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         if len(es_office["sort"]) != sort_fields_total:
             raise ValueError("Incorrect number of sorting fields in ES response.")
         # Add an extra `distance` attribute with one digit.
-        office.distance = round(es_office["sort"][distance_sort_index], 1)
+        # office.distance = round(es_office["sort"][distance_sort_index], 1)
         # position is later used in labonneboite/web/static/js/results.js
         office.position = position
 

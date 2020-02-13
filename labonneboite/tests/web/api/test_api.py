@@ -582,13 +582,14 @@ class ApiCompanyListTest(ApiBaseTest):
             data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
-            self.assertEqual(data['companies'][0]['siret'], '00000000000004')
+            self.assertEqual(data['companies'][0]['siret'], '00000000000001')
+            # self.assertEqual(data['companies'][0]['department'], '14')
 
     def test_query_by_departement(self):
-        import ipdb; ipdb.set_trace()
+        # import ipdb; ipdb.set_trace()
         with self.test_request_context():
             params = self.add_security_params({
-                'departement': '92',
+                'departments': '14,57,75,92',
                 'page': 1,
                 'page_size': 2,
                 'rome_codes': 'D1405',

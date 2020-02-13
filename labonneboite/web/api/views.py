@@ -94,13 +94,14 @@ def offers_offices_list():
 # to our retrocompatibility standard.
 
 
+#######
 @apiBlueprint.route('/company/')
 @api_auth_required
 @cross_origin()
 def company_list():
 
     try:
-        location, zipcode, commune_id = get_location(request.args)
+        location, zipcode, commune_id, departements = get_location(request.args)
         fetcher = create_hidden_market_fetcher(location, request.args)
     except InvalidFetcherArgument as e:
         return response_400(e)
@@ -108,7 +109,7 @@ def company_list():
 
     offices, _ = fetcher.get_offices(add_suggestions=False)
 
-    result = build_result(fetcher, offices, commune_id, zipcode)
+    result = build_result(fetcher, offices, departements, commune_id, zipcode)
 
     activity.log_search(
         sirets=[office.siret for office in offices],
@@ -116,6 +117,7 @@ def company_list():
         source='api',
         naf=fetcher.naf_codes,
         localisation={
+            'departements': departements,
             'codepostal': zipcode,
             'latitude': location.latitude,
             'longitude': location.longitude,
@@ -265,10 +267,12 @@ def get_location(request_args):
         location (Location)
         zipcode (str)
         commune_id (str)
+        departements (str)
     """
     location = None
     zipcode = None
     commune_id = None
+    departements = None
 
     # Commune_id or longitude/latitude
     if 'commune_id' in request_args:
@@ -278,6 +282,7 @@ def get_location(request_args):
             raise InvalidFetcherArgument('could not resolve latitude and longitude from given commune_id')
         latitude = city['coords']['lat']
         longitude = city['coords']['lon']
+        location = Location(latitude, longitude)
         zipcode = city['zipcode']
     elif 'latitude' in request_args and 'longitude' in request_args:
         if not request_args.get('latitude') or not request_args.get('longitude'):
@@ -286,13 +291,18 @@ def get_location(request_args):
         try:
             latitude = float(request_args['latitude'])
             longitude = float(request_args['longitude'])
+            location = Location(latitude, longitude)
         except ValueError:
             raise InvalidFetcherArgument('latitude and longitude must be float')
+    elif 'departments' in request_args:
+        location = Location(None, None)
     else:
         raise InvalidFetcherArgument('missing arguments: either commune_id or latitude and longitude')
 
-    location = Location(latitude, longitude)
-    return location, zipcode, commune_id
+    if 'departments' in request_args:
+        departements = request_args.get('departments')
+
+    return location, zipcode, commune_id, departements
 
 
 def create_visible_market_fetcher(request_args):
@@ -364,6 +374,9 @@ def create_hidden_market_fetcher(location, request_args):
         sort = request_args.get('sort')
         if sort not in sorting.SORT_FILTERS:
             raise InvalidFetcherArgument('sort. Possible values : %s' % ', '.join(sorting.SORT_FILTERS))
+    if sort != sorting.SORT_FILTER_SCORE and location.latitude is None and location.longitude is None:
+        raise InvalidFetcherArgument('sort. Only possible value with departement search is : %s' % sorting.SORT_FILTER_SCORE)
+
     kwargs['sort'] = sort
 
     # Rome_code
