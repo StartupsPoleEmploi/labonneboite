@@ -7,25 +7,20 @@ from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 
 
-class NoDataException(Exception):
-    pass
+def create_table_queries():
+    '''Init function which will create tables in the database if they don't exist
+    '''
 
-
-def sql_queries():
-    create_table_query1 = 'CREATE TABLE IF NOT EXISTS `idpe_connect` ( \
+    #Create the table that will store into database the idpeconnect
+    create_table_query1 = 'CREATE TABLE IF NOT EXISTS `logs_idpe_connect` ( \
                                 `idutilisateur_peconnect` text, \
                                 `dateheure` text \
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 
-    create_table_query2 = 'CREATE TABLE IF NOT EXISTS `activity_logs` ( \
+    #Create the table that will store into database the activity logs
+    create_table_query2 = 'CREATE TABLE IF NOT EXISTS `logs_activity` ( \
                             `dateheure` text,\
                             `nom` text,\
-                            `idutilisateur_peconnect` text,\
-                            `siret` text\
-                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
-
-    create_table_query3 = 'CREATE TABLE IF NOT EXISTS `activity_logs_pse` ( \
-                            `dateheure` text,\
                             `idutilisateur_peconnect` text,\
                             `siret` text,\
                             `utm_medium` text,\
@@ -33,10 +28,14 @@ def sql_queries():
                             `utm_campaign` text\
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 
-    # If a problem occurs during insertion of idpe_connect rows, just drop rows after the last recorded activity :
-    #    DELETE
-    #    FROM idpe_connect
-    #    WHERE dateheure > '2019-05-28 01:59:40'
+    #Create the table that will store into database the activity logs
+    create_table_query3 = 'CREATE TABLE IF NOT EXISTS `logs_activity_recherche` ( \
+                            `dateheure` text,\
+                            `idutilisateur_peconnect` text,\
+                            `ville` text,\
+                            `code_postal` text,\
+                            `emploi` text\
+                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 
     engine = import_util.create_sqlalchemy_engine()
     engine.execute(create_table_query1)
@@ -44,193 +43,241 @@ def sql_queries():
     engine.execute(create_table_query3)
     engine.close()
 
+## Functions used by pandas to create new fields based on other fields, in the dataframe
+def siret(row):
+    return row['proprietes']['siret']
 
-def parse_activity_logs():
-    def format_dateheure(row):
-        return row['dateheure'].replace('T', ' ').split('.')[0]
+def format_dateheure(row):
+    return row['dateheure'].replace('T', ' ').split('.')[0]
 
-    def get_dateheure(row):
-        return row['dateheure'].split()[0]
+def get_date(row):
+    return row['dateheure'].split()[0]
 
-    data = []
+def get_propriete(row, key, key2=None):
+    value = None
+    if key in row['proprietes']:
+        if key2 is not None:
+            if key2 in row['proprietes'][key]:
+                value = row['proprietes'][key][key2]
+        else:
+            value = row['proprietes'][key]
 
-    # FIXME : Later, we'll be able to get datas, directly from PE datalake
-    # Now we have a cron task which will copy json activity logs to /srv/lbb/data
-    json_logs_folder_path = importer_settings.INPUT_SOURCE_FOLDER
-    json_logs_paths = os.listdir(json_logs_folder_path)
-    json_logs_paths = [i for i in json_logs_paths if i.startswith('activity')]
+    return value
 
-    logger.info('.json files found : {}'.format(json_logs_paths))
+class NoDataException(Exception):
+    pass
 
-    file_used = False
+class ActivityLog:
 
-    engine = import_util.create_sqlalchemy_engine()
+    def __init__(self):
+        self.json_logs_folder_path = importer_settings.INPUT_SOURCE_FOLDER
+        self.json_logs_files_names_to_parse = self.get_json_logs_activity()
 
-    for json_logs_path in json_logs_paths:
-        date = json_logs_path.replace(
+    def get_json_logs_activity(self):
+        '''Function which will return a list with all file names of activity logs that need to be parsed
+        '''
+        # FIXME : Later, we'll be able to get datas, directly from PE datalake
+        # Now we have a cron task which will copy json activity logs to /srv/lbb/data
+        
+        data = []
+
+        #path of folder which stores all the activityXXX.json
+        
+        #list of all the json activities files
+        json_logs_files_names = [i for i in os.listdir(self.json_logs_folder_path) if i.startswith('activity')]
+
+        #list of all the json activities that need to be parsed (which aren't stored in database)
+        json_logs_files_names_to_parse = [file_name for file_name in json_logs_files_names if self.needs_parse_json_activity_log(file_name)]
+
+        if len(json_logs_files_names_to_parse) == 0:
+            logger.info("Did not find/need any data to parse")
+            raise NoDataException
+
+        logger.info('.json files to parse : {}'.format(json_logs_files_names_to_parse))
+
+        return json_logs_files_names_to_parse
+
+    def needs_parse_json_activity_log(self, json_file_name):
+        '''Function which takes one json file name and check if it needs to be parsed and saved in database
+        '''
+
+        #json_file_name is format : activity-lbb-2019.09.13.json
+        date = json_file_name.replace(
             'activity-lbb-', '').replace('.json', '').replace('.', '-')
 
         date_in_db_query = 'select dateheure\
-                        from activity_logs\
+                        from logs_activity\
                         where date(dateheure) = "{}"\
                         ORDER BY dateheure desc\
                         LIMIT 1'.format(date)
 
+        engine = import_util.create_sqlalchemy_engine()         
         row = engine.execute(date_in_db_query).fetchone()
+        engine.close()
         
-        logs_in_db = True
+        file_needs_to_be_parsed = False
         if row is None:
-            logs_in_db = False
+            file_needs_to_be_parsed = True
         else:
+            #we check the last hour of the activity logs in database
             hour_recorded_activity = int(row[0].split()[1].split(':')[0])
-            if hour_recorded_activity <= 3: #Complètement arbitraire, mais si les logs les plus récents de la journée sont avant 3h du matin, on estime que les logs n'ont pas été parsés 
-                logs_in_db = False
+            #if the most recent hour in the database for the logs is before 3am, the file needs to be parsed
+            if hour_recorded_activity <= 3:
+                file_needs_to_be_parsed = True
 
-        if not logs_in_db:
-            file_used = True
-            logger.info('.json file used : {}'.format(json_logs_path))
-            with open(json_logs_folder_path+'/'+json_logs_path, 'r') as json_file:
-                for line in json_file:
-                    data.append(line)
+        return file_needs_to_be_parsed
 
-    engine.close()
+    def save_logs_activity(self):
+        '''
+           Main function which will take the list of all json files,
+           create a dataframe from it,
+           and which, from the dataframe, save data in the 3 tables created above
+        '''
+        for file_name in self.json_logs_files_names_to_parse:
 
-    if not file_used:
-        logger.info("Did not find/need any data to parse")
-        raise NoDataException
+            #Create dataframe from json file
+            logger.info(f'activity dataframe for file {file_name}: start')
+            activity_df = self.get_activity_log_dataframe(file_name)
+            logger.info(f'activity dataframe for file {file_name}: end')
+            
+            #Insert into idpeconnect
+            logger.info(f'Insert into idepeconnect for file {file_name}: start')
+            self.insert_id_peconnect(activity_df)
+            logger.info(f'Insert into idepeconnect for file {file_name}: end')
+            
+            #Insert into logs_activity
+            logger.info(f'Insert into logs_activity for file {file_name}: start')
+            self.insert_logs_activity(activity_df)
+            logger.info(f'Insert into logs_activity for file {file_name}: end')
 
-    activities = {}
-    i = 1
-    for activity in data:
-        activities[str(i)] = json.loads(activity)
-        i += 1
+            #Insert into logs_activity_recherche
+            logger.info(f'Insert into logs_activity_recherche for file {file_name}: start')
+            self.insert_logs_activity_recherche(activity_df)
+            logger.info(f'Insert into logs_activity_recherche for file {file_name}: end')
 
-    activity_df = pd.DataFrame.from_dict(activities).transpose()
+    def get_activity_log_dataframe(self, json_file_name):
+        '''Function which will transform a json file, into a pandas dataframe
+        '''
+        data = []
 
-    # FIXME : Change the names of mysql column instead of renaming here
-    activity_df.rename(
-        columns={'idutilisateur-peconnect': 'idutilisateur_peconnect'}, inplace=True)
+        # Chargement des logs json dans une liste
+        with open(f'{self.json_logs_folder_path}/{json_file_name}', 'r') as json_file:
+            for line in json_file:
+                data.append(line)
+        
+        activities_logs_lines = {}
+        i = 1
+        for activity_log_line in data:
+            activities_logs_lines[str(i)] = json.loads(activity_log_line)
+            i += 1
+        
+        activity_df = pd.DataFrame.from_dict(activities_logs_lines).transpose()
+        activity_df['dateheure'] = activity_df.apply(lambda row: format_dateheure(row), axis=1)
+        activity_df['date'] = activity_df.apply(lambda row: get_date(row), axis=1)
+        activity_df.rename(columns={'idutilisateur-peconnect': 'idutilisateur_peconnect'}, inplace=True)
 
-    activity_df['dateheure'] = activity_df.apply(
-        lambda row: format_dateheure(row), axis=1)
-
-    activity_df['date'] = activity_df.apply(
-        lambda row: get_dateheure(row), axis=1)
-
-    logger.info('activity dataframe OK')
-
-    return activity_df
-
-
-def insert_id_peconnect(activity_df):
-
-    activity_df = activity_df.dropna(
-        axis=0, subset=['idutilisateur_peconnect'])
-
-    activity_idpec = activity_df.drop_duplicates(
-        subset=['idutilisateur_peconnect', 'date'], keep='first')
-
-    activity_idpec = activity_idpec[[
-        'dateheure', 'idutilisateur_peconnect']]
-
-    engine = import_util.create_sqlalchemy_engine()
-
-    nb_lines = activity_idpec.shape[0]
-    logger.info('Number of lines to insert into idpec : {}'.format(nb_lines))
-
-    activity_idpec.to_sql(
-        con=engine, name='idpe_connect', if_exists='append', index=False, chunksize=10000)
-
-    engine.close()
-
-    logger.info('insert into idpe_connect OK')
+        return activity_df
 
 
-def siret(row):
-    return row['proprietes']['siret']
+    def insert_id_peconnect(self, activity_df):
+        
+        activity_df = activity_df.dropna(axis=0, subset=['idutilisateur_peconnect'])
+        activity_idpec = activity_df.drop_duplicates(subset=['idutilisateur_peconnect', 'date'], keep='first')
+        activity_idpec = activity_idpec[['dateheure', 'idutilisateur_peconnect']]
+
+        nb_lines = activity_idpec.shape[0]
+        logger.info(f'Number of lines to insert into idpec : {nb_lines}')
+
+        engine = import_util.create_sqlalchemy_engine()
+        activity_idpec.to_sql(
+            con=engine, 
+            name='logs_idpe_connect', 
+            if_exists='append', 
+            index=False, 
+            chunksize=10000
+        )
+        engine.close()
+
+    def insert_logs_activity(self, activity_df):
+        
+        clics_of_interest = ['details', 'afficher-details', 'telecharger-pdf', 'ajout-favori']
+
+        logs_activity_df = activity_df[activity_df['nom'].isin(clics_of_interest)]
+
+        logs_activity_df['siret'] = logs_activity_df.apply(lambda row: siret(row), axis=1)
+        logs_activity_df['utm_medium'] = logs_activity_df.apply(lambda row: get_propriete(row, 'utm_medium'), axis=1)
+        logs_activity_df['utm_source'] = logs_activity_df.apply(lambda row: get_propriete(row, 'utm_source'), axis=1)
+        logs_activity_df['utm_campaign'] = logs_activity_df.apply(lambda row: get_propriete(row, 'utm_campaign'), axis=1)
+        
+        #TODO : Remove the logs without idpeconnect, except the ones related to PSE, or the one we want to keep
+        cols_of_interest = [
+            "dateheure", 
+            "nom", 
+            "idutilisateur_peconnect", 
+            "siret",
+            "utm_medium",
+            "utm_source",
+            "utm_campaign",
+        ]
+
+        logs_activity_df = logs_activity_df[cols_of_interest]
+
+        nb_lines = logs_activity_df.shape[0]
+        logger.info(f'Number of lines to insert into logs_activity : {nb_lines}')
 
 
-def insert_activity_logs(activity_df):
-    activity_df = activity_df.dropna(
-        axis=0, subset=['idutilisateur_peconnect'])
+        engine = import_util.create_sqlalchemy_engine()
+        
+        logs_activity_df.to_sql(
+            con=engine, 
+            name='logs_activity',
+            if_exists='append', 
+            index=False, 
+            chunksize=10000
+        )
 
-    clics_of_interest = ['details', 'afficher-details',
-                         'telecharger-pdf', 'ajout-favori']
+        engine.close()
 
-    activity_logs_df = activity_df[activity_df['nom'].isin(clics_of_interest)]
+    def insert_logs_activity_recherche(self, activity_df):
 
-    activity_logs_df['siret'] = activity_logs_df.apply(
-        lambda row: siret(row), axis=1)
+        logs_activity_df = activity_df[activity_df['nom'] == 'recherche']
 
-    cols_of_interest = ["dateheure", "nom", "idutilisateur_peconnect", "siret"]
+        logs_activity_df['ville'] = logs_activity_df.apply(lambda row: get_propriete(row, 'localisation','ville'), axis=1)        
+        logs_activity_df['code_postal'] = logs_activity_df.apply(lambda row: get_propriete(row, 'localisation','codepostal'), axis=1)
+        logs_activity_df['emploi'] = logs_activity_df.apply(lambda row: get_propriete(row, 'emploi'), axis=1)
+        
+        #TODO : Find a way to concatenate logs, because too many
 
-    activity_logs_df = activity_logs_df[cols_of_interest]
+        cols_of_interest = [
+            "dateheure", 
+            "idutilisateur_peconnect", 
+            "ville",
+            "code_postal",
+            "emploi",
+        ]
 
-    engine = import_util.create_sqlalchemy_engine()
+        logs_activity_df = logs_activity_df[cols_of_interest]
 
-    nb_lines = activity_logs_df.shape[0]
-    logger.info(
-        'Number of lines to insert into activity logs : {}'.format(nb_lines))
-
-    activity_logs_df.to_sql(con=engine, name='activity_logs',
-                            if_exists='append', index=False, chunksize=10000)
-
-    engine.close()
-
-    logger.info('insert into activity_logs OK')
+        nb_lines = logs_activity_df.shape[0]
+        logger.info(f'Number of lines to insert into logs_activity_recherche : {nb_lines}')
 
 
-def insert_activity_logs_pse(activity_df):
+        engine = import_util.create_sqlalchemy_engine()
+        
+        logs_activity_df.to_sql(
+            con=engine, 
+            name='logs_activity_recherche',
+            if_exists='append', 
+            index=False, 
+            chunksize=10000
+        )
 
-    activity_df = activity_df[activity_df['nom'].isin(['details'])]
-
-    activity_df['siret'] = activity_df.apply(
-        lambda row: siret(row), axis=1)
-
-    def utm(row, key):
-        value = None
-        if key in row['proprietes']:
-            value = row['proprietes'][key]
-
-        return value
-
-    activity_df['utm_medium'] = activity_df.apply(
-        lambda row: utm(row, 'utm_medium'), axis=1)
-
-    activity_df['utm_source'] = activity_df.apply(
-        lambda row: utm(row, 'utm_source'), axis=1)
-
-    activity_df['utm_campaign'] = activity_df.apply(
-        lambda row: utm(row, 'utm_campaign'), axis=1)
-
-    activity_df = activity_df[activity_df.utm_medium == "mailing"]
-
-    cols_of_interest = ["dateheure", "idutilisateur_peconnect",
-                        "siret", "utm_medium", "utm_source", "utm_campaign"]
-
-    activity_df = activity_df[cols_of_interest]
-
-    engine = import_util.create_sqlalchemy_engine()
-
-    nb_lines = activity_df.shape[0]
-    logger.info(
-        'Number of lines to insert into activity logs PSE : {}'.format(nb_lines))
-
-    activity_df.to_sql(con=engine, name='activity_logs_pse',
-                       if_exists='append', index=False, chunksize=10000)
-
-    engine.close()
-
-    logger.info('insert into activity_logs PSE OK')
-
+        engine.close()
 
 def run_main():
-    sql_queries()
-    activity_df = parse_activity_logs()
-    insert_activity_logs_pse(activity_df)
-    insert_id_peconnect(activity_df)
-    insert_activity_logs(activity_df)
-
+    create_table_queries()
+    activity_log = ActivityLog()
+    activity_log.save_logs_activity()
 
 if __name__ == '__main__':
     run_main()

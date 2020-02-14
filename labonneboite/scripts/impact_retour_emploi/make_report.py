@@ -5,8 +5,6 @@ from os import makedirs, remove, listdir
 import os.path
 from datetime import date
 import pandas as pd
-import openpyxl
-import openpyxl.styles
 from sqlalchemy import create_engine
 from labonneboite.scripts.impact_retour_emploi.scripts_charts import charts as charts
 from labonneboite.scripts.impact_retour_emploi.scripts_charts import fr_charts as fr
