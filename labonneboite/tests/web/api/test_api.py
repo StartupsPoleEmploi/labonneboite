@@ -585,11 +585,12 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][0]['siret'], '00000000000001')
             # self.assertEqual(data['companies'][0]['department'], '14')
 
+    # test 1 dpt without geoloc
     def test_query_by_departement(self):
         # import ipdb; ipdb.set_trace()
         with self.test_request_context():
             params = self.add_security_params({
-                'departments': '14,57,75,92',
+                'departments': '14',
                 'page': 1,
                 'page_size': 2,
                 'rome_codes': 'D1405',
@@ -601,6 +602,75 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
+
+    # test several dpt without geoloc
+    def test_query_by_multiple_departements(self):
+        # import ipdb; ipdb.set_trace()
+        with self.test_request_context():
+            params = self.add_security_params({
+                'departments': '14,57',
+                'page': 1,
+                'page_size': 2,
+                'rome_codes': 'D1405,D1211',
+                'user': 'labonneboite',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data.decode())
+            self.assertEqual(data['companies_count'], 2)
+            self.assertEqual(data['companies'][0]['siret'], '00000000000004')
+
+    # test dpt+geoloc (case labonneformation)
+    def test_query_by_departement_geoloc(self):
+        # import ipdb; ipdb.set_trace()
+        with self.test_request_context():
+            params = self.add_security_params({
+                'distance': 50,
+                'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
+                'longitude': self.positions['bayonville_sur_mad']['coords'][0]['lon'],
+                'departments': '57',
+                'page': 1,
+                'page_size': 2,
+                'rome_codes': 'D1405,D1211',
+                'user': 'labonneboite',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data.decode())
+            self.assertEqual(data['companies_count'], 1)
+            self.assertEqual(data['companies'][0]['siret'], '00000000000007')
+
+    # test dpt without geoloc with distance sort
+    def test_query_by_departement_invalid_query_sort(self):
+        # import ipdb; ipdb.set_trace()
+        with self.test_request_context():
+            params = self.add_security_params({
+                'departments': '14',
+                'sort': 'distance',
+                'page': 1,
+                'page_size': 2,
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 400)
+            self.assertTrue(rv.data.decode().startswith('Invalid request argument'))
+
+    # test dpt without geoloc with distance filter
+    def test_query_by_departement_invalid_query_filter(self):
+        # import ipdb; ipdb.set_trace()
+        with self.test_request_context():
+            params = self.add_security_params({
+                'departments': '14',
+                'distance': 50,
+                'page': 1,
+                'page_size': 2,
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 400)
+            self.assertTrue(rv.data.decode().startswith('Invalid request argument'))
 
     def test_query_returns_urls_with_rome_code_context(self):
         with self.test_request_context():

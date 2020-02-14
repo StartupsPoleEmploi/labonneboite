@@ -46,7 +46,9 @@ class HiddenMarketFetcher(Fetcher):
 
     def __init__(
         self,
-        search_location,
+        longitude,
+        latitude,
+        departments,
         romes=None,
         distance=None,
         duration=None,
@@ -60,10 +62,10 @@ class HiddenMarketFetcher(Fetcher):
         naf=None,
         naf_codes=None,
         aggregate_by=None,
-        departments=None,
         flag_pmsmp=None,
     ):
-        self.location = search_location
+        self.latitude = latitude
+        self.longitude = longitude
 
         self.romes = romes
         self.distance = distance
@@ -125,8 +127,8 @@ class HiddenMarketFetcher(Fetcher):
         return count_offices(
             self.naf_codes,
             rome_codes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             distance,
             duration=self.duration,
             travel_mode=self.travel_mode,
@@ -145,8 +147,8 @@ class HiddenMarketFetcher(Fetcher):
         _, _, aggregations = fetch_offices(
             {},  # No naf filter
             self.romes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             self.distance,
             duration=self.duration,
             travel_mode=self.travel_mode,
@@ -165,8 +167,8 @@ class HiddenMarketFetcher(Fetcher):
         _, _, aggregations = fetch_offices(
             self.naf_codes,
             self.romes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             self.distance,
             duration=self.duration,
             travel_mode=self.travel_mode,
@@ -190,8 +192,8 @@ class HiddenMarketFetcher(Fetcher):
         total_dpae = count_offices(
             self.naf_codes,
             self.romes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             self.distance,
             duration=self.duration,
             travel_mode=self.travel_mode,
@@ -207,8 +209,8 @@ class HiddenMarketFetcher(Fetcher):
         total_alternance = count_offices(
             self.naf_codes,
             self.romes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             self.distance,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
@@ -225,8 +227,8 @@ class HiddenMarketFetcher(Fetcher):
         _, _, aggregations = fetch_offices(
             self.naf_codes,
             self.romes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             DISTANCE_FILTER_MAX,  # France
             duration=self.duration,
             travel_mode=self.travel_mode,
@@ -267,8 +269,8 @@ class HiddenMarketFetcher(Fetcher):
             result, _, aggregations = fetch_offices(
                 self.naf_codes,
                 self.romes,
-                self.location.latitude,
-                self.location.longitude,
+                self.latitude,
+                self.longitude,
                 self.distance,
                 duration=self.duration,
                 travel_mode=self.travel_mode,

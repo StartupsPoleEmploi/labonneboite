@@ -80,7 +80,7 @@ def offers_offices_list():
     except InvalidFetcherArgument as e:
         return response_400(e)
 
-    _, zipcode, _ = get_location(request.args)
+    _, zipcode, _, _ = get_location(request.args)
 
     offices = fetcher.get_offices()
 
@@ -102,14 +102,20 @@ def company_list():
 
     try:
         location, zipcode, commune_id, departements = get_location(request.args)
-        fetcher = create_hidden_market_fetcher(location, request.args)
+        fetcher = create_hidden_market_fetcher(location, departements, request.args)
     except InvalidFetcherArgument as e:
         return response_400(e)
 
 
     offices, _ = fetcher.get_offices(add_suggestions=False)
 
-    result = build_result(fetcher, offices, departements, commune_id, zipcode)
+    result = build_result(fetcher, offices, commune_id, zipcode)
+
+    latitude = None
+    longitude = None
+    if location is not None:
+        latitude = location.latitude
+        longitude = location.longitude
 
     activity.log_search(
         sirets=[office.siret for office in offices],
@@ -119,8 +125,8 @@ def company_list():
         localisation={
             'departements': departements,
             'codepostal': zipcode,
-            'latitude': location.latitude,
-            'longitude': location.longitude,
+            'latitude': latitude,
+            'longitude': longitude,
         },
     )
     return jsonify(result)
@@ -131,8 +137,8 @@ def company_list():
 def company_count():
 
     try:
-        location, _, commune_id = get_location(request.args)
-        fetcher = create_hidden_market_fetcher(location, request.args)
+        location, _, commune_id, departements = get_location(request.args)
+        fetcher = create_hidden_market_fetcher(location, departements, request.args)
     except InvalidFetcherArgument as e:
         return response_400(e)
 
@@ -218,8 +224,8 @@ def compute_frontend_url(fetcher, query_string, commune_id):
 def company_filter_list():
 
     try:
-        location, _, _ = get_location(request.args)
-        fetcher = create_hidden_market_fetcher(location, request.args)
+        location, _, _, departements = get_location(request.args)
+        fetcher = create_hidden_market_fetcher(location, departements, request.args)
     except InvalidFetcherArgument as e:
         return response_400(e)
 
@@ -294,9 +300,7 @@ def get_location(request_args):
             location = Location(latitude, longitude)
         except ValueError:
             raise InvalidFetcherArgument('latitude and longitude must be float')
-    elif 'departments' in request_args:
-        location = Location(None, None)
-    else:
+    elif 'departments' not in request_args:
         raise InvalidFetcherArgument('missing arguments: either commune_id or latitude and longitude')
 
     if 'departments' in request_args:
@@ -343,12 +347,13 @@ def create_visible_market_fetcher(request_args):
     )
 
 
-def create_hidden_market_fetcher(location, request_args):
+def create_hidden_market_fetcher(location, departements, request_args):
     """
     Returns the filters given a set of parameters.
 
     Required parameters:
-    - `location` (Location): location near which to search.
+    - `location` (Location): location near which to search. May be None if departements is set.
+    - `departements`: a list of french "departements". May be None if location is set.
     - `rome_codes`: one or more "Pôle emploi ROME" codes, comma separated.
 
     Optional parameters:
@@ -374,8 +379,8 @@ def create_hidden_market_fetcher(location, request_args):
         sort = request_args.get('sort')
         if sort not in sorting.SORT_FILTERS:
             raise InvalidFetcherArgument('sort. Possible values : %s' % ', '.join(sorting.SORT_FILTERS))
-    if sort != sorting.SORT_FILTER_SCORE and location.latitude is None and location.longitude is None:
-        raise InvalidFetcherArgument('sort. Only possible value with departement search is : %s' % sorting.SORT_FILTER_SCORE)
+    if sort != sorting.SORT_FILTER_SCORE and location is None:
+        raise InvalidFetcherArgument('sort. %s is the only possible value with departement search. Please remove sort or departments.' % sorting.SORT_FILTER_SCORE)
 
     kwargs['sort'] = sort
 
@@ -412,6 +417,8 @@ def create_hidden_market_fetcher(location, request_args):
     # Distance
     # WARNING: MAP uses distance=0 in their use of the API.
     kwargs['distance'] = get_distance(request_args)
+    if request_args.get('distance') is not None and location is None:
+        raise InvalidFetcherArgument('filter. Long/lat is not provided so distance can not be computed. Please remove the distance param.')
 
     # Naf
     naf_codes = {}
@@ -452,7 +459,10 @@ def create_hidden_market_fetcher(location, request_args):
     if request.args['user'] in settings.API_INTERNAL_CONSUMERS:
         kwargs['flag_pmsmp'] = check_bool_argument(request_args, 'flag_pmsmp', 0)
 
-    return search.HiddenMarketFetcher(location, **kwargs)
+    if location is not None:
+        return search.HiddenMarketFetcher(location.longitude, location.latitude, **kwargs)
+
+    return search.HiddenMarketFetcher(None, None, **kwargs)
 
 
 def check_bool_argument(args, name, default_value):
