@@ -582,8 +582,6 @@ class ApiCompanyListTest(ApiBaseTest):
             data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
-            self.assertEqual(data['companies'][0]['siret'], '00000000000001')
-            # self.assertEqual(data['companies'][0]['department'], '14')
 
     # test 1 dpt without geoloc
     def test_query_by_departement(self):
