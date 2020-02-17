@@ -785,6 +785,9 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         sorting.SORT_FILTER_DISTANCE: 1,  # (distance_sort)
         sorting.SORT_FILTER_SCORE: 3,  # (boosted_romes_sort, randomized_score_sort, distance_sort)
     }[sort]
+    # Check if this is a request with long/lat
+    has_geo_distance = next((dic for dic in json_body.get('sort') if '_geo_distance' in dic), None) != None
+    # Check each office in the results and add some fields
     for position, office in enumerate(offices, start=1):
         # Get the corresponding item from the Elasticsearch results.
         es_office = es_offices_by_siret[office.siret]
@@ -792,7 +795,8 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         if len(es_office["sort"]) != sort_fields_total:
             raise ValueError("Incorrect number of sorting fields in ES response.")
         # Add an extra `distance` attribute with one digit.
-        # office.distance = round(es_office["sort"][distance_sort_index], 1)
+        if has_geo_distance:
+            office.distance = round(es_office["sort"][distance_sort_index], 1)
         # position is later used in labonneboite/web/static/js/results.js
         office.position = position
 
