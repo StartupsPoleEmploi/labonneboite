@@ -147,9 +147,11 @@ def clean_csv_act_dpae_file():
 
         query = f"select * from {table_name_act_dpae}"
         df_dpae_act_existing = pd.read_sql_query(query, engine)
-
-        df_dpae_act_existing = df_dpae_act_existing.siren.astype(str)
-        df_dpae_act_existing = df_dpae_act_existing.siret.astype(str)
+    
+        if JOIN_ON_SIREN:
+            df_dpae_act_existing = df_dpae_act_existing.siren.astype(str)
+        else:
+            df_dpae_act_existing = df_dpae_act_existing.siret.astype(str)
 
         # In case a problem appear in the script, we save old datas under .csv extension
         # because we will rewrite the whole table after each execution, we have to remove duplicates
