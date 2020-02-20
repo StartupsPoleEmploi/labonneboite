@@ -304,7 +304,7 @@ def entreprises():
     fetcher = search_util.HiddenMarketFetcher(
         location.longitude,
         location.latitude,
-        None, # no departments selection
+        departments=None,
         romes=[rome],
         distance=parameters['distance'],
         travel_mode=parameters['travel_mode'],

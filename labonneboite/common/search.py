@@ -444,6 +444,7 @@ def build_json_body_elastic_search(
 ):
 
     hiring_type = hiring_type or hiring_type_util.DEFAULT
+    gps_available = latitude is not None and longitude is not None
 
     score_for_rome_field_names = [
         get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes
@@ -523,7 +524,7 @@ def build_json_body_elastic_search(
         }
     })
 
-    if latitude is not None and longitude is not None:
+    if gps_available:
         filters.append({
             "geo_distance": {
                 "distance": "%skm" % distance,
@@ -548,7 +549,7 @@ def build_json_body_elastic_search(
             }
         })
 
-    if duration is not None and latitude is not None and longitude is not None:
+    if duration is not None and gps_available:
         isochrone = travel.isochrone((latitude, longitude), duration, mode=travel_mode)
         if isochrone:
             for polygon in isochrone:
@@ -666,7 +667,7 @@ def build_json_body_elastic_search(
         # always show boosted offices first then sort by randomized score
         sort_attrs.append(boosted_romes_sort)
         sort_attrs.append(randomized_score_sort)
-        if latitude is not None and longitude is not None:
+        if gps_available:
             sort_attrs.append(distance_sort)  # required so that office distance can be extracted and displayed on frontend
         else:
             sort_attrs.append({
@@ -685,7 +686,7 @@ def build_json_body_elastic_search(
     }
 
     # Add aggregate
-    if aggregate_by and latitude is not None and longitude is not None:
+    if aggregate_by and gps_available:
 
         json_body['aggs'] = {}
         for aggregate in aggregate_by:
@@ -786,7 +787,8 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         sorting.SORT_FILTER_SCORE: 3,  # (boosted_romes_sort, randomized_score_sort, distance_sort)
     }[sort]
     # Check if this is a request with long/lat
-    has_geo_distance = next((dic for dic in json_body.get('sort') if '_geo_distance' in dic), None) != None
+    first_dic_with_geo_distance = next((dic for dic in json_body.get('sort') if '_geo_distance' in dic), None)
+    has_geo_distance = (first_dic_with_geo_distance != None)
     # Check each office in the results and add some fields
     for position, office in enumerate(offices, start=1):
         # Get the corresponding item from the Elasticsearch results.

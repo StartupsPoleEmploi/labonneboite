@@ -583,9 +583,10 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
 
-    # test 1 dpt without geoloc
     def test_query_by_departement(self):
-        # import ipdb; ipdb.set_trace()
+        """
+        test 1 dpt without geoloc
+        """
         with self.test_request_context():
             params = self.add_security_params({
                 'departments': '14',
@@ -600,10 +601,12 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
+            self.assertFalse('distance' in data['companies'][0])
 
-    # test several dpt without geoloc
     def test_query_by_multiple_departements(self):
-        # import ipdb; ipdb.set_trace()
+        """
+        test several dpt without geoloc
+        """
         with self.test_request_context():
             params = self.add_security_params({
                 'departments': '14,57',
@@ -617,10 +620,13 @@ class ApiCompanyListTest(ApiBaseTest):
             data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
+            self.assertEqual(data['companies'][1]['siret'], '00000000000007')
+            self.assertFalse('distance' in data['companies'][0])
 
-    # test dpt+geoloc (case labonneformation)
     def test_query_by_departement_geoloc(self):
-        # import ipdb; ipdb.set_trace()
+        """
+        test dpt+geoloc (case labonneformation)
+        """
         with self.test_request_context():
             params = self.add_security_params({
                 'distance': 50,
@@ -638,9 +644,10 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000007')
 
-    # test dpt without geoloc with distance sort
     def test_query_by_departement_invalid_query_sort(self):
-        # import ipdb; ipdb.set_trace()
+        """
+        test dpt without geoloc with distance sort
+        """
         with self.test_request_context():
             params = self.add_security_params({
                 'departments': '14',
@@ -654,9 +661,10 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 400)
             self.assertTrue(rv.data.decode().startswith('Invalid request argument'))
 
-    # test dpt without geoloc with distance filter
     def test_query_by_departement_invalid_query_filter(self):
-        # import ipdb; ipdb.set_trace()
+        """
+        test dpt without geoloc with distance filter
+        """
         with self.test_request_context():
             params = self.add_security_params({
                 'departments': '14',

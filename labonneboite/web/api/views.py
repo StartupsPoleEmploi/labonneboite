@@ -94,7 +94,6 @@ def offers_offices_list():
 # to our retrocompatibility standard.
 
 
-#######
 @apiBlueprint.route('/company/')
 @api_auth_required
 @cross_origin()
@@ -111,11 +110,8 @@ def company_list():
 
     result = build_result(fetcher, offices, commune_id, zipcode)
 
-    latitude = None
-    longitude = None
-    if location is not None:
-        latitude = location.latitude
-        longitude = location.longitude
+    latitude = location.latitude if location else None
+    longitude = location.longitude if location else None
 
     activity.log_search(
         sirets=[office.siret for office in offices],
