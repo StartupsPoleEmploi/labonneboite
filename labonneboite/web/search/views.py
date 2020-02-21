@@ -249,7 +249,6 @@ def entreprises():
     selected office search form.
     """
     fix_csrf_session()
-    session['search_args'] = request.args # FIXME: this is never used
     location, named_location = get_location(request.args)
 
     occupation = request.args.get('occupation', '')

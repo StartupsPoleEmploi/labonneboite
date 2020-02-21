@@ -110,8 +110,8 @@ def company_list():
 
     result = build_result(fetcher, offices, commune_id, zipcode)
 
-    latitude = location.latitude if location else None
-    longitude = location.longitude if location else None
+    latitude = location.latitude if location is not None else None
+    longitude = location.longitude if location is not None else None
 
     activity.log_search(
         sirets=[office.siret for office in offices],
