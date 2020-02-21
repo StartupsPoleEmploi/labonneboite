@@ -11,8 +11,8 @@ from labonneboite.conf import settings
 from ..exceptions import BackendUnreachable
 
 
-BATCH_TIMEOUT_SECONDS = 8
-REQUEST_TIMEOUT_SECONDS = 5
+BATCH_TIMEOUT_SECONDS = 5
+REQUEST_TIMEOUT_SECONDS = 2
 
 
 def isochrone(origin, duration):
@@ -57,8 +57,6 @@ def durations(origin, destinations):
 
 def get_journey(origin, destination, timeout=REQUEST_TIMEOUT_SECONDS):
     """
-    As a rough estimate, the IGN API replies in 1-2s.
-
     Documentation: https://geoservices.ign.fr/documentation/geoservices/itineraires.html
 
     Args:
