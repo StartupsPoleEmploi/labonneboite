@@ -1,10 +1,9 @@
-
 from urllib.parse import urlencode
 import json
 
 from slugify import slugify
 
-from flask import abort, make_response, redirect, render_template, request, session, url_for
+from flask import jsonify, abort, make_response, redirect, render_template, request, session, url_for
 from flask import Blueprint
 from flask_login import current_user
 
@@ -250,7 +249,6 @@ def entreprises():
     selected office search form.
     """
     fix_csrf_session()
-    session['search_args'] = request.args
     location, named_location = get_location(request.args)
 
     occupation = request.args.get('occupation', '')
@@ -303,7 +301,9 @@ def entreprises():
 
     # Fetch offices and alternatives
     fetcher = search_util.HiddenMarketFetcher(
-        location,
+        location.longitude,
+        location.latitude,
+        departments=None,
         romes=[rome],
         distance=parameters['distance'],
         travel_mode=parameters['travel_mode'],
@@ -316,7 +316,6 @@ def entreprises():
         naf=parameters['naf'],
         naf_codes=None,
         aggregate_by=['naf'],
-        departments=None,
     )
     alternative_rome_descriptions = []
     naf_codes_with_descriptions = []

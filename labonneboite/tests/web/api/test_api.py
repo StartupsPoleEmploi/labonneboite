@@ -582,7 +582,101 @@ class ApiCompanyListTest(ApiBaseTest):
             data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 1)
             self.assertEqual(len(data['companies']), 1)
+
+    def test_query_by_departement(self):
+        """
+        test 1 dpt without geoloc
+        """
+        with self.test_request_context():
+            params = self.add_security_params({
+                'departments': '14',
+                'page': 1,
+                'page_size': 2,
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data.decode())
+            self.assertEqual(data['companies_count'], 1)
+            self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
+            self.assertFalse('distance' in data['companies'][0])
+
+    def test_query_by_multiple_departements(self):
+        """
+        test several dpt without geoloc
+        """
+        with self.test_request_context():
+            params = self.add_security_params({
+                'departments': '14,57',
+                'page': 1,
+                'page_size': 2,
+                'rome_codes': 'D1405,D1211',
+                'user': 'labonneboite',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data.decode())
+            self.assertEqual(data['companies_count'], 2)
+            self.assertEqual(data['companies'][0]['siret'], '00000000000004')
+            self.assertEqual(data['companies'][1]['siret'], '00000000000007')
+            self.assertFalse('distance' in data['companies'][0])
+
+    def test_query_by_departement_geoloc(self):
+        """
+        test dpt+geoloc (case labonneformation)
+        """
+        with self.test_request_context():
+            params = self.add_security_params({
+                'distance': 50,
+                'latitude': self.positions['bayonville_sur_mad']['coords'][0]['lat'],
+                'longitude': self.positions['bayonville_sur_mad']['coords'][0]['lon'],
+                'departments': '57',
+                'page': 1,
+                'page_size': 2,
+                'rome_codes': 'D1405,D1211',
+                'user': 'labonneboite',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+            data = json.loads(rv.data.decode())
+            self.assertEqual(data['companies_count'], 1)
+            self.assertEqual(data['companies'][0]['siret'], '00000000000007')
+
+    def test_query_by_departement_invalid_query_sort(self):
+        """
+        test dpt without geoloc with distance sort
+        """
+        with self.test_request_context():
+            params = self.add_security_params({
+                'departments': '14',
+                'sort': 'distance',
+                'page': 1,
+                'page_size': 2,
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 400)
+            self.assertTrue(rv.data.decode().startswith('Invalid request argument'))
+
+    def test_query_by_departement_invalid_query_filter(self):
+        """
+        test dpt without geoloc with distance filter
+        """
+        with self.test_request_context():
+            params = self.add_security_params({
+                'departments': '14',
+                'distance': 50,
+                'page': 1,
+                'page_size': 2,
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 400)
+            self.assertTrue(rv.data.decode().startswith('Invalid request argument'))
 
     def test_query_returns_urls_with_rome_code_context(self):
         with self.test_request_context():

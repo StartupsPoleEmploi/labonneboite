@@ -208,7 +208,7 @@ def entreprises():
     # Fetch offices and alternatives
     # Other filters are hidden in this documentation for readability purposes.
     fetcher = search_util.HiddenMarketFetcher(
-        location,
+        longitude, latitude,
         travel_mode=parameters['travel_mode'],
         duration=parameters['duration'],
         # ...

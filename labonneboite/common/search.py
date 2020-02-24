@@ -46,7 +46,9 @@ class HiddenMarketFetcher(Fetcher):
 
     def __init__(
         self,
-        search_location,
+        longitude,
+        latitude,
+        departments,
         romes=None,
         distance=None,
         duration=None,
@@ -60,10 +62,10 @@ class HiddenMarketFetcher(Fetcher):
         naf=None,
         naf_codes=None,
         aggregate_by=None,
-        departments=None,
         flag_pmsmp=None,
     ):
-        self.location = search_location
+        self.latitude = latitude
+        self.longitude = longitude
 
         self.romes = romes
         self.distance = distance
@@ -125,8 +127,8 @@ class HiddenMarketFetcher(Fetcher):
         return count_offices(
             self.naf_codes,
             rome_codes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             distance,
             duration=self.duration,
             travel_mode=self.travel_mode,
@@ -145,8 +147,8 @@ class HiddenMarketFetcher(Fetcher):
         _, _, aggregations = fetch_offices(
             {},  # No naf filter
             self.romes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             self.distance,
             duration=self.duration,
             travel_mode=self.travel_mode,
@@ -165,8 +167,8 @@ class HiddenMarketFetcher(Fetcher):
         _, _, aggregations = fetch_offices(
             self.naf_codes,
             self.romes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             self.distance,
             duration=self.duration,
             travel_mode=self.travel_mode,
@@ -190,8 +192,8 @@ class HiddenMarketFetcher(Fetcher):
         total_dpae = count_offices(
             self.naf_codes,
             self.romes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             self.distance,
             duration=self.duration,
             travel_mode=self.travel_mode,
@@ -207,8 +209,8 @@ class HiddenMarketFetcher(Fetcher):
         total_alternance = count_offices(
             self.naf_codes,
             self.romes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             self.distance,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
@@ -225,8 +227,8 @@ class HiddenMarketFetcher(Fetcher):
         _, _, aggregations = fetch_offices(
             self.naf_codes,
             self.romes,
-            self.location.latitude,
-            self.location.longitude,
+            self.latitude,
+            self.longitude,
             DISTANCE_FILTER_MAX,  # France
             duration=self.duration,
             travel_mode=self.travel_mode,
@@ -267,8 +269,8 @@ class HiddenMarketFetcher(Fetcher):
             result, _, aggregations = fetch_offices(
                 self.naf_codes,
                 self.romes,
-                self.location.latitude,
-                self.location.longitude,
+                self.latitude,
+                self.longitude,
                 self.distance,
                 duration=self.duration,
                 travel_mode=self.travel_mode,
@@ -442,6 +444,7 @@ def build_json_body_elastic_search(
 ):
 
     hiring_type = hiring_type or hiring_type_util.DEFAULT
+    gps_available = latitude is not None and longitude is not None
 
     score_for_rome_field_names = [
         get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes
@@ -521,15 +524,16 @@ def build_json_body_elastic_search(
         }
     })
 
-    filters.append({
-        "geo_distance": {
-            "distance": "%skm" % distance,
-            "locations": {
-                "lat": latitude,
-                "lon": longitude,
+    if gps_available:
+        filters.append({
+            "geo_distance": {
+                "distance": "%skm" % distance,
+                "locations": {
+                    "lat": latitude,
+                    "lon": longitude,
+                }
             }
-        }
-    })
+        })
 
     if departments:
         filters.append({
@@ -545,7 +549,7 @@ def build_json_body_elastic_search(
             }
         })
 
-    if duration is not None:
+    if duration is not None and gps_available:
         isochrone = travel.isochrone((latitude, longitude), duration, mode=travel_mode)
         if isochrone:
             for polygon in isochrone:
@@ -663,7 +667,15 @@ def build_json_body_elastic_search(
         # always show boosted offices first then sort by randomized score
         sort_attrs.append(boosted_romes_sort)
         sort_attrs.append(randomized_score_sort)
-        sort_attrs.append(distance_sort)  # required so that office distance can be extracted and displayed on frontend
+        if gps_available:
+            sort_attrs.append(distance_sort)  # required so that office distance can be extracted and displayed on frontend
+        else:
+            sort_attrs.append({
+                "department": {
+                    "order": "asc",
+                }
+            })
+
     elif sort == sorting.SORT_FILTER_DISTANCE:
         # no randomization nor boosting happens when sorting by distance
         sort_attrs.append(distance_sort)
@@ -674,7 +686,7 @@ def build_json_body_elastic_search(
     }
 
     # Add aggregate
-    if aggregate_by:
+    if aggregate_by and gps_available:
 
         json_body['aggs'] = {}
         for aggregate in aggregate_by:
@@ -708,6 +720,7 @@ def build_json_body_elastic_search(
                 logger.exception("to_number < from_number : %s < %s", to_number, from_number)
                 raise Exception("to_number < from_number")
             json_body["size"] = to_number - from_number + 1
+
 
     return json_body
 
@@ -773,6 +786,9 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         sorting.SORT_FILTER_DISTANCE: 1,  # (distance_sort)
         sorting.SORT_FILTER_SCORE: 3,  # (boosted_romes_sort, randomized_score_sort, distance_sort)
     }[sort]
+    # Check if this is a request with long/lat
+    has_geo_distance = any([('_geo_distance' in d) for d in json_body.get('sort')])
+    # Check each office in the results and add some fields
     for position, office in enumerate(offices, start=1):
         # Get the corresponding item from the Elasticsearch results.
         es_office = es_offices_by_siret[office.siret]
@@ -780,7 +796,8 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         if len(es_office["sort"]) != sort_fields_total:
             raise ValueError("Incorrect number of sorting fields in ES response.")
         # Add an extra `distance` attribute with one digit.
-        office.distance = round(es_office["sort"][distance_sort_index], 1)
+        if has_geo_distance:
+            office.distance = round(es_office["sort"][distance_sort_index], 1)
         # position is later used in labonneboite/web/static/js/results.js
         office.position = position
 
