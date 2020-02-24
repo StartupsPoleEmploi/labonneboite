@@ -1,7 +1,7 @@
 /* Badges.
 =========================================================================== */
 
-[class^="badge"] {
+.badge {
     background-color: #636c72;
     border-radius: 0.25rem;
     color: #fff;
