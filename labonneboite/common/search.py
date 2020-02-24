@@ -787,8 +787,7 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         sorting.SORT_FILTER_SCORE: 3,  # (boosted_romes_sort, randomized_score_sort, distance_sort)
     }[sort]
     # Check if this is a request with long/lat
-    first_dic_with_geo_distance = next((dic for dic in json_body.get('sort') if '_geo_distance' in dic), None)
-    has_geo_distance = (first_dic_with_geo_distance != None)
+    has_geo_distance = any([('_geo_distance' in d) for d in json_body.get('sort')])
     # Check each office in the results and add some fields
     for position, office in enumerate(offices, start=1):
         # Get the corresponding item from the Elasticsearch results.
