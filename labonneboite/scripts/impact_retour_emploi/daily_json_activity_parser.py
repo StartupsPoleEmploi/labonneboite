@@ -28,13 +28,14 @@ def create_table_queries():
                             `utm_campaign` text\
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 
-    #Create the table that will store into database the activity logs
+    #Create the table that will store into database the search queries (too many search queries)
     create_table_query3 = 'CREATE TABLE IF NOT EXISTS `logs_activity_recherche` ( \
-                            `dateheure` text,\
+                            `date` text,\
                             `idutilisateur_peconnect` text,\
                             `ville` text,\
                             `code_postal` text,\
-                            `emploi` text\
+                            `emploi` text,\
+                            `count` int \
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 
     engine = import_util.create_sqlalchemy_engine()
@@ -142,7 +143,7 @@ class ActivityLog:
             
             #Insert into idpeconnect
             logger.info(f'Insert into idepeconnect for file {file_name}: start')
-            self.insert_id_peconnect(activity_df)
+            #self.insert_id_peconnect(activity_df)
             logger.info(f'Insert into idepeconnect for file {file_name}: end')
             
             #Insert into logs_activity
@@ -151,9 +152,9 @@ class ActivityLog:
             logger.info(f'Insert into logs_activity for file {file_name}: end')
 
             #Insert into logs_activity_recherche
-            logger.info(f'Insert into logs_activity_recherche for file {file_name}: start')
+            logger.info(f'Insert into logs_activity for file {file_name}: start')
             self.insert_logs_activity_recherche(activity_df)
-            logger.info(f'Insert into logs_activity_recherche for file {file_name}: end')
+            logger.info(f'Insert into logs_activity for file {file_name}: end')
 
     def get_activity_log_dataframe(self, json_file_name):
         '''Function which will transform a json file, into a pandas dataframe
@@ -200,16 +201,28 @@ class ActivityLog:
 
     def insert_logs_activity(self, activity_df):
         
-        clics_of_interest = ['details', 'afficher-details', 'telecharger-pdf', 'ajout-favori']
+        '''
+        details = consulter une page entreprise 
+        afficher-details = déplier fiche entreprise 
+        premiere étape JP --> Récup datas ailleurs
+
+        '''
+
+        clics_of_interest = ['details', 'afficher-details', 'ajout-favori']
 
         logs_activity_df = activity_df[activity_df['nom'].isin(clics_of_interest)]
-
+        
+        import ipdb;ipdb.set_trace()
         logs_activity_df['siret'] = logs_activity_df.apply(lambda row: siret(row), axis=1)
         logs_activity_df['utm_medium'] = logs_activity_df.apply(lambda row: get_propriete(row, 'utm_medium'), axis=1)
         logs_activity_df['utm_source'] = logs_activity_df.apply(lambda row: get_propriete(row, 'utm_source'), axis=1)
         logs_activity_df['utm_campaign'] = logs_activity_df.apply(lambda row: get_propriete(row, 'utm_campaign'), axis=1)
         
-        #TODO : Remove the logs without idpeconnect, except the ones related to PSE, or the one we want to keep
+        # We want to keep only the activity logs with IDPeconnect OR the ones that have the values we want in utm_medium
+        # If we keep everything, there will be way too many lines in the database
+        utm_medium_to_keep = ['mailing']
+        logs_activity_df = logs_activity_df[(logs_activity_df.idutilisateur_peconnect.notnull()) | (logs_activity_df.utm_medium.isin(utm_medium_to_keep))]
+
         cols_of_interest = [
             "dateheure", 
             "nom", 
@@ -224,7 +237,6 @@ class ActivityLog:
 
         nb_lines = logs_activity_df.shape[0]
         logger.info(f'Number of lines to insert into logs_activity : {nb_lines}')
-
 
         engine = import_util.create_sqlalchemy_engine()
         
@@ -242,11 +254,12 @@ class ActivityLog:
 
         logs_activity_df = activity_df[activity_df['nom'] == 'recherche']
 
-        logs_activity_df['ville'] = logs_activity_df.apply(lambda row: get_propriete(row, 'localisation','ville'), axis=1)        
+        logs_activity_df['ville'] = logs_activity_df.apply(lambda row: get_propriete(row, 'localisation','ville'), axis=1)
         logs_activity_df['code_postal'] = logs_activity_df.apply(lambda row: get_propriete(row, 'localisation','codepostal'), axis=1)
         logs_activity_df['emploi'] = logs_activity_df.apply(lambda row: get_propriete(row, 'emploi'), axis=1)
         
         #TODO : Find a way to concatenate logs, because too many
+        import ipdb;ipdb.set_trace()
 
         cols_of_interest = [
             "dateheure", 
