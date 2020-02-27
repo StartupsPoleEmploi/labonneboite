@@ -8,7 +8,7 @@ from flask import url_for, request
 from sqlalchemy.orm.exc import NoResultFound
 
 from labonneboite.common import models
-from labonneboite.common.email_util import MailNoSendException
+from labonneboite.common.mailjet import MailjetAPIError
 from labonneboite.common.models import OfficeAdminUpdate
 from labonneboite.conf import settings
 from labonneboite.web.admin.views.office_admin_update import CONTACT_MODES
@@ -273,8 +273,8 @@ def update_coordinates_form():
             mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
 
             try:
-                mail.send_mail(mail_content, get_subject())
-            except MailNoSendException as e:
+                mail.send_mail(mail_content=mail_content, subject=get_subject())
+            except MailjetAPIError as e:
                 logger.exception(e)
                 flash(generate_fail_flash_content(), 'error')
 
@@ -348,7 +348,7 @@ def update_jobs_form():
 
         try:
             mail.send_mail(mail_content, get_subject())
-        except MailNoSendException as e:
+        except MailjetAPIError as e:
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
 
@@ -397,7 +397,7 @@ def delete_form():
 
         try:
             mail.send_mail(mail_content, get_subject())
-        except MailNoSendException as e:
+        except MailjetAPIError as e:
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
 
@@ -434,7 +434,7 @@ def other_form():
 
         try:
             mail.send_mail(mail_content, get_subject())
-        except MailNoSendException as e:
+        except MailjetAPIError as e:
             logger.exception(e)
             flash(generate_fail_flash_content(), 'error')
 

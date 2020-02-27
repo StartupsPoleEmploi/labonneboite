@@ -1,5 +1,4 @@
 Flask<0.13
-Flask-Mandrill
 Flask-Script
 
 # Flask assets.
@@ -79,6 +78,7 @@ python-slugify
 requests
 validators
 geopy
+mailjet_rest
 
 # Deployment and production
 uWSGI

@@ -24,9 +24,6 @@ class Config(object):
     URL_EXPIRE = True
     JSON_AS_ASCII = False
 
-    MANDRILL_API_KEY = settings.MANDRILL_API_KEY
-    MANDRILL_DEFAULT_FROM = 'pole-emploi@noreply-pole-emploi.fr'
-
     SENTRY_ENVIRONMENT = settings.SENTRY_ENVIRONMENT
     WTF_CSRF_ENABLED = settings.WTF_CSRF_ENABLED
 

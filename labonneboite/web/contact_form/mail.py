@@ -4,9 +4,9 @@ from flask import current_app, url_for
 
 from labonneboite.conf import settings
 from labonneboite.common import mapping as mapping_util
-from labonneboite.common.email_util import MandrillClient
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.common import models
+from labonneboite.common import mailjet
 from labonneboite.web.contact_form import forms
 from labonneboite.web.auth.backends.peam_recruiter import SessionKeys, is_certified_recruiter
 
@@ -49,9 +49,7 @@ def common_mail_template(form):
 
 
 def send_mail(mail_content, subject):
-    client = MandrillClient(current_app.extensions['mandrill'])
-    client.send(mail_content, subject)
-
+    mailjet.send(subject=subject, html_content=mail_content)
 
 def generate_update_coordinates_mail(form, recruiter_message):
     return """
