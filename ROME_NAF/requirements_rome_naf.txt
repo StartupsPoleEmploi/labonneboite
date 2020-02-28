@@ -1,7 +1,7 @@
 jsonschema==2.5.1
 jupyter==1.0.0
 matplotlib==1.5.3
-notebook ~> 5.4.1
+notebook>=5.7.8
 numpy==1.11.3
 pandas==0.19.1
 python-slugify==1.2.4
