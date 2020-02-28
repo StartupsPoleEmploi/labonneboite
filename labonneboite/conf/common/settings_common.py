@@ -133,8 +133,8 @@ PEAM_CLIENT_SECRET = '<set it>'
 
 MAILJET_API_KEY = '<set it>'
 MAILJET_API_SECRET = '<set it>'
-FORM_EMAIL = '<set it>'
-EMAIL_DEFAULT_FROM = 'pole-emploi@noreply-pole-emploi.fr'
+TO_EMAIL = '<set it>' # this was named `FORM_EMAIL`, but it is confusing
+FROM_EMAIL = '<set it>'
 
 # GA/GO snippets are only useful in production and staging,
 # we use dummy values everywhere else

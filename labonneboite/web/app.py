@@ -248,9 +248,6 @@ def create_app():
     register_teardown_appcontext(flask_app)
     register_teardown_appcontext(flask_app)
 
-    # Emails.
-    mailjet.init_mail(mailjet_api_key=settings.MAILJET_API_KEY, mailjet_api_secret=settings.MAILJET_API_SECRET, form_email=settings.FORM_EMAIL, email_default_from=settings.EMAIL_DEFAULT_FROM)
-
     # Assets.
     assets = Environment(app=flask_app)
     js = Bundle(

@@ -47,9 +47,16 @@ def common_mail_template(form):
         unique_recruiter_id,
     )
 
+# get ready to send emails
+mailJetClient = mailjet.MailJetClient(settings.MAILJET_API_KEY, settings.MAILJET_API_SECRET)
 
 def send_mail(mail_content, subject):
-    mailjet.send(subject=subject, html_content=mail_content)
+    mailJetClient.send(
+        subject=subject,
+        html_content=mail_content,
+        from_email=settings.FROM_EMAIL,
+        recipients=(settings.TO_EMAIL,)
+    )
 
 def generate_update_coordinates_mail(form, recruiter_message):
     return """
