@@ -659,13 +659,12 @@ def build_json_body_elastic_search(
         }
     }
 
-    randomized_score_sort = "_score"
-
     sort_attrs = []
 
     if sort == sorting.SORT_FILTER_SCORE:
         # always show boosted offices first then sort by randomized score
         sort_attrs.append(boosted_romes_sort)
+        randomized_score_sort = "_score"
         sort_attrs.append(randomized_score_sort)
         if gps_available:
             sort_attrs.append(distance_sort)  # required so that office distance can be extracted and displayed on frontend
@@ -786,8 +785,6 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         sorting.SORT_FILTER_DISTANCE: 1,  # (distance_sort)
         sorting.SORT_FILTER_SCORE: 3,  # (boosted_romes_sort, randomized_score_sort, distance_sort)
     }[sort]
-    # Check if this is a request with long/lat
-    has_geo_distance = any([('_geo_distance' in d) for d in json_body.get('sort')])
     # Check each office in the results and add some fields
     for position, office in enumerate(offices, start=1):
         # Get the corresponding item from the Elasticsearch results.
@@ -795,6 +792,8 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
 
         if len(es_office["sort"]) != sort_fields_total:
             raise ValueError("Incorrect number of sorting fields in ES response.")
+        # Check if this is a request with long/lat
+        has_geo_distance = any([('_geo_distance' in d) for d in json_body.get('sort')])
         # Add an extra `distance` attribute with one digit.
         if has_geo_distance:
             office.distance = round(es_office["sort"][distance_sort_index], 1)

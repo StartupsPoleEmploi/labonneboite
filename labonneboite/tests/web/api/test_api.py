@@ -619,8 +619,10 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = json.loads(rv.data.decode())
             self.assertEqual(data['companies_count'], 2)
-            self.assertEqual(data['companies'][0]['siret'], '00000000000004')
-            self.assertEqual(data['companies'][1]['siret'], '00000000000007')
+            self.assertEqual(
+                set([c['siret'] for c in data['companies']]),
+                set(['00000000000004', '00000000000007'])
+            )
             self.assertFalse('distance' in data['companies'][0])
 
     def test_query_by_departement_geoloc(self):
