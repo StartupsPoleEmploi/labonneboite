@@ -101,7 +101,8 @@ class MailJetClient:
     def post_api(self, data):
         client = Client(auth=(self.MAILJET_API_KEY, self.MAILJET_API_SECRET), version='v3.1')
         response = client.send.create(data=data)
-        # In case of error, we just crash: it's important that the task queue
+        # In case of error, throw so that the caller can retry sending the email
+        # When there is a queue - i.e. JP, it's important that the task queue
         # crashes, too, so failed messages can be tried again.
         if response.status_code >= 400:
             raise MailjetAPIError(response.status_code, response.content)
