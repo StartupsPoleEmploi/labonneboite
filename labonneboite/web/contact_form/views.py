@@ -16,6 +16,7 @@ from labonneboite.web.auth.backends import peam_recruiter
 from labonneboite.web.contact_form import forms, mail
 from labonneboite.web.utils import fix_csrf_session
 
+import time
 
 logger = logging.getLogger('main')
 
@@ -103,6 +104,24 @@ def unknown_siret_message():
 def get_office_identification_data():
     return forms.OfficeHiddenIdentificationForm(data=request.args, meta={'csrf': False}).data
 
+def sendMail(mail_content, subject):
+    '''
+        This funciton will send an email to us and retry in case of failure
+        The wait time will be 15s at worst
+    '''
+    max_attempts = 3
+    for retry in range(max_attempts):
+        try:
+            mail.send_mail(mail_content=mail_content, subject=subject)
+        except MailjetAPIError as e:
+            logger.exception(e)
+            if(retry < max_attempts - 1):
+                time.sleep(5*(retry+1))
+        else:
+            break
+    else:
+        logger.critical('Mail not sent (to settings.TO_EMAIL)', subject, mail_content)
+        flash(generate_fail_flash_content(), 'error')
 
 @contactFormBlueprint.route('/verification-informations-entreprise', methods=['GET'])
 @contactFormBlueprint.route('/verification-informations-entreprise/<siret>', methods=['GET'])
@@ -272,11 +291,7 @@ def update_coordinates_form():
             )
             mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
 
-            try:
-                mail.send_mail(mail_content=mail_content, subject=get_subject())
-            except MailjetAPIError as e:
-                logger.exception(e)
-                flash(generate_fail_flash_content(), 'error')
+            sendMail(mail_content=mail_content, subject=get_subject())
 
             params = request.args.to_dict()
             params.update({
@@ -346,11 +361,7 @@ def update_jobs_form():
         )
         mail_content = mail.generate_update_jobs_mail(form, recruiter_message)
 
-        try:
-            mail.send_mail(mail_content, get_subject())
-        except MailjetAPIError as e:
-            logger.exception(e)
-            flash(generate_fail_flash_content(), 'error')
+        sendMail(mail_content=mail_content, subject=get_subject())
 
         params = request.args.to_dict()
         params.update({
@@ -395,11 +406,7 @@ def delete_form():
         )
         mail_content = mail.generate_delete_mail(form, recruiter_message)
 
-        try:
-            mail.send_mail(mail_content, get_subject())
-        except MailjetAPIError as e:
-            logger.exception(e)
-            flash(generate_fail_flash_content(), 'error')
+        sendMail(mail_content=mail_content, subject=get_subject())
 
         params = request.args.to_dict()
         params.update({
@@ -432,11 +439,7 @@ def other_form():
         )
         mail_content = mail.generate_other_mail(form, recruiter_message)
 
-        try:
-            mail.send_mail(mail_content, get_subject())
-        except MailjetAPIError as e:
-            logger.exception(e)
-            flash(generate_fail_flash_content(), 'error')
+        sendMail(mail_content=mail_content, subject=get_subject())
 
         params = request.args.to_dict()
         params.update({
