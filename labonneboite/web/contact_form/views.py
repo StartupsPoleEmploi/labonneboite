@@ -107,16 +107,16 @@ def get_office_identification_data():
 MAX_ATTEMPTS = 2
 def sendMail(mail_content, subject):
     '''
-        This funciton will send an email to us and retry in case of failure
+        This function will send an email to us and retry in case of failure
         With 2 attempts - i.e. 1 retry, the wait time will be 5s at worst
     '''
-    for retry in range(MAX_ATTEMPTS):
+    for attempt in range(MAX_ATTEMPTS):
         try:
             mail.send_mail(mail_content=mail_content, subject=subject)
         except MailjetAPIError as e:
             logger.exception(e)
-            if(retry < MAX_ATTEMPTS - 1):
-                time.sleep(5*(retry+1))
+            if(attempt < MAX_ATTEMPTS - 1):
+                time.sleep(5*(attempt+1))
         else:
             break
     else:
