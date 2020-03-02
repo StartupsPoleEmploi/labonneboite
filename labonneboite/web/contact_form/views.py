@@ -104,18 +104,18 @@ def unknown_siret_message():
 def get_office_identification_data():
     return forms.OfficeHiddenIdentificationForm(data=request.args, meta={'csrf': False}).data
 
+MAX_ATTEMPTS = 2
 def sendMail(mail_content, subject):
     '''
         This funciton will send an email to us and retry in case of failure
-        The wait time will be 15s at worst
+        With 2 attempts - i.e. 1 retry, the wait time will be 5s at worst
     '''
-    max_attempts = 3
-    for retry in range(max_attempts):
+    for retry in range(MAX_ATTEMPTS):
         try:
             mail.send_mail(mail_content=mail_content, subject=subject)
         except MailjetAPIError as e:
             logger.exception(e)
-            if(retry < max_attempts - 1):
+            if(retry < MAX_ATTEMPTS - 1):
                 time.sleep(5*(retry+1))
         else:
             break
