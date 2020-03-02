@@ -131,8 +131,10 @@ REMEMBER_ME_ARG_NAME = 'keep'
 PEAM_CLIENT_ID = '<set it>'
 PEAM_CLIENT_SECRET = '<set it>'
 
-MANDRILL_API_KEY = '<set it>'
-FORM_EMAIL = '<set it>'
+MAILJET_API_KEY = '<set it>'
+MAILJET_API_SECRET = '<set it>'
+TO_EMAIL = '<set it>' # this was named `FORM_EMAIL`, but it is confusing
+FROM_EMAIL = '<set it>'
 
 # GA/GO snippets are only useful in production and staging,
 # we use dummy values everywhere else

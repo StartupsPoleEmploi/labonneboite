@@ -16,7 +16,6 @@ from flask_admin import Admin
 from flask_assets import Environment, Bundle
 from flask_babelex import Babel
 from flask_login import current_user, LoginManager
-from flask_mandrill import Mandrill
 from flask_wtf.csrf import CSRFProtect
 
 # labonneboite.
@@ -25,6 +24,7 @@ from labonneboite.common import pro
 from labonneboite.common.database import db_session, engine  # This is how we talk to the database.
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
+from labonneboite.common import mailjet
 from labonneboite.conf import settings
 
 # labonneboite web.
@@ -84,9 +84,6 @@ def register_extensions(flask_app):
     """
     Babel(flask_app)  # Babel is currently only used with Flask-Admin.
     CSRFProtect(flask_app)  # Enable CSRF protection globally.
-    mandrill = Mandrill()
-    mandrill.init_app(flask_app)
-    flask_app.extensions['mandrill'] = mandrill  # Provide easy access to the mandrill extension in Blueprints.
     login_manager.init_app(flask_app)
     init_social(flask_app, db_session)
 

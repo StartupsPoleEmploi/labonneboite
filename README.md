@@ -472,7 +472,7 @@ Here is an example of output:
 
 ## How to contribute
 
-For devs in the core team, this repo follows the [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow). 
+For devs in the core team, this repo follows the [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow).
 
 We are also open to comments, questions and contributions from devs outside the core dev team! Here is [a document about contributions to this project (in french)](/CONTRIBUTING.md)
 
