@@ -41,9 +41,17 @@ def create_cursor():
     return con, cur
 
 def create_sqlalchemy_engine():
-    connexion_url = ('mysql://'+DATABASE['USER']+':%s@'+\
-                    DATABASE['HOST']+':'+str(DATABASE['PORT'])+\
-                    '/'+DATABASE['NAME']) % urllib.parse.quote_plus(DATABASE['PASSWORD'])
+    user = DATABASE['USER']
+    host = DATABASE['HOST']
+    port = str(DATABASE['PORT'])
+    db_name = DATABASE['NAME']
+    db_password = DATABASE['PASSWORD']
+    
+    connexion_url = (f'mysql://{user}:{db_password}@{host}:{port}/{db_name}?charset=utf8mb4')
+
+    #connexion_url = ('mysql://'+DATABASE['USER']+':%s@'+\
+    #                DATABASE['HOST']+':'+str(DATABASE['PORT'])+\
+    #                '/'+DATABASE['NAME']) % urllib.parse.quote_plus(DATABASE['PASSWORD'])
 
     engine = create_engine(connexion_url)
 
