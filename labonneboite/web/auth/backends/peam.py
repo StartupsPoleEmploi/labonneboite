@@ -5,9 +5,11 @@ Useful documentation of social-auth-core:
 https://python-social-auth.readthedocs.io/en/latest/
 """
 import requests
+from timeit import default_timer as timer
 
 from social_core.exceptions import AuthUnreachableProvider
 from social_core.backends.open_id_connect import OpenIdConnectAuth
+from social_core.utils import SSLHttpAdapter
 
 from labonneboite.conf import settings
 from labonneboite.common import activity
@@ -82,6 +84,62 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         user = super().complete(*args, **kwargs)
         activity.log('connexion', user=user)
         return user
+
+    def request(self, url, method='GET', *args, **kwargs):
+        """
+        Override the official method:
+        https://github.com/python-social-auth/social-core/blob/master/social_core/backends/base.py#L216
+        """
+        kwargs.setdefault('headers', {})
+        if self.setting('VERIFY_SSL') is not None:
+            kwargs.setdefault('verify', self.setting('VERIFY_SSL'))
+        kwargs.setdefault('timeout', self.setting('REQUESTS_TIMEOUT') or
+                                     self.setting('URLOPEN_TIMEOUT'))
+        if self.SEND_USER_AGENT and 'User-Agent' not in kwargs['headers']:
+            kwargs['headers']['User-Agent'] = self.setting('USER_AGENT') or user_agent()
+
+        try:
+            if self.SSL_PROTOCOL:
+                session = SSLHttpAdapter.ssl_adapter_session(self.SSL_PROTOCOL)
+                start = timer()
+                response = session.request(method, url, *args, **kwargs)
+                end = timer()
+                time_spent = end - start
+            else:
+                start = timer()
+                response = requests.request(method, url, *args, **kwargs)
+                end = timer()
+                time_spent = end - start
+        except ConnectionError as err:
+            raise AuthFailed(self, str(err))
+        self.log_request(url, method, args, kwargs, response, time_spent)
+        response.raise_for_status()
+        return response
+
+    def log_request(self, url, method, args, kwargs, response, time_spent):
+        time_spent = round(time_spent, 3)
+        if url == 'https://authentification-candidat.pole-emploi.fr/connexion/oauth2/access_token':
+            activity.log(
+                event_name='peam-access-token',
+                user=None,
+                source=None,
+                url=url,
+                response_code=response.status_code,
+                authorization_code=kwargs['data']['code'],
+                time_spent=time_spent,
+            )
+        elif url == 'https://api.emploi-store.fr/partenaire/peconnect-individu/v1/userinfo':
+            activity.log(
+                event_name='peam-peconnect-userinfo',
+                user=None,
+                source=None,
+                url=url,
+                response_code=response.status_code,
+                time_spent=time_spent,
+            )
+        else:
+            raise RuntimeError('Unknown PEAM endpoint.')
+
 
 
 # pylint:disable=abstract-method
