@@ -16,11 +16,12 @@ from labonneboite.common.locations import Location
 from labonneboite.common.load_data import ROME_CODES
 from labonneboite.common.models import Office
 from labonneboite.common.fetcher import InvalidFetcherArgument
+from labonneboite.common.scope import Scope
 from labonneboite.conf import settings
+from labonneboite.web.api import user
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
 from flask.ext.cors import cross_origin
-
 
 apiBlueprint = Blueprint('api', __name__)
 
@@ -37,17 +38,17 @@ def api_auth_required(function):
         if 'user' not in request.args:
             return 'missing argument: user', 400
 
-        # if not current_app.debug:
-        try:
-            api_util.check_api_request(request)
-        except api_util.TimestampFormatException:
-            return 'timestamp format: %Y-%m-%dT%H:%M:%S', 400
-        except api_util.TimestampExpiredException:
-            return 'timestamp has expired', 400
-        except api_util.InvalidSignatureException:
-            return 'signature is invalid', 400
-        except api_util.UnknownUserException:
-            return 'user is unknown', 400
+        if not current_app.debug:
+            try:
+                api_util.check_api_request(request)
+            except api_util.TimestampFormatException:
+                return 'timestamp format: %Y-%m-%dT%H:%M:%S', 400
+            except api_util.TimestampExpiredException:
+                return 'timestamp has expired', 400
+            except api_util.InvalidSignatureException:
+                return 'signature is invalid', 400
+            except api_util.UnknownUserException:
+                return 'user is unknown', 400
 
         return function(*args, **kwargs)
 
@@ -452,7 +453,7 @@ def create_hidden_market_fetcher(location, departements, request_args):
     kwargs['departments'] = departments
 
     # PMSMP filter only available for internal users.
-    if request.args['user'] in settings.API_INTERNAL_CONSUMERS:
+    if (Scope.COMPANY_PMSMP in user.get_api_user_scopes(request.args['user'],  [])):
         kwargs['flag_pmsmp'] = check_bool_argument(request_args, 'flag_pmsmp', 0)
 
     if location is not None:
@@ -601,8 +602,11 @@ def get_office_details(siret, alternance=False):
 def patch_office_result_with_sensitive_information(api_username, office, result, alternance=False):
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
-    if api_username in settings.API_INTERNAL_CONSUMERS:
-        result['email'] = office.email_alternance if alternance and office.email_alternance else office.email
-        result['phone'] = office.phone_alternance if alternance and office.phone_alternance else office.tel
-        result['website'] = office.website_alternance if alternance and office.website_alternance else office.website
+    scopes = user.get_api_user_scopes(api_username)
+    result['scopes'] = [scope.name for scope in scopes]
+    if(Scope.COMPANY_EMAIL in scopes): result['email'] = office.email_alternance if alternance and office.email_alternance else office.email
+    if(Scope.COMPANY_PHONE in scopes): result['phone'] = office.phone_alternance if alternance and office.phone_alternance else office.tel
+    if(Scope.COMPANY_WEBSITE in scopes): result['website'] = office.website_alternance if alternance and office.website_alternance else office.website
+    if(Scope.COMPANY_PMSMP in scopes): result['pmsmp'] = office.flag_pmsmp
+    if(Scope.COMPANY_POE in scopes): result['poe'] = office.flag_poe_afpr
     return result

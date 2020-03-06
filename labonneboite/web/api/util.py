@@ -2,7 +2,7 @@ import datetime
 import hmac
 import urllib.request, urllib.parse, urllib.error
 
-from labonneboite.conf import settings
+from labonneboite.web.api.user import get_api_user_key
 
 
 class TimestampFormatException(Exception):
@@ -35,18 +35,16 @@ def get_ordered_argument_string(args):
         ordered_args.append((arg, args_copy[arg]))
     return urllib.parse.urlencode(ordered_args)
 
-
 def make_signature(args, timestamp, user='labonneboite'):
     args['timestamp'] = timestamp
-    api_key = settings.API_KEYS.get(user, '')
+    api_key = get_api_user_key(user, '')
     return compute_signature(args, api_key)
 
-
 def check_api_request(request):
-    try:
-        api_key = settings.API_KEYS[request.args['user']]
-    except KeyError:
+    api_key = get_api_user_key(request.args['user'])
+    if(api_key is None):
         raise UnknownUserException
+
     timestamp = request.args.get('timestamp')
     try:
         timestamp_dt = datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S')
