@@ -10,14 +10,11 @@ import time
 import datetime as datetime
 from labonneboite.scripts.impact_retour_emploi.settings import DEBUG
 
-
-
 #Pandas utils functions 
 #----------------------
 # function used to create a new column from dateheure column in dpae
 def get_date(row):
     return row['kd_dateembauche'][:10]
-
 
 class JoinActivityLogsDPAE:
 

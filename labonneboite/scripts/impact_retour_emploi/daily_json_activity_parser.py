@@ -42,7 +42,9 @@ def create_table_queries():
     engine.execute(create_table_query2)
     engine.execute(create_table_query3)
     engine.close()
-
+    
+#Pandas utils functions 
+#----------------------
 ## Functions used by pandas to create new fields based on other fields, in the dataframe
 def siret(row):
     return row['proprietes']['siret']
@@ -67,7 +69,7 @@ def get_propriete(row, key, key2=None):
 class NoDataException(Exception):
     pass
 
-class ActivityLog:
+class ActivityLogParser:
 
     def __init__(self):
         self.json_logs_folder_path = importer_settings.INPUT_SOURCE_FOLDER
@@ -285,7 +287,7 @@ class ActivityLog:
 
 def run_main():
     create_table_queries()
-    activity_log = ActivityLog()
+    activity_log = ActivityLogParser()
     activity_log.save_logs_activity()
 
 if __name__ == '__main__':
