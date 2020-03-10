@@ -1,7 +1,7 @@
 import pandas as pd
 
 # get csv file from : https://statistiques.pole-emploi.org/bmo/bmo?in=4&lg=0&pp=2019&ss=1#
-# To build a new file, we join the old file with the new one and we update the pourcentage de tension
+# To build a new file, we join the old file with the new one and we update the percentage of tension for each rome/fap
 
 
 def format_tension(row):

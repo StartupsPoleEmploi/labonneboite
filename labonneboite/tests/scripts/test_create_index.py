@@ -955,10 +955,10 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('K1401')
         self.assertEqual(score_minimum_for_rome, scoring_util.SCORE_FOR_ROME_MINIMUM)
         
-        # This row with rome K1401 has 46.2% tension
-        # A0Z43	Conducteurs d'engins agricoles ou forestiers	46.2	A1101	CONDUITE D'ENGINS AGRICOLES ET FORESTIERS
+        # This row with rome A1101 has 61.9% tension
+        #A0Z43,Conducteurs d'engins agricoles ou forestiers,61.9,A1101,CONDUITE D'ENGINS AGRICOLES ET FORESTIERS
         score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('A1101')
-        result = ((scoring_util.SCORE_FOR_ROME_MINIMUM - scoring_util.MINIMUM_POSSIBLE_SCORE) * ((100 - 46.2)/100)) + scoring_util.MINIMUM_POSSIBLE_SCORE
+        result = ((scoring_util.SCORE_FOR_ROME_MINIMUM - scoring_util.MINIMUM_POSSIBLE_SCORE) * ((100 - 61.9)/100)) + scoring_util.MINIMUM_POSSIBLE_SCORE
         self.assertEqual(score_minimum_for_rome, result)
         self.assertTrue(scoring_util.MINIMUM_POSSIBLE_SCORE <= score_minimum_for_rome <= scoring_util.SCORE_FOR_ROME_MINIMUM)        
 
