@@ -73,7 +73,6 @@ class ActivityLogParser:
 
     def __init__(self):
         self.json_logs_folder_path = importer_settings.INPUT_SOURCE_FOLDER
-        self.json_logs_files_names_to_parse = self.get_json_logs_activity()
 
     def get_json_logs_activity(self):
         '''Function which will return a list with all file names of activity logs that need to be parsed
@@ -97,7 +96,7 @@ class ActivityLogParser:
 
         logger.info('.json files to parse : {}'.format(json_logs_files_names_to_parse))
 
-        return json_logs_files_names_to_parse
+        self.json_logs_files_names_to_parse = json_logs_files_names_to_parse
 
     def needs_parse_json_activity_log(self, json_file_name):
         '''Function which takes one json file name and check if it needs to be parsed and saved in database
@@ -144,17 +143,21 @@ class ActivityLogParser:
             
             #Insert into idpeconnect
             logger.info(f'Insert into idepeconnect for file {file_name}: start')
-            self.insert_id_peconnect(activity_df)
+            df = self.insert_id_peconnect(activity_df)
+            self.insert_in_database(df, 'logs_idpe_connect')
             logger.info(f'Insert into idepeconnect for file {file_name}: end')
             
             #Insert into logs_activity
             logger.info(f'Insert into logs_activity for file {file_name}: start')
-            self.insert_logs_activity(activity_df)
+            df = self.insert_logs_activity(activity_df)
+            self.insert_in_database(df, 'logs_activity')
             logger.info(f'Insert into logs_activity for file {file_name}: end')
 
             #Insert into logs_activity_recherche
             logger.info(f'Insert into logs_activity_recherche for file {file_name}: start')
-            self.insert_logs_activity_recherche(activity_df)
+            df = self.insert_logs_activity_recherche(activity_df)
+            self.insert_in_database(df, 'logs_activity_recherche')
+
             logger.info(f'Insert into logs_activity_recherche for file {file_name}: end')
 
     def get_activity_log_dataframe(self, json_file_name):
@@ -190,15 +193,7 @@ class ActivityLogParser:
         nb_lines = activity_idpec.shape[0]
         logger.info(f'Number of lines to insert into idpec : {nb_lines}')
 
-        engine = import_util.create_sqlalchemy_engine()
-        activity_idpec.to_sql(
-            con=engine, 
-            name='logs_idpe_connect', 
-            if_exists='append', 
-            index=False, 
-            chunksize=10000
-        )
-        engine.close()
+        return activity_idpec
 
     def insert_logs_activity(self, activity_df):
         
@@ -237,17 +232,7 @@ class ActivityLogParser:
         nb_lines = logs_activity_df.shape[0]
         logger.info(f'Number of lines to insert into logs_activity : {nb_lines}')
 
-        engine = import_util.create_sqlalchemy_engine()
-        
-        logs_activity_df.to_sql(
-            con=engine, 
-            name='logs_activity',
-            if_exists='append', 
-            index=False, 
-            chunksize=10000
-        )
-
-        engine.close()
+        return logs_activity_df
 
     def insert_logs_activity_recherche(self, activity_df):
 
@@ -272,12 +257,15 @@ class ActivityLogParser:
 
         nb_lines = logs_activity_df.shape[0]
         logger.info(f'Number of lines to insert into logs_activity_recherche : {nb_lines}')
-
+        
+        return logs_activity_df
+    
+    def insert_in_database(self, dataframe, table_name):
         engine = import_util.create_sqlalchemy_engine()
         
-        logs_activity_df.to_sql(
+        dataframe.to_sql(
             con=engine, 
-            name='logs_activity_recherche',
+            name=table_name,
             if_exists='append', 
             index=False, 
             chunksize=10000
@@ -288,6 +276,7 @@ class ActivityLogParser:
 def run_main():
     create_table_queries()
     activity_log = ActivityLogParser()
+    activity_log.get_json_logs_activity()
     activity_log.save_logs_activity()
 
 if __name__ == '__main__':
