@@ -17,7 +17,7 @@ class DailyJsonActivityParser(unittest.TestCase):
         self.assertIsInstance(activity_df,pd.DataFrame)
         self.assertEqual(activity_df.shape[0],1000) #1000 rows in the test log activity
         self.assertEqual(activity_df.shape[1],9) #9 columns in the test log activity
-        self.activity_df = activity_df 
+        self.activity_df = activity_df
 
     def test_insert_id_peconnect(self):
         activity_df = self.alp.get_activity_log_dataframe(self.alp.json_logs_files_names_to_parse[0])
@@ -42,7 +42,7 @@ class DailyJsonActivityParser(unittest.TestCase):
         activity_df = self.alp.get_activity_log_dataframe(self.alp.json_logs_files_names_to_parse[0])
         df = self.alp.insert_logs_activity_recherche(activity_df)
         self.assertIsInstance(df,pd.DataFrame)
-        self.assertEqual(df.shape[0],10) 
+        self.assertEqual(df.shape[0],10)
         self.assertEqual(df.shape[1],5)
         emplois = [
             'secretariat', 
