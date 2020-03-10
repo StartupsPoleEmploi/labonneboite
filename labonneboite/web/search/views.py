@@ -13,7 +13,6 @@ from labonneboite.common import geocoding
 from labonneboite.common import doorbell
 from labonneboite.common import pro
 from labonneboite.common import sorting
-from labonneboite.common import search as search_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common.locations import CityLocation, Location, NamedLocation
@@ -22,6 +21,7 @@ from labonneboite.common.maps import precompute
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.web.utils import fix_csrf_session
 
+from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter
 from labonneboite.conf import settings
 from labonneboite.web.search.forms import make_company_search_form
 
@@ -154,7 +154,7 @@ PARAMETER_FIELD_MAPPING = {
     'sort': 'sort',
     'from': 'from_number',
     'to': 'to_number',
-    'p': 'public',
+    'p': 'audience',
 }
 
 
@@ -208,17 +208,17 @@ def get_parameters(args):
     if kwargs.get('sort') not in sorting.SORT_FILTERS:
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
-    try:
-        kwargs['public'] = int(kwargs.get('public'))
-    except (ValueError, TypeError):
-        kwargs['public'] = 0
-
-    if kwargs['public'] not in search_util.PUBLIC_CHOICES:
-        kwargs['public'] = search_util.PUBLIC_ALL
+    # audience filter defaults to ALL
+    # from value in GET to enum
+    kwargs['audience'] = {
+        str(AudienceFilter.JUNIOR.value): AudienceFilter.JUNIOR,
+        str(AudienceFilter.SENIOR.value): AudienceFilter.SENIOR,
+        str(AudienceFilter.HANDICAP.value): AudienceFilter.HANDICAP,
+    }.get(kwargs.get('audience', None), AudienceFilter.ALL)
 
     # ensure PRO filters are never used in the public version
     if not pro.pro_version_enabled():
-        del kwargs['public']
+        del kwargs['audience']
 
     return kwargs
 
@@ -300,7 +300,7 @@ def entreprises():
     parameters = get_parameters(request.args)
 
     # Fetch offices and alternatives
-    fetcher = search_util.HiddenMarketFetcher(
+    fetcher = HiddenMarketFetcher(
         location.longitude,
         location.latitude,
         departments=None,
@@ -311,7 +311,7 @@ def entreprises():
         sort=parameters['sort'],
         from_number=parameters['from_number'],
         to_number=parameters['to_number'],
-        public=parameters.get('public'),
+        audience=parameters['audience'],
         headcount=parameters['headcount'],
         naf=parameters['naf'],
         naf_codes=None,

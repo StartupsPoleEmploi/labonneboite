@@ -6,7 +6,6 @@ from flask import abort, Blueprint, current_app, jsonify, request, url_for
 from labonneboite.common import activity
 from labonneboite.common import autocomplete
 from labonneboite.common import geocoding
-from labonneboite.common import search
 from labonneboite.common import offers
 from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
@@ -21,6 +20,7 @@ from labonneboite.conf import settings
 from labonneboite.web.api import user
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
+from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter
 from flask.ext.cors import cross_origin
 
 apiBlueprint = Blueprint('api', __name__)
@@ -197,7 +197,7 @@ def compute_frontend_url(fetcher, query_string, commune_id):
             'sort': fetcher.sort,
             'd': fetcher.distance,
             'h': fetcher.headcount,
-            'p': fetcher.public,
+            'p': fetcher.audience,
         })
 
         return url_for(
@@ -452,14 +452,23 @@ def create_hidden_market_fetcher(location, departements, request_args):
             raise InvalidFetcherArgument('departments : %s' % ', '.join(unknown_departments))
     kwargs['departments'] = departments
 
+    # audience filter defaults to ALL
+    # from value in GET to enum
+    kwargs['audience'] = {
+        str(AudienceFilter.JUNIOR.value): AudienceFilter.JUNIOR,
+        str(AudienceFilter.SENIOR.value): AudienceFilter.SENIOR,
+        str(AudienceFilter.HANDICAP.value): AudienceFilter.HANDICAP,
+    }.get(request_args.get('audience'), AudienceFilter.ALL)
+
+
     # PMSMP filter only available for internal users.
     if (Scope.COMPANY_PMSMP in user.get_api_user_scopes(request.args['user'],  [])):
         kwargs['flag_pmsmp'] = check_bool_argument(request_args, 'flag_pmsmp', 0)
 
     if location is not None:
-        return search.HiddenMarketFetcher(location.longitude, location.latitude, **kwargs)
+        return HiddenMarketFetcher(location.longitude, location.latitude, **kwargs)
 
-    return search.HiddenMarketFetcher(None, None, **kwargs)
+    return HiddenMarketFetcher(None, None, **kwargs)
 
 
 def check_bool_argument(args, name, default_value):
@@ -608,5 +617,5 @@ def patch_office_result_with_sensitive_information(api_username, office, result,
     if(Scope.COMPANY_PHONE in scopes): result['phone'] = office.phone_alternance if alternance and office.phone_alternance else office.tel
     if(Scope.COMPANY_WEBSITE in scopes): result['website'] = office.website_alternance if alternance and office.website_alternance else office.website
     if(Scope.COMPANY_PMSMP in scopes): result['pmsmp'] = office.flag_pmsmp
-    if(Scope.COMPANY_POE in scopes): result['poe'] = office.flag_poe_afpr
+    if(Scope.COMPANY_BOE in scopes): result['boe'] = office.flag_handicap
     return result
