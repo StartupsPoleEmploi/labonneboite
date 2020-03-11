@@ -1,6 +1,8 @@
 import logging
 import os
 
+from labonneboite.common.scope import SCOPES_SAFE
+
 TESTING = True
 
 ES_INDEX = 'labonneboite_unit_test'
@@ -17,8 +19,14 @@ LOG_LEVEL_USER_ACTIVITY = logging.ERROR
 
 ENABLE_TIMEIT_TIMERS = False
 API_KEYS = {
-    'labonneboite': 'dummykey',
-    'emploi_store_dev': 'anotherdummykey',
+    'labonneboite': {
+        'key': 'dummykey',
+        'scopes': SCOPES_SAFE,
+    },
+    'emploi_store_dev': {
+        'key': 'anotherdummykey',
+        'scopes': SCOPES_SAFE,
+    },
 }
 
 API_ADRESSE_BASE_URL = 'http://urlintrouvablepourlbb.fr'

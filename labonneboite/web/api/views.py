@@ -16,11 +16,11 @@ from labonneboite.common.load_data import ROME_CODES
 from labonneboite.common.models import Office
 from labonneboite.common.fetcher import InvalidFetcherArgument
 from labonneboite.common.scope import Scope
+from labonneboite.common.user_util import has_scope, string_to_enum, UnknownUserException
 from labonneboite.conf import settings
-from labonneboite.web.api import user
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
-from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter
+from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter, FILTERS, DISTANCE_FILTER_MAX
 from flask.ext.cors import cross_origin
 
 apiBlueprint = Blueprint('api', __name__)
@@ -47,7 +47,7 @@ def api_auth_required(function):
                 return 'timestamp has expired', 400
             except api_util.InvalidSignatureException:
                 return 'signature is invalid', 400
-            except api_util.UnknownUserException:
+            except UnknownUserException:
                 return 'user is unknown', 400
 
         return function(*args, **kwargs)
@@ -227,7 +227,7 @@ def company_filter_list():
         return response_400(e)
 
     # Add aggregations
-    fetcher.aggregate_by = search.FILTERS
+    fetcher.aggregate_by = FILTERS
 
     _, aggregations = fetcher.get_offices(add_suggestions=False)
 
@@ -244,7 +244,7 @@ def company_filter_list():
             result['filters']['naf'] = fetcher.get_naf_aggregations()
         if 'headcount' in request.args and 'headcount' in fetcher.aggregate_by:
             result['filters']['headcount'] = fetcher.get_headcount_aggregations()
-        if 'distance' in fetcher.aggregate_by and fetcher.distance != search.DISTANCE_FILTER_MAX:
+        if 'distance' in fetcher.aggregate_by and fetcher.distance != DISTANCE_FILTER_MAX:
             result['filters']['distance'] = fetcher.get_distance_aggregations()
         if 'hiring_type' in fetcher.aggregate_by:
             result['filters']['contract'] = fetcher.get_contract_aggregations()
@@ -452,17 +452,11 @@ def create_hidden_market_fetcher(location, departements, request_args):
             raise InvalidFetcherArgument('departments : %s' % ', '.join(unknown_departments))
     kwargs['departments'] = departments
 
-    # audience filter defaults to ALL
     # from value in GET to enum
-    kwargs['audience'] = {
-        str(AudienceFilter.JUNIOR.value): AudienceFilter.JUNIOR,
-        str(AudienceFilter.SENIOR.value): AudienceFilter.SENIOR,
-        str(AudienceFilter.HANDICAP.value): AudienceFilter.HANDICAP,
-    }.get(request_args.get('audience'), AudienceFilter.ALL)
+    # audience filter defaults to ALL
+    kwargs['audience'] = string_to_enum(AudienceFilter, request_args.get('audience'), AudienceFilter.ALL)
 
-
-    # PMSMP filter only available for internal users.
-    if (Scope.COMPANY_PMSMP in user.get_api_user_scopes(request.args['user'],  [])):
+    if (has_scope(request.args['user'],  Scope.COMPANY_PMSMP)):
         kwargs['flag_pmsmp'] = check_bool_argument(request_args, 'flag_pmsmp', 0)
 
     if location is not None:
@@ -611,11 +605,14 @@ def get_office_details(siret, alternance=False):
 def patch_office_result_with_sensitive_information(api_username, office, result, alternance=False):
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
-    scopes = user.get_api_user_scopes(api_username)
-    result['scopes'] = [scope.name for scope in scopes]
-    if(Scope.COMPANY_EMAIL in scopes): result['email'] = office.email_alternance if alternance and office.email_alternance else office.email
-    if(Scope.COMPANY_PHONE in scopes): result['phone'] = office.phone_alternance if alternance and office.phone_alternance else office.tel
-    if(Scope.COMPANY_WEBSITE in scopes): result['website'] = office.website_alternance if alternance and office.website_alternance else office.website
-    if(Scope.COMPANY_PMSMP in scopes): result['pmsmp'] = office.flag_pmsmp
-    if(Scope.COMPANY_BOE in scopes): result['boe'] = office.flag_handicap
+    if(has_scope(api_username, Scope.COMPANY_EMAIL)):
+        result['email'] = office.email_alternance if alternance and office.email_alternance else office.email
+    if(has_scope(api_username, Scope.COMPANY_PHONE)):
+        result['phone'] = office.phone_alternance if alternance and office.phone_alternance else office.tel
+    if(has_scope(api_username, Scope.COMPANY_WEBSITE)):
+        result['website'] = office.website_alternance if alternance and office.website_alternance else office.website
+    if(has_scope(api_username, Scope.COMPANY_PMSMP)):
+        result['pmsmp'] = office.flag_pmsmp
+    if(has_scope(api_username, Scope.COMPANY_BOE)):
+        result['boe'] = office.flag_handicap
     return result

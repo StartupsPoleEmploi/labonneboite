@@ -19,6 +19,7 @@ from labonneboite.common.locations import CityLocation, Location, NamedLocation
 from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.maps import precompute
 from labonneboite.common.models import UserFavoriteOffice
+from labonneboite.common.user_util import string_to_enum
 from labonneboite.web.utils import fix_csrf_session
 
 from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter
@@ -208,13 +209,9 @@ def get_parameters(args):
     if kwargs.get('sort') not in sorting.SORT_FILTERS:
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
-    # audience filter defaults to ALL
     # from value in GET to enum
-    kwargs['audience'] = {
-        str(AudienceFilter.JUNIOR.value): AudienceFilter.JUNIOR,
-        str(AudienceFilter.SENIOR.value): AudienceFilter.SENIOR,
-        str(AudienceFilter.HANDICAP.value): AudienceFilter.HANDICAP,
-    }.get(kwargs.get('audience', None), AudienceFilter.ALL)
+    # audience filter defaults to ALL
+    kwargs['audience'] = string_to_enum(AudienceFilter, kwargs.get('audience'), AudienceFilter.ALL)
 
     # ensure PRO filters are never used in the public version
     if not pro.pro_version_enabled():

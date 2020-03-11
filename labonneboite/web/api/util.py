@@ -2,8 +2,7 @@ import datetime
 import hmac
 import urllib.request, urllib.parse, urllib.error
 
-from labonneboite.web.api.user import get_api_user_key
-
+from labonneboite.common.user_util import get_key, UnknownUserException
 
 class TimestampFormatException(Exception):
     pass
@@ -15,11 +14,6 @@ class TimestampExpiredException(Exception):
 
 class InvalidSignatureException(Exception):
     pass
-
-
-class UnknownUserException(Exception):
-    pass
-
 
 def make_timestamp():
     timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
@@ -37,11 +31,12 @@ def get_ordered_argument_string(args):
 
 def make_signature(args, timestamp, user='labonneboite'):
     args['timestamp'] = timestamp
-    api_key = get_api_user_key(user, '')
+    api_key = get_key(user, '')
     return compute_signature(args, api_key)
 
 def check_api_request(request):
-    api_key = get_api_user_key(request.args['user'])
+    user = request.args['user']
+    api_key = get_key(user)
     if(api_key is None):
         raise UnknownUserException
 
