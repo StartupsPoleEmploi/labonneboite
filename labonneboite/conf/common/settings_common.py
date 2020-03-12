@@ -59,7 +59,14 @@ SCORE_60_HIRINGS = 50.0
 SCORE_80_HIRINGS = 100.0
 SCORE_100_HIRINGS = 500.0
 
+# API keys used to sign requests and check that a user is authorised to use the API
+# Note for API proxies such as ESD: they have api keys and need to sign the requests with it
+# So an api key is chosen according to the GET param `user` **not** `origin_user`
 API_KEYS = {}
+
+# Per user config
+# Note for API proxies such as ESD: `API_USERS` are "real" users, the name can be either in the GET param `user` or `origin_user`
+API_USERS = {}
 
 VERSION_PRO_ALLOWED_IPS = []
 VERSION_PRO_ALLOWED_EMAILS = []

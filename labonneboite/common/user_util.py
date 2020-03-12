@@ -10,14 +10,14 @@ class Gender(Enum):
   FEMALE = 'female'
   OTHER = 'autre'
 
-def has_scope(user_name, scope):
-    user_data = settings.API_KEYS.get(user_name)
+def has_scope(api_user_name, api_user_name_forwarded, scope):
+    user_data = settings.API_USERS.get(api_user_name_forwarded, settings.API_USERS.get(api_user_name))
     if(user_data is None):
         return False
-    return scope in user_data.get('scopes')
+    return scope in user_data.get('scopes', [])
 
-def get_key(user_name, default = None):
-    return settings.API_KEYS.get(user_name, {'key': default}).get('key')
+def get_key(api_user_name, default = None):
+    return settings.API_KEYS.get(api_user_name)
 
 def string_to_enum(EnumClass, value, default = None):
     '''

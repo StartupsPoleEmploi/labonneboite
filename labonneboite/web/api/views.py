@@ -146,7 +146,7 @@ def company_count():
 
 def build_result(fetcher, offices, commune_id, zipcode, add_url=True):
     offices = [
-        patch_office_result_with_sensitive_information(request.args['user'], office, office.as_json(
+        patch_office_result_with_sensitive_information(request.args['user'], request.args.get('origin_user'), office, office.as_json(
             rome_codes=fetcher.romes,
             distance=fetcher.distance,
             zipcode=zipcode,
@@ -456,7 +456,7 @@ def create_hidden_market_fetcher(location, departements, request_args):
     # audience filter defaults to ALL
     kwargs['audience'] = string_to_enum(AudienceFilter, request_args.get('audience'), AudienceFilter.ALL)
 
-    if (has_scope(request.args['user'],  Scope.COMPANY_PMSMP)):
+    if (has_scope(request.args['user'], request.args.get('origin_user'),  Scope.COMPANY_PMSMP)):
         kwargs['flag_pmsmp'] = check_bool_argument(request_args, 'flag_pmsmp', 0)
 
     if location is not None:
@@ -598,21 +598,21 @@ def get_office_details(siret, alternance=False):
             'zipcode': office.zipcode,
         },
     }
-    patch_office_result_with_sensitive_information(request.args['user'], office, result, alternance)
+    patch_office_result_with_sensitive_information(request.args['user'], request.args.get('origin_user'), office, result, alternance)
     return jsonify(result)
 
 
-def patch_office_result_with_sensitive_information(api_username, office, result, alternance=False):
+def patch_office_result_with_sensitive_information(api_username, api_user_name_forwarded, office, result, alternance=False):
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
-    if(has_scope(api_username, Scope.COMPANY_EMAIL)):
+    if(has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_EMAIL)):
         result['email'] = office.email_alternance if alternance and office.email_alternance else office.email
-    if(has_scope(api_username, Scope.COMPANY_PHONE)):
+    if(has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_PHONE)):
         result['phone'] = office.phone_alternance if alternance and office.phone_alternance else office.tel
-    if(has_scope(api_username, Scope.COMPANY_WEBSITE)):
+    if(has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_WEBSITE)):
         result['website'] = office.website_alternance if alternance and office.website_alternance else office.website
-    if(has_scope(api_username, Scope.COMPANY_PMSMP)):
+    if(has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_PMSMP)):
         result['pmsmp'] = office.flag_pmsmp
-    if(has_scope(api_username, Scope.COMPANY_BOE)):
+    if(has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_BOE)):
         result['boe'] = office.flag_handicap
     return result

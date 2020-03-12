@@ -19,13 +19,19 @@ LOG_LEVEL_USER_ACTIVITY = logging.ERROR
 
 ENABLE_TIMEIT_TIMERS = False
 API_KEYS = {
+    'labonneboite': 'dummykey',
+    'emploi_store_dev': 'anotherdummykey',
+}
+
+API_USERS = {
     'labonneboite': {
-        'key': 'dummykey',
         'scopes': SCOPES_SAFE,
     },
-    'emploi_store_dev': {
-        'key': 'anotherdummykey',
+    'emploi_store_dev_user1': {
         'scopes': SCOPES_SAFE,
+    },
+    'empty_user': {
+        # no scope here
     },
 }
 

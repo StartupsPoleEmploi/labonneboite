@@ -6,9 +6,11 @@ from labonneboite.conf import settings
 class UserTest(DatabaseTest):
 
     def test_has_scopes(self):
-        self.assertFalse(has_scope('labonneboite', Scope.COMPANY_EMAIL))
-        self.assertTrue(has_scope('labonneboite', Scope.COMPANY_WEBSITE))
-        self.assertFalse(has_scope('unknown_user', Scope.COMPANY_WEBSITE))
+        self.assertFalse(has_scope('labonneboite', None, Scope.COMPANY_EMAIL))
+        self.assertTrue(has_scope('labonneboite', None, Scope.COMPANY_WEBSITE))
+        self.assertFalse(has_scope('unknown_user', None, Scope.COMPANY_WEBSITE))
+        self.assertFalse(has_scope('empty_user', None, Scope.COMPANY_WEBSITE))
+        self.assertTrue(has_scope('unknown_user', 'labonneboite', Scope.COMPANY_WEBSITE))
 
     def test_get_key(self):
         self.assertEqual(get_key('labonneboite'), 'dummykey')
