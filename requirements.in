@@ -89,3 +89,6 @@ raven[flask]
 locustio
 pyzmq
 remote-pdb
+
+#Fix markupsafe issue 1.0
+markupsafe==1.1.1
