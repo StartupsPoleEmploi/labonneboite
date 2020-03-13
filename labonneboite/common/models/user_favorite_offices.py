@@ -1,15 +1,11 @@
-
 import datetime
 
-from sqlalchemy import Column, ForeignKey, UniqueConstraint
-from sqlalchemy import desc
-from sqlalchemy import Integer, String, DateTime
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, desc
 from sqlalchemy.orm import relationship
 
-from labonneboite.common.database import Base
-from labonneboite.common.database import db_session
+from labonneboite.common.database import Base, db_session
+from labonneboite.common.env import ENV_BONAPARTE, get_current_env
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.common.env import get_current_env, ENV_BONAPARTE
 
 
 class UserFavoriteOffice(CRUDMixin, Base):
@@ -24,29 +20,26 @@ class UserFavoriteOffice(CRUDMixin, Base):
     The data deployment process takes care of dropping then recreating the foreign key
     during import. Favorites linked to no longer existing offices will be dropped.
     """
-    __tablename__ = 'user_favorite_offices'
-    __table_args__ = (
-        UniqueConstraint('user_id', 'office_siret', name='_user_fav_office'),
-    )
+
+    __tablename__ = "user_favorite_offices"
+    __table_args__ = (UniqueConstraint("user_id", "office_siret", name="_user_fav_office"),)
 
     id = Column(Integer, primary_key=True)
     # Set `ondelete` to `CASCADE`: when a `user` is deleted, all his `favorites` are deleted too.
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     # Set `ondelete` to `CASCADE`: when an `office` is deleted, all related `favorites` are deleted too.
-    office_siret = Column(String(191), ForeignKey('etablissements.siret', ondelete='CASCADE'), nullable=True)
+    office_siret = Column(String(191), ForeignKey("etablissements.siret", ondelete="CASCADE"), nullable=True)
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
 
-    user = relationship('User')
+    user = relationship("User")
     if get_current_env() == ENV_BONAPARTE:
         # Disable relationship which mysteriously breaks on lbbdev only, not needed there anyway.
         # FIXME very ugly, try again to fix this bug. Bug happens in lbbdev environment only.
         pass
     else:
-        office = relationship('Office', lazy='joined')
+        office = relationship("Office", lazy="joined")
 
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
+    __mapper_args__ = {"order_by": desc(date_created)}  # Default order_by for all queries.
 
     @classmethod
     def add_favorite(cls, user, office):
@@ -54,10 +47,7 @@ class UserFavoriteOffice(CRUDMixin, Base):
         Add a favorite to a user.
         Avoid as much as possible replication errors by ignoring duplicates.
         """
-        statement = cls.__table__.insert().prefix_with("IGNORE").values(
-            user_id=user.id,
-            office_siret=office.siret,
-        )
+        statement = cls.__table__.insert().prefix_with("IGNORE").values(user_id=user.id, office_siret=office.siret)
         db_session.execute(statement)
         db_session.commit()
 
@@ -83,15 +73,12 @@ class UserFavoriteOffice(CRUDMixin, Base):
             return header_row
 
         rows = [fav.as_csv_row() for fav in db_session.query(cls).filter_by(user_id=user.id)]
-        csv_text = "%s\r\n%s" % (
-            header_row,
-            "\r\n".join(rows),
-        )
+        csv_text = "%s\r\n%s" % (header_row, "\r\n".join(rows))
         return csv_text
 
     @classmethod
     def as_csv_header_row(cls):
-        return 'siret;nom;adresse;ville;url'
+        return "siret;nom;adresse;ville;url"
 
     def as_csv_row(self):
         values = [

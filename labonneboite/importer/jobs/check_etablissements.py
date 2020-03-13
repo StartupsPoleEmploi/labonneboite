@@ -1,5 +1,7 @@
 import sys
+
 from labonneboite.importer import util as import_util
+
 
 def run():
     filename = import_util.detect_runnable_file("etablissements")
@@ -8,5 +10,6 @@ def run():
     else:
         sys.exit(-1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run()

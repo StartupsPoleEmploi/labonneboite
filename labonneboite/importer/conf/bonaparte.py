@@ -1,7 +1,8 @@
 import os
 
+
 # --- importer input directory of DPAE and ETABLISSEMENT exports
-INPUT_SOURCE_FOLDER = '/srv/lbb/data'
+INPUT_SOURCE_FOLDER = "/srv/lbb/data"
 
 # --- job 1/8 & 2/8 : check_etablissements & extract_etablissements
 MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT = 10000

@@ -1,4 +1,3 @@
-
 """
 Load testing API+Frontend using Locust framework.
 
@@ -29,11 +28,13 @@ On average in production, we observe that for 50 frontend searches,
 we get 60 suggest_job_labels requests, 20 suggest_cities requests etc..
 """
 
-from operator import itemgetter
 import logging
 import math
 import random
-import urllib.request, urllib.parse, urllib.error
+import urllib.error
+import urllib.parse
+import urllib.request
+from operator import itemgetter
 
 from locust import HttpLocust, TaskSet, task
 from slugify import slugify
@@ -61,21 +62,17 @@ def generate_siret_choices():
 
 
 def generate_city_choices():
-    cities_by_population = sorted(geocoding.get_cities(), key=itemgetter('population'), reverse=True)
+    cities_by_population = sorted(geocoding.get_cities(), key=itemgetter("population"), reverse=True)
     city_choices = []
     for city in cities_by_population[:2000]:
-        city_choices.append(
-            [
-                (city['name'], city['zipcode']), math.log10(city['population'])
-            ]
-        )
+        city_choices.append([(city["name"], city["zipcode"]), math.log10(city["population"])])
     return city_choices
 
 
 CITY_CHOICES = generate_city_choices()
 
 
-COMMUNE_CHOICES = [city_['commune_id'] for city_ in geocoding.get_cities()]
+COMMUNE_CHOICES = [city_["commune_id"] for city_ in geocoding.get_cities()]
 
 
 SIRET_CHOICES = generate_siret_choices()
@@ -129,18 +126,14 @@ class UserBehavior(TaskSet):
 
         job = pick_job_rome()
 
-        params = {
-            'commune_id': commune_id,
-            'rome_codes': job,
-            'user': 'labonneboite',
-        }
+        params = {"commune_id": commune_id, "rome_codes": job, "user": "labonneboite"}
 
         timestamp = util.make_timestamp()
-        signature = util.make_signature(params, timestamp, user=params.get('user'))
-        params['timestamp'] = timestamp
-        params['signature'] = signature
+        signature = util.make_signature(params, timestamp, user=params.get("user"))
+        params["timestamp"] = timestamp
+        params["signature"] = signature
 
-        url = '/api/v1/company/?%s' % urllib.parse.urlencode(params)
+        url = "/api/v1/company/?%s" % urllib.parse.urlencode(params)
         logger.info("GET %s", url)
         self.client.get(url)
 

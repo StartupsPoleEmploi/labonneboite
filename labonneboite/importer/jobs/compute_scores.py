@@ -7,18 +7,17 @@ bypassing the Global Interpreter Lock limits.
 
 Each compute_score job is launched on a given departement.
 """
-import sys
 import multiprocessing as mp
-from multiprocessing.dummy import Pool as ThreadPool
+import sys
 from functools import partial
+from multiprocessing.dummy import Pool as ThreadPool
 
 from labonneboite.common import departements as dpt
-from labonneboite.importer import settings
-from labonneboite.importer import compute_score
-from labonneboite.importer import util as import_util
 from labonneboite.common.util import timeit
+from labonneboite.importer import compute_score, settings, util as import_util
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
+
 
 # Only enable if you know what you are doing - this will compute only selected departements then fail on purpose
 COMPUTE_SCORES_DEBUG_MODE = False
@@ -56,7 +55,6 @@ def compute(departement):
 
 
 class ScoreComputingJob(Job):
-
     @timeit
     def run(self):
         """
@@ -104,8 +102,8 @@ class ScoreComputingJob(Job):
                     at_least_one_departement_failed = True
 
             if at_least_one_departement_failed:
-                raise Exception('At least one departement failed. See above for details.')
-                    
+                raise Exception("At least one departement failed. See above for details.")
+
         for departement, compute_result in compute_results.items():
             if not compute_result:
                 logger.info("departement with error : %s", departement)

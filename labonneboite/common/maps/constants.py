@@ -3,8 +3,8 @@ ENABLE_PUBLIC_MODE = False
 
 ISOCHRONE_DURATIONS_MINUTES = (15, 30, 45)
 
-CAR_MODE = 'car'
-PUBLIC_MODE = 'public'
+CAR_MODE = "car"
+PUBLIC_MODE = "public"
 
 TRAVEL_MODES = ()
 if ENABLE_PUBLIC_MODE:
@@ -17,7 +17,4 @@ if ENABLE_CAR_MODE:
 else:
     DEFAULT_TRAVEL_MODE = PUBLIC_MODE
 
-TRAVEL_MODES_FRENCH = {
-    CAR_MODE: 'Voiture',
-    PUBLIC_MODE: 'Transports en commun',
-}
+TRAVEL_MODES_FRENCH = {CAR_MODE: "Voiture", PUBLIC_MODE: "Transports en commun"}

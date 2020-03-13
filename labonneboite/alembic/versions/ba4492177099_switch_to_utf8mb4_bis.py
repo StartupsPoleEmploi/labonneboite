@@ -5,23 +5,18 @@ Revision ID: ba4492177099
 Revises: 963bf41f07fa
 Create Date: 2017-08-04 12:49:44.849038
 """
-from alembic import op
-
 import sqlalchemy as sa
+from alembic import op
 
 
 # Revision identifiers, used by Alembic.
-revision = 'ba4492177099'
-down_revision = '963bf41f07fa'
+revision = "ba4492177099"
+down_revision = "963bf41f07fa"
 branch_labels = None
 depends_on = None
 
 
-TABLES_WITH_VARCHAR_COLUMNS = {
-  'social_auth_code': (
-    'email',
-  ),
-}
+TABLES_WITH_VARCHAR_COLUMNS = {"social_auth_code": ("email",)}
 
 
 def upgrade():

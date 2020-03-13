@@ -14,7 +14,7 @@ class LbbAdminIndexView(AdminIndexView):
     A custom index view class for the LBB admin.
     """
 
-    @expose('/')
+    @expose("/")
     def index(self):
         if user_is_admin():
             return super(LbbAdminIndexView, self).index()

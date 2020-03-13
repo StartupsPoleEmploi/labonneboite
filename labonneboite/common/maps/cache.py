@@ -1,10 +1,11 @@
 import json
+
 import redis
 import redis.sentinel
-
 from flask import current_app
 
 from labonneboite.conf import settings
+
 
 # Here we define caches to store results provided by vendor APIs, so that
 # we don't exceed our allowed quotas. The various classes have different storage
@@ -12,7 +13,6 @@ from labonneboite.conf import settings
 
 
 class BaseCache(object):
-
     def get(self, key, default=None):
         raise NotImplementedError
 
@@ -112,10 +112,7 @@ class RedisCache(BaseCache):
         # Connect directly to redis
         if cls.CONNECTION_POOL is None:
             # Share one connection pool for all RedisCache instances
-            cls.CONNECTION_POOL = redis.ConnectionPool(
-                host=settings.REDIS_HOST,
-                port=settings.REDIS_PORT
-            )
+            cls.CONNECTION_POOL = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
         return redis.StrictRedis(connection_pool=cls.CONNECTION_POOL)
 
     def get(self, key, default=None):
@@ -128,19 +125,17 @@ class RedisCache(BaseCache):
         return json.loads(value)
 
     def set(self, key, value):
-        self.__safe(
-            self.__redis.set, key, json.dumps(value), ex=self.EXPIRES_IN_SECONDS
-        )
+        self.__safe(self.__redis.set, key, json.dumps(value), ex=self.EXPIRES_IN_SECONDS)
 
     def clear(self):
         self.__safe(self.__redis.flushdb)
 
 
-if settings.TRAVEL_CACHE == 'dummy':
+if settings.TRAVEL_CACHE == "dummy":
     Cache = DummyCache
-elif settings.TRAVEL_CACHE == 'local':
+elif settings.TRAVEL_CACHE == "local":
     Cache = LocalCache
-elif settings.TRAVEL_CACHE == 'redis':
+elif settings.TRAVEL_CACHE == "redis":
     Cache = RedisCache
 else:
     raise ValueError("Invalid TRAVEL_CACHE setting: {}".format(settings.TRAVEL_CACHE))

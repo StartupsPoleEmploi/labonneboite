@@ -1,12 +1,10 @@
+import redis
 from flask import current_app
 from huey import RedisHuey
-import redis
 
 from labonneboite.conf import settings
 
-from . import cache
-from . import constants
-from . import travel
+from . import cache, constants, travel
 
 
 def create_huey():
@@ -23,11 +21,14 @@ class DummyHuey:
     """
     Dummy task scheduler that just trashes tasks. Useful for testing.
     """
+
     def task(self, *args, **kwargs):
         def patched(func):
             def dummy(*args, **kwargs):
                 pass
+
             return dummy
+
         return patched
 
 
@@ -35,6 +36,7 @@ huey = create_huey()
 
 # Asynchronous version of the `isochrone` function
 isochrone = huey.task()(travel.isochrone)
+
 
 def isochrones(location):
     """

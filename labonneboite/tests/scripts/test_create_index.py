@@ -4,17 +4,20 @@ from unittest import mock
 from flask import url_for
 from social_flask_sqlalchemy.models import UserSocialAuth
 
-from labonneboite.common import mapping as mapping_util
-from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
-from labonneboite.common.models import OfficeAdminExtraGeoLocation, User
+from labonneboite.common import es, mapping as mapping_util, scoring as scoring_util
 from labonneboite.common.database import db_session
+from labonneboite.common.models import (
+    Office,
+    OfficeAdminAdd,
+    OfficeAdminExtraGeoLocation,
+    OfficeAdminRemove,
+    OfficeAdminUpdate,
+    User,
+)
 from labonneboite.conf import settings
-from labonneboite.common import es
 from labonneboite.scripts import create_index as script
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
-from labonneboite.common import scoring as scoring_util
-
 
 
 class CreateIndexBaseTest(DatabaseTest):
@@ -84,16 +87,17 @@ class CreateIndexBaseTest(DatabaseTest):
         # Put offices into ES.
         # Disable parallel computing because it does not play well with test environment (it hangs).
         script.create_offices(disable_parallel_computing=True)
-        self.es.indices.flush(index=settings.ES_INDEX) # required by ES to register new documents.
+        self.es.indices.flush(index=settings.ES_INDEX)  # required by ES to register new documents.
 
         # We should have 3 offices in ES (2 + the fake office).
-        count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={'query': {'match_all': {}}})
-        self.assertEqual(count['count'], 2+1)
+        count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={"query": {"match_all": {}}})
+        self.assertEqual(count["count"], 2 + 1)
         # Ensure that the office is the one that has been indexed in ES.
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office1.siret)
-        self.assertEqual(res['_source']['email'], self.office1.email)
+        self.assertEqual(res["_source"]["email"], self.office1.email)
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office2.siret)
-        self.assertEqual(res['_source']['email'], self.office2.email)
+        self.assertEqual(res["_source"]["email"], self.office2.email)
+
 
 class DeleteOfficeAdminTest(CreateIndexBaseTest):
     def test_office_admin_add(self):
@@ -124,16 +128,14 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
 
         with self.test_request_context():
             # Create an user admin
-            self.user = User(email='john@doe.com', gender='male',
-                             first_name='John', last_name='Doe', active=True,
-                             is_admin=True)
+            self.user = User(
+                email="john@doe.com", gender="male", first_name="John", last_name="Doe", active=True, is_admin=True
+            )
             db_session.add(self.user)
             db_session.flush()
 
             user_social_auth = UserSocialAuth(
-                provider=PEAMOpenIdConnect.name,
-                extra_data={'id_token': 'fake'},
-                user_id=self.user.id,
+                provider=PEAMOpenIdConnect.name, extra_data={"id_token": "fake"}, user_id=self.user.id
             )
             db_session.add(user_social_auth)
             db_session.commit()
@@ -145,34 +147,27 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
 
             # Create OfficeAdminRemove
             self.assertEqual(0, OfficeAdminAdd.query.filter_by(id=1).count())
-            self.app.post(url_for('officeadminadd.create_view'), data=form)
+            self.app.post(url_for("officeadminadd.create_view"), data=form)
             self.assertEqual(1, OfficeAdminAdd.query.filter_by(id=1).count())
 
             # Delete OfficeAdminAdd
-            self.app.post(url_for('officeadminadd.delete_view'), data={'id': 1})
+            self.app.post(url_for("officeadminadd.delete_view"), data={"id": 1})
             self.assertEqual(0, OfficeAdminRemove.query.filter_by(id=1).count())
 
     def test_office_admin_remove(self):
         # Create officeAdminRemove
-        form = {
-            'siret': '01234567891234',
-            'name': 'Test company',
-            'reason': 'N/A',
-            'initiative': 'office',
-        }
+        form = {"siret": "01234567891234", "name": "Test company", "reason": "N/A", "initiative": "office"}
 
         with self.test_request_context():
             # Create an user admin
-            self.user = User(email='john@doe.com', gender='male',
-                             first_name='John', last_name='Doe', active=True,
-                             is_admin=True)
+            self.user = User(
+                email="john@doe.com", gender="male", first_name="John", last_name="Doe", active=True, is_admin=True
+            )
             db_session.add(self.user)
             db_session.flush()
 
             user_social_auth = UserSocialAuth(
-                provider=PEAMOpenIdConnect.name,
-                extra_data={'id_token': 'fake'},
-                user_id=self.user.id,
+                provider=PEAMOpenIdConnect.name, extra_data={"id_token": "fake"}, user_id=self.user.id
             )
             db_session.add(user_social_auth)
             db_session.commit()
@@ -183,12 +178,12 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
             self.login(self.user)
 
             # Create OfficeAdminRemove
-            self.assertEqual(0, OfficeAdminRemove.query.filter_by(siret='01234567891234').count())
-            self.app.post(url_for('officeadminremove.create_view'), data=form)
-            self.assertEqual(1, OfficeAdminRemove.query.filter_by(siret='01234567891234').count())
+            self.assertEqual(0, OfficeAdminRemove.query.filter_by(siret="01234567891234").count())
+            self.app.post(url_for("officeadminremove.create_view"), data=form)
+            self.assertEqual(1, OfficeAdminRemove.query.filter_by(siret="01234567891234").count())
 
             # Delete OfficeAdminRemove
-            self.app.post(url_for('officeadminremove.delete_view'), data={'id': 1})
+            self.app.post(url_for("officeadminremove.delete_view"), data={"id": 1})
             self.assertEqual(0, OfficeAdminRemove.query.filter_by(id=1).count())
 
 
@@ -202,46 +197,33 @@ class VariousModesTest(CreateIndexBaseTest):
     """
 
     def test_create_index(self):
-        script.update_data_profiling_wrapper(
-            create_full=False,
-            create_partial=False,
-            disable_parallel_computing=True,
-        )
+        script.update_data_profiling_wrapper(create_full=False, create_partial=False, disable_parallel_computing=True)
 
     def test_create_index_from_scratch(self):
         # longer ES timeout needed for slow docker performance in local dev on Mac OS when running `make test-scripts`
-        with mock.patch.object(settings, 'ES_TIMEOUT', 30):
+        with mock.patch.object(settings, "ES_TIMEOUT", 30):
             script.update_data_profiling_wrapper(
-                create_full=True,
-                create_partial=False,
-                disable_parallel_computing=True,
+                create_full=True, create_partial=False, disable_parallel_computing=True
             )
 
     def test_create_index_from_scratch_with_profiling(self):
-        with mock.patch.object(script.Profiling, 'ACTIVATED', True):
+        with mock.patch.object(script.Profiling, "ACTIVATED", True):
             script.update_data_profiling_wrapper(
-                create_full=True,
-                create_partial=False,
-                disable_parallel_computing=True,
+                create_full=True, create_partial=False, disable_parallel_computing=True
             )
 
     def test_create_index_from_scratch_with_profiling_create_partial(self):
-        with mock.patch.object(script.Profiling, 'ACTIVATED', True):
+        with mock.patch.object(script.Profiling, "ACTIVATED", True):
             script.update_data_profiling_wrapper(
-                create_full=False,
-                create_partial=True,
-                disable_parallel_computing=True,
+                create_full=False, create_partial=True, disable_parallel_computing=True
             )
 
         # create_partial version of the script left ES data in an inconsistent state:
         # office data for only one departement
         # no ogr data nor location data
         # thus we need to rebuild normal data now:
-        script.update_data_profiling_wrapper(
-            create_full=True,
-            create_partial=False,
-            disable_parallel_computing=True,
-        )
+        script.update_data_profiling_wrapper(create_full=True, create_partial=False, disable_parallel_computing=True)
+
 
 class UtilsTest(CreateIndexBaseTest):
     """
@@ -254,33 +236,31 @@ class UtilsTest(CreateIndexBaseTest):
         """
         doc = script.get_office_as_es_doc(self.office1)
         expected_doc = {
-            'website': 'http://www.supermarchesmatch.fr',
-            'tel': '0387787878',
-            'flag_alternance': 0,
-            'flag_senior': 0,
-            'flag_handicap': 0,
-            'naf': '4711D',
-            'name': 'SUPERMARCHES MATCH',
-            'flag_junior': 0,
-            'score': 90,
-            'scores_by_rome': {
-                'N1103': 25,
-                'D1214': 51,
-                'D1101': 45,
-                'D1507': 54,
-                'D1506': 90,
-                'D1505': 52,
-                'D1502': 20,
-                'M1607': 20,
-                'K1303': 20,
-                'D1106': 45
+            "website": "http://www.supermarchesmatch.fr",
+            "tel": "0387787878",
+            "flag_alternance": 0,
+            "flag_senior": 0,
+            "flag_handicap": 0,
+            "naf": "4711D",
+            "name": "SUPERMARCHES MATCH",
+            "flag_junior": 0,
+            "score": 90,
+            "scores_by_rome": {
+                "N1103": 25,
+                "D1214": 51,
+                "D1101": 45,
+                "D1507": 54,
+                "D1506": 90,
+                "D1505": 52,
+                "D1502": 20,
+                "M1607": 20,
+                "K1303": 20,
+                "D1106": 45,
             },
-            'locations': [
-                {'lat': 49.1044, 'lon': 6.17952},
-            ],
-            'siret': '78548035101646',
-            'headcount': 12,
-            'email': 'supermarche@match.com',
+            "locations": [{"lat": 49.1044, "lon": 6.17952}],
+            "siret": "78548035101646",
+            "headcount": 12,
+            "email": "supermarche@match.com",
         }
         # self.assertDictEqual(doc, expected_doc)
 
@@ -307,7 +287,7 @@ class AddOfficesTest(CreateIndexBaseTest):
             flag_junior=0,
             flag_senior=0,
             departement="57",
-            headcount='31',
+            headcount="31",
             score=80,
             x=6.17528,
             y=49.1187,
@@ -325,8 +305,9 @@ class AddOfficesTest(CreateIndexBaseTest):
         self.assertEqual(office.website, "")
 
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office_to_add.siret)
-        self.assertEqual(res['_source']['siret'], office.siret)
-        self.assertEqual(res['_source']['score'], office.score)
+        self.assertEqual(res["_source"]["siret"], office.siret)
+        self.assertEqual(res["_source"]["score"], office.score)
+
 
 class RemoveOfficesTest(CreateIndexBaseTest):
     """
@@ -338,34 +319,28 @@ class RemoveOfficesTest(CreateIndexBaseTest):
         Test `remove_offices` to delete an office.
         """
         office_to_remove1 = OfficeAdminRemove(
-            siret=self.office1.siret,
-            name=self.office1.company_name,
-            reason="N/A",
-            initiative=False,
+            siret=self.office1.siret, name=self.office1.company_name, reason="N/A", initiative=False
         )
         office_to_remove1.save()
 
         office_to_remove2 = OfficeAdminRemove(
-            siret=self.office2.siret,
-            name=self.office2.company_name,
-            reason="N/A",
-            initiative=False,
+            siret=self.office2.siret, name=self.office2.company_name, reason="N/A", initiative=False
         )
         office_to_remove2.save()
 
         # We should have 3 offices in ES (2 + the fake office).
-        count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={'query': {'match_all': {}}})
-        self.assertEqual(count['count'], 3)
+        count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={"query": {"match_all": {}}})
+        self.assertEqual(count["count"], 3)
 
         script.remove_offices()
-        self.es.indices.flush(index=settings.ES_INDEX) # Required by ES to register new documents.
+        self.es.indices.flush(index=settings.ES_INDEX)  # Required by ES to register new documents.
 
         # The offices should have been removed from the DB.
         self.assertEqual(Office.query.count(), 0)
 
         # The offices should have been removed from ES. Only the fake doc remains.
-        count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={'query': {'match_all': {}}})
-        self.assertEqual(count['count'], 1)
+        count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={"query": {"match_all": {}}})
+        self.assertEqual(count["count"], 1)
 
 
 class UpdateOfficesTest(CreateIndexBaseTest):
@@ -379,20 +354,20 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         Related to a previous bug where some scores where removed.
         """
         # No romes removed when computing scores
-        with mock.patch.object(
-            script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0
-        ), mock.patch.object(script.scoring_util, 'SCORE_ALTERNANCE_FOR_ROME_MINIMUM', 0):
+        with mock.patch.object(script.scoring_util, "SCORE_FOR_ROME_MINIMUM", 0), mock.patch.object(
+            script.scoring_util, "SCORE_ALTERNANCE_FOR_ROME_MINIMUM", 0
+        ):
             script.update_offices()
 
         for office in [self.office1, self.office2]:
             romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(office.naf)]
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
-            
-            self.assertIn('scores_by_rome', res['_source'])
-            self.assertIn('scores_alternance_by_rome', res['_source'])
 
-            self.assertTrue(len(romes_for_office), len(res['_source']['scores_by_rome']))
-            self.assertTrue(len(romes_for_office), len(res['_source']['scores_alternance_by_rome']))
+            self.assertIn("scores_by_rome", res["_source"])
+            self.assertIn("scores_alternance_by_rome", res["_source"])
+
+            self.assertTrue(len(romes_for_office), len(res["_source"]["scores_by_rome"]))
+            self.assertTrue(len(romes_for_office), len(res["_source"]["scores_alternance_by_rome"]))
 
     def test_update_office_by_updating_contact(self):
         """
@@ -425,17 +400,17 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
 
-        self.assertEqual(res['_source']['email'], office.email)
-        self.assertEqual(res['_source']['phone'], office.tel)
-        self.assertEqual(res['_source']['website'], office.website)
+        self.assertEqual(res["_source"]["email"], office.email)
+        self.assertEqual(res["_source"]["phone"], office.tel)
+        self.assertEqual(res["_source"]["website"], office.website)
 
         # Global score should always be the same.
-        self.assertEqual(res['_source']['score'], office.score)
+        self.assertEqual(res["_source"]["score"], office.score)
         # Check scores for ROME.
         # Since `romes_to_boost` is empty, all romes should be boosted.
         self.assertEqual(office_to_update.romes_to_boost, "")
         for rome in mapping_util.romes_for_naf(office.naf):
-            self.assertTrue(res['_source']['boosted_romes'][rome.code])
+            self.assertTrue(res["_source"]["boosted_romes"][rome.code])
 
     def test_update_office_by_removing_contact(self):
         """
@@ -457,17 +432,17 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         script.update_offices()
 
         office = Office.get(self.office1.siret)
-        self.assertEqual(office.email, '')
-        self.assertEqual(office.tel, '')
-        self.assertEqual(office.website, '')
+        self.assertEqual(office.email, "")
+        self.assertEqual(office.tel, "")
+        self.assertEqual(office.website, "")
         # Names should still be the same.
         self.assertEqual(office.company_name, self.office1.company_name)
         self.assertEqual(office.office_name, self.office1.office_name)
 
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
-        self.assertEqual(res['_source']['email'], '')
-        self.assertEqual(res['_source']['phone'], '')
-        self.assertEqual(res['_source']['website'], '')
+        self.assertEqual(res["_source"]["email"], "")
+        self.assertEqual(res["_source"]["phone"], "")
+        self.assertEqual(res["_source"]["website"], "")
 
     def test_update_office_boost_specific_romes(self):
         """
@@ -493,11 +468,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
-        self.assertEqual({
-            'D1507': True,
-            'D1103': True,
-        }, res['_source']['boosted_romes'])
-
+        self.assertEqual({"D1507": True, "D1103": True}, res["_source"]["boosted_romes"])
 
     def test_update_office_boost_unrelated_romes(self):
         """
@@ -506,8 +477,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         """
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
 
-        self.assertNotIn("D1506", romes_for_office) # Rome not related to the office
-        self.assertIn("D1507", romes_for_office) # Rome related to the office
+        self.assertNotIn("D1506", romes_for_office)  # Rome not related to the office
+        self.assertIn("D1507", romes_for_office)  # Rome related to the office
 
         office_to_update = OfficeAdminUpdate(
             sirets=self.office1.siret,
@@ -524,13 +495,13 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         # Check boosted scores.
 
-        self.assertTrue(res['_source']['boosted_romes']['D1506'])
-        self.assertTrue(res['_source']['boosted_romes']['D1507'])
+        self.assertTrue(res["_source"]["boosted_romes"]["D1506"])
+        self.assertTrue(res["_source"]["boosted_romes"]["D1507"])
 
         # Other scores should not be boosted.
         for rome in romes_for_office:
             if rome != "D1507":
-                self.assertNotIn(rome, res['_source']['boosted_romes'])
+                self.assertNotIn(rome, res["_source"]["boosted_romes"])
 
     def test_update_office_removed_romes(self):
         """
@@ -538,14 +509,14 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         """
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
 
-        self.assertIn("D1101", romes_for_office) # Rome related to the office
-        self.assertIn("D1507", romes_for_office) # Rome related to the office
+        self.assertIn("D1101", romes_for_office)  # Rome related to the office
+        self.assertIn("D1507", romes_for_office)  # Rome related to the office
 
         office_to_update = OfficeAdminUpdate(
             sirets=self.office1.siret,
             name=self.office1.company_name,
             boost=False,
-            romes_to_boost='',
+            romes_to_boost="",
             romes_to_remove="D1507",  # Remove score only for those ROME.
         )
         office_to_update.save()
@@ -556,13 +527,13 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
 
         # Check rome scores.
-        self.assertIn('D1101', res['_source']['scores_by_rome'])
-        self.assertNotIn('D1507', res['_source']['scores_by_rome'])
+        self.assertIn("D1101", res["_source"]["scores_by_rome"])
+        self.assertNotIn("D1507", res["_source"]["scores_by_rome"])
 
         # Other scores should not be boosted.
         for rome in romes_for_office:
             if rome != "D1507":
-                self.assertNotIn(rome, res['_source']['boosted_romes'])
+                self.assertNotIn(rome, res["_source"]["boosted_romes"])
 
     def test_update_office_add_alternance_infos(self):
         """
@@ -593,9 +564,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         # Remove alternance for this company
         office_to_update = OfficeAdminUpdate(
-            sirets=self.office1.siret,
-            name=self.office1.company_name,
-            score_alternance=0,
+            sirets=self.office1.siret, name=self.office1.company_name, score_alternance=0
         )
 
         office = Office.get(self.office1.siret)
@@ -608,18 +577,13 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office = Office.get(self.office1.siret)
         self.assertEqual(office.score_alternance, 0)
 
-
     def test_update_office_remove_on_lbb(self):
         """
         Test `update_offices` to hide on lbb
         """
 
         # Remove for this company
-        office_to_update = OfficeAdminUpdate(
-            sirets=self.office1.siret,
-            name=self.office1.company_name,
-            score=0,
-        )
+        office_to_update = OfficeAdminUpdate(sirets=self.office1.siret, name=self.office1.company_name, score=0)
 
         office = Office.get(self.office1.siret)
         self.assertNotEqual(office.score, 0)
@@ -631,37 +595,30 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office = Office.get(self.office1.siret)
         self.assertEqual(office.score, 0)
 
-
     def test_update_office_add_naf(self):
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
         romes_for_office += [rome.code for rome in mapping_util.romes_for_naf("4772A")]
 
         office_to_update = OfficeAdminUpdate(
-            sirets=self.office1.siret,
-            name=self.office1.company_name,
-            nafs_to_add="4772A",
+            sirets=self.office1.siret, name=self.office1.company_name, nafs_to_add="4772A"
         )
         office_to_update.save()
 
         # Use a mock to temporarily adjust scoring_util.SCORE_FOR_ROME_MINIMUM
         # and avoid removing romes if their score is too low.
-        with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0),\
-                mock.patch.object(script.scoring_util, 'MINIMUM_POSSIBLE_SCORE', 0):
+        with mock.patch.object(script.scoring_util, "SCORE_FOR_ROME_MINIMUM", 0), mock.patch.object(
+            script.scoring_util, "MINIMUM_POSSIBLE_SCORE", 0
+        ):
             script.update_offices()
 
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office1.siret)
-        self.assertEqual(len(set(romes_for_office)), len(res['_source']['scores_by_rome']))
-
+        self.assertEqual(len(set(romes_for_office)), len(res["_source"]["scores_by_rome"]))
 
     def test_remove_contacts_multi_siret(self):
         sirets = [self.office1.siret, self.office2.siret]
 
         office_to_update = OfficeAdminUpdate(
-            sirets='\n'.join(sirets),
-            name="Supermarché",
-            remove_email=True,
-            remove_phone=True,
-            remove_website=True,
+            sirets="\n".join(sirets), name="Supermarché", remove_email=True, remove_phone=True, remove_website=True
         )
         office_to_update.save()
 
@@ -669,21 +626,20 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         for siret in sirets:
             office = Office.get(siret)
-            self.assertEqual(office.email, '')
-            self.assertEqual(office.tel, '')
-            self.assertEqual(office.website, '')
+            self.assertEqual(office.email, "")
+            self.assertEqual(office.tel, "")
+            self.assertEqual(office.website, "")
 
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
-            self.assertEqual(res['_source']['email'], '')
-            self.assertEqual(res['_source']['phone'], '')
-            self.assertEqual(res['_source']['website'], '')
-
+            self.assertEqual(res["_source"]["email"], "")
+            self.assertEqual(res["_source"]["phone"], "")
+            self.assertEqual(res["_source"]["website"], "")
 
     def test_email_alternance_multi_siret(self):
         sirets = [self.office1.siret, self.office2.siret]
 
         office_to_update = OfficeAdminUpdate(
-            sirets='\n'.join(sirets),
+            sirets="\n".join(sirets),
             name="Supermarché",
             email_alternance="email_alternance@mail.com",
             phone_alternance="0699999999",
@@ -698,15 +654,10 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             self.assertEqual(office.phone_alternance, "0699999999")
             self.assertEqual(office.website_alternance, "http://example-alternance.com")
 
-
     def test_boost_multi_siret(self):
         sirets = [self.office1.siret, self.office2.siret]
 
-        office_to_update = OfficeAdminUpdate(
-            sirets='\n'.join(sirets),
-            name="Supermarché",
-            boost=True,
-        )
+        office_to_update = OfficeAdminUpdate(sirets="\n".join(sirets), name="Supermarché", boost=True)
         office_to_update.save(commit=True)
         script.update_offices()
 
@@ -717,14 +668,13 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             # Since `romes_to_boost` is empty, all `scores_by_rome` should be boosted.
             self.assertEqual(office_to_update.romes_to_boost, "")
             for rome in mapping_util.romes_for_naf(office.naf):
-                self.assertTrue(res['_source']['boosted_romes'][rome.code])
-
+                self.assertTrue(res["_source"]["boosted_romes"][rome.code])
 
     def test_new_contact_multi_siret(self):
         sirets = [self.office1.siret, self.office2.siret]
 
         office_to_update = OfficeAdminUpdate(
-            sirets='\n'.join(sirets),
+            sirets="\n".join(sirets),
             name="Supermarchés",
             new_email="foo@pole-emploi.fr",
             new_phone="0240656459",
@@ -743,10 +693,9 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             self.assertEqual(office.website, office_to_update.new_website)
 
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
-            self.assertEqual(res['_source']['email'], office_to_update.new_email)
-            self.assertEqual(res['_source']['phone'], office_to_update.new_phone)
-            self.assertEqual(res['_source']['website'], office_to_update.new_website)
-
+            self.assertEqual(res["_source"]["email"], office_to_update.new_email)
+            self.assertEqual(res["_source"]["phone"], office_to_update.new_phone)
+            self.assertEqual(res["_source"]["website"], office_to_update.new_website)
 
     def test_nafs_to_add_multi_siret(self):
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
@@ -754,24 +703,19 @@ class UpdateOfficesTest(CreateIndexBaseTest):
 
         sirets = [self.office1.siret, self.office2.siret]
 
-        office_to_update = OfficeAdminUpdate(
-            sirets='\n'.join(sirets),
-            name="Supermarchés",
-            nafs_to_add="4772A",
-        )
+        office_to_update = OfficeAdminUpdate(sirets="\n".join(sirets), name="Supermarchés", nafs_to_add="4772A")
         office_to_update.save()
 
         # Use a mock to temporarily adjust scoring_util.SCORE_FOR_ROME_MINIMUM
         # and avoid removing romes if their score is too low.
-        with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0),\
-                mock.patch.object(script.scoring_util, 'MINIMUM_POSSIBLE_SCORE', 0):
+        with mock.patch.object(script.scoring_util, "SCORE_FOR_ROME_MINIMUM", 0), mock.patch.object(
+            script.scoring_util, "MINIMUM_POSSIBLE_SCORE", 0
+        ):
             script.update_offices()
-
 
         for siret in sirets:
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
-            self.assertEqual(len(set(romes_for_office)), len(res['_source']['scores_by_rome']))
-
+            self.assertEqual(len(set(romes_for_office)), len(res["_source"]["scores_by_rome"]))
 
     def test_romes_to_boost_multi_siret(self):
         sirets = [self.office1.siret, self.office2.siret]
@@ -783,7 +727,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertIn("D1103", romes_for_office)
 
         office_to_update = OfficeAdminUpdate(
-            sirets='\n'.join(sirets),
+            sirets="\n".join(sirets),
             name="Supermarchés",
             boost=True,
             romes_to_boost="D1507\nD1103",  # Boost score only for those ROME.
@@ -796,24 +740,22 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
 
             # Check boosted scores.
-            self.assertTrue(res['_source']['boosted_romes']['D1507'])
-            self.assertTrue(res['_source']['boosted_romes']['D1103'])
-
+            self.assertTrue(res["_source"]["boosted_romes"]["D1507"])
+            self.assertTrue(res["_source"]["boosted_romes"]["D1103"])
 
     def test_romes_to_remove_multi_siret(self):
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
 
         sirets = [self.office1.siret, self.office2.siret]
 
-
-        self.assertIn("D1101", romes_for_office) # Rome related to the office
-        self.assertIn("D1507", romes_for_office) # Rome related to the office
+        self.assertIn("D1101", romes_for_office)  # Rome related to the office
+        self.assertIn("D1507", romes_for_office)  # Rome related to the office
 
         office_to_update = OfficeAdminUpdate(
-            sirets='\n'.join(sirets),
+            sirets="\n".join(sirets),
             name="Supermarchés",
             boost=False,
-            romes_to_boost='',
+            romes_to_boost="",
             romes_to_remove="D1507",  # Remove score only for those ROME.
         )
         office_to_update.save()
@@ -824,23 +766,22 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
 
             # Check romes
-            self.assertIn('D1101', res['_source']['scores_by_rome'])
-            self.assertNotIn('D1507', res['_source']['scores_by_rome'])
-
+            self.assertIn("D1101", res["_source"]["scores_by_rome"])
+            self.assertNotIn("D1507", res["_source"]["scores_by_rome"])
 
     def test_romes_alternance_to_remove_single_siret(self):
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
 
         siret = self.office1.siret
 
-        self.assertIn("D1101", romes_for_office) # Rome related to the office
-        self.assertIn("D1507", romes_for_office) # Rome related to the office
+        self.assertIn("D1101", romes_for_office)  # Rome related to the office
+        self.assertIn("D1507", romes_for_office)  # Rome related to the office
 
         office_to_update = OfficeAdminUpdate(
             sirets=siret,
             name="Supermarchés",
             boost_alternance=False,
-            romes_alternance_to_boost='',
+            romes_alternance_to_boost="",
             romes_alternance_to_remove="D1507",  # Remove score only for those ROME.
         )
         office_to_update.save()
@@ -850,23 +791,22 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
 
         # Check romes
-        self.assertIn('D1101', res['_source']['scores_alternance_by_rome'])
-        self.assertNotIn('D1507', res['_source']['scores_alternance_by_rome'])
-
+        self.assertIn("D1101", res["_source"]["scores_alternance_by_rome"])
+        self.assertNotIn("D1507", res["_source"]["scores_alternance_by_rome"])
 
     def test_romes_alternance_to_remove_multi_siret(self):
         romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(self.office1.naf)]
 
         sirets = [self.office1.siret, self.office2.siret]
 
-        self.assertIn("D1101", romes_for_office) # Rome related to the office
-        self.assertIn("D1507", romes_for_office) # Rome related to the office
+        self.assertIn("D1101", romes_for_office)  # Rome related to the office
+        self.assertIn("D1507", romes_for_office)  # Rome related to the office
 
         office_to_update = OfficeAdminUpdate(
-            sirets='\n'.join(sirets),
+            sirets="\n".join(sirets),
             name="Supermarchés",
             boost_alternance=False,
-            romes_alternance_to_boost='',
+            romes_alternance_to_boost="",
             romes_alternance_to_remove="D1507",  # Remove score only for those ROME.
         )
         office_to_update.save()
@@ -877,9 +817,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
 
             # Check romes
-            self.assertIn('D1101', res['_source']['scores_alternance_by_rome'])
-            self.assertNotIn('D1507', res['_source']['scores_alternance_by_rome'])
-
+            self.assertIn("D1101", res["_source"]["scores_alternance_by_rome"])
+            self.assertNotIn("D1507", res["_source"]["scores_alternance_by_rome"])
 
     def test_update_office_boost_specific_romes_alternance(self):
         """
@@ -905,11 +844,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
 
         # Check boosted scores.
-        self.assertEqual({
-            'D1507': True,
-            'D1103': True,
-        }, res['_source']['boosted_alternance_romes'])
-
+        self.assertEqual({"D1507": True, "D1103": True}, res["_source"]["boosted_alternance_romes"])
 
     def test_update_office_social_network(self):
         """
@@ -926,15 +861,12 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         # Check contact mode
         self.assertEqual("https://www.facebook.com/poleemploi/", office.social_network)
 
-
     def test_update_office_contact_mode(self):
         """
         Test `update_offices` to update an office: boost alternance score for specific ROME codes.
         """
         office_to_update = OfficeAdminUpdate(
-            sirets=self.office1.siret,
-            name=self.office1.company_name,
-            contact_mode="Come with his driver license",
+            sirets=self.office1.siret, name=self.office1.company_name, contact_mode="Come with his driver license"
         )
 
         office_to_update.save()
@@ -949,21 +881,25 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         """
         Test `get_score_minimum_for_rome` to get a score threshold that a company must have at least
         """
-        #In the metiers_tension csv file
+        # In the metiers_tension csv file
         # This row with rome K1401 should give the maximum possible threshold
-        # P2Z90	#N/A	#N/A	K1401	CONCEPTION ET PILOTAGE DE LA POLITIQUE DES POUVOIRS PUBLICS 
-        score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('K1401')
+        # P2Z90	#N/A	#N/A	K1401	CONCEPTION ET PILOTAGE DE LA POLITIQUE DES POUVOIRS PUBLICS
+        score_minimum_for_rome = scoring_util.get_score_minimum_for_rome("K1401")
         self.assertEqual(score_minimum_for_rome, scoring_util.SCORE_FOR_ROME_MINIMUM)
-        
+
         # This row with rome A1101 has 61.9% tension
-        #A0Z43,Conducteurs d'engins agricoles ou forestiers,61.9,A1101,CONDUITE D'ENGINS AGRICOLES ET FORESTIERS
-        score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('A1101')
-        result = ((scoring_util.SCORE_FOR_ROME_MINIMUM - scoring_util.MINIMUM_POSSIBLE_SCORE) * ((100 - 61.9)/100)) + scoring_util.MINIMUM_POSSIBLE_SCORE
+        # A0Z43,Conducteurs d'engins agricoles ou forestiers,61.9,A1101,CONDUITE D'ENGINS AGRICOLES ET FORESTIERS
+        score_minimum_for_rome = scoring_util.get_score_minimum_for_rome("A1101")
+        result = (
+            (scoring_util.SCORE_FOR_ROME_MINIMUM - scoring_util.MINIMUM_POSSIBLE_SCORE) * ((100 - 61.9) / 100)
+        ) + scoring_util.MINIMUM_POSSIBLE_SCORE
         self.assertEqual(score_minimum_for_rome, result)
-        self.assertTrue(scoring_util.MINIMUM_POSSIBLE_SCORE <= score_minimum_for_rome <= scoring_util.SCORE_FOR_ROME_MINIMUM)        
+        self.assertTrue(
+            scoring_util.MINIMUM_POSSIBLE_SCORE <= score_minimum_for_rome <= scoring_util.SCORE_FOR_ROME_MINIMUM
+        )
 
         # Test with the only rome not in the metiers en tension csv file : L1510|Films d'animation et effets spéciaux
-        score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('L1510')
+        score_minimum_for_rome = scoring_util.get_score_minimum_for_rome("L1510")
         self.assertEqual(score_minimum_for_rome, scoring_util.SCORE_FOR_ROME_MINIMUM)
 
 
@@ -978,8 +914,7 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         """
         # Add an entry in the OfficeAdminExtraGeoLocation table with extra geolocations.
         extra_geolocation = OfficeAdminExtraGeoLocation(
-            siret=self.office1.siret,
-            codes="75110\n13055",  # Paris 10 + Marseille
+            siret=self.office1.siret, codes="75110\n13055"  # Paris 10 + Marseille
         )
         extra_geolocation.save(commit=True)
 
@@ -988,11 +923,11 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         # The office should now have 3 geolocations in ES (the original one + Paris 10 + Marseille).
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office1.siret)
         expected_locations = [
-            {'lat': 43.25996690043557, 'lon': 5.370740865779022},
-            {'lat': 48.8815994262695, 'lon': 2.36229991912841},
-            {'lat': 49.1044, 'lon': 6.17952},
+            {"lat": 43.25996690043557, "lon": 5.370740865779022},
+            {"lat": 48.8815994262695, "lon": 2.36229991912841},
+            {"lat": 49.1044, "lon": 6.17952},
         ]
-        self.assertEqual(sorted(res['_source']['locations'], key=lambda x: (x['lat'], x['lon'])), expected_locations)
+        self.assertEqual(sorted(res["_source"]["locations"], key=lambda x: (x["lat"], x["lon"])), expected_locations)
 
         office = Office.get(self.office1.siret)
         self.assertTrue(office.has_multi_geolocations)
@@ -1006,10 +941,8 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
 
         # The office extra geolocations should now be reset.
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office1.siret)
-        expected_locations = [
-            {'lat': 49.1044, 'lon': 6.17952},
-        ]
-        self.assertEqual(res['_source']['locations'], expected_locations)
+        expected_locations = [{"lat": 49.1044, "lon": 6.17952}]
+        self.assertEqual(res["_source"]["locations"], expected_locations)
 
         office = Office.get(self.office1.siret)
         self.assertFalse(office.has_multi_geolocations)

@@ -1,5 +1,5 @@
-
 import unidecode
+
 
 def sanitize_string(s):
     """
@@ -11,7 +11,7 @@ def sanitize_string(s):
     if isinstance(s, bytes):
         # the main optimistic case : UTF-8
         try:
-            return s.decode('utf-8')
+            return s.decode("utf-8")
         except UnicodeDecodeError:
             pass
         # a trick to deal with french accents found in unknown encoding
@@ -20,23 +20,23 @@ def sanitize_string(s):
         # é : \xc3\xa3\xa9 unknown encoding => \xc3\xa9 utf-8
         # à : \xc3\xa3\xa0 unknown encoding => \xc3\xa0 utf-8
         try:
-            return s.replace('\xa3', '').decode('utf-8')
+            return s.replace("\xa3", "").decode("utf-8")
         except UnicodeDecodeError:
             pass
         # a special character often seen is the degree sign (e.g. in N°)
         # see http://www.codetable.net/hex/b0
         # which matches the latin1 encoding
         try:
-            return s.decode('latin1')
+            return s.decode("latin1")
         except UnicodeDecodeError:
             pass
         # last resort
         # 'ignore' will removed any unrecognized character
-        return s.decode('utf-8', 'ignore')
+        return s.decode("utf-8", "ignore")
     elif isinstance(s, str):
         return s
     elif s is None:
-        return s # leave None value untouched
+        return s  # leave None value untouched
     raise Exception("not a string nor bytes nor None")
 
 

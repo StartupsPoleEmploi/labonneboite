@@ -6,10 +6,11 @@ import os
 from unittest import mock
 
 from labonneboite.common.maps.vendors import ign
+
 from .utils import mock_response_from_json
 
 
-FIXTURES_ROOT = os.path.join(os.path.dirname(__file__), 'fixtures', 'ign')
+FIXTURES_ROOT = os.path.join(os.path.dirname(__file__), "fixtures", "ign")
 
 
 def isochrone(origin, duration):
@@ -19,19 +20,14 @@ def isochrone(origin, duration):
     origin: tuple(latitude, longitude)
     duration: integer
     """
-    file = open(os.path.join(
-        FIXTURES_ROOT,
-        'isochrones',
-        f'metz_{duration}_minutes.json'
-    )).read()
+    file = open(os.path.join(FIXTURES_ROOT, "isochrones", f"metz_{duration}_minutes.json")).read()
 
     response = mock_response_from_json(file)
 
-    with mock.patch.object(ign.requests, 'get', response):
+    with mock.patch.object(ign.requests, "get", response):
         isochrone = ign.isochrone(origin, duration)
 
     return isochrone
-
 
 
 def durations(origin, destinations):
@@ -50,18 +46,13 @@ def durations(origin, destinations):
     result = []
     for destination in destinations:
 
-        file = open(os.path.join(
-            FIXTURES_ROOT,
-            'destinations',
-            f'{destination[0]}_{destination[1]}.json'
-        )).read()
+        file = open(os.path.join(FIXTURES_ROOT, "destinations", f"{destination[0]}_{destination[1]}.json")).read()
 
         response = mock_response_from_json(file)
 
-
-        with mock.patch.object(ign.requests, 'get', response):
+        with mock.patch.object(ign.requests, "get", response):
             data = ign.get_journey(origin, destination)
 
-        result.append(float(data['durationSeconds']))
+        result.append(float(data["durationSeconds"]))
 
     return result

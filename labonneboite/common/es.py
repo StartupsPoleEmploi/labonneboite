@@ -1,14 +1,15 @@
-from datetime import datetime
 import random
 import string
+from datetime import datetime
 
 import elasticsearch
 
 from labonneboite.conf import settings
 
-OFFICE_TYPE = 'office'
-OGR_TYPE = 'ogr'
-LOCATION_TYPE = 'location'
+
+OFFICE_TYPE = "office"
+OGR_TYPE = "ogr"
+LOCATION_TYPE = "location"
 
 
 class ConnectionPool(object):
@@ -31,10 +32,7 @@ def new_elasticsearch_instance():
     In some cases e.g. parallel jobs you may need a dedicated es connection for each
     of your threads.
     """
-    return elasticsearch.Elasticsearch(
-        hosts=[settings.ES_HOST],
-        timeout=settings.ES_TIMEOUT
-    )
+    return elasticsearch.Elasticsearch(hosts=[settings.ES_HOST], timeout=settings.ES_TIMEOUT)
 
 
 def drop_and_create_index():
@@ -61,7 +59,7 @@ def drop_indexes_of_alias(name=settings.ES_INDEX):
 
 
 def drop_index(index):
-    Elasticsearch().indices.delete(index=index, params={'ignore': [400, 404]})
+    Elasticsearch().indices.delete(index=index, params={"ignore": [400, 404]})
 
 
 def get_new_index_name():
@@ -70,7 +68,7 @@ def get_new_index_name():
     appended to avoid collisions for indexes created at the same second (it
     happens in tests).
     """
-    suffix = ''.join([random.choice(string.ascii_lowercase) for _ in range(5)])
+    suffix = "".join([random.choice(string.ascii_lowercase) for _ in range(5)])
     return datetime.now().strftime(settings.ES_INDEX + "-%Y%m%d%H%M%S-" + suffix)
 
 
@@ -83,75 +81,32 @@ def create_index(index):
     Create index with the right settings.
     """
     filters = {
-        "stop_francais": {
-            "type": "stop",
-            "stopwords": ["_french_"],
-        },
-        "fr_stemmer": {
-            "type": "stemmer",
-            "name": "light_french",
-        },
-        "elision": {
-            "type": "elision",
-            "articles": ["c", "l", "m", "t", "qu", "n", "s", "j", "d"],
-        },
-        "ngram_filter": {
-            "type": "ngram",
-            "min_gram": 2,
-            "max_gram": 20,
-        },
-        "edge_ngram_filter": {
-            "type": "edge_ngram",
-            "min_gram": 1,
-            "max_gram": 20,
-        },
+        "stop_francais": {"type": "stop", "stopwords": ["_french_"]},
+        "fr_stemmer": {"type": "stemmer", "name": "light_french"},
+        "elision": {"type": "elision", "articles": ["c", "l", "m", "t", "qu", "n", "s", "j", "d"]},
+        "ngram_filter": {"type": "ngram", "min_gram": 2, "max_gram": 20},
+        "edge_ngram_filter": {"type": "edge_ngram", "min_gram": 1, "max_gram": 20},
     }
 
     analyzers = {
         "stemmed": {
             "type": "custom",
             "tokenizer": "standard",
-            "filter": [
-                "asciifolding",
-                "lowercase",
-                "stop_francais",
-                "elision",
-                "fr_stemmer",
-            ],
+            "filter": ["asciifolding", "lowercase", "stop_francais", "elision", "fr_stemmer"],
         },
-        "autocomplete": {
-            "type": "custom",
-            "tokenizer": "standard",
-            "filter": [
-                "lowercase",
-                "edge_ngram_filter",
-            ],
-        },
+        "autocomplete": {"type": "custom", "tokenizer": "standard", "filter": ["lowercase", "edge_ngram_filter"]},
         "ngram_analyzer": {
             "type": "custom",
             "tokenizer": "standard",
-            "filter": [
-                "asciifolding",
-                "lowercase",
-                "stop_francais",
-                "elision",
-                "ngram_filter",
-            ],
+            "filter": ["asciifolding", "lowercase", "stop_francais", "elision", "ngram_filter"],
         },
     }
 
     mapping_ogr = {
         # https://www.elastic.co/guide/en/elasticsearch/reference/1.7/mapping-all-field.html
-        "_all": {
-            "type": "string",
-            "index_analyzer": "ngram_analyzer",
-            "search_analyzer": "standard",
-        },
+        "_all": {"type": "string", "index_analyzer": "ngram_analyzer", "search_analyzer": "standard"},
         "properties": {
-            "ogr_code": {
-                "type": "string",
-                "index": "not_analyzed",
-            },
+            "ogr_code": {"type": "string", "index": "not_analyzed"},
             "ogr_description": {
                 "type": "string",
                 "include_in_all": True,
@@ -159,10 +114,7 @@ def create_index(index):
                 "index_analyzer": "ngram_analyzer",
                 "search_analyzer": "standard",
             },
-            "rome_code": {
-                "type": "string",
-                "index": "not_analyzed",
-            },
+            "rome_code": {"type": "string", "index": "not_analyzed"},
             "rome_description": {
                 "type": "string",
                 "include_in_all": True,
@@ -178,122 +130,47 @@ def create_index(index):
             "city_name": {
                 "type": "multi_field",
                 "fields": {
-                    "raw": {
-                        "type": "string",
-                        "index": "not_analyzed",
-                    },
-                    "autocomplete" : {
-                        "type": "string",
-                        "analyzer": "autocomplete",
-                    },
-                    "stemmed": {
-                        "type": "string",
-                        "analyzer": "stemmed",
-                        "store": "yes",
-                        "term_vector": "yes",
-                    },
+                    "raw": {"type": "string", "index": "not_analyzed"},
+                    "autocomplete": {"type": "string", "analyzer": "autocomplete"},
+                    "stemmed": {"type": "string", "analyzer": "stemmed", "store": "yes", "term_vector": "yes"},
                 },
             },
-            "coordinates": {
-                "type": "geo_point",
-            },
-            "population": {
-                "type": "integer",
-            },
-            "slug": {
-                "type": "string",
-                "index": "not_analyzed",
-            },
-            "zipcode": {
-                "type": "string",
-                "index": "not_analyzed",
-            },
-        },
+            "coordinates": {"type": "geo_point"},
+            "population": {"type": "integer"},
+            "slug": {"type": "string", "index": "not_analyzed"},
+            "zipcode": {"type": "string", "index": "not_analyzed"},
+        }
     }
 
     mapping_office = {
         "properties": {
-            "naf": {
-                "type": "string",
-                "index": "not_analyzed",
-            },
-            "siret": {
-                "type": "string",
-                "index": "not_analyzed",
-            },
-            "name": {
-                "type": "string",
-                "index": "not_analyzed",
-            },
-            "email": {
-                "type": "string",
-                "index": "not_analyzed",
-            },
-            "tel": {
-                "type": "string",
-                "index": "not_analyzed",
-            },
-            "website": {
-                "type": "string",
-                "index": "not_analyzed",
-            },
-            "score": {
-                "type": "integer",
-                "index": "not_analyzed",
-            },
-            "scores_by_rome": {
-                "type": "object",
-                "index": "not_analyzed",
-            },
-            "score_alternance": {
-                "type": "integer",
-                "index": "not_analyzed",
-            },
-            "scores_alternance_by_rome": {
-                "type": "object",
-                "index": "not_analyzed",
-            },
-            "boosted_romes": {
-                "type": "object",
-                "index": "not_analyzed",
-            },
-            "boosted_alternance_romes": {
-                "type": "object",
-                "index": "not_analyzed",
-            },
-            "headcount": {
-                "type": "integer",
-                "index": "not_analyzed",
-            },
-            "department": {
-                "type": "string",
-                "index": "not_analyzed"
-            },
-            "locations": {
-                "type": "geo_point",
-            },
-        },
+            "naf": {"type": "string", "index": "not_analyzed"},
+            "siret": {"type": "string", "index": "not_analyzed"},
+            "name": {"type": "string", "index": "not_analyzed"},
+            "email": {"type": "string", "index": "not_analyzed"},
+            "tel": {"type": "string", "index": "not_analyzed"},
+            "website": {"type": "string", "index": "not_analyzed"},
+            "score": {"type": "integer", "index": "not_analyzed"},
+            "scores_by_rome": {"type": "object", "index": "not_analyzed"},
+            "score_alternance": {"type": "integer", "index": "not_analyzed"},
+            "scores_alternance_by_rome": {"type": "object", "index": "not_analyzed"},
+            "boosted_romes": {"type": "object", "index": "not_analyzed"},
+            "boosted_alternance_romes": {"type": "object", "index": "not_analyzed"},
+            "headcount": {"type": "integer", "index": "not_analyzed"},
+            "department": {"type": "string", "index": "not_analyzed"},
+            "locations": {"type": "geo_point"},
+        }
     }
     create_body = {
-        "settings": {
-            "index": {
-                "analysis": {
-                    "filter": filters,
-                    "analyzer": analyzers,
-                },
-            },
-        },
-        "mappings":  {
-            "ogr": mapping_ogr,
-            "location": mapping_location,
-            "office": mapping_office,
-        },
+        "settings": {"index": {"analysis": {"filter": filters, "analyzer": analyzers}}},
+        "mappings": {"ogr": mapping_ogr, "location": mapping_location, "office": mapping_office},
     }
 
     Elasticsearch().indices.create(index=index, body=create_body)
 
     fake_doc = fake_office()
-    Elasticsearch().index(index=index, doc_type=OFFICE_TYPE, id=fake_doc['siret'], body=fake_doc)
+    Elasticsearch().index(index=index, doc_type=OFFICE_TYPE, id=fake_doc["siret"], body=fake_doc)
+
 
 # This fake office having a zero but existing score for each rome is designed
 # as a workaround of the following bug:
@@ -316,14 +193,14 @@ def create_index(index):
 # This fake office ensures no rome will ever be orphaned.
 def fake_office():
     doc = {
-        'siret': "0",
+        "siret": "0",
         # fields required even if not used by function_score
-        'score': 0,
-        'score_alternance': 0,
+        "score": 0,
+        "score_alternance": 0,
     }
 
     # all fields used by function_score which could potentially be orphaned and thus cause the bug
-    doc['scores_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
-    doc['scores_alternance_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
+    doc["scores_by_rome"] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
+    doc["scores_alternance_by_rome"] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
 
     return doc

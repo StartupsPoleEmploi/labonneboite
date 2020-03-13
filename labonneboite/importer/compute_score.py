@@ -21,35 +21,39 @@ the number of hirings.
 We use the scikit-learn library: more info at
 http://scikit-learn.org/stable/documentation.html
 """
-from calendar import monthrange
 import math
-from operator import getitem
 import os
 import pickle
 import sys
-
+from calendar import monthrange
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
+from operator import getitem
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+import sqlalchemy
+from dateutil.relativedelta import relativedelta
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
-import sqlalchemy
 from sqlalchemy.pool import NullPool
+
+from labonneboite.common import scoring as scoring_util
+from labonneboite.common.database import get_db_string
+from labonneboite.common.env import ENV_DEVELOPMENT, get_current_env
 from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import DpaeStatistics, Hiring, RawOffice
-from labonneboite.common import scoring as scoring_util
-from labonneboite.common.database import get_db_string
-from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
+
 from .debug import listen
 from .jobs.common import logger
 
+
 listen()
+
 
 def get_engine():
     return sqlalchemy.create_engine(get_db_string(), poolclass=NullPool)
+
 
 # Output additional debug info about these sirets
 # To disable, set to an empty list []
@@ -77,8 +81,7 @@ def debug_df(df, description="no description"):
     Outputs useful information about dataframe
     """
     if len(DEBUG_SIRETS) >= 1:
-        logger.debug("dataframe debug info [%s] about sirets %s",
-                     description, DEBUG_SIRETS)
+        logger.debug("dataframe debug info [%s] about sirets %s", description, DEBUG_SIRETS)
         columns = list(df.columns)
         logger.debug("dataframe has %s rows and columns = %s", len(df), columns)
         if "siret" in columns:
@@ -91,23 +94,21 @@ def debug_df(df, description="no description"):
 
 def discarded_check(departement):
     # weird data distribution for these departements, discard safey
-    return int(departement) in [20, ]
+    return int(departement) in [20]
 
 
 def check_coefficient_of_variation(df_etab, departement, period_count_columns, prefix):
     hiring_count_per_period_sum = df_etab[period_count_columns].sum(axis=0)
     coefficient_of_variation = hiring_count_per_period_sum.std() / hiring_count_per_period_sum.mean()
-    logger.debug('hiring_count_per_period_sum %s', hiring_count_per_period_sum)
-    logger.debug('coefficient of variation of hiring count per period %s', coefficient_of_variation)
+    logger.debug("hiring_count_per_period_sum %s", hiring_count_per_period_sum)
+    logger.debug("coefficient of variation of hiring count per period %s", coefficient_of_variation)
     logger.info("checking mean_between_existing_and_new_score: %s", coefficient_of_variation)
     if not discarded_check(departement):
         if not coefficient_of_variation < importer_settings.SCORE_COEFFICIENT_OF_VARIATION_MAX:
-            raise_with_message("[dpt%s] %s coefficient_of_variation too high: %s > %s" % (
-                departement,
-                prefix,
-                coefficient_of_variation,
-                importer_settings.SCORE_COEFFICIENT_OF_VARIATION_MAX
-            ))
+            raise_with_message(
+                "[dpt%s] %s coefficient_of_variation too high: %s > %s"
+                % (departement, prefix, coefficient_of_variation, importer_settings.SCORE_COEFFICIENT_OF_VARIATION_MAX)
+            )
 
 
 def check_mean_between_existing_and_new_score(departement, df):
@@ -115,7 +116,7 @@ def check_mean_between_existing_and_new_score(departement, df):
     logger.info("checking mean_between_existing_and_new_score: %s", mean)
     if not discarded_check(departement):
         if not np.nan_to_num(df[["diff_score"]].mean())[0] < importer_settings.SCORE_COMPUTING_MAX_DIFF_MEAN:
-            raise "np.nan_to_num(df[[\"diff_score\"]].mean())[0] too high"
+            raise 'np.nan_to_num(df[["diff_score"]].mean())[0] too high'
 
 
 def check_highly_scored_companies_evolution(departement, high_existing_scores, high_new_scores):
@@ -133,28 +134,28 @@ def check_number_highly_scored_companies(departement, high_new_scores):
         if not high_new_scores > importer_settings.HIGH_SCORE_COMPANIES_COUNT_MIN:
             error_msg = "high_new_scores too low: %s < %s" % (
                 high_new_scores,
-                importer_settings.HIGH_SCORE_COMPANIES_COUNT_MIN
+                importer_settings.HIGH_SCORE_COMPANIES_COUNT_MIN,
             )
             raise Exception(error_msg)
 
 
 def tranche_to_effectif(tranche):
     map_tranche_to_effectif = {
-        '00': 0,
-        '01': 1,
-        '02': 3,
-        '03': 6,
-        '11': 10,
-        '12': 20,
-        '21': 50,
-        '22': 100,
-        '31': 200,
-        '32': 250,
-        '41': 500,
-        '42': 1000,
-        '51': 2000,
-        '52': 5000,
-        '53': 10000
+        "00": 0,
+        "01": 1,
+        "02": 3,
+        "03": 6,
+        "11": 10,
+        "12": 20,
+        "21": 50,
+        "22": 100,
+        "31": 200,
+        "32": 250,
+        "41": 500,
+        "42": 1000,
+        "51": 2000,
+        "52": 5000,
+        "53": 10000,
     }
     if tranche not in list(map_tranche_to_effectif.keys()):
         return 1
@@ -182,9 +183,13 @@ def go_back_last_day_of_the_month(date):
 @timeit
 def get_df_etab(departement):
     logger.debug("reading etablissements data (%s)", departement)
-    df_etab = pd.read_sql_query("""
+    df_etab = pd.read_sql_query(
+        """
         select * from %s where departement = %s and siret != ''
-        """ % (RawOffice.__tablename__, departement), get_engine())
+        """
+        % (RawOffice.__tablename__, departement),
+        get_engine(),
+    )
     debug_df(df_etab, "after loading from raw office table")
     if df_etab.empty:
         logger.warning("dataframe empty for departement %s", departement)
@@ -192,7 +197,7 @@ def get_df_etab(departement):
     logger.debug("loading data (%s) OK (%i etablissements)!", departement, len(df_etab))
 
     logger.debug("adding effectif (%s)...", departement)
-    df_etab['effectif'] = df_etab['trancheeffectif'].map(tranche_to_effectif)
+    df_etab["effectif"] = df_etab["trancheeffectif"].map(tranche_to_effectif)
     logger.debug("effectif done (%s)!", departement)
 
     return df_etab
@@ -201,7 +206,8 @@ def get_df_etab(departement):
 @timeit
 def get_df_hiring(departement, prediction_beginning_date):
     logger.debug("reading hiring data...")
-    df_hiring = pd.read_sql_query("""
+    df_hiring = pd.read_sql_query(
+        """
         select
             siret,
             hiring_date,
@@ -214,12 +220,13 @@ def get_df_hiring(departement, prediction_beginning_date):
             departement = %s
             and contract_type in (%s)
             and hiring_date < '%s'
-        """ % (
-            ', '.join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_DPAE]),
-            ', '.join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_ALTERNANCE]),
+        """
+        % (
+            ", ".join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_DPAE]),
+            ", ".join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_ALTERNANCE]),
             Hiring.__tablename__,
             departement,
-            ', '.join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_ALL]),
+            ", ".join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_ALL]),
             str(prediction_beginning_date.isoformat()),
         ),
         get_engine(),
@@ -253,8 +260,9 @@ def get_df_etab_with_hiring_monthly_aggregates(departement, prediction_beginning
     debug_df(df_dpae, "after group by")
     logger.debug("pivoting table dpae (%s)...", departement)
     # FIXME understand why `values="hiring_date"` is needed at all
-    df_dpae = pd.pivot_table(df_dpae, values="hiring_date", index="siret",
-        columns=["hiring_type", "hiring_date_year", "hiring_date_month"])
+    df_dpae = pd.pivot_table(
+        df_dpae, values="hiring_date", index="siret", columns=["hiring_type", "hiring_date_year", "hiring_date_month"]
+    )
     debug_df(df_dpae, "after pivot")
     logger.debug("pivoting table (%s) ok!", departement)
 
@@ -265,9 +273,9 @@ def get_df_etab_with_hiring_monthly_aggregates(departement, prediction_beginning
     df_dpae["siret"] = df_dpae.index
     df_dpae = df_dpae.fillna(0)
 
-    df_dpae.columns = ['-'.join([str(c) for c in col]) for col in df_dpae.columns.values]
-    siret_raw_column_name = 'siret--'
-    df_dpae['siret'] = df_dpae[siret_raw_column_name]
+    df_dpae.columns = ["-".join([str(c) for c in col]) for col in df_dpae.columns.values]
+    siret_raw_column_name = "siret--"
+    df_dpae["siret"] = df_dpae[siret_raw_column_name]
     del df_dpae[siret_raw_column_name]
     debug_df(df_dpae, "after transform")
 
@@ -280,7 +288,7 @@ def get_df_etab_with_hiring_monthly_aggregates(departement, prediction_beginning
 
     logger.debug("merging dpae with etablissements (%s)...", departement)
     # inner join to keep only etabs which have at least one dpae
-    df_etab = pd.merge(df_dpae, df_etab, on='siret', how="inner")
+    df_etab = pd.merge(df_dpae, df_etab, on="siret", how="inner")
     debug_df(df_etab, "after merge")
     logger.debug("merging done with %s offices(%s)!", len(df_etab), departement)
 
@@ -309,6 +317,7 @@ def compute_prediction_beginning_date():
 def total_hired_period(period):
     def f(office):
         return office[period]
+
     return f
 
 
@@ -325,14 +334,15 @@ def months_between_dates(d1, d2):
     return delta
 
 
-def get_features_for_lag(df_etab, prefix, training_periods, data_gap_in_periods,
-        periods_back_in_time, debug_msg="Unnamed"):
+def get_features_for_lag(
+    df_etab, prefix, training_periods, data_gap_in_periods, periods_back_in_time, debug_msg="Unnamed"
+):
     temporal_features = []
     for i in range(0, training_periods):  # [0, 1, ... training_periods - 1]
         index = data_gap_in_periods + (1 + i) + periods_back_in_time
-        temporal_features.append('%s-period-%i' % (prefix, index))
+        temporal_features.append("%s-period-%i" % (prefix, index))
     features = list(temporal_features)
-    features.append('effectif')
+    features.append("effectif")
 
     df_etab_features_only = df_etab[features]
     X = df_etab_features_only.values
@@ -353,7 +363,7 @@ def get_hirings_over_period_for_office(office, prediction_beginning_date, months
     columns_of_period = []
     for i in range(0, months_per_period):  # [0, 1, 2, ..., months_per_period - 1]
         current_date = start_date + relativedelta(months=i)
-        columns_of_period.append('%s-%s-%s' % (prefix, current_date.year, current_date.month))
+        columns_of_period.append("%s-%s-%s" % (prefix, current_date.year, current_date.month))
 
     hirings_over_period = 0
     for column in columns_of_period:
@@ -365,8 +375,7 @@ def get_hirings_over_period_for_office(office, prediction_beginning_date, months
     return hirings_over_period
 
 
-def compute_hiring_aggregates(
-        df_etab, departement, prediction_beginning_date, periods, prefix, months_per_period):
+def compute_hiring_aggregates(df_etab, departement, prediction_beginning_date, periods, prefix, months_per_period):
     """
     Edits in place df_etab.
     Adds one column per period containing hiring total for this hiring_type.
@@ -376,11 +385,11 @@ def compute_hiring_aggregates(
     # df_etab has one row per siret and one column per hiring month-aggregate and per hiring_type
     period_count_columns = []
     for i in range(1, periods + 1):  # [1, 2, ..., periods]
-        column = '%s-period-%s' % (prefix, i)
+        column = "%s-period-%s" % (prefix, i)
         # pylint: disable=cell-var-from-loop
         df_etab[column] = df_etab.apply(
             lambda office: get_hirings_over_period_for_office(
-                office, prediction_beginning_date, months_per_period, minus=i, prefix=prefix,
+                office, prediction_beginning_date, months_per_period, minus=i, prefix=prefix
             ),
             axis=1,
         )
@@ -393,8 +402,16 @@ def compute_hiring_aggregates(
 
 
 @timeit
-def train(df_etab, departement, prediction_beginning_date, last_historical_data_date,
-        months_per_period, training_periods, prefix_for_fields, score_field_name):
+def train(
+    df_etab,
+    departement,
+    prediction_beginning_date,
+    last_historical_data_date,
+    months_per_period,
+    training_periods,
+    prefix_for_fields,
+    score_field_name,
+):
     """
     Edits in place df_etab by adding final score columns
     (e.g. score and score_regr for DPAE/LBB, or score_alternance and score_alternance_regr for LBA).
@@ -423,7 +440,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
             if data_gap_in_periods <= 0:
                 raise ValueError("dpae data should have at least one period of gap")
         else:
-            #if data_gap_in_periods != 0:
+            # if data_gap_in_periods != 0:
             if data_gap_in_periods not in [0, 1]:
                 # FIXME restore when we have dpae 10 april
                 raise ValueError("dpae data should have no gap")
@@ -451,7 +468,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     # We model the problem as a linear regression.
     regr = linear_model.LinearRegression()
 
-    y_train_period = '%s-period-%s' % (prefix_for_fields, 2 * periods_per_year + data_gap_in_periods)
+    y_train_period = "%s-period-%s" % (prefix_for_fields, 2 * periods_per_year + data_gap_in_periods)
     y_train_regr = df_etab.apply(total_hired_period(y_train_period), axis=1)
 
     X_train, X_train_feature_names = get_features_for_lag(
@@ -474,8 +491,9 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     logger.debug("(%s %s) fitting done!", departement, prefix_for_fields)
 
     logger.debug("(%s %s) X_train_feature_names: %s", departement, prefix_for_fields, X_train_feature_names)
-    logger.debug("(%s %s) regression_coefficients (fitting done on X_train) : %s",
-        departement, prefix_for_fields, regr.coef_)
+    logger.debug(
+        "(%s %s) regression_coefficients (fitting done on X_train) : %s", departement, prefix_for_fields, regr.coef_
+    )
 
     X_test, X_test_feature_names = get_features_for_lag(
         df_etab,
@@ -489,19 +507,14 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     logger.debug("(%s %s) X_test_feature_names: %s", departement, prefix_for_fields, X_test_feature_names)
 
     X_live, X_live_feature_names = get_features_for_lag(
-        df_etab,
-        prefix_for_fields,
-        training_periods,
-        data_gap_in_periods,
-        periods_back_in_time=0,
-        debug_msg="X_live",
+        df_etab, prefix_for_fields, training_periods, data_gap_in_periods, periods_back_in_time=0, debug_msg="X_live"
     )
 
     logger.debug("(%s %s) X_live_feature_names: %s", departement, prefix_for_fields, X_live_feature_names)
 
     # --- compute regression metrics
     y_train_regr_pred = regr.predict(X_train)
-    y_test_period = '%s-period-%s' % (prefix_for_fields, periods_per_year + data_gap_in_periods)
+    y_test_period = "%s-period-%s" % (prefix_for_fields, periods_per_year + data_gap_in_periods)
     y_test_regr = df_etab.apply(total_hired_period(y_test_period), axis=1)
     y_test_regr_pred = regr.predict(X_test)
     rmse_train = mean_squared_error(y_train_regr, y_train_regr_pred)
@@ -515,10 +528,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
         "X_live_feature_names": X_live_feature_names,
         "regression": regr,
         "regression_coefficients": regr.coef_,
-        "regression_scores": {
-            "rmse_train": rmse_train,
-            "rmse_test": rmse_test,
-        }
+        "regression_scores": {"rmse_train": rmse_train, "rmse_test": rmse_test},
     }
 
     current_time = datetime.now().strftime("%Y-%m-%d_%Hh%Mm%Ss")
@@ -542,8 +552,12 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     df_etab[score_field_name] = [scoring_util.get_score_from_hirings(h) for h in df_etab[score_regr_field_name]]
 
     ranges = [0, 20, 40, 60, 80, 100]
-    logger.info('(%s %s) score distribution : %s', departement, prefix_for_fields,
-        df_etab.groupby(pd.cut(df_etab.score, ranges))[score_field_name].agg('count'))
+    logger.info(
+        "(%s %s) score distribution : %s",
+        departement,
+        prefix_for_fields,
+        df_etab.groupby(pd.cut(df_etab.score, ranges))[score_field_name].agg("count"),
+    )
 
     compare_new_scores_to_old_ones(departement, df_etab)
 
@@ -555,14 +569,14 @@ def export_df_etab_to_db(df_etab, departement):
     def departement_to_str(x):
         return "{:02d}".format(int(x["departement"]))
 
-    df_etab['departement'] = df_etab.apply(departement_to_str, axis=1)
+    df_etab["departement"] = df_etab.apply(departement_to_str, axis=1)
 
     # FIXME control more precisely the schema (indexes!) of temporary tables created by to_sql,
     # current version adds an 'index' column (which is the panda dataframe index column itself,
     # nothing to do with our app) and makes it a primary key.
     # see https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_sql.html
     # Maybe using no index at all (no primary key) would be faster.
-    df_etab.to_sql("etablissements_%s" % departement, get_engine(), if_exists='replace', chunksize=10000)
+    df_etab.to_sql("etablissements_%s" % departement, get_engine(), if_exists="replace", chunksize=10000)
     logger.debug("sql done (%s)!", departement)
 
 
@@ -570,9 +584,8 @@ def export_df_etab_to_db(df_etab, departement):
 def compare_new_scores_to_old_ones(departement, df_etab):
     logger.debug("fetching existing scores for %s", departement)
     df_existing_score = pd.read_sql_query(
-        "select siret, score as existing_score from %s where departement=%s" % (
-            importer_settings.SCORE_REDUCING_TARGET_TABLE, departement
-        ),
+        "select siret, score as existing_score from %s where departement=%s"
+        % (importer_settings.SCORE_REDUCING_TARGET_TABLE, departement),
         get_engine(),
     )
     debug_df(df_existing_score, "df_existing_score")
@@ -592,7 +605,7 @@ def compare_new_scores_to_old_ones(departement, df_etab):
             "mean difference of scores: %s new score %s existing score %s",
             df_etab[["diff_score"]].mean()[0],
             df_etab[["score"]].mean()[0],
-            df_etab[["existing_score"]].mean()[0]
+            df_etab[["existing_score"]].mean()[0],
         )
         # abort if the mean between the existing score and the new just computed score is too high
         check_mean_between_existing_and_new_score(departement, df_etab)
@@ -608,10 +621,8 @@ def compare_new_scores_to_old_ones(departement, df_etab):
 
 @timeit
 def run(
-        departement,
-        prediction_beginning_date=compute_prediction_beginning_date(),
-        return_df_etab_if_successful=False,
-    ):
+    departement, prediction_beginning_date=compute_prediction_beginning_date(), return_df_etab_if_successful=False
+):
     """
     Returns True if computation successful and False otherwise.
     """
@@ -624,7 +635,7 @@ def run(
 
     if df_etab is None:
         logger.warning("no etab/hiring data found for departement %s", departement)
-        return False # failed computation (e.g. no data)
+        return False  # failed computation (e.g. no data)
 
     # LBB / DPAE.
 
@@ -635,8 +646,8 @@ def run(
         last_historical_data_date=go_back_last_day_of_the_month(DpaeStatistics.get_last_historical_data_date()),
         months_per_period=6,
         training_periods=7,
-        prefix_for_fields='dpae',
-        score_field_name='score',
+        prefix_for_fields="dpae",
+        score_field_name="score",
     )
     logger.debug("DPAE/LBB training done for departement %s", departement)
 
@@ -649,8 +660,8 @@ def run(
         last_historical_data_date=importer_settings.ALTERNANCE_LAST_HISTORICAL_DATA_DATE,
         months_per_period=6,
         training_periods=7,
-        prefix_for_fields='alt',
-        score_field_name='score_alternance',
+        prefix_for_fields="alt",
+        score_field_name="score_alternance",
     )
     logger.debug("Alternance/LBA training done for departement %s", departement)
 

@@ -2,7 +2,6 @@ from labonneboite.tests.test_base import AppTest
 
 
 class StaticPagesTest(AppTest):
-
     def test_homepage(self):
         rv = self.app.get("/")
         self.assertEqual(rv.status_code, 200)

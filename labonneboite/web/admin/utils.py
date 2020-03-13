@@ -33,12 +33,12 @@ class AdminModelViewMixin(object):
 
     def on_model_change(self, form, model, is_created):
         if is_created:
-            if hasattr(model, 'created_by'):
+            if hasattr(model, "created_by"):
                 model.created_by = current_user
         else:
-            if hasattr(model, 'updated_by'):
+            if hasattr(model, "updated_by"):
                 model.updated_by = current_user
-            if hasattr(model, 'date_updated'):
+            if hasattr(model, "date_updated"):
                 model.date_updated = datetime.datetime.utcnow()
 
 
@@ -48,8 +48,8 @@ def datetime_format(view, context, model, name):
     """
     dt = getattr(model, name)
     if dt:
-        return dt.strftime('%d/%m/%Y %H:%M')
-    return ''
+        return dt.strftime("%d/%m/%Y %H:%M")
+    return ""
 
 
 class SelectForChoiceTypeField(SelectField):

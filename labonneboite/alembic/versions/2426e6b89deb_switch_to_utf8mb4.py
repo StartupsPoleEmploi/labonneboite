@@ -8,65 +8,48 @@ Revision ID: 2426e6b89deb
 Revises: 428e168fdf0c
 Create Date: 2017-07-20 13:19:58.132736
 """
-from alembic import op
-
 import sqlalchemy as sa
+from alembic import op
 
 
 # Revision identifiers, used by Alembic.
-revision = '2426e6b89deb'
-down_revision = '428e168fdf0c'
+revision = "2426e6b89deb"
+down_revision = "428e168fdf0c"
 branch_labels = None
 depends_on = None
 
 
 TABLES = [
-    'alembic_version',
-    'social_auth_association',
-    'social_auth_code',
-    'social_auth_nonce',
-    'social_auth_partial',
-    'social_auth_usersocialauth',
-    'users',
-    'user_favorite_offices',
-    'etablissements',
+    "alembic_version",
+    "social_auth_association",
+    "social_auth_code",
+    "social_auth_nonce",
+    "social_auth_partial",
+    "social_auth_usersocialauth",
+    "users",
+    "user_favorite_offices",
+    "etablissements",
 ]
 
 TABLES_WITH_VARCHAR_COLUMNS = {
-  'etablissements': (
-    'siret',
-    'raisonsociale',
-    'enseigne',
-    'codenaf',
-    'trancheeffectif',
-    'numerorue',
-    'libellerue',
-    'tel',
-    'email',
-    'website',
-    'codecommune',
-  ),
-  'social_auth_association': (
-    'server_url',
-    'handle',
-    'secret',
-  ),
-  'social_auth_nonce': (
-    'server_url',
-  ),
-  'social_auth_usersocialauth': (
-    'uid',
-  ),
-  'user_favorite_offices': (
-    'office_siret',
-  ),
-  'users': (
-    'email',
-    'gender',
-    'first_name',
-    'last_name',
-    'external_id',
-  ),
+    "etablissements": (
+        "siret",
+        "raisonsociale",
+        "enseigne",
+        "codenaf",
+        "trancheeffectif",
+        "numerorue",
+        "libellerue",
+        "tel",
+        "email",
+        "website",
+        "codecommune",
+    ),
+    "social_auth_association": ("server_url", "handle", "secret"),
+    "social_auth_nonce": ("server_url",),
+    "social_auth_usersocialauth": ("uid",),
+    "user_favorite_offices": ("office_siret",),
+    "users": ("email", "gender", "first_name", "last_name", "external_id"),
 }
 
 
@@ -98,12 +81,14 @@ def create_constraints(conn):
     conn.execute(
         "ALTER TABLE user_favorite_offices "
         + "ADD CONSTRAINT user_favorite_offices_ibfk_2 FOREIGN KEY (office_siret) REFERENCES etablissements(siret) "
-        + "ON DELETE CASCADE;")
+        + "ON DELETE CASCADE;"
+    )
     # Create foreign key on `user_id` to `users(user_id)` on the `user_favorite_offices` table.
     conn.execute(
         "ALTER TABLE user_favorite_offices "
         + "ADD CONSTRAINT `user_favorite_offices_ibfk_1` FOREIGN KEY (user_id) REFERENCES users(id) "
-        + "ON DELETE CASCADE;")
+        + "ON DELETE CASCADE;"
+    )
     # Create unique key (`user_id`, `office_siret`) on the `user_favorite_offices` table.
     conn.execute("ALTER TABLE user_favorite_offices ADD UNIQUE KEY `_user_fav_office` (user_id, office_siret);")
 

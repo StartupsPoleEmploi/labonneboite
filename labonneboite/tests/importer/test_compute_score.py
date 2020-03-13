@@ -1,16 +1,18 @@
-from datetime import timedelta, datetime
 import random
+from datetime import datetime, timedelta
 
-from labonneboite.importer import compute_score
-from labonneboite.importer import settings as importer_settings
-from labonneboite.importer.models.computing import Hiring, RawOffice, DpaeStatistics
+from labonneboite.importer import compute_score, settings as importer_settings
+from labonneboite.importer.models.computing import DpaeStatistics, Hiring, RawOffice
+
 from .test_base import DatabaseTest
+
 
 TOTAL_OFFICES = 20
 OFFICES_HAVING_HIRINGS = 10
 YEARS_OF_HIRINGS = 5
 AVERAGE_HIRINGS_PER_MONTH_PER_OFFICE = 2
 TOTAL_HIRINGS = AVERAGE_HIRINGS_PER_MONTH_PER_OFFICE * OFFICES_HAVING_HIRINGS * 12 * YEARS_OF_HIRINGS
+
 
 def get_dpae_last_historical_data_date():
     return DpaeStatistics.get_last_historical_data_date()
@@ -25,15 +27,22 @@ def get_prediction_beginning_date():
 
 def make_offices():
     for i in range(0, TOTAL_OFFICES):
-        office = RawOffice(departement="57", siret=str(i), headcount="03", company_name="SNCF",
-            naf="2363Z", city_code="57463", zipcode="57000")
+        office = RawOffice(
+            departement="57",
+            siret=str(i),
+            headcount="03",
+            company_name="SNCF",
+            naf="2363Z",
+            city_code="57463",
+            zipcode="57000",
+        )
         office.save()
 
 
 def make_hirings():
     random.seed(99)  # use a seed to get deterministic random numbers
     for _ in range(0, TOTAL_HIRINGS):
-        hiring_date = get_dpae_last_historical_data_date() - timedelta(days=random.randint(1, 365*YEARS_OF_HIRINGS))
+        hiring_date = get_dpae_last_historical_data_date() - timedelta(days=random.randint(1, 365 * YEARS_OF_HIRINGS))
         hiring = Hiring(
             siret=str(random.randint(1, OFFICES_HAVING_HIRINGS)),
             departement="57",
@@ -44,7 +53,6 @@ def make_hirings():
 
 
 class TestComputeScore(DatabaseTest):
-
     def test_happy_path(self):
         make_offices()
         make_hirings()
@@ -86,10 +94,10 @@ class TestComputeScore(DatabaseTest):
         # --- DPAE/LBB checks
 
         # we should have exactly 5 years of hirings including the last month (2011-12)
-        self.assertNotIn('dpae-2006-12', columns)
-        self.assertIn('dpae-2007-1', columns)
-        self.assertIn('dpae-2011-12', columns)
-        self.assertNotIn('dpae-2012-1', columns)
+        self.assertNotIn("dpae-2006-12", columns)
+        self.assertIn("dpae-2007-1", columns)
+        self.assertIn("dpae-2011-12", columns)
+        self.assertNotIn("dpae-2012-1", columns)
 
         # Reminder: for DPAE 1 period = 6 months.
         # We expect 7+2+2=11 (past) periods to be computed, here is why:
@@ -98,22 +106,22 @@ class TestComputeScore(DatabaseTest):
         # and thus ignores last 2 periods and is based on 7 periods before that.
         # TRAIN set is like LIVE set slided 24 months earlier,
         # and thus ignores last 4 periods and is based on 7 periods before that.
-        self.assertNotIn('dpae-period-0', columns)
-        self.assertIn('dpae-period-1', columns)
-        self.assertIn('dpae-period-11', columns)
-        self.assertNotIn('dpae-period-12', columns)
+        self.assertNotIn("dpae-period-0", columns)
+        self.assertIn("dpae-period-1", columns)
+        self.assertIn("dpae-period-11", columns)
+        self.assertNotIn("dpae-period-12", columns)
 
         # final score columns
-        self.assertIn('score', columns)
-        self.assertIn('score_regr', columns)
+        self.assertIn("score", columns)
+        self.assertIn("score_regr", columns)
 
         # --- Alternance/LBA checks
 
         # we should have exactly 5 years of hirings including the last month (2011-12)
-        self.assertNotIn('alt-2006-12', columns)
-        self.assertIn('alt-2007-1', columns)
-        self.assertIn('alt-2011-12', columns)
-        self.assertNotIn('alt-2012-1', columns)
+        self.assertNotIn("alt-2006-12", columns)
+        self.assertIn("alt-2007-1", columns)
+        self.assertIn("alt-2011-12", columns)
+        self.assertNotIn("alt-2012-1", columns)
 
         # Reminder: for Alternance 1 period = 6 months.
         # We expect 7+2+2+1=12 (past) periods to be computed, here is why:
@@ -126,13 +134,11 @@ class TestComputeScore(DatabaseTest):
         # TRAIN set is like LIVE set slided 24 months earlier,
         # and thus ignores 4 more periods and is based on 7 periods before that.
 
-        self.assertNotIn('alt-period-0', columns)
-        self.assertIn('alt-period-1', columns)
-        self.assertIn('alt-period-12', columns)
-        self.assertNotIn('alt-period-13', columns)
+        self.assertNotIn("alt-period-0", columns)
+        self.assertIn("alt-period-1", columns)
+        self.assertIn("alt-period-12", columns)
+        self.assertNotIn("alt-period-13", columns)
 
         # final score columns
-        self.assertIn('score_alternance', columns)
-        self.assertIn('score_alternance_regr', columns)
-
-
+        self.assertIn("score_alternance", columns)
+        self.assertIn("score_alternance_regr", columns)

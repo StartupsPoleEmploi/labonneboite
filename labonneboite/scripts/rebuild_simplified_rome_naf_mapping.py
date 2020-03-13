@@ -1,22 +1,22 @@
-import os
-import re
 import itertools
 import logging
+import os
+import re
+
+import numpy as np
 import pandas as pd
 from slugify import slugify
-import numpy as np
 
-from labonneboite.conf import settings
-from labonneboite.common import mapping as mapping_util
-from labonneboite.common import hiring_type_util
-from labonneboite.common import geocoding
+from labonneboite.common import geocoding, hiring_type_util, mapping as mapping_util
 from labonneboite.common.search import fetch_offices
+from labonneboite.conf import settings
+
 
 logging.basicConfig(level=logging.INFO)
 
-INPUT_FILENAME = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../common/data/rome_naf_mapping.raw.csv')
-OUTPUT_FILENAME = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../common/data/rome_naf_mapping.csv')
-CSV_DELIMITER = ','
+INPUT_FILENAME = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../common/data/rome_naf_mapping.raw.csv")
+OUTPUT_FILENAME = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../common/data/rome_naf_mapping.csv")
+CSV_DELIMITER = ","
 
 # There might sometimes be a few items more than the wanted maximum,
 # because for example we won't drop the last ROME of a given NAF
@@ -31,21 +31,20 @@ SHOW_DETAILED_STATS = False
 
 
 class RomeNafMapping:
-
     def __init__(self):
         self.df = pd.read_table(INPUT_FILENAME, sep=CSV_DELIMITER)
 
         self.sorted_nafs_for_rome = {}
         for rome in self.df.rome_id.unique():
-            self.sorted_nafs_for_rome[rome] = self.df[self.df.rome_id == rome].sort_values(
-                by='hirings', ascending=False
-            ).naf_id.tolist()
+            self.sorted_nafs_for_rome[rome] = (
+                self.df[self.df.rome_id == rome].sort_values(by="hirings", ascending=False).naf_id.tolist()
+            )
 
         self.sorted_romes_for_naf = {}
         for naf in self.df.naf_id.unique():
-            self.sorted_romes_for_naf[naf] = self.df[self.df.naf_id == naf].sort_values(
-                by='hirings', ascending=False
-            ).rome_id.tolist()
+            self.sorted_romes_for_naf[naf] = (
+                self.df[self.df.naf_id == naf].sort_values(by="hirings", ascending=False).rome_id.tolist()
+            )
 
     def get_romes(self):
         return self.sorted_nafs_for_rome.keys()
@@ -58,7 +57,7 @@ class RomeNafMapping:
         # M* romes mappings should stay untouched, as they are generally by
         # nature relevant for all kinds of companies.
         # For example, every company needs a secretary... (M1607)
-        if rome.startswith('M'):
+        if rome.startswith("M"):
             return
 
         self.sorted_romes_for_naf[naf].remove(rome)
@@ -123,12 +122,11 @@ class RomeNafMapping:
                 self.simplify_naf(naf)
             mappings_after = len(self.df)
             mappings_deleted = mappings_before - mappings_after
-            logging.info("Iteration #{} : eliminated {} mappings (from {} down to {} mappings)".format(
-                iteration_id,
-                mappings_deleted,
-                mappings_before,
-                mappings_after,
-            ))
+            logging.info(
+                "Iteration #{} : eliminated {} mappings (from {} down to {} mappings)".format(
+                    iteration_id, mappings_deleted, mappings_before, mappings_after
+                )
+            )
             if mappings_deleted == 0:
                 self.mappings_final = mappings_after
                 self.iterations = iteration_id
@@ -137,35 +135,38 @@ class RomeNafMapping:
             iteration_id += 1
 
     def display_initial_stats(self):
-        logging.info("Loaded {} mappings ({} romes and {} nafs).".format(
-            self.mappings_initial,
-            len(self.sorted_nafs_for_rome),
-            len(self.sorted_romes_for_naf),
-        ))
+        logging.info(
+            "Loaded {} mappings ({} romes and {} nafs).".format(
+                self.mappings_initial, len(self.sorted_nafs_for_rome), len(self.sorted_romes_for_naf)
+            )
+        )
 
     def display_final_stats(self):
         logging.info("Stability reached! No more mappings to simplify.")
-        logging.info("Eliminated {} mappings (from {} down to {} mappings) in {} iterations!".format(
-            self.mappings_initial - self.mappings_final,
-            self.mappings_initial,
-            self.mappings_final,
-            self.iterations,
-        ))
-        logging.info("Ended with a mapping dataset of {} romes and {} nafs).".format(
-            len(self.sorted_nafs_for_rome),
-            len(self.sorted_romes_for_naf),
-        ))
+        logging.info(
+            "Eliminated {} mappings (from {} down to {} mappings) in {} iterations!".format(
+                self.mappings_initial - self.mappings_final,
+                self.mappings_initial,
+                self.mappings_final,
+                self.iterations,
+            )
+        )
+        logging.info(
+            "Ended with a mapping dataset of {} romes and {} nafs).".format(
+                len(self.sorted_nafs_for_rome), len(self.sorted_romes_for_naf)
+            )
+        )
 
         romes_per_naf = [len(romes) for romes in self.sorted_romes_for_naf.values()]
         max_romes_per_naf = max(romes_per_naf)
         max_romes_per_naf_champions = [
-            naf for naf in self.get_nafs()
-            if len(self.sorted_romes_for_naf[naf]) == max_romes_per_naf
+            naf for naf in self.get_nafs() if len(self.sorted_romes_for_naf[naf]) == max_romes_per_naf
         ]
-        logging.info("Actual maximum of romes per naf : {} achieved by nafs {}".format(
-            max_romes_per_naf,
-            max_romes_per_naf_champions,
-        ))
+        logging.info(
+            "Actual maximum of romes per naf : {} achieved by nafs {}".format(
+                max_romes_per_naf, max_romes_per_naf_champions
+            )
+        )
         if SHOW_DETAILED_STATS:
             logging.info("Romes per naf : {}".format(romes_per_naf))
         logging.info("90% of nafs have {} romes or less.".format(round(np.percentile(romes_per_naf, 90), 1)))
@@ -173,20 +174,19 @@ class RomeNafMapping:
         nafs_per_rome = [len(nafs) for nafs in self.sorted_nafs_for_rome.values()]
         max_nafs_per_rome = max(nafs_per_rome)
         max_nafs_per_rome_champions = [
-            rome for rome in self.get_romes()
-            if len(self.sorted_nafs_for_rome[rome]) == max_nafs_per_rome
+            rome for rome in self.get_romes() if len(self.sorted_nafs_for_rome[rome]) == max_nafs_per_rome
         ]
-        logging.info("Actual maximum of nafs per rome : {} achieved by romes {}".format(
-            max_nafs_per_rome,
-            max_nafs_per_rome_champions,
-        ))
+        logging.info(
+            "Actual maximum of nafs per rome : {} achieved by romes {}".format(
+                max_nafs_per_rome, max_nafs_per_rome_champions
+            )
+        )
         if SHOW_DETAILED_STATS:
             logging.info("Nafs per rome : {}".format(nafs_per_rome))
         logging.info("90% of romes have {} nafs or less.".format(round(np.percentile(nafs_per_rome, 90), 1)))
 
-
     def export_to_file(self):
-        self.df.to_csv(OUTPUT_FILENAME, sep=CSV_DELIMITER, index=False, encoding='utf-8')
+        self.df.to_csv(OUTPUT_FILENAME, sep=CSV_DELIMITER, index=False, encoding="utf-8")
 
 
 def rebuild_simplified_rome_naf_mapping():
@@ -196,5 +196,5 @@ def rebuild_simplified_rome_naf_mapping():
     logging.info("please consult result in file %s", OUTPUT_FILENAME)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     rebuild_simplified_rome_naf_mapping()

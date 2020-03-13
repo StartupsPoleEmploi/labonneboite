@@ -1,30 +1,31 @@
 from urllib.parse import urlparse
+
 import pandas as pd
 import validators
 
-from labonneboite.importer import settings
-from labonneboite.importer import util as import_util
-from labonneboite.common.util import timeit
-from labonneboite.importer.models.computing import ImportTask
-from labonneboite.importer.models.computing import RawOffice
-from labonneboite.common import departements as dpt
-from labonneboite.common import encoding as encoding_util
-from labonneboite.common import siret as siret_util
-from labonneboite.common.database import db_session
+from labonneboite.common import departements as dpt, encoding as encoding_util, siret as siret_util
 from labonneboite.common.chunks import chunks
+from labonneboite.common.database import db_session
+from labonneboite.common.util import timeit
+from labonneboite.importer import settings, util as import_util
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
+from labonneboite.importer.models.computing import ImportTask, RawOffice
+
 
 # This list contains siret that must not be found in data,
 # we use it as a test : if one of those is found in data, we stop the importer
 # and need to extract data again
-WRONG_SIRETS = ['50468025700020', #siret of Oxynel : old siret which has been replaced with this one : 50468025700038
-                '48791579500024', #old siret for "L’entreprise Philippe Murielle a changé de SIRET en avril 2018 suite à un changement d’adresse"
-                '41006536100041', #old siret for equant france sa - cesson sevigne
+WRONG_SIRETS = [
+    "50468025700020",  # siret of Oxynel : old siret which has been replaced with this one : 50468025700038
+    "48791579500024",  # old siret for "L’entreprise Philippe Murielle a changé de SIRET en avril 2018 suite à un changement d’adresse"
+    "41006536100041",  # old siret for equant france sa - cesson sevigne
 ]
+
 
 class WrongSiretException(Exception):
     pass
+
 
 def has_text_content(s):
     return s is not None and len(s) > 0 and not s.isspace()
@@ -43,12 +44,12 @@ def normalize_website_url(url):
     website URLs are raw data entered by human, with lots of mistakes,
     so it has to be automatically cleaned up and normalized
     """
-    if (not url) or ('@' in url) or ('.' not in url) or (len(url) <= 3):
+    if (not url) or ("@" in url) or ("." not in url) or (len(url) <= 3):
         return None
 
     url = encoding_util.strip_french_accents(url)
 
-    url = url.replace('"', '').strip()
+    url = url.replace('"', "").strip()
 
     # add missing http prefix if needed
     if not urlparse(url).scheme:
@@ -96,7 +97,7 @@ class EtablissementExtractJob(Job):
         if len(departements) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
             msg = "wrong number of departements : %s instead of expected %s" % (
                 len(departements),
-                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
+                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES,
             )
             raise Exception(msg)
 
@@ -107,7 +108,7 @@ class EtablissementExtractJob(Job):
             if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
                 msg = "too few companies in departement : %s instead of expected %s" % (
                     count,
-                    settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT
+                    settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT,
                 )
                 raise Exception(msg)
 
@@ -125,42 +126,39 @@ class EtablissementExtractJob(Job):
         # 1 - create offices which did not exist before
         self.creatable_sirets = csv_set - existing_set
 
-        
         logger.info("nombre d'etablissement dans le csv : %i" % len(csv_set))
 
-        i = 0 
-        logger.info("liste de 20 sirets dans le csv" )
-        if csv_set :
-            while  i < 20 :
-                i=i+1
+        i = 0
+        logger.info("liste de 20 sirets dans le csv")
+        if csv_set:
+            while i < 20:
+                i = i + 1
                 value_test = csv_set.pop()
                 csv_set.add(value_test)
-                logger.info(" siret : %s" % value_test )
-
+                logger.info(" siret : %s" % value_test)
 
         logger.info("nombre d'etablissement existant : %i" % len(existing_set))
 
-        i = 0 
-        logger.info("liste de 20 sirets existant" )
-        if existing_set :
-            while  i < 20 :
-                i=i+1
+        i = 0
+        logger.info("liste de 20 sirets existant")
+        if existing_set:
+            while i < 20:
+                i = i + 1
                 value_test = existing_set.pop()
                 existing_set.add(value_test)
-                logger.info(" siret : %s" % value_test )
-
+                logger.info(" siret : %s" % value_test)
 
         logger.info("nombre d'etablissement à créer : %i" % len(self.creatable_sirets))
 
-        i = 0 
-        logger.info("liste de 20 sirets à créer" )
-        if self.creatable_sirets :
-            while  i < 20 :
-                i=i+1
+        i = 0
+        logger.info("liste de 20 sirets à créer")
+        if self.creatable_sirets:
+            while i < 20:
+                i = i + 1
                 value_test = self.creatable_sirets.pop()
                 self.creatable_sirets.add(value_test)
-                logger.info(" siret : %s" % value_test )
-        
+                logger.info(" siret : %s" % value_test)
+
         num_created = self.create_creatable_offices()
 
         # 2 - delete offices which no longer exist
@@ -186,7 +184,8 @@ class EtablissementExtractJob(Job):
     def update_updatable_offices(self):
         # FIXME parallelize and/or batch for better performance
         con, cur = import_util.create_cursor()
-        query = """UPDATE %s SET
+        query = (
+            """UPDATE %s SET
             raisonsociale=%%s,
             enseigne=%%s,
             codenaf=%%s,
@@ -201,7 +200,9 @@ class EtablissementExtractJob(Job):
             website=%%s,
             flag_poe_afpr=%%s,
             flag_pmsmp=%%s
-        where siret=%%s""" % settings.RAW_OFFICE_TABLE
+        where siret=%%s"""
+            % settings.RAW_OFFICE_TABLE
+        )
 
         count = 0
         logger.info("update updatable offices in table %s", settings.RAW_OFFICE_TABLE)
@@ -230,10 +231,13 @@ class EtablissementExtractJob(Job):
         create new offices (that are not yet in our etablissement table)
         """
         con, cur = import_util.create_cursor()
-        query = """INSERT into %s(siret, raisonsociale, enseigne, codenaf, numerorue,
+        query = (
+            """INSERT into %s(siret, raisonsociale, enseigne, codenaf, numerorue,
             libellerue, codecommune, codepostal, email, tel, departement, trancheeffectif,
             website, flag_poe_afpr, flag_pmsmp)
-        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.RAW_OFFICE_TABLE
+        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)"""
+            % settings.RAW_OFFICE_TABLE
+        )
 
         count = 1
         logger.info("create new offices in table %s", settings.RAW_OFFICE_TABLE)
@@ -277,7 +281,7 @@ class EtablissementExtractJob(Job):
     @timeit
     def benchmark_loading_using_pandas(self):
         return  # not working yet, see below
-        
+
         # FIXME retry this very soon, as soon as we have the pipe delimiter
 
         # ValueError: Falling back to the 'python' engine because the separator encoded in UTF-8 is > 1 char long,
@@ -285,11 +289,10 @@ class EtablissementExtractJob(Job):
         # it is not supported by the 'python' engine.
         df = pd.read_csv(
             self.input_filename,
-            sep='\xa5',
+            sep="\xa5",
             error_bad_lines=False,  # no longer raise Exception when a row is incorrect (wrong number of fields...)
             warn_bad_lines=True,  # still display warning about those ignored incorrect rows
         )
-
 
     @timeit
     def get_offices_from_file(self):
@@ -304,11 +307,12 @@ class EtablissementExtractJob(Job):
         unprocessable_departement_errors = 0
         format_errors = 0
         # KPI expected after the add of the RGPD email column
-        emails_here_before_rgpd = 0 # Number of offices who did not have email before, and now have one
-        emails_not_here_before_rgpd = 0 # Number of offices who had an existing email, which has been replaced by the new rgpd mail clean
+        emails_here_before_rgpd = 0  # Number of offices who did not have email before, and now have one
+        emails_not_here_before_rgpd = (
+            0
+        )  # Number of offices who had an existing email, which has been replaced by the new rgpd mail clean
         departement_counter_dic = {}
         offices = {}
-
 
         with import_util.get_reader(self.input_filename) as myfile:
             header_line = myfile.readline().strip()  # FIXME detect column positions from header
@@ -328,18 +332,18 @@ class EtablissementExtractJob(Job):
                         logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
 
-                    siret, raisonsociale, enseigne, codenaf, numerorue, \
-                        libellerue, codecommune, codepostal, first_email, rgpd_email, \
-                        tel, trancheeffectif_etablissement, _, _, _, \
-                        website1, website2, better_tel, \
-                        website3, _, contrat_afpr, contrat_poe, contrat_pmsmp = fields
+                    siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, codecommune, codepostal, first_email, rgpd_email, tel, trancheeffectif_etablissement, _, _, _, website1, website2, better_tel, website3, _, contrat_afpr, contrat_poe, contrat_pmsmp = (
+                        fields
+                    )
 
                     if not siret_util.is_siret(siret):
                         logger.exception("wrong siret : %s", siret)
                         raise ValueError
 
                     if siret in WRONG_SIRETS:
-                        logger.exception("wrong siret : %s, should not be here - need other extract from datalake", siret)
+                        logger.exception(
+                            "wrong siret : %s, should not be here - need other extract from datalake", siret
+                        )
                         raise WrongSiretException
 
                 except ValueError:
@@ -373,23 +377,48 @@ class EtablissementExtractJob(Job):
                     process_this_departement = departement in departements
                     if process_this_departement:
                         # Trello Pz5UlnFh : supprimer-les-emails-pe-des-entreprises-qui-ne-sont-pas-des-agences-pe
-                        if  "@pole-emploi." in email and raisonsociale != "POLE EMPLOI":
+                        if "@pole-emploi." in email and raisonsociale != "POLE EMPLOI":
                             email = ""
                         if len(codepostal) == 4:
                             codepostal = "0%s" % codepostal
-                        etab_create_fields = siret, raisonsociale, enseigne, codenaf, numerorue, libellerue, \
-                            codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-                            website, flag_poe_afpr, flag_pmsmp
-                        etab_update_fields = raisonsociale, enseigne, codenaf, numerorue, libellerue, \
-                            codecommune, codepostal, email, tel, departement, trancheeffectif_etablissement, \
-                            website, flag_poe_afpr, flag_pmsmp, siret
+                        etab_create_fields = (
+                            siret,
+                            raisonsociale,
+                            enseigne,
+                            codenaf,
+                            numerorue,
+                            libellerue,
+                            codecommune,
+                            codepostal,
+                            email,
+                            tel,
+                            departement,
+                            trancheeffectif_etablissement,
+                            website,
+                            flag_poe_afpr,
+                            flag_pmsmp,
+                        )
+                        etab_update_fields = (
+                            raisonsociale,
+                            enseigne,
+                            codenaf,
+                            numerorue,
+                            libellerue,
+                            codecommune,
+                            codepostal,
+                            email,
+                            tel,
+                            departement,
+                            trancheeffectif_etablissement,
+                            website,
+                            flag_poe_afpr,
+                            flag_pmsmp,
+                            siret,
+                        )
                         if codepostal.startswith(departement):
                             departement_counter_dic.setdefault(departement, 0)
                             departement_counter_dic[departement] += 1
-                            offices[siret] = {
-                                "create_fields": etab_create_fields,
-                                "update_fields": etab_update_fields,
-                            }
+                            offices[siret] = {"create_fields": etab_create_fields, "update_fields": etab_update_fields}
                         else:
                             logger.info(
                                 "zipcode %s and departement %s don't match commune_id %s",
@@ -422,7 +451,7 @@ class EtablissementExtractJob(Job):
         if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
             msg = "incorrect total number of departements : %s instead of expected %s" % (
                 len(departement_counter_dic),
-                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
+                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES,
             )
             raise ValueError(msg)
         for departement, count in departement_count:
@@ -438,6 +467,6 @@ def run():
     task = EtablissementExtractJob(etablissement_filename)
     task.run()
 
+
 if __name__ == "__main__":
     run()
-

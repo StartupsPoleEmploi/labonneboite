@@ -26,15 +26,15 @@ class LbbSeleniumTestCase(LiveServerTestCase):
 
     def create_app(self):
         # Override settings
-        settings.API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
+        settings.API_ADRESSE_BASE_URL = "https://api-adresse.data.gouv.fr"
 
         # Random port generation
-        app.config['LIVESERVER_PORT'] = 0
-        app.config['SERVER_NAME'] = None
+        app.config["LIVESERVER_PORT"] = 0
+        app.config["SERVER_NAME"] = None
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
-        logging.getLogger('werkzeug').setLevel(logging.CRITICAL)
-        logging.getLogger('easyprocess').setLevel(logging.CRITICAL)
+        logging.getLogger("werkzeug").setLevel(logging.CRITICAL)
+        logging.getLogger("easyprocess").setLevel(logging.CRITICAL)
 
         return app
 
@@ -44,6 +44,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         self.display = None
         try:
             from pyvirtualdisplay import Display
+
             display = Display(visible=0, size=(1600, 1600))
             display.start()
         except easyprocess.EasyProcessCheckInstalledError:
@@ -54,25 +55,23 @@ class LbbSeleniumTestCase(LiveServerTestCase):
             print("Xvfb is not available. Running selenium tests in non-virtual display.")
 
         # Chromedriver is often in /usr/lib/chromium-browser/chromedriver
-        chromedriver_path = distutils.spawn.find_executable('chromedriver')
+        chromedriver_path = distutils.spawn.find_executable("chromedriver")
         if not chromedriver_path:
-            chromedriver_path = distutils.spawn.find_executable('chromedriver', path='/usr/lib/chromium-browser/')
+            chromedriver_path = distutils.spawn.find_executable("chromedriver", path="/usr/lib/chromium-browser/")
         if not chromedriver_path:
-            raise RuntimeError('Missing chromedriver executable. Did you install the chromium-chromedriver package?')
+            raise RuntimeError("Missing chromedriver executable. Did you install the chromium-chromedriver package?")
 
         # Configure logging
         capabilities = DesiredCapabilities.CHROME
-        capabilities['loggingPrefs'] = {'browser': 'ALL'}
+        capabilities["loggingPrefs"] = {"browser": "ALL"}
 
         chrome_options = Options()
-        #chrome_options.add_argument("--disable-extensions")
-        #chrome_options.add_argument("--disable-gpu")
+        # chrome_options.add_argument("--disable-extensions")
+        # chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--headless")
 
         self.driver = webdriver.Chrome(
-            desired_capabilities=capabilities,
-            executable_path=chromedriver_path,
-            options=chrome_options,
+            desired_capabilities=capabilities, executable_path=chromedriver_path, options=chrome_options
         )
 
         # Ensure that the window size is large enough so that HTML elements won't overlap.
@@ -99,10 +98,12 @@ class LbbSeleniumTestCase(LiveServerTestCase):
 
     def print_js_logs(self):
         # Convenient utility to print client-side logs
-        for entry in self.driver.get_log('browser'):
+        for entry in self.driver.get_log("browser"):
             print(entry)
+
 
 def url_has_changed(current_url):
     def check(driver):
         return driver.current_url != current_url
+
     return check

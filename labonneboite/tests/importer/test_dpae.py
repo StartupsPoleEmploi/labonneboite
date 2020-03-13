@@ -1,14 +1,15 @@
-from labonneboite.importer.jobs import check_dpae
-from labonneboite.importer.jobs import extract_dpae
+from labonneboite.importer.jobs import check_dpae, extract_dpae
 from labonneboite.importer.models.computing import Hiring
 from labonneboite.importer.util import get_departement_from_zipcode
+
 from .test_base import DatabaseTest
+
 
 FIRST_DPAE_FILE_NAME = "lbb_xdpdpae_delta_201611102200.csv"
 SECOND_DPAE_FILE_NAME = "lbb_xdpdpae_delta_201612102200.csv"
 
-class TestDpae(DatabaseTest):
 
+class TestDpae(DatabaseTest):
     def test_check_dpae(self):
         filename = self.get_data_file_path(FIRST_DPAE_FILE_NAME)
         check_dpae.check_file(filename)
@@ -30,7 +31,7 @@ class TestDpae(DatabaseTest):
         self.assertEqual(Hiring.query.count(), 6)
         task = extract_dpae.DpaeExtractJob(filename_second_month)
         task.run()
-        self.assertEqual(Hiring.query.count(), 6+2)
+        self.assertEqual(Hiring.query.count(), 6 + 2)
 
     def test_extract_departement(self):
         departement = get_departement_from_zipcode("6600")

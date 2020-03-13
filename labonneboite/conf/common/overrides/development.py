@@ -1,9 +1,10 @@
 import flask.logging
 
+
 DEBUG = True
 SERVER_NAME = None
 
-DB_HOST = '127.0.0.1'
+DB_HOST = "127.0.0.1"
 DB_PORT = 3307
 
 LOG_FORMAT_USER_ACTIVITY = flask.logging.DEBUG_LOG_FORMAT
@@ -20,12 +21,6 @@ SENTRY_ENVIRONMENT = "development"
 # offices in the local DB.
 
 TRAVEL_VENDOR_BACKENDS = {
-    'isochrone': {
-        'car': 'ign_mock',
-        'public': 'navitia_mock',
-    },
-    'durations': {
-        'car': 'dummy',
-        'public': 'dummy',
-    },
+    "isochrone": {"car": "ign_mock", "public": "navitia_mock"},
+    "durations": {"car": "dummy", "public": "dummy"},
 }

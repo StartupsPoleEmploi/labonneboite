@@ -1,15 +1,12 @@
-
-from werkzeug.datastructures import MultiDict
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, HiddenField, RadioField, DecimalField
-from wtforms.validators import DataRequired, Optional, NumberRange
+from werkzeug.datastructures import MultiDict
+from wtforms import DecimalField, HiddenField, RadioField, SelectField, StringField
+from wtforms.validators import DataRequired, NumberRange, Optional
 from wtforms.widgets import HiddenInput
 
-from labonneboite.conf import settings
-from labonneboite.common import pro
-from labonneboite.common import search
-from labonneboite.common import sorting
+from labonneboite.common import pro, search, sorting
 from labonneboite.common.maps import constants as maps_constants
+from labonneboite.conf import settings
 
 
 class CompanySearchForm(FlaskForm):
@@ -17,25 +14,21 @@ class CompanySearchForm(FlaskForm):
     This form is used only for rendering, not for validation.
     """
 
-    HEADCOUNT_CHOICES = (
-        ('1', 'Toutes tailles'),
-        ('2', 'Moins de 50 salariés'),
-        ('3', 'Plus de 50 salariés'),
-    )
+    HEADCOUNT_CHOICES = (("1", "Toutes tailles"), ("2", "Moins de 50 salariés"), ("3", "Plus de 50 salariés"))
 
-    NAF_CHOICES = [('', 'Tous les secteurs')] + [(k, v) for k, v in list(settings.NAF_CODES.items())]
+    NAF_CHOICES = [("", "Tous les secteurs")] + [(k, v) for k, v in list(settings.NAF_CODES.items())]
 
     DISTANCE_CHOICES = (
-        ('5', '5 km'),
-        ('10', '10 km'),
-        ('30', '30 km'),
-        ('50', '50 km'),
-        ('100', '100 km'),
-        ('3000', '+ de 100 km'),
+        ("5", "5 km"),
+        ("10", "10 km"),
+        ("30", "30 km"),
+        ("50", "50 km"),
+        ("100", "100 km"),
+        ("3000", "+ de 100 km"),
     )
 
     DURATION_CHOICES = [
-        (str(dur), 'Moins de {:d} min'.format(dur)) for dur in maps_constants.ISOCHRONE_DURATIONS_MINUTES
+        (str(dur), "Moins de {:d} min".format(dur)) for dur in maps_constants.ISOCHRONE_DURATIONS_MINUTES
     ]
 
     class Meta:
@@ -47,69 +40,54 @@ class CompanySearchForm(FlaskForm):
         csrf = False
 
     # Typed job
-    j = StringField('Métier recherché', validators=[DataRequired()])
+    j = StringField("Métier recherché", validators=[DataRequired()])
     # Corresponding occupation found by autocomplete
-    occupation = HiddenField('', validators=[DataRequired()])
+    occupation = HiddenField("", validators=[DataRequired()])
 
     # Typed location
-    l = StringField('Lieu de recherche', validators=[DataRequired()])
+    l = StringField("Lieu de recherche", validators=[DataRequired()])
     # Corresponding coordinates found by autocomplete
     lat = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-90, 90)])
     lon = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-180, 180)])
 
     # Headcount
-    h = RadioField(
-        'Taille de l\'entreprise',
-        default=1,
-        choices=HEADCOUNT_CHOICES,
-        validators=[Optional()])
+    h = RadioField("Taille de l'entreprise", default=1, choices=HEADCOUNT_CHOICES, validators=[Optional()])
 
     sort = RadioField(
-        'Classement par',
-        choices=sorting.SORTING_CHOICES,
-        default=sorting.SORT_FILTER_DEFAULT,
-        validators=[Optional()])
+        "Classement par", choices=sorting.SORTING_CHOICES, default=sorting.SORT_FILTER_DEFAULT, validators=[Optional()]
+    )
 
-    naf = SelectField(
-        'Secteur d\'activité',
-        choices=NAF_CHOICES,
-        default='',
-        validators=[Optional()])
+    naf = SelectField("Secteur d'activité", choices=NAF_CHOICES, default="", validators=[Optional()])
 
     d = RadioField(
-        'Distance',
-        choices=DISTANCE_CHOICES,
-        default=settings.DISTANCE_FILTER_DEFAULT,
-        validators=[Optional()])
-
-    tr = HiddenField(
-        'Mode de transport',
-        default=maps_constants.DEFAULT_TRAVEL_MODE,
-        validators=[Optional()]
+        "Distance", choices=DISTANCE_CHOICES, default=settings.DISTANCE_FILTER_DEFAULT, validators=[Optional()]
     )
 
-    dur = RadioField(
-        'Temps de trajet',
-        choices=DURATION_CHOICES,
-        validators=[Optional()]
-    )
+    tr = HiddenField("Mode de transport", default=maps_constants.DEFAULT_TRAVEL_MODE, validators=[Optional()])
+
+    dur = RadioField("Temps de trajet", choices=DURATION_CHOICES, validators=[Optional()])
 
 
 class ProCompanySearchForm(CompanySearchForm):
 
     PUBLIC_CHOICES = (
-        (str(search.PUBLIC_ALL), 'Tout'),
-        (str(search.PUBLIC_JUNIOR), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="moins de 26 ans">Junior</span>'),
-        (str(search.PUBLIC_SENIOR), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="plus de 50 ans">Senior</span>'),
-        (str(search.PUBLIC_HANDICAP), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">BOE</span>'),
+        (str(search.PUBLIC_ALL), "Tout"),
+        (
+            str(search.PUBLIC_JUNIOR),
+            '<span class="badge badge-large badge-info" data-toggle="tooltip" title="moins de 26 ans">Junior</span>',
+        ),
+        (
+            str(search.PUBLIC_SENIOR),
+            '<span class="badge badge-large badge-info" data-toggle="tooltip" title="plus de 50 ans">Senior</span>',
+        ),
+        (
+            str(search.PUBLIC_HANDICAP),
+            '<span class="badge badge-large badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">BOE</span>',
+        ),
     )
 
     # this field is activated only in pro mode
-    p = RadioField(
-        'Public',
-        choices=PUBLIC_CHOICES,
-        default=0,
-        validators=[Optional()])
+    p = RadioField("Public", choices=PUBLIC_CHOICES, default=0, validators=[Optional()])
 
 
 def make_company_search_form(**kwargs):

@@ -18,11 +18,12 @@ See:
 Warning: make sure the order of the imports matches the order of which the
 dependent tables should be created.
 """
-# pylint: disable=wildcard-import
-from labonneboite.common.models.office_mixin import *
-from labonneboite.common.models.office_admin import *
-from labonneboite.common.models.office import *
 from labonneboite.common.models.auth import *
-from labonneboite.common.models.user_favorite_offices import *
+from labonneboite.common.models.office import *
+from labonneboite.common.models.office_admin import *
+from labonneboite.common.models.office_mixin import *
 from labonneboite.common.models.recruiter_message import *
+from labonneboite.common.models.user_favorite_offices import *
+
+
 # pylint: enable=wildcard-import

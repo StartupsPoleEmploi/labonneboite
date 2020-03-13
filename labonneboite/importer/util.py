@@ -1,30 +1,30 @@
-import os
-import gzip
 import bz2
+import gzip
+import logging
+import os
 import re
 import subprocess
 from datetime import datetime
-import logging
 from functools import lru_cache
 
 import MySQLdb as mdb
 
-from labonneboite.common import departements as dpt
+from labonneboite.common import departements as dpt, encoding as encoding_util
+from labonneboite.common.database import DATABASE
 from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import ImportTask
-from labonneboite.common.database import DATABASE
-from labonneboite.common import encoding as encoding_util
 
-logging.basicConfig(level=logging.INFO, format='%(message)s')
 
-logger = logging.getLogger('main')
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+logger = logging.getLogger("main")
 
 TRANCHE_AGE_SENIOR = "51-99"
 TRANCHE_AGE_JUNIOR = "00-25"
 TRANCHE_AGE_MIDDLE = "26-50"
 
-OFFICE_FLAGS = ['flag_alternance', 'flag_junior', 'flag_senior', 'flag_handicap']
+OFFICE_FLAGS = ["flag_alternance", "flag_junior", "flag_senior", "flag_handicap"]
 
 
 class InvalidRowException(Exception):
@@ -32,9 +32,15 @@ class InvalidRowException(Exception):
 
 
 def create_cursor():
-    con = mdb.connect(host=DATABASE['HOST'], port=DATABASE['PORT'],
-                      user=DATABASE['USER'], passwd=DATABASE['PASSWORD'],
-                      db=DATABASE['NAME'], use_unicode=True, charset="utf8")
+    con = mdb.connect(
+        host=DATABASE["HOST"],
+        port=DATABASE["PORT"],
+        user=DATABASE["USER"],
+        passwd=DATABASE["PASSWORD"],
+        db=DATABASE["NAME"],
+        use_unicode=True,
+        charset="utf8",
+    )
     cur = con.cursor()
     return con, cur
 
@@ -55,9 +61,9 @@ def check_for_updates(input_folder):
 
 @timeit
 def back_up(backup_folder, table, filename, timestamp, new_table_name=None):
-    timestamp_filename = '%s_backup_%s.sql.gz' % (filename, timestamp)
+    timestamp_filename = "%s_backup_%s.sql.gz" % (filename, timestamp)
     backup_filename = os.path.join(backup_folder, timestamp_filename)
-    password_statement = "-p'%s'" % DATABASE['PASSWORD']
+    password_statement = "-p'%s'" % DATABASE["PASSWORD"]
     logger.info("backing up table %s into %s", table, backup_filename)
     if new_table_name:
         table_new = new_table_name
@@ -69,17 +75,20 @@ def back_up(backup_folder, table, filename, timestamp, new_table_name=None):
     # to rename table name on the fly,
     # useful in the case of deploy_data to allow zero downtime atomic table swap of table etablissements
     subprocess.check_call(
-        """mysqldump -u %s %s --host %s --port %d %s %s | sed 's/`%s`/`%s`/g' | gzip > %s""" % (
-            DATABASE['USER'],
+        """mysqldump -u %s %s --host %s --port %d %s %s | sed 's/`%s`/`%s`/g' | gzip > %s"""
+        % (
+            DATABASE["USER"],
             password_statement,
-            DATABASE['HOST'],
-            DATABASE['PORT'],
-            DATABASE['NAME'],
+            DATABASE["HOST"],
+            DATABASE["PORT"],
+            DATABASE["NAME"],
             table,
             table,
             table_new,
-            backup_filename),
-        shell=True)
+            backup_filename,
+        ),
+        shell=True,
+    )
 
     logger.info("finished back up !")
     return backup_filename
@@ -92,16 +101,13 @@ def is_processed(filename):
     This function lets us know whether contents were imported or not.
     """
     import_tasks = ImportTask.query.filter(
-        ImportTask.filename == os.path.basename(filename),
-        ImportTask.state >= ImportTask.FILE_READ).all()
+        ImportTask.filename == os.path.basename(filename), ImportTask.state >= ImportTask.FILE_READ
+    ).all()
     return bool(import_tasks)
 
 
 def check_runnable(filename, file_type):
-    patterns = {
-        'dpae': 'lbb_xdpdpae_delta_.*',
-        'etablissements': 'lbb_etablissement_full_.*'
-    }
+    patterns = {"dpae": "lbb_xdpdpae_delta_.*", "etablissements": "lbb_etablissement_full_.*"}
     base_name = os.path.basename(filename)
     return re.match(patterns[file_type], base_name) and not is_processed(base_name)
 
@@ -118,12 +124,7 @@ def detect_runnable_file(file_type):
 
 
 @timeit
-def reduce_scores_into_table(
-        description,
-        departements,
-        target_table,
-        select_fields,
-    ):
+def reduce_scores_into_table(description, departements, target_table, select_fields):
     """
     Analog to a Map/Reduce operation.
     We have "etablissements" in MySQL tables for each departement.
@@ -141,21 +142,26 @@ def reduce_scores_into_table(
 
     for departement in departements:
         departement_table = "etablissements_%s" % departement
-        query = """insert into %s select %s from %s""" % (
-            target_table, select_fields, departement_table)
+        query = """insert into %s select %s from %s""" % (target_table, select_fields, departement_table)
         try:
             run_sql_script(query)  # FIXME
             successes += 1
         except mdb.ProgrammingError:
-            logger.error("an error happened while reducing departement=%s description=%s using query [%s]",
-                departement, description, query)
+            logger.error(
+                "an error happened while reducing departement=%s description=%s using query [%s]",
+                departement,
+                description,
+                query,
+            )
             errors += 1
     if errors > importer_settings.MAXIMUM_COMPUTE_SCORE_JOB_FAILURES:
-        msg = "too many job failures: %s (max %s) vs %s successes" % (errors,
-            importer_settings.MAXIMUM_COMPUTE_SCORE_JOB_FAILURES, successes)
+        msg = "too many job failures: %s (max %s) vs %s successes" % (
+            errors,
+            importer_settings.MAXIMUM_COMPUTE_SCORE_JOB_FAILURES,
+            successes,
+        )
         raise Exception(msg)
-    logger.info("score reduction %s finished, all data available in table %s",
-                description, target_table)
+    logger.info("score reduction %s finished, all data available in table %s", description, target_table)
 
 
 def get_shared_select_fields():
@@ -163,12 +169,13 @@ def get_shared_select_fields():
         """siret, raisonsociale, enseigne, codenaf,
         trancheeffectif, numerorue, libellerue, codepostal,
         tel, email, website, """
-        + "0, 0, 0, 0, " # stand for flag_alternance, flag_junior, flag_senior, flag_handicap
-        + "0, " # stands for has_multi_geolocation
+        + "0, 0, 0, 0, "  # stand for flag_alternance, flag_junior, flag_senior, flag_handicap
+        + "0, "  # stands for has_multi_geolocation
         + "codecommune, "
-        + "0, 0, " # stands for coordinates_x, coordinates_y
+        + "0, 0, "  # stands for coordinates_x, coordinates_y
         + "departement, score"
-        )
+    )
+
 
 def get_select_fields_for_main_db():
     """
@@ -178,9 +185,9 @@ def get_select_fields_for_main_db():
     return (
         get_shared_select_fields()
         + ', ""'  # stands for email_alternance
-        + ', score_alternance'
+        + ", score_alternance"
         + ', "", "", "", ""'  # stand for social_network, phone_alternance, website_alternance, contact_mode
-        + ', flag_poe_afpr, flag_pmsmp'
+        + ", flag_poe_afpr, flag_pmsmp"
     )
 
 
@@ -196,7 +203,7 @@ def get_select_fields_for_backoffice():
     fields += ", score_alternance, score_alternance_regr"
     for i in range(7, 0, -1):  # [7, 6, 5, 4, 3, 2, 1]
         fields += ", `alt-period-%s`" % i
-    fields += ', flag_poe_afpr, flag_pmsmp'
+    fields += ", flag_poe_afpr, flag_pmsmp"
     return fields
 
 
@@ -230,14 +237,14 @@ def clean_temporary_tables():
         run_sql_script(drop_table_query)
 
 
-def get_fields_from_csv_line(line, delimiter='|'):
+def get_fields_from_csv_line(line, delimiter="|"):
     # get rid of invisible space characters (\xc2) if present
-    line = line.strip().replace('\xc2', '')
+    line = line.strip().replace("\xc2", "")
     fields = [encoding_util.sanitize_string(f) for f in line.split(delimiter)]
 
     # The CSV files which are now extracted can contain either '' OR 'NULL' when there are null values.
     # We need to replace 'NULL' values with an empty string
-    fields = ['' if field=='NULL' else field for field in fields]
+    fields = ["" if field == "NULL" else field for field in fields]
 
     return fields
 
@@ -246,9 +253,7 @@ def parse_dpae_line(line):
     fields = get_fields_from_csv_line(line)
     required_fields = 27
     if len(fields) != required_fields:  # an assert statement here does not work from nosetests
-        msg = ("found %s fields instead of %s in line: %s" % (
-            len(fields), required_fields, line
-        ))
+        msg = "found %s fields instead of %s in line: %s" % (len(fields), required_fields, line)
         logger.error(msg)
         raise InvalidRowException(msg)
 
@@ -279,12 +284,12 @@ def parse_dpae_line(line):
     iiann = fields[21]
 
     def remove_exotic_characters(text):
-        return ''.join(i for i in text if ord(i) < 128)
+        return "".join(i for i in text if ord(i) < 128)
 
     choices = {
         "- de 26 ans": TRANCHE_AGE_JUNIOR,
         "de 26 ans ? 50 ans": TRANCHE_AGE_MIDDLE,
-        "+ de 50 ans": TRANCHE_AGE_SENIOR
+        "+ de 50 ans": TRANCHE_AGE_SENIOR,
     }
 
     handicap_label = fields[22]
@@ -299,8 +304,18 @@ def parse_dpae_line(line):
     except ValueError:
         duree_pec = None
 
-    return (siret, hiring_date, zipcode, contract_type, departement,
-        contract_duration, iiann, tranche_age, handicap_label, duree_pec)
+    return (
+        siret,
+        hiring_date,
+        zipcode,
+        contract_type,
+        departement,
+        contract_duration,
+        iiann,
+        tranche_age,
+        handicap_label,
+        duree_pec,
+    )
 
 
 def get_file_extension(filename):
@@ -326,7 +341,7 @@ def get_reader(filename):
     return open_file(filename, "rb")
 
 
-@lru_cache(maxsize=128*1024)
+@lru_cache(maxsize=128 * 1024)
 def get_departement_from_zipcode(zipcode):
     zipcode = str(zipcode).strip()
 
@@ -349,7 +364,7 @@ def get_departement_from_zipcode(zipcode):
 def run_sql_script(sql_script):
     con, cur = create_cursor()
 
-    for query in sql_script.split(';'):
+    for query in sql_script.split(";"):
         query = query.strip()
         if len(query) >= 1:
             cur.execute(query)

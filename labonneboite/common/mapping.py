@@ -1,6 +1,5 @@
-
-from collections import namedtuple
 import logging
+from collections import namedtuple
 from functools import lru_cache
 
 from slugify import slugify
@@ -9,7 +8,7 @@ from labonneboite.common.load_data import load_rome_naf_mapping
 from labonneboite.conf import settings
 
 
-logger = logging.getLogger('main')
+logger = logging.getLogger("main")
 
 
 SLUGIFIED_ROME_LABELS = {slugify(v): k for k, v in list(settings.ROME_DESCRIPTIONS.items())}
@@ -46,20 +45,16 @@ def populate_rome_naf_mapping():
 
         if ENSURE_LABELS_IN_MAPPING_MATCH:
 
-            if naf_label != settings.NAF_CODES[naf].encode('utf8'):
-                raise Exception("labels '%s' and '%s' do not match for NAF %s" % (
-                    naf_label,
-                    settings.NAF_CODES[naf].encode('utf8'),
-                    naf,
-                    )
+            if naf_label != settings.NAF_CODES[naf].encode("utf8"):
+                raise Exception(
+                    "labels '%s' and '%s' do not match for NAF %s"
+                    % (naf_label, settings.NAF_CODES[naf].encode("utf8"), naf)
                 )
 
-            if rome_label != settings.ROME_DESCRIPTIONS[rome].encode('utf8'):
-                raise Exception("labels '%s' and '%s' do not match for ROME %s" % (
-                    rome_label,
-                    settings.ROME_DESCRIPTIONS[rome].encode('utf8'),
-                    rome,
-                    )
+            if rome_label != settings.ROME_DESCRIPTIONS[rome].encode("utf8"):
+                raise Exception(
+                    "labels '%s' and '%s' do not match for ROME %s"
+                    % (rome_label, settings.ROME_DESCRIPTIONS[rome].encode("utf8"), rome)
                 )
 
         MANUAL_ROME_NAF_MAPPING.setdefault(rome, {})
@@ -89,7 +84,7 @@ def get_total_naf_hirings(naf):
     return sum(MANUAL_NAF_ROME_MAPPING[naf][rome] for rome in romes)
 
 
-@lru_cache(maxsize=32*1024)
+@lru_cache(maxsize=32 * 1024)
 def get_affinity_between_rome_and_naf(rome_code, naf_code):
     """
     Ratio of hirings of this NAF made by this ROME.
@@ -108,11 +103,11 @@ def map_romes_to_nafs(rome_codes, optional_naf_codes=None):
     naf_codes = set()
     for rome in rome_codes:
         if rome not in settings.ROME_DESCRIPTIONS:
-            raise ValueError('bad rome code : %s' % rome)
+            raise ValueError("bad rome code : %s" % rome)
         try:
             naf_codes_with_hirings = MANUAL_ROME_NAF_MAPPING[rome]
         except KeyError:
-            logger.error('soft fail: no NAF codes for ROME %s', rome)
+            logger.error("soft fail: no NAF codes for ROME %s", rome)
             naf_codes_with_hirings = {}
         for naf, _ in naf_codes_with_hirings.items():
             if optional_naf_codes:
@@ -137,11 +132,11 @@ def romes_for_naf(naf):
     """
     romes = {k: v for (k, v) in list(MANUAL_ROME_NAF_MAPPING.items()) if naf in v}
     romes = sorted(list(romes.items()), key=lambda k_v: k_v[1][naf], reverse=True)
-    Rome = namedtuple('Rome', ['code', 'name', 'nafs'])
+    Rome = namedtuple("Rome", ["code", "name", "nafs"])
     return [Rome(rome[0], settings.ROME_DESCRIPTIONS[rome[0]], rome[1]) for rome in romes]
 
 
-@lru_cache(maxsize=8*1024)  # about 500 rome_codes in current dataset and 5000 in sliced dataset
+@lru_cache(maxsize=8 * 1024)  # about 500 rome_codes in current dataset and 5000 in sliced dataset
 def nafs_for_rome(rome):
     """
     Returns NAF codes matching the given ROME code as a list of named tuples ordered by the number of hires.
@@ -155,13 +150,11 @@ def nafs_for_rome(rome):
     """
     nafs = MANUAL_ROME_NAF_MAPPING.get(rome, {})
     nafs = sorted(list(nafs.items()), key=lambda k_v1: k_v1[1], reverse=True)
-    Naf = namedtuple('Naf', ['code', 'name', 'hirings', 'affinity'])
-    return [Naf(
-        naf[0],
-        settings.NAF_CODES[naf[0]],
-        naf[1],
-        get_affinity_between_rome_and_naf(rome, naf[0]),
-        ) for naf in nafs]
+    Naf = namedtuple("Naf", ["code", "name", "hirings", "affinity"])
+    return [
+        Naf(naf[0], settings.NAF_CODES[naf[0]], naf[1], get_affinity_between_rome_and_naf(rome, naf[0]))
+        for naf in nafs
+    ]
 
 
 def rome_is_valid(rome):

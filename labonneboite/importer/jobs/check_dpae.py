@@ -1,9 +1,8 @@
 import sys
 
-from labonneboite.importer import settings
-from labonneboite.importer import util as import_util
-from labonneboite.importer.util import parse_dpae_line
+from labonneboite.importer import settings, util as import_util
 from labonneboite.importer.jobs.common import logger
+from labonneboite.importer.util import parse_dpae_line
 
 
 def get_n_lines(path, n=5, ignore_header=True):
@@ -66,5 +65,6 @@ def run():
     else:
         sys.exit(-1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run()

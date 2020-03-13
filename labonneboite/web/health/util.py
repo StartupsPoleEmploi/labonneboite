@@ -1,16 +1,17 @@
 import logging
+
 from labonneboite.common.database import db_session
 from labonneboite.common.es import Elasticsearch
-from labonneboite.common.maps.vendors import ign
 from labonneboite.common.maps import cache
+from labonneboite.common.maps.vendors import ign
 
 
-logger = logging.getLogger('main')
+logger = logging.getLogger("main")
 
 
 def is_db_alive():
     try:
-        db_session.execute('SELECT NOW()').first()
+        db_session.execute("SELECT NOW()").first()
         return True
     # pylint: disable=W0703
     except Exception as e:
@@ -32,10 +33,10 @@ def is_elasticsearch_alive():
 def is_redis_alive():
     try:
         redis_cache = cache.RedisCache()
-        redis_cache.set('redis_is_alive', 'yes')
-        result = redis_cache.get('redis_is_alive')
-        redis_cache.set('redis_is_alive', 'no')
-        return result == 'yes'
+        redis_cache.set("redis_is_alive", "yes")
+        result = redis_cache.get("redis_is_alive")
+        redis_cache.set("redis_is_alive", "no")
+        return result == "yes"
     # pylint: disable=W0703
     except Exception as e:
         logger.exception(e)
@@ -51,15 +52,11 @@ def is_uwsgi_alive():
 
 
 def is_ign_duration_alive():
-    endpoint = 'itineraire/rest/route.json'
-    params = {
-        'destination': '6.1697400,49.1080000',
-        'graphName': 'Voiture',
-        'origin': '6.1760260,49.1191460',
-    }
+    endpoint = "itineraire/rest/route.json"
+    params = {"destination": "6.1697400,49.1080000", "graphName": "Voiture", "origin": "6.1760260,49.1191460"}
 
     try:
-        return ign.request_json_api(endpoint, params, timeout=ign.REQUEST_TIMEOUT_SECONDS)["status"] == 'OK'
+        return ign.request_json_api(endpoint, params, timeout=ign.REQUEST_TIMEOUT_SECONDS)["status"] == "OK"
     # pylint: disable=W0703
     except Exception as e:
         logger.exception(e)
@@ -67,15 +64,11 @@ def is_ign_duration_alive():
 
 
 def is_ign_isochrone_alive():
-    endpoint = 'isochrone/isochrone.json'
-    params = {
-        'location': '4.2645464,48.5300431',
-        'smoothing': 'true',
-        'time': 1800,
-    }
+    endpoint = "isochrone/isochrone.json"
+    params = {"location": "4.2645464,48.5300431", "smoothing": "true", "time": 1800}
 
     try:
-        return ign.request_json_api(endpoint, params, timeout=ign.REQUEST_TIMEOUT_SECONDS)["status"] == 'OK'
+        return ign.request_json_api(endpoint, params, timeout=ign.REQUEST_TIMEOUT_SECONDS)["status"] == "OK"
     # pylint: disable=W0703
     except Exception as e:
         logger.exception(e)
