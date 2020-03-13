@@ -3,10 +3,7 @@ import json
 import re
 
 from dateutil.relativedelta import relativedelta
-from sqlalchemy import Boolean, DateTime, Integer, String, Text
-from sqlalchemy.dialects import mysql
-from sqlalchemy import Column, ForeignKey
-from sqlalchemy import desc
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, desc
 from sqlalchemy.dialects import mysql
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm import relationship
@@ -29,32 +26,31 @@ class OfficeAdminAdd(OfficeMixin, CRUDMixin, Base):
     are provided by the `OfficeMixin`.
     """
 
-    __tablename__ = 'etablissements_admin_add'
+    __tablename__ = "etablissements_admin_add"
 
     def __init__(self, *args, **kwargs):
         # The `headcount` field must be different form the one of `Office`
         # to be able to provide a clean <select> choice in the admin UI.
-        self.headcount = Column('trancheeffectif', ChoiceType(settings.HEADCOUNT_INSEE_CHOICES), default="00",
-            nullable=False,)
+        self.headcount = Column(
+            "trancheeffectif", ChoiceType(settings.HEADCOUNT_INSEE_CHOICES), default="00", nullable=False
+        )
         super(OfficeAdminAdd, self).__init__(*args, **kwargs)
 
     id = Column(Integer, primary_key=True)
 
     # Some fields that must be common with the `Office` model are provided by the `OfficeMixin`.
 
-    reason = Column(Text, default='', nullable=False)  # Reason of the addition.
+    reason = Column(Text, default="", nullable=False)  # Reason of the addition.
     # Metadata.
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
     date_updated = Column(DateTime, nullable=True)
-    created_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
-    updated_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    created_by_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    updated_by_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
-    created_by = relationship('User', foreign_keys=[created_by_id])
-    updated_by = relationship('User', foreign_keys=[updated_by_id])
+    created_by = relationship("User", foreign_keys=[created_by_id])
+    updated_by = relationship("User", foreign_keys=[updated_by_id])
 
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
+    __mapper_args__ = {"order_by": desc(date_created)}  # Default order_by for all queries.
 
 
 class OfficeAdminRemove(CRUDMixin, Base):
@@ -63,40 +59,35 @@ class OfficeAdminRemove(CRUDMixin, Base):
     This model collects the list of offices to remove.
     """
 
-    __tablename__ = 'etablissements_admin_remove'
+    __tablename__ = "etablissements_admin_remove"
 
-    INITIATIVE_OFFICE = 'office'
-    INITIATIVE_LBB = 'lbb'
-    INITIATIVE_CHOICES = [
-        (INITIATIVE_OFFICE, "L'entreprise"),
-        (INITIATIVE_LBB, "La Bonne Boite"),
-    ]
+    INITIATIVE_OFFICE = "office"
+    INITIATIVE_LBB = "lbb"
+    INITIATIVE_CHOICES = [(INITIATIVE_OFFICE, "L'entreprise"), (INITIATIVE_LBB, "La Bonne Boite")]
 
     id = Column(Integer, primary_key=True)
     siret = Column(String(191), nullable=False, unique=True)
-    name = Column(String(191), default='', nullable=False)
-    reason = Column(Text, default='', nullable=False)  # Reason of the removal.
+    name = Column(String(191), default="", nullable=False)
+    reason = Column(Text, default="", nullable=False)  # Reason of the removal.
     initiative = Column(ChoiceType(INITIATIVE_CHOICES), default=INITIATIVE_OFFICE, nullable=False)
     date_follow_up_phone_call = Column(DateTime, nullable=True)
 
     # Removal requested by.
-    requested_by_email = Column(String(191), default='', nullable=False)
-    requested_by_first_name = Column(String(191), default='', nullable=False)
-    requested_by_last_name = Column(String(191), default='', nullable=False)
-    requested_by_phone = Column(String(191), default='', nullable=False)
+    requested_by_email = Column(String(191), default="", nullable=False)
+    requested_by_first_name = Column(String(191), default="", nullable=False)
+    requested_by_last_name = Column(String(191), default="", nullable=False)
+    requested_by_phone = Column(String(191), default="", nullable=False)
 
     # Metadata.
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
     date_updated = Column(DateTime, nullable=True)
-    created_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
-    updated_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    created_by_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    updated_by_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
-    created_by = relationship('User', foreign_keys=[created_by_id])
-    updated_by = relationship('User', foreign_keys=[updated_by_id])
+    created_by = relationship("User", foreign_keys=[created_by_id])
+    updated_by = relationship("User", foreign_keys=[updated_by_id])
 
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
+    __mapper_args__ = {"order_by": desc(date_created)}  # Default order_by for all queries.
 
 
 class OfficeAdminUpdate(CRUDMixin, Base):
@@ -105,28 +96,28 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     This model collects the changes to apply to offices.
     """
 
-    __tablename__ = 'etablissements_admin_update'
+    __tablename__ = "etablissements_admin_update"
 
-    SEPARATORS = ['\n', '\r']
+    SEPARATORS = ["\n", "\r"]
 
     id = Column(Integer, primary_key=True)
 
     # Stores a list of SIRET as a string separated by `SEPARATORS`
-    sirets = Column(Text, default='', nullable=False, unique=False)
+    sirets = Column(Text, default="", nullable=False, unique=False)
 
     # This name is for internal use only and reserved to the support team.
-    name = Column(String(191), default='', nullable=False)
+    name = Column(String(191), default="", nullable=False)
 
     # Info to update.
-    new_company_name = Column(String(191), default='', nullable=False)  # New "raison sociale".
-    new_office_name = Column(String(191), default='', nullable=False)  # New "enseigne".
-    new_email = Column(String(191), default='', nullable=False)
-    new_phone = Column(String(191), default='', nullable=False)
-    new_website = Column(String(191), default='', nullable=False)
+    new_company_name = Column(String(191), default="", nullable=False)  # New "raison sociale".
+    new_office_name = Column(String(191), default="", nullable=False)  # New "enseigne".
+    new_email = Column(String(191), default="", nullable=False)
+    new_phone = Column(String(191), default="", nullable=False)
+    new_website = Column(String(191), default="", nullable=False)
     social_network = Column(mysql.TINYTEXT, nullable=True)
     contact_mode = Column(mysql.TINYTEXT, nullable=True)
 
-    email_alternance = Column(mysql.TINYTEXT, default='', nullable=True)
+    email_alternance = Column(mysql.TINYTEXT, default="", nullable=True)
     phone_alternance = Column(mysql.TINYTEXT, nullable=True)
     website_alternance = Column(mysql.TINYTEXT, nullable=True)
 
@@ -138,18 +129,18 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     # Stores a list of ROME codes as a string separated by `SEPARATORS`.
     # If `romes_to_boost` is populated, boosting will be set only for specified ROME codes for LBB.
     # If `romes_alternance_to_boost` is populated, boosting will be set only for specified ROME codes for alternance.
-    romes_to_boost = Column(Text, default='', nullable=False)
-    romes_alternance_to_boost = Column(Text, default='', nullable=False)
+    romes_to_boost = Column(Text, default="", nullable=False)
+    romes_alternance_to_boost = Column(Text, default="", nullable=False)
 
     # Stores a list of ROME codes as a string separated by `SEPARATORS`.
     # If `romes_to_remove` is populated, these ROME codes will not be indexed for LBB
     # If `romes_alternance_to_remove` is populated, these ROME codes will not be indexed for alternance
-    romes_to_remove = Column(Text, default='', nullable=False)
-    romes_alternance_to_remove = Column(Text, default='', nullable=False)
+    romes_to_remove = Column(Text, default="", nullable=False)
+    romes_alternance_to_remove = Column(Text, default="", nullable=False)
 
     # Stores a list of NAF codes as a string separated by `SEPARATORS`.
     # If `nafs_to_add` is populated, all the romes associated to this NAF will be added.
-    nafs_to_add = Column(Text, default='', nullable=False)
+    nafs_to_add = Column(Text, default="", nullable=False)
 
     # Info to remove.
     remove_email = Column(Boolean, default=False, nullable=False)
@@ -161,30 +152,28 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     score_alternance = Column(Integer, default=None, nullable=True)
 
     # Update requested by.
-    requested_by_email = Column(String(191), default='', nullable=False)
-    requested_by_first_name = Column(String(191), default='', nullable=False)
-    requested_by_last_name = Column(String(191), default='', nullable=False)
-    requested_by_phone = Column(String(191), default='', nullable=False)
+    requested_by_email = Column(String(191), default="", nullable=False)
+    requested_by_first_name = Column(String(191), default="", nullable=False)
+    requested_by_last_name = Column(String(191), default="", nullable=False)
+    requested_by_phone = Column(String(191), default="", nullable=False)
 
     # Certified Recruiter values (from Emploi Store Developper)
     certified_recruiter = Column(Boolean, default=False, nullable=False)
-    recruiter_uid = Column(String(191), default='', nullable=True)
+    recruiter_uid = Column(String(191), default="", nullable=True)
 
     # Reason of the update
-    reason = Column(Text, default='', nullable=False)
+    reason = Column(Text, default="", nullable=False)
 
     # Metadata.
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
     date_updated = Column(DateTime, nullable=True)
-    created_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
-    updated_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    created_by_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    updated_by_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
-    created_by = relationship('User', foreign_keys=[created_by_id])
-    updated_by = relationship('User', foreign_keys=[updated_by_id])
+    created_by = relationship("User", foreign_keys=[created_by_id])
+    updated_by = relationship("User", foreign_keys=[updated_by_id])
 
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
+    __mapper_args__ = {"order_by": desc(date_created)}  # Default order_by for all queries.
 
     def clean(self):
         """
@@ -204,7 +193,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
         if not codes:
             return []
         separators = OfficeAdminUpdate.SEPARATORS
-        codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
+        codes = [v.strip() for v in re.split("|".join(separators), codes) if v.strip()]
         return sorted(set(codes))
 
     def romes_as_html(self, romes):
@@ -215,7 +204,7 @@ class OfficeAdminUpdate(CRUDMixin, Base):
         html = []
         for rome in self.as_list(romes):
             html.append("{0} - {1}".format(rome, settings.ROME_DESCRIPTIONS[rome]))
-        return '<br>'.join(html)
+        return "<br>".join(html)
 
 
 class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
@@ -224,9 +213,9 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     This allows companies that hire to appear in multiple locations.
     """
 
-    __tablename__ = 'etablissements_admin_extra_geolocations'
+    __tablename__ = "etablissements_admin_extra_geolocations"
 
-    GEOLOCATIONS_TEXT_SEPARATORS = ['\n', '\r']
+    GEOLOCATIONS_TEXT_SEPARATORS = ["\n", "\r"]
 
     id = Column(Integer, primary_key=True)
     siret = Column(String(191), nullable=False, unique=True)
@@ -239,21 +228,19 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     # After this date, extra geolocations will be considered obsolete.
     date_end = Column(DateTime, default=datetime.datetime.utcnow() + relativedelta(months=3), nullable=False)
 
-    reason = Column(Text, default='', nullable=False)
+    reason = Column(Text, default="", nullable=False)
 
     # Metadata.
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
     date_updated = Column(DateTime, nullable=True)
-    created_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
-    updated_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    created_by_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    updated_by_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
 
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
-    created_by = relationship('User', foreign_keys=[created_by_id])
-    updated_by = relationship('User', foreign_keys=[updated_by_id])
+    created_by = relationship("User", foreign_keys=[created_by_id])
+    updated_by = relationship("User", foreign_keys=[updated_by_id])
 
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
+    __mapper_args__ = {"order_by": desc(date_created)}  # Default order_by for all queries.
 
     def clean(self):
         """
@@ -284,8 +271,8 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         ]
         """
         return sorted(
-            [{'lat': coords[0], 'lon': coords[1]} for coords in json.loads(self.geolocations)],
-            key=lambda x: (x['lat'], x['lon'])
+            [{"lat": coords[0], "lon": coords[1]} for coords in json.loads(self.geolocations)],
+            key=lambda x: (x["lat"], x["lon"]),
         )
 
     def geolocations_as_html_links(self):
@@ -296,8 +283,8 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         html = []
         link = '<a href="https://maps.google.com/maps?q={lat},{lon}" target="_blank">{lat}, {lon}</a>'
         for coords in self.geolocations_as_lat_lon_properties():
-            html.append(link.format(lat=coords['lat'], lon=coords['lon']))
-        return '<br>'.join(html)
+            html.append(link.format(lat=coords["lat"], lon=coords["lon"]))
+        return "<br>".join(html)
 
     @staticmethod
     def codes_as_list(codes):
@@ -307,7 +294,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         if not codes:
             return []
         separators = OfficeAdminExtraGeoLocation.GEOLOCATIONS_TEXT_SEPARATORS
-        codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
+        codes = [v.strip() for v in re.split("|".join(separators), codes) if v.strip()]
         return sorted(set(codes))
 
     @staticmethod
@@ -325,10 +312,10 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         for code in codes_list:
             if geocoding.is_departement(code):
                 for city in geocoding.get_all_cities_from_departement(code):
-                    geolocations.append((city['coords']['lat'], city['coords']['lon']))
+                    geolocations.append((city["coords"]["lat"], city["coords"]["lon"]))
             elif geocoding.is_commune_id(code):
                 city = geocoding.get_city_by_commune_id(code)
-                geolocations.append((city['coords']['lat'], city['coords']['lon']))
+                geolocations.append((city["coords"]["lat"], city["coords"]["lon"]))
         return geolocations
 
     @staticmethod
@@ -341,10 +328,10 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         return json.dumps(OfficeAdminExtraGeoLocation.codes_as_geolocations(codes))
 
 
-@listens_for(OfficeAdminUpdate, 'before_insert')
-@listens_for(OfficeAdminUpdate, 'before_update')
-@listens_for(OfficeAdminExtraGeoLocation, 'before_insert')
-@listens_for(OfficeAdminExtraGeoLocation, 'before_update')
+@listens_for(OfficeAdminUpdate, "before_insert")
+@listens_for(OfficeAdminUpdate, "before_update")
+@listens_for(OfficeAdminExtraGeoLocation, "before_insert")
+@listens_for(OfficeAdminExtraGeoLocation, "before_update")
 def clean(mapper, connect, self):
     """
     Trigger the `clean()` method before an insert or an update.

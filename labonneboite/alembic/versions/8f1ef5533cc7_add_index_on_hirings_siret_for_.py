@@ -9,15 +9,15 @@ from alembic import op
 
 
 # Revision identifiers, used by Alembic.
-revision = '8f1ef5533cc7'
-down_revision = '99473cb51564'
+revision = "8f1ef5533cc7"
+down_revision = "99473cb51564"
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
-    op.create_index('_siret', 'hirings', ['siret'], unique=False)
+    op.create_index("_siret", "hirings", ["siret"], unique=False)
 
 
 def downgrade():
-    op.drop_constraint('_siret', 'hirings', type_='unique')
+    op.drop_constraint("_siret", "hirings", type_="unique")

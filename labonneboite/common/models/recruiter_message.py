@@ -1,15 +1,15 @@
 import datetime
 
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
 from sqlalchemy.dialects import mysql
-from sqlalchemy import Column
-from sqlalchemy import Boolean, DateTime, Integer, String, Text
 from sqlalchemy.orm.exc import NoResultFound
 
 from labonneboite.common import mapping as mapping_util
-from labonneboite.common.models import Office
 from labonneboite.common.database import Base
+from labonneboite.common.models import Office
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.web.contact_form import forms
+
 
 class NoOfficeFoundException(Exception):
     pass
@@ -26,14 +26,14 @@ class RecruiterMessageCommon(object):
 
     # Certified Recruiter values (from Emploi Store Developper)
     certified_recruiter = Column(Boolean, default=False, nullable=False)
-    recruiter_uid = Column(String(191), default='', nullable=True)
+    recruiter_uid = Column(String(191), default="", nullable=True)
 
     # Timestamps
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=True)
     date_updated = Column(DateTime, nullable=True)
 
     @classmethod
-    def create_from_form(cls, form, is_certified_recruiter=False, uid=''):
+    def create_from_form(cls, form, is_certified_recruiter=False, uid=""):
         instance = cls()
         instance.siret = form.siret.data
         instance.requested_by_first_name = form.first_name.data
@@ -50,8 +50,8 @@ class RecruiterMessageCommon(object):
 
 
 class OtherRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
-    __tablename__ = 'other_recruiter_message'
-    name = 'other'
+    __tablename__ = "other_recruiter_message"
+    name = "other"
 
     comment = Column(Text, nullable=True)
 
@@ -60,8 +60,8 @@ class OtherRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
 
 
 class RemoveRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
-    __tablename__ = 'remove_recruiter_message'
-    name = 'remove'
+    __tablename__ = "remove_recruiter_message"
+    name = "remove"
 
     remove_lba = Column(Boolean, default=True)
     remove_lbb = Column(Boolean, default=True)
@@ -72,8 +72,8 @@ class RemoveRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
 
 
 class UpdateCoordinatesRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
-    __tablename__ = 'update_coordinates_recruiter_message'
-    name = 'update_coordinates'
+    __tablename__ = "update_coordinates_recruiter_message"
+    name = "update_coordinates"
 
     new_website = Column(mysql.TINYTEXT, nullable=True)
     new_email = Column(mysql.TINYTEXT, nullable=True)
@@ -94,8 +94,8 @@ class UpdateCoordinatesRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base)
 
 
 class UpdateJobsRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
-    __tablename__ = 'update_jobs_recruiter_message'
-    name = 'update_jobs'
+    __tablename__ = "update_jobs_recruiter_message"
+    name = "update_jobs"
 
     romes_to_add = Column(mysql.TEXT, nullable=True)
     romes_to_remove = Column(mysql.TEXT, nullable=True)
@@ -106,9 +106,9 @@ class UpdateJobsRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
         try:
             office = Office.query.filter(Office.siret == form.siret.data).first()
         except NoResultFound:
-            raise NoOfficeFoundException('No office found with siret : {}'.format(form.data.siret))
+            raise NoOfficeFoundException("No office found with siret : {}".format(form.data.siret))
 
-        self.romes_alternance_to_add = ','.join(form.romes_alternance_to_add)
-        self.romes_alternance_to_remove = ','.join(form.romes_alternance_to_remove)
-        self.romes_to_add = ','.join(form.romes_to_add)
-        self.romes_to_remove = ','.join(form.romes_to_remove)
+        self.romes_alternance_to_add = ",".join(form.romes_alternance_to_add)
+        self.romes_alternance_to_remove = ",".join(form.romes_alternance_to_remove)
+        self.romes_to_add = ",".join(form.romes_to_add)
+        self.romes_to_remove = ",".join(form.romes_to_remove)

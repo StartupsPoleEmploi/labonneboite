@@ -1,5 +1,6 @@
-from labonneboite.importer.models.computing import ExportableOffice
 from labonneboite.importer.jobs.geocode import GeocodeJob
+from labonneboite.importer.models.computing import ExportableOffice
+
 from .test_base import DatabaseTest
 
 
@@ -21,11 +22,10 @@ def make_geocoded_office():
 
 
 class TestGeocode(DatabaseTest):
-
     def test_run_geocoding_job(self):
         task = GeocodeJob()
         initial_coordinates = [0, 0]
-        jobs = [[1234, "1 rue Marca 64000 Pau", initial_coordinates, '64445']]
+        jobs = [[1234, "1 rue Marca 64000 Pau", initial_coordinates, "64445"]]
         task.run_geocoding_jobs(jobs, disable_multithreading=True)
         updates = task.run_missing_geocoding_jobs(disable_multithreading=True)
         self.assertTrue(len(updates), 1)
@@ -36,11 +36,12 @@ class TestGeocode(DatabaseTest):
     def test_run_geocoding_jobs(self):
         task = GeocodeJob()
         initial_coordinates = [0, 0]
-        jobs = [['001234', "1 rue Marca 64000 Pau", initial_coordinates, '64445'],
-                ['005678', "13 rue de l'hotel de ville 44000 Nantes", initial_coordinates, '44109']]
+        jobs = [
+            ["001234", "1 rue Marca 64000 Pau", initial_coordinates, "64445"],
+            ["005678", "13 rue de l'hotel de ville 44000 Nantes", initial_coordinates, "44109"],
+        ]
         task.run_geocoding_jobs(jobs, disable_multithreading=True)
-        updates = task.run_missing_geocoding_jobs(
-            csv_max_rows=1, disable_multithreading=True)
+        updates = task.run_missing_geocoding_jobs(csv_max_rows=1, disable_multithreading=True)
         self.assertTrue(len(updates), 2)
         coordinates_1 = updates[0]
         coordinates_2 = updates[1]
@@ -60,8 +61,7 @@ class TestGeocode(DatabaseTest):
         jobs = task.create_geocoding_jobs()
         self.assertEqual(len(jobs), 1)
         self.assertEqual(jobs[0][0], "1234")
-        self.assertEqual(
-            jobs[0][1], "30 rue Edouard Poisson 93300 AUBERVILLIERS")
+        self.assertEqual(jobs[0][1], "30 rue Edouard Poisson 93300 AUBERVILLIERS")
 
     def test_update_coordinates(self):
         make_geocoded_office()

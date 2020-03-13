@@ -1,7 +1,7 @@
 import errno
+import io
 import logging
 import os
-import io
 
 from flask import render_template
 from slugify import slugify
@@ -11,13 +11,19 @@ from labonneboite.common import util
 from labonneboite.conf import settings
 from labonneboite.web import WEB_DIR
 
-logger = logging.getLogger('main')
+
+logger = logging.getLogger("main")
 
 
 def get_file_path(office):
-    return os.path.join(settings.GLOBAL_STATIC_PATH, "pdf",
-                        office.departement, office.naf, slugify(office.name.strip()[0]),
-                        "%s.pdf" % office.siret)
+    return os.path.join(
+        settings.GLOBAL_STATIC_PATH,
+        "pdf",
+        office.departement,
+        office.naf,
+        slugify(office.name.strip()[0]),
+        "%s.pdf" % office.siret,
+    )
 
 
 def write_file(office, data, path):
@@ -50,10 +56,7 @@ def convert_to_pdf(pdf_data):
     # local static assets required to generate the pdf. This should not point
     # to http://labonneboite.
     link_callback = lambda uri, rel: os.path.join(WEB_DIR, uri.strip("/"))
-    pisa.CreatePDF(
-        io.StringIO(pdf_data), dest=pdf_target,
-        link_callback=link_callback
-    )
+    pisa.CreatePDF(io.StringIO(pdf_data), dest=pdf_target, link_callback=link_callback)
     pdf_target.seek(0)
     return pdf_target
 
@@ -64,10 +67,6 @@ def render_favorites(offices):
 
     Return: a file-like object.
     """
-    companies = [
-        (company, util.get_contact_mode_for_rome_and_office(None, company)) for company in offices
-    ]
-    pdf_data = render_template(
-        'office/pdf_list.html', companies=companies,
-    )
+    companies = [(company, util.get_contact_mode_for_rome_and_office(None, company)) for company in offices]
+    pdf_data = render_template("office/pdf_list.html", companies=companies)
     return convert_to_pdf(pdf_data)

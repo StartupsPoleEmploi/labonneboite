@@ -11,27 +11,19 @@ class UserModelView(AdminModelViewMixin, ModelView):
     can_create = False
     can_delete = False
     can_view_details = True
-    column_searchable_list = ['email', 'first_name', 'last_name']
+    column_searchable_list = ["email", "first_name", "last_name"]
     page_size = 100
 
-    column_list = [
-        'id',
-        'email',
-        'first_name',
-        'last_name',
-        'date_created',
-        'active',
-        'is_admin',
-    ]
+    column_list = ["id", "email", "first_name", "last_name", "date_created", "active", "is_admin"]
 
     column_labels = {
-        'gender':  "Genre",
-        'first_name': "Prénom",
-        'last_name': "Nom",
-        'date_created': "Date de création",
-        'active': "Actif",
-        'external_id': "ID externe",
-        'is_admin': "Admin",
+        "gender": "Genre",
+        "first_name": "Prénom",
+        "last_name": "Nom",
+        "date_created": "Date de création",
+        "active": "Actif",
+        "external_id": "ID externe",
+        "is_admin": "Admin",
     }
 
-    form_columns = ['active', 'is_admin']
+    form_columns = ["active", "is_admin"]

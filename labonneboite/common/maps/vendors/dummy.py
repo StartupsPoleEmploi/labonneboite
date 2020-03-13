@@ -13,4 +13,4 @@ def durations(origin, destinations):
     Returns: list of float durations, or None when duration could not be
     computed. The list has the same length as the destinations argument.
     """
-    return [None]*len(destinations)
+    return [None] * len(destinations)

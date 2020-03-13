@@ -1,14 +1,13 @@
 import unittest
-
 from unittest import mock
+
 import redis.sentinel
 
-from labonneboite.tests.test_base import AppTest
 from labonneboite.common.maps import cache
+from labonneboite.tests.test_base import AppTest
 
 
 class LocalCacheTests(unittest.TestCase):
-
     def setUp(self):
         self.cache = cache.LocalCache()
 
@@ -21,7 +20,6 @@ class LocalCacheTests(unittest.TestCase):
 
 
 class RedisCacheTest(AppTest):
-
     def setUp(self):
         super(RedisCacheTest, self).setUp()
         self.cache = cache.RedisCache()
@@ -38,14 +36,10 @@ class RedisCacheTest(AppTest):
         # MasterNotFoundError
         self.cache.SENTINEL = mock.Mock(
             master_for=mock.Mock(
-                get=mock.Mock(
-                    side_effect=redis.sentinel.MasterNotFoundError
-                ),
-                set=mock.Mock(
-                    side_effect=redis.sentinel.MasterNotFoundError
-                )
+                get=mock.Mock(side_effect=redis.sentinel.MasterNotFoundError),
+                set=mock.Mock(side_effect=redis.sentinel.MasterNotFoundError),
             )
         )
 
         with self.test_request_context():
-            self.assertIsNone(self.cache.get('somekey'))
+            self.assertIsNone(self.cache.get("somekey"))

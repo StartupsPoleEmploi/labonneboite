@@ -1,6 +1,8 @@
 import datetime
 import hmac
-import urllib.request, urllib.parse, urllib.error
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from labonneboite.conf import settings
 
@@ -28,28 +30,28 @@ def make_timestamp():
 
 def get_ordered_argument_string(args):
     args_copy = dict(args)
-    if 'signature' in args_copy:
-        del args_copy['signature']
+    if "signature" in args_copy:
+        del args_copy["signature"]
     ordered_args = []
     for arg in sorted(args_copy):
         ordered_args.append((arg, args_copy[arg]))
     return urllib.parse.urlencode(ordered_args)
 
 
-def make_signature(args, timestamp, user='labonneboite'):
-    args['timestamp'] = timestamp
-    api_key = settings.API_KEYS.get(user, '')
+def make_signature(args, timestamp, user="labonneboite"):
+    args["timestamp"] = timestamp
+    api_key = settings.API_KEYS.get(user, "")
     return compute_signature(args, api_key)
 
 
 def check_api_request(request):
     try:
-        api_key = settings.API_KEYS[request.args['user']]
+        api_key = settings.API_KEYS[request.args["user"]]
     except KeyError:
         raise UnknownUserException
-    timestamp = request.args.get('timestamp')
+    timestamp = request.args.get("timestamp")
     try:
-        timestamp_dt = datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S')
+        timestamp_dt = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S")
     except:
         raise TimestampFormatException("incorrect format")
     # check timestamp for API request and reject it if it's too old or in the future
@@ -59,7 +61,7 @@ def check_api_request(request):
     seconds = (now - timestamp_dt).total_seconds()
     if abs(seconds) > 60 * 10:
         raise TimestampExpiredException("time window is over")
-    check_signature(request, request.args.get('signature'), api_key)
+    check_signature(request, request.args.get("signature"), api_key)
 
 
 def compute_signature(args, api_key):
@@ -71,7 +73,7 @@ def check_signature(request, requested_signature, api_key):
     args = {}
     for k, v in request.args.items():
         # unicode parameters (e.g. rome_codes_keyword_search) need to be properly encoded
-        args[k] = v.encode('utf8')
+        args[k] = v.encode("utf8")
     computed_signature = compute_signature(args, api_key)
     if not computed_signature == requested_signature:
         raise InvalidSignatureException

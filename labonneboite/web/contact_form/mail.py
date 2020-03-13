@@ -1,29 +1,26 @@
-from flask import escape, session
+from flask import current_app, escape, session, url_for
 
-from flask import current_app, url_for
-
-from labonneboite.conf import settings
-from labonneboite.common import mapping as mapping_util
+from labonneboite.common import mailjet, mapping as mapping_util, models
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
-from labonneboite.common import models
-from labonneboite.common import mailjet
-from labonneboite.web.contact_form import forms
+from labonneboite.conf import settings
 from labonneboite.web.auth.backends.peam_recruiter import SessionKeys, is_certified_recruiter
+from labonneboite.web.contact_form import forms
+
 
 def compute_action_name(form):
     form_to_action = {
-        'OfficeUpdateCoordinatesForm': 'Mise à jour des coordonnées',
-        'OfficeUpdateJobsForm': 'Mise à jour des métiers',
-        'OfficeRemoveForm': 'Suppression de coordonnées',
-        'OfficeOtherRequestForm': 'Demande autre',
+        "OfficeUpdateCoordinatesForm": "Mise à jour des coordonnées",
+        "OfficeUpdateJobsForm": "Mise à jour des métiers",
+        "OfficeRemoveForm": "Suppression de coordonnées",
+        "OfficeOtherRequestForm": "Demande autre",
     }
-    return form_to_action.get(form.__class__.__name__, 'Inconnu')
+    return form_to_action.get(form.__class__.__name__, "Inconnu")
 
 
 def common_mail_template(form):
 
     certified_recruiter = is_certified_recruiter()
-    unique_recruiter_id = session.get(SessionKeys.UID.value, '')
+    unique_recruiter_id = session.get(SessionKeys.UID.value, "")
 
     return """
         Un email a été envoyé par le formulaire de contact de la Bonne Boite :<br>
@@ -43,20 +40,20 @@ def common_mail_template(form):
         escape(form.last_name.data),
         escape(form.email.data),
         escape(form.phone.data),
-        'oui' if certified_recruiter else 'non',
+        "oui" if certified_recruiter else "non",
         unique_recruiter_id,
     )
+
 
 # get ready to send emails
 mailJetClient = mailjet.MailJetClient(settings.MAILJET_API_KEY, settings.MAILJET_API_SECRET)
 
+
 def send_mail(mail_content, subject):
     mailJetClient.send(
-        subject=subject,
-        html_content=mail_content,
-        from_email=settings.FROM_EMAIL,
-        recipients=[settings.TO_EMAIL]
+        subject=subject, html_content=mail_content, from_email=settings.FROM_EMAIL, recipients=[settings.TO_EMAIL]
     )
+
 
 def generate_update_coordinates_mail(form, recruiter_message):
     return """
@@ -77,21 +74,14 @@ def generate_update_coordinates_mail(form, recruiter_message):
         La Bonne Boite & La Bonne alternance
     """.format(
         common_mail_template(form),
-
         escape(form.new_website.data),
         escape(form.new_email.data),
         escape(form.new_phone.data),
-
-        forms.OfficeUpdateCoordinatesForm.CONTACT_MODES_LABELS.get(form.new_contact_mode.data, 'Inconnu'),
-
+        forms.OfficeUpdateCoordinatesForm.CONTACT_MODES_LABELS.get(form.new_contact_mode.data, "Inconnu"),
         escape(form.new_email_alternance.data),
         escape(form.new_phone_alternance.data),
         escape(form.social_network.data),
-        make_save_suggestion(
-            form,
-            recruiter_message,
-            models.UpdateCoordinatesRecruiterMessage.name
-        ),
+        make_save_suggestion(form, recruiter_message, models.UpdateCoordinatesRecruiterMessage.name),
     )
 
 
@@ -126,7 +116,7 @@ def format_romes(romes):
     """
     Return all romes has a HTMl list : <li>ROME_NAME (ROME_CODE)</li>
     """
-    return ''.join(['<li>{} ({})</li>'.format(settings.ROME_DESCRIPTIONS[rome], rome) for rome in romes])
+    return "".join(["<li>{} ({})</li>".format(settings.ROME_DESCRIPTIONS[rome], rome) for rome in romes])
 
 
 def generate_delete_mail(form, recruiter_message):
@@ -141,13 +131,9 @@ def generate_delete_mail(form, recruiter_message):
         La Bonne Boite & La Bonne alternance
     """.format(
         common_mail_template(form),
-        'oui' if form.remove_lbb.data else 'non',
-        'oui' if form.remove_lba.data else 'non',
-        make_save_suggestion(
-            form,
-            recruiter_message,
-            models.RemoveRecruiterMessage.name,
-        ),
+        "oui" if form.remove_lbb.data else "non",
+        "oui" if form.remove_lba.data else "non",
+        make_save_suggestion(form, recruiter_message, models.RemoveRecruiterMessage.name),
     )
 
 
@@ -162,11 +148,7 @@ def generate_other_mail(form, recruiter_message):
     """.format(
         common_mail_template(form),
         escape(form.comment.data),
-        make_save_suggestion(
-            form,
-            recruiter_message,
-            models.OtherRecruiterMessage.name,
-        ),
+        make_save_suggestion(form, recruiter_message, models.OtherRecruiterMessage.name),
     )
 
 
@@ -175,9 +157,9 @@ def make_save_suggestion(form, recruiter_message, recruiter_message_type):
     company = Office.query.filter_by(siret=form.siret.data).first()
 
     params = {
-        '_external': True,
-        'recruiter_message_id': recruiter_message.id,
-        'recruiter_message_type': recruiter_message_type,
+        "_external": True,
+        "recruiter_message_id": recruiter_message.id,
+        "recruiter_message_type": recruiter_message_type,
     }
 
     if not company:
@@ -187,7 +169,7 @@ def make_save_suggestion(form, recruiter_message, recruiter_message_type):
             url = url_for("officeadminremove.edit_view", id=office_admin_remove.id, **params)
             return "Entreprise retirée via Save : <a href='{}'>Voir la fiche de suppression</a>".format(url)
 
-        return 'Aucune entreprise trouvée avec le siret {}'.format(form.siret.data)
+        return "Aucune entreprise trouvée avec le siret {}".format(form.siret.data)
 
     # OfficeAdminAdd already exists ?
     office_admin_add = OfficeAdminAdd.query.filter_by(siret=form.siret.data).first()
@@ -196,13 +178,11 @@ def make_save_suggestion(form, recruiter_message, recruiter_message_type):
         return "Entreprise créée via Save : <a href='{}'>Voir la fiche d'ajout</a>".format(url)
 
     # OfficeAdminUpdate already exits ?
-    office_admin_update = OfficeAdminUpdate.query.filter(
-        OfficeAdminUpdate.sirets.contains(form.siret.data)
-    ).first()
+    office_admin_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets.contains(form.siret.data)).first()
     if office_admin_update:
         url = url_for("officeadminupdate.edit_view", id=office_admin_update.id, **params)
         return "Entreprise modifiée via Save : <a href='{}'>Voir la fiche de modification</a>".format(url)
 
     # No office AdminOffice found : suggest to create an OfficeAdminRemove
-    url = url_for('officeadminupdate.create_view', **params)
+    url = url_for("officeadminupdate.create_view", **params)
     return "Entreprise non modifiée via Save : <a href='{}'>Créer une fiche de modification</a>".format(url)

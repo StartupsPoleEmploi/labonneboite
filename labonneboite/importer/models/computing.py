@@ -1,12 +1,11 @@
 import datetime
 
-from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime
-from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy import BigInteger, Column, DateTime, Float, Index, Integer, PrimaryKeyConstraint, String
 
-from labonneboite.importer import settings as importer_settings
 from labonneboite.common.database import Base
+from labonneboite.common.models import FinalOfficeMixin, PrimitiveOfficeMixin
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.common.models import PrimitiveOfficeMixin, FinalOfficeMixin
+from labonneboite.importer import settings as importer_settings
 
 
 class Hiring(CRUDMixin, Base):
@@ -24,15 +23,15 @@ class Hiring(CRUDMixin, Base):
     1) APR  == Apprentissage.
     2) CP   == Contrat professionnel.
     """
+
     __tablename__ = importer_settings.HIRING_TABLE
     __table_args__ = (
         # Improve performance of importer compute_scores parallel jobs
-        # by quickly fetching all hirings of any given departement. 
-        Index('_departement', 'departement'),
-
+        # by quickly fetching all hirings of any given departement.
+        Index("_departement", "departement"),
         # Make it fast to retrieve all hirings of a given siret.
         # For convenience only, not actually used by the importer itself.
-        Index('_siret', 'siret'),
+        Index("_siret", "siret"),
     )
 
     CONTRACT_TYPE_CDD = 1
@@ -44,19 +43,19 @@ class Hiring(CRUDMixin, Base):
     CONTRACT_TYPES_ALTERNANCE = [CONTRACT_TYPE_APR, CONTRACT_TYPE_CP]
     CONTRACT_TYPES_ALL = CONTRACT_TYPES_DPAE + CONTRACT_TYPES_ALTERNANCE
 
-    _id = Column('id', BigInteger, primary_key=True)
+    _id = Column("id", BigInteger, primary_key=True)
     siret = Column(String(191))
     hiring_date = Column(DateTime, default=datetime.datetime.utcnow)
     contract_type = Column(Integer)
     departement = Column(String(8))
     contract_duration = Column(Integer)
     iiann = Column(String(191))
-    age_group = Column('tranche_age', String(191))
+    age_group = Column("tranche_age", String(191))
     handicap_label = Column(String(191))
     duree_pec = Column(Integer, nullable=True)
 
     def __str__(self):
-        return '%s %s' % (self.siret, self.hiring_date)
+        return "%s %s" % (self.siret, self.hiring_date)
 
 
 class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
@@ -65,13 +64,13 @@ class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
     Stores the totality of officially existing offices at the time.
     About 10M sirets are indeed officially registered in France.
     """
+
     __tablename__ = importer_settings.RAW_OFFICE_TABLE
     __table_args__ = (
-        PrimaryKeyConstraint('siret'),
-        
+        PrimaryKeyConstraint("siret"),
         # Improve performance of importer compute_scores parallel jobs
-        # by quickly fetching all offices of any given departement.        
-        Index('_departement', 'departement'),
+        # by quickly fetching all offices of any given departement.
+        Index("_departement", "departement"),
     )
 
     # any column specific to this very model should go here.
@@ -89,18 +88,17 @@ class ExportableOffice(FinalOfficeMixin, CRUDMixin, Base):
     When a new dataset built by the importer is deployed, the content of this
     table will replace the content of the main Office table.
     """
+
     __tablename__ = importer_settings.SCORE_REDUCING_TARGET_TABLE
 
     __table_args__ = (
-        PrimaryKeyConstraint('siret'),
-
+        PrimaryKeyConstraint("siret"),
         # Improve performance of create_index.py parallel jobs
         # by quickly fetching all offices of any given departement.
-        Index('_departement', 'departement'),
-        
+        Index("_departement", "departement"),
         # Improve performance of create_index.py remove_scam_emails()
         # by quickly locating offices having a given scam email.
-        Index('_email', 'email'),
+        Index("_email", "email"),
     )
 
 
@@ -109,10 +107,11 @@ class Geolocation(CRUDMixin, Base):
     cache each full_address <=> coordinates(longitude, latitude) match
     managed by geocoding process
     """
+
     __tablename__ = "geolocations"
     full_address = Column(String(191), primary_key=True)
-    x = Column('coordinates_x', Float)  # longitude
-    y = Column('coordinates_y', Float)  # latitude
+    x = Column("coordinates_x", Float)  # longitude
+    y = Column("coordinates_y", Float)  # latitude
 
 
 class ImportTask(CRUDMixin, Base):
@@ -120,6 +119,7 @@ class ImportTask(CRUDMixin, Base):
     Used to store and remember which ETAB and/or DPAE exports have already been processed
     by the importer jobs.
     """
+
     __tablename__ = "import_tasks"
 
     # Import state
@@ -131,7 +131,7 @@ class ImportTask(CRUDMixin, Base):
     DPAE = 1
     ETABLISSEMENT = 2
 
-    _id = Column('id', BigInteger, primary_key=True)
+    _id = Column("id", BigInteger, primary_key=True)
     filename = Column(String(191))
     state = Column(Integer)
     import_type = Column(Integer)
@@ -146,9 +146,10 @@ class DpaeStatistics(CRUDMixin, Base):
     """
     Used to store details about the last DPAE import.
     """
+
     __tablename__ = "dpae_statistics"
 
-    _id = Column('id', BigInteger, primary_key=True)
+    _id = Column("id", BigInteger, primary_key=True)
     last_import = Column(DateTime, default=datetime.datetime.utcnow)
     most_recent_data_date = Column(DateTime, default=datetime.datetime.utcnow)
 

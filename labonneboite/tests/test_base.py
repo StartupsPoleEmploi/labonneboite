@@ -1,12 +1,10 @@
 import logging
 import unittest
 
-from flask import url_for as flask_url_for
-from flask import _request_ctx_stack
+from flask import _request_ctx_stack, url_for as flask_url_for
 
+from labonneboite.common import env, es
 from labonneboite.common.database import db_session, delete_db, engine, init_db
-from labonneboite.common import env
-from labonneboite.common import es
 from labonneboite.conf import settings
 from labonneboite.web.app import app
 
@@ -46,7 +44,7 @@ class AppTest(unittest.TestCase):
             url = flask_url_for(endpoint, **kwargs)
             return url
 
-    def login(self, user, social_auth_backend='peam-openidconnect'):
+    def login(self, user, social_auth_backend="peam-openidconnect"):
         """
         Logs a user in by simulating a third-party authentication process.
 
@@ -59,10 +57,10 @@ class AppTest(unittest.TestCase):
         _request_ctx_stack.top.user = user
         with self.app.session_transaction() as sess:
             # Session info set by Flask-Login.
-            sess['user_id'] = user.id
+            sess["user_id"] = user.id
             # Session info set by Python Social Auth.
-            sess['social_auth_last_login_backend'] = social_auth_backend
-            sess['%s_state' % social_auth_backend] = 'a1z2e3r4t5y6y'
+            sess["social_auth_last_login_backend"] = social_auth_backend
+            sess["%s_state" % social_auth_backend] = "a1z2e3r4t5y6y"
 
     def logout(self):
         """
@@ -74,7 +72,7 @@ class AppTest(unittest.TestCase):
                 ...
                 self.logout()
         """
-        self.app.get('/authentication/logout')
+        self.app.get("/authentication/logout")
         del _request_ctx_stack.top.user
 
 
@@ -92,20 +90,22 @@ class DatabaseTest(AppTest):
 
     def setUp(self):
         if env.get_current_env() != env.ENV_TEST:
-            raise ValueError("Running database tests, but not in test mode. You"
-                             " most certainly don't want to do that. Set the"
-                             " `LBB_ENV=test` environment variable.")
+            raise ValueError(
+                "Running database tests, but not in test mode. You"
+                " most certainly don't want to do that. Set the"
+                " `LBB_ENV=test` environment variable."
+            )
 
         # Disable elasticsearch logging
-        logging.getLogger('elasticsearch').setLevel(logging.CRITICAL)
-        logging.getLogger('main').setLevel(logging.CRITICAL)
+        logging.getLogger("elasticsearch").setLevel(logging.CRITICAL)
+        logging.getLogger("main").setLevel(logging.CRITICAL)
 
         # Create MySQL tables.
         delete_db()
         init_db()
 
         # Create ES index.
-        self.assertIn('test', settings.ES_INDEX)
+        self.assertIn("test", settings.ES_INDEX)
         self.es = es.Elasticsearch()
         es.drop_and_create_index()
 

@@ -1,11 +1,10 @@
-
-import logging
 import json
+import logging
 
+from . import exceptions, vendors
 from .cache import Cache
 from .constants import DEFAULT_TRAVEL_MODE, TRAVEL_MODES
-from . import exceptions
-from . import vendors
+
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +14,7 @@ DURATIONS_CACHE = Cache()
 
 # Note: everywhere we deal with coordinates, they are assumed to be float tuples of the
 # form (latitude, longitude).
+
 
 def isochrone(location, duration, mode=None):
     """
@@ -29,7 +29,7 @@ def isochrone(location, duration, mode=None):
         A list of polygons; each polygon is itself a list of coordinates. Thus,
         the result is a list of list of coordinates.
     """
-    return backend_cached_func(ISOCHRONE_CACHE, 'isochrone', mode, location, duration)
+    return backend_cached_func(ISOCHRONE_CACHE, "isochrone", mode, location, duration)
 
 
 def durations(origin, destinations, mode=None):
@@ -51,8 +51,8 @@ def durations(origin, destinations, mode=None):
     durations_by_destination = {}
     destinations_to_fetch = []
 
-    backend_name, mode = backend_info('durations', mode)
-    func_name = 'durations'
+    backend_name, mode = backend_info("durations", mode)
+    func_name = "durations"
 
     # Fetch results from cache
     for destination in set(destinations):
@@ -133,7 +133,7 @@ def backend_info(func_name, mode):
     """
     mode = mode or DEFAULT_TRAVEL_MODE
     if mode not in TRAVEL_MODES:
-        raise ValueError('Invalid travel mode: {}'.format(mode))
+        raise ValueError("Invalid travel mode: {}".format(mode))
     backend_name = vendors.backend_name(func_name, mode)
     return backend_name, mode
 

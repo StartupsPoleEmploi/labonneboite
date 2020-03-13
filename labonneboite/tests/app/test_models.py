@@ -1,8 +1,8 @@
 import datetime
 
-from labonneboite.conf import settings
 from labonneboite.common.database import db_session
 from labonneboite.common.models import Office, OfficeAdminExtraGeoLocation
+from labonneboite.conf import settings
 from labonneboite.tests.test_base import DatabaseTest
 
 
@@ -16,30 +16,25 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         Test `OfficeAdminExtraGeoLocation.clean()`.
         """
         extra_geolocation = OfficeAdminExtraGeoLocation(
-            siret="38524664000176",
-            codes="75110\n\n\n\n\n\n\n57616",
-            reason="Paris 10 + Metz Saint Julien",
+            siret="38524664000176", codes="75110\n\n\n\n\n\n\n57616", reason="Paris 10 + Metz Saint Julien"
         )
         db_session.add(extra_geolocation)
         db_session.commit()
         # The `clean()` method should have been called automatically.
         extra_geolocation = db_session.query(OfficeAdminExtraGeoLocation).first()
         # Multiple newlines should have been removed.
-        self.assertEqual(extra_geolocation.codes, '57616\n75110')
+        self.assertEqual(extra_geolocation.codes, "57616\n75110")
         # Corresponding Lat/Lon coords should have been found and stored.
         self.assertEqual(
             extra_geolocation.geolocations,
-            '[[49.135208952059884, 6.207906756168173], [48.8815994262695, 2.36229991912841]]'
+            "[[49.135208952059884, 6.207906756168173], [48.8815994262695, 2.36229991912841]]",
         )
 
     def test_is_outdated(self):
         """
         Test `OfficeAdminExtraGeoLocation.is_outdated()`.
         """
-        extra_geolocation = OfficeAdminExtraGeoLocation(
-            siret="38524664000176",
-            codes="75108",
-        )
+        extra_geolocation = OfficeAdminExtraGeoLocation(siret="38524664000176", codes="75108")
         extra_geolocation.save()
         self.assertFalse(extra_geolocation.is_outdated())
         # Make `extra_geolocation` instance out-of-date.
@@ -53,10 +48,10 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         """
         codes = "   57616\n\n\n\n\n\n     75110  \n  54      "
         codes_as_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
-        self.assertEqual(sorted(codes_as_list), ['54', '57616', '75110'])
+        self.assertEqual(sorted(codes_as_list), ["54", "57616", "75110"])
         codes = "75\r57\n13"
         codes_as_list = OfficeAdminExtraGeoLocation.codes_as_list(codes)
-        self.assertEqual(sorted(codes_as_list), ['13', '57', '75'])
+        self.assertEqual(sorted(codes_as_list), ["13", "57", "75"])
 
     def test_codes_as_geolocations(self):
         """
@@ -98,18 +93,18 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         """
         codes = "75110"
         codes_as_json_geolocations = OfficeAdminExtraGeoLocation.codes_as_json_geolocations(codes)
-        expected = '[[48.8815994262695, 2.36229991912841]]'
+        expected = "[[48.8815994262695, 2.36229991912841]]"
         self.assertEqual(expected, codes_as_json_geolocations)
 
     def test_office_as_json(self):
         # Create office
         office = Office(
-            siret='00000000000001',
-            company_name='1',
-            headcount='11',
-            city_code='57070',
-            zipcode='57070',
-            naf='4646Z',
+            siret="00000000000001",
+            company_name="1",
+            headcount="11",
+            city_code="57070",
+            zipcode="57070",
+            naf="4646Z",
             score=90,
             x=6.166667,
             y=49.133333,
@@ -118,11 +113,11 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         office.distance = 10
 
         office_json = office.as_json()
-        self.assertEqual(office.siret, office_json['siret'])
-        self.assertEqual(office.company_name, office_json['name'])
-        self.assertEqual(settings.HEADCOUNT_INSEE[office.headcount], office_json['headcount_text'])
-        self.assertEqual(office.x, office_json['lon'])
-        self.assertEqual(office.y, office_json['lat'])
-        self.assertEqual(office.naf, office_json['naf'])
-        self.assertEqual(office.distance, office_json['distance'])
-        self.assertTrue(office_json['alternance'])
+        self.assertEqual(office.siret, office_json["siret"])
+        self.assertEqual(office.company_name, office_json["name"])
+        self.assertEqual(settings.HEADCOUNT_INSEE[office.headcount], office_json["headcount_text"])
+        self.assertEqual(office.x, office_json["lon"])
+        self.assertEqual(office.y, office_json["lat"])
+        self.assertEqual(office.naf, office_json["naf"])
+        self.assertEqual(office.distance, office_json["distance"])
+        self.assertTrue(office_json["alternance"])

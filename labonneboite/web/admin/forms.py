@@ -1,6 +1,7 @@
-
 from wtforms import ValidationError
+
 from labonneboite.common.siret import is_siret
+
 
 def siret_validator(form, field):
     """
@@ -39,8 +40,8 @@ def nospace_filter(value):
     """
     Remove spaces from user input.
     """
-    if value is not None and hasattr(value, 'replace'):
-        return value.replace(' ', '')
+    if value is not None and hasattr(value, "replace"):
+        return value.replace(" ", "")
     return value
 
 
@@ -48,6 +49,6 @@ def strip_filter(value):
     """
     Strip the spaces from user input.
     """
-    if value is not None and hasattr(value, 'strip'):
+    if value is not None and hasattr(value, "strip"):
         return value.strip()
     return value

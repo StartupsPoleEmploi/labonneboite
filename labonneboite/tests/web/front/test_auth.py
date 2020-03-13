@@ -3,29 +3,26 @@ import urllib.parse
 from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common.database import db_session
-from labonneboite.common.models import get_user_social_auth, User
+from labonneboite.common.models import User, get_user_social_auth
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.app import app
-from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
 from labonneboite.web.auth import utils as auth_utils
+from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
 
 
 class AuthTest(DatabaseTest):
-
     def test_logout(self):
         """
         Test that the session is cleaned after a logout.
         """
 
-        user = User(email='j@test.com', gender='male', first_name='John', last_name='Doe')
+        user = User(email="j@test.com", gender="male", first_name="John", last_name="Doe")
         db_session.add(user)
         db_session.flush()
 
         # This `UserSocialAuth` entry will be required later by the logout function.
         user_social_auth = UserSocialAuth(
-            provider=PEAMOpenIdConnect.name,
-            extra_data={'id_token': 'fake'},
-            user_id=user.id,
+            provider=PEAMOpenIdConnect.name, extra_data={"id_token": "fake"}, user_id=user.id
         )
         db_session.add(user_social_auth)
         db_session.commit()
@@ -33,29 +30,29 @@ class AuthTest(DatabaseTest):
         with self.test_request_context():
 
             with self.app.session_transaction() as sess:
-                sess['this_should_not_be_deleted'] = 'foo'  # This should not be deleted by a login or logout.
+                sess["this_should_not_be_deleted"] = "foo"  # This should not be deleted by a login or logout.
 
             self.login(user)
 
             with self.app.session_transaction() as sess:
-                self.assertIn('this_should_not_be_deleted', sess)
-                self.assertIn('user_id', sess)
-                self.assertIn('social_auth_last_login_backend', sess)
-                self.assertIn('peam-openidconnect_state', sess)
+                self.assertIn("this_should_not_be_deleted", sess)
+                self.assertIn("user_id", sess)
+                self.assertIn("social_auth_last_login_backend", sess)
+                self.assertIn("peam-openidconnect_state", sess)
 
             self.logout()
 
             with self.app.session_transaction() as sess:
-                self.assertIn('this_should_not_be_deleted', sess)
-                self.assertNotIn('user_id', sess)
-                self.assertNotIn('social_auth_last_login_backend', sess)
-                self.assertNotIn('peam-openidconnect_state', sess)
+                self.assertIn("this_should_not_be_deleted", sess)
+                self.assertNotIn("user_id", sess)
+                self.assertNotIn("social_auth_last_login_backend", sess)
+                self.assertNotIn("peam-openidconnect_state", sess)
 
     def test_get_user_social_auth(self):
         """
         Test the `get_user_social_auth()` function.
         """
-        user = User(email='john@doe.com', gender='male', first_name='John', last_name='Doe')
+        user = User(email="john@doe.com", gender="male", first_name="John", last_name="Doe")
         db_session.add(user)
         db_session.flush()
 
@@ -78,22 +75,22 @@ class AuthTest(DatabaseTest):
         parsed = urllib.parse.urlsplit(login_url)
         querystring = urllib.parse.parse_qs(parsed.query)
         self.assertIsNotNone(login_url)
-        self.assertEqual(['1'], querystring['keep'])
-        self.assertNotIn('next', querystring)
+        self.assertEqual(["1"], querystring["keep"])
+        self.assertNotIn("next", querystring)
 
     def test_login_url_with_next(self):
-        next_url = 'http://infinityandbeyond.com/subpath?arg=value'
+        next_url = "http://infinityandbeyond.com/subpath?arg=value"
         with self.app_context():
             login_url = auth_utils.login_url(next_url=next_url)
 
         parsed = urllib.parse.urlsplit(login_url)
         querystring = urllib.parse.parse_qs(parsed.query)
-        self.assertEqual([next_url], querystring['next'])
+        self.assertEqual([next_url], querystring["next"])
 
     def test_login_url_with_request(self):
-        with app.test_request_context(path='/pioupiou', base_url='http://laser.com'):
+        with app.test_request_context(path="/pioupiou", base_url="http://laser.com"):
             login_url = auth_utils.login_url()
 
         parsed = urllib.parse.urlsplit(login_url)
         querystring = urllib.parse.parse_qs(parsed.query)
-        self.assertEqual(['http://laser.com/pioupiou'], querystring['next'])
+        self.assertEqual(["http://laser.com/pioupiou"], querystring["next"])

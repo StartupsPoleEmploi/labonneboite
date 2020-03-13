@@ -1,8 +1,7 @@
 import os
 import unittest
 
-from labonneboite.common.database import db_session, init_db, delete_db, engine
-
+from labonneboite.common.database import db_session, delete_db, engine, init_db
 from labonneboite.importer.jobs.common import logger
 
 
@@ -17,6 +16,7 @@ class DatabaseTest(unittest.TestCase):
         # pylint:disable=unused-variable
         # Imports are used by SQLAlchemy to know what tables to create.
         from labonneboite.importer.models.computing import Hiring, DpaeStatistics, ImportTask
+
         # pylint:enable=unused-variable
 
         db_session.remove()
@@ -25,7 +25,7 @@ class DatabaseTest(unittest.TestCase):
         init_db()
 
         # Mute jobs logger
-        logger.setLevel('CRITICAL')
+        logger.setLevel("CRITICAL")
 
         return super(DatabaseTest, self).setUp()
 

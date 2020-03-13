@@ -1,23 +1,21 @@
-from datetime import datetime
 import collections
 import logging
+from datetime import datetime
 
 from slugify import slugify
 
-from labonneboite.common import mapping as mapping_util
-from labonneboite.common import sorting
-from labonneboite.common import hiring_type_util
-from labonneboite.common import util
-from labonneboite.common.pagination import OFFICES_PER_PAGE
-from labonneboite.common.models import Office
-from labonneboite.common.fetcher import Fetcher
+from labonneboite.common import hiring_type_util, mapping as mapping_util, sorting, util
 from labonneboite.common.es import Elasticsearch
-from labonneboite.conf import settings
+from labonneboite.common.fetcher import Fetcher
+from labonneboite.common.models import Office
+from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
+from labonneboite.conf import settings
+
 from .maps import travel
 
 
-logger = logging.getLogger('main')
+logger = logging.getLogger("main")
 
 
 PUBLIC_ALL = 0
@@ -27,14 +25,14 @@ PUBLIC_HANDICAP = 3
 PUBLIC_CHOICES = [PUBLIC_ALL, PUBLIC_JUNIOR, PUBLIC_SENIOR, PUBLIC_HANDICAP]
 
 KEY_TO_LABEL_DISTANCES = {
-    '*-10.0': 'less_10_km',
-    '*-30.0': 'less_30_km',
-    '*-50.0': 'less_50_km',
-    '*-100.0': 'less_100_km',
-    '*-3000.0': 'france',
+    "*-10.0": "less_10_km",
+    "*-30.0": "less_30_km",
+    "*-50.0": "less_50_km",
+    "*-100.0": "less_100_km",
+    "*-3000.0": "france",
 }
 
-FILTERS = ['naf', 'headcount', 'hiring_type', 'distance']
+FILTERS = ["naf", "headcount", "hiring_type", "distance"]
 DISTANCE_FILTER_MAX = 3000
 
 
@@ -116,12 +114,12 @@ class HiddenMarketFetcher(Fetcher):
         return self.public == PUBLIC_SENIOR
 
     def update_aggregations(self, aggregations):
-        if self.headcount and 'headcount' in aggregations:
-            aggregations['headcount'] = self.get_headcount_aggregations()
-        if self.distance != DISTANCE_FILTER_MAX and 'distance' in aggregations:
-            aggregations['distance'] = self.get_distance_aggregations()
-        if self.naf and 'naf' in aggregations:
-            aggregations['naf'] = self.get_naf_aggregations()
+        if self.headcount and "headcount" in aggregations:
+            aggregations["headcount"] = self.get_headcount_aggregations()
+        if self.distance != DISTANCE_FILTER_MAX and "distance" in aggregations:
+            aggregations["distance"] = self.get_distance_aggregations()
+        if self.naf and "naf" in aggregations:
+            aggregations["naf"] = self.get_naf_aggregations()
 
     def _get_office_count(self, rome_codes, distance):
         return count_offices(
@@ -161,7 +159,7 @@ class HiddenMarketFetcher(Fetcher):
             departments=self.departments,
             flag_pmsmp=self.flag_pmsmp,
         )
-        return aggregations['naf']
+        return aggregations["naf"]
 
     def get_headcount_aggregations(self):
         _, _, aggregations = fetch_offices(
@@ -181,7 +179,7 @@ class HiddenMarketFetcher(Fetcher):
             departments=self.departments,
             flag_pmsmp=self.flag_pmsmp,
         )
-        return aggregations['headcount']
+        return aggregations["headcount"]
 
     def get_contract_aggregations(self):
         """
@@ -221,7 +219,7 @@ class HiddenMarketFetcher(Fetcher):
             flag_pmsmp=self.flag_pmsmp,
         )
 
-        return {'alternance': total_alternance, 'dpae': total_dpae}
+        return {"alternance": total_alternance, "dpae": total_dpae}
 
     def get_distance_aggregations(self):
         _, _, aggregations = fetch_offices(
@@ -241,7 +239,7 @@ class HiddenMarketFetcher(Fetcher):
             departments=self.departments,
             flag_pmsmp=self.flag_pmsmp,
         )
-        return aggregations['distance']
+        return aggregations["distance"]
 
     def compute_office_count(self):
         self.office_count = self._get_office_count(self.romes, self.distance)
@@ -298,7 +296,7 @@ class HiddenMarketFetcher(Fetcher):
 
             # Suggest other distances.
             last_count = 0
-            for distance, distance_label in [(30, '30 km'), (50, '50 km'), (3000, 'France entière')]:
+            for distance, distance_label in [(30, "30 km"), (50, "50 km"), (3000, "France entière")]:
                 office_count = self._get_office_count(self.romes, distance)
                 if office_count > last_count:
                     last_count = office_count
@@ -331,36 +329,27 @@ def count_offices_from_es(json_body):
 
 def fetch_offices(naf_codes, rome_codes, latitude, longitude, distance, aggregate_by=None, **kwargs):
     json_body = build_json_body_elastic_search(
-        naf_codes,
-        rome_codes,
-        latitude,
-        longitude,
-        distance,
-        aggregate_by=aggregate_by,
-        **kwargs
+        naf_codes, rome_codes, latitude, longitude, distance, aggregate_by=aggregate_by, **kwargs
     )
 
-    sort = kwargs.get('sort', sorting.SORT_FILTER_DEFAULT)
+    sort = kwargs.get("sort", sorting.SORT_FILTER_DEFAULT)
 
     offices, office_count, aggregations_raw = get_offices_from_es_and_db(
-        json_body,
-        sort=sort,
-        rome_codes=rome_codes,
-        hiring_type=kwargs['hiring_type'],
+        json_body, sort=sort, rome_codes=rome_codes, hiring_type=kwargs["hiring_type"]
     )
 
     # Extract aggregations
     aggregations = {}
     if aggregate_by:
-        if 'naf' in aggregate_by:
-            aggregations['naf'] = aggregate_naf(aggregations_raw)
-        if 'hiring_type' in aggregate_by:
+        if "naf" in aggregate_by:
+            aggregations["naf"] = aggregate_naf(aggregations_raw)
+        if "hiring_type" in aggregate_by:
             pass  # hiring_type cannot technically be aggregated and is thus processed at a later step
-        if 'headcount' in aggregate_by:
-            aggregations['headcount'] = aggregate_headcount(aggregations_raw)
-        if 'distance' in aggregate_by:
+        if "headcount" in aggregate_by:
+            aggregations["headcount"] = aggregate_headcount(aggregations_raw)
+        if "distance" in aggregate_by:
             if distance == DISTANCE_FILTER_MAX:
-                aggregations['distance'] = aggregate_distance(aggregations_raw)
+                aggregations["distance"] = aggregate_distance(aggregations_raw)
 
     return offices, office_count, aggregations
 
@@ -368,10 +357,11 @@ def fetch_offices(naf_codes, rome_codes, latitude, longitude, distance, aggregat
 def aggregate_naf(aggregations_raw):
     return [
         {
-            "code": naf_aggregate['key'],
-            "count": naf_aggregate['doc_count'],
-            'label': settings.NAF_CODES.get(naf_aggregate['key']),
-        } for naf_aggregate in aggregations_raw['naf']['buckets']
+            "code": naf_aggregate["key"],
+            "count": naf_aggregate["doc_count"],
+            "label": settings.NAF_CODES.get(naf_aggregate["key"]),
+        }
+        for naf_aggregate in aggregations_raw["naf"]["buckets"]
     ]
 
 
@@ -381,19 +371,19 @@ def aggregate_headcount(aggregations_raw):
 
     # Count by HEADCOUNT_INSEE values
     for contract_aggregate in aggregations_raw["headcount"]["buckets"]:
-        key = contract_aggregate['key']
+        key = contract_aggregate["key"]
         if key <= settings.HEADCOUNT_SMALL_ONLY_MAXIMUM:
-            small += contract_aggregate['doc_count']
+            small += contract_aggregate["doc_count"]
         elif key >= settings.HEADCOUNT_BIG_ONLY_MINIMUM:
-            big += contract_aggregate['doc_count']
+            big += contract_aggregate["doc_count"]
 
-    return {'small': small, 'big': big}
+    return {"small": small, "big": big}
 
 
 def aggregate_distance(aggregations_raw):
     distances_aggregations = {}
-    for distance_aggregate in aggregations_raw['distance']['buckets']:
-        key = distance_aggregate['key']
+    for distance_aggregate in aggregations_raw["distance"]["buckets"]:
+        key = distance_aggregate["key"]
         try:
             label = KEY_TO_LABEL_DISTANCES[key]
         except KeyError as e:
@@ -401,25 +391,23 @@ def aggregate_distance(aggregations_raw):
             logger.exception(e)
             continue
 
-        distances_aggregations[label] = distance_aggregate['doc_count']
+        distances_aggregations[label] = distance_aggregate["doc_count"]
 
     return distances_aggregations
 
 
 def get_score_for_rome_field_name(hiring_type, rome_code):
-    return {
-        hiring_type_util.DPAE: "scores_by_rome.%s",
-        hiring_type_util.ALTERNANCE: "scores_alternance_by_rome.%s",
-    }[hiring_type] % rome_code
+    return {hiring_type_util.DPAE: "scores_by_rome.%s", hiring_type_util.ALTERNANCE: "scores_alternance_by_rome.%s"}[
+        hiring_type
+    ] % rome_code
 
 
 def get_boosted_rome_field_name(hiring_type, rome_code):
     hiring_type = hiring_type or hiring_type_util.DEFAULT
 
-    return {
-        hiring_type_util.DPAE: "boosted_romes.%s",
-        hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s",
-    }[hiring_type] % rome_code
+    return {hiring_type_util.DPAE: "boosted_romes.%s", hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s"}[
+        hiring_type
+    ] % rome_code
 
 
 def build_json_body_elastic_search(
@@ -446,9 +434,7 @@ def build_json_body_elastic_search(
     hiring_type = hiring_type or hiring_type_util.DEFAULT
     gps_available = latitude is not None and longitude is not None
 
-    score_for_rome_field_names = [
-        get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes
-    ]
+    score_for_rome_field_names = [get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes]
 
     # FIXME one day make boosted_rome logic compatible with multi rome, right now it only
     # works based on the first of the romes. Not urgent, as multi rome is API only,
@@ -460,13 +446,7 @@ def build_json_body_elastic_search(
     filters = []
     should_filters = []
     if naf_codes:
-        filters = [
-            {
-                "terms": {
-                    "naf": naf_codes,
-                },
-            }
-        ]
+        filters = [{"terms": {"naf": naf_codes}}]
 
     # in some cases, a string is given as input, let's ensure it is an int from now on
     try:
@@ -486,94 +466,44 @@ def build_json_body_elastic_search(
             headcount = {"gte": min_office_size}
         if max_office_size:
             headcount = {"lte": max_office_size}
-        filters.append({
-            "numeric_range": {
-                "headcount": headcount,
-            }
-        })
+        filters.append({"numeric_range": {"headcount": headcount}})
 
     if flag_junior == 1:
-        filters.append({
-            "term": {
-                "flag_junior": 1,
-            }
-        })
+        filters.append({"term": {"flag_junior": 1}})
 
     if flag_senior == 1:
-        filters.append({
-            "term": {
-                "flag_senior": 1,
-            }
-        })
+        filters.append({"term": {"flag_senior": 1}})
 
     if flag_handicap == 1:
-        filters.append({
-            "term": {
-                "flag_handicap": 1,
-            }
-        })
+        filters.append({"term": {"flag_handicap": 1}})
 
     # at least one of these fields should exist
-    filters.append({
-        "bool": {
-            "should": [{
-                "exists": {
-                    "field": field_name,
-                }
-            } for field_name in score_for_rome_field_names]
-        }
-    })
+    filters.append(
+        {"bool": {"should": [{"exists": {"field": field_name}} for field_name in score_for_rome_field_names]}}
+    )
 
     if gps_available:
-        filters.append({
-            "geo_distance": {
-                "distance": "%skm" % distance,
-                "locations": {
-                    "lat": latitude,
-                    "lon": longitude,
-                }
-            }
-        })
+        filters.append(
+            {"geo_distance": {"distance": "%skm" % distance, "locations": {"lat": latitude, "lon": longitude}}}
+        )
 
     if departments:
-        filters.append({
-            'terms': {
-                'department': departments,
-            }
-        })
+        filters.append({"terms": {"department": departments}})
 
     if flag_pmsmp == 1:
-        filters.append({
-            "term": {
-                "flag_pmsmp": 1,
-            }
-        })
+        filters.append({"term": {"flag_pmsmp": 1}})
 
     if duration is not None and gps_available:
         isochrone = travel.isochrone((latitude, longitude), duration, mode=travel_mode)
         if isochrone:
             for polygon in isochrone:
-                should_filters.append({
-                    "geo_polygon": {
-                        "locations": {
-                            "points": [[p[1], p[0]] for p in polygon]
-                        }
-                    }
-                })
+                should_filters.append({"geo_polygon": {"locations": {"points": [[p[1], p[0]] for p in polygon]}}})
 
-    main_query = {
-        "filtered": {
-            "filter": {
-                "bool": {
-                    "must": filters,
-                }
-            }
-        }
-    }
+    main_query = {"filtered": {"filter": {"bool": {"must": filters}}}}
 
     if should_filters:
         # 'should' filters means that at least 1 of the filters should match
-        main_query['filtered']['filter']['bool']['should'] = should_filters
+        main_query["filtered"]["filter"]["bool"]["should"] = should_filters
 
     # Build sorting.
 
@@ -593,7 +523,8 @@ def build_json_body_elastic_search(
                             # Fallback value used in case the field score_for_rome_field_name is absent.
                             "missing": 0,
                         }
-                    } for score_for_rome_field_name in score_for_rome_field_names
+                    }
+                    for score_for_rome_field_name in score_for_rome_field_names
                 ],
                 # How to combine the result of the various functions 'field_value_factor' (1 per rome_code).
                 # We keep the maximum score amongst scores of all requested rome_codes.
@@ -614,9 +545,9 @@ def build_json_body_elastic_search(
                         "random_score": {
                             # Use a different seed every day. This way results are shuffled again
                             # every 24 hours.
-                            "seed": datetime.today().strftime('%Y-%m-%d'),
-                        },
-                    },
+                            "seed": datetime.today().strftime("%Y-%m-%d")
+                        }
+                    }
                 ],
                 # How to combine the result of the various functions.
                 # Totally irrelevant here as we use only one function.
@@ -635,19 +566,10 @@ def build_json_body_elastic_search(
         # https://github.com/elastic/elasticsearch/issues/7783#issuecomment-64880008
 
     if sort not in sorting.SORT_FILTERS:
-        logger.info('unknown sort: %s', sort)
+        logger.info("unknown sort: %s", sort)
         sort = sorting.SORT_FILTER_DEFAULT
 
-    distance_sort = {
-        "_geo_distance": {
-            "locations": {
-                "lat": latitude,
-                "lon": longitude,
-            },
-            "order": "asc",
-            "unit": "km",
-        }
-    }
+    distance_sort = {"_geo_distance": {"locations": {"lat": latitude, "lon": longitude}, "order": "asc", "unit": "km"}}
 
     boosted_romes_sort = {
         boosted_rome_field_name: {
@@ -667,48 +589,39 @@ def build_json_body_elastic_search(
         randomized_score_sort = "_score"
         sort_attrs.append(randomized_score_sort)
         if gps_available:
-            sort_attrs.append(distance_sort)  # required so that office distance can be extracted and displayed on frontend
+            sort_attrs.append(
+                distance_sort
+            )  # required so that office distance can be extracted and displayed on frontend
         else:
-            sort_attrs.append({
-                "department": {
-                    "order": "asc",
-                }
-            })
+            sort_attrs.append({"department": {"order": "asc"}})
 
     elif sort == sorting.SORT_FILTER_DISTANCE:
         # no randomization nor boosting happens when sorting by distance
         sort_attrs.append(distance_sort)
 
-    json_body = {
-        "sort": sort_attrs,
-        "query": main_query,
-    }
+    json_body = {"sort": sort_attrs, "query": main_query}
 
     # Add aggregate
     if aggregate_by and gps_available:
 
-        json_body['aggs'] = {}
+        json_body["aggs"] = {}
         for aggregate in aggregate_by:
             # Distance is not an ES field, so we have to do a specific aggregation.
-            if aggregate == 'distance':
-                json_body['aggs']['distance'] = {
-                    'geo_distance': {
+            if aggregate == "distance":
+                json_body["aggs"]["distance"] = {
+                    "geo_distance": {
                         "field": "locations",
                         "origin": "%s,%s" % (latitude, longitude),
-                        'unit': 'km',
-                        'ranges': [{'to': 10}, {'to': 30}, {'to': 50}, {'to': 100}, {'to': 3000}],
+                        "unit": "km",
+                        "ranges": [{"to": 10}, {"to": 30}, {"to": 50}, {"to": 100}, {"to": 3000}],
                     }
                 }
             # We cannot use aggregation for contract=dpae/alternance, as both kinds use different
             # logics and are not simply two different values of the same field.
-            elif aggregate == 'contract':
+            elif aggregate == "contract":
                 pass
             else:
-                json_body['aggs'][aggregate] = {
-                    "terms": {
-                        "field": aggregate,
-                    }
-                }
+                json_body["aggs"][aggregate] = {"terms": {"field": aggregate}}
 
     # Process from_number and to_number.
     if from_number:
@@ -719,7 +632,6 @@ def build_json_body_elastic_search(
                 logger.exception("to_number < from_number : %s < %s", to_number, from_number)
                 raise Exception("to_number < from_number")
             json_body["size"] = to_number - from_number + 1
-
 
     return json_body
 
@@ -748,9 +660,9 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
     logger.debug("Elastic Search request : %s", json_body)
     res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
 
-    office_count = res['hits']['total']
+    office_count = res["hits"]["total"]
     offices = []
-    siret_list = [office["_source"]["siret"] for office in res['hits']['hits']]
+    siret_list = [office["_source"]["siret"] for office in res["hits"]["hits"]]
 
     if siret_list:
 
@@ -762,7 +674,9 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
                 office = office_dict[siret]
             except KeyError:
                 # ES and DB out of sync: siret is in ES but not in DB - this should never happen
-                logger.error("ES and DB out of sync: siret %s is in ES but not in DB - this should never happen", siret)
+                logger.error(
+                    "ES and DB out of sync: siret %s is in ES but not in DB - this should never happen", siret
+                )
                 raise
             if office.has_city():
                 offices.append(office)
@@ -772,15 +686,10 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
     # FIXME it's not great to add new properties to an existing object. It
     # would be better to wrap the office objects in a new OfficeResult
     # class that would add new properties related to the query.
-    es_offices_by_siret = {
-        item['_source']['siret']: item for item in res['hits']['hits']
-    }
+    es_offices_by_siret = {item["_source"]["siret"]: item for item in res["hits"]["hits"]}
     # FIXME These hardcoded values are soooooo ugly, unfortunately it is not so
     # easy to make it DNRY. For the corresponding code see method build_json_body_elastic_search().
-    distance_sort_index = {
-        sorting.SORT_FILTER_DISTANCE: 0,
-        sorting.SORT_FILTER_SCORE: 2,
-    }[sort]
+    distance_sort_index = {sorting.SORT_FILTER_DISTANCE: 0, sorting.SORT_FILTER_SCORE: 2}[sort]
     sort_fields_total = {
         sorting.SORT_FILTER_DISTANCE: 1,  # (distance_sort)
         sorting.SORT_FILTER_SCORE: 3,  # (boosted_romes_sort, randomized_score_sort, distance_sort)
@@ -793,7 +702,7 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         if len(es_office["sort"]) != sort_fields_total:
             raise ValueError("Incorrect number of sorting fields in ES response.")
         # Check if this is a request with long/lat
-        has_geo_distance = any([('_geo_distance' in d) for d in json_body.get('sort')])
+        has_geo_distance = any([("_geo_distance" in d) for d in json_body.get("sort")])
         # Add an extra `distance` attribute with one digit.
         if has_geo_distance:
             office.distance = round(es_office["sort"][distance_sort_index], 1)
@@ -802,11 +711,9 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
 
         if len(rome_codes) > 1:
             # Identify which rome_code actually matched this office.
-            keyname = get_score_for_rome_field_name(hiring_type, rome_codes[0]).split('.')[0]
-            all_scores = es_office['_source'][keyname]
-            scores_of_searched_romes = dict([
-                (rome, all_scores[rome]) for rome in rome_codes if rome in all_scores
-            ])
+            keyname = get_score_for_rome_field_name(hiring_type, rome_codes[0]).split(".")[0]
+            all_scores = es_office["_source"][keyname]
+            scores_of_searched_romes = dict([(rome, all_scores[rome]) for rome in rome_codes if rome in all_scores])
             # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
             rome_with_highest_score = max(scores_of_searched_romes, key=scores_of_searched_romes.get)
             # Store it as an extra attribute.
@@ -817,9 +724,9 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
 
         # Set boost flag
         office.boost = False
-        boosted_rome_keyname = get_boosted_rome_field_name(hiring_type, rome_codes[0]).split('.')[0]
-        if boosted_rome_keyname in es_office['_source']:
-            boost_romes = es_office['_source'][boosted_rome_keyname]
+        boosted_rome_keyname = get_boosted_rome_field_name(hiring_type, rome_codes[0]).split(".")[0]
+        if boosted_rome_keyname in es_office["_source"]:
+            boost_romes = es_office["_source"][boosted_rome_keyname]
             romes_intersection = set(rome_codes).intersection(boost_romes)
             office.boost = bool(romes_intersection)
 
@@ -827,7 +734,7 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         office.contact_mode = util.get_contact_mode_for_rome_and_office(rome_code_for_contact_mode, office)
 
     try:
-        aggregations = res['aggregations']
+        aggregations = res["aggregations"]
     except KeyError:
         aggregations = []
 

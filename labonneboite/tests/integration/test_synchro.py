@@ -1,10 +1,9 @@
-
 import random
 import unittest
 
+from labonneboite.common import departements as dpt
 from labonneboite.common.es import Elasticsearch
 from labonneboite.common.models import Office
-from labonneboite.common import departements as dpt
 from labonneboite.conf import settings
 
 
@@ -34,7 +33,7 @@ class SynchronizationIndexAndDatabaseTest(unittest.TestCase):
         scores = {office.siret: office.score for office in offices}
         body = {"query": {"filtered": {"filter": {"terms": {"siret": list(scores.keys())}}}}}
         res = es.search(index=settings.ES_INDEX, doc_type="office", body=body)
-        for office in res['hits']['hits']:
+        for office in res["hits"]["hits"]:
             index_score = office["_source"]["score"]
             siret = office["_source"]["siret"]
             self.assertEqual(index_score, scores[siret])

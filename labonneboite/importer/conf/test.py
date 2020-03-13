@@ -1,8 +1,9 @@
 import os
 from datetime import datetime
 
+
 # --- importer input directory of DPAE and ETABLISSEMENT exports
-INPUT_SOURCE_FOLDER = os.path.join(os.path.dirname(__file__), '..', '..', 'tests', 'importer', 'data')
+INPUT_SOURCE_FOLDER = os.path.join(os.path.dirname(__file__), "..", "..", "tests", "importer", "data")
 
 # --- job 1/8 & 2/8 : check_etablissements & extract_etablissements
 DISTINCT_DEPARTEMENTS_HAVING_OFFICES = 15

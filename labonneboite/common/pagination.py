@@ -1,7 +1,7 @@
-
+import urllib.parse
 from math import ceil
 from urllib.parse import urlencode
-import urllib.parse
+
 
 OFFICES_PER_PAGE = 20  # constant for Frontend, variable default for API
 OFFICES_MAXIMUM_PAGE_SIZE = 100  # API only as of now
@@ -17,6 +17,7 @@ class Pagination(object):
     """
     A generic pagination class.
     """
+
     def __init__(self, page, per_page, total_count):
         self.page = page
         self.per_page = per_page
@@ -62,8 +63,8 @@ class PaginationManager(object):
     """
     Specific pagination class for office search results.
     """
-    def __init__(self, company_count, current_from_number, current_to_number,
-                 full_path_url):
+
+    def __init__(self, company_count, current_from_number, current_to_number, full_path_url):
         self.pages = []
         self.company_count = company_count
         self.current_from_number = current_from_number
@@ -89,17 +90,11 @@ class PaginationManager(object):
             min_page = 0
             max_page = min(MAX_PAGES, page_count)
         else:
-            max_page = min(
-                current_page + int(MAX_PAGES / 2),
-                page_count
-            )
+            max_page = min(current_page + int(MAX_PAGES / 2), page_count)
             if max_page == page_count:
                 min_page = max(1, page_count - MAX_PAGES)
             else:
-                min_page = max(
-                    0,
-                    current_page - int(MAX_PAGES / 2) - 1
-                )
+                min_page = max(0, current_page - int(MAX_PAGES / 2) - 1)
         return min_page, max_page
 
     def get_current_page(self):
@@ -108,8 +103,7 @@ class PaginationManager(object):
         return self._current_page
 
     def get_page_count(self):
-        return 1 + \
-            (self.company_count - 1) // OFFICES_PER_PAGE
+        return 1 + (self.company_count - 1) // OFFICES_PER_PAGE
 
     def get_pages(self):
         if not self.pages:
@@ -135,7 +129,6 @@ class PaginationManager(object):
 
 
 class Page(object):
-
     def __init__(self, ranking, company_count, current_from_number, original_url):
         """
         Args:
@@ -169,7 +162,7 @@ class Page(object):
         Returns:
             page_url (unicode)
         """
-        params = {'from': self.get_from_number(), 'to': self.get_to_number()}
+        params = {"from": self.get_from_number(), "to": self.get_to_number()}
         url_query = dict(urllib.parse.parse_qsl(self.url_parts[4]))
         url_query.update(params)
         self.url_parts[4] = urlencode(sorted(url_query.items()))

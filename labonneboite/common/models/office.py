@@ -1,27 +1,29 @@
+import logging
 from functools import lru_cache
 from urllib.parse import urlencode
-import logging
 
 from babel.dates import format_date
 from flask import url_for
 from slugify import slugify
-from sqlalchemy import PrimaryKeyConstraint, Index
+from sqlalchemy import Index, PrimaryKeyConstraint
 from werkzeug import cached_property
 
-from labonneboite.common import encoding as encoding_util
-from labonneboite.common import hiring_type_util
-from labonneboite.common import mapping as mapping_util
-from labonneboite.common import scoring as scoring_util
-from labonneboite.common import util
-from labonneboite.common.database import Base, db_session, DATABASE
+from labonneboite.common import (
+    encoding as encoding_util,
+    hiring_type_util,
+    mapping as mapping_util,
+    scoring as scoring_util,
+    util,
+)
+from labonneboite.common.database import DATABASE, Base, db_session
 from labonneboite.common.load_data import load_city_codes, load_groupements_employeurs
+from labonneboite.common.models import FinalOfficeMixin, OfficeAdminUpdate
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
 
-from labonneboite.common.models import FinalOfficeMixin, OfficeAdminUpdate
 
-logger = logging.getLogger('main')
+logger = logging.getLogger("main")
 
 
 CITY_NAMES = load_city_codes()
@@ -56,15 +58,13 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     __tablename__ = settings.OFFICE_TABLE
 
     __table_args__ = (
-        PrimaryKeyConstraint('siret'),
-
+        PrimaryKeyConstraint("siret"),
         # Improve performance of create_index.py parallel jobs
         # by quickly fetching all offices of any given departement.
-        Index('_departement', 'departement'),
-
+        Index("_departement", "departement"),
         # Improve performance of create_index.py remove_scam_emails()
         # by quickly locating offices having a given scam email.
-        Index('_email', 'email'),
+        Index("_email", "email"),
     )
 
     # You should normally *not* add any column here - see documentation above.
@@ -72,13 +72,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     def __unicode__(self):
         return "%s - %s" % (self.siret, self.name)
 
-    def as_json(self,
-            rome_codes=None,
-            hiring_type=None,
-            distance=None,
-            zipcode=None,
-            extra_query_string=None,
-        ):
+    def as_json(self, rome_codes=None, hiring_type=None, distance=None, zipcode=None, extra_query_string=None):
         """
         `rome_codes`: optional parameter, used only in case of being in the context
         of a search by ROME codes (single rome or multi rome).
@@ -97,57 +91,57 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         `extra_query_string` (dict): extra query string to be added to the API
         urls for each office. Typically some Google Analytics trackers.
         """
-        if rome_codes is None:        # no rome search context
+        if rome_codes is None:  # no rome search context
             rome_code = None
-        elif len(rome_codes) == 1:    # single rome search context
+        elif len(rome_codes) == 1:  # single rome search context
             rome_code = rome_codes[0]
-        else:                         # multi rome search context
+        else:  # multi rome search context
             rome_code = self.matched_rome
 
         alternance = hiring_type == hiring_type_util.ALTERNANCE
 
         extra_query_string = extra_query_string or {}
         json = {
-            'address': self.address_as_text,
-            'city': self.city,
-            'headcount_text': self.headcount_text,
-            'lat': self.y,
-            'lon': self.x,
-            'naf': self.naf,
-            'naf_text': self.naf_text,
-            'name': self.name,
-            'siret': self.siret,
-            'stars': self.get_stars_for_rome_code(rome_code, hiring_type),
-            'url':  self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
-            'contact_mode': util.get_contact_mode_for_rome_and_office(rome_code, self),
-            'social_network': self.social_network or '',
-            'alternance': self.qualifies_for_alternance(),
+            "address": self.address_as_text,
+            "city": self.city,
+            "headcount_text": self.headcount_text,
+            "lat": self.y,
+            "lon": self.x,
+            "naf": self.naf,
+            "naf_text": self.naf_text,
+            "name": self.name,
+            "siret": self.siret,
+            "stars": self.get_stars_for_rome_code(rome_code, hiring_type),
+            "url": self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
+            "contact_mode": util.get_contact_mode_for_rome_and_office(rome_code, self),
+            "social_network": self.social_network or "",
+            "alternance": self.qualifies_for_alternance(),
         }
 
         # Warning: the `distance`, `boost` and `matched_rome` fields are added by `get_offices_from_es_and_db`,
         # they are NOT model fields or properties!
-        if hasattr(self, 'distance'):
-            json['distance'] = self.distance
+        if hasattr(self, "distance"):
+            json["distance"] = self.distance
 
-        if hasattr(self, 'boost'):
-            json['boosted'] = self.boost
+        if hasattr(self, "boost"):
+            json["boosted"] = self.boost
 
         if rome_code:
-            json['matched_rome_code'] = rome_code
-            json['matched_rome_label'] = settings.ROME_DESCRIPTIONS[rome_code]
-            json['matched_rome_slug'] = slugify(settings.ROME_DESCRIPTIONS[rome_code])
+            json["matched_rome_code"] = rome_code
+            json["matched_rome_label"] = settings.ROME_DESCRIPTIONS[rome_code]
+            json["matched_rome_slug"] = slugify(settings.ROME_DESCRIPTIONS[rome_code])
 
         # offers* fields are added by VisibleMarketFetcher.get_offices,
         # they are NOT model fields or properties
-        if hasattr(self, 'offers_count'):
-            json['offers_count'] = self.offers_count
-        if hasattr(self, 'offers'):
-            json['offers'] = self.offers
+        if hasattr(self, "offers_count"):
+            json["offers_count"] = self.offers_count
+        if hasattr(self, "offers"):
+            json["offers"] = self.offers
 
         # This message should concern only a small number of companies who explicitly requested
         # to appear in extra geolocations.
-        if any([distance, zipcode]) and json['address'] and self.show_multi_geolocations_msg(distance, zipcode):
-            json['address'] += ", Cette entreprise recrute aussi dans votre région."
+        if any([distance, zipcode]) and json["address"] and self.show_multi_geolocations_msg(distance, zipcode):
+            json["address"] += ", Cette entreprise recrute aussi dans votre région."
         return json
 
     @property
@@ -156,8 +150,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         if not self.is_small:
             result.append("Service des ressources humaines")
         if self.street_name:
-            result.append('%s %s' % (self.street_number, self.street_name))
-        result.append('%s %s' % (self.zipcode, self.city))
+            result.append("%s %s" % (self.street_number, self.street_name))
+        result.append("%s %s" % (self.zipcode, self.city))
         return result
 
     @property
@@ -171,9 +165,9 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         has_phone = self.tel and not self.tel.isspace()
         if has_phone:
             # not sure why, the import botched the phone number...
-            if self.tel[-2] == '.':
-                s = '0%s' % self.tel[:-2]
-                return " ".join(s[i:i + 2] for i in range(0, len(s), 2))
+            if self.tel[-2] == ".":
+                s = "0%s" % self.tel[:-2]
+                return " ".join(s[i : i + 2] for i in range(0, len(s), 2))
             return self.tel
         return None
 
@@ -184,12 +178,12 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         elif self.company_name:
             result = self.company_name.upper()
         else:
-            result = 'sans nom'
+            result = "sans nom"
         return encoding_util.sanitize_string(result)
 
     @property
     def google_url(self):
-        google_search = "%s+%s" % (self.name.replace(' ', '+'), self.city.replace(' ', '+'))
+        google_search = "%s+%s" % (self.name.replace(" ", "+"), self.city.replace(" ", "+"))
         return "https://www.google.fr/search?q=%s" % google_search
 
     @property
@@ -217,9 +211,11 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         # such a score.
         # We still have to check that there actually is a SAVE record
         # specifically asking for this removal.
-        office_admin_update = OfficeAdminUpdate.query.filter(
-            OfficeAdminUpdate.sirets.like("%{}%".format(self.siret))
-        ).filter_by(score_alternance=0).first()
+        office_admin_update = (
+            OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets.like("%{}%".format(self.siret)))
+            .filter_by(score_alternance=0)
+            .first()
+        )
         return bool(office_admin_update)
 
     @property
@@ -227,7 +223,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         try:
             return settings.HEADCOUNT_INSEE[self.headcount]
         except KeyError:
-            return ''
+            return ""
 
     @property
     def is_small(self):
@@ -240,7 +236,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         try:
             city = bool(CITY_NAMES[self.city_code])
         except KeyError:
-            if self.city_code.startswith('75'):
+            if self.city_code.startswith("75"):
                 city = True
             else:
                 city = None
@@ -251,8 +247,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         try:
             return CITY_NAMES[self.city_code]
         except KeyError:
-            if self.city_code.startswith('75'):
-                return 'Paris'
+            if self.city_code.startswith("75"):
+                return "Paris"
             else:
                 raise
 
@@ -284,10 +280,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             raise ValueError("Unknown hiring_type")
         raw_score = self.score if hiring_type == hiring_type_util.DPAE else self.score_alternance
         return scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-            score=raw_score,
-            rome_code=rome_code,
-            naf_code=self.naf
-            )
+            score=raw_score, rome_code=rome_code, naf_code=self.naf
+        )
 
     def get_stars_for_rome_code(self, rome_code, hiring_type=None):
         score = self.get_score_for_rome_code(rome_code, hiring_type)
@@ -314,16 +308,16 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         Returns the URL of `La Bonne Alternance` page or `None` if we are outside of a Flask's application context.
         """
-        return 'https://labonnealternance.pole-emploi.fr/details-entreprises/{}'.format(self.siret)
+        return "https://labonnealternance.pole-emploi.fr/details-entreprises/{}".format(self.siret)
 
     def get_url_for_rome_code(self, rome_code, alternance=False, **query_string):
         if alternance:
-            return '{}?{}'.format(self.url_alternance, urlencode(query_string))
+            return "{}?{}".format(self.url_alternance, urlencode(query_string))
 
         try:
             if rome_code:
-                return url_for('office.details', siret=self.siret, rome_code=rome_code, _external=True, **query_string)
-            return url_for('office.details', siret=self.siret, _external=True, **query_string)
+                return url_for("office.details", siret=self.siret, rome_code=rome_code, _external=True, **query_string)
+            return url_for("office.details", siret=self.siret, _external=True, **query_string)
         except RuntimeError:
             # RuntimeError is raised when we are outside of a Flask's application context.
             # Here, we cannot properly generate an URL via url_for.
@@ -343,6 +337,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
                 return False
             # If the given `distance` is too far: the message is unnecessary.
             from labonneboite.web.search.forms import CompanySearchForm
+
             if distance and int(distance) > int(CompanySearchForm.DISTANCE_S):
                 return False
             return True
@@ -361,7 +356,10 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
                 FROM information_schema.tables
                 WHERE TABLE_SCHEMA = '%s'
                     AND TABLE_NAME = '%s';
-        """ % (DATABASE['NAME'], settings.OFFICE_TABLE)
+        """ % (
+            DATABASE["NAME"],
+            settings.OFFICE_TABLE,
+        )
 
         last_data_deploy_date = db_session.execute(query).first()
 
@@ -373,5 +371,5 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         # Formatting date in french format using locale.setlocale is strongly discouraged.
         # Using babel instead is the recommended way.
         # See https://stackoverflow.com/questions/985505/locale-date-formatting-in-python
-        last_data_deploy_date_formated_as_french = format_date(last_data_deploy_date, locale='fr', format='long')
+        last_data_deploy_date_formated_as_french = format_date(last_data_deploy_date, locale="fr", format="long")
         return last_data_deploy_date_formated_as_french

@@ -1,13 +1,12 @@
-from flask import Blueprint
-from flask import make_response
+from flask import Blueprint, make_response
 
 from labonneboite.web.health import util as health_util
 
 
-healthBlueprint = Blueprint('health', __name__)
+healthBlueprint = Blueprint("health", __name__)
 
 
-@healthBlueprint.route('')
+@healthBlueprint.route("")
 def health_all():
     """
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot).
@@ -15,13 +14,11 @@ def health_all():
     Does not check external dependencies (IGN) nor Redis.    
     """
     return health_response(
-        health_util.is_db_alive()
-        and health_util.is_elasticsearch_alive()
-        and health_util.is_uwsgi_alive()
+        health_util.is_db_alive() and health_util.is_elasticsearch_alive() and health_util.is_uwsgi_alive()
     )
 
 
-@healthBlueprint.route('/db')
+@healthBlueprint.route("/db")
 def health_db():
     """
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot).
@@ -30,7 +27,7 @@ def health_db():
     return health_response(health_util.is_db_alive())
 
 
-@healthBlueprint.route('/es')
+@healthBlueprint.route("/es")
 def health_es():
     """
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot).
@@ -39,7 +36,7 @@ def health_es():
     return health_response(health_util.is_elasticsearch_alive())
 
 
-@healthBlueprint.route('/redis')
+@healthBlueprint.route("/redis")
 def health_redis():
     """
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot).
@@ -48,7 +45,7 @@ def health_redis():
     return health_response(health_util.is_redis_alive())
 
 
-@healthBlueprint.route('/uwsgi')
+@healthBlueprint.route("/uwsgi")
 def health_uwsgi():
     """
     Health check to test if uwsgi is up.
@@ -56,7 +53,7 @@ def health_uwsgi():
     return health_response(health_util.is_uwsgi_alive())
 
 
-@healthBlueprint.route('/ign/duration')
+@healthBlueprint.route("/ign/duration")
 def health_ign_duration():
     """
     Health check to test if IGN API duration is up.
@@ -64,7 +61,7 @@ def health_ign_duration():
     return health_response(health_util.is_ign_duration_alive())
 
 
-@healthBlueprint.route('/ign/isochrone')
+@healthBlueprint.route("/ign/isochrone")
 def health_ign_isochrone():
     """
     Health check to test if IGN API isochrone is up.
