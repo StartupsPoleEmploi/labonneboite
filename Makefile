@@ -83,14 +83,21 @@ clean-services: stop-services ## Delete containers and attached volumes
 # Code quality
 # ------------
 
-# Run pylint on the whole project.
-pylint-all:
-	pylint --rcfile=.pylintrc --reports=no --output-format=colorized $(PACKAGE_DIR) || true
+quality: black isort flake8
 
-# Run pylint on a specific file, e.g.:
-# make pylint FILE=labonneboite/web/app.py
-pylint:
-	pylint --rcfile=.pylintrc --reports=no --output-format=colorized $(FILE) || true
+black:
+	black --line-length 119 .
+
+isort:
+	isort --recursive .
+
+flake8:
+	flake8 .
+
+setup_git_pre_commit_hook:
+	touch .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+	echo "make black && make isort" > .git/hooks/pre-commit
 
 
 # Local dev

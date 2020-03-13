@@ -26,8 +26,13 @@ huey
 Flask-DebugToolbar
 ipdb
 ipython
-pylint
 pip-tools
+
+# Code quality.
+pylint
+flake8
+black==19.3b0
+isort
 
 # profiling tools used in create_index.py
 pycallgraph

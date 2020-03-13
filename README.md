@@ -60,7 +60,7 @@ Table of contents:
 - [Elastic Search](#elasticsearch)
 - [DB content in the development environment](#db-content-in-the-development-environment)
 - [Running scripts](#running-scripts)
-- [Running Pylint](#running-pylint)
+- [Code quality](#code-quality)
 - [Debugging safely in development, staging or production](#debugging-safely-in-a-development-staging-or-production-environment)
 - [Importer](#importer)
 - [Single ROME versus multi-ROME search](#single-rome-vs-multi-rome-search)
@@ -234,25 +234,17 @@ For example `create_index`:
 
     $ python labonneboite/scripts/create_index.py
 
-## Running pylint
+## Code quality
 
-You can run [pylint](https://www.pylint.org) on the whole project:
+We use three code quality tools: black, isort and flake8.
 
-    $ make pylint-all
+Run `make quality` for run all three of them. Or `make black`, `make isort` and `make flake8` separately.
 
-Or on a specific python file:
+Black and isort will automatically apply changes for you, however flake8 requires you to manually fix every issue.
 
-    $ make pylint FILE=labonneboite/web/app.py
+We recommend you run `make setup_git_pre_commit_hook` to setup a git pre-commit hook which will run both black and isort automatically before every commit.
 
-We recommend you use a pylint git pre-commit hook:
-
-    $ pip install git-pylint-commit-hook
-    $ vim .git/hooks/pre-commit
-    #!/bin/bash
-    # (...) previous content which was already present (e.g. nosetests)
-    # add the following line at the end of your pre-commit hook file
-    git-pylint-commit-hook
-
+You will still have to run flake 8 manually though.
 
 ## Debugging safely in a development, staging or production environment
 
