@@ -143,3 +143,13 @@ def unique_elements(iterable, key=None):
             result.append(element)
             seen.add(hashed)
     return result
+
+def get_enum_from_value(EnumClass, value, default = None):
+    '''
+    Get an enum member out of a string value, e.g. Color.BLUE out of 1 if Color.BLUE.value is 1
+    Used to convert value in GET to enum
+    '''
+    try:
+        return EnumClass(value)
+    except(ValueError):
+        return default

@@ -1,7 +1,7 @@
 import logging
 import os
 
-from labonneboite.common.scope import SCOPES_SAFE
+from labonneboite.common.constants import Scope, SCOPES_SAFE, SCOPES_TRUSTED
 
 TESTING = True
 
@@ -21,14 +21,23 @@ ENABLE_TIMEIT_TIMERS = False
 API_KEYS = {
     'labonneboite': 'dummykey',
     'emploi_store_dev': 'anotherdummykey',
+    'trusteduser': 'trusteduserkey',
+    'supertrusteduser': 'supertrusteduserkey',
+    'untrusteduser': 'untrusteduserkey',
 }
 
 API_USERS = {
     'labonneboite': {
         'scopes': SCOPES_SAFE,
     },
-    'emploi_store_dev_user1': {
-        'scopes': SCOPES_SAFE,
+    'trusteduser': {
+        'scopes': SCOPES_TRUSTED,
+    },
+    'supertrusteduser': {
+        'scopes': SCOPES_TRUSTED + [Scope.COMPANY_PMSMP, Scope.COMPANY_BOE],
+    },
+    'untrusteduser': {
+        'scopes': [],
     },
     'empty_user': {
         # no scope here

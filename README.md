@@ -365,7 +365,8 @@ Connection closed.
 
 ## About the API
 
-The API is not used by the front end
+For legacy reasons, the (LBB/LBA) API is not consumed by the LBB frontend, but it is consumed however by the LBA frontend, which is technically just an API consumer like any other.
+
 
 API users must have an API key defined in the settings like this:
 
@@ -388,7 +389,7 @@ API_USERS = {
 
 `scopes` is an option used to let specific users access sensitive data.
 
-Note for API proxies such as ESD (emploi store dev): the real user name needs to be forwarded in the GET param `origin_user` for each request. This will be taken into accont to match a user to options in `API_USERS`.
+Note for API proxies such as ESD (emploi store dev): the real user name needs to be forwarded in the GET param `origin_user` for each request. This will be taken into acccount to match a user to options in `API_USERS`.
 
 ## Importer
 

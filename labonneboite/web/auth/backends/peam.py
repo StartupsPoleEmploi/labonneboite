@@ -11,7 +11,7 @@ from social_core.backends.open_id_connect import OpenIdConnectAuth
 
 from labonneboite.conf import settings
 from labonneboite.common import activity
-from labonneboite.common import user_util
+from labonneboite.common.constants import GENDER_OTHER
 from labonneboite.common.models import User
 from .exceptions import AuthFailedMissingReturnValues
 
@@ -57,7 +57,7 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
 
     def get_user_details(self, response):
         user_details = {
-            'gender': response.get('gender', user_util.GENDER_OTHER),
+            'gender': response.get('gender', GENDER_OTHER),
             'email': response.get('email'),
             'external_id': response.get('sub'),
             'first_name': response.get('given_name'),

@@ -11,7 +11,7 @@ from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common.database import Base, db_session
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.common.user_util import Gender
+from labonneboite.common import constants
 
 
 class User(CRUDMixin, UserMixin, Base):
@@ -25,9 +25,9 @@ class User(CRUDMixin, UserMixin, Base):
     __tablename__ = 'users'
 
     GENDERS = [
-        (Gender.MALE.value, 'Homme'),
-        (Gender.FEMALE.value, 'Femme'),
-        (Gender.OTHER.value, 'Autre'),
+        (constants.GENDER_MALE, 'Homme'),
+        (constants.GENDER_FEMALE, 'Femme'),
+        (constants.GENDER_OTHER, 'Autre'),
     ]
 
     id = Column(Integer, primary_key=True)

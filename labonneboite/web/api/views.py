@@ -15,9 +15,9 @@ from labonneboite.common.locations import Location
 from labonneboite.common.load_data import ROME_CODES
 from labonneboite.common.models import Office
 from labonneboite.common.fetcher import InvalidFetcherArgument
-from labonneboite.common.scope import Scope
-from labonneboite.common.user_util import has_scope, string_to_enum, UnknownUserException
+from labonneboite.common.constants import Scope
 from labonneboite.conf import settings
+from labonneboite.common.util import get_enum_from_value
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
 from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter, FILTERS, DISTANCE_FILTER_MAX
@@ -47,7 +47,7 @@ def api_auth_required(function):
                 return 'timestamp has expired', 400
             except api_util.InvalidSignatureException:
                 return 'signature is invalid', 400
-            except UnknownUserException:
+            except api_util.UnknownUserException:
                 return 'user is unknown', 400
 
         return function(*args, **kwargs)
@@ -454,9 +454,9 @@ def create_hidden_market_fetcher(location, departements, request_args):
 
     # from value in GET to enum
     # audience filter defaults to ALL
-    kwargs['audience'] = string_to_enum(AudienceFilter, request_args.get('audience'), AudienceFilter.ALL)
+    kwargs['audience'] = get_enum_from_value(AudienceFilter, request_args.get('audience'), AudienceFilter.ALL)
 
-    if (has_scope(request.args['user'], request.args.get('origin_user'),  Scope.COMPANY_PMSMP)):
+    if (api_util.has_scope(request.args['user'], request.args.get('origin_user'),  Scope.COMPANY_PMSMP)):
         kwargs['flag_pmsmp'] = check_bool_argument(request_args, 'flag_pmsmp', 0)
 
     if location is not None:
@@ -605,14 +605,14 @@ def get_office_details(siret, alternance=False):
 def patch_office_result_with_sensitive_information(api_username, api_user_name_forwarded, office, result, alternance=False):
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
-    if(has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_EMAIL)):
+    if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_EMAIL):
         result['email'] = office.email_alternance if alternance and office.email_alternance else office.email
-    if(has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_PHONE)):
+    if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_PHONE):
         result['phone'] = office.phone_alternance if alternance and office.phone_alternance else office.tel
-    if(has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_WEBSITE)):
+    if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_WEBSITE):
         result['website'] = office.website_alternance if alternance and office.website_alternance else office.website
-    if(has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_PMSMP)):
+    if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_PMSMP):
         result['pmsmp'] = office.flag_pmsmp
-    if(has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_BOE)):
+    if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_BOE):
         result['boe'] = office.flag_handicap
     return result

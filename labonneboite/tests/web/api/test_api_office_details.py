@@ -35,18 +35,17 @@ class ApiOfficeDetailsTest(ApiBaseTest):
             },
             'lat': 49.0,
         }
-        params = self.add_security_params({'user': 'labonneboite'})
+        params = self.add_security_params({'user': 'untrusteduser'})
         rv = self.app.get('/api/v1/office/%s/details?%s' % (expected_result['siret'], urlencode(params)))
         self.assertEqual(rv.status_code, 200)
         data = json.loads(rv.data.decode())
         self.assertDictEqual(data, expected_result)
 
-    @mock.patch('labonneboite.conf.settings.API_INTERNAL_CONSUMERS', ['labonneboite'])
     def test_query_office_with_internal_user(self):
         """
         Test that internal services of Pôle emploi can have access to sensitive information.
         """
-        params = self.add_security_params({'user': 'labonneboite'})
+        params = self.add_security_params({'user': 'trusteduser'})
         rv = self.app.get('/api/v1/office/%s/details?%s' % ('00000000000001', urlencode(params)))
         self.assertEqual(rv.status_code, 200)
         data = json.loads(rv.data.decode())
@@ -56,7 +55,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
 
     def test_query_office_with_external_user(self):
         """
-        Test that external services of Pôle emploi cannot have access to sensitive information.
+        Test that external services of Pôle emploi cannot have access to sensitive information by default.
         """
         params = self.add_security_params({'user': 'emploi_store_dev'})
         rv = self.app.get('/api/v1/office/%s/details?%s' % ('00000000000001', urlencode(params)))
@@ -65,6 +64,18 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         self.assertNotIn('email', data)
         self.assertNotIn('phone', data)
         self.assertNotIn('website', data)
+
+    def test_query_office_with_trusted_external_user(self):
+        """
+        Test that some users of external services of Pôle emploi have access to sensitive information.
+        """
+        params = self.add_security_params({'user': 'emploi_store_dev', 'origin_user': 'trusteduser'})
+        rv = self.app.get('/api/v1/office/%s/details?%s' % ('00000000000001', urlencode(params)))
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.data.decode())
+        self.assertIn('email', data)
+        self.assertIn('phone', data)
+        self.assertIn('website', data)
 
     def test_office_with_score_alternance_zero_is_still_shown_via_details(self):
         """
