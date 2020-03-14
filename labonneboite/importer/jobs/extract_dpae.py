@@ -165,18 +165,30 @@ class DpaeExtractJob(Job):
             raise IOError('too many zipcode errors')
         if self.invalid_row_errors > settings.MAXIMUM_INVALID_ROWS:
             raise IOError('too many invalid_row errors')
+
         con.commit()
         cur.close()
         con.close()
 
-        last_import_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        most_recent_date = self.last_historical_data_date_in_file.strftime('%Y-%m-%d %H:%M:%S')
-        query = f"insert into dpae_statistics (last_import, most_recent_data_date) values ('{last_import_date}','{most_recent_date}')"
-        con, cur = import_util.create_cursor()
-        cur.execute(query)
-        con.commit()
-        cur.close()
-        con.close()
+        try:
+            statistics = DpaeStatistics(
+                last_import=datetime.now(),
+                most_recent_data_date=self.last_historical_data_date_in_file,
+            )
+            statistics.save()
+        except: 
+            # For an obscure reason, the DpaeStatistics way to insert does not work on the bonaparte server
+            # So we insert it directly via an SQL query
+            # This job has been broken for more than a year, only way to fix it : 
+            last_import_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            most_recent_date = self.last_historical_data_date_in_file.strftime('%Y-%m-%d %H:%M:%S')
+            query = f"insert into dpae_statistics (last_import, most_recent_data_date) values ('{last_import_date}','{most_recent_date}')"
+            con, cur = import_util.create_cursor()
+            cur.execute(query)
+            con.commit()
+            cur.close()
+            con.close()
+
 
         logger.info("finished importing dpae...")
         return something_new
