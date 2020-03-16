@@ -215,7 +215,7 @@ def get_parameters(args):
 
     # ensure PRO filters are never used in the public version
     if not pro.pro_version_enabled():
-        del kwargs['audience']
+        kwargs['audience'] = AudienceFilter.ALL
 
     return kwargs
 
