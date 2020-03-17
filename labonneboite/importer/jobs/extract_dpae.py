@@ -176,7 +176,7 @@ class DpaeExtractJob(Job):
                 most_recent_data_date=self.last_historical_data_date_in_file,
             )
             statistics.save()
-        except: 
+        except OperationalError:
             # For an obscure reason, the DpaeStatistics way to insert does not work on the bonaparte server
             # So we insert it directly via an SQL query
             # This job has been broken for more than a year, only way to fix it : 
