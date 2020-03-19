@@ -77,7 +77,6 @@ class ActivityLogParser:
     def get_json_logs_activity(self):
         '''Function which will return a list with all file names of activity logs that need to be parsed
         '''
-        # FIXME : Later, we'll be able to get datas, directly from PE datalake
         # Now we have a cron task which will copy json activity logs to /srv/lbb/data
         
         data = []
@@ -200,7 +199,6 @@ class ActivityLogParser:
         '''
         details = consulter une page entreprise 
         afficher-details = déplier fiche entreprise 
-        premiere étape JP --> Récup datas ailleurs
         '''
 
         clics_of_interest = ['details', 'afficher-details', 'ajout-favori']

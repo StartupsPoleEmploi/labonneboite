@@ -41,6 +41,8 @@ def get_priv_pub(row):
         secteur = 'Public'
     elif row['dc_privepublic'] == 1:
         secteur = 'Prive'
+    else:
+        secteur = None
 
     return secteur
 
@@ -66,8 +68,9 @@ class CleanActivityLogsDPAE:
         self.csv_folder_path = importer_settings.INPUT_SOURCE_FOLDER+'/'
         self.df_dpae_act = pd.read_csv(
             self.csv_folder_path + self.get_most_recent_csv_file(), 
-            sep='|', 
-            header=0
+            sep='|',
+            header=0,
+            dtype = {'siret': str}
         )
 
     def get_most_recent_csv_file(self):
@@ -76,7 +79,7 @@ class CleanActivityLogsDPAE:
         csv_paths.sort()
         most_recent_csv_file = csv_paths[-1]
 
-        logger.info(f"the DPAE file which will be used is : {most_recent_csv_file}")
+        logger.info(f"the act-dpae file which will be used is : {most_recent_csv_file}")
 
         return most_recent_csv_file
     
@@ -142,7 +145,7 @@ class CleanActivityLogsDPAE:
 
         # remove duplicates when multiple activities for the same dpae
         self.df_dpae_act = self.df_dpae_act.sort_values('date_activite')
-        self.df_dpae_act = self.df_dpae_act.drop_duplicates(subset=['idutilisateur-peconnect', 'siret'], keep='first')
+        self.df_dpae_act = self.df_dpae_act.drop_duplicates(subset=['idutilisateur_peconnect', 'siret'], keep='first')
         nb_rows = self.df_dpae_act.shape[0]
         logger.info(f"The .csv file - duplicates has {nb_rows} rows")
 
@@ -202,7 +205,7 @@ class CleanActivityLogsDPAE:
             # In case a problem appear in the script, we save old datas under .csv extension
             # because we will rewrite the whole table after each execution, we have to remove duplicates
             df_dpae_act_existing.to_csv(
-                f"{self.csv_folder_path}backup_sql_{TABLE_NAME}", 
+                f"{self.csv_folder_path}backup_sql_{TABLE_NAME}.csv", 
                 encoding='utf-8', 
                 sep='|'
             )
@@ -218,7 +221,6 @@ class CleanActivityLogsDPAE:
             nb_rows = self.df_dpae_act.shape[0]
             logger.info(f"Concatenation of both has {nb_rows} rows")
 
-            
             #Remove the duplicates
             self.df_dpae_act = self.df_dpae_act.sort_values('date_activite')
             self.df_dpae_act = self.df_dpae_act.drop_duplicates(subset=['idutilisateur_peconnect', 'siret'], keep='first')
