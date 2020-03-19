@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from labonneboite.importer import util as import_util
 from labonneboite.importer.jobs.common import logger
 from labonneboite.scripts.impact_retour_emploi.settings import SPREADSHEET_ID, ORDERING_COLUMN
+from labonneboite.importer import settings as importer_settings
 import numpy
 from utils_make_report import generate_google_sheet_service
 
@@ -24,23 +25,40 @@ TABLE_NAME = 'logs_activity_dpae_clean'
 class MakeGoogleSheetsReport:
 
     def __init__(self):
-        # First column : Nb IDPE unique ayant accédé à LBB
+        #Link to the report : https://docs.google.com/spreadsheets/d/1kx-mxCaXIkys3hU4El4K7a6JBwzrdF75X4U8igqLB4I/edit?folder=1QFm0t2weoUjTsl-FPYUj94__zq_mZq0h#gid=0
+
+        # 1st column : Nb IDPE unique ayant accédé à LBB
         self.df_evol_idpe_connect = self.get_df_evol_idpe_connect()
         
-        # Second column : Nb d'IDPE unique ayant déplié une fiche entreprise 
+        # 2nd column : Nb d'IDPE unique ayant déplié une fiche entreprise 
         self.df_evol_idpe_connect_sign_afficher_details = self.get_df_evol_idpe_connect_sign(did_specific_activity='afficher-details')
         
-        #Third column : Nb d'IDPE unique ayant consulté une page entreprise
+        # 3rd column : Nb d'IDPE unique ayant consulté une page entreprise
         self.df_evol_idpe_connect_sign_details = self.get_df_evol_idpe_connect_sign(did_specific_activity='details')
 
-        #Fourth column : Not data yet but : Nb d'IDPE unique ayant accédé à la première étape de "Je postule"
+        # 4th column : Not data yet but : Nb d'IDPE unique ayant accédé à la première étape de "Je postule"
 
-        #Fifth column : Nb IDPE unique ayant déplié une fiche entreprise, consulté une page entreprise, mis en Favoris une entreprise ou accédé à la première étape de JP
+        # 5th column : Nb IDPE unique ayant déplié une fiche entreprise, consulté une page entreprise, mis en Favoris une entreprise ou accédé à la première étape de JP
         #               + Fourth column
         self.df_evol_idpe_connect_sign = self.get_df_evol_idpe_connect_sign()
 
-        # Sixth column : Nb d'embauche par mois ayant pour origine une activité d'usager connecté LBB (date de début/fin = date d'embauche)
+        # 6th column : Nb d'embauche par mois ayant pour origine une activité d'usager connecté LBB (date de début/fin = date d'embauche)
         self.df_evol_dpae = self.get_df_evol_dpae()
+
+        # 7th column is an empty column
+
+        self.dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER
+
+        # 8th column : Nb candidatures JP
+        self.df_nb_candidatures_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_nb_candidatures_jp.csv')
+        
+        import ipdb; ipdb.set_trace()
+        # 9th column : Nb email unique ayant candidaté via Je postule
+
+        # 10th column : Nb candidats ayant reçus une réponse via JP
+
+        # 11th column : Délai moyen de réponse des recruteurs via JP (en jours)
+
 
         print('Getting infos and datas from SQL done !')
 
