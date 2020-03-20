@@ -211,8 +211,8 @@ class PrepareDataForGoogleSheetReport:
             df.loc[row['date_month_activite'], row['date_month_embauche']] = row['count_dpae_lbb']
         
         #Rename the date of the month by adding a '0' when needed
-        df.index = [ row if len(row.split('-')[0]) == 2 else '0'+row.split('-')[0] for row in df.index]
-        df.columns = [ column if len(column.split('-')[0]) == 2 else '0'+column.split('-')[0]+'-'+column.split('-')[1] for column in df.columns]
+        df.index = ['0' + row if len(row) != 7 else row for row in df.index]
+        df.columns = ['0' + col if len(col) != 7 else col for col in df.columns]
 
         #Sort dataframe by column name and row index for the date to be in the right order
         df = df.reindex(sorted(df.columns), axis=1)
