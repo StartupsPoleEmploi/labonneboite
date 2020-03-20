@@ -1,32 +1,34 @@
 import urllib
 import shutil
 import calendar
-from os import makedirs, remove, listdir
-import os.path
-from datetime import date
 import pandas as pd
-from sqlalchemy import create_engine
+import os.path
+import numpy
+from os import makedirs, remove, listdir
+from datetime import date
+import string
+
 from labonneboite.importer import util as import_util
 from labonneboite.importer.jobs.common import logger
-from labonneboite.scripts.impact_retour_emploi.settings import SPREADSHEET_ID, ORDERING_COLUMN
 from labonneboite.importer import settings as importer_settings
-import numpy
-from utils_make_report import generate_google_sheet_service
+from labonneboite.scripts.impact_retour_emploi.google_sheets_report import GoogleSheetReport, generate_google_sheet_service
 
 TABLE_NAME = 'logs_activity_dpae_clean'
 
-# PI 
-'''
-        details = consulter une page entreprise 
-        afficher-details = déplier fiche entreprise 
-        premiere étape JP --> Récup datas ailleurs
-'''
+#https://docs.google.com/spreadsheets/d/1kx-mxCaXIkys3hU4El4K7a6JBwzrdF75X4U8igqLB4I/edit?folder=1QFm0t2weoUjTsl-FPYUj94__zq_mZq0h#gid=0
+FIRST_SPREADSHEET_ID = '1kx-mxCaXIkys3hU4El4K7a6JBwzrdF75X4U8igqLB4I'
 
-class MakeGoogleSheetsReport:
+#https://docs.google.com/spreadsheets/d/1gbvFvFEEugCmPhsAdoRZEdjfEl579uUnmf5MIryaVB8/edit#gid=0
+SECOND_SPREADSHEET_ID = '1gbvFvFEEugCmPhsAdoRZEdjfEl579uUnmf5MIryaVB8'
+
+class PrepareDataForGoogleSheetReport:
 
     def __init__(self):
-        #Link to the report : https://docs.google.com/spreadsheets/d/1kx-mxCaXIkys3hU4El4K7a6JBwzrdF75X4U8igqLB4I/edit?folder=1QFm0t2weoUjTsl-FPYUj94__zq_mZq0h#gid=0
+        self.dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER
 
+    def get_data(self):
+        
+        ### FIRST SHEET : https://docs.google.com/spreadsheets/d/1kx-mxCaXIkys3hU4El4K7a6JBwzrdF75X4U8igqLB4I/edit?folder=1QFm0t2weoUjTsl-FPYUj94__zq_mZq0h#gid=0
         # 1st column : Nb IDPE unique ayant accédé à LBB
         self.df_evol_idpe_connect = self.get_df_evol_idpe_connect()
         
@@ -38,8 +40,8 @@ class MakeGoogleSheetsReport:
 
         # 4th column : Not data yet but : Nb d'IDPE unique ayant accédé à la première étape de "Je postule"
 
-        # 5th column : Nb IDPE unique ayant déplié une fiche entreprise, consulté une page entreprise, mis en Favoris une entreprise ou accédé à la première étape de JP
-        #               + Fourth column
+        # 5th column : Nb IDPE unique ayant déplié une fiche entreprise, consulté une page entreprise, mis en Favoris une entreprise
+        #               + Fourth column ( accédé à la première étape de JP)
         self.df_evol_idpe_connect_sign = self.get_df_evol_idpe_connect_sign()
 
         # 6th column : Nb d'embauche par mois ayant pour origine une activité d'usager connecté LBB (date de début/fin = date d'embauche)
@@ -47,23 +49,22 @@ class MakeGoogleSheetsReport:
 
         # 7th column is an empty column
 
-        self.dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER
-
         # 8th column : Nb candidatures JP
-        self.df_nb_candidatures_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_nb_candidatures_jp.csv')
+        self.df_nb_candidatures_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_nb_candidatures_jp.csv',delimiter=';')
         
-        import ipdb; ipdb.set_trace()
         # 9th column : Nb email unique ayant candidaté via Je postule
+        self.df_nb_distinct_email_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_nb_distinct_email_jp.csv',delimiter=';')
 
         # 10th column : Nb candidats ayant reçus une réponse via JP
+        self.df_nb_candidates_with_answer_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_nb_candidates_with_answer_jp.csv',delimiter=';')
 
         # 11th column : Délai moyen de réponse des recruteurs via JP (en jours)
+        self.df_medium_delay_answer_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_medium_delay_answer_jp.csv',delimiter=';')
 
+        ### SECOND SHEET : https://docs.google.com/spreadsheets/d/1gbvFvFEEugCmPhsAdoRZEdjfEl579uUnmf5MIryaVB8/edit#gid=0
+        self.df_evol_nb_dpae_hiring_and_activity_date = self.get_df_evol_nb_dpae_hiring_and_activity_date()
 
         print('Getting infos and datas from SQL done !')
-
-        self.df_month = self.prepare_google_sheet_data() 
-
 
     def get_df_evol_dpae(self):
         # GET the evolution of the number of dpae with LBB activity
@@ -110,25 +111,29 @@ class MakeGoogleSheetsReport:
         engine.close()
         return df_evol_idpe_connect_sign
 
+    def get_df_evol_nb_dpae_hiring_and_activity_date(self):
+        # GET the evolution of the number of dpae with LBB activity
+        engine = import_util.create_sqlalchemy_engine()
+        query = 'SELECT count(idutilisateur_peconnect) as count_dpae_lbb, concat(MONTH(date_activite),"-",YEAR(date_activite)) as date_month_activite,concat(MONTH(date_embauche),"-",YEAR(date_embauche)) as date_month_embauche \
+                 FROM logs_activity_dpae_clean \
+                 GROUP BY date_month_embauche, date_month_activite \
+                 ORDER BY date_month_embauche;'
+        df_evol_nb_dpae_hiring_and_activity_date = pd.read_sql_query(query, engine)
+        engine.close()
+        return df_evol_nb_dpae_hiring_and_activity_date
 
     def prepare_google_sheet_data(self):
-
-        # Prepare main df needed by other df
-        df_by_month = self.prepare_main_data_frame()
-
-        # Clean df by month
-        df_by_month = self.clean_main_data_frame(df_by_month)
-
-        return df_by_month
-
-    def prepare_main_data_frame(self):
         
         #Merge all datas requested before on the field 'date_month'
         df_by_month = self.df_evol_idpe_connect.merge(
-            self.df_evol_idpe_connect_sign_afficher_details).merge(
-            self.df_evol_idpe_connect_sign_details).merge(
-            self.df_evol_idpe_connect_sign).merge(
-            self.df_evol_dpae)
+            self.df_evol_idpe_connect_sign_afficher_details, how='outer').merge(
+            self.df_evol_idpe_connect_sign_details, how='outer').merge(
+            self.df_evol_idpe_connect_sign, how='outer').merge(
+            self.df_evol_dpae, how='outer').merge(
+            self.df_nb_candidatures_jp, how='outer').merge(
+            self.df_nb_distinct_email_jp, how='outer').merge(
+            self.df_nb_candidates_with_answer_jp, how='outer').merge(
+            self.df_medium_delay_answer_jp, how='outer')
 
         df_by_month.reset_index(inplace=True)
 
@@ -154,26 +159,85 @@ class MakeGoogleSheetsReport:
         df_by_month = df_by_month.sort_values(by=['year', 'month'])
         df_by_month = df_by_month.reset_index(drop=True)
 
-        df_by_month['count_postule'] = 0
+        #FIXME : When datas will be available
+        df_by_month['count_id_pe_firststep_jp'] = 0
 
-        df_by_month['count_distinct_activity'] = df_by_month['count_distinct_activity'] + df_by_month['count_postule'] 
+        df_by_month['empty_column'] = None
 
-        return df_by_month
+        df_by_month['count_distinct_activity'] = df_by_month['count_distinct_activity'] + df_by_month['count_id_pe_firststep_jp']
 
-    # Clean and format df_by_month
-    def clean_main_data_frame(self, df_by_month):
+        df = self.create_columns('month', df_by_month, df_by_month['date_month'])
 
-        df_ = self.create_columns('month', df_by_month, df_by_month['date_month'])
+        ORDERING_COLUMN = [
+            'date_begin',
+            'date_end',
+            'count_distinct_idpe',
+            'count_distinct_activity_afficher_details',
+            'count_distinct_activity_details',
+            'count_id_pe_firststep_jp',
+            'count_distinct_activity',
+            'count_dpae_lbb',
+            'empty_column',
+            'count_jp_applications',
+            'count_distint_email',
+            'count_distinct_candidates_with_answer',
+            'delay_answer_average',
+        ]
 
         # Clean unecessary column
-        df_ = df_[ORDERING_COLUMN]
+        df = df[ORDERING_COLUMN]
 
         # Ordering column
-        df_ = df_.loc[:, ORDERING_COLUMN]
+        df = df.loc[:, ORDERING_COLUMN]
 
-        return df_
+        # clean NaN data
+        df = df.replace(numpy.nan, '', regex=True)
 
-    # Create the colum needed for any sheet (date_begin, date_end, tre_max, and 'count_postule for the moment )
+        # Define ValueJSON body to insert in Google Sheets
+        df_values_to_insert = {'values': df.values.tolist()}
+
+        return df_values_to_insert
+
+    def prepare_2nd_google_sheet_data(self):
+
+        # Prepare rows for dataframe
+        rows = self.df_evol_nb_dpae_hiring_and_activity_date.date_month_activite.unique()
+
+        #Prepare columns for dataframe
+        columns = self.df_evol_nb_dpae_hiring_and_activity_date.date_month_embauche.unique()
+        
+        df = pd.DataFrame(columns=columns, index=rows)
+        for index, row in self.df_evol_nb_dpae_hiring_and_activity_date.iterrows():
+            df.loc[row['date_month_activite'], row['date_month_embauche']] = row['count_dpae_lbb']
+        
+        #Rename the date of the month by adding a '0' when needed
+        df.index = [ row if len(row.split('-')[0]) == 2 else '0'+row.split('-')[0] for row in df.index]
+        df.columns = [ column if len(column.split('-')[0]) == 2 else '0'+column.split('-')[0]+'-'+column.split('-')[1] for column in df.columns]
+
+        #Sort dataframe by column name and row index for the date to be in the right order
+        df = df.reindex(sorted(df.columns), axis=1)
+        df = df.sort_index()
+
+        df = df.fillna(0)
+
+        #For the values to insert, we also need the columns names and index name to insert into google sheets
+        values_to_insert = []
+
+        #columns        
+        columns = df.columns.tolist()
+        columns.insert(0,'')
+        values_to_insert.append(columns)
+
+        #indexes + values of dataframe
+        i = 0
+        for row in df.values.tolist():
+            row.insert(0,df.index[i])
+            values_to_insert.append(row)
+            i += 1
+
+        df_values_to_insert = {'values': values_to_insert}
+        return df_values_to_insert
+
     def create_columns(self, type_, df_initial, df_date):
 
         df_ = df_initial
@@ -258,50 +322,30 @@ class MakeGoogleSheetsReport:
     def switch_year_end(self, type_, date_):
         return '31/12/'+str(date_)
 
-    def make_google_sheet_report(self):
-
-        google_service = generate_google_sheet_service()
-
-        # Get the list of our sheets properties (title)
-        list_sheets = google_service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID,
-                                                        fields="sheets/properties").execute()['sheets']
-
-        # Writing the 1st sheet (by month)
-        sheet_name = list_sheets[0]['properties']
-        self.write_data_into_sheet(google_service, sheet_name, self.df_month)
-
-    def write_data_into_sheet(self, google_service, sheet, df_data):
-
-        # clean NaN data
-        df_data = df_data.replace(numpy.nan, '', regex=True)
-
-        # Clear sheet
-        range_all = '{0}!A2:H'.format(sheet['title'])
-        google_service.spreadsheets().values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=range_all, 
-            body={}).execute()
-
-        # Calculate range data
-        range_ = sheet['title'] + '!'+'A2:H'+str(len(df_data)+2)
-
-        # Define ValueJSON body
-        value_range_body = {'values': df_data.values.tolist()}
-
-        # Execute update
-        request = google_service.spreadsheets().values().update(
-            spreadsheetId=SPREADSHEET_ID, 
-            range=range_, 
-            valueInputOption='USER_ENTERED', 
-            body=value_range_body
-        )
-
-        request.execute()
-
 def run_main():
 
-    make_google_sheet_report = MakeGoogleSheetsReport()
-    make_google_sheet_report.make_google_sheet_report()
+    data_preparation_for_google_sheets = PrepareDataForGoogleSheetReport()
+    data_preparation_for_google_sheets.get_data()
+
+    service = generate_google_sheet_service()
+
+    values_to_insert_first_sheet = data_preparation_for_google_sheets.prepare_google_sheet_data()
+    first_sheet_report = GoogleSheetReport(
+        service=service,
+        spreadsheet_id= FIRST_SPREADSHEET_ID,
+        start_cell= 'A2',
+        values= values_to_insert_first_sheet        
+    )
+    first_sheet_report.write_data_into_sheet()
+
+    values_to_insert_second_sheet = data_preparation_for_google_sheets.prepare_2nd_google_sheet_data()
+    second_sheet_report = GoogleSheetReport(
+        service=service,
+        spreadsheet_id= SECOND_SPREADSHEET_ID,
+        start_cell= 'B5',
+        values= values_to_insert_second_sheet        
+    )
+    second_sheet_report.write_data_into_sheet()
 
 
 if __name__ == '__main__':
