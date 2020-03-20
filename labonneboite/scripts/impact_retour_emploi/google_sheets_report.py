@@ -7,15 +7,13 @@ from google.auth.transport.requests import Request
 
 
 def generate_google_sheet_service():
-    
+
     # https://developers.google.com/sheets/api/guides/authorizing
     # Delete the file token.pickle if the scopes changes
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-    TOKEN_FILE = 'token.pickle'
-
-    # Put the credentials file on the root of the labonneboite project
-    CREDENTIAL_FILE = 'credentials.json'
+    TOKEN_FILE = os.path.dirname(os.path.realpath(__file__))+'/token.pickle'
+    CREDENTIAL_FILE = os.path.dirname(os.path.realpath(__file__))+'/credentials.json'
 
     # Check the validity of the token
     credentials = None
