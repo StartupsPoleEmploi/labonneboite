@@ -20,9 +20,9 @@ class JoinActivityLogsDPAE:
 
     def __init__(self):
         self.dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER+'/'
-        self.most_recent_dpae_file = self.get_most_recent_dpae_file()
+        #self.most_recent_dpae_file = self.get_most_recent_dpae_file()
         # TODO : Remove this line for initialisation, we'll have to parse older DPAE files 
-        #self.most_recent_dpae_file = "lbb_xdpdpae_delta_201909102200.bz2"
+        self.most_recent_dpae_file = "lbb_xdpdpae_delta_201908102200.bz2"
         self.df_activity = self.get_activity_logs()
 
     def get_activity_logs(self):
