@@ -26,7 +26,7 @@ class PrepareDataForGoogleSheetReport:
     def __init__(self):
         self.dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER
 
-    def get_data(self):
+    def get_data_first_sheet(self):
         
         ### FIRST SHEET : https://docs.google.com/spreadsheets/d/1kx-mxCaXIkys3hU4El4K7a6JBwzrdF75X4U8igqLB4I/edit?folder=1QFm0t2weoUjTsl-FPYUj94__zq_mZq0h#gid=0
         # 1st column : Nb IDPE unique ayant accédé à LBB
@@ -60,6 +60,8 @@ class PrepareDataForGoogleSheetReport:
 
         # 11th column : Délai moyen de réponse des recruteurs via JP (en jours)
         self.df_medium_delay_answer_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_medium_delay_answer_jp.csv',delimiter=';')
+
+    def get_data_second_sheet(self):
 
         ### SECOND SHEET : https://docs.google.com/spreadsheets/d/1gbvFvFEEugCmPhsAdoRZEdjfEl579uUnmf5MIryaVB8/edit#gid=0
         self.df_evol_nb_dpae_hiring_and_activity_date = self.get_df_evol_nb_dpae_hiring_and_activity_date()
@@ -114,7 +116,7 @@ class PrepareDataForGoogleSheetReport:
     def get_df_evol_nb_dpae_hiring_and_activity_date(self):
         # GET the evolution of the number of dpae with LBB activity
         engine = import_util.create_sqlalchemy_engine()
-        query = 'SELECT count(idutilisateur_peconnect) as count_dpae_lbb, concat(MONTH(date_activite),"-",YEAR(date_activite)) as date_month_activite,concat(MONTH(date_embauche),"-",YEAR(date_embauche)) as date_month_embauche \
+        query = 'SELECT count(idutilisateur_peconnect) as count_dpae_lbb, concat(YEAR(date_activite),"-",MONTH(date_activite)) as date_month_activite,concat(YEAR(date_embauche),"-",MONTH(date_embauche)) as date_month_embauche \
                  FROM logs_activity_dpae_clean \
                  GROUP BY date_month_embauche, date_month_activite \
                  ORDER BY date_month_embauche;'
@@ -200,6 +202,25 @@ class PrepareDataForGoogleSheetReport:
 
     def prepare_2nd_google_sheet_data(self):
 
+        
+        #Rename the date of the month by adding a '0' when needed
+        #The dates in columns and indexes look like : 
+        #['2018-10', '2018-8', '2018-9', '2018-11', '2018-12', '2019-1',
+        # '2019-10', '2019-2', '2019-3', '2019-4', '2019-5', '2019-6', '2019-7',
+        # '2019-8', '2019-9', '2019-11', '2019-12', '2020-1', '2020-2', '2020-3']
+        #
+        # ==> It needs to be turned into 'YYYY-MM' FROM 'YYYY-M' (2019-1 for example)
+        def clean_dates_list(date_list):
+            clean_list = []
+            for row in date_list:
+                if len(row) != 7:
+                    stripped_index = row.split('-')
+                    clean_list.append(f"{stripped_index[0]}-0{stripped_index[1]}")
+                else:
+                    clean_list.append(row)
+
+            return clean_list
+
         # Prepare rows for dataframe
         rows = self.df_evol_nb_dpae_hiring_and_activity_date.date_month_activite.unique()
 
@@ -209,10 +230,10 @@ class PrepareDataForGoogleSheetReport:
         df = pd.DataFrame(columns=columns, index=rows)
         for index, row in self.df_evol_nb_dpae_hiring_and_activity_date.iterrows():
             df.loc[row['date_month_activite'], row['date_month_embauche']] = row['count_dpae_lbb']
-        
-        #Rename the date of the month by adding a '0' when needed
-        df.index = ['0' + row if len(row) != 7 else row for row in df.index]
-        df.columns = ['0' + col if len(col) != 7 else col for col in df.columns]
+
+        #Rename columns dates names
+        df.index = clean_dates_list(df.index)
+        df.columns = clean_dates_list(df.columns)
 
         #Sort dataframe by column name and row index for the date to be in the right order
         df = df.reindex(sorted(df.columns), axis=1)
@@ -325,20 +346,27 @@ class PrepareDataForGoogleSheetReport:
 def run_main():
 
     data_preparation_for_google_sheets = PrepareDataForGoogleSheetReport()
-    data_preparation_for_google_sheets.get_data()
 
     service = generate_google_sheet_service()
 
-    values_to_insert_first_sheet = data_preparation_for_google_sheets.prepare_google_sheet_data()
-    first_sheet_report = GoogleSheetReport(
-        service=service,
-        spreadsheet_id= FIRST_SPREADSHEET_ID,
-        start_cell= 'A2',
-        values= values_to_insert_first_sheet        
-    )
-    first_sheet_report.write_data_into_sheet()
+    #First sheet 
 
+    #data_preparation_for_google_sheets.get_data_first_sheet()
+    #values_to_insert_first_sheet = data_preparation_for_google_sheets.prepare_google_sheet_data()
+
+    #first_sheet_report = GoogleSheetReport(
+    #    service=service,
+    #    spreadsheet_id= FIRST_SPREADSHEET_ID,
+    #    start_cell= 'A2',
+    #    values= values_to_insert_first_sheet        
+    #)
+    #first_sheet_report.write_data_into_sheet()
+
+    #Second sheet 
+
+    data_preparation_for_google_sheets.get_data_second_sheet()
     values_to_insert_second_sheet = data_preparation_for_google_sheets.prepare_2nd_google_sheet_data()
+
     second_sheet_report = GoogleSheetReport(
         service=service,
         spreadsheet_id= SECOND_SPREADSHEET_ID,
