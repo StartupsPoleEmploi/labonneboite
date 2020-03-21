@@ -63,7 +63,7 @@ class JoinActivityLogsDPAE:
     def get_last_recorded_hiring_date(self):
 
         #We want to check if the final table has already been created
-        table_name_act_dpae = 'act_dpae_clean'
+        table_name_act_dpae = 'logs_activity_dpae_clean'
         query = f"SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{table_name_act_dpae}'"
         engine = import_util.create_sqlalchemy_engine()
 
