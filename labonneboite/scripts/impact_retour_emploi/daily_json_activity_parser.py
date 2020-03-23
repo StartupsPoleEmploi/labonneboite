@@ -66,6 +66,82 @@ def get_propriete(row, key, key2=None):
 
     return value
 
+#Specific function to clean the emploi field in the logs activity recherche dataframe 
+def clean_emploi(row):
+    def hasNumbers(inputString):
+        return any(char.isdigit() for char in inputString)
+
+    emploi = row['emploi']
+    try:
+        #example : "soins-d-hygiene-de-confort-du-patient99999' union select unhex(hex(version
+        if ' ' in emploi:
+            emploi = emploi.split(' ')[0]
+        #example : securite-et-surveillance-privees/static/images/logo-lbb.svg
+        if '/' in emploi:
+            emploi = emploi.split('/')[0]
+        #example : tel:0590482468
+        if emploi.startswith('tel:'):
+            emploi = ''
+        #example :vente-en-habillement-et-accessoires-de-la-personne?to=82&from=81&sa=U&ved=2ahUKEwiLqI6mi43mAhVD6aQKHVxyAP4QFjAOegQIRxAB&usg=AOvVaw1hYvyYvxE3CPZnYly-CKci"
+        if '?' in emploi:
+            emploi = emploi.split('?')[0]
+        # example : vente-en-habillement-et-accessoires-de-la-personne%Fto=&from=&d=
+        if '%' in emploi:
+            emploi = emploi.split('%')[0]
+        # example : 'conduite-de-transport-en-commun-sur-route&sa=U&ved=ahUKEwjhlZvHv_kAhUKqlkKHRJyCNQFjAWegQIDBAB&usg=AOvVawWAKqGLFCkVOTiWqLfJXF"'            
+        if '&' in emploi:
+            emploi = emploi.split('&')[0]
+        # example : soins-d-hygiene-de-confort-du-patient99999
+        if hasNumbers(emploi):
+            emploi = ''.join([i for i in emploi if not i.isdigit()])
+        # example : soins-d-hygiene-de-confort-du-patient\'"
+        if '\'' in emploi:
+            emploi = emploi.split('\'')[0]
+        #example : www.orecrute.fr
+        if emploi.startswith('www'):
+            emploi = ''
+        #example : '...'
+        if emploi.endswith('..'):
+            emploi = ''
+        #example : '�'
+        if len(emploi) == 1:
+            emploi = ''
+        #example '||UTL_INADDR.get_host_address(', 
+        if emploi.startswith('||'):
+            emploi = ''
+        #example {{__field_friYEMKBPT}}']
+        if emploi.startswith('{'):
+            emploi = ''
+        #exampleS : 
+        # '"><javascript:alert(String.fromCharCode(,,));">', '"><script',
+        # '(SELECT', '-"', '-)', '-);select', '..', ';copy', '@@AMfqT',
+        #'@@Ddywc', '@@EnFdC', '@@JOQK', '@@LAdgd', '@@MlSoU', '@@QKchw',
+        #'@@Rido', '@@WiWWC', '@@XFdfe', '@@ZIdkt', '@@bLTT', '@@gZP',
+        #'@@lMTz', '@@nc', '@@ozw', '@@uusYI', '@@zRlWc', '@@ziuX',
+        if ('<' or '>') in emploi:
+            emploi = ''
+        if emploi.startswith('>'):
+            emploi = ''
+        if ';' in emploi:
+            emploi = ''
+        if emploi.startswith('('):
+            emploi = ''
+        if emploi.startswith('('):
+            emploi = ''
+        if emploi.startswith('@'):
+            emploi = ''
+        if '\"' in emploi:
+            emploi.replace('\"','')
+        if '.' in emploi:
+            emploi.replace('.','')
+        if 'test' in emploi:
+            emploi = ''
+
+    except TypeError: #If emploi is NoneType
+        emploi = ''
+
+    return emploi
+
 class NoDataException(Exception):
     pass
 
@@ -239,7 +315,8 @@ class ActivityLogParser:
         logs_activity_df['ville'] = logs_activity_df.apply(lambda row: get_propriete(row, 'localisation','ville'), axis=1)
         logs_activity_df['code_postal'] = logs_activity_df.apply(lambda row: get_propriete(row, 'localisation','codepostal'), axis=1)
         logs_activity_df['emploi'] = logs_activity_df.apply(lambda row: get_propriete(row, 'emploi'), axis=1)
-        
+        logs_activity_df['emploi'] = logs_activity_df.apply(lambda row: clean_emploi(row), axis=1)
+
         #TODO : Find a way to concatenate logs, because too many
         logs_activity_df = logs_activity_df[(logs_activity_df.source == 'site')]
 
