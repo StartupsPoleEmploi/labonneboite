@@ -39,10 +39,6 @@ def merge_and_normalize_websites(websites):
             return clean_website
     return ""
 
-def get_effectif_id_from_effectif_reel(effectif_reel):
-    import ipdb; ipdb.set_trace()
-    return DF_EFFECTIF_TO_LABEL[DF_EFFECTIF_TO_LABEL.start_effectif ]
-
 def normalize_website_url(url):
     """
     website URLs are raw data entered by human, with lots of mistakes,
