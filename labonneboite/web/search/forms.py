@@ -7,9 +7,9 @@ from wtforms.widgets import HiddenInput
 
 from labonneboite.conf import settings
 from labonneboite.common import pro
-from labonneboite.common import search
 from labonneboite.common import sorting
 from labonneboite.common.maps import constants as maps_constants
+from labonneboite.common.search import AudienceFilter
 
 
 class CompanySearchForm(FlaskForm):
@@ -97,17 +97,17 @@ class CompanySearchForm(FlaskForm):
 
 class ProCompanySearchForm(CompanySearchForm):
 
-    PUBLIC_CHOICES = (
-        (str(search.PUBLIC_ALL), 'Tout'),
-        (str(search.PUBLIC_JUNIOR), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="moins de 26 ans">Junior</span>'),
-        (str(search.PUBLIC_SENIOR), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="plus de 50 ans">Senior</span>'),
-        (str(search.PUBLIC_HANDICAP), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">BOE</span>'),
+    AUDIENCE_CHOICES = (
+        (str(AudienceFilter.ALL.value), 'Tout'),
+        (str(AudienceFilter.JUNIOR.value), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="moins de 26 ans">Junior</span>'),
+        (str(AudienceFilter.SENIOR.value), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="plus de 50 ans">Senior</span>'),
+        (str(AudienceFilter.HANDICAP.value), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">BOE</span>'),
     )
 
     # this field is activated only in pro mode
     p = RadioField(
         'Public',
-        choices=PUBLIC_CHOICES,
+        choices=AUDIENCE_CHOICES,
         default=0,
         validators=[Optional()])
 

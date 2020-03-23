@@ -1,9 +1,7 @@
 import datetime
 import hmac
 import urllib.request, urllib.parse, urllib.error
-
 from labonneboite.conf import settings
-
 
 class TimestampFormatException(Exception):
     pass
@@ -16,10 +14,8 @@ class TimestampExpiredException(Exception):
 class InvalidSignatureException(Exception):
     pass
 
-
 class UnknownUserException(Exception):
     pass
-
 
 def make_timestamp():
     timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
@@ -35,18 +31,17 @@ def get_ordered_argument_string(args):
         ordered_args.append((arg, args_copy[arg]))
     return urllib.parse.urlencode(ordered_args)
 
-
 def make_signature(args, timestamp, user='labonneboite'):
     args['timestamp'] = timestamp
-    api_key = settings.API_KEYS.get(user, '')
+    api_key = get_key(user, '')
     return compute_signature(args, api_key)
 
-
 def check_api_request(request):
-    try:
-        api_key = settings.API_KEYS[request.args['user']]
-    except KeyError:
+    user = request.args['user']
+    api_key = get_key(user)
+    if api_key is None:
         raise UnknownUserException
+
     timestamp = request.args.get('timestamp')
     try:
         timestamp_dt = datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S')
@@ -75,3 +70,12 @@ def check_signature(request, requested_signature, api_key):
     computed_signature = compute_signature(args, api_key)
     if not computed_signature == requested_signature:
         raise InvalidSignatureException
+
+def has_scope(api_user_name, api_user_name_forwarded, scope):
+    user_data = settings.API_USERS.get(api_user_name_forwarded, settings.API_USERS.get(api_user_name))
+    if user_data is None:
+        return False
+    return scope in user_data.get('scopes', [])
+
+def get_key(api_user_name, default = None):
+    return settings.API_KEYS.get(api_user_name, default)

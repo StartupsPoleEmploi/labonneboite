@@ -2,6 +2,7 @@ from datetime import datetime
 import collections
 import logging
 
+from enum import auto, Enum
 from slugify import slugify
 
 from labonneboite.common import mapping as mapping_util
@@ -20,11 +21,12 @@ from .maps import travel
 logger = logging.getLogger('main')
 
 
-PUBLIC_ALL = 0
-PUBLIC_JUNIOR = 1
-PUBLIC_SENIOR = 2
-PUBLIC_HANDICAP = 3
-PUBLIC_CHOICES = [PUBLIC_ALL, PUBLIC_JUNIOR, PUBLIC_SENIOR, PUBLIC_HANDICAP]
+class AudienceFilter(Enum):
+    ALL = 0
+    JUNIOR = 1
+    SENIOR = 2
+    HANDICAP = 3
+
 
 KEY_TO_LABEL_DISTANCES = {
     '*-10.0': 'less_10_km',
@@ -57,7 +59,7 @@ class HiddenMarketFetcher(Fetcher):
         hiring_type=None,
         from_number=1,
         to_number=OFFICES_PER_PAGE,
-        public=None,
+        audience=None,
         headcount=None,
         naf=None,
         naf_codes=None,
@@ -79,7 +81,7 @@ class HiddenMarketFetcher(Fetcher):
         self.to_number = to_number
 
         # Flags.
-        self.public = public
+        self.audience = audience
 
         # Headcount.
         try:
@@ -105,15 +107,15 @@ class HiddenMarketFetcher(Fetcher):
 
     @property
     def flag_handicap(self):
-        return self.public == PUBLIC_HANDICAP
+        return self.audience == AudienceFilter.HANDICAP
 
     @property
     def flag_junior(self):
-        return self.public == PUBLIC_JUNIOR
+        return self.audience == AudienceFilter.JUNIOR
 
     @property
     def flag_senior(self):
-        return self.public == PUBLIC_SENIOR
+        return self.audience == AudienceFilter.SENIOR
 
     def update_aggregations(self, aggregations):
         if self.headcount and 'headcount' in aggregations:

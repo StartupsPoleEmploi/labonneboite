@@ -363,6 +363,33 @@ telnet> quit
 Connection closed.
 ```
 
+## About the API
+
+For legacy reasons, the (LBB/LBA) API is not consumed by the LBB frontend, but it is consumed however by the LBA frontend, which is technically just an API consumer like any other.
+
+
+API users must have an API key defined in the settings like this:
+
+```python
+API_KEYS = {
+  'lba': 'dummykey',
+  'emploi_store_dev': 'dummykey',
+}
+```
+
+API users may have options defined in the settings like this:
+
+```python
+API_USERS = {
+  'lba': {
+    'scopes': [Scope.COMPANY_WEBSITE, Scope.COMPANY_EMAIL],
+  },
+}
+```
+
+`scopes` is an option used to let specific users access sensitive data.
+
+Note for API proxies such as ESD (emploi store dev): the real user name needs to be forwarded in the GET param `origin_user` for each request. This will be taken into acccount to match a user to options in `API_USERS`.
 
 ## Importer
 

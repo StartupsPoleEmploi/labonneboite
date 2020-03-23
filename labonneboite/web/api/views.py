@@ -6,7 +6,6 @@ from flask import abort, Blueprint, current_app, jsonify, request, url_for
 from labonneboite.common import activity
 from labonneboite.common import autocomplete
 from labonneboite.common import geocoding
-from labonneboite.common import search
 from labonneboite.common import offers
 from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
@@ -16,11 +15,13 @@ from labonneboite.common.locations import Location
 from labonneboite.common.load_data import ROME_CODES
 from labonneboite.common.models import Office
 from labonneboite.common.fetcher import InvalidFetcherArgument
+from labonneboite.common.constants import Scope
 from labonneboite.conf import settings
+from labonneboite.common.util import get_enum_from_value
 from labonneboite.web.api import util as api_util
 from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
+from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter, FILTERS, DISTANCE_FILTER_MAX
 from flask.ext.cors import cross_origin
-
 
 apiBlueprint = Blueprint('api', __name__)
 
@@ -37,17 +38,17 @@ def api_auth_required(function):
         if 'user' not in request.args:
             return 'missing argument: user', 400
 
-        # if not current_app.debug:
-        try:
-            api_util.check_api_request(request)
-        except api_util.TimestampFormatException:
-            return 'timestamp format: %Y-%m-%dT%H:%M:%S', 400
-        except api_util.TimestampExpiredException:
-            return 'timestamp has expired', 400
-        except api_util.InvalidSignatureException:
-            return 'signature is invalid', 400
-        except api_util.UnknownUserException:
-            return 'user is unknown', 400
+        if not current_app.debug:
+            try:
+                api_util.check_api_request(request)
+            except api_util.TimestampFormatException:
+                return 'timestamp format: %Y-%m-%dT%H:%M:%S', 400
+            except api_util.TimestampExpiredException:
+                return 'timestamp has expired', 400
+            except api_util.InvalidSignatureException:
+                return 'signature is invalid', 400
+            except api_util.UnknownUserException:
+                return 'user is unknown', 400
 
         return function(*args, **kwargs)
 
@@ -145,7 +146,7 @@ def company_count():
 
 def build_result(fetcher, offices, commune_id, zipcode, add_url=True):
     offices = [
-        patch_office_result_with_sensitive_information(request.args['user'], office, office.as_json(
+        patch_office_result_with_sensitive_information(request.args['user'], request.args.get('origin_user'), office, office.as_json(
             rome_codes=fetcher.romes,
             distance=fetcher.distance,
             zipcode=zipcode,
@@ -196,7 +197,7 @@ def compute_frontend_url(fetcher, query_string, commune_id):
             'sort': fetcher.sort,
             'd': fetcher.distance,
             'h': fetcher.headcount,
-            'p': fetcher.public,
+            'p': fetcher.audience,
         })
 
         return url_for(
@@ -226,7 +227,7 @@ def company_filter_list():
         return response_400(e)
 
     # Add aggregations
-    fetcher.aggregate_by = search.FILTERS
+    fetcher.aggregate_by = FILTERS
 
     _, aggregations = fetcher.get_offices(add_suggestions=False)
 
@@ -243,7 +244,7 @@ def company_filter_list():
             result['filters']['naf'] = fetcher.get_naf_aggregations()
         if 'headcount' in request.args and 'headcount' in fetcher.aggregate_by:
             result['filters']['headcount'] = fetcher.get_headcount_aggregations()
-        if 'distance' in fetcher.aggregate_by and fetcher.distance != search.DISTANCE_FILTER_MAX:
+        if 'distance' in fetcher.aggregate_by and fetcher.distance != DISTANCE_FILTER_MAX:
             result['filters']['distance'] = fetcher.get_distance_aggregations()
         if 'hiring_type' in fetcher.aggregate_by:
             result['filters']['contract'] = fetcher.get_contract_aggregations()
@@ -451,14 +452,17 @@ def create_hidden_market_fetcher(location, departements, request_args):
             raise InvalidFetcherArgument('departments : %s' % ', '.join(unknown_departments))
     kwargs['departments'] = departments
 
-    # PMSMP filter only available for internal users.
-    if request.args['user'] in settings.API_INTERNAL_CONSUMERS:
+    # from value in GET to enum
+    # audience filter defaults to ALL
+    kwargs['audience'] = get_enum_from_value(AudienceFilter, request_args.get('audience'), AudienceFilter.ALL)
+
+    if (api_util.has_scope(request.args['user'], request.args.get('origin_user'),  Scope.COMPANY_PMSMP)):
         kwargs['flag_pmsmp'] = check_bool_argument(request_args, 'flag_pmsmp', 0)
 
     if location is not None:
-        return search.HiddenMarketFetcher(location.longitude, location.latitude, **kwargs)
+        return HiddenMarketFetcher(location.longitude, location.latitude, **kwargs)
 
-    return search.HiddenMarketFetcher(None, None, **kwargs)
+    return HiddenMarketFetcher(None, None, **kwargs)
 
 
 def check_bool_argument(args, name, default_value):
@@ -594,15 +598,21 @@ def get_office_details(siret, alternance=False):
             'zipcode': office.zipcode,
         },
     }
-    patch_office_result_with_sensitive_information(request.args['user'], office, result, alternance)
+    patch_office_result_with_sensitive_information(request.args['user'], request.args.get('origin_user'), office, result, alternance)
     return jsonify(result)
 
 
-def patch_office_result_with_sensitive_information(api_username, office, result, alternance=False):
+def patch_office_result_with_sensitive_information(api_username, api_user_name_forwarded, office, result, alternance=False):
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
-    if api_username in settings.API_INTERNAL_CONSUMERS:
+    if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_EMAIL):
         result['email'] = office.email_alternance if alternance and office.email_alternance else office.email
+    if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_PHONE):
         result['phone'] = office.phone_alternance if alternance and office.phone_alternance else office.tel
+    if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_WEBSITE):
         result['website'] = office.website_alternance if alternance and office.website_alternance else office.website
+    if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_PMSMP):
+        result['pmsmp'] = office.flag_pmsmp
+    if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_BOE):
+        result['boe'] = office.flag_handicap
     return result

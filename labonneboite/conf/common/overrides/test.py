@@ -1,6 +1,8 @@
 import logging
 import os
 
+from labonneboite.common.constants import Scope, SCOPES_SAFE, SCOPES_TRUSTED
+
 TESTING = True
 
 ES_INDEX = 'labonneboite_unit_test'
@@ -19,6 +21,27 @@ ENABLE_TIMEIT_TIMERS = False
 API_KEYS = {
     'labonneboite': 'dummykey',
     'emploi_store_dev': 'anotherdummykey',
+    'trusteduser': 'trusteduserkey',
+    'supertrusteduser': 'supertrusteduserkey',
+    'untrusteduser': 'untrusteduserkey',
+}
+
+API_USERS = {
+    'labonneboite': {
+        'scopes': SCOPES_SAFE,
+    },
+    'trusteduser': {
+        'scopes': SCOPES_TRUSTED,
+    },
+    'supertrusteduser': {
+        'scopes': SCOPES_TRUSTED + [Scope.COMPANY_PMSMP, Scope.COMPANY_BOE],
+    },
+    'untrusteduser': {
+        'scopes': [],
+    },
+    'empty_user': {
+        # no scope here
+    },
 }
 
 API_ADRESSE_BASE_URL = 'http://urlintrouvablepourlbb.fr'

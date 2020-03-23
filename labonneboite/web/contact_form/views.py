@@ -115,7 +115,7 @@ def sendMail(mail_content, subject):
             mail.send_mail(mail_content=mail_content, subject=subject)
         except MailjetAPIError as e:
             logger.exception(e)
-            if(attempt < MAX_ATTEMPTS - 1):
+            if attempt < MAX_ATTEMPTS - 1:
                 time.sleep(5)
         else:
             break
