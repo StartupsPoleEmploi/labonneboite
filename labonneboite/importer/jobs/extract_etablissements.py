@@ -14,6 +14,7 @@ from labonneboite.common.database import db_session
 from labonneboite.common.chunks import chunks
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
+from labonneboite.common.load_data import load_effectif_labels
 
 # This list contains siret that must not be found in data,
 # we use it as a test : if one of those is found in data, we stop the importer
@@ -23,12 +24,13 @@ WRONG_SIRETS = ['50468025700020', #siret of Oxynel : old siret which has been re
                 '41006536100041', #old siret for equant france sa - cesson sevigne
 ]
 
+DF_EFFECTIF_TO_LABEL = load_effectif_labels()
+
 class WrongSiretException(Exception):
     pass
 
 def has_text_content(s):
     return s is not None and len(s) > 0 and not s.isspace()
-
 
 def merge_and_normalize_websites(websites):
     for website in websites:
@@ -36,7 +38,6 @@ def merge_and_normalize_websites(websites):
         if clean_website:
             return clean_website
     return ""
-
 
 def normalize_website_url(url):
     """
@@ -65,6 +66,7 @@ def normalize_website_url(url):
         return None
 
     return url
+
 
 
 @timeit
@@ -330,7 +332,7 @@ class EtablissementExtractJob(Job):
 
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
                         libellerue, codecommune, codepostal, first_email, rgpd_email, \
-                        tel, trancheeffectif_etablissement, _, _, _, \
+                        tel, trancheeffectif_etablissement, effectif_reel, _, _, \
                         website1, website2, better_tel, \
                         website3, _, contrat_afpr, contrat_poe, contrat_pmsmp = fields
 
@@ -346,6 +348,16 @@ class EtablissementExtractJob(Job):
                     logger.exception("exception in line %s", line)
                     format_errors += 1
                     continue
+
+                # We cant rely on the field trancheeffectif_etablissement which is in etablissement file
+                # We have to rely on the field effectif_reel
+                # We take the number of employees and we use a dataframe which will help us to determine which category the number of employees is related to 
+                # If there is no effectif reel in the dataset, we use the old field tranche_effectif
+                if effectif_reel != '':
+                    trancheeffectif_etablissement = DF_EFFECTIF_TO_LABEL[ 
+                        (DF_EFFECTIF_TO_LABEL.start_effectif <= int(effectif_reel)) & 
+                        (DF_EFFECTIF_TO_LABEL.end_effectif >= int(effectif_reel))
+                    ]['code'].values[0]
 
                 website = merge_and_normalize_websites([website1, website2, website3])
 
