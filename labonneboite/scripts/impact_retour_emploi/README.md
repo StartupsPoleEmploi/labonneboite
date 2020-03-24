@@ -20,3 +20,9 @@ Il va consister en plusieurs scripts :
     - make_report
     
     Ce script va récupérer les données précédentes, pour les envoyer sur un Google Sheets qui ira alimenter un Google Data Studio, afin d'élaborer un rapport sur l'impact sur le retour à l'emploi. 
+
+
+Cette image ci-dessous va représenter les différentes sources des données utilisées, et comment les scripts explicités ci-dessus vont utiliser ces données : 
+
+![](doc_ire.png)
+
