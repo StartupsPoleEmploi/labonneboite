@@ -94,14 +94,6 @@ remote-pdb
 markupsafe==1.1.1
 
 #Impact retour emploi.
-#matplotlib
-#openpyxl
-#pygal
-#pygal_maps_fr
-#matplotlib
-#imgkit
-#xlsxwriter
-#cairosvg
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
