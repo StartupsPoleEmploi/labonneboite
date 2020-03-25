@@ -12,19 +12,14 @@ from labonneboite.importer import util as import_util
 from labonneboite.importer.jobs.common import logger
 from labonneboite.importer import settings as importer_settings
 from labonneboite.scripts.impact_retour_emploi.google_sheets_report import GoogleSheetReport, generate_google_sheet_service
+from labonneboite.scripts.impact_retour_emploi.settings import FIRST_SPREADSHEET_ID,SECOND_SPREADSHEET_ID,FIRST_SPREADSHEET_SHEET_INDEX, SECOND_SPREADSHEET_SHEET_INDEX
 
 TABLE_NAME = 'logs_activity_dpae_clean'
-
-#https://docs.google.com/spreadsheets/d/1kx-mxCaXIkys3hU4El4K7a6JBwzrdF75X4U8igqLB4I/edit?folder=1QFm0t2weoUjTsl-FPYUj94__zq_mZq0h#gid=0
-FIRST_SPREADSHEET_ID = '1kx-mxCaXIkys3hU4El4K7a6JBwzrdF75X4U8igqLB4I'
-
-#https://docs.google.com/spreadsheets/d/1gbvFvFEEugCmPhsAdoRZEdjfEl579uUnmf5MIryaVB8/edit#gid=0
-SECOND_SPREADSHEET_ID = '1gbvFvFEEugCmPhsAdoRZEdjfEl579uUnmf5MIryaVB8'
 
 class PrepareDataForGoogleSheetReport:
 
     def __init__(self):
-        self.dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER
+        self.csv_jp_folder_path = importer_settings.INPUT_SOURCE_FOLDER
 
     def get_data_first_sheet(self):
         
@@ -50,21 +45,23 @@ class PrepareDataForGoogleSheetReport:
         # 7th column is an empty column
 
         # 8th column : Nb candidatures JP
-        self.df_nb_candidatures_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_nb_candidatures_jp.csv',delimiter=';')
+        self.df_nb_candidatures_jp = pd.read_csv(f'{self.csv_jp_folder_path}/dump_nb_candidatures_jp.csv',delimiter=';')
         
         # 9th column : Nb email unique ayant candidaté via Je postule
-        self.df_nb_distinct_email_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_nb_distinct_email_jp.csv',delimiter=';')
+        self.df_nb_distinct_email_jp = pd.read_csv(f'{self.csv_jp_folder_path}/dump_nb_distinct_email_jp.csv',delimiter=';')
 
         # 10th column : Nb candidats ayant reçus une réponse via JP
-        self.df_nb_candidates_with_answer_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_nb_candidates_with_answer_jp.csv',delimiter=';')
+        self.df_nb_candidates_with_answer_jp = pd.read_csv(f'{self.csv_jp_folder_path}/dump_nb_candidates_with_answer_jp.csv',delimiter=';')
 
         # 11th column : Délai moyen de réponse des recruteurs via JP (en jours)
-        self.df_medium_delay_answer_jp = pd.read_csv(f'{self.dpae_folder_path}/dump_medium_delay_answer_jp.csv',delimiter=';')
+        self.df_medium_delay_answer_jp = pd.read_csv(f'{self.csv_jp_folder_path}/dump_medium_delay_answer_jp.csv',delimiter=';')
 
     def get_data_second_sheet(self):
 
+
         ### SECOND SHEET : https://docs.google.com/spreadsheets/d/1gbvFvFEEugCmPhsAdoRZEdjfEl579uUnmf5MIryaVB8/edit#gid=0
         self.df_evol_nb_dpae_hiring_and_activity_date = self.get_df_evol_nb_dpae_hiring_and_activity_date()
+        import ipdb; ipdb.set_trace()
 
         print('Getting infos and datas from SQL done !')
 
@@ -125,9 +122,17 @@ class PrepareDataForGoogleSheetReport:
         return df_evol_nb_dpae_hiring_and_activity_date
 
     def prepare_google_sheet_data(self):
-        
+        def clean_date(row):
+            date = row['date_month']
+            stripped_index = date.split('-')
+            if len(date) != 7:
+                date = f"{stripped_index[1]}-0{stripped_index[0]}"
+            else:
+                date = f"{stripped_index[1]}-{stripped_index[0]}"
+            return date
+
         #Merge all datas requested before on the field 'date_month'
-        df_by_month = self.df_evol_idpe_connect.merge(
+        df = self.df_evol_idpe_connect.merge(
             self.df_evol_idpe_connect_sign_afficher_details, how='outer').merge(
             self.df_evol_idpe_connect_sign_details, how='outer').merge(
             self.df_evol_idpe_connect_sign, how='outer').merge(
@@ -137,42 +142,22 @@ class PrepareDataForGoogleSheetReport:
             self.df_nb_candidates_with_answer_jp, how='outer').merge(
             self.df_medium_delay_answer_jp, how='outer')
 
-        df_by_month.reset_index(inplace=True)
+        df.reset_index(inplace=True)
 
-        #Deal with different types of wanted dates
-        df_date_month = df_by_month['date_month']
-
-        semester_year = [] #Formatting
-        list_month = []
-        list_year = []
-        i = 0
-
-        while i < len(df_date_month):
-            month, year = df_date_month[i].split('-')
-            semester_year.append(str((int(month)-1)//6 + 1)+'-'+year)
-            list_month.append(int(month))
-            list_year.append(int(year))
-            i += 1
-
-        df_by_month['semester'] = semester_year
-        df_by_month['month'] = list_month
-        df_by_month['year'] = list_year
-
-        df_by_month = df_by_month.sort_values(by=['year', 'month'])
-        df_by_month = df_by_month.reset_index(drop=True)
+        df['date_month'] = df.apply(lambda row: clean_date(row), axis=1)
+        df = df.sort_values('date_month')
 
         #FIXME : When datas will be available
-        df_by_month['count_id_pe_firststep_jp'] = 0
+        df['count_id_pe_firststep_jp'] = 0
 
-        df_by_month['empty_column'] = None
+        df['empty_column'] = None
 
-        df_by_month['count_distinct_activity'] = df_by_month['count_distinct_activity'] + df_by_month['count_id_pe_firststep_jp']
+        df['count_distinct_activity'] = df['count_distinct_activity'] + df['count_id_pe_firststep_jp']
 
-        df = self.create_columns('month', df_by_month, df_by_month['date_month'])
+        #df = self.create_columns('month', df, df['date_month'])
 
         ORDERING_COLUMN = [
-            'date_begin',
-            'date_end',
+            'date_month',
             'count_distinct_idpe',
             'count_distinct_activity_afficher_details',
             'count_distinct_activity_details',
@@ -196,9 +181,9 @@ class PrepareDataForGoogleSheetReport:
         df = df.replace(numpy.nan, '', regex=True)
 
         # Define ValueJSON body to insert in Google Sheets
-        df_values_to_insert = {'values': df.values.tolist()}
+        values_to_insert = {'values': df.values.tolist()}
 
-        return df_values_to_insert
+        return values_to_insert, df
 
     def prepare_2nd_google_sheet_data(self):
 
@@ -256,92 +241,9 @@ class PrepareDataForGoogleSheetReport:
             values_to_insert.append(row)
             i += 1
 
-        df_values_to_insert = {'values': values_to_insert}
-        return df_values_to_insert
+        values_to_insert = {'values': values_to_insert}
 
-    def create_columns(self, type_, df_initial, df_date):
-
-        df_ = df_initial
-
-        date_begin = []
-        date_end = []
-
-        i = 0
-        while i < len(df_date):
-            j = i if type_ != 'cumulative_month' else 0
-            date_begin.append(self.calculate_date_begin(type_, df_date[j]))
-            date_end.append(self.calculate_date_end(type_, df_date[i]))
-            i += 1
-            gline = str(i+1)
-
-        df_['date_begin'] = date_begin
-        df_['date_end'] = date_end
-
-        return df_
-
-    # Switch to calculat the date of begin depends of type of df
-    def calculate_date_begin(self, type_, date_):
-
-        switcher = {
-            'semester': self.switch_semester_begin,
-            'year': self.switch_year_begin,
-            'cumulative_month': self.switch_month_begin,
-            'month': self.switch_month_begin
-        }
-
-        return switcher.get(type_)(type_, date_)
-
-    # Rule for calulate the first date of semester
-
-
-    def switch_semester_begin(self, type_, date_):
-        sem, year = date_.split('-')
-        if sem == '1':  # first semester
-            return '01/01/'+year
-        else:
-            return '01/07/'+year
-
-    # Rule for calulate the first date of month
-
-
-    def switch_month_begin(self, type_, date_):
-        month, year = date_.split('-')
-        return '01/'+month+'/'+year
-
-    # Rule for calulate the first date of year
-
-
-    def switch_year_begin(self, type_, date_):
-        return '01/01/'+str(date_)
-
-    # Switch to calculat the date of end depends of type of df
-    def calculate_date_end(self, type_, date_):
-
-        switcher = {
-            'semester': self.switch_semester_end,
-            'year': self.switch_year_end,
-            'cumulative_month': self.switch_month_end,
-            'month': self.switch_month_end
-        }
-
-        return switcher.get(type_)(type_, date_)
-
-    # Rule for calulate the last date of semester
-    def switch_semester_end(self, type_, date_):
-        sem, year = date_.split('-')
-        if sem == '1':  # first semester
-            return '30/06/'+year
-        else:
-            return '31/12/'+year
-
-    # Rule for calulate the last date of month
-    def switch_month_end(self, type_, date_):
-        month, year = date_.split('-')
-        return str(calendar.monthrange(int(year), int(month))[1])+'/'+month+'/'+year
-
-    # Rule for calulate the last date of year
-    def switch_year_end(self, type_, date_):
-        return '31/12/'+str(date_)
+        return values_to_insert, df
 
 def run_main():
 
@@ -350,29 +252,31 @@ def run_main():
     service = generate_google_sheet_service()
 
     #First sheet 
+    data_preparation_for_google_sheets.get_data_first_sheet()
+    values_to_insert_first_sheet, _ = data_preparation_for_google_sheets.prepare_google_sheet_data()
 
-    #data_preparation_for_google_sheets.get_data_first_sheet()
-    #values_to_insert_first_sheet = data_preparation_for_google_sheets.prepare_google_sheet_data()
-
-    #first_sheet_report = GoogleSheetReport(
-    #    service=service,
-    #    spreadsheet_id= FIRST_SPREADSHEET_ID,
-    #    start_cell= 'A2',
-    #    values= values_to_insert_first_sheet        
-    #)
-    #first_sheet_report.write_data_into_sheet()
+    first_sheet_report = GoogleSheetReport(
+        service=service,
+        spreadsheet_id= FIRST_SPREADSHEET_ID,
+        sheet_index= FIRST_SPREADSHEET_SHEET_INDEX,
+        start_cell= 'A2',
+        values= values_to_insert_first_sheet        
+    )
+    first_sheet_report.set_sheet_range()
+    first_sheet_report.write_data_into_sheet()
 
     #Second sheet 
-
     data_preparation_for_google_sheets.get_data_second_sheet()
-    values_to_insert_second_sheet = data_preparation_for_google_sheets.prepare_2nd_google_sheet_data()
+    values_to_insert_second_sheet, _ = data_preparation_for_google_sheets.prepare_2nd_google_sheet_data()
 
     second_sheet_report = GoogleSheetReport(
         service=service,
         spreadsheet_id= SECOND_SPREADSHEET_ID,
+        sheet_index= SECOND_SPREADSHEET_SHEET_INDEX,
         start_cell= 'B5',
         values= values_to_insert_second_sheet        
     )
+    second_sheet_report.set_sheet_range()
     second_sheet_report.write_data_into_sheet()
 
 

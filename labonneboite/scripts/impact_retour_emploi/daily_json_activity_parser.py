@@ -126,6 +126,8 @@ def clean_emploi(row):
             emploi = ''
         if emploi.startswith('('):
             emploi = ''
+        if emploi.startswith('-'):
+            emploi = ''
         if emploi.startswith('('):
             emploi = ''
         if emploi.startswith('@'):

@@ -20,9 +20,8 @@ class JoinActivityLogsDPAE:
 
     def __init__(self):
         self.dpae_folder_path = importer_settings.INPUT_SOURCE_FOLDER+'/'
-        self.most_recent_dpae_file = self.get_most_recent_dpae_file()
-        # TODO : Remove this line for initialisation, we'll have to parse older DPAE files 
-        # self.most_recent_dpae_file = "lbb_xdpdpae_delta_201908102200.bz2"
+
+    def set_df_activity(self):
         self.df_activity = self.get_activity_logs()
 
     def get_activity_logs(self):
@@ -30,7 +29,7 @@ class JoinActivityLogsDPAE:
 
         query = "select * from logs_activity"
         if DEBUG:
-            query += " ORDER BY RAND() LIMIT 100"
+            query += " ORDER BY RAND() LIMIT 10000"
         df_activity = pd.read_sql_query(query, engine)
         
         engine.close()
@@ -46,6 +45,11 @@ class JoinActivityLogsDPAE:
         logger.info('Activities logs are loaded')
 
         return df_activity.astype(str)
+    
+    def set_most_recent_dpae_file(self):
+        self.most_recent_dpae_file = self.get_most_recent_dpae_file()
+        # Remove this comment to pass a specific dpae file for initialisation, we'll have to parse older DPAE files 
+        # self.most_recent_dpae_file = "lbb_xdpdpae_delta_201908102200.bz2"
 
     def get_most_recent_dpae_file(self):
         dpae_paths = os.listdir(self.dpae_folder_path)
@@ -59,6 +63,9 @@ class JoinActivityLogsDPAE:
         logger.info(f"the DPAE file which will be used is : {most_recent_dpae_file}")
 
         return most_recent_dpae_file
+
+    def set_last_recorded_hiring_date(self):
+        self.date_last_recorded_hiring = self.get_last_recorded_hiring_date()
 
     def get_last_recorded_hiring_date(self):
 
@@ -81,6 +88,7 @@ class JoinActivityLogsDPAE:
         logger.info(f"the most recent date found is {date_last_recorded_hiring}")
 
         return date_last_recorded_hiring
+
 
     def get_compression_to_use_by_pandas_according_to_file(self):
         dpae_file_extension = self.most_recent_dpae_file.split('.')[-1]
@@ -111,9 +119,6 @@ class JoinActivityLogsDPAE:
                 df_dpae_act.to_csv(f, header=False, sep='|')
 
     def join_dpae_activity_logs(self):
-
-        # We select the last DPAE date that has been used in the last joined dpae
-        date_last_recorded_hiring = self.get_last_recorded_hiring_date()
 
         # We use the datas in csv using smaller chunks
         if DEBUG:
@@ -148,7 +153,7 @@ class JoinActivityLogsDPAE:
             # We keep rows in the DPAE file that has a date > to the date_last_recorded_hiring
             # The dpae used must be after the last recorded emabuche date
             df_dpae['kd_dateembauche_bis'] = df_dpae.apply(lambda row: get_date(row), axis=1)
-            df_dpae = df_dpae[df_dpae.kd_dateembauche_bis > date_last_recorded_hiring]
+            df_dpae = df_dpae[df_dpae.kd_dateembauche_bis > self.date_last_recorded_hiring]
             nb_rows = df_dpae.shape[0]
             logger.info(f"Sample of DPAE minus old dates has : {nb_rows} rows")
 
@@ -190,15 +195,16 @@ class JoinActivityLogsDPAE:
 
             i += 1
 
-            # In debug mode, we stop parsing the DPAE file when we reach (10 ** 5) * 20 = 2 000 000 lines
-            if DEBUG and i == 20:
-                break
-
-        return self.path_to_csv
+        return self.path_to_csv, df_dpae_act
 
 
 def run_main():
     join_act_log = JoinActivityLogsDPAE()
+
+    join_act_log.set_most_recent_dpae_file()
+    join_act_log.set_df_activity()
+    join_act_log.set_last_recorded_hiring_date()
+
     join_act_log.join_dpae_activity_logs()
 
 if __name__ == '__main__':

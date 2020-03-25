@@ -37,18 +37,27 @@ def generate_google_sheet_service():
 
 class GoogleSheetReport:
 
-    def __init__(self, service, spreadsheet_id, start_cell, values):
+    def __init__(self, service, spreadsheet_id, sheet_index, start_cell, values):
         self.google_service = service
         self.spreadsheet_id = spreadsheet_id
         self.values = values
+        self.start_cell = start_cell
+        self.sheet_index = sheet_index
 
-        nb_columns = len(values['values'][0])
-        nb_rows = len(values['values'])
-        end_cell = self.get_end_cell(start_cell, nb_columns, nb_rows)
+    def set_sheet_range(self):
+        nb_columns = self.get_nb_columns()
+        nb_rows = self.get_nb_rows()
+        end_cell = self.get_end_cell(self.start_cell, nb_columns, nb_rows)
+        self.sheet_range = self.get_sheet_range(self.start_cell, end_cell)
 
-        self.sheet_range = self.get_sheet_range(start_cell, end_cell)
+    def get_nb_columns(self):
+        return len(self.values['values'][0])
+
+    def get_nb_rows(self):
+        return len(self.values['values'])
 
     def get_end_cell(self, start_cell, nb_columns, nb_rows):
+        # FIXME : Cant accept long cells like ZZ32 for now
         letter_first_column = start_cell[0]
         number_first_row = start_cell[1]
         
@@ -67,7 +76,7 @@ class GoogleSheetReport:
                         ).execute()['sheets']
 
         # Writing the 1st sheet
-        sheet = list_sheets[0]['properties']
+        sheet = list_sheets[self.sheet_index]['properties']
 
         return f"{sheet['title']}!{start_cell}:{end_cell}"
 

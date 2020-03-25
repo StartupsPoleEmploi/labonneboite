@@ -237,16 +237,16 @@ alembic-generate-migration:
 daily-json-activity-parser:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/daily_json_activity_parser.py
 
-join_activity_logs_and_dpae:
+join-activity-logs-and-dpae:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/join_activity_logs_dpae.py
 
-clean_activity_logs_and_dpae:
+clean-activity-logs-and-dpae:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/clean_activity_logs_dpae.py
 
-make_report:
+make-report:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/make_report.py
 
-run_ire_jobs:
+run-impact-retour-emploi-jobs:
 	make join_activity_logs_and_dpae && \
 	make clean_activity_logs_and_dpae && \
 	make make_report && \

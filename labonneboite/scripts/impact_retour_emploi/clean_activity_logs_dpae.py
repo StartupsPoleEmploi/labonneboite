@@ -6,7 +6,6 @@ import math
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
-from labonneboite.scripts.impact_retour_emploi.settings import DEBUG
 
 TABLE_NAME = 'logs_activity_dpae_clean'
 
@@ -62,16 +61,27 @@ def del_cdd_incoherent(row):
     
     return status
 
+class NoDataException(Exception):
+    pass
+
 class CleanActivityLogsDPAE:
 
     def __init__(self):
         self.csv_folder_path = importer_settings.INPUT_SOURCE_FOLDER+'/'
+
+    def set_df_dpae_act(self):
         self.df_dpae_act = pd.read_csv(
-            self.csv_folder_path + self.get_most_recent_csv_file(), 
+            self.csv_folder_path + self.most_recent_csv_file, 
             sep='|',
             header=0,
             dtype = {'siret': str}
         )
+        
+        if self.df_dpae_act.shape[0] == 0: # 0 rows in dataframe
+            raise NoDataException
+
+    def set_most_recent_csv_file(self):
+        self.most_recent_csv_file = self.get_most_recent_csv_file()
 
     def get_most_recent_csv_file(self):
         csv_paths = os.listdir(self.csv_folder_path)
@@ -83,6 +93,10 @@ class CleanActivityLogsDPAE:
 
         return most_recent_csv_file
     
+    def set_existing_act_dpae_table(self):
+        #We check if the table which stores the clean data about dpae and activities exist
+        self.existing_sql_table = self.check_existing_act_dpae_table()
+
     def check_existing_act_dpae_table(self):
         engine = import_util.create_sqlalchemy_engine()
 
@@ -194,11 +208,12 @@ class CleanActivityLogsDPAE:
 
         self.df_dpae_act = self.df_dpae_act[cols_of_interest]
 
-        #We check if the table which stores the clean data about dpae and activities exist
-        existing_sql_table = self.check_existing_act_dpae_table()
+        return self.df_dpae_act
+
+    def join_old_data_with_new_ones(self):
 
         #If it exists, we have to get the whole old datas, to delete rows which are duplicates for a couple idpeconnect/siret
-        if existing_sql_table:
+        if self.existing_sql_table:
 
             df_dpae_act_existing = self.get_old_activities_logs_saved()
 
@@ -227,11 +242,28 @@ class CleanActivityLogsDPAE:
             nb_rows = self.df_dpae_act.shape[0]
             logger.info(f"Concatenation of both minus duplicates has {nb_rows} rows")
 
-        self.save_activity_logs()
 
 def run_main():
     clean_act_log_dpae = CleanActivityLogsDPAE()
+
+    #Get the most recent csv file (join of dpae and activity logs)
+    clean_act_log_dpae.set_most_recent_csv_file()
+
+    #Load the dataframe from the csv file
+    clean_act_log_dpae.set_df_dpae_act()
+
+    #Clean the dataframe (remove duplicates, make some fields understandable to human)
     clean_act_log_dpae.clean_csv_act_dpae_file()
+
+    #Check if there are already couple siret/idpeconnect saved previously
+    clean_act_log_dpae.set_existing_act_dpae_table()
+
+    #If there were already couple siret/idpeconnect saved previously, we have to join them and remove the duplicates
+    clean_act_log_dpae.join_old_data_with_new_ones()
+
+    #We save the dataframe to the database
+    clean_act_log_dpae.save_activity_logs()
+
 
 if __name__ == '__main__':
     run_main()
