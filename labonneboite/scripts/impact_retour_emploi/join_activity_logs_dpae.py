@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
 
 import os
-import urllib
+import time
+import datetime as datetime
 import pandas as pd
+
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
-import time
-import datetime as datetime
 from labonneboite.scripts.impact_retour_emploi.settings import DEBUG
 
-#Pandas utils functions 
-#----------------------
+# Pandas utils functions
+# ----------------------
 # function used to create a new column from dateheure column in dpae
+
+
 def get_date(row):
     return row['kd_dateembauche'][:10]
+
 
 class JoinActivityLogsDPAE:
 
@@ -31,10 +34,10 @@ class JoinActivityLogsDPAE:
         if DEBUG:
             query += " ORDER BY RAND() LIMIT 10000"
         df_activity = pd.read_sql_query(query, engine)
-        
+
         engine.close()
 
-        # TODO : Define how long we should use logs 
+        # TODO : Define how long we should use logs
         # https://valodata.slack.com/archives/C0QR8RYL8/p1562319224015200
 
         # TODO : Uncomment these lines after the first initialization of the project
@@ -45,10 +48,10 @@ class JoinActivityLogsDPAE:
         logger.info('Activities logs are loaded')
 
         return df_activity.astype(str)
-    
+
     def set_most_recent_dpae_file(self):
         self.most_recent_dpae_file = self.get_most_recent_dpae_file()
-        # Remove this comment to pass a specific dpae file for initialisation, we'll have to parse older DPAE files 
+        # Remove this comment to pass a specific dpae file for initialisation, we'll have to parse older DPAE files
         # self.most_recent_dpae_file = "lbb_xdpdpae_delta_201908102200.bz2"
 
     def get_most_recent_dpae_file(self):
@@ -69,19 +72,19 @@ class JoinActivityLogsDPAE:
 
     def get_last_recorded_hiring_date(self):
 
-        #We want to check if the final table has already been created
+        # We want to check if the final table has already been created
         table_name_act_dpae = 'logs_activity_dpae_clean'
         query = f"SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{table_name_act_dpae}'"
         engine = import_util.create_sqlalchemy_engine()
 
-        #If the table is created
+        # If the table is created
         if engine.execute(query).fetchone()[0] == 1:
             query = f"select date_embauche from {table_name_act_dpae} order by date_embauche DESC LIMIT 1"
             row = engine.execute(query).fetchone()
             date_last_recorded_hiring = row[0].split()[0]
-        #Table not created
+        # Table not created
         else:
-            #We set the date to the first activity log that has ever been created on LBB
+            # We set the date to the first activity log that has ever been created on LBB
             date_last_recorded_hiring = "2018-08-31"
 
         engine.close()
@@ -89,14 +92,13 @@ class JoinActivityLogsDPAE:
 
         return date_last_recorded_hiring
 
-
     def get_compression_to_use_by_pandas_according_to_file(self):
         dpae_file_extension = self.most_recent_dpae_file.split('.')[-1]
         if dpae_file_extension == 'csv':
             compression = 'infer'
         else:
             compression = 'bz2'
-        
+
         return compression
 
     def get_path_to_saved_csv(self):
@@ -110,7 +112,7 @@ class JoinActivityLogsDPAE:
         file_exists = os.path.isfile(self.path_to_csv)
 
         # We want to rewrite the CSV file after each new execution of Join activity Logs DPAE extraction
-        if iteration == 0: # First iteration
+        if iteration == 0:  # First iteration
             if file_exists:
                 os.remove(self.path_to_csv)
             df_dpae_act.to_csv(self.path_to_csv, encoding='utf-8', sep='|')
@@ -140,12 +142,12 @@ class JoinActivityLogsDPAE:
         self.path_to_csv = self.get_path_to_saved_csv()
 
         for df_dpae in pd.read_csv(self.dpae_folder_path + self.most_recent_dpae_file,
-                                header=None,
-                                compression=self.get_compression_to_use_by_pandas_according_to_file(),
-                                names=column_names,
-                                sep='|',
-                                index_col=False,
-                                chunksize=chunksize):
+                                   header=None,
+                                   compression=self.get_compression_to_use_by_pandas_according_to_file(),
+                                   names=column_names,
+                                   sep='|',
+                                   index_col=False,
+                                   chunksize=chunksize):
 
             nb_rows = df_dpae.shape[0]
             logger.info(f"Sample of DPAE has : {nb_rows} rows")
@@ -160,12 +162,12 @@ class JoinActivityLogsDPAE:
             # convert df dpae columns to 'object'
             df_dpae = df_dpae.astype(str)
 
-            #We join the dpae and activity logs dataframe
+            # We join the dpae and activity logs dataframe
             df_dpae_act = pd.merge(
                 df_dpae,
                 self.df_activity,
                 how='left',
-                left_on=['dc_ididentiteexterne','kc_siret'],
+                left_on=['dc_ididentiteexterne', 'kc_siret'],
                 right_on=['idutilisateur_peconnect', 'siret']
             )
 
@@ -180,9 +182,9 @@ class JoinActivityLogsDPAE:
 
             df_dpae_act = df_dpae_act.astype(str)
 
-            #We save the lines of the join we want to keep
+            # We save the lines of the join we want to keep
             self.save_csv_file(df_dpae_act, i)
-            
+
             nb_rows = df_dpae_act.shape[0]
             logger.info(f" ==> Nb rows we keep in this sample : {nb_rows} rows")
 
@@ -206,6 +208,7 @@ def run_main():
     join_act_log.set_last_recorded_hiring_date()
 
     join_act_log.join_dpae_activity_logs()
+
 
 if __name__ == '__main__':
     run_main()
