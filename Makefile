@@ -201,6 +201,9 @@ test-integration: clear-data-test database-test populate-data-test
 test-selenium: clear-data-test database-test populate-data-test-selenium
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/selenium
 
+test-impact-retour-emploi:
+	LBB_ENV=test $(NOSETESTS) labonneboite/tests/scripts/impact_retour_emploi
+
 # Convenient reminder about how to run a specific test manually.
 test-custom:
 	@echo "To run a specific test, run for example:"
@@ -234,27 +237,40 @@ alembic-generate-migration:
 
 # Impact retour à l'emploi
 # ------------------------
-daily-json-activity-parser:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/daily_json_activity_parser.py
 
-join-activity-logs-and-dpae:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/join_activity_logs_dpae.py
-
-clean-activity-logs-and-dpae:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/clean_activity_logs_dpae.py
-
-make-report:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/make_report.py
+#Main command which runs all scripts
 
 run-impact-retour-emploi-jobs:
-	make join_activity_logs_and_dpae && \
-	make clean_activity_logs_and_dpae && \
-	make make_report && \
+	make prepare-impact-retour-emploi-00 && \
+	make daily-json-activity-parser-01 && \
+	make join-activity-logs-and-dpae-02 && \
+	make clean-activity-logs-and-dpae-03 && \
+	make make-report-04 && \
 	echo "The new report has been built successfully."
+
+prepare-impact-retour-emploi-00:
+	export LBB_ENV=development && \
+		echo delete from logs_activity            | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from logs_activity_recherche  | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from logs_idpe_connect        | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from logs_activity_dpae_clean | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo "completed impact retour emploi run preparation."
+
+daily-json-activity-parser-01:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/daily_json_activity_parser.py
+
+join-activity-logs-and-dpae-02:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/join_activity_logs_dpae.py
+
+clean-activity-logs-and-dpae-03:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/clean_activity_logs_dpae.py
+
+# Runs every month
+make-report-04:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/make_report.py
 
 # Importer jobs
 # -------------
-
 run-importer-jobs:
 	make run-importer-job-00-prepare-all && \
 	make run-importer-job-01-check-etablissements && \
