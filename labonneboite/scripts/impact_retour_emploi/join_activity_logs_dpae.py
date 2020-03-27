@@ -9,6 +9,7 @@ from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 from labonneboite.scripts.impact_retour_emploi.settings import DEBUG
+from labonneboite.importer.models.computing import LogsActivityDPAEClean
 
 # Pandas utils functions
 # ----------------------
@@ -72,17 +73,17 @@ class JoinActivityLogsDPAE:
 
     def get_last_recorded_hiring_date(self):
 
-        # We want to check if the final table has already been created
-        table_name_act_dpae = 'logs_activity_dpae_clean'
-        query = f"SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{table_name_act_dpae}'"
+        # We want to check if there are already data  in the final table
+        table_name_act_dpae = LogsActivityDPAEClean.__tablename__
+        query = f"SELECT COUNT(*) FROM {table_name_act_dpae}"
         engine = import_util.create_sqlalchemy_engine()
 
-        # If the table is created
-        if engine.execute(query).fetchone()[0] == 1:
+        # If data in table
+        if engine.execute(query).fetchone()[0] > 0:
             query = f"select date_embauche from {table_name_act_dpae} order by date_embauche DESC LIMIT 1"
             row = engine.execute(query).fetchone()
             date_last_recorded_hiring = row[0].split()[0]
-        # Table not created
+        # Else no data
         else:
             # We set the date to the first activity log that has ever been created on LBB
             date_last_recorded_hiring = "2018-08-31"

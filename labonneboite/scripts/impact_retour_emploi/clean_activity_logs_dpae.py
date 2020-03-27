@@ -6,8 +6,9 @@ import pandas as pd
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
+from labonneboite.importer.models.computing import LogsActivityDPAEClean
 
-TABLE_NAME = 'logs_activity_dpae_clean'
+TABLE_NAME = LogsActivityDPAEClean.__tablename__
 
 # Pandas utils functions
 # ----------------------
@@ -103,17 +104,17 @@ class CleanActivityLogsDPAE:
 
         return most_recent_csv_file
 
-    def set_existing_act_dpae_table(self):
+    def set_existing_data_in_table(self):
         # We check if the table which stores the clean data about dpae and activities exist
-        self.existing_sql_table = self.check_existing_act_dpae_table()
+        self.existing_sql_table = self.check_existing_data_in_table()
 
-    def check_existing_act_dpae_table(self):
+    def check_existing_data_in_table(self):
         engine = import_util.create_sqlalchemy_engine()
 
-        query = f"SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{TABLE_NAME}'"
+        query = f"SELECT COUNT(*) FROM {TABLE_NAME}"
 
         existing_sql_table = False
-        if engine.execute(query).fetchone()[0] == 1:  # Table existe
+        if engine.execute(query).fetchone()[0] > 0:  # Table existe
             existing_sql_table = True
 
         engine.close()
@@ -123,7 +124,20 @@ class CleanActivityLogsDPAE:
     def get_old_activities_logs_saved(self):
         engine = import_util.create_sqlalchemy_engine()
 
-        query = f"select * from {TABLE_NAME}"
+        query = f"select idutilisateur_peconnect,\
+                         siret, date_activite,\
+                         date_embauche,\
+                         type_contrat,\
+                         duree_activite_cdd_mois,\
+                         duree_activite_cdd_jours,\
+                         diff_activite_embauche_jrs,\
+                         dc_lblprioritede,\
+                         tranche_age,\
+                         dc_prive_public,\
+                         duree_prise_en_charge,\
+                         dn_tailleetablissement,\
+                         code_postal from {TABLE_NAME}"
+
         df_dpae_act_existing = pd.read_sql_query(query, engine)
         df_dpae_act_existing['siret'] = df_dpae_act_existing.siret.astype(str)
         engine.close()
@@ -133,11 +147,13 @@ class CleanActivityLogsDPAE:
     def save_activity_logs(self):
 
         engine = import_util.create_sqlalchemy_engine()
+        self.df_dpae_act.reset_index(drop=True, inplace=True)
         self.df_dpae_act.to_sql(
             con=engine,
             name=TABLE_NAME,
             if_exists='replace',
-            index=False,
+            index=True,
+            index_label='id',
             chunksize=10000
         )
         engine.close()
@@ -184,7 +200,7 @@ class CleanActivityLogsDPAE:
         self.df_dpae_act['diff_activite_embauche_jrs'] = self.df_dpae_act.apply(lambda row: get_nbr_jours_act_emb(row), axis=1)
 
         # make readable the private/public field
-        self.df_dpae_act['dc_privepublic'] = self.df_dpae_act.apply(lambda row: get_priv_pub(row), axis=1)
+        self.df_dpae_act['dc_prive_public'] = self.df_dpae_act.apply(lambda row: get_priv_pub(row), axis=1)
 
         # make readable the hiring date
         self.df_dpae_act['date_embauche'] = self.df_dpae_act.apply(lambda row: good_format(row), axis=1)
@@ -212,7 +228,7 @@ class CleanActivityLogsDPAE:
                             'diff_activite_embauche_jrs',
                             'dc_lblprioritede',
                             'tranche_age',
-                            'dc_privepublic',
+                            'dc_prive_public',
                             'duree_prise_en_charge',
                             'dn_tailleetablissement',
                             'code_postal']
@@ -267,7 +283,7 @@ def run_main():
     clean_act_log_dpae.clean_csv_act_dpae_file()
 
     # Check if there are already couple siret/idpeconnect saved previously
-    clean_act_log_dpae.set_existing_act_dpae_table()
+    clean_act_log_dpae.set_existing_data_in_table()
 
     # If there were already couple siret/idpeconnect saved previously, we have to join them and remove the duplicates
     clean_act_log_dpae.join_old_data_with_new_ones()

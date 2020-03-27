@@ -160,3 +160,65 @@ class DpaeStatistics(CRUDMixin, Base):
             # if there was no import of dpae thus far, return the date for which
             # we don't want to import dpae before that date
             return importer_settings.OLDEST_POSSIBLE_DPAE_DATE
+
+# Tables needed for the "Impact sur le retour à l'emploi" project
+#-------------------------------------
+class LogsIDPEConnect(CRUDMixin, Base):
+    """
+    Used to store details about the idpeconnect which logged to lbb
+    """
+    __tablename__ = "logs_idpe_connect"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    idutilisateur_peconnect = Column(String)
+    dateheure = Column(DateTime, default=datetime.datetime.utcnow)
+
+class LogsActivity(CRUDMixin, Base):
+    """
+    Used to store details about the events on website LBB
+    """
+    __tablename__ = "logs_activity"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    dateheure = Column(DateTime, default=datetime.datetime.utcnow)
+    nom = Column(String)
+    idutilisateur_peconnect = Column(String)
+    siret = Column(String)
+    utm_medium = Column(String)
+    utm_source = Column(String)
+    utm_campaign = Column(String)
+
+class LogsActivityRecherche(CRUDMixin, Base):
+    """
+    Table which stores all queries made on the lbb website
+    """
+    __tablename__ = "logs_activity_recherche"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    dateheure = Column(DateTime, default=datetime.datetime.utcnow)
+    idutilisateur_peconnect = Column(String)
+    ville = Column(String)
+    code_postal = Column(String)
+    emploi = Column(String)
+
+class LogsActivityDPAEClean(CRUDMixin, Base):
+    """
+    Table which stores activity joined and dpae
+    """
+    __tablename__ = "logs_activity_dpae_clean"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    idutilisateur_peconnect = Column(String)
+    siret = Column(String)
+    date_activite = Column(DateTime, default=None)
+    date_embauche = Column(DateTime, default=None)
+    type_contrat = Column(String)
+    duree_activite_cdd_mois = Column(Integer)
+    duree_activite_cdd_jours = Column(Integer)
+    diff_activite_embauche_jrs = Column(Integer)
+    dc_lblprioritede = Column(String)
+    tranche_age = Column(String)
+    dc_prive_public = Column(String)
+    duree_prise_en_charge = Column(Integer)
+    dn_tailleetablissement = Column(Integer)
+    code_postal = Column(String)

@@ -6,43 +6,6 @@ from labonneboite.importer import util as import_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 
-
-def create_table_queries():
-    '''Init function which will create tables in the database if they don't exist
-    '''
-
-    # Create the table that will store into database the idpeconnect
-    create_table_query1 = 'CREATE TABLE IF NOT EXISTS `logs_idpe_connect` ( \
-                                `idutilisateur_peconnect` text, \
-                                `dateheure` text \
-                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
-
-    # Create the table that will store into database the activity logs
-    create_table_query2 = 'CREATE TABLE IF NOT EXISTS `logs_activity` ( \
-                            `dateheure` text,\
-                            `nom` text,\
-                            `idutilisateur_peconnect` text,\
-                            `siret` text,\
-                            `utm_medium` text,\
-                            `utm_source` text,\
-                            `utm_campaign` text\
-                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
-
-    # Create the table that will store into database the search queries (too many search queries)
-    create_table_query3 = 'CREATE TABLE IF NOT EXISTS `logs_activity_recherche` ( \
-                            `dateheure` text,\
-                            `idutilisateur_peconnect` text,\
-                            `ville` text,\
-                            `code_postal` text,\
-                            `emploi` text\
-                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
-
-    engine = import_util.create_sqlalchemy_engine()
-    engine.execute(create_table_query1)
-    engine.execute(create_table_query2)
-    engine.execute(create_table_query3)
-    engine.close()
-
 # Pandas utils functions
 # ----------------------
 # Functions used by pandas to create new fields based on other fields, in the dataframe
@@ -190,10 +153,10 @@ class ActivityLogParser:
             'activity-lbb-', '').replace('.json', '').replace('.', '-')
 
         date_in_db_query = 'select dateheure\
-                        from logs_activity\
-                        where date(dateheure) = "{}"\
-                        ORDER BY dateheure desc\
-                        LIMIT 1'.format(date)
+                            from logs_activity\
+                            where date(dateheure) = "{}"\
+                            ORDER BY dateheure desc\
+                            LIMIT 1'.format(date)
 
         engine = import_util.create_sqlalchemy_engine()
         row = engine.execute(date_in_db_query).fetchone()
@@ -204,7 +167,7 @@ class ActivityLogParser:
             file_needs_to_be_parsed = True
         else:
             # we check the last hour of the activity logs in database
-            hour_recorded_activity = int(row[0].split()[1].split(':')[0])
+            hour_recorded_activity = row[0].hour
             # if the most recent hour in the database for the logs is before 3am, the file needs to be parsed
             if hour_recorded_activity <= 3:
                 file_needs_to_be_parsed = True
@@ -360,7 +323,6 @@ class ActivityLogParser:
 
 
 def run_main():
-    create_table_queries()
     activity_log = ActivityLogParser()
     activity_log.get_json_logs_activity()
     activity_log.save_logs_activity()
