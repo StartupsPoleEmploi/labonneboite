@@ -52,16 +52,16 @@ def get_priv_pub(row):
     return secteur
 
 
-def good_format(row):
+def clean_date(row):
     return row['date_embauche'][:-2]
 
 
-def del_interrogation(row):
+def get_tranche_age(row):
     tranche_age = 'entre 26 et 50 ans' if row['tranche_age'] == 'de 26 ans ? 50 ans' else row['tranche_age']
     return tranche_age
 
 
-def del_cdd_incoherent(row):
+def delete_cdd_too_long(row):
     duree = row['duree_activite_cdd_jours']
     status = 'OK'
     if duree is not None:
@@ -203,13 +203,13 @@ class CleanActivityLogsDPAE:
         self.df_dpae_act['dc_prive_public'] = self.df_dpae_act.apply(lambda row: get_priv_pub(row), axis=1)
 
         # make readable the hiring date
-        self.df_dpae_act['date_embauche'] = self.df_dpae_act.apply(lambda row: good_format(row), axis=1)
+        self.df_dpae_act['date_embauche'] = self.df_dpae_act.apply(lambda row: clean_date(row), axis=1)
 
         # make readable the age of the employee
-        self.df_dpae_act['tranche_age'] = self.df_dpae_act.apply(lambda row: del_interrogation(row), axis=1)
+        self.df_dpae_act['tranche_age'] = self.df_dpae_act.apply(lambda row: get_tranche_age(row), axis=1)
 
         # create a field that will delete wrong functionnaly rows that contain CDD which last longer than 1200 days
-        self.df_dpae_act['status_duree'] = self.df_dpae_act.apply(lambda row: del_cdd_incoherent(row), axis=1)
+        self.df_dpae_act['status_duree'] = self.df_dpae_act.apply(lambda row: delete_cdd_too_long(row), axis=1)
         self.df_dpae_act = self.df_dpae_act[self.df_dpae_act.status_duree == 'OK']
         nb_rows = self.df_dpae_act.shape[0]
         logger.info(f"The .csv file - contrats which last too long to be legal has {nb_rows} rows")

@@ -1,13 +1,14 @@
 import numpy
 import pandas as pd
 
+from labonneboite.conf.common.settings_common import SPREADSHEET_IDS
 from labonneboite.importer import util as import_util
 from labonneboite.importer.jobs.common import logger
 from labonneboite.importer import settings as importer_settings
 from labonneboite.scripts.impact_retour_emploi.google_sheets_report import GoogleSheetReport, generate_google_sheet_service
-from labonneboite.scripts.impact_retour_emploi.settings import FIRST_SPREADSHEET_ID, SECOND_SPREADSHEET_ID, FIRST_SPREADSHEET_SHEET_INDEX, SECOND_SPREADSHEET_SHEET_INDEX
+from labonneboite.importer.models.computing import LogsActivityDPAEClean
 
-TABLE_NAME = 'logs_activity_dpae_clean'
+TABLE_NAME = LogsActivityDPAEClean.__tablename__
 
 
 class PrepareDataForGoogleSheetReport:
@@ -258,8 +259,8 @@ def run_main():
 
     first_sheet_report = GoogleSheetReport(
         service=service,
-        spreadsheet_id=FIRST_SPREADSHEET_ID,
-        sheet_index=FIRST_SPREADSHEET_SHEET_INDEX,
+        spreadsheet_id=SPREADSHEET_IDS[0],
+        sheet_index=0,
         start_cell='A2',
         values=values_to_insert_first_sheet
     )
@@ -274,8 +275,8 @@ def run_main():
 
     second_sheet_report = GoogleSheetReport(
         service=service,
-        spreadsheet_id=SECOND_SPREADSHEET_ID,
-        sheet_index=SECOND_SPREADSHEET_SHEET_INDEX,
+        spreadsheet_id=SPREADSHEET_IDS[1],
+        sheet_index=0,
         start_cell='B5',
         values=values_to_insert_second_sheet
     )
