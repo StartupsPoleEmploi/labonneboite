@@ -51,9 +51,9 @@ class JoinActivityLogsDPAE:
         return df_activity.astype(str)
 
     def set_most_recent_dpae_file(self):
-        # self.most_recent_dpae_file = self.get_most_recent_dpae_file()
-        # FIXME : Remove this comment to pass a specific dpae file for initialisation, we'll have to parse older DPAE files
-        self.most_recent_dpae_file = "lbb_xdpdpae_delta_201908102200.bz2"
+        self.most_recent_dpae_file = self.get_most_recent_dpae_file()
+        # FIXME : Remove this line to pass a specific dpae file for initialisation, we'll have to parse older DPAE files
+        # self.most_recent_dpae_file = "lbb_xdpdpae_delta_201908102200.bz2"
 
     def get_most_recent_dpae_file(self):
         dpae_paths = os.listdir(self.dpae_folder_path)
