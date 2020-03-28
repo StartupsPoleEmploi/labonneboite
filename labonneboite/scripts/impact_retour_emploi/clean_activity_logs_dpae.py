@@ -26,7 +26,7 @@ def get_type_contrat(row):
 def get_nb_mois(row):
     try:
         nb_mois = math.ceil(row['duree_activite_cdd_jours'] // 30)
-    except TypeError:
+    except (TypeError, ValueError) as e:
         nb_mois = None
 
     return nb_mois
