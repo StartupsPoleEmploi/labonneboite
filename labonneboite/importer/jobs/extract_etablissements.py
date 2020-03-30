@@ -1,9 +1,11 @@
 from urllib.parse import urlparse
 import pandas as pd
 import validators
+import os
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
+from labonneboite.importer.util import history_importer_job_decorator
 from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.importer.models.computing import RawOffice
@@ -15,6 +17,7 @@ from labonneboite.common.chunks import chunks
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 from labonneboite.common.load_data import load_effectif_labels
+
 
 # This list contains siret that must not be found in data,
 # we use it as a test : if one of those is found in data, we stop the importer
@@ -444,12 +447,12 @@ class EtablissementExtractJob(Job):
 
         return offices
 
-
+@history_importer_job_decorator(job_name=os.path.basename(__file__))
 def run():
     etablissement_filename = import_util.detect_runnable_file("etablissements")
     task = EtablissementExtractJob(etablissement_filename)
     task.run()
 
 if __name__ == "__main__":
-    run()
+    run
 

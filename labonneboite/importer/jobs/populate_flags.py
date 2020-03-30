@@ -4,6 +4,7 @@ from datetime import datetime
 from shutil import copyfile
 
 from labonneboite.importer import util as import_util
+from labonneboite.importer.util import history_importer_job_decorator
 from labonneboite.common.util import timeit
 from labonneboite.importer import settings
 from labonneboite.importer.jobs.common import logger
@@ -137,7 +138,7 @@ def make_link_file_to_new_archive(archive_path):
     except OSError:
         copyfile(archive_path, link_path)
 
-
+@history_importer_job_decorator(job_name=os.path.basename(__file__))
 def run_main():
     prepare_flags_junior_and_senior()
     prepare_flag_handicap()
@@ -145,7 +146,5 @@ def run_main():
     filename = dump()
     make_link_file_to_new_archive(filename)
 
-
-
 if __name__ == "__main__":
-    run_main()
+    run_main

@@ -1,10 +1,10 @@
 import sys
+import os
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import parse_dpae_line
+from labonneboite.importer.util import parse_dpae_line, history_importer_job_decorator
 from labonneboite.importer.jobs.common import logger
-
 
 def get_n_lines(path, n=5, ignore_header=True):
     results = []
@@ -57,14 +57,16 @@ def check_file(dpae_filename):
     check_complete_test(dpae_filename)
     logger.info("all tests passed with flying colors!")
 
+class NoDataException(Exception):
+    pass
 
+@history_importer_job_decorator(job_name=os.path.basename(__file__))
 def run():
     filename = import_util.detect_runnable_file("dpae")
     if filename:
         check_file(filename)
-        sys.exit(0)
     else:
-        sys.exit(-1)
+        raise NoDataException
 
 if __name__ == '__main__':
-    run()
+    run
