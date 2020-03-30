@@ -14,7 +14,7 @@ setup(
     packages=['labonneboite',],
     include_package_data=True,
     long_description=read('README.md'),
-    install_requires=[req for req in open('requirements_importer.txt')],
+    install_requires=[req for req in open('requirements.txt')],
     entry_points={
         'console_scripts': [
             'create_index = labonneboite.scripts.create_index:run',
