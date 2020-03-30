@@ -25,7 +25,7 @@
     <form class="form-vertical" action="{{ url_for('user.account_delete') }}" method="post">
       {{ form.hidden_tag() }}
       <div class="lbb-dropdown-wrapper">
-        <a class="btn btn-error" href="#">Supprimer définitivement mon compte ▴</a>
+        <a class="btn btn-error lbb-header-btn" href="#">Supprimer définitivement mon compte ▴</a>
         <div class="lbb-dropdown lbb-dropdown-top-right" style="display: none;">
           <p>
             <a class="btn btn-dark" href="{{ url_for('user.account') }}">Annuler</a>
