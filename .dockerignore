@@ -1,7 +1,5 @@
+# as a .gitignore, a .dockerignore file enables to tell docker to not take the 
+# files/folders that are listed below 
 
-# ignore .git and .cache folders
-.git
-.cache
+# ignore virtualenvs
 venv
-venv_importer
-venv_test
