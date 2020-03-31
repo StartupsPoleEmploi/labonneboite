@@ -22,6 +22,7 @@ from flask_wtf.csrf import CSRFProtect
 from labonneboite.common import hotjar
 from labonneboite.common import pro
 from labonneboite.common.database import db_session, engine  # This is how we talk to the database.
+from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
 from labonneboite.common import mailjet
@@ -404,4 +405,9 @@ def internal_error(error):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    if get_current_env() == ENV_DEVELOPMENT:
+        # Since March 2020, PE Connect no longer allows redirect_uri with port 5000, however port 8080 works.
+        # Additionally 'localhost' works whereas '0.0.0.0' no longer does.
+        app.run(host='localhost', port=8080)
+    else:
+        app.run(host='0.0.0.0')
