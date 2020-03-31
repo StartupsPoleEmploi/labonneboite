@@ -222,12 +222,8 @@ class LogsActivityDPAEClean(CRUDMixin, Base):
     duree_prise_en_charge = Column(Integer)
     dn_tailleetablissement = Column(Integer)
     code_postal = Column(Text)
-# FIXME : Make it work
-#class StatusJobExecution(Enum):
-#    START = "started"
-#    FAILED = "failed"
-#    DONE = "done"
 
+# FIXME : Replace with Enum if possible
 StatusJobExecution = {
     'start' : 0,
     'done' : 1,
@@ -243,19 +239,18 @@ class HistoryImporterJobs(CRUDMixin, Base):
     _id = Column('id', BigInteger, primary_key=True)
     start_date = Column(DateTime, default=datetime.datetime.utcnow)
     end_date = Column(DateTime, default=None)
-    job_name = Column(String())
+    job_name = Column(Text)
     status = Column(Integer)
-    exception = Column(String(), default=None)
-    trace_log = Column(String(), default=None)
+    exception = Column(Text, default=None)
+    trace_log = Column(Text, default=None)
 
     @classmethod
     def is_job_done(cls, job):
-        job_done = False
         most_recent_job_history = cls.query.filter_by(job_name=job).order_by(cls.start_date.desc()).first()
 
         #No rows matching to the job in the database
         if most_recent_job_history is None:
-            return job_done
+            return False
 
         # check if the most recent row in db for this job has start_date < 25 days
         # 25 days totally arbitrary, we run importer each month, and with this function, 
@@ -264,9 +259,10 @@ class HistoryImporterJobs(CRUDMixin, Base):
         most_recent_start_date = most_recent_job_history.start_date
         delta = now - most_recent_start_date
         if delta.days > 25:
-            return job_done
+            return False
 
-        if most_recent_job_history.status == StatusJobExecution['done']:
-            job_done = True
-
+<<<<<<< HEAD
         return job_done
+=======
+        return most_recent_job_history.status == StatusJobExecution['done']
+>>>>>>> Fix after review

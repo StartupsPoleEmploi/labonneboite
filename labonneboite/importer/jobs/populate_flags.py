@@ -138,7 +138,7 @@ def make_link_file_to_new_archive(archive_path):
     except OSError:
         copyfile(archive_path, link_path)
 
-@history_importer_job_decorator(job_name=os.path.basename(__file__))
+@history_importer_job_decorator(os.path.basename(__file__))
 def run_main():
     prepare_flags_junior_and_senior()
     prepare_flag_handicap()
@@ -147,4 +147,4 @@ def run_main():
     make_link_file_to_new_archive(filename)
 
 if __name__ == "__main__":
-    run_main
+    run_main()

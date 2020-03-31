@@ -447,12 +447,12 @@ class EtablissementExtractJob(Job):
 
         return offices
 
-@history_importer_job_decorator(job_name=os.path.basename(__file__))
+@history_importer_job_decorator(os.path.basename(__file__))
 def run():
     etablissement_filename = import_util.detect_runnable_file("etablissements")
     task = EtablissementExtractJob(etablissement_filename)
     task.run()
 
 if __name__ == "__main__":
-    run
+    run()
 

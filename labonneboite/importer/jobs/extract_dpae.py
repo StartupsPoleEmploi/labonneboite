@@ -195,7 +195,7 @@ class DpaeExtractJob(Job):
         logger.info("finished importing dpae...")
         return something_new
 
-@history_importer_job_decorator(job_name=os.path.basename(__file__))
+@history_importer_job_decorator(os.path.basename(__file__))
 def run_main():
     import logging
     logging.basicConfig(level=logging.DEBUG)
@@ -205,4 +205,4 @@ def run_main():
 
 
 if __name__ == '__main__':
-    run_main
+    run_main()

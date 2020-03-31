@@ -116,7 +116,7 @@ class ScoreComputingJob(Job):
         logger.info("compute_scores FINISHED")
         return results
 
-@history_importer_job_decorator(job_name=os.path.basename(__file__))
+@history_importer_job_decorator(os.path.basename(__file__))
 @timeit
 def run_main():
     import_util.clean_temporary_tables()
@@ -149,4 +149,4 @@ def run_main():
 
 
 if __name__ == "__main__":
-    run_main
+    run_main()

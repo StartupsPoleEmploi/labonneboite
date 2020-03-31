@@ -19,6 +19,7 @@ from labonneboite.common.database import DATABASE
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
 from labonneboite.common.database import db_session
+from labonneboite.common.env import get_current_env, ENV_TEST
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 
@@ -397,7 +398,7 @@ IMPORTER_JOBS_ORDER = [
     'populate_flags'
 ]
 
-def is_previous_job_done(job_name):
+def get_previous_job_info(job_name):
     index = IMPORTER_JOBS_ORDER.index(job_name)
     previous_job_name = None
     previous_job_done = False
@@ -407,50 +408,59 @@ def is_previous_job_done(job_name):
         previous_job_name = IMPORTER_JOBS_ORDER[index-1]
         previous_job_done = HistoryImporterJobs.is_job_done(job=previous_job_name)
 
-    return previous_job_done, previous_job_name
+    return {"name": previous_job_name, "is_completed": previous_job_done}
+
+def history_importer_job_decorator(script_name):
+    def decorator(function_to_execute):
+        def fonction_with_history():
+            # For the tests, we dont want it to test if a previous job has been run before
+            if get_current_env() != ENV_TEST:
+                job_name = script_name[:-3] # Get the job_name argument and remove the .py extension in the job name
+                info_previous_job = get_previous_job_info(job_name)
+                
+
+                # Check that the previous job is done to start this one
+                # If the previous job is not done, it will raise an exception
+                if info_previous_job['is_completed'] is False:
+                    print(f"The previous job '{info_previous_job['name']}' is not done ")
+                    raise PreviousJobNotDone
+                else:
+                    print(f"The previous job '{info_previous_job['name']}' is done. We can run this one ! ")
+
+                #Save in database the start of this job
+                start_date = datetime.now()
+                history = HistoryImporterJobs(
+                    start_date = start_date,
+                    end_date = None,
+                    job_name = job_name,
+                    status = StatusJobExecution['start'],
+                    exception = None,
+                    trace_log = None
+                )
+                db_session.add(history)
+                db_session.commit()
+
+                #If the job is done, we save it with done status
+                try:
+                    result = function_to_execute()
+                    history.end_date = datetime.now()
+                    history.status = StatusJobExecution['done']
+                    db_session.commit()
+                #Else if an error occured, we raise the exception, and save it in the DB with a failed status
+                except Exception as e:
+                    history.end_date = datetime.now()
+                    history.exception = type(e).__name__
+                    history.trace_log = traceback.format_exc()
+                    history.status = StatusJobExecution['error']
+                    db_session.commit()
+                    raise
+            else:
+                result = function_to_execute()
+
+            return result
+        return fonction_with_history
+    return decorator
+
 
 class PreviousJobNotDone(Exception):
     pass
-
-def history_importer_job_decorator(*args, **kwargs):
-    def wrapper_function(func):
-        #Check that the previous job is done to start this one
-        job_name = kwargs['job_name'][:-3] # Get the job_name argument and remove the .py extension in the job name
-        previous_job_done, previous_job_name = is_previous_job_done(job_name)
-        if previous_job_done is False:
-            print(f"The previous job '{previous_job_name}' is not done ")
-            raise PreviousJobNotDone
-        else:
-            print(f"The previous job '{previous_job_name}' is done")
-
-        #Save in database the start of this job
-        start_date = datetime.now()
-        history = HistoryImporterJobs(
-            start_date = start_date,
-            end_date = None,
-            job_name = job_name,
-            status = StatusJobExecution['start'],
-            exception = None,
-            trace_log = None
-        )
-        db_session.add(history)
-        db_session.commit()
-
-        #If the job is done, we save it with done status
-        try:
-            result = func()
-            history.end_date = datetime.now()
-            history.status = StatusJobExecution['done']
-            db_session.commit()
-        #Else if an error occured, we raise the exception, and save it in the DB with a failed status
-        except Exception as e:
-            history.end_date = datetime.now()
-            history.exception = type(e).__name__
-            history.trace_log = traceback.format_exc()
-            history.status = StatusJobExecution['error']
-            db_session.commit()
-            raise
-
-        return result
-
-    return wrapper_function
