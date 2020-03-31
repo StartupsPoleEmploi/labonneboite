@@ -16,6 +16,7 @@ from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common.database import DATABASE
 from labonneboite.common import encoding as encoding_util
+from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 
@@ -108,6 +109,15 @@ def is_processed(filename):
     in order to track whether its contents were imported or not.
     This function lets us know whether contents were imported or not.
     """
+    # To make run impact retour emploi project and importer project
+    # There are 2 DPAE files
+    #  lbb_xdpdpae_delta_201511102200.csv ==> Impact retour emploi
+    #  lbb_xdpdpae_delta_201611102200.csv ==> Importer
+    # When we are in local dev, we don't want the importer to use 
+    #  lbb_xdpdpae_delta_201511102200.csv, so we will say that it's an alreay processed file
+    if get_current_env() == ENV_DEVELOPMENT and filename == "lbb_xdpdpae_delta_201511102200.csv":
+        return True
+
     import_tasks = ImportTask.query.filter(
         ImportTask.filename == os.path.basename(filename),
         ImportTask.state >= ImportTask.FILE_READ).all()

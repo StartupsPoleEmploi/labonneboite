@@ -10,6 +10,7 @@ from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 from labonneboite.scripts.impact_retour_emploi.settings import DEBUG
 from labonneboite.importer.models.computing import LogsActivityDPAEClean
+from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
 
 # Pandas utils functions
 # ----------------------
@@ -63,6 +64,8 @@ class JoinActivityLogsDPAE:
 
         dpae_paths.sort()
         most_recent_dpae_file = dpae_paths[-1]
+        if get_current_env() == ENV_DEVELOPMENT:
+            most_recent_dpae_file = 'lbb_xdpdpae_delta_201511102200.csv'
 
         logger.info(f"the DPAE file which will be used is : {most_recent_dpae_file}")
 

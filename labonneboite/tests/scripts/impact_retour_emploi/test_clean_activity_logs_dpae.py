@@ -4,7 +4,7 @@ import pandas as pd
 
 from labonneboite.scripts.impact_retour_emploi.join_activity_logs_dpae import JoinActivityLogsDPAE
 from labonneboite.scripts.impact_retour_emploi.daily_json_activity_parser import ActivityLogParser
-from labonneboite.scripts.impact_retour_emploi.clean_activity_logs_dpae import CleanActivityLogsDPAE, get_type_contrat, get_nb_mois, get_nbr_jours_act_emb, get_priv_pub, good_format, del_interrogation, del_cdd_incoherent
+from labonneboite.scripts.impact_retour_emploi.clean_activity_logs_dpae import CleanActivityLogsDPAE, get_type_contrat, get_nb_mois, get_nbr_jours_act_emb, get_priv_pub, clean_date, get_tranche_age, delete_cdd_too_long
 
 
 class TestCleanActivityLogsDPAE(unittest.TestCase):
@@ -97,25 +97,25 @@ class TestCleanActivityLogsDPAE(unittest.TestCase):
         self.assertEqual(df.loc[2, 'secteur'], None)
         self.assertEqual(df.loc[3, 'secteur'], None)
 
-    def test_good_format(self):
+    def test_clean_date(self):
         data = [["2019-10-28 00:00:00.0"]]
         df = pd.DataFrame(data, columns=['date_embauche'])
-        df['date_embauche'] = df.apply(lambda row: good_format(row), axis=1)
+        df['date_embauche'] = df.apply(lambda row: clean_date(row), axis=1)
         self.assertEqual(df.loc[0, 'date_embauche'], '2019-10-28 00:00:00')
 
-    def test_del_interrogation(self):
+    def test_get_tranche_age(self):
         data = [["- de 26 ans"], ["+ de 20 ans"], ['de 26 ans ? 50 ans']]
         df = pd.DataFrame(data, columns=['tranche_age'])
-        df['tranche_age'] = df.apply(lambda row: del_interrogation(row), axis=1)
+        df['tranche_age'] = df.apply(lambda row: get_tranche_age(row), axis=1)
 
         self.assertEqual(df.loc[0, 'tranche_age'], '- de 26 ans')
         self.assertEqual(df.loc[1, 'tranche_age'], '+ de 20 ans')
         self.assertEqual(df.loc[2, 'tranche_age'], 'entre 26 et 50 ans')
 
-    def test_del_cdd_incoherent(self):
+    def test_delete_cdd_too_long(self):
         data = [[None], [10000], [1300], [36]]
         df = pd.DataFrame(data, columns=['duree_activite_cdd_jours'])
-        df['status_cdd'] = df.apply(lambda row: del_cdd_incoherent(row), axis=1)
+        df['status_cdd'] = df.apply(lambda row: delete_cdd_too_long(row), axis=1)
 
         self.assertEqual(df.loc[0, 'status_cdd'], 'OK')
         self.assertEqual(df.loc[1, 'status_cdd'], 'KO')

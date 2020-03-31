@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime
+from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime, Text
 from sqlalchemy import PrimaryKeyConstraint
 
 from labonneboite.importer import settings as importer_settings
@@ -170,7 +170,7 @@ class LogsIDPEConnect(CRUDMixin, Base):
     __tablename__ = "logs_idpe_connect"
 
     _id = Column('id', BigInteger, primary_key=True)
-    idutilisateur_peconnect = Column(String)
+    idutilisateur_peconnect = Column(Text)
     dateheure = Column(DateTime, default=datetime.datetime.utcnow)
 
 class LogsActivity(CRUDMixin, Base):
@@ -181,12 +181,12 @@ class LogsActivity(CRUDMixin, Base):
 
     _id = Column('id', BigInteger, primary_key=True)
     dateheure = Column(DateTime, default=datetime.datetime.utcnow)
-    nom = Column(String)
-    idutilisateur_peconnect = Column(String)
-    siret = Column(String)
-    utm_medium = Column(String)
-    utm_source = Column(String)
-    utm_campaign = Column(String)
+    nom = Column(Text)
+    idutilisateur_peconnect = Column(Text)
+    siret = Column(Text)
+    utm_medium = Column(Text)
+    utm_source = Column(Text)
+    utm_campaign = Column(Text)
 
 class LogsActivityRecherche(CRUDMixin, Base):
     """
@@ -196,10 +196,10 @@ class LogsActivityRecherche(CRUDMixin, Base):
 
     _id = Column('id', BigInteger, primary_key=True)
     dateheure = Column(DateTime, default=datetime.datetime.utcnow)
-    idutilisateur_peconnect = Column(String)
-    ville = Column(String)
-    code_postal = Column(String)
-    emploi = Column(String)
+    idutilisateur_peconnect = Column(Text)
+    ville = Column(Text)
+    code_postal = Column(Text)
+    emploi = Column(Text)
 
 class LogsActivityDPAEClean(CRUDMixin, Base):
     """
@@ -208,17 +208,17 @@ class LogsActivityDPAEClean(CRUDMixin, Base):
     __tablename__ = "logs_activity_dpae_clean"
 
     _id = Column('id', BigInteger, primary_key=True)
-    idutilisateur_peconnect = Column(String)
-    siret = Column(String)
+    idutilisateur_peconnect = Column(Text)
+    siret = Column(Text)
     date_activite = Column(DateTime, default=None)
     date_embauche = Column(DateTime, default=None)
-    type_contrat = Column(String)
+    type_contrat = Column(Text)
     duree_activite_cdd_mois = Column(Integer)
     duree_activite_cdd_jours = Column(Integer)
     diff_activite_embauche_jrs = Column(Integer)
-    dc_lblprioritede = Column(String)
-    tranche_age = Column(String)
-    dc_prive_public = Column(String)
+    dc_lblprioritede = Column(Text)
+    tranche_age = Column(Text)
+    dc_prive_public = Column(Text)
     duree_prise_en_charge = Column(Integer)
     dn_tailleetablissement = Column(Integer)
-    code_postal = Column(String)
+    code_postal = Column(Text)

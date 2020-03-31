@@ -1,7 +1,7 @@
 import numpy
 import pandas as pd
 
-from labonneboite.conf.common.settings_common import SPREADSHEET_IDS
+from labonneboite.conf import settings
 from labonneboite.importer import util as import_util
 from labonneboite.importer.jobs.common import logger
 from labonneboite.importer import settings as importer_settings
@@ -259,7 +259,7 @@ def run_main():
 
     first_sheet_report = GoogleSheetReport(
         service=service,
-        spreadsheet_id=SPREADSHEET_IDS[0],
+        spreadsheet_id=settings.SPREADSHEET_IDS[0],
         sheet_index=0,
         start_cell='A2',
         values=values_to_insert_first_sheet
@@ -275,7 +275,7 @@ def run_main():
 
     second_sheet_report = GoogleSheetReport(
         service=service,
-        spreadsheet_id=SPREADSHEET_IDS[1],
+        spreadsheet_id=settings.SPREADSHEET_IDS[1],
         sheet_index=0,
         start_cell='B5',
         values=values_to_insert_second_sheet

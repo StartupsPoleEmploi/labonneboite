@@ -254,6 +254,7 @@ prepare-impact-retour-emploi-00:
 		echo delete from logs_activity_recherche  | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from logs_idpe_connect        | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from logs_activity_dpae_clean | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		rm labonneboite/importer/data/act_dpae-*.csv && \
 		echo "completed impact retour emploi run preparation."
 
 daily-json-activity-parser-01:
@@ -294,7 +295,7 @@ run-importer-job-00-prepare-all: alembic-migrate
 		echo delete from etablissements_exportable | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
+		rm data/lbb_xdpdpae_delta_201611102200.csv data/lbb_etablissement_full_201612192300.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
 		cp ../tests/importer/data/lbb_xdpdpae_delta_201611102200.csv data/ && \
 		cp ../tests/importer/data/lbb_etablissement_full_201612192300.csv data/ && \
 		echo "completed importer run preparation."
