@@ -30,7 +30,8 @@ setup(
             'daily_json_activity_parser = labonneboite.scripts.impact_retour_emploi.daily_json_activity_parser:run_main',
             'join_activity_logs_dpae = labonneboite.scripts.impact_retour_emploi.join_activity_logs_dpae:run_main',
             'clean_activity_logs_dpae = labonneboite.scripts.impact_retour_emploi.clean_activity_logs_dpae:run_main',
-            'make_report = labonneboite.scripts.impact_retour_emploi.make_report:run_main'
+            'make_report = labonneboite.scripts.impact_retour_emploi.make_report:run_main',
+            'get_nb_clics_per_siret = labonneboite.scripts.data_scripts.get_nb_clic_per_siret_pse:run_main', 
         ],
     },
     classifiers=[

@@ -148,6 +148,9 @@ rebuild-city-codes:
 update_metiers_tension:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/update_metiers_tension.py
 
+get_nb_clic_per_siret:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/data_scripts/get_nb_clic_per_siret_pse.py
+
 # Load testing
 # ------------
 

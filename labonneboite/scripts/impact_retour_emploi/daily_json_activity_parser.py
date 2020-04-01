@@ -124,7 +124,7 @@ class ActivityLogParser:
     def __init__(self):
         self.json_logs_folder_path = importer_settings.INPUT_SOURCE_FOLDER
 
-    def get_json_logs_activity(self):
+    def get_json_logs_activity(self, need_all_files = False):
         '''Function which will return a list with all file names of activity logs that need to be parsed
         '''
         # Now we have a cron task which will copy json activity logs to /srv/lbb/data
@@ -133,9 +133,12 @@ class ActivityLogParser:
         json_logs_files_names = [i for i in os.listdir(self.json_logs_folder_path) if i.startswith('activity')]
 
         # list of all the json activities that need to be parsed (which aren't stored in database)
-        json_logs_files_names_to_parse = [
-            file_name for file_name in json_logs_files_names if self.needs_parse_json_activity_log(file_name)]
-
+        if need_all_files is False:
+            json_logs_files_names_to_parse = [
+                file_name for file_name in json_logs_files_names if self.needs_parse_json_activity_log(file_name)]
+        else:
+            json_logs_files_names_to_parse = json_logs_files_names
+            
         if not json_logs_files_names_to_parse: #if empty list
             logger.info("Did not find/need any data to parse")
             raise NoDataException
