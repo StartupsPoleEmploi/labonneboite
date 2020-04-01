@@ -6,7 +6,6 @@ import subprocess
 from datetime import datetime
 import logging
 from functools import lru_cache
-import urllib
 
 import MySQLdb as mdb
 from sqlalchemy import create_engine
@@ -57,6 +56,7 @@ def create_sqlalchemy_engine():
     engine = create_engine(connexion_url)
 
     return engine.connect()
+
 
 def check_for_updates(input_folder):
     """
