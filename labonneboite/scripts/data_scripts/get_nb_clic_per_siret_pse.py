@@ -1,7 +1,7 @@
 import os
 import json
-import pandas as pd
 from datetime import date
+import pandas as pd
 
 from labonneboite.scripts.impact_retour_emploi.daily_json_activity_parser import ActivityLogParser, siret
 
@@ -31,7 +31,7 @@ def get_clics_per_siret_main(activity_log_parser, file_path):
 
 # PSE school wanted to know how many 'clics' on companies have been made
 # We consider a "clic on a company" to be an event in : details, afficher-details, ajout-favory
-# So for these 3 categories, we group by siret and date the number of each event
+# So for these 3 categories, we group by siret and date the number of occurences for each event
 def get_clics_per_siret(activity_df):
     '''
     details = consulter une page entreprise
