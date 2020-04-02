@@ -9,7 +9,7 @@ from labonneboite.importer.jobs.common import logger
 from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
 
 
-def get_total_hirings_per_company():
+def get_total_hirings_per_office():
     engine = import_util.create_sqlalchemy_engine()
 
     query = "select\
@@ -90,7 +90,7 @@ def is_a_bonne_boite(row):
     return row['score'] >= row['seuil']
 
 
-def get_companies_are_bonne_boite(df_total_hirings):
+def get_offices_are_bonne_boite(df_total_hirings):
 
     df_total_hirings['total_score'] = df_total_hirings.apply(lambda row: get_score(row), axis=1)
     logger.info("Total score just has been computed for each row")
@@ -124,7 +124,7 @@ def get_companies_are_bonne_boite(df_total_hirings):
     df_total_hirings = df_total_hirings[cols_of_interest]
 
     df_total_hirings['seuil'] = df_total_hirings['rome'].apply(lambda x: scoring_util.get_score_minimum_for_rome(x))
-    logger.info("We compute the threshold, related to the score column. If a score is >= to this threshold, it's considered as a company")
+    logger.info("We compute the threshold, related to the score column. If a score is >= to this threshold, it's considered as a office")
 
     df_total_hirings['is a bonne boite ?'] = df_total_hirings.apply(lambda row: is_a_bonne_boite(row), axis=1)
     logger.info("We added a column to tell if its a bonne boite or no")
@@ -137,15 +137,15 @@ def get_nb_bonne_boite_per_rome(df):
 
 
 def run_main():
-    # Get the file for PSE that compute the nb of hirings per rome per company
-    df_total_hirings = get_total_hirings_per_company()
-    df_total_hirings = get_companies_are_bonne_boite(df_total_hirings)
+    # Get the file for PSE that compute the nb of hirings per rome per office
+    df_total_hirings = get_total_hirings_per_office()
+    df_total_hirings = get_offices_are_bonne_boite(df_total_hirings)
     date_today = str(datetime.date.today())
-    path = f'{importer_settings.INPUT_SOURCE_FOLDER}/nb_hirings_per_company-{date_today}.csv'
+    path = f'{importer_settings.INPUT_SOURCE_FOLDER}/nb_hirings_per_office-{date_today}.csv'
     df_total_hirings.to_csv(path)
     print(f"File has been saved in {path}")
 
-    # Get the file for PSE that compute the nb of hirings per rome per company
+    # Get the file for PSE that compute the nb of hirings per rome per office
     df_nb_bonne_boite_per_rome = get_nb_bonne_boite_per_rome(df_total_hirings)
     path = f'{importer_settings.INPUT_SOURCE_FOLDER}/nb_bonne_boite_per_rome-{date_today}.csv'
     df_nb_bonne_boite_per_rome.to_csv(path, header=['nb_bonnes_boites'])

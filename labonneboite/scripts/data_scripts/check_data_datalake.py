@@ -41,7 +41,7 @@ class DatalakeFile:
 
         return df
 
-# FUNCTIONS ETABLISSEMENTS
+# METHODS ETABLISSEMENTS
 # ----------------------
 
 # For etablissement file : Print the lines that are related to a siret
@@ -65,7 +65,7 @@ def run_function_etab():
     # extract_mail_clean(df)
     #filter_on_siret_etab(df, 44443604200261)
 
-# FUNCTIONS DPAE
+# METHODS DPAE
 # ----------------------
 
 def filter_on_siret_dpae(self, df, siret):
