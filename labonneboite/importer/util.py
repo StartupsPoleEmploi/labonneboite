@@ -412,13 +412,16 @@ def get_previous_job_info(job_name):
 def history_importer_job_decorator(script_name):
     def decorator(function_to_execute):
         def fonction_with_history():
-            # For the tests, we dont want it to test if a previous job has been run before
-            job_name = script_name[:-3] # Get the job_name argument and remove the .py extension in the job name
-            info_previous_job = get_previous_job_info(job_name)
-            
+            # Get the job_name argument and remove the .py extension in the job name
+            job = script_name.split('.')
+            if job[1] == 'py':
+                job_name = job[0]
+            else:
+                raise BadDecoratorUse
 
             # Check that the previous job is done to start this one
             # If the previous job is not done, it will raise an exception
+            info_previous_job = get_previous_job_info(job_name)
             if info_previous_job['is_completed'] is False:
                 print(f"The previous job '{info_previous_job['name']}' is not done ")
                 raise PreviousJobNotDone
@@ -457,6 +460,8 @@ def history_importer_job_decorator(script_name):
         return fonction_with_history
     return decorator
 
+class BadDecoratorUse(Exception):
+    pass
 
 class PreviousJobNotDone(Exception):
     pass
