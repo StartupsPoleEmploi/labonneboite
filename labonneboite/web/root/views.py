@@ -85,7 +85,7 @@ def cookbook():
 
 @rootBlueprint.route('/stats')
 def stats():
-    return redirect('https://datastudio.google.com/open/0B0PPPCjOppNIdVNXVVM0QnJHNEE')
+    return redirect('https://datastudio.google.com/reporting/274966af-0975-4d86-8c7b-23b4c7bca698')
 
 
 @rootBlueprint.route('/widget-esd')
