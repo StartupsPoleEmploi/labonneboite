@@ -8,7 +8,7 @@ import requests
 from labonneboite.conf import settings
 from labonneboite.common import crypto
 from labonneboite.common.models.office import Office
-from labonneboite.common.models.auth import TokenRefreshFailure
+from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 
 from .utils import jepostule_enabled
 
@@ -22,13 +22,11 @@ def application(siret):
     if not jepostule_enabled(current_user, company):
         abort(404)
 
-    try:
-        candidate_peam_access_token = current_user.get_peam_access_token()
-    except TokenRefreshFailure:
-        message = "Votre session PE Connect a expiré. Veuillez vous reconnecter."
-        flash(message, 'warning')
-        return_url = url_for('auth.logout')
-        return redirect(return_url)
+    refresh_token_result = attempt_to_refresh_peam_token()
+    if refresh_token_result["token_has_expired"]:
+        redirect(refresh_token_result["redirect_url"])
+    
+    candidate_peam_access_token = current_user.get_peam_access_token()
 
     encrypted_candidate_peam_access_token = crypto.encrypt(candidate_peam_access_token)
 

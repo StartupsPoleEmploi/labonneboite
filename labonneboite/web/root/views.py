@@ -8,7 +8,7 @@ from flask_login import current_user
 from labonneboite.common import activity
 from labonneboite.common import doorbell
 from labonneboite.common import pro
-from labonneboite.common.models.auth import TokenRefreshFailure
+from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.conf import settings
 from labonneboite.web.search.forms import CompanySearchForm
 from labonneboite.web.utils import fix_csrf_session
@@ -26,14 +26,11 @@ def home():
         utm_source=request.args.get('utm_source', ''),
         utm_campaign=request.args.get('utm_campaign', ''),
     )
-    if current_user.is_authenticated:
-        try:
-            current_user.refresh_peam_access_token_if_needed()
-        except TokenRefreshFailure:
-            message = "Votre session PE Connect a expiré. Veuillez vous reconnecter."
-            flash(message, 'warning')
-            return_url = url_for('auth.logout')
-            return redirect(return_url)
+
+    refresh_token_result = attempt_to_refresh_peam_token()
+    if refresh_token_result["token_has_expired"]:
+        redirect(refresh_token_result["redirect_url"])
+
     return render_template('home.html', form=CompanySearchForm())
 
 @rootBlueprint.route('/favicon.ico')
