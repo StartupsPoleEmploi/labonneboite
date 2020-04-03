@@ -261,8 +261,4 @@ class HistoryImporterJobs(CRUDMixin, Base):
         if delta.days > 25:
             return False
 
-<<<<<<< HEAD
-        return job_done
-=======
         return most_recent_job_history.status == StatusJobExecution['done']
->>>>>>> Fix after review
