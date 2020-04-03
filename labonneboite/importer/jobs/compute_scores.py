@@ -11,13 +11,11 @@ import sys
 import multiprocessing as mp
 from multiprocessing.dummy import Pool as ThreadPool
 from functools import partial
-import os
 
 from labonneboite.common import departements as dpt
 from labonneboite.importer import settings
 from labonneboite.importer import compute_score
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import history_importer_job_decorator
 from labonneboite.common.util import timeit
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
@@ -116,7 +114,7 @@ class ScoreComputingJob(Job):
         logger.info("compute_scores FINISHED")
         return results
 
-@history_importer_job_decorator(os.path.basename(__file__))
+
 @timeit
 def run_main():
     import_util.clean_temporary_tables()
