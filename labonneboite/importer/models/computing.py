@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime
+from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime, Text
 from sqlalchemy import PrimaryKeyConstraint
 
 from labonneboite.importer import settings as importer_settings
@@ -160,3 +160,65 @@ class DpaeStatistics(CRUDMixin, Base):
             # if there was no import of dpae thus far, return the date for which
             # we don't want to import dpae before that date
             return importer_settings.OLDEST_POSSIBLE_DPAE_DATE
+
+# Tables needed for the "Impact sur le retour à l'emploi" project
+#-------------------------------------
+class LogsIDPEConnect(CRUDMixin, Base):
+    """
+    Used to store details about the idpeconnect which logged to lbb
+    """
+    __tablename__ = "logs_idpe_connect"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    idutilisateur_peconnect = Column(Text)
+    dateheure = Column(DateTime, default=datetime.datetime.utcnow)
+
+class LogsActivity(CRUDMixin, Base):
+    """
+    Used to store details about the events on website LBB
+    """
+    __tablename__ = "logs_activity"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    dateheure = Column(DateTime, default=datetime.datetime.utcnow)
+    nom = Column(Text)
+    idutilisateur_peconnect = Column(Text)
+    siret = Column(Text)
+    utm_medium = Column(Text)
+    utm_source = Column(Text)
+    utm_campaign = Column(Text)
+
+class LogsActivityRecherche(CRUDMixin, Base):
+    """
+    Table which stores all queries made on the lbb website
+    """
+    __tablename__ = "logs_activity_recherche"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    dateheure = Column(DateTime, default=datetime.datetime.utcnow)
+    idutilisateur_peconnect = Column(Text)
+    ville = Column(Text)
+    code_postal = Column(Text)
+    emploi = Column(Text)
+
+class LogsActivityDPAEClean(CRUDMixin, Base):
+    """
+    Table which stores activity joined and dpae
+    """
+    __tablename__ = "logs_activity_dpae_clean"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    idutilisateur_peconnect = Column(Text)
+    siret = Column(Text)
+    date_activite = Column(DateTime, default=None)
+    date_embauche = Column(DateTime, default=None)
+    type_contrat = Column(Text)
+    duree_activite_cdd_mois = Column(Integer)
+    duree_activite_cdd_jours = Column(Integer)
+    diff_activite_embauche_jrs = Column(Integer)
+    dc_lblprioritede = Column(Text)
+    tranche_age = Column(Text)
+    dc_prive_public = Column(Text)
+    duree_prise_en_charge = Column(Integer)
+    dn_tailleetablissement = Column(Integer)
+    code_postal = Column(Text)

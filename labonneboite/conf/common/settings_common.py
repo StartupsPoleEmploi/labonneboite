@@ -209,6 +209,12 @@ IGN_CREDENTIALS = {
 }
 NAVITIA_API_TOKEN = 'setme'
 
+# Ids of spreadsheets for local dev
+SPREADSHEET_IDS = [
+    '197iFVyuCHiNNuA0ns99TCTS-v2CmBITg-e0ztEcwPMA',
+    '1Gl_rWicSmLwpXAPJLR3eRbs5nWJ1ROf6GSmUGmL2DEk'
+]
+
 if get_current_env() == ENV_BONAPARTE:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.bonaparte import *
@@ -218,4 +224,3 @@ elif get_current_env() == ENV_DEVELOPMENT:
 elif get_current_env() == ENV_TEST:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.test import *
-

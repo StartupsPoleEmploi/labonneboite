@@ -81,7 +81,15 @@ labonneboite/*.lprof
 # Importer #
 ############
 pickle_exports/*.pickle
-labonneboite/importer/data/*.csv
+labonneboite/importer/data/lbb_xdpdpae_delta_201611102200.csv
+labonneboite/importer/data/lbb_etablissement_full_201612192300.csv
+labonneboite/importer/data/backup_sql_logs_activity_dpae_clean.csv
+labonneboite/importer/data/act_dpae*.csv
+labonneboite/importer/data/clics_per_siret_pse*.csv
+labonneboite/importer/data/nb_bonne_boite_per_rome*.csv
+labonneboite/importer/data/nb_hirings_per_company*.csv
+labonneboite/tests/scripts/impact_retour_emploi/data/act_dpae*.csv
+
 labonneboite/importer/jenkins/*.jenkins
 labonneboite/importer/output/*.bz2
 labonneboite/importer/output/*.gz
@@ -105,5 +113,11 @@ labonneboite/web/static/gen/
 # pycharm IDE files
 .idea
 
+# vscode IDE file
+.vscode
+
 # test-generated files
 .noseids
+
+# virtualenv 
+venv/

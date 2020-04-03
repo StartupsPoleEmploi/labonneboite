@@ -8,6 +8,7 @@ import logging
 from functools import lru_cache
 
 import MySQLdb as mdb
+from sqlalchemy import create_engine
 
 from labonneboite.common import departements as dpt
 from labonneboite.common.util import timeit
@@ -15,6 +16,7 @@ from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.common.database import DATABASE
 from labonneboite.common import encoding as encoding_util
+from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 
@@ -38,6 +40,22 @@ def create_cursor():
     cur = con.cursor()
     return con, cur
 
+def create_sqlalchemy_engine():
+    user = DATABASE['USER']
+    host = DATABASE['HOST']
+    port = str(DATABASE['PORT'])
+    db_name = DATABASE['NAME']
+    db_password = DATABASE['PASSWORD']
+    
+    connexion_url = (f'mysql://{user}:{db_password}@{host}:{port}/{db_name}?charset=utf8mb4')
+
+    #connexion_url = ('mysql://'+DATABASE['USER']+':%s@'+\
+    #                DATABASE['HOST']+':'+str(DATABASE['PORT'])+\
+    #                '/'+DATABASE['NAME']) % urllib.parse.quote_plus(DATABASE['PASSWORD'])
+
+    engine = create_engine(connexion_url)
+
+    return engine.connect()
 
 def check_for_updates(input_folder):
     """
@@ -91,6 +109,15 @@ def is_processed(filename):
     in order to track whether its contents were imported or not.
     This function lets us know whether contents were imported or not.
     """
+    # To make run impact retour emploi project and importer project
+    # There are 2 DPAE files
+    #  lbb_xdpdpae_delta_201511102200.csv ==> Impact retour emploi
+    #  lbb_xdpdpae_delta_201611102200.csv ==> Importer
+    # When we are in local dev, we don't want the importer to use 
+    #  lbb_xdpdpae_delta_201511102200.csv, so we will say that it's an alreay processed file
+    if get_current_env() == ENV_DEVELOPMENT and filename == "lbb_xdpdpae_delta_201511102200.csv":
+        return True
+
     import_tasks = ImportTask.query.filter(
         ImportTask.filename == os.path.basename(filename),
         ImportTask.state >= ImportTask.FILE_READ).all()

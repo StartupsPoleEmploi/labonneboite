@@ -148,6 +148,9 @@ rebuild-city-codes:
 update_metiers_tension:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/update_metiers_tension.py
 
+get_nb_clic_per_siret:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/data_scripts/get_nb_clic_per_siret_pse.py
+
 # Load testing
 # ------------
 
@@ -201,6 +204,9 @@ test-integration: clear-data-test database-test populate-data-test
 test-selenium: clear-data-test database-test populate-data-test-selenium
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/selenium
 
+test-impact-retour-emploi:
+	LBB_ENV=test $(NOSETESTS) labonneboite/tests/scripts/impact_retour_emploi
+
 # Convenient reminder about how to run a specific test manually.
 test-custom:
 	@echo "To run a specific test, run for example:"
@@ -232,9 +238,43 @@ alembic-generate-migration:
 	@echo
 	@echo "    $$ alembic revision -m 'create account table'"
 
+# Impact retour à l'emploi
+# ------------------------
+
+#Main command which runs all scripts
+
+run-impact-retour-emploi-jobs:
+	make prepare-impact-retour-emploi-00 && \
+	make daily-json-activity-parser-01 && \
+	make join-activity-logs-and-dpae-02 && \
+	make clean-activity-logs-and-dpae-03 && \
+	make make-report-04 && \
+	echo "The new report has been built successfully."
+
+prepare-impact-retour-emploi-00:
+	export LBB_ENV=development && \
+		echo delete from logs_activity            | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from logs_activity_recherche  | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from logs_idpe_connect        | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from logs_activity_dpae_clean | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		rm labonneboite/importer/data/act_dpae-*.csv && \
+		echo "completed impact retour emploi run preparation."
+
+daily-json-activity-parser-01:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/daily_json_activity_parser.py
+
+join-activity-logs-and-dpae-02:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/join_activity_logs_dpae.py
+
+clean-activity-logs-and-dpae-03:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/clean_activity_logs_dpae.py
+
+# Runs every month
+make-report-04:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/make_report.py
+
 # Importer jobs
 # -------------
-
 run-importer-jobs:
 	make run-importer-job-00-prepare-all && \
 	make run-importer-job-01-check-etablissements && \
@@ -258,7 +298,7 @@ run-importer-job-00-prepare-all: alembic-migrate
 		echo delete from etablissements_exportable | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
 		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		rm data/*.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
+		rm data/lbb_xdpdpae_delta_201611102200.csv data/lbb_etablissement_full_201612192300.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
 		cp ../tests/importer/data/lbb_xdpdpae_delta_201611102200.csv data/ && \
 		cp ../tests/importer/data/lbb_etablissement_full_201612192300.csv data/ && \
 		echo "completed importer run preparation."

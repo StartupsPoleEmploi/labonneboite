@@ -16,10 +16,9 @@ from labonneboite.common.load_data import ROME_CODES
 from labonneboite.common.models import Office
 from labonneboite.common.fetcher import InvalidFetcherArgument
 from labonneboite.common.constants import Scope
-from labonneboite.conf import settings
 from labonneboite.common.util import get_enum_from_value
 from labonneboite.web.api import util as api_util
-from labonneboite.conf.common.settings_common import HEADCOUNT_VALUES
+from labonneboite.conf import settings
 from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter, FILTERS, DISTANCE_FILTER_MAX
 from flask.ext.cors import cross_origin
 
@@ -438,9 +437,9 @@ def create_hidden_market_fetcher(location, departements, request_args):
     # Headcount
     headcount = settings.HEADCOUNT_WHATEVER
     if 'headcount' in request_args:
-        headcount = HEADCOUNT_VALUES.get(request_args.get('headcount'))
+        headcount = settings.HEADCOUNT_VALUES.get(request_args.get('headcount'))
         if not headcount:
-            raise InvalidFetcherArgument('headcount. Possible values : %s' % ', '.join(sorted(HEADCOUNT_VALUES.keys())))
+            raise InvalidFetcherArgument('headcount. Possible values : %s' % ', '.join(sorted(settings.HEADCOUNT_VALUES.keys())))
     kwargs['headcount'] = headcount
 
     # Departments
