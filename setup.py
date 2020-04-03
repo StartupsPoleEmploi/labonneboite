@@ -32,6 +32,7 @@ setup(
             'clean_activity_logs_dpae = labonneboite.scripts.impact_retour_emploi.clean_activity_logs_dpae:run_main',
             'make_report = labonneboite.scripts.impact_retour_emploi.make_report:run_main',
             'get_nb_clics_per_siret = labonneboite.scripts.data_scripts.get_nb_clic_per_siret_pse:run_main',
+            'get_total_lbb_offices_by_rome = labonneboite.scripts.data_scripts.get_nb_bonne_boite_per_rome_company.get_bonne_boite_company_rome:run_main',
         ],
     },
     classifiers=[

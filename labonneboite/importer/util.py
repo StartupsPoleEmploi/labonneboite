@@ -57,6 +57,7 @@ def create_sqlalchemy_engine():
 
     return engine.connect()
 
+
 def check_for_updates(input_folder):
     """
     do we have a new file we haven't processed yet in the input folder?

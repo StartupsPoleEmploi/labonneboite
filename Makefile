@@ -150,6 +150,9 @@ update_metiers_tension:
 
 get_nb_clic_per_siret:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/data_scripts/get_nb_clic_per_siret_pse.py
+	
+get-total-lbb-offices-by-rome:
+	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/data_scripts/get_nb_bonne_boite_per_rome_company/get_bonne_boite_company_rome.py
 
 # Load testing
 # ------------
