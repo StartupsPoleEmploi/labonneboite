@@ -9,7 +9,6 @@ https://adresse.data.gouv.fr/faq
 """
 from multiprocessing import Manager, Pool
 import io
-import os
 import csv
 import time
 import requests
@@ -21,7 +20,6 @@ from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_city_codes
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import history_importer_job_decorator
 from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import Geolocation
 from labonneboite.importer.jobs.base import Job
@@ -390,7 +388,7 @@ class GeocodeJob(Job):
         logger.info("validated coordinates !")
         logger.info("completed geocoding task.")
 
-@history_importer_job_decorator(os.path.basename(__file__))
+
 def run_main():
     geocode_task = GeocodeJob()
     geocode_task.run()
