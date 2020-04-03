@@ -24,12 +24,8 @@ def application(siret):
 
     refresh_token_result = attempt_to_refresh_peam_token()
     if refresh_token_result["token_has_expired"]:
-        redirect(refresh_token_result["redirect_url"])
+        return redirect(refresh_token_result["redirect_url"])
     
-    candidate_peam_access_token = current_user.get_peam_access_token()
-
-    encrypted_candidate_peam_access_token = crypto.encrypt(candidate_peam_access_token)
-
     data = {
         'candidate_first_name': current_user.first_name,
         'candidate_last_name': current_user.last_name,
@@ -44,6 +40,8 @@ def application(siret):
     }
 
     if settings.FORWARD_PEAM_TOKEN_TO_JP_FOR_AMI:
+        candidate_peam_access_token = current_user.get_peam_access_token()
+        encrypted_candidate_peam_access_token = crypto.encrypt(candidate_peam_access_token)
         data['candidate_peam_access_token'] = encrypted_candidate_peam_access_token
 
     token, timestamp = get_token(**data)

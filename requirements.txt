@@ -103,7 +103,7 @@ scikit-learn==0.16.1
 scipy==1.2.1
 selenium==3.141.0
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via astroid, cryptography, flask-cors, html5lib, pip-tools, prompt-toolkit, pyjwkest, pylint, python-dateutil, social-auth-app-flask, social-auth-app-flask-sqlalchemy, social-auth-core, social-auth-storage-sqlalchemy, sqlalchemy-utils, traitlets, validators, xhtml2pdf
+six==1.10.0               # via astroid, cryptography, flask-cors, google-api-python-client, google-auth, html5lib, pip-tools, prompt-toolkit, pyjwkest, pylint, python-dateutil, social-auth-app-flask, social-auth-app-flask-sqlalchemy, social-auth-core, social-auth-storage-sqlalchemy, sqlalchemy-utils, traitlets, validators, xhtml2pdf
 social-auth-app-flask-sqlalchemy==1.0.1
 social-auth-app-flask==1.0.0
 social-auth-core[openidconnect]==1.4.0

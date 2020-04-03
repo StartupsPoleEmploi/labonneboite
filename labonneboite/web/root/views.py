@@ -29,7 +29,7 @@ def home():
 
     refresh_token_result = attempt_to_refresh_peam_token()
     if refresh_token_result["token_has_expired"]:
-        redirect(refresh_token_result["redirect_url"])
+        return redirect(refresh_token_result["redirect_url"])
 
     return render_template('home.html', form=CompanySearchForm())
 

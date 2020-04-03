@@ -38,10 +38,10 @@ def account():
     """
     fix_csrf_session()
     user_social_auth = get_user_social_auth(current_user.id)
-    context = {
-        'token': user_social_auth.extra_data['access_token'],
-        'token_age_in_seconds': int(time.time()) - user_social_auth.extra_data['auth_time'],
-    }
+    context = {}
+    if user_social_auth:
+        context['token'] = user_social_auth.extra_data['access_token']
+        context['token_age_in_seconds'] = int(time.time()) - user_social_auth.extra_data['auth_time'],
     return render_template('user/account.html', **context)
 
 

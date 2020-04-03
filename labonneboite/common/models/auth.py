@@ -63,11 +63,12 @@ class User(CRUDMixin, UserMixin, Base):
     def get_peam_access_token(self):
         self.refresh_peam_access_token_if_needed()
         user_social_auth = get_user_social_auth(self.id)
-        peam_access_token = user_social_auth.extra_data['access_token']
-        return peam_access_token
+        return user_social_auth.extra_data['access_token']
 
     def refresh_peam_access_token_if_needed(self):
         user_social_auth = get_user_social_auth(self.id)
+        if not user_social_auth:
+            return
         # FTR there is no extra_data['expires'] nor extra_data['expires_in'] :-(
         token_age_in_seconds = int(time.time()) - user_social_auth.extra_data['auth_time']
         # The PEAMU token is valid for 6 months supposedly.

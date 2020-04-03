@@ -17,10 +17,10 @@
       <li><a href="{{ url_for('user.favorites_list') }}">Mes favoris</a></li>
       {% if user.is_admin %}
         <li>
-          PEAMU Token : {{ token }}
+          [utilisateurs admins uniquement] PEAMU Token : {{ token }}
         </li>
         <li>
-          PEAMU Token age in seconds : {{ token_age_in_seconds }}
+          [utilisateurs admins uniquement] PEAMU Token age in seconds : {{ token_age_in_seconds }}
         </li>
       {% endif %}
     </ul>
