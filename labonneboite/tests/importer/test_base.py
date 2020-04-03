@@ -16,7 +16,7 @@ class DatabaseTest(unittest.TestCase):
 
         # pylint:disable=unused-variable
         # Imports are used by SQLAlchemy to know what tables to create.
-        from labonneboite.importer.models.computing import Hiring, DpaeStatistics, ImportTask
+        from labonneboite.importer.models.computing import Hiring, DpaeStatistics, ImportTask, HistoryImporterJobs
         # pylint:enable=unused-variable
 
         db_session.remove()

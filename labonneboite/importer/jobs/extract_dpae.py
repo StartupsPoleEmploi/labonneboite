@@ -11,11 +11,13 @@ import time
 from datetime import datetime
 import sys
 from sqlalchemy.exc import OperationalError
+import os
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
+from labonneboite.importer.util import history_importer_job_decorator
 from labonneboite.common.util import timeit
-from labonneboite.importer.util import parse_dpae_line, InvalidRowException
+from labonneboite.importer.util import parse_dpae_line, InvalidRowException, history_importer_job_decorator
 from labonneboite.importer.models.computing import DpaeStatistics, ImportTask, Hiring
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
@@ -193,6 +195,7 @@ class DpaeExtractJob(Job):
         logger.info("finished importing dpae...")
         return something_new
 
+@history_importer_job_decorator(os.path.basename(__file__))
 def run_main():
     import logging
     logging.basicConfig(level=logging.DEBUG)
