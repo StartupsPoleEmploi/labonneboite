@@ -215,6 +215,19 @@ SPREADSHEET_IDS = [
     '1Gl_rWicSmLwpXAPJLR3eRbs5nWJ1ROf6GSmUGmL2DEk'
 ]
 
+# Encryption of user PEAM-U token between LBB and JePostule.
+# Dummy key used everywhere but in production.
+CRYPTOGRAPHY_SECRET_KEY = b'gj6ouKvodK6PCAz4mt5tdTMUnVPHFFYWjh_P-O-IMqU='
+
+# The only case where you don't want this is when using
+# PE Connect on the staging ESD, where we do not have this
+# QOS privilege.
+ENABLE_PEAM_HIGHER_QOS = True
+
+REFRESH_PEAM_TOKEN_NO_MORE_THAN_ONCE_EVERY_SECONDS = 2 * 3600
+
+FORWARD_PEAM_TOKEN_TO_JP_FOR_AMI = False
+
 if get_current_env() == ENV_BONAPARTE:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.bonaparte import *

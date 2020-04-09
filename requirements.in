@@ -79,6 +79,7 @@ requests
 validators
 geopy
 mailjet_rest
+cryptography
 
 # Deployment and production
 uWSGI

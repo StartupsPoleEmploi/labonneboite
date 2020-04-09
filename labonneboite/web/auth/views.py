@@ -5,8 +5,10 @@ from urllib.parse import urlencode
 
 from flask import Blueprint, flash, redirect, session, url_for, render_template, request
 from flask_login import current_user, logout_user
+from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common import activity
+from labonneboite.common.database import db_session
 from labonneboite.common.models import get_user_social_auth
 from labonneboite.conf import settings
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
@@ -38,8 +40,15 @@ def logout(user_social_auth=None):
 
     logged_with_peam = session.get(
         'social_auth_last_login_backend') == PEAMOpenIdConnect.name
-    if logged_with_peam and not user_social_auth:
-        user_social_auth = get_user_social_auth(current_user.id)
+    if logged_with_peam:
+        if not user_social_auth:
+            user_social_auth = get_user_social_auth(current_user.id)
+        if user_social_auth:
+            id_token = user_social_auth.extra_data['id_token']
+
+    # Force delete PEAMU token.
+    db_session.query(UserSocialAuth).filter_by(user_id=current_user.id).delete()
+    db_session.commit()
 
     # Log the user out and destroy the LBB session.
     activity.log('deconnexion')
@@ -56,7 +65,7 @@ def logout(user_social_auth=None):
     # Log the user out from PEAM and destroy the PEAM session.
     if logged_with_peam and user_social_auth:
         params = {
-            'id_token_hint': user_social_auth.extra_data['id_token'],
+            'id_token_hint': id_token,
             'redirect_uri': url_for('auth.logout_from_peam_callback', _external=True),
         }
         peam_logout_url = '%s/compte/deconnexion?%s' % (

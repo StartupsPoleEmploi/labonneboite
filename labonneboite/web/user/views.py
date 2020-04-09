@@ -1,4 +1,4 @@
-
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -37,7 +37,12 @@ def account():
     The current user account main page.
     """
     fix_csrf_session()
-    return render_template('user/account.html')
+    user_social_auth = get_user_social_auth(current_user.id)
+    context = {}
+    if user_social_auth:
+        context['token'] = user_social_auth.extra_data['access_token']
+        context['token_age_in_seconds'] = int(time.time()) - user_social_auth.extra_data['auth_time'],
+    return render_template('user/account.html', **context)
 
 
 @userBlueprint.route('/account/delete', methods=['GET', 'POST'])

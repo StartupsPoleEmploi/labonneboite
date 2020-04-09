@@ -1,16 +1,17 @@
 import requests
 
 
-from flask import Blueprint, current_app
+from flask import Blueprint, current_app, flash, url_for
 from flask import abort, send_from_directory, redirect, render_template, request
+from flask_login import current_user
 
 from labonneboite.common import activity
 from labonneboite.common import doorbell
 from labonneboite.common import pro
+from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.conf import settings
 from labonneboite.web.search.forms import CompanySearchForm
 from labonneboite.web.utils import fix_csrf_session
-
 
 rootBlueprint = Blueprint('root', __name__)
 
@@ -25,6 +26,11 @@ def home():
         utm_source=request.args.get('utm_source', ''),
         utm_campaign=request.args.get('utm_campaign', ''),
     )
+
+    refresh_token_result = attempt_to_refresh_peam_token()
+    if refresh_token_result["token_has_expired"]:
+        return redirect(refresh_token_result["redirect_url"])
+
     return render_template('home.html', form=CompanySearchForm())
 
 @rootBlueprint.route('/favicon.ico')

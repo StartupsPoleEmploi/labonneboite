@@ -15,6 +15,14 @@
       <li>Nom: {{ user.last_name }}</li>
       {% if user.email %}<li>Email: {{ user.email | lower }}</li>{% endif %}
       <li><a href="{{ url_for('user.favorites_list') }}">Mes favoris</a></li>
+      {% if user.is_admin %}
+        <li>
+          [utilisateurs admins uniquement] PEAMU Token : {{ token }}
+        </li>
+        <li>
+          [utilisateurs admins uniquement] PEAMU Token age in seconds : {{ token_age_in_seconds }}
+        </li>
+      {% endif %}
     </ul>
 
     <hr>
