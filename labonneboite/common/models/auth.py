@@ -63,7 +63,10 @@ class User(CRUDMixin, UserMixin, Base):
     def get_peam_access_token(self):
         self.refresh_peam_access_token_if_needed()
         user_social_auth = get_user_social_auth(self.id)
-        return user_social_auth.extra_data['access_token']
+        if user_social_auth:
+            return user_social_auth.extra_data['access_token']
+        else:
+            return None
 
     def refresh_peam_access_token_if_needed(self):
         user_social_auth = get_user_social_auth(self.id)

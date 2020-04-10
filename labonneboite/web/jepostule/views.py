@@ -41,8 +41,9 @@ def application(siret):
 
     if settings.FORWARD_PEAM_TOKEN_TO_JP_FOR_AMI:
         candidate_peam_access_token = current_user.get_peam_access_token()
-        encrypted_candidate_peam_access_token = crypto.encrypt(candidate_peam_access_token)
-        data['candidate_peam_access_token'] = encrypted_candidate_peam_access_token
+        if candidate_peam_access_token:
+            encrypted_candidate_peam_access_token = crypto.encrypt(candidate_peam_access_token)
+            data['candidate_peam_access_token'] = encrypted_candidate_peam_access_token
 
     token, timestamp = get_token(**data)
     data['token'] = token
