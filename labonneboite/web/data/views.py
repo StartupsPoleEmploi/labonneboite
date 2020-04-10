@@ -113,7 +113,7 @@ def sirets_for_email():
     form = EmailForm(email=email)
 
     if email and form.validate():
-        offices = Office.query.filter(Office.email == email).all()
+        offices = Office.query.filter(Office.email == email, Office.score > 0).all()
 
         if offices:
             for office in offices:
