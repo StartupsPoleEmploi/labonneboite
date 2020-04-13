@@ -33,8 +33,7 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         if settings.ENABLE_PEAM_HIGHER_QOS:
             # enable higher quota of req/s to avoid 429 HTTP errors
             scope += ['qos_silver_peconnect-individuv1']
-        if settings.FORWARD_PEAM_TOKEN_TO_JP_FOR_AMI:
-            scope += ['api_candidaturespontaneev1', 'ami', 'amiW']
+        scope += ['api_candidaturespontaneev1', 'ami', 'amiW']
         return scope
 
     def request_access_token(self, *args, **kwargs):
