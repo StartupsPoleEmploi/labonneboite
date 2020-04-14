@@ -58,12 +58,21 @@ def extract_mail_clean_etab(self, df):
     df = df.drop_duplicates()
     df.to_csv('/srv/lbb/data/mail_clean_entreprises.csv')
 
+def extract_siret_lbb_supprimes(df):
+    df_siret = pd.read_csv('siret_supprimes.csv', sep=';')
+    siret_liste = df_siret.SIRET.tolist()
+    df = df[df.dc_siretetablissement.isin(siret_liste)]
+    df = df[['dc_siretetablissement', 'dc_raisonsocialeentreprise','dn_effectifreelentreprise','dc_nafrev2_id','dc_numerodansvoie', 'dc_libnomrue', 'dc_commune_etablissement_id', 'dc_codepostal']]
+    df = df.drop_duplicates(subset=['dc_siretetablissement'])
+    df.to_csv('/srv/lbb/data/infos_siret_supprimes_10_04_2020.csv')
+
 # Main function for établissement
 def run_function_etab():
     etab_data = DatalakeFile('etab')
     df = etab_data.read_file()
     # extract_mail_clean(df)
-    #filter_on_siret_etab(df, 44443604200261)
+    # filter_on_siret_etab(df, 44443604200261)
+    extract_siret_lbb_supprimes(df)
 
 # METHODS DPAE
 # ----------------------
