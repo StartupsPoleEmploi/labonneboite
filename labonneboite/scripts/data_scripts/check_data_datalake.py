@@ -47,12 +47,13 @@ class DatalakeFile:
 # For etablissement file : Print the lines that are related to a siret
 # Example : Check some fields that seem to contain wrong values for a specific siret
 # Used it when we wantee to check the effectif field for this specific siret
-def filter_on_siret_etab(self, df, siret):
+def filter_on_siret_etab(df, siret):
     df_filtre = df[df.dc_siretetablissement == siret]
     print(df_filtre)
+    import ipdb;ipdb.set_trace()
 
 # Here, we needed to extract all mail cleans that datalake sent us via the etablissement file
-def extract_mail_clean_etab(self, df):
+def extract_mail_clean_etab(df):
     df = df[['dc_siretetablissement', 'dc_raisonsocialeentreprise', 'dc_emailcorrespondant']]
     df = df.dropna(subset=['dc_emailcorrespondant'])
     df = df.drop_duplicates()
@@ -77,7 +78,7 @@ def run_function_etab():
 # METHODS DPAE
 # ----------------------
 
-def filter_on_siret_dpae(self, df, siret):
+def filter_on_siret_dpae(df, siret):
     df_filtre = df[df.kc_siret == siret]
     print(df_filtre)
 
