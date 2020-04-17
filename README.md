@@ -68,6 +68,7 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 - [Single ROME versus multi-ROME search](#single-rome-vs-multi-rome-search)
 - [How to contribute](#how-to-contribute)
 - [Je Postule](#je-postule)
+- [Sending job applications to PE internal service AMI (API CSP)](/labonneboite/doc/README-ami-api-csp.md)
 - [Database migration system](/labonneboite/alembic)
 - [Search using isochrone data](/labonneboite/common/maps)
 - [User Authentication system / PE Connect / PEAM / SSO](/labonneboite/web/auth)
@@ -422,4 +423,3 @@ In order to link your local instance of labonneboite with a local instance of je
 ```
 JEPOSTULE_QUOTA = 0 # put 1 if you want to enable it.
 ```
-
