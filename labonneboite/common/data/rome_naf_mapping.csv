@@ -171,7 +171,6 @@ A1501,Aide aux soins animaux,9499Z,Autres organisations fonctionnant par adhési
 A1502,Podologie animale,0162Z,Activités de soutien à la production animale,34
 A1502,Podologie animale,9329Z,Autres activités récréatives et de loisirs,11
 A1503,Toilettage des animaux,4776Z,"Commerce de détail de fleurs, plantes, graines, engrais, animaux de compagnie et aliments pour ces animaux en magasin spécialisé",49
-A1503,Toilettage des animaux,7010Z,Activités des sièges sociaux,13
 A1503,Toilettage des animaux,9609Z,Autres services personnels n.c.a.,125
 A1504,Santé animale,7500Z,Activités vétérinaires,1429
 A1504,Santé animale,8411Z,Administration publique générale,47
@@ -2321,7 +2320,6 @@ J1201,Biologie médicale,7022Z,Conseil pour les affaires et autres conseils de g
 J1201,Biologie médicale,8610Z,Activités hospitalières,21
 J1201,Biologie médicale,8690B,Laboratoires d'analyses médicales,63
 J1202,Pharmacie,4773Z,Commerce de détail de produits pharmaceutiques en magasin spécialisé,6066
-J1202,Pharmacie,7010Z,Activités des sièges sociaux,129
 J1202,Pharmacie,8610Z,Activités hospitalières,453
 J1301,Personnel polyvalent des services hospitaliers,8610Z,Activités hospitalières,14644
 J1301,Personnel polyvalent des services hospitaliers,8690D,Activités des infirmiers et des sages-femmes,393
@@ -2349,11 +2347,9 @@ J1306,Imagerie médicale,8610Z,Activités hospitalières,572
 J1306,Imagerie médicale,8621Z,Activité des médecins généralistes,183
 J1306,Imagerie médicale,8622A,Activités de radiodiagnostic et de radiothérapie,185
 J1307,Préparation en pharmacie,4773Z,Commerce de détail de produits pharmaceutiques en magasin spécialisé,7127
-J1307,Préparation en pharmacie,7010Z,Activités des sièges sociaux,187
 J1307,Préparation en pharmacie,8610Z,Activités hospitalières,1628
 J1401,Audioprothèses,4774Z,Commerce de détail d'articles médicaux et orthopédiques en magasin spécialisé,55
 J1401,Audioprothèses,4778A,Commerces de détail d'optique,25
-J1401,Audioprothèses,7010Z,Activités des sièges sociaux,6
 J1402,Diététique,4729Z,Autres commerces de détail alimentaires en magasin spécialisé,360
 J1402,Diététique,5629A,Restauration collective sous contrat,139
 J1402,Diététique,8610Z,Activités hospitalières,625
@@ -2376,7 +2372,6 @@ J1407,Orthoptique,8621Z,Activité des médecins généralistes,30
 J1407,Orthoptique,8622C,Autres activités des médecins spécialistes,54
 J1408,Ostéopathie et chiropraxie,8559A,Formation continue d'adultes,5
 J1410,Prothèses dentaires,3250A,Fabrication de matériel médico-chirurgical et dentaire,1042
-J1410,Prothèses dentaires,7010Z,Activités des sièges sociaux,24
 J1410,Prothèses dentaires,8623Z,Pratique dentaire,73
 J1411,Prothèses et orthèses,3250A,Fabrication de matériel médico-chirurgical et dentaire,98
 J1411,Prothèses et orthèses,4774Z,Commerce de détail d'articles médicaux et orthopédiques en magasin spécialisé,58
