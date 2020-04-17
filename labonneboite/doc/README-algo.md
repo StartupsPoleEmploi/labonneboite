@@ -49,3 +49,25 @@ A simple linear transformation is used for this conversion, see [this code](http
 
 Historically stars were between 1.0 and 5.0, matching scores between 20 and 100, however as lower stars may give a bad unjustified feeling about the company, we decided to artificially raise the
 stars to be guaranteed to be between 2.5 and 5.0.
+
+## Importer jobs
+
+The importer needs two files to compute hirings for companies :
+- Offices file which contains informations about all french offices
+- Hirings file which contains informations about all hirings made by french companies
+
+The importer is made up of several jobs :
+
+- [Job 1](https://github.com/StartupsPoleEmploi/labonneboite/blob/master/labonneboite/importer/jobs/check_etablissements.py) and [Job 2](https://github.com/StartupsPoleEmploi/labonneboite/blob/master/labonneboite/importer/jobs/extract_etablissements.py) : These jobs have to check that the offices file is available, and will parse the file to insert into database. 
+  **Note** : After each execution of the importer, the offices table is totally rebuilt from scratch.
+
+- [Job 3](https://github.com/StartupsPoleEmploi/labonneboite/blob/master/labonneboite/importer/jobs/check_dpae.py) and [Job 4](https://github.com/StartupsPoleEmploi/labonneboite/blob/master/labonneboite/importer/jobs/extract_dpae.py) : These jobs have to check that the hirings file is available, and will parse the file to insert into database. 
+  **Note** : After each execution of the importer, the hirings table is **NOT** totally rebuilt from scratch. We have to keep hirings year after year for the algorithm to work.
+
+- [Job 5](https://github.com/StartupsPoleEmploi/labonneboite/blob/master/labonneboite/importer/jobs/compute_scores.py) is the job which will compute scores for each company. The behaviour of this job and how it computes scores is explained in the sections above.
+
+- [Job 6](https://github.com/StartupsPoleEmploi/labonneboite/blob/master/labonneboite/importer/jobs/validate_scores.py) task is the job which will check different ratios about the prediction of number of hirings that has just been made. It will check that we have enough data for each "departement" (geographic section in France).
+
+- [Job 7](https://github.com/StartupsPoleEmploi/labonneboite/blob/master/labonneboite/importer/jobs/geocode.py) is the job which will get coordinates (latitude and longitude) for each office's location, based on the adress. The [Geolocation Gouv API](https://geo.api.gouv.fr/adresse) is used. There is a cache system that enables to not compute every coordinates for all companies during each importer's cycle. **Note** : This job uses multithreading !
+
+- [Job 8](https://github.com/StartupsPoleEmploi/labonneboite/blob/master/labonneboite/importer/jobs/populate_flags.py) is the job which will assign to each companies some flags. There are different types of flags which let us know if companies hire some old/young people or disabled people...
