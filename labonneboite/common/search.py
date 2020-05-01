@@ -606,7 +606,7 @@ def build_json_body_elastic_search(
             }
         }
 
-        # 2) overload main_query to add smart randomization
+        # 2) overload main_query to add smart randomization aka weighted shuffling aka "Tri optimisé"
         main_query = {
             # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
             "function_score": {

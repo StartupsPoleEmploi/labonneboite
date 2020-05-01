@@ -48,9 +48,7 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 
 [Press Coverage on La Bonne Boite](https://labonneboite.pole-emploi.fr/espace-presse)
 
-# Development
-
-Table of contents:
+# Table of contents
 
 - [Installation](#install)
 - [Launch web app in development](#launch-web-app)
@@ -62,14 +60,21 @@ Table of contents:
 - [Running scripts](#running-scripts)
 - [Running Pylint](#running-pylint)
 - [Debugging safely in development, staging or production](#debugging-safely-in-a-development-staging-or-production-environment)
-- [Importer](#importer)
+- [Algo LBB : about the ROME dataset, our OGR-ROME mapping, job autocomplete and thesaurus](/labonneboite/doc/README-ogr-rome-mapping.md)
+- [Algo LBB : about our custom ROME-NAF mapping](/labonneboite/doc/README-rome-naf-mapping.md)
+- [Algo LBB : hiring potential for each company in each ROME code, number of stars](/labonneboite/doc/README-algo.md)
+- [Algo LBB : importer scripts and cycle](#importer)
+- [Algo LBB : weighted shuffling aka randomization of results](/labonneboite/doc/README-randomization.md)
 - [Single ROME versus multi-ROME search](#single-rome-vs-multi-rome-search)
-- [Load testing (API and front end)](#load-testing-apifrontend)
-- [Profiling](#profiling)
 - [How to contribute](#how-to-contribute)
 - [Je Postule](#je-postule)
-- [Further documentation](#further-documentation)
-
+- [Sending job applications to PE internal service AMI (API CSP)](/labonneboite/doc/README-ami-api-csp.md)
+- [Database migration system](/labonneboite/alembic)
+- [Search using isochrone data](/labonneboite/common/maps)
+- [User Authentication system / PE Connect / PEAM / SSO](/labonneboite/web/auth)
+- [Functional tests](/labonneboite/tests/selenium)
+- [Load testing (API and front end) (outdated)](/labonneboite/doc/README-load-testing.md)
+- [Code performance profiling (outdated)](/labonneboite/doc/README-profiling.md)
 
 ## Install
 
@@ -253,7 +258,6 @@ We recommend you use a pylint git pre-commit hook:
     # add the following line at the end of your pre-commit hook file
     git-pylint-commit-hook
 
-
 ## Debugging safely in a development, staging or production environment
 
 ### Development
@@ -276,11 +280,9 @@ We recommend you use a pylint git pre-commit hook:
     # and/or
     import ipdb; ipdb.set_trace()
 
-
 ### Staging or production
 
 Debugging **safely** in staging and in production is hard but not impossible! Here is how you can do.
-
 
 #### Set a breaking point and target it
 Add a breaking point in your code.
@@ -309,7 +311,6 @@ requests.get('http://wonderful.world/armstrong?pdb=true')
 ```
 
 Nothing happens, it's normal! Time for step two.
-
 
 #### Getting the IP address if you're using Docker
 
@@ -405,98 +406,6 @@ Use `make run-importer-jobs` to run all these jobs in local development environm
 
 The company search on the frontend only allows searching for a single ROME (a.k.a. rome_code). However, the API allows for multi-ROME search, both when sorting by distance and by score.
 
-## Load testing (API+Frontend)
-
-We use the Locust framework (http://locust.io/). Here is how to run load testing against your local environment only. For instructions about how to run load testing against production, please see `README.md` in our private repository.
-
-The load testing is designed to run directly from your vagrant VM using 4 cores (feel free to adjust this to your own number of CPUs). It runs in distributed mode (4 locust slaves and 1 master running the web interface).
-
-- First double check your vagrant VM settings directly in VirtualBox interface. You should ensure that your VM uses 4 CPUs and not the default 1 CPU only. You have to make this change once, and you'll most likely need to reboot the VM to do it. Without this change, your VM CPU usage might quickly become the bottleneck of the load testing.
-- Read `labonneboite/scripts/loadtesting.py` script and adjust values to your load testing scenario.
-- Start your local server `make serve-web-app`
-- Start your locust instance `make start-locust-against-localhost`. By default, this will load-test http://localhost:5000. To test a different server, run e.g: `make start-locust-against-localhost LOCUST_HOST=https://labonneboite.pole-emploi.fr` (please don't do this, though).
-- Load the locust web interface in your browser: http://localhost:8089
-- Start your swarm with for example 1 user then increase slowly and observe what happens.
-- As long as your observed RPS stays coherent with your number of users, it means the app behaves correctly. As soon as the RPS is less than it shoud be and/or you get many 500 errors (check your logs) it means the load is too high or that your available bandwidth is too low.
-
-## Profiling
-
-You will need to install a kgrind file visualizer for profiling. Kgrind files store the detailed results of a profiling.
-- For Mac OS install and use QCacheGrind: `brew update && brew install qcachegrind`
-- For other OSes: install and use [KCacheGrind](https://kcachegrind.github.io/html/Home.html)
-
-### Profiling `create_index.py`
-
-Here is how to profile the `create_index.py` script and its (long) reindexing of all elasticsearch data. This script is the first we had to do some profiling on, but the idea is that all techniques below should be easily reusable for future profilings of other parts of the code.
-
-### Notes
-
-- Part of this script heavily relies on parallel computing (using `multiprocessing` library). However profiling and parallel computing do not go very well together. Profiling the main process will give zero information about what happens inside each parallel job. This is why we also profile from within each job.
-
-### Profiling the full script in local
-
-Reminder: the local database has only a small part of the data .i.e data of only 1 of 96 departements, namely the departement 57. Thus profiling on this dataset is not exactly relevant. Let's still explain the details though.
-- `make create-index-from-scratch-with-profiling`
-
-Visualize the results (for Mac OS):
-- `qcachegrind labonneboite/scripts/profiling_results/create_index_run.kgrind`
-  - you will visualize the big picture of the profiling, however you cannot see there the profiling from within any of the parrallel jobs.
-
-![](https://www.evernote.com/l/ABKrdnXchbJNA6D_tl_PtEYUUezIhiz5DUcB/image.png)
-
-- `qcachegrind labonneboite/scripts/profiling_results/create_index_dpt57.kgrind`
-  - you will visualize the profiling from within the single job reindexing data of departement 57.
-
-![](https://www.evernote.com/l/ABLptykQ5cNP7LzMtHOsC9wMVPdnK-wYErYB/image.png)
-
-### Profiling the full script in staging
-
-*Warning: in order to do this, you need to have ssh access to our staging server.*
-
-The full dataset (all 96 departements) is in staging which makes it a very good environment to run the full profiling to get a big picture.
-- `make create-index-from-scratch-with-profiling-on-staging`
-
-Visualize the results (for Mac OS):
-- `qcachegrind labonneboite/scripts/profiling_results/staging/create_index_run.kgrind`
-  - you will visualize the big picture of the profiling, and as you have the full dataset, you will get the correct big picture about the time ratio between high-level methods:
-
-![](https://www.evernote.com/l/ABIF2kbcoFtJCqDkThppsj98o8K1B7B__LUB/image.png)
-
-- `qcachegrind labonneboite/scripts/profiling_results/staging/create_index_dpt57.kgrind`
-  - you will visualize the profiling from within the single job reindexing data of departement 57.
-
-![](https://www.evernote.com/l/ABKoq_-DZw1GlqbPyISsH_-MbQbxVyy9WoAB/image.png)
-
-### Profiling a single job in local
-
-Former profiling methods are good to get a big picture however they take quite some time to compute, and sometimes you want a quick profiling in local in order to quickly see the result of some changes. Here is how to do that:
-- `make create-index-from-scratch-with-profiling-single-job`
-
-This variant disables parallel computation, skips all tasks but office reindexing, and runs only a single job (departement 57). This makes the result very fast and easy to profile:
-- `qcachegrind labonneboite/scripts/profiling_results/create_index_run.kgrind`
-
-![](https://www.evernote.com/l/ABJT1VAV0_xI26HSnAHBP5a7JRSar7CnMjcB/image.png)
-
-### Surgical profiling line by line
-
-Profiling techniques above can give you a good idea of the performance big picture, but sometimes you really want to dig deeper into very specific and critical methods. For example above we really want to investigate what happens within the `get_scores_by_rome` method which seems critical for performance.
-
-Let's do a line by line profiling using https://github.com/rkern/line_profiler.
-
-Simply add a `@profile` decorator to any method you would like to profile line by line e.g.
-
-```
-@profile
-def get_scores_by_rome(office, office_to_update=None):
-```
-
-You can perfectly profile methods in other parts of the code than `create_index.py`.
-
-Here is an example of output:
-
-![](https://www.evernote.com/l/ABJdN3iVDEJFgLeH2HgHyYOVMjOYK0a30e4B/image.png)
-
-
 ## How to contribute
 
 For devs in the core team, this repo follows the [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow).
@@ -509,17 +418,14 @@ We are also open to comments, questions and contributions from devs outside the 
 
 In order to link your local instance of labonneboite with a local instance of jepostule, you will need to edit the file `labonneboite/conf/local_settings.py` to override the settings of the section "Je postule" from the file `labonneboite/conf/common/settings_common.py`. In particular you will need to set the client ID and client secret provided by jepostule when you create a client platform as explained in the README section "Create a client platform".
 
-:point_up: If you want to disable Je Postule features in La Bonne Boite, you can do it pretty easily editing the `JEPOSTULE_QUOTA` setting:
+### How to disable JePostule on LBB frontend
+
+When JePostule has serious issues (Mailjet issue and/or the whole service is unavailable) you want to hide the JePostule button on the LBB frontend to avoid frustrating your users.
+
+You can do it pretty easily editing the `JEPOSTULE_QUOTA` setting:
 
 ```
 JEPOSTULE_QUOTA = 0 # put 1 if you want to enable it.
 ```
 
-
-## Further documentation
-
-- [Data management](/ROME_NAF)
-- [Search using isochrone data](/labonneboite/common/maps)
-- [Database migration system](/labonneboite/alembic)
-- [User Authentication system](/labonneboite/web/auth)
-- [Functional tests](/labonneboite/tests/selenium)
+One easy way to do that is to rebase and deploy [this MR](https://git.beta.pole-emploi.fr/lbb/lbb-private/-/merge_requests/148).
