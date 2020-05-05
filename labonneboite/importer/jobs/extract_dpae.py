@@ -11,14 +11,16 @@ import time
 from datetime import datetime
 import sys
 from sqlalchemy.exc import OperationalError
+import os
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
 from labonneboite.common.util import timeit
-from labonneboite.importer.util import parse_dpae_line, InvalidRowException
+from labonneboite.importer.util import parse_dpae_line, InvalidRowException, history_importer_job_decorator
 from labonneboite.importer.models.computing import DpaeStatistics, ImportTask, Hiring
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
+from labonneboite.common.database import db_session
 
 
 class DpaeExtractJob(Job):
@@ -175,11 +177,14 @@ class DpaeExtractJob(Job):
                 last_import=datetime.now(),
                 most_recent_data_date=self.last_historical_data_date_in_file,
             )
-            statistics.save()
+            db_session.add(statistics)
+            db_session.commit()
+            logger.info("First way to insert DPAE statistics in DB : OK")
         except OperationalError:
             # For an obscure reason, the DpaeStatistics way to insert does not work on the bonaparte server
             # So we insert it directly via an SQL query
             # This job has been broken for more than a year, only way to fix it : 
+            db_session.rollback()
             last_import_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             most_recent_date = self.last_historical_data_date_in_file.strftime('%Y-%m-%d %H:%M:%S')
             query = f"insert into dpae_statistics (last_import, most_recent_data_date) values ('{last_import_date}','{most_recent_date}')"
@@ -188,11 +193,13 @@ class DpaeExtractJob(Job):
             con.commit()
             cur.close()
             con.close()
+            logger.info("Second way to insert DPAE statistics in DB : OK")
 
 
         logger.info("finished importing dpae...")
         return something_new
 
+@history_importer_job_decorator(os.path.basename(__file__))
 def run_main():
     import logging
     logging.basicConfig(level=logging.DEBUG)

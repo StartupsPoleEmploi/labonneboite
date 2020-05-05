@@ -1,9 +1,11 @@
 from urllib.parse import urlparse
 import pandas as pd
 import validators
+import os
 
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
+from labonneboite.importer.util import history_importer_job_decorator
 from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.importer.models.computing import RawOffice
@@ -444,7 +446,7 @@ class EtablissementExtractJob(Job):
 
         return offices
 
-
+@history_importer_job_decorator(os.path.basename(__file__))
 def run():
     etablissement_filename = import_util.detect_runnable_file("etablissements")
     task = EtablissementExtractJob(etablissement_filename)

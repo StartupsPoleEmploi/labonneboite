@@ -6,6 +6,7 @@ import subprocess
 from datetime import datetime
 import logging
 from functools import lru_cache
+import traceback
 
 import MySQLdb as mdb
 from sqlalchemy import create_engine
@@ -13,10 +14,11 @@ from sqlalchemy import create_engine
 from labonneboite.common import departements as dpt
 from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
-from labonneboite.importer.models.computing import ImportTask
+from labonneboite.importer.models.computing import ImportTask, HistoryImporterJobs, StatusJobExecution
 from labonneboite.common.database import DATABASE
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
+from labonneboite.common.database import db_session
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 
@@ -384,3 +386,84 @@ def run_sql_script(sql_script):
             con.commit()
     cur.close()
     con.close()
+
+IMPORTER_JOBS_ORDER = [
+    'check_etablissements',
+    'extract_etablissements',
+    'check_dpae',
+    'extract_dpae',
+    'compute_scores',
+    'validate_scores',
+    'geocode',
+    'populate_flags'
+]
+
+def get_previous_job_info(job_name):
+    index = IMPORTER_JOBS_ORDER.index(job_name)
+    previous_job_name = None
+    previous_job_done = False
+    if index == 0: # First job, there is no job to start previously
+        previous_job_done = True
+    else:
+        previous_job_name = IMPORTER_JOBS_ORDER[index-1]
+        previous_job_done = HistoryImporterJobs.is_job_done(job=previous_job_name)
+
+    return {"name": previous_job_name, "is_completed": previous_job_done}
+
+def history_importer_job_decorator(script_name):
+    def decorator(function_to_execute):
+        def fonction_with_history():
+            # Get the job_name argument and remove the .py extension in the job name
+            job = script_name.split('.')
+            if job[1] == 'py':
+                job_name = job[0]
+            else:
+                raise BadDecoratorUse
+
+            # Check that the previous job is done to start this one
+            # If the previous job is not done, it will raise an exception
+            info_previous_job = get_previous_job_info(job_name)
+            if info_previous_job['is_completed'] is False:
+                print(f"The previous job '{info_previous_job['name']}' is not done ")
+                raise PreviousJobNotDone
+            else:
+                print(f"The previous job '{info_previous_job['name']}' is done. We can run this one ! ")
+
+            #Save in database the start of this job
+            start_date = datetime.now()
+            history = HistoryImporterJobs(
+                start_date = start_date,
+                end_date = None,
+                job_name = job_name,
+                status = StatusJobExecution['start'],
+                exception = None,
+                trace_log = None
+            )
+            db_session.add(history)
+            db_session.commit()
+
+            #If the job is done, we save it with done status
+            try:
+                result = function_to_execute()
+                history.end_date = datetime.now()
+                history.status = StatusJobExecution['done']
+                db_session.commit()
+            #Else if an error occured, we raise the exception, and save it in the DB with a failed status
+            except Exception as e:
+                history.end_date = datetime.now()
+                history.exception = type(e).__name__
+                history.trace_log = traceback.format_exc()
+                history.status = StatusJobExecution['error']
+                db_session.commit()
+                raise
+
+            return result
+        return fonction_with_history
+    return decorator
+
+class BadDecoratorUse(Exception):
+    print("this decorator is used for importer jobs")
+    pass
+
+class PreviousJobNotDone(Exception):
+    pass
