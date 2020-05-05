@@ -1,6 +1,11 @@
 import os
 import pandas as pd
 
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
+pd.set_option('display.max_colwidth', -1)
+
 # NOT DONE TO RUN IN LOCAL DEV
 # A util script to run outside the current lbb dev to check validity of files values sent by datalake
 # To copy and paste on the importer server (Bonaparte) where data are located
@@ -72,8 +77,9 @@ def run_function_etab():
     etab_data = DatalakeFile('etab')
     df = etab_data.read_file()
     # extract_mail_clean(df)
-    # filter_on_siret_etab(df, 44443604200261)
-    extract_siret_lbb_supprimes(df)
+    
+    filter_on_siret_etab(df, 34918135400029)
+    # extract_siret_lbb_supprimes(df)
 
 # METHODS DPAE
 # ----------------------
@@ -81,6 +87,7 @@ def run_function_etab():
 def filter_on_siret_dpae(df, siret):
     df_filtre = df[df.kc_siret == siret]
     print(df_filtre)
+    import ipdb; ipdb.set_trace()
 
 # Main function for dpae
 def run_function_dpae():
