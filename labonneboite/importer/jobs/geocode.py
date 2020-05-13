@@ -360,6 +360,7 @@ class GeocodeJob(Job):
                         # rollback needed otherwise db_session is left
                         # in a state unusable by the other parallel jobs
                         db_session.rollback()
+                        db_session.flush()
                         GEOCODING_STATS['rollbacks'] = GEOCODING_STATS.get(
                             'rollbacks', 0) + 1
                     if coordinates:
