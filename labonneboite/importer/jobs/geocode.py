@@ -27,7 +27,7 @@ from labonneboite.importer.models.computing import Geolocation
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 pool_size = 8
 connection_limit = pool_size
