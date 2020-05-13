@@ -27,7 +27,7 @@ from labonneboite.importer.models.computing import Geolocation
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 pool_size = 8
 connection_limit = pool_size
@@ -303,10 +303,13 @@ class GeocodeJob(Job):
                 logger.info(
                     "API addr gouv response on CSV {} OK".format(csv_path))
                 decoded_content = response.content.decode('utf-8')
+                logger.info("decoded content ok")
                 df_geocodes = pd.read_csv(io.StringIO(
                     decoded_content), dtype={'siret': str})
+                logger.info("df_geocodes ok")
                 csv_api_back_path = csv_path + '-api'
                 df_geocodes.to_csv(csv_api_back_path, index=False)
+                logger.info("df_geocodes to csv ok")
                 csv_api_back.append(csv_api_back_path)
                 logger.info(
                     "Wrote CSV sent back by API : {}".format(csv_api_back_path))
