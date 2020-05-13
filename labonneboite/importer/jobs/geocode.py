@@ -279,7 +279,11 @@ class GeocodeJob(Job):
         BASE = "http://api-adresse.data.gouv.fr/search/csv/"
 
         files = {'data': open(csv_path, 'rb')}
-        values = {'columns': 'full_address', 'city_code': 'city_code'}
+        values = {
+            'columns': 'full_address', 
+            'city_code': 'city_code',
+            'result_columns': ['longitude','latitude']
+        }
 
         # FIXME : Ugly way to wait for the API to be OK with our requests
         retry_counter = 5
@@ -315,7 +319,7 @@ class GeocodeJob(Job):
                     "Wrote CSV sent back by API : {}".format(csv_api_back_path))
             except ValueError:
                 logger.warning(
-                    'ValueError in json-ing features result %s', response.text)
+                    'ValueError in json-ing features result')
         else:
             logger.info("The csv {} was not saved correctly".format(csv_path))
         logger.info("GEOCODING_STATS = {} for CSV {}".format(
@@ -381,7 +385,7 @@ class GeocodeJob(Job):
         geocoding_jobs = self.create_geocoding_jobs()
         logger.info(
             "requesting BAN for all the adresses we need to geocode for...")
-        self.run_geocoding_jobs(geocoding_jobs, disable_multithreading=True)
+        self.run_geocoding_jobs(geocoding_jobs)
         if DEBUG_MODE:
             self.run_missing_geocoding_jobs(csv_max_rows=500)
         else:
