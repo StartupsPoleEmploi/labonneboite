@@ -84,17 +84,27 @@ On Debian-based OS:
 
     $ sudo apt-get install -y language-pack-fr git python3 python3-dev python-virtualenv python-pip mysql-server libmysqlclient-dev libncurses5-dev build-essential python-numpy python-scipy python-mysqldb chromium-chromedriver xvfb graphviz htop libblas-dev liblapack-dev libatlas-base-dev gfortran
 
-    # On Mac OS:
+On Mac OS:
 
     $ brew install openssl selenium-server-standalone
     $ brew switch openssl 1.0.2s  # fixes error about libssl 1.0.0 missing
     $ brew cask install chromedriver
+
+On fedora
+
+    $ sudo dnf install python3-numpy glib docker-compose
 
 You will also need to install docker and docker-compose. Follow the instructions related to your particular OS from the [official Docker documentation](https://docs.docker.com/install/).
 
 ### Create a virtualenv for Python 3.6
 
 For now, La Bonne Boite runs in production under Python 3.6.8. You are going to have to create a virtualenv that runs this specific version of Python.
+
+    $ wget https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
+    $ tar -xvzf Python-3.6.8.tgz
+    $ cd Python-3.6.8
+    $ ./configure --prefix=/usr/local --enable-loadable-sqlite-extensions
+    $ sudo make altinstall
 
 Create an [isolated Python environment](https://virtualenv.pypa.io/), for example using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
 
