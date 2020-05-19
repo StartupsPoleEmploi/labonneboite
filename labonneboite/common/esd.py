@@ -55,7 +55,6 @@ class EsdToken(object):
             ('scope', "application_%s" % settings.PEAM_CLIENT_ID)
         ])
         data += "%20api_offresdemploiv2 o2dsoffre"
-        data += " qos_silver_offresdemploiv2"
 
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
