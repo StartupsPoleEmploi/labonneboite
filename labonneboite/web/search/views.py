@@ -40,6 +40,15 @@ def suggest_job_labels():
 
 @searchBlueprint.route('/suggest_locations')
 def suggest_locations():
+    """
+    This route uses our internal search mechanism (elastic)
+    It does not use the api-adresse.data.gouv.fr API
+    
+    Query string arguments:
+
+        term (str)
+
+    """
     term = request.args.get('term', '')
     suggestions = autocomplete.build_location_suggestions(term)
     return make_response(json.dumps(suggestions))
@@ -48,6 +57,11 @@ def suggest_locations():
 @searchBlueprint.route('/autocomplete/locations')
 def autocomplete_locations():
     """
+    This route trys to get an address from api-adresse.data.gouv.fr API
+    If this fails - e.g. the API is down, then we use our internal search mechanism (elastic)
+    The api-adresse.data.gouv.fr API is more flexible as 
+    it allows the users to search based on an address, not just departments names
+
     Query string arguments:
 
         term (str)
