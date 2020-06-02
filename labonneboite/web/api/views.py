@@ -53,6 +53,21 @@ def api_auth_required(function):
 
     return decorated
 
+def log_api(function):
+    @wraps(function)
+    def decorated(*args, **kwargs):
+        response = function(*args, **kwargs)
+
+        activity.log_api(
+            response=response,
+            user_agent=request.user_agent.string,
+            referrer=request.referrer,
+            remote_addr=request.remote_addr,
+            application=request.args.get('origin_user', request.args.get('user', 'unknown'))
+        )
+        return response
+    return decorated
+
 
 def get_ga_query_string():
     """
@@ -73,6 +88,7 @@ def log_api_request():
 
 @apiBlueprint.route('/offers/offices/')
 @api_auth_required
+@log_api
 def offers_offices_list():
 
     try:
@@ -96,6 +112,7 @@ def offers_offices_list():
 
 @apiBlueprint.route('/company/')
 @api_auth_required
+@log_api
 @cross_origin()
 def company_list():
 
@@ -130,6 +147,7 @@ def company_list():
 
 @apiBlueprint.route('/company/count/')
 @api_auth_required
+@log_api
 def company_count():
 
     try:
@@ -217,6 +235,7 @@ def compute_frontend_url(fetcher, query_string, commune_id):
 
 @apiBlueprint.route('/filter/')
 @api_auth_required
+@log_api
 def company_filter_list():
 
     try:
@@ -547,6 +566,7 @@ def check_integer_argument(args, name, default_value):
 
 @apiBlueprint.route('/office/<siret>/details')
 @api_auth_required
+@log_api
 def office_details(siret):
     """
     Returns the details of an office for the given <siret> number.

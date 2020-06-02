@@ -20,9 +20,11 @@ TESTING = False
 
 LOG_LEVEL = logging.INFO
 LOG_LEVEL_DB_ENGINE = logging.WARNING
+LOG_API_ID = 'labonneboite.pole-emploi.fr'
 
 LOG_LEVEL_USER_ACTIVITY = logging.INFO
 LOGGING_HANDLER_USER_ACTIVITY = logging.StreamHandler()
+LOGGING_HANDLER_API_ACTIVITY = logging.StreamHandler()
 LOG_FORMAT_USER_ACTIVITY = '%(message)s'
 
 GLOBAL_STATIC_PATH = '/tmp'
