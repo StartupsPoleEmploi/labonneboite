@@ -47,12 +47,12 @@ def log_search(sirets=None, count=None, page=None, source=None, **properties):
     }
     log('recherche', source=source, resultats=resultats, **properties)
 
-apiLogger = logging.getLogger('useractivity')
+apiLogger = logging.getLogger('apiactivity')
 apiLogger.setLevel(settings.LOG_LEVEL_USER_ACTIVITY)
-settings.LOGGING_HANDLER_USER_ACTIVITY.setFormatter(logging.Formatter(settings.LOG_FORMAT_USER_ACTIVITY))
-apiLogger.addHandler(settings.LOGGING_HANDLER_USER_ACTIVITY)
+settings.LOGGING_HANDLER_API_ACTIVITY.setFormatter(logging.Formatter(settings.LOG_FORMAT_USER_ACTIVITY))
+apiLogger.addHandler(settings.LOGGING_HANDLER_API_ACTIVITY)
 
-def log_api(response, application, user_agent, referrer, remote_addr, **properties):
+def log_api(status, application, user_agent, referrer, remote_addr):
     data = OrderedDict()
 
     data['startup'] = settings.LOG_API_ID
@@ -63,7 +63,7 @@ def log_api(response, application, user_agent, referrer, remote_addr, **properti
     data['httpUserAgent'] = user_agent
     data['application'] = application
     data['apiVersion'] = '1'
-    data['status'] = response.status_code
+    data['status'] = status
     # TODO: data['widget'] = False
 
     apiLogger.info(json.dumps(data))

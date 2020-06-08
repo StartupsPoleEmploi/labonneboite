@@ -54,12 +54,19 @@ def api_auth_required(function):
     return decorated
 
 def log_api(function):
+    """
+    Decorator to log API calls and results.
+
+    Keep this decorator first in the list of decorators so that it is executed last.
+    This will make sure we log the final result of the API.
+    """
+
     @wraps(function)
     def decorated(*args, **kwargs):
         response = function(*args, **kwargs)
 
         activity.log_api(
-            response=response,
+            status=response.status_code,
             user_agent=request.user_agent.string,
             referrer=request.referrer,
             remote_addr=request.remote_addr,
@@ -86,9 +93,9 @@ def log_api_request():
     current_app.logger.debug("API request received: %s", request.full_path)
 
 
+@log_api
 @apiBlueprint.route('/offers/offices/')
 @api_auth_required
-@log_api
 def offers_offices_list():
 
     try:
@@ -110,9 +117,9 @@ def offers_offices_list():
 # to our retrocompatibility standard.
 
 
+@log_api
 @apiBlueprint.route('/company/')
 @api_auth_required
-@log_api
 @cross_origin()
 def company_list():
 
@@ -145,9 +152,9 @@ def company_list():
     return jsonify(result)
 
 
+@log_api
 @apiBlueprint.route('/company/count/')
 @api_auth_required
-@log_api
 def company_count():
 
     try:
@@ -233,9 +240,9 @@ def compute_frontend_url(fetcher, query_string, commune_id):
     return url_for('root.home', _external=True, **query_string)
 
 
+@log_api
 @apiBlueprint.route('/filter/')
 @api_auth_required
-@log_api
 def company_filter_list():
 
     try:
@@ -564,9 +571,9 @@ def check_integer_argument(args, name, default_value):
     return value
 
 
+@log_api
 @apiBlueprint.route('/office/<siret>/details')
 @api_auth_required
-@log_api
 def office_details(siret):
     """
     Returns the details of an office for the given <siret> number.
