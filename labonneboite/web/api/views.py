@@ -136,18 +136,6 @@ def company_list():
     latitude = location.latitude if location is not None else None
     longitude = location.longitude if location is not None else None
 
-    activity.log_search(
-        sirets=[office.siret for office in offices],
-        count=fetcher.office_count,
-        source='api',
-        naf=fetcher.naf_codes,
-        localisation={
-            'departements': departements,
-            'codepostal': zipcode,
-            'latitude': latitude,
-            'longitude': longitude,
-        },
-    )
     return jsonify(result)
 
 
