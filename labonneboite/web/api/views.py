@@ -63,9 +63,15 @@ def log_api(function):
     @wraps(function)
     def decorated(*args, **kwargs):
         response = function(*args, **kwargs)
+        # get the status: from a real response object or from the error tuple returned by api_auth_required
+        try:
+            status = response.status_code if hasattr(response, 'status_code') else response[1]
+        except:
+            # just in case something went wrong with the status
+            status = None
 
         activity.log_api(
-            status=response.status_code,
+            status=status,
             user_agent=request.user_agent.string,
             referrer=request.referrer,
             remote_addr=request.remote_addr,
