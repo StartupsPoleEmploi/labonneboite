@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import logging
 import socket
+import uuid
 
 from flask import has_request_context, request
 from flask_login import current_user
@@ -16,10 +17,10 @@ from labonneboite.conf import settings
 # Because fields are parsed by the data lake teams, we MUST NOT modify them
 # without telling them about it.
 
-logger = logging.getLogger('useractivity')
-logger.setLevel(settings.LOG_LEVEL_USER_ACTIVITY)
+userLogger = logging.getLogger('useractivity')
+userLogger.setLevel(settings.LOG_LEVEL_USER_ACTIVITY)
 settings.LOGGING_HANDLER_USER_ACTIVITY.setFormatter(logging.Formatter(settings.LOG_FORMAT_USER_ACTIVITY))
-logger.addHandler(settings.LOGGING_HANDLER_USER_ACTIVITY)
+userLogger.addHandler(settings.LOGGING_HANDLER_USER_ACTIVITY)
 
 
 def log(event_name, user=None, source=None, **properties):
@@ -36,7 +37,7 @@ def log(event_name, user=None, source=None, **properties):
     data['idutilisateur-peconnect'] = user.external_id if user else None
     data['url'] = request.full_path if has_request_context() else None
     data['proprietes'] = properties
-    logger.info(json.dumps(data))
+    userLogger.info(json.dumps(data))
 
 def log_search(sirets=None, count=None, page=None, source=None, **properties):
     resultats = {
@@ -45,3 +46,24 @@ def log_search(sirets=None, count=None, page=None, source=None, **properties):
         'sirets': sirets,
     }
     log('recherche', source=source, resultats=resultats, **properties)
+
+apiLogger = logging.getLogger('apiactivity')
+apiLogger.setLevel(settings.LOG_LEVEL_USER_ACTIVITY)
+settings.LOGGING_HANDLER_API_ACTIVITY.setFormatter(logging.Formatter(settings.LOG_FORMAT_USER_ACTIVITY))
+apiLogger.addHandler(settings.LOGGING_HANDLER_API_ACTIVITY)
+
+def log_api(status, application, user_agent, referrer, remote_addr):
+    data = OrderedDict()
+
+    data['startup'] = settings.LOG_API_ID
+    data['requestId'] = str(uuid.uuid1())
+    data['date'] = datetime.isoformat(datetime.now())
+    data['remoteIP'] = remote_addr
+    data['httpReferer'] = referrer
+    data['httpUserAgent'] = user_agent
+    data['application'] = application
+    data['apiVersion'] = '1'
+    data['status'] = status
+    # TODO: data['widget'] = False
+
+    apiLogger.info(json.dumps(data))

@@ -53,6 +53,33 @@ def api_auth_required(function):
 
     return decorated
 
+def log_api(function):
+    """
+    Decorator to log API calls and results.
+
+    Keep this decorator first in the list of decorators so that it is executed last.
+    This will make sure we log the final result of the API.
+    """
+    @wraps(function)
+    def decorated(*args, **kwargs):
+        response = function(*args, **kwargs)
+        # get the status: from a real response object or from the error tuple returned by api_auth_required
+        try:
+            status = response.status_code if hasattr(response, 'status_code') else response[1]
+        except:
+            # just in case something went wrong with the status
+            status = None
+
+        activity.log_api(
+            status=status,
+            user_agent=request.user_agent.string,
+            referrer=request.referrer,
+            remote_addr=request.remote_addr,
+            application=request.args.get('origin_user', request.args.get('user', 'unknown'))
+        )
+        return response
+    return decorated
+
 
 def get_ga_query_string():
     """
@@ -72,6 +99,7 @@ def log_api_request():
 
 
 @apiBlueprint.route('/offers/offices/')
+@log_api
 @api_auth_required
 def offers_offices_list():
 
@@ -95,6 +123,7 @@ def offers_offices_list():
 
 
 @apiBlueprint.route('/company/')
+@log_api
 @api_auth_required
 @cross_origin()
 def company_list():
@@ -113,22 +142,11 @@ def company_list():
     latitude = location.latitude if location is not None else None
     longitude = location.longitude if location is not None else None
 
-    activity.log_search(
-        sirets=[office.siret for office in offices],
-        count=fetcher.office_count,
-        source='api',
-        naf=fetcher.naf_codes,
-        localisation={
-            'departements': departements,
-            'codepostal': zipcode,
-            'latitude': latitude,
-            'longitude': longitude,
-        },
-    )
     return jsonify(result)
 
 
 @apiBlueprint.route('/company/count/')
+@log_api
 @api_auth_required
 def company_count():
 
@@ -216,6 +234,7 @@ def compute_frontend_url(fetcher, query_string, commune_id):
 
 
 @apiBlueprint.route('/filter/')
+@log_api
 @api_auth_required
 def company_filter_list():
 
@@ -546,6 +565,7 @@ def check_integer_argument(args, name, default_value):
 
 
 @apiBlueprint.route('/office/<siret>/details')
+@log_api
 @api_auth_required
 def office_details(siret):
     """
