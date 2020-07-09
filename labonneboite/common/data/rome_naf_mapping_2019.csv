@@ -20,36 +20,36 @@ A1201,Bûcheronnage et élagage,8411Z,Administration publique générale,185
 A1202,Entretien des espaces naturels,7830Z,Autre mise à disposition de ressources humaines,595
 A1202,Entretien des espaces naturels,8411Z,Administration publique générale,763
 A1202,Entretien des espaces naturels,8899B,Action sociale sans hébergement n.c.a.,533
-A1203,Aménagement et entretien des espaces verts,0111Z,"Culture de céréales (à l'exception du riz), de légumineuses et de graines oléagineuses",153
-A1203,Aménagement et entretien des espaces verts,0119Z,Autres cultures non permanentes,86
-A1203,Aménagement et entretien des espaces verts,0122Z,Culture de fruits tropicaux et subtropicaux,81
-A1203,Aménagement et entretien des espaces verts,0130Z,Reproduction de plantes,152
-A1203,Aménagement et entretien des espaces verts,0149Z,Élevage d'autres animaux,34
-A1203,Aménagement et entretien des espaces verts,0210Z,Sylviculture et autres activités forestières,27
-A1203,Aménagement et entretien des espaces verts,0220Z,Exploitation forestière,71
-A1203,Aménagement et entretien des espaces verts,0240Z,Services de soutien à l'exploitation forestière,106
-A1203,Aménagement et entretien des espaces verts,3811Z,Collecte des déchets non dangereux,528
-A1203,Aménagement et entretien des espaces verts,4776Z,"Commerce de détail de fleurs, plantes, graines, engrais, animaux de compagnie et aliments pour ces animaux en magasin spécialisé",460
-A1203,Aménagement et entretien des espaces verts,7810Z,Activités des agences de placement de main-d'œuvre,1189
-A1203,Aménagement et entretien des espaces verts,7830Z,Autre mise à disposition de ressources humaines,5957
-A1203,Aménagement et entretien des espaces verts,8129B,Autres activités de nettoyage n.c.a.,131
-A1203,Aménagement et entretien des espaces verts,8130Z,Services d'aménagement paysager,6753
-A1203,Aménagement et entretien des espaces verts,8411Z,Administration publique générale,7529
-A1203,Aménagement et entretien des espaces verts,8810C,Aide par le travail,1202
-A1203,Aménagement et entretien des espaces verts,9103Z,Gestion des sites et monuments historiques et des attractions touristiques similaires,229
-A1203,Aménagement et entretien des espaces verts,9104Z,Gestion des jardins botaniques et zoologiques et des réserves naturelles,79
-A1203,Aménagement et entretien des espaces verts,9311Z,Gestion d'installations sportives,242
-A1203,Aménagement et entretien des espaces verts,9603Z,Services funéraires,85
-A1203,Aménagement et entretien des espaces verts,9900Z,Activités des organisations et organismes extraterritoriaux,15
+A1203,Entretien des espaces verts,0111Z,"Culture de céréales (à l'exception du riz), de légumineuses et de graines oléagineuses",153
+A1203,Entretien des espaces verts,0119Z,Autres cultures non permanentes,86
+A1203,Entretien des espaces verts,0122Z,Culture de fruits tropicaux et subtropicaux,81
+A1203,Entretien des espaces verts,0130Z,Reproduction de plantes,152
+A1203,Entretien des espaces verts,0149Z,Élevage d'autres animaux,34
+A1203,Entretien des espaces verts,0210Z,Sylviculture et autres activités forestières,27
+A1203,Entretien des espaces verts,0220Z,Exploitation forestière,71
+A1203,Entretien des espaces verts,0240Z,Services de soutien à l'exploitation forestière,106
+A1203,Entretien des espaces verts,3811Z,Collecte des déchets non dangereux,528
+A1203,Entretien des espaces verts,4776Z,"Commerce de détail de fleurs, plantes, graines, engrais, animaux de compagnie et aliments pour ces animaux en magasin spécialisé",460
+A1203,Entretien des espaces verts,7810Z,Activités des agences de placement de main-d'œuvre,1189
+A1203,Entretien des espaces verts,7830Z,Autre mise à disposition de ressources humaines,5957
+A1203,Entretien des espaces verts,8129B,Autres activités de nettoyage n.c.a.,131
+A1203,Entretien des espaces verts,8130Z,Services d'aménagement paysager,6753
+A1203,Entretien des espaces verts,8411Z,Administration publique générale,7529
+A1203,Entretien des espaces verts,8810C,Aide par le travail,1202
+A1203,Entretien des espaces verts,9103Z,Gestion des sites et monuments historiques et des attractions touristiques similaires,229
+A1203,Entretien des espaces verts,9104Z,Gestion des jardins botaniques et zoologiques et des réserves naturelles,79
+A1203,Entretien des espaces verts,9311Z,Gestion d'installations sportives,242
+A1203,Entretien des espaces verts,9603Z,Services funéraires,85
+A1203,Entretien des espaces verts,9900Z,Activités des organisations et organismes extraterritoriaux,15
 A1204,Protection du patrimoine naturel,8411Z,Administration publique générale,184
 A1204,Protection du patrimoine naturel,8413Z,Administration publique (tutelle) des activités économiques,82
 A1204,Protection du patrimoine naturel,9499Z,Autres organisations fonctionnant par adhésion volontaire,122
 A1205,Sylviculture,0240Z,Services de soutien à l'exploitation forestière,72
 A1205,Sylviculture,8130Z,Services d'aménagement paysager,37
 A1205,Sylviculture,8411Z,Administration publique générale,59
-A1301,Conseil et assistance technique en agriculture et environnement naturel,4621Z,"Commerce de gros (commerce interentreprises) de céréales, de tabac non manufacturé, de semences et d'aliments pour le bétail",113
-A1301,Conseil et assistance technique en agriculture et environnement naturel,8413Z,Administration publique (tutelle) des activités économiques,134
-A1301,Conseil et assistance technique en agriculture et environnement naturel,9499Z,Autres organisations fonctionnant par adhésion volontaire,110
+A1301,Conseil et assistance technique en agriculture,4621Z,"Commerce de gros (commerce interentreprises) de céréales, de tabac non manufacturé, de semences et d'aliments pour le bétail",113
+A1301,Conseil et assistance technique en agriculture,8413Z,Administration publique (tutelle) des activités économiques,134
+A1301,Conseil et assistance technique en agriculture,9499Z,Autres organisations fonctionnant par adhésion volontaire,110
 A1302,Contrôle et diagnostic technique en agriculture,0162Z,Activités de soutien à la production animale,61
 A1302,Contrôle et diagnostic technique en agriculture,4621Z,"Commerce de gros (commerce interentreprises) de céréales, de tabac non manufacturé, de semences et d'aliments pour le bétail",74
 A1302,Contrôle et diagnostic technique en agriculture,8413Z,Administration publique (tutelle) des activités économiques,55
@@ -139,10 +139,10 @@ A1414,Horticulture et maraîchage,4622Z,Commerce de gros (commerce interentrepri
 A1414,Horticulture et maraîchage,4776Z,"Commerce de détail de fleurs, plantes, graines, engrais, animaux de compagnie et aliments pour ces animaux en magasin spécialisé",321
 A1414,Horticulture et maraîchage,7830Z,Autre mise à disposition de ressources humaines,909
 A1414,Horticulture et maraîchage,8411Z,Administration publique générale,663
-A1415,Équipage de la pêche,0311Z,Pêche en mer,11
-A1415,Équipage de la pêche,0321Z,Aquaculture en mer,8
-A1415,Équipage de la pêche,1394Z,"Fabrication de ficelles, cordes et filets",7
-A1415,Équipage de la pêche,9499Z,Autres organisations fonctionnant par adhésion volontaire,15
+A1415,Equipage de la pêche,0311Z,Pêche en mer,11
+A1415,Equipage de la pêche,0321Z,Aquaculture en mer,8
+A1415,Equipage de la pêche,1394Z,"Fabrication de ficelles, cordes et filets",7
+A1415,Equipage de la pêche,9499Z,Autres organisations fonctionnant par adhésion volontaire,15
 A1416,"Polyculture, élevage",0111Z,"Culture de céréales (à l'exception du riz), de légumineuses et de graines oléagineuses",559
 A1416,"Polyculture, élevage",0113Z,"Culture de légumes, de melons, de racines et de tubercules",288
 A1416,"Polyculture, élevage",0114Z,Culture de la canne à sucre,123
@@ -838,8 +838,8 @@ E1101,Animation de site multimédia,5821Z,Édition de jeux électroniques,8
 E1101,Animation de site multimédia,6201Z,Programmation informatique,75
 E1101,Animation de site multimédia,7022Z,Conseil pour les affaires et autres conseils de gestion,89
 E1101,Animation de site multimédia,7311Z,Activités des agences de publicité,94
-E1102,"Écriture d'ouvrages, de livres",6010Z,Édition et diffusion de programmes radio,21
-E1102,"Écriture d'ouvrages, de livres",9499Z,Autres organisations fonctionnant par adhésion volontaire,38
+E1102,"Ecriture d'ouvrages, de livres",6010Z,Édition et diffusion de programmes radio,21
+E1102,"Ecriture d'ouvrages, de livres",9499Z,Autres organisations fonctionnant par adhésion volontaire,38
 E1103,Communication,5811Z,Édition de livres,106
 E1103,Communication,5813Z,Édition de journaux,146
 E1103,Communication,5814Z,Édition de revues et périodiques,275
@@ -944,9 +944,9 @@ E1401,Développement et promotion publicitaire,7312Z,Régie publicitaire de méd
 E1402,Élaboration de plan média,7022Z,Conseil pour les affaires et autres conseils de gestion,68
 E1402,Élaboration de plan média,7311Z,Activités des agences de publicité,82
 E1402,Élaboration de plan média,7312Z,Régie publicitaire de médias,60
-F1101,Architecture du BTP et du paysage,7111Z,Activités d'architecture,4120
-F1101,Architecture du BTP et du paysage,7112B,"Ingénierie, études techniques",601
-F1101,Architecture du BTP et du paysage,8411Z,Administration publique générale,222
+F1101,Architecture du BTP,7111Z,Activités d'architecture,4120
+F1101,Architecture du BTP,7112B,"Ingénierie, études techniques",601
+F1101,Architecture du BTP,8411Z,Administration publique générale,222
 F1102,Conception - aménagement d'espaces intérieurs,4665Z,Commerce de gros (commerce interentreprises) de mobilier de bureau,32
 F1102,Conception - aménagement d'espaces intérieurs,4759A,Commerce de détail de meubles,360
 F1102,Conception - aménagement d'espaces intérieurs,7111Z,Activités d'architecture,396
@@ -955,11 +955,11 @@ F1102,Conception - aménagement d'espaces intérieurs,7410Z,Activités spéciali
 F1103,Contrôle et diagnostic technique du bâtiment,3900Z,Dépollution et autres services de gestion des déchets,31
 F1103,Contrôle et diagnostic technique du bâtiment,7112B,"Ingénierie, études techniques",149
 F1103,Contrôle et diagnostic technique du bâtiment,7120B,"Analyses, essais et inspections techniques",293
-F1104,Dessin BTP et paysage,4321A,Travaux d'installation électrique dans tous locaux,313
-F1104,Dessin BTP et paysage,7111Z,Activités d'architecture,695
-F1104,Dessin BTP et paysage,7112A,Activité des géomètres,60
-F1104,Dessin BTP et paysage,7112B,"Ingénierie, études techniques",1603
-F1104,Dessin BTP et paysage,7490A,Activité des économistes de la construction,68
+F1104,Dessin BTP,4321A,Travaux d'installation électrique dans tous locaux,313
+F1104,Dessin BTP,7111Z,Activités d'architecture,695
+F1104,Dessin BTP,7112A,Activité des géomètres,60
+F1104,Dessin BTP,7112B,"Ingénierie, études techniques",1603
+F1104,Dessin BTP,7490A,Activité des économistes de la construction,68
 F1105,Études géologiques,4313Z,Forages et sondages,30
 F1105,Études géologiques,7112B,"Ingénierie, études techniques",534
 F1105,Études géologiques,7120B,"Analyses, essais et inspections techniques",84
@@ -977,12 +977,12 @@ F1108,Métré de la construction,4332A,Travaux de menuiserie bois et PVC,266
 F1108,Métré de la construction,4399C,Travaux de maçonnerie générale et gros œuvre de bâtiment,230
 F1108,Métré de la construction,7112B,"Ingénierie, études techniques",335
 F1108,Métré de la construction,7490A,Activité des économistes de la construction,102
-F1201,Conduite de travaux du BTP et de travaux paysagers,4110A,Promotion immobilière de logements,186
-F1201,Conduite de travaux du BTP et de travaux paysagers,4120B,Construction d'autres bâtiments,1054
-F1201,Conduite de travaux du BTP et de travaux paysagers,4212Z,Construction de voies ferrées de surface et souterraines,86
-F1201,Conduite de travaux du BTP et de travaux paysagers,4399C,Travaux de maçonnerie générale et gros œuvre de bâtiment,1253
-F1201,Conduite de travaux du BTP et de travaux paysagers,7112B,"Ingénierie, études techniques",1215
-F1201,Conduite de travaux du BTP et de travaux paysagers,7490A,Activité des économistes de la construction,93
+F1201,Conduite de travaux du BTP,4110A,Promotion immobilière de logements,186
+F1201,Conduite de travaux du BTP,4120B,Construction d'autres bâtiments,1054
+F1201,Conduite de travaux du BTP,4212Z,Construction de voies ferrées de surface et souterraines,86
+F1201,Conduite de travaux du BTP,4399C,Travaux de maçonnerie générale et gros œuvre de bâtiment,1253
+F1201,Conduite de travaux du BTP,7112B,"Ingénierie, études techniques",1215
+F1201,Conduite de travaux du BTP,7490A,Activité des économistes de la construction,93
 F1202,Direction de chantier du BTP,4120B,Construction d'autres bâtiments,1092
 F1202,Direction de chantier du BTP,4212Z,Construction de voies ferrées de surface et souterraines,70
 F1202,Direction de chantier du BTP,4213B,Construction et entretien de tunnels,30
@@ -991,9 +991,9 @@ F1202,Direction de chantier du BTP,4399C,Travaux de maçonnerie générale et gr
 F1203,Direction et ingénierie d'exploitation de gisements et de carrières,0812Z,"Exploitation de gravières et sablières, extraction d'argiles et de kaolin",13
 F1203,Direction et ingénierie d'exploitation de gisements et de carrières,7022Z,Conseil pour les affaires et autres conseils de gestion,11
 F1203,Direction et ingénierie d'exploitation de gisements et de carrières,7112B,"Ingénierie, études techniques",64
-F1204,Qualité Sécurité Environnement et protection santé du BTP,7022Z,Conseil pour les affaires et autres conseils de gestion,12
-F1204,Qualité Sécurité Environnement et protection santé du BTP,7112B,"Ingénierie, études techniques",103
-F1204,Qualité Sécurité Environnement et protection santé du BTP,7120B,"Analyses, essais et inspections techniques",63
+F1204,Sécurité et protection santé du BTP,7022Z,Conseil pour les affaires et autres conseils de gestion,12
+F1204,Sécurité et protection santé du BTP,7112B,"Ingénierie, études techniques",103
+F1204,Sécurité et protection santé du BTP,7120B,"Analyses, essais et inspections techniques",63
 F1301,Conduite de grue,4120A,Construction de maisons individuelles,197
 F1301,Conduite de grue,4120B,Construction d'autres bâtiments,1739
 F1301,Conduite de grue,4399C,Travaux de maçonnerie générale et gros œuvre de bâtiment,2080
@@ -2235,9 +2235,9 @@ I1401,Maintenance informatique et bureautique,7733Z,Location et location-bail de
 I1401,Maintenance informatique et bureautique,9511Z,Réparation d'ordinateurs et d'équipements périphériques,588
 I1401,Maintenance informatique et bureautique,9512Z,Réparation d'équipements de communication,61
 I1401,Maintenance informatique et bureautique,9521Z,Réparation de produits électroniques grand public,51
-I1402,Réparation de biens électrodomestiques et multimédia,4754Z,Commerce de détail d'appareils électroménagers en magasin spécialisé,97
-I1402,Réparation de biens électrodomestiques et multimédia,9521Z,Réparation de produits électroniques grand public,94
-I1402,Réparation de biens électrodomestiques et multimédia,9522Z,Réparation d'appareils électroménagers et d'équipements pour la maison et le jardin,110
+I1402,Réparation de biens électrodomestiques,4754Z,Commerce de détail d'appareils électroménagers en magasin spécialisé,97
+I1402,Réparation de biens électrodomestiques,9521Z,Réparation de produits électroniques grand public,94
+I1402,Réparation de biens électrodomestiques,9522Z,Réparation d'appareils électroménagers et d'équipements pour la maison et le jardin,110
 I1501,Intervention en grande hauteur,4291Z,Construction d'ouvrages maritimes et fluviaux,36
 I1501,Intervention en grande hauteur,4399C,Travaux de maçonnerie générale et gros œuvre de bâtiment,127
 I1501,Intervention en grande hauteur,4399D,Autres travaux spécialisés de construction,705
@@ -2784,13 +2784,13 @@ L1505,Image cinématographique et télévisuelle,6020B,Édition de chaînes thé
 L1506,Machinerie spectacle,5911A,Production de films et de programmes pour la télévision,150
 L1506,Machinerie spectacle,9001Z,Arts du spectacle vivant,969
 L1506,Machinerie spectacle,9002Z,Activités de soutien au spectacle vivant,720
-L1507,Montage audiovisuel et post-production,5911A,Production de films et de programmes pour la télévision,2626
-L1507,Montage audiovisuel et post-production,5911B,Production de films institutionnels et publicitaires,593
-L1507,Montage audiovisuel et post-production,5911C,Production de films pour le cinéma,720
-L1507,Montage audiovisuel et post-production,5912Z,"Post-production de films cinématographiques, de vidéo et de programmes de télévision",763
-L1507,Montage audiovisuel et post-production,5913B,Édition et distribution vidéo,8
-L1507,Montage audiovisuel et post-production,6020A,Édition de chaînes généralistes,103
-L1507,Montage audiovisuel et post-production,6020B,Édition de chaînes thématiques,56
+L1507,Montage et post-production,5911A,Production de films et de programmes pour la télévision,2626
+L1507,Montage et post-production,5911B,Production de films institutionnels et publicitaires,593
+L1507,Montage et post-production,5911C,Production de films pour le cinéma,720
+L1507,Montage et post-production,5912Z,"Post-production de films cinématographiques, de vidéo et de programmes de télévision",763
+L1507,Montage et post-production,5913B,Édition et distribution vidéo,8
+L1507,Montage et post-production,6020A,Édition de chaînes généralistes,103
+L1507,Montage et post-production,6020B,Édition de chaînes thématiques,56
 L1508,Prise de son et sonorisation,5911A,Production de films et de programmes pour la télévision,742
 L1508,Prise de son et sonorisation,5920Z,Enregistrement sonore et édition musicale,246
 L1508,Prise de son et sonorisation,6010Z,Édition et diffusion de programmes radio,145
@@ -4390,20 +4390,20 @@ M1801,Administration de systèmes d'information,7112B,"Ingénierie, études tech
 M1801,Administration de systèmes d'information,7820Z,Activités des agences de travail temporaire,30
 M1801,Administration de systèmes d'information,8411Z,Administration publique générale,185
 M1801,Administration de systèmes d'information,9511Z,Réparation d'ordinateurs et d'équipements périphériques,138
-M1802,Expertise et support en systèmes d'information,4651Z,"Commerce de gros (commerce interentreprises) d'ordinateurs, d'équipements informatiques périphériques et de logiciels",48
-M1802,Expertise et support en systèmes d'information,5829A,Édition de logiciels système et de réseau,17
-M1802,Expertise et support en systèmes d'information,5829C,Édition de logiciels applicatifs,54
-M1802,Expertise et support en systèmes d'information,6201Z,Programmation informatique,149
-M1802,Expertise et support en systèmes d'information,6202A,Conseil en systèmes et logiciels informatiques,903
-M1802,Expertise et support en systèmes d'information,6203Z,Gestion d'installations informatiques,58
-M1802,Expertise et support en systèmes d'information,6209Z,Autres activités informatiques,35
-M1802,Expertise et support en systèmes d'information,6311Z,"Traitement de données, hébergement et activités connexes",78
-M1802,Expertise et support en systèmes d'information,7022Z,Conseil pour les affaires et autres conseils de gestion,194
-M1802,Expertise et support en systèmes d'information,7112B,"Ingénierie, études techniques",201
-M1802,Expertise et support en systèmes d'information,7219Z,Recherche-développement en autres sciences physiques et naturelles,28
-M1802,Expertise et support en systèmes d'information,7830Z,Autre mise à disposition de ressources humaines,47
-M1802,Expertise et support en systèmes d'information,8299Z,Autres activités de soutien aux entreprises n.c.a.,40
-M1802,Expertise et support en systèmes d'information,8542Z,Enseignement supérieur,36
+M1802,Expertise et support technique en systèmes d'information,4651Z,"Commerce de gros (commerce interentreprises) d'ordinateurs, d'équipements informatiques périphériques et de logiciels",48
+M1802,Expertise et support technique en systèmes d'information,5829A,Édition de logiciels système et de réseau,17
+M1802,Expertise et support technique en systèmes d'information,5829C,Édition de logiciels applicatifs,54
+M1802,Expertise et support technique en systèmes d'information,6201Z,Programmation informatique,149
+M1802,Expertise et support technique en systèmes d'information,6202A,Conseil en systèmes et logiciels informatiques,903
+M1802,Expertise et support technique en systèmes d'information,6203Z,Gestion d'installations informatiques,58
+M1802,Expertise et support technique en systèmes d'information,6209Z,Autres activités informatiques,35
+M1802,Expertise et support technique en systèmes d'information,6311Z,"Traitement de données, hébergement et activités connexes",78
+M1802,Expertise et support technique en systèmes d'information,7022Z,Conseil pour les affaires et autres conseils de gestion,194
+M1802,Expertise et support technique en systèmes d'information,7112B,"Ingénierie, études techniques",201
+M1802,Expertise et support technique en systèmes d'information,7219Z,Recherche-développement en autres sciences physiques et naturelles,28
+M1802,Expertise et support technique en systèmes d'information,7830Z,Autre mise à disposition de ressources humaines,47
+M1802,Expertise et support technique en systèmes d'information,8299Z,Autres activités de soutien aux entreprises n.c.a.,40
+M1802,Expertise et support technique en systèmes d'information,8542Z,Enseignement supérieur,36
 M1803,Direction des systèmes d'information,4651Z,"Commerce de gros (commerce interentreprises) d'ordinateurs, d'équipements informatiques périphériques et de logiciels",79
 M1803,Direction des systèmes d'information,5829A,Édition de logiciels système et de réseau,30
 M1803,Direction des systèmes d'information,5829C,Édition de logiciels applicatifs,209
@@ -4913,10 +4913,10 @@ N3101,Encadrement de la navigation maritime,3315Z,Réparation et maintenance nav
 N3101,Encadrement de la navigation maritime,5010Z,Transports maritimes et côtiers de passagers,22
 N3101,Encadrement de la navigation maritime,5020Z,Transports maritimes et côtiers de fret,17
 N3101,Encadrement de la navigation maritime,7721Z,Location et location-bail d'articles de loisirs et de sport,30
-N3102,Équipage de la navigation maritime,0311Z,Pêche en mer,5
-N3102,Équipage de la navigation maritime,5010Z,Transports maritimes et côtiers de passagers,33
-N3102,Équipage de la navigation maritime,7721Z,Location et location-bail d'articles de loisirs et de sport,35
-N3102,Équipage de la navigation maritime,8411Z,Administration publique générale,49
+N3102,Equipage de la navigation maritime,0311Z,Pêche en mer,5
+N3102,Equipage de la navigation maritime,5010Z,Transports maritimes et côtiers de passagers,33
+N3102,Equipage de la navigation maritime,7721Z,Location et location-bail d'articles de loisirs et de sport,35
+N3102,Equipage de la navigation maritime,8411Z,Administration publique générale,49
 N3103,Navigation fluviale,5030Z,Transports fluviaux de passagers,165
 N3103,Navigation fluviale,5040Z,Transports fluviaux de fret,92
 N3103,Navigation fluviale,7734Z,Location et location-bail de matériels de transport par eau,6
