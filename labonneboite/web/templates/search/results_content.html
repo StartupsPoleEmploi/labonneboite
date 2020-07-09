@@ -118,7 +118,7 @@
               {% else %}
                 {{ company_count }} entreprises sont susceptibles
               {% endif %}
-              de recruter en {{ rome_description }}{% if location_name %} autour de {{ location_name }}{% endif %}
+              de recruter en {{ rome_description }}{% if location_name %} - {{ location_name }}{% endif %}
             </h1>
           {% endif %}
 
@@ -138,7 +138,7 @@
               <p>
                 Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour
                 <b>{{ rome_description }}</b>
-                {% if location_name %} à {{ distance }} km de {{ location_name }}{% endif %}.
+                {% if location_name %} à {{ distance }} km - {{ location_name }}{% endif %}.
               </p>
               {% if alternative_rome_descriptions and alternative_distances %}
                   <div class="grid-row grid-spacing">
