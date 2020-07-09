@@ -203,10 +203,20 @@ class DpaeExtractJob(Job):
 def run_main():
     import logging
     logging.basicConfig(level=logging.DEBUG)
-    dpae_filename = import_util.detect_runnable_file("dpae")
-    task = DpaeExtractJob(dpae_filename)
-    task.run()
-
+    #dpae_filename = import_util.detect_runnable_file("dpae")
+    dpae_missings = [
+        "/srv/lbb/data/lbb_xdpdpae_delta_201911101800.bz2",
+        "/srv/lbb/data/lbb_xdpdpae_delta_201912101800.bz2",
+        "/srv/lbb/data/lbb_xdpdpae_delta_202002101800.bz2",
+        "/srv/lbb/data/lbb_xdpdpae_delta_202003101800.bz2",
+        "/srv/lbb/data/lbb_xdpdpae_delta_201908102200.bz2",
+        "/srv/lbb/data/lbb_xdpdpae_delta_202004101800.bz2",
+        "/srv/lbb/data/lbb_xdpdpae_delta_202005101800.bz2",
+        "/srv/lbb/data/lbb_xdpdpae_delta_202006101800.bz2"
+    ]
+    for dpae_filename in dpae_missings:
+        task = DpaeExtractJob(dpae_filename)
+        task.run()
 
 if __name__ == '__main__':
     run_main()
