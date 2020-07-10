@@ -2,10 +2,10 @@ rome_id|rome_label
 A1101|Conduite d'engins agricoles et forestiers
 A1201|Bûcheronnage et élagage
 A1202|Entretien des espaces naturels
-A1203|Aménagement et entretien des espaces verts
+A1203|Entretien des espaces verts
 A1204|Protection du patrimoine naturel
 A1205|Sylviculture
-A1301|Conseil et assistance technique en agriculture et environnement naturel
+A1301|Conseil et assistance technique en agriculture
 A1302|Contrôle et diagnostic technique en agriculture
 A1303|Ingénierie en agriculture et environnement naturel
 A1401|Aide agricole de production fruitière ou viticole
@@ -22,7 +22,7 @@ A1411|Élevage porcin
 A1412|Fabrication et affinage de fromages
 A1413|Fermentation de boissons alcoolisées
 A1414|Horticulture et maraîchage
-A1415|Équipage de la pêche
+A1415|Equipage de la pêche
 A1416|Polyculture, élevage
 A1417|Saliculture
 A1501|Aide aux soins animaux
@@ -113,7 +113,7 @@ D1507|Mise en rayon libre-service
 D1508|Encadrement du personnel de caisses
 D1509|Management de département en grande distribution
 E1101|Animation de site multimédia
-E1102|Écriture d'ouvrages, de livres
+E1102|Ecriture d'ouvrages, de livres
 E1103|Communication
 E1104|Conception de contenus multimédias
 E1105|Coordination d'édition
@@ -135,18 +135,18 @@ E1307|Reprographie
 E1308|Intervention technique en industrie graphique
 E1401|Développement et promotion publicitaire
 E1402|Élaboration de plan média
-F1101|Architecture du BTP et du paysage
+F1101|Architecture du BTP
 F1102|Conception - aménagement d'espaces intérieurs
 F1103|Contrôle et diagnostic technique du bâtiment
-F1104|Dessin BTP et paysage
+F1104|Dessin BTP
 F1105|Études géologiques
 F1106|Ingénierie et études du BTP
 F1107|Mesures topographiques
 F1108|Métré de la construction
-F1201|Conduite de travaux du BTP et de travaux paysagers
+F1201|Conduite de travaux du BTP
 F1202|Direction de chantier du BTP
 F1203|Direction et ingénierie d'exploitation de gisements et de carrières
-F1204|Qualité Sécurité Environnement et protection santé du BTP
+F1204|Sécurité et protection santé du BTP
 F1301|Conduite de grue
 F1302|Conduite d'engins de terrassement et de carrière
 F1401|Extraction liquide et gazeuse
@@ -314,7 +314,7 @@ I1308|Maintenance d'installation de chauffage
 I1309|Maintenance électrique
 I1310|Maintenance mécanique industrielle
 I1401|Maintenance informatique et bureautique
-I1402|Réparation de biens électrodomestiques et multimédia
+I1402|Réparation de biens électrodomestiques
 I1501|Intervention en grande hauteur
 I1502|Intervention en milieu subaquatique
 I1503|Intervention en milieux et produits nocifs
@@ -377,7 +377,7 @@ K1401|Conception et pilotage de la politique des pouvoirs publics
 K1402|Conseil en Santé Publique
 K1403|Management de structure de santé, sociale ou pénitentiaire
 K1404|Mise en oeuvre et pilotage de la politique des pouvoirs publics
-K1405|Représentation de l'État sur le territoire national ou international
+K1405|Représentation de l'Etat sur le territoire national ou international
 K1501|Application des règles financières publiques
 K1502|Contrôle et inspection des Affaires Sociales
 K1503|Contrôle et inspection des impôts
@@ -512,7 +512,7 @@ N2203|Exploitation des pistes aéroportuaires
 N2204|Préparation des vols
 N2205|Direction d'escale et exploitation aéroportuaire
 N3101|Encadrement de la navigation maritime
-N3102|Équipage de la navigation maritime
+N3102|Equipage de la navigation maritime
 N3103|Navigation fluviale
 N3201|Exploitation des opérations portuaires et du transport maritime
 N3202|Exploitation du transport fluvial
