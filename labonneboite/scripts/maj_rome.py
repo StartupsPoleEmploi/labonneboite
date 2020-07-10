@@ -1,5 +1,15 @@
 import pandas as pd
 
+# This script has been written to :
+# - Update Rome labels
+# - Add and update Ogr labels
+# - Add more mapping rome OGR
+# - Update rome labels in mapping rome naf
+#
+# We use the data updated by Pole Emploi :
+# https://www.pole-emploi.org/opendata/repertoire-operationnel-des-meti.html?type=article
+# 
+# You can download the main dataset (common/data/arbo_rome_ogr_2020.csv) on this link : https://www.pole-emploi.org/files/live/sites/peorg/files/documents/Statistiques-et-analyses/Open-data/ROME/ROME_ArboPrincipale.xlsx
 
 def concat_rome_columns(row):
     return row['Rome1']+row['Rome2']+row['Rome3']
