@@ -354,12 +354,13 @@ class EtablissementExtractJob(Job):
                 # We cant rely on the field trancheeffectif_etablissement which is in etablissement file
                 # We have to rely on the field effectif_reel
                 # We take the number of employees and we use a dataframe which will help us to determine which category the number of employees is related to 
-                # If there is no effectif reel in the dataset, we use the old field tranche_effectif
+                # If there is no effectif reel in the dataset OR it is 0, we use the old field tranche_effectif
                 if effectif_reel != '':
-                    trancheeffectif_etablissement = DF_EFFECTIF_TO_LABEL[ 
-                        (DF_EFFECTIF_TO_LABEL.start_effectif <= int(effectif_reel)) & 
-                        (DF_EFFECTIF_TO_LABEL.end_effectif >= int(effectif_reel))
-                    ]['code'].values[0]
+                    if int(effectif_reel) > 0:
+                        trancheeffectif_etablissement = DF_EFFECTIF_TO_LABEL[ 
+                            (DF_EFFECTIF_TO_LABEL.start_effectif <= int(effectif_reel)) & 
+                            (DF_EFFECTIF_TO_LABEL.end_effectif >= int(effectif_reel))
+                        ]['code'].values[0]
 
                 website = merge_and_normalize_websites([website1, website2, website3])
 
