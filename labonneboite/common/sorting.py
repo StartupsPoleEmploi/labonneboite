@@ -2,7 +2,7 @@
 SCORE_SORTING_LABEL = 'Tri optimisé %s' % (
 	'<span class="badge badge-large badge-info" data-toggle="tooltip" data-placement="right" title="%s">?</span>' % (
 		"""
-		Tri exclusif LaBonneBoite basé sur le potentiel d'embauche des entreprises mis à jour toutes les 24 heures.
+		Tri exclusif La bonne boite basé sur le potentiel d'embauche des entreprises mis à jour toutes les 24 heures.
 		"""
 	)
 )
