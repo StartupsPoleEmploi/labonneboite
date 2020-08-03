@@ -153,6 +153,7 @@ GOOGLE_OPTIMIZE_ID = 'GTM-AAAA00A'
 
 MEMO_JS_URL = 'https://memo.pole-emploi.fr/js/importButton/memoButtonLBB-min.js'
 API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
+API_DISTRICSTS_URL = 'https://geo.api.gouv.fr/departements'
 
 # Je postule
 JEPOSTULE_BASE_URL = 'http://127.0.0.1:8000'

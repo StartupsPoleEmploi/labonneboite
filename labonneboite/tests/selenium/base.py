@@ -27,6 +27,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
     def create_app(self):
         # Override settings
         settings.API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
+        settings.API_DISTRICSTS_URL = 'https://geo.api.gouv.fr/departements'
 
         # Random port generation
         app.config['LIVESERVER_PORT'] = 0

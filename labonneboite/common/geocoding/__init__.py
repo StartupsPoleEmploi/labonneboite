@@ -190,29 +190,7 @@ def get_coordinates(address, limit=10):
         latitude (float)
         longitude (float)
     """
-    if not address:
-        return []
-
-    features = []
-    for result in datagouv.search(address, limit=limit):
-        try:
-            feature = {
-                'latitude': result['geometry']['coordinates'][1],
-                'longitude': result['geometry']['coordinates'][0],
-                'label': result['properties']['label'],
-                'zipcode': result['properties']['postcode'],
-                'city': result['properties']['city']
-            }
-            # The zipcode is normally always present in the label,
-            # but sometimes is inconsistently absent from it (e.g. Saint-Paul)
-            # thus we add it if necessary.
-            if feature['zipcode'] not in feature['label']:
-                feature['label'] += " %s" % feature['zipcode']
-            features.append(feature)
-        except KeyError:
-            continue
-
-    return unique_elements(features, key=lambda x: (x['latitude'], x['longitude']))
+    return datagouv.search(address, limit=limit)
 
 
 def get_address(latitude, longitude, limit=10):
@@ -223,14 +201,4 @@ def get_address(latitude, longitude, limit=10):
         zipcode (str)
         city (str)
     """
-    features = []
-    for result in datagouv.reverse(latitude, longitude, limit=limit):
-        try:
-            features.append({
-                'label': result['properties']['label'],
-                'zipcode': result['properties']['postcode'],
-                'city': result['properties']['city']
-            })
-        except KeyError:
-            pass
-    return unique_elements(features)
+    return datagouv.reverse(latitude, longitude, limit=limit)

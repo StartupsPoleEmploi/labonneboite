@@ -59,7 +59,7 @@ def autocomplete_locations():
     """
     This route trys to get an address from api-adresse.data.gouv.fr API
     If this fails - e.g. the API is down, then we use our internal search mechanism (elastic)
-    The api-adresse.data.gouv.fr API is more flexible as 
+    The api-adresse.data.gouv.fr API is more flexible as
     it allows the users to search based on an address, not just departments names
 
     Query string arguments:
@@ -266,7 +266,7 @@ def entreprises():
     if refresh_token_result["token_has_expired"]:
         return redirect(refresh_token_result["redirect_url"])
 
-    location, named_location = get_location(request.args)
+    location, named_location, departments = get_location(request.args)
 
     occupation = request.args.get('occupation', '')
     if not occupation and 'j' in request.args:
@@ -292,6 +292,9 @@ def entreprises():
         form_kwargs['lat'] = location.latitude
         form_kwargs['lon'] = location.longitude
 
+    if departments:
+        form_kwargs['departments'] = departments
+
     form = make_company_search_form(**form_kwargs)
 
     # Render different template if it's an ajax call
@@ -305,6 +308,7 @@ def entreprises():
             'codepostal': named_location.zipcode if named_location else None,
             'latitude': location.latitude if location else None,
             'longitude': location.longitude if location else None,
+            'departments': departments if departments else None,
         },
     )
 
@@ -320,7 +324,7 @@ def entreprises():
     fetcher = HiddenMarketFetcher(
         location.longitude,
         location.latitude,
-        departments=None,
+        departments=departments,
         romes=[rome],
         distance=parameters['distance'],
         travel_mode=parameters['travel_mode'],
@@ -451,10 +455,12 @@ def get_location(request_args):
 
         location (Location) or None
         named_location (NamedLocation) or None
+        departements (str)
     """
 
     # Parse location from latitude/longitude
     location = None
+    departements = None
     zipcode = city_name = location_name = ''
     if 'lat' in request_args and 'lon' in request_args:
         try:
@@ -497,7 +503,10 @@ def get_location(request_args):
     if zipcode and city_name and location_name:
         named_location = NamedLocation(zipcode, city_name, location_name)
 
-    return location, named_location
+    if 'departments' in request_args:
+        departements = request_args.get('departments')
+
+    return location, named_location, departements
 
 
 @searchBlueprint.route('/entreprises/commune/<commune_id>/rome/<rome_id>')
