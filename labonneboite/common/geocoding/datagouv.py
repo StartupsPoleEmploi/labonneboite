@@ -20,7 +20,8 @@ def search(address, limit=10):
     Return a list of locations with latitude/longitude coordinates that
     corresponds to the required address. Perfect for autocomplete.
 
-    Example: https://api-adresse.data.gouv.fr/search/?q=8%20bd%20du%20port
+    This API mixess the results of the address API (https://api-adresse.data.gouv.fr/)
+    with the districts API (https://geo.api.gouv.fr/departements)
     """
     if not address:
         return []
@@ -29,9 +30,9 @@ def search(address, limit=10):
         'q': address[:200], # Longer requests cause a 413 error
         'limit': limit
     })
-    districts = get_districts(address, limit)
+    districts = get_districts(address, 2)
 
-    combined = sorted(districts + addresses, key=lambda item: item['score'])
+    combined = districts + addresses
 
     return combined[0:limit]
 

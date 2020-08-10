@@ -41,8 +41,9 @@ class DatagouvTest(TestCase):
             mock.patch.object(datagouv, 'get_districts', return_value=autocomplete_cal_formatted) as mock_get_districts:
             result = datagouv.search(long_address)
             self.assertEqual(short_address, mock_get_addresses.call_args[1]['q'])
-            self.assertEqual(result[1], autocomplete_cal_formatted[0])
-            self.assertEqual(result[2], search_lelab_formatted[0])
+            self.assertEqual(autocomplete_cal_formatted[0], result[0])
+            self.assertEqual(autocomplete_cal_formatted[1], result[1])
+            self.assertEqual(search_lelab_formatted[0], result[2])
 
 
 class DistrictApiTest(TestCase):
