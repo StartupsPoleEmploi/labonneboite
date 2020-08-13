@@ -322,9 +322,9 @@ def entreprises():
 
     # Fetch offices and alternatives
     fetcher = HiddenMarketFetcher(
-        location.longitude,
-        location.latitude,
-        departments=departments,
+        location.longitude if location is not None else None,
+        location.latitude if location is not None else None,
+        departments=departments.split(','),
         romes=[rome],
         distance=parameters['distance'],
         travel_mode=parameters['travel_mode'],
@@ -460,51 +460,52 @@ def get_location(request_args):
 
     # Parse location from latitude/longitude
     location = None
-    departements = None
-    zipcode = city_name = location_name = ''
-    if 'lat' in request_args and 'lon' in request_args:
-        try:
-            latitude = float(request_args['lat'])
-            longitude = float(request_args['lon'])
-        except ValueError:
-            pass
-        else:
-            location = Location(latitude, longitude)
-            addresses = geocoding.get_address(latitude, longitude, limit=1)
-            if addresses:
-                zipcode = addresses[0]['zipcode']
-                city_name = addresses[0]['city']
-                location_name = addresses[0]['label']
-
-    # Parse location from zipcode/city slug (slug is optional)
-    if location is None and 'zipcode' in request_args:
-        zipcode = request_args['zipcode']
-        city_slug = request_args.get('city', '')
-        city = CityLocation(zipcode, city_slug)
-
-        location = city.location
-        zipcode = city.zipcode
-        city_name = city.name
-        location_name = city.full_name
-
-    # Autocompletion has probably not worked: do autocompletion here
-    if location is None and 'l' in request_args:
-        try:
-            result = geocoding.get_coordinates(request_args['l'], limit=1)[0]
-        except IndexError:
-            pass
-        else:
-            location = Location(result['latitude'], result['longitude'])
-            zipcode = result['zipcode']
-            city_name = result['city']
-            location_name = result['label']
-
     named_location = None
-    if zipcode and city_name and location_name:
-        named_location = NamedLocation(zipcode, city_name, location_name)
-
+    departements = None
     if 'departments' in request_args:
         departements = request_args.get('departments')
+    else:
+        zipcode = city_name = location_name = ''
+        if 'lat' in request_args and 'lon' in request_args:
+            try:
+                latitude = float(request_args['lat'])
+                longitude = float(request_args['lon'])
+            except ValueError:
+                pass
+            else:
+                location = Location(latitude, longitude)
+                addresses = geocoding.get_address(latitude, longitude, limit=1)
+                if addresses:
+                    zipcode = addresses[0]['zipcode']
+                    city_name = addresses[0]['city']
+                    location_name = addresses[0]['label']
+
+        # Parse location from zipcode/city slug (slug is optional)
+        if location is None and 'zipcode' in request_args:
+            zipcode = request_args['zipcode']
+            city_slug = request_args.get('city', '')
+            city = CityLocation(zipcode, city_slug)
+
+            location = city.location
+            zipcode = city.zipcode
+            city_name = city.name
+            location_name = city.full_name
+
+        # Autocompletion has probably not worked: do autocompletion here
+        if location is None and 'l' in request_args:
+            try:
+                result = geocoding.get_coordinates(request_args['l'], limit=1)[0]
+            except IndexError:
+                pass
+            else:
+                if 'latitude' in result and 'longitude' in result:
+                    location = Location(result['latitude'], result['longitude'])
+                    zipcode = result['zipcode']
+                    city_name = result['city']
+                    location_name = result['label']
+
+        if zipcode and city_name and location_name:
+            named_location = NamedLocation(zipcode, city_name, location_name)
 
     return location, named_location, departements
 
