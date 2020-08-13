@@ -324,7 +324,7 @@ def entreprises():
     fetcher = HiddenMarketFetcher(
         location.longitude if location is not None else None,
         location.latitude if location is not None else None,
-        departments=departments.split(','),
+        departments=departments.split(',') if departments else None,
         romes=[rome],
         distance=parameters['distance'],
         travel_mode=parameters['travel_mode'],

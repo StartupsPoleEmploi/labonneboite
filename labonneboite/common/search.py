@@ -353,7 +353,7 @@ def fetch_offices(naf_codes, rome_codes, latitude, longitude, distance, aggregat
 
     # Extract aggregations
     aggregations = {}
-    if aggregate_by:
+    if aggregate_by and len(aggregations_raw):
         if 'naf' in aggregate_by:
             aggregations['naf'] = aggregate_naf(aggregations_raw)
         if 'hiring_type' in aggregate_by:
