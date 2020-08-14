@@ -353,7 +353,7 @@ def fetch_offices(naf_codes, rome_codes, latitude, longitude, distance, aggregat
 
     # Extract aggregations
     aggregations = {}
-    if aggregate_by and len(aggregations_raw):
+    if aggregate_by:
         if 'naf' in aggregate_by:
             aggregations['naf'] = aggregate_naf(aggregations_raw)
         if 'hiring_type' in aggregate_by:
@@ -687,12 +687,11 @@ def build_json_body_elastic_search(
     }
 
     # Add aggregate
-    if aggregate_by and gps_available:
-
+    if aggregate_by:
         json_body['aggs'] = {}
         for aggregate in aggregate_by:
             # Distance is not an ES field, so we have to do a specific aggregation.
-            if aggregate == 'distance':
+            if aggregate == 'distance' and gps_available:
                 json_body['aggs']['distance'] = {
                     'geo_distance': {
                         "field": "locations",
