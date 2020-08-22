@@ -52,6 +52,7 @@
                <div id="distance-duration-switch"
                  data-switch-value-selected="{{ "duration" if duration_filter_enabled else "distance"}}">
 
+               {% if not departments %}
                  {% if enable_isochrones %}
                    <div class="lbb-sidebar-item">
                      <p>Rayon de recherche</p>
@@ -82,14 +83,15 @@
                      <p>{{ form.dur.label.text }}</p>
                      {{ form.dur }}
                    </div>
-                {% endif %} {# endif enable_isochrones #}
+                 {% endif %} {# endif enable_isochrones #}
 
                  <div class="lbb-sidebar-item" data-switch-display-on="distance">
                    <p>{{ form.d.label.text }}</p>
                    {{ form.d }}
                  </div>
+                 <!-- END DISTANCE DURATION SWITCH -->
+               {% endif %} {# endif not departments #}
                </div>
-               <!-- END DISTANCE DURATION SWITCH -->
                {% if pro_version_enabled %}
                  <div class="lbb-sidebar-item">
                    <p>
@@ -118,7 +120,8 @@
               {% else %}
                 {{ company_count }} entreprises sont susceptibles
               {% endif %}
-              de recruter en {{ rome_description }}{% if location_name %} - {{ location_name }}{% endif %}
+              de recruter en {{ rome_description }}
+              {% if location_name %} - {{ location_name }}{% endif %}
             </h1>
           {% endif %}
 
@@ -132,7 +135,7 @@
           <div class="lbb-bright-container ga-no-results">
             {% if job_doesnt_exist %}
               <p>Le métier que vous avez choisi n'est pas valide. Veuillez réessayer.</p>
-            {% elif not location %}
+            {% elif not location and not departments %}
               <p>La ville que vous avez choisie n'est pas valide. Veuillez réessayer.</p>
             {% elif alternative_rome_descriptions or alternative_distances %}
               <p>

@@ -399,6 +399,7 @@ def entreprises():
         'job_doesnt_exist': False,
         'naf': fetcher.naf,
         'location': location,
+        'departments': departments,
         'city_name': named_location.city if named_location else '',
         'location_name': named_location.name if named_location else '',
         'page': current_page,
