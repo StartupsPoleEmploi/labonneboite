@@ -289,6 +289,8 @@ run-importer-jobs:
 	make run-importer-job-03-check-dpae && \
 	make run-importer-job-04-extract-dpae && \
 	make run-importer-job-04hack-create-fake-alternance-hirings && \
+	make run-importer-job-04-check-lba && \
+	make run-importer-job-04-extract-lba && \
 	make run-importer-job-05-compute-scores && \
 	make run-importer-job-06-validate-scores && \
 	make run-importer-job-07-geocode && \
@@ -310,6 +312,7 @@ run-importer-job-00-prepare-all: alembic-migrate
 		cp ../tests/importer/data/lbb_etablissement_full_201612192300.csv data/ && \
 		echo "completed importer run preparation."
 
+
 run-importer-job-01-check-etablissements:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/check_etablissements.py
 
@@ -326,6 +329,12 @@ run-importer-job-04hack-create-fake-alternance-hirings:
 	export LBB_ENV=development && \
 		cd labonneboite/importer && \
 		cat scripts/create_fake_alternance_hirings.sql | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307
+
+run-importer-job-04-check-lba:
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/check_lba.py
+
+run-importer-job-04-extract-lba:
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/extract_lba.py
 
 run-importer-job-05-compute-scores:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/compute_scores.py

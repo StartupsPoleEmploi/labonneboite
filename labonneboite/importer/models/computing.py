@@ -58,7 +58,6 @@ class Hiring(CRUDMixin, Base):
     def __str__(self):
         return '%s %s' % (self.siret, self.hiring_date)
 
-
 class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
     """
     Initial large table storing all 10M offices and acting as the 'input' of the importer jobs.
@@ -130,6 +129,7 @@ class ImportTask(CRUDMixin, Base):
     # Import type
     DPAE = 1
     ETABLISSEMENT = 2
+    APPRENTISSAGE = 3
 
     _id = Column('id', BigInteger, primary_key=True)
     filename = Column(String(191))
@@ -148,14 +148,20 @@ class DpaeStatistics(CRUDMixin, Base):
     """
     __tablename__ = "dpae_statistics"
 
+    #File types
+    DPAE = 1
+    APR = 2
+    PRO = 3
+
     _id = Column('id', BigInteger, primary_key=True)
+    file_type = Column(Integer)
     last_import = Column(DateTime, default=datetime.datetime.utcnow)
     most_recent_data_date = Column(DateTime, default=datetime.datetime.utcnow)
 
     @classmethod
-    def get_last_historical_data_date(cls):
+    def get_last_historical_data_date(cls, file_type):
         try:
-            return cls.query.order_by(cls.most_recent_data_date.desc()).first().most_recent_data_date
+            return cls.query.order_by(cls.most_recent_data_date.desc()).filter_by(file_type=file_type).first().most_recent_data_date
         except AttributeError:
             # if there was no import of dpae thus far, return the date for which
             # we don't want to import dpae before that date

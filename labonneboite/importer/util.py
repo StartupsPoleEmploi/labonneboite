@@ -34,6 +34,12 @@ OFFICE_FLAGS = ['flag_alternance', 'flag_junior', 'flag_senior', 'flag_handicap'
 class InvalidRowException(Exception):
     pass
 
+class InvalidSiretException(Exception):
+    pass
+
+class InvalidZipCodeException(Exception):
+    pass
+
 
 def create_cursor():
     con = mdb.connect(host=DATABASE['HOST'], port=DATABASE['PORT'],
@@ -130,7 +136,9 @@ def is_processed(filename):
 def check_runnable(filename, file_type):
     patterns = {
         'dpae': 'lbb_xdpdpae_delta_.*',
-        'etablissements': 'lbb_etablissement_full_.*'
+        'etablissements': 'lbb_etablissement_full_.*',
+        'lba-app': '.*ExtractAPP.csv',
+        'lba-pro': '.*ExtractPRO.csv'
     }
     base_name = os.path.basename(filename)
     return re.match(patterns[file_type], base_name) and not is_processed(base_name)
@@ -271,6 +279,37 @@ def get_fields_from_csv_line(line, delimiter='|'):
 
     return fields
 
+def parse_alternance_line(line, required_fields = 4):
+    fields = get_fields_from_csv_line(line, delimiter=';')
+
+    if len(fields) != required_fields:  # an assert statement here does not work from nosetests
+        msg = f"found {len(fields)} fields instead of {required_fields} in line: {line}"
+        logger.error(msg)
+        raise InvalidRowException(msg)
+
+    siret = fields[0]
+    if len(siret) != 14:
+        #Problem in data sent : the siret must be parsed to int somewhere in the process, and the first possible 3 '0' are skipped...
+        if len(siret) <= 13 and len(siret) >= 11:
+            zero_missing = 14 - len(siret)
+            siret = (zero_missing * '0' ) + siret
+        else:
+            raise InvalidSiretException(f"The siret {siret} is not valid")
+
+    hiring_date_raw = fields[1]
+    hiring_date = datetime.strptime(hiring_date_raw, "%m%Y")
+
+    departement = fields[3]
+    if departement == '' or departement is None or departement == '0':
+        raise InvalidZipCodeException
+    
+    if len(departement) == 1 and departement.isdigit():
+        departement = '0' + departement
+
+    if len(departement) > 3 and len(departement) < 2:
+        raise InvalidZipCodeException
+
+    return siret, hiring_date, departement
 
 def parse_dpae_line(line):
     fields = get_fields_from_csv_line(line)
@@ -283,6 +322,8 @@ def parse_dpae_line(line):
         raise InvalidRowException(msg)
 
     siret = fields[0]
+
+
     hiring_date_raw = fields[7]
     try:
         hiring_date = datetime.strptime(hiring_date_raw, "%Y-%m-%d %H:%M:%S")
@@ -392,6 +433,8 @@ IMPORTER_JOBS_ORDER = [
     'extract_etablissements',
     'check_dpae',
     'extract_dpae',
+    'check_lba',
+    'extract_lba',
     'compute_scores',
     'validate_scores',
     'geocode',
