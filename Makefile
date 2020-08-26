@@ -375,3 +375,11 @@ clean-car-isochrone-and-durations-cache: clean-car-isochrone-cache
 delete-unused-redis-containers:
 	docker ps -f status=restarting -f name=redis --format "{{.ID}}" \
     | xargs docker rm -f
+
+# Test API with key
+# -----
+# Use:
+# make get-signed-api-url URL=https://labonneboite.beta.pole-emploi.fr/api/v1/offers/offices/\?commune_id\=68294\&user\=labonnealternance\&rome_codes\=I1606\&contract\=alternance\&page_size\=100\&distance\=3000
+
+get-signed-api-url:
+	python labonneboite/scripts/get_signed_api_url.py $(URL)
