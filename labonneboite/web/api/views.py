@@ -607,6 +607,7 @@ def get_office_details(siret, alternance=False):
         'raison_sociale': office.company_name,
         'siret': office.siret,
         'stars': office.stars,
+        'alternance': office.qualifies_for_alternance(),
         'url': url,
         'social_network': office.social_network or '',
         'address': {
