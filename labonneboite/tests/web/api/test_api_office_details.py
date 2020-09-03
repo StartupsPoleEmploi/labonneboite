@@ -34,6 +34,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
                 'zipcode': '54890'
             },
             'lat': 49.0,
+            'alternance': False,
         }
         params = self.add_security_params({'user': 'untrusteduser'})
         rv = self.app.get('/api/v1/office/%s/details?%s' % (expected_result['siret'], urlencode(params)))

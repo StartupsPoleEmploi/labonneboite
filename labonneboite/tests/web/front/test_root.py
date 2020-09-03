@@ -33,8 +33,8 @@ class RootTest(DatabaseTest):
             with self.app.session_transaction() as sess:
                 sess[pro.PRO_VERSION_SESSION_KEY] = True
 
-            # Non-empty pdf file
+            # Non-empty kit page
             rv = self.app.get(self.url_for('root.kit'))
             self.assertEqual(rv.status_code, 200)
-            self.assertEqual('application/pdf', rv.content_type)
+            self.assertEqual('text/html; charset=utf-8', rv.content_type)
             self.assertLess(1000, rv.content_length)

@@ -110,6 +110,8 @@ labonneboite/common/data/ogr_rome_mapping_update/ogr_rome_mapping.csv
 #############################
 labonneboite/web/static/.webassets-cache
 labonneboite/web/static/gen/
+# pro static pages contain .zip and must be versioned
+!labonneboite/web/static_kit/*
 
 # pycharm IDE files
 .idea
