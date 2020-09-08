@@ -418,18 +418,15 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     # `1.0 * int/int` trick is needed because otherwise int/int gives the floor int value.
     data_gap_in_periods = int(math.ceil(data_gap_in_months / months_per_period))
 
-    if prefix_for_fields == "dpae":
-        if get_current_env() == ENV_DEVELOPMENT:
-            if data_gap_in_periods <= 0:
-                raise ValueError("dpae data should have at least one period of gap")
-        else:
-            #if data_gap_in_periods != 0:
-            if data_gap_in_periods not in [0, 1]:
-                # FIXME restore when we have dpae 10 april
-                raise ValueError("dpae data should have no gap")
-    if prefix_for_fields == "alt":
+    #Since August 2020, we have all alternance data, so there should be no gap anymore
+    if get_current_env() == ENV_DEVELOPMENT:
         if data_gap_in_periods <= 0:
-            raise ValueError("alternance data should have at least one month of gap")
+            raise ValueError("dpae data should have at least one period of gap")
+    else:
+        #if data_gap_in_periods != 0:
+        if data_gap_in_periods not in [0, 1]:
+            # FIXME restore when we have dpae 10 april
+            raise ValueError("dpae data should have no gap")
 
     # Training set is moved 2 years back in time relative to live set,
     # and testing set is moved 1 year back in time relative to live set.
@@ -641,7 +638,6 @@ def run(
     logger.debug("DPAE/LBB training done for departement %s", departement)
 
     # LBA / Alternance.
-
     train(
         df_etab,
         departement,
