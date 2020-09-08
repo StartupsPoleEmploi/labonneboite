@@ -13,7 +13,7 @@ AVERAGE_HIRINGS_PER_MONTH_PER_OFFICE = 2
 TOTAL_HIRINGS = AVERAGE_HIRINGS_PER_MONTH_PER_OFFICE * OFFICES_HAVING_HIRINGS * 12 * YEARS_OF_HIRINGS
 
 def get_dpae_last_historical_data_date():
-    return DpaeStatistics.get_last_historical_data_date()
+    return DpaeStatistics.get_last_historical_data_date(DpaeStatistics.DPAE)
 
 
 def get_prediction_beginning_date():
@@ -80,9 +80,9 @@ class TestComputeScore(DatabaseTest):
         # There is gap of several months for the alternance data, and this is what happens
         # in real life as of now :/
         self.assertEqual(get_dpae_last_historical_data_date(), datetime(2011, 12, 31))
-        self.assertEqual(importer_settings.ALTERNANCE_LAST_HISTORICAL_DATA_DATE, datetime(2011, 8, 31))
+        #self.assertEqual(importer_settings.ALTERNANCE_LAST_HISTORICAL_DATA_DATE, datetime(2011, 8, 31))
         self.assertEqual(prediction_beginning_date, datetime(2012, 1, 1))  # for both DPAE and Alternance
-
+ 
         # --- DPAE/LBB checks
 
         # we should have exactly 5 years of hirings including the last month (2011-12)
@@ -128,8 +128,8 @@ class TestComputeScore(DatabaseTest):
 
         self.assertNotIn('alt-period-0', columns)
         self.assertIn('alt-period-1', columns)
-        self.assertIn('alt-period-12', columns)
-        self.assertNotIn('alt-period-13', columns)
+        self.assertIn('alt-period-11', columns)
+        self.assertNotIn('alt-period-12', columns)
 
         # final score columns
         self.assertIn('score_alternance', columns)

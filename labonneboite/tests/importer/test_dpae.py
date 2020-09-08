@@ -22,7 +22,7 @@ class TestDpae(DatabaseTest):
         self.assertEqual(Hiring.query.count(), 6)
 
     def test_extract_dpae_two_files_diff(self):
-        # Second file contains duplicated records and one record from the future and only 2 really new valid records.
+        # Second file contains one record from the future
         filename_first_month = self.get_data_file_path(FIRST_DPAE_FILE_NAME)
         filename_second_month = self.get_data_file_path(SECOND_DPAE_FILE_NAME)
         task = extract_dpae.DpaeExtractJob(filename_first_month)
@@ -30,7 +30,7 @@ class TestDpae(DatabaseTest):
         self.assertEqual(Hiring.query.count(), 6)
         task = extract_dpae.DpaeExtractJob(filename_second_month)
         task.run()
-        self.assertEqual(Hiring.query.count(), 6+2)
+        self.assertEqual(Hiring.query.count(), 6+5)
 
     def test_extract_departement(self):
         departement = get_departement_from_zipcode("6600")
