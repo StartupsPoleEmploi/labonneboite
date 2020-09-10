@@ -465,6 +465,9 @@ def get_location(request_args):
     departements = None
     if 'departments' in request_args:
         departements = request_args.get('departments')
+        # FIXME: this is a temporary shortcut, we should use the departement API to get the name and zipcode of the departement
+        zipcode = departements[0]
+        location_name = city_name = request_args.get('l')
     else:
         zipcode = city_name = location_name = ''
         if 'lat' in request_args and 'lon' in request_args:
@@ -505,8 +508,8 @@ def get_location(request_args):
                     city_name = result['city']
                     location_name = result['label']
 
-        if zipcode and city_name and location_name:
-            named_location = NamedLocation(zipcode, city_name, location_name)
+    if zipcode and city_name and location_name:
+        named_location = NamedLocation(zipcode, city_name, location_name)
 
     return location, named_location, departements
 
