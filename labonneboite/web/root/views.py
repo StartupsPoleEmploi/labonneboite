@@ -1,5 +1,5 @@
 import requests
-
+import os
 
 from flask import Blueprint, current_app, flash, url_for
 from flask import abort, send_from_directory, redirect, render_template, request
@@ -41,14 +41,6 @@ def favicon():
 @rootBlueprint.route('/googleaece67026df0ee76.html')
 def static_from_root():
     return send_from_directory(current_app.static_folder, request.path[1:])
-
-
-@rootBlueprint.route('/kit.pdf')
-def kit():
-    if pro.pro_version_enabled():
-        return send_from_directory(current_app.static_folder, 'kit.pdf')
-    abort(404)
-
 
 @rootBlueprint.route('/espace-presse')
 def press():
@@ -137,3 +129,19 @@ def widget_no_esd():
 @rootBlueprint.route('/widget-no-esd-staging')
 def widget_no_esd_staging():
     return render_template('root/widget-no-esd-staging.html')
+
+# Private files, for PRO only (lgged in PRO users)
+# html files are expected to be in the template folder, in a `static_kit` subfolder
+# all other files will be served as is
+FOLDER_NAME = 'static_kit' # this is the name of a folder in web/ and a folder in web/template/
+@rootBlueprint.route('/boite-a-outils/')
+@rootBlueprint.route('/boite-a-outils/<path:page>')
+def kit(page='index.html'):
+    # only if pro version is activated
+    if pro.pro_version_enabled():
+        page = page.replace('%20', ' ')
+        if page.endswith('.html'):
+            return render_template(FOLDER_NAME + '/' + page)
+        PRO_STATIC_FOLDER = os.path.join(current_app.root_path, FOLDER_NAME)
+        return send_from_directory(PRO_STATIC_FOLDER, page)
+    abort(404)
