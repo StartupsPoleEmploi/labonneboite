@@ -266,18 +266,22 @@ def entreprises():
     if refresh_token_result["token_has_expired"]:
         return redirect(refresh_token_result["redirect_url"])
 
-    location, named_location, departments = get_location(request.args)
+    # filter empty url params
+    args = {key: request.args[key] for key in request.args if request.args[key] != ''}
 
-    occupation = request.args.get('occupation', '')
-    if not occupation and 'j' in request.args:
-        suggestion = autocomplete.build_job_label_suggestions(request.args['j'], size=1)
+    # get structured location data from url params
+    location, named_location, departments = get_location(args)
+
+    occupation = args.get('occupation', '')
+    if not occupation and 'j' in args:
+        suggestion = autocomplete.build_job_label_suggestions(args['j'], size=1)
         occupation = suggestion[0]['occupation'] if suggestion else None
 
     rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
     job_doesnt_exist = not rome
 
     # Build form
-    form_kwargs = {key: val for key, val in list(request.args.items()) if val}
+    form_kwargs = {key: val for key, val in list(args.items()) if val}
     form_kwargs['j'] = settings.ROME_DESCRIPTIONS.get(rome, occupation)
 
     if 'occupation' not in form_kwargs:
@@ -318,7 +322,7 @@ def entreprises():
         return render_template(template, job_doesnt_exist=job_doesnt_exist, form=form)
 
     # Convert request arguments to fetcher parameters
-    parameters = get_parameters(request.args)
+    parameters = get_parameters(args)
 
     # Fetch offices and alternatives
     fetcher = HiddenMarketFetcher(
