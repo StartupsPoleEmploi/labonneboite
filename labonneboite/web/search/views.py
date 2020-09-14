@@ -224,6 +224,10 @@ def get_parameters(args):
     if kwargs.get('sort') not in sorting.SORT_FILTERS:
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
+    # prevent sorting by distance for departements
+    if kwargs.get('sort') == sorting.SORT_FILTER_DISTANCE and 'departments' in args:
+        kwargs['sort'] = sorting.SORT_FILTER_SCORE
+
     # from value in GET to enum
     # audience filter defaults to ALL
     kwargs['audience'] = get_enum_from_value(AudienceFilter, kwargs.get('audience'), AudienceFilter.ALL)

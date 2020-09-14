@@ -33,11 +33,13 @@
                  <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
                  <hr>
                </div>
+               {% if not departments %}
                <h3>Trier</h3>
                <div class="lbb-sidebar-item">
                  {{ form.sort }}
                </div>
                <hr>
+               {% endif %}
                <h3>Affinez votre recherche</h3>
                <div class="lbb-sidebar-item">
                  <p>
