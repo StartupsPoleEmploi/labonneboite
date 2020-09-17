@@ -3,7 +3,7 @@
   <div>
 
     {% set css_class = "input-icon input-icon-suitcase" %}
-    {% set placeholder = "Métier recherché : (boucher, cariste, secrétaire, ...)" %}
+    {% set placeholder = "Indiquez le métier recherché : (boucher, cariste, secrétaire, ...)" %}
     {% if form.j.errors %}
       {% set css_class = "input-icon input-icon-suitcase form-error" %}
     {% endif %}
@@ -11,7 +11,7 @@
     {{ form.j(class=css_class, required="required", placeholder=placeholder) }}
 
     {% set css_class = "input-icon input-icon-location" %}
-    {% set placeholder = "Autour de : (Paris, Bd Voltaire, 33000...)" %}
+    {% set placeholder = "Renseignez le lieu de recherche : (Île-de-France, Paris, Bd Voltaire, 33000 ...)" %}
     {% if form.l.errors %}
       {% set css_class = "input-icon input-icon-location form-error" %}
     {% endif %}

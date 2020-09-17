@@ -687,12 +687,11 @@ def build_json_body_elastic_search(
     }
 
     # Add aggregate
-    if aggregate_by and gps_available:
-
+    if aggregate_by:
         json_body['aggs'] = {}
         for aggregate in aggregate_by:
             # Distance is not an ES field, so we have to do a specific aggregation.
-            if aggregate == 'distance':
+            if aggregate == 'distance' and gps_available:
                 json_body['aggs']['distance'] = {
                     'geo_distance': {
                         "field": "locations",

@@ -59,7 +59,7 @@ def autocomplete_locations():
     """
     This route trys to get an address from api-adresse.data.gouv.fr API
     If this fails - e.g. the API is down, then we use our internal search mechanism (elastic)
-    The api-adresse.data.gouv.fr API is more flexible as 
+    The api-adresse.data.gouv.fr API is more flexible as
     it allows the users to search based on an address, not just departments names
 
     Query string arguments:
@@ -224,6 +224,10 @@ def get_parameters(args):
     if kwargs.get('sort') not in sorting.SORT_FILTERS:
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
+    # prevent sorting by distance for departments
+    if kwargs.get('sort') == sorting.SORT_FILTER_DISTANCE and 'departments' in args:
+        kwargs['sort'] = sorting.SORT_FILTER_SCORE
+
     # from value in GET to enum
     # audience filter defaults to ALL
     kwargs['audience'] = get_enum_from_value(AudienceFilter, kwargs.get('audience'), AudienceFilter.ALL)
@@ -266,18 +270,22 @@ def entreprises():
     if refresh_token_result["token_has_expired"]:
         return redirect(refresh_token_result["redirect_url"])
 
-    location, named_location = get_location(request.args)
+    # filter empty url params
+    args = {key: request.args[key] for key in request.args if request.args[key] != ''}
 
-    occupation = request.args.get('occupation', '')
-    if not occupation and 'j' in request.args:
-        suggestion = autocomplete.build_job_label_suggestions(request.args['j'], size=1)
+    # get structured location data from url params
+    location, named_location, departments = get_location(args)
+
+    occupation = args.get('occupation', '')
+    if not occupation and 'j' in args:
+        suggestion = autocomplete.build_job_label_suggestions(args['j'], size=1)
         occupation = suggestion[0]['occupation'] if suggestion else None
 
     rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
     job_doesnt_exist = not rome
 
     # Build form
-    form_kwargs = {key: val for key, val in list(request.args.items()) if val}
+    form_kwargs = {key: val for key, val in list(args.items()) if val}
     form_kwargs['j'] = settings.ROME_DESCRIPTIONS.get(rome, occupation)
 
     if 'occupation' not in form_kwargs:
@@ -292,6 +300,9 @@ def entreprises():
         form_kwargs['lat'] = location.latitude
         form_kwargs['lon'] = location.longitude
 
+    if departments:
+        form_kwargs['departments'] = departments
+
     form = make_company_search_form(**form_kwargs)
 
     # Render different template if it's an ajax call
@@ -305,6 +316,7 @@ def entreprises():
             'codepostal': named_location.zipcode if named_location else None,
             'latitude': location.latitude if location else None,
             'longitude': location.longitude if location else None,
+            'departments': departments if departments else None,
         },
     )
 
@@ -314,13 +326,13 @@ def entreprises():
         return render_template(template, job_doesnt_exist=job_doesnt_exist, form=form)
 
     # Convert request arguments to fetcher parameters
-    parameters = get_parameters(request.args)
+    parameters = get_parameters(args)
 
     # Fetch offices and alternatives
     fetcher = HiddenMarketFetcher(
-        location.longitude,
-        location.latitude,
-        departments=None,
+        location.longitude if location is not None else None,
+        location.latitude if location is not None else None,
+        departments=departments.split(',') if departments else None,
         romes=[rome],
         distance=parameters['distance'],
         travel_mode=parameters['travel_mode'],
@@ -395,6 +407,7 @@ def entreprises():
         'job_doesnt_exist': False,
         'naf': fetcher.naf,
         'location': location,
+        'departments': departments,
         'city_name': named_location.city if named_location else '',
         'location_name': named_location.name if named_location else '',
         'page': current_page,
@@ -451,53 +464,62 @@ def get_location(request_args):
 
         location (Location) or None
         named_location (NamedLocation) or None
+        departments (str)
     """
 
     # Parse location from latitude/longitude
     location = None
-    zipcode = city_name = location_name = ''
-    if 'lat' in request_args and 'lon' in request_args:
-        try:
-            latitude = float(request_args['lat'])
-            longitude = float(request_args['lon'])
-        except ValueError:
-            pass
-        else:
-            location = Location(latitude, longitude)
-            addresses = geocoding.get_address(latitude, longitude, limit=1)
-            if addresses:
-                zipcode = addresses[0]['zipcode']
-                city_name = addresses[0]['city']
-                location_name = addresses[0]['label']
-
-    # Parse location from zipcode/city slug (slug is optional)
-    if location is None and 'zipcode' in request_args:
-        zipcode = request_args['zipcode']
-        city_slug = request_args.get('city', '')
-        city = CityLocation(zipcode, city_slug)
-
-        location = city.location
-        zipcode = city.zipcode
-        city_name = city.name
-        location_name = city.full_name
-
-    # Autocompletion has probably not worked: do autocompletion here
-    if location is None and 'l' in request_args:
-        try:
-            result = geocoding.get_coordinates(request_args['l'], limit=1)[0]
-        except IndexError:
-            pass
-        else:
-            location = Location(result['latitude'], result['longitude'])
-            zipcode = result['zipcode']
-            city_name = result['city']
-            location_name = result['label']
-
     named_location = None
+    departments = None
+    if 'departments' in request_args:
+        departments = request_args.get('departments')
+        # FIXME: this is a temporary shortcut, we should use the department API to get the name and zipcode of the department
+        zipcode = departments[0]
+        location_name = city_name = request_args.get('l')
+    else:
+        zipcode = city_name = location_name = ''
+        if 'lat' in request_args and 'lon' in request_args:
+            try:
+                latitude = float(request_args['lat'])
+                longitude = float(request_args['lon'])
+            except ValueError:
+                pass
+            else:
+                location = Location(latitude, longitude)
+                addresses = geocoding.get_address(latitude, longitude, limit=1)
+                if addresses:
+                    zipcode = addresses[0]['zipcode']
+                    city_name = addresses[0]['city']
+                    location_name = addresses[0]['label']
+
+        # Parse location from zipcode/city slug (slug is optional)
+        if location is None and 'zipcode' in request_args:
+            zipcode = request_args['zipcode']
+            city_slug = request_args.get('city', '')
+            city = CityLocation(zipcode, city_slug)
+
+            location = city.location
+            zipcode = city.zipcode
+            city_name = city.name
+            location_name = city.full_name
+
+        # Autocompletion has probably not worked: do autocompletion here
+        if location is None and 'l' in request_args:
+            try:
+                result = geocoding.get_coordinates(request_args['l'], limit=1)[0]
+            except IndexError:
+                pass
+            else:
+                if 'latitude' in result and 'longitude' in result:
+                    location = Location(result['latitude'], result['longitude'])
+                    zipcode = result['zipcode']
+                    city_name = result['city']
+                    location_name = result['label']
+
     if zipcode and city_name and location_name:
         named_location = NamedLocation(zipcode, city_name, location_name)
 
-    return location, named_location
+    return location, named_location, departments
 
 
 @searchBlueprint.route('/entreprises/commune/<commune_id>/rome/<rome_id>')

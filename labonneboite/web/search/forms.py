@@ -2,7 +2,7 @@
 from werkzeug.datastructures import MultiDict
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, HiddenField, RadioField, DecimalField
-from wtforms.validators import DataRequired, Optional, NumberRange
+from wtforms.validators import DataRequired, Optional, NumberRange, Regexp
 from wtforms.widgets import HiddenInput
 
 from labonneboite.conf import settings
@@ -54,8 +54,9 @@ class CompanySearchForm(FlaskForm):
     # Typed location
     l = StringField('Lieu de recherche', validators=[DataRequired()])
     # Corresponding coordinates found by autocomplete
-    lat = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-90, 90)])
-    lon = DecimalField(widget=HiddenInput(), validators=[DataRequired(), NumberRange(-180, 180)])
+    lat = DecimalField(widget=HiddenInput(), validators=[Optional(), NumberRange(-90, 90)])
+    lon = DecimalField(widget=HiddenInput(), validators=[Optional(), NumberRange(-180, 180)])
+    departments = StringField(widget=HiddenInput(), validators=[Optional(), Regexp('([0-9]+,?)+')])
 
     # Headcount
     h = RadioField(
@@ -93,6 +94,16 @@ class CompanySearchForm(FlaskForm):
         choices=DURATION_CHOICES,
         validators=[Optional()]
     )
+
+    def validate(self):
+        """
+            Custom validators
+        """
+        if not super(CompanySearchForm, self).validate():
+            return False
+        if not self.departments.data and (not self.lon.data or not self.lat.data):
+            return False
+        return True
 
 
 class ProCompanySearchForm(CompanySearchForm):

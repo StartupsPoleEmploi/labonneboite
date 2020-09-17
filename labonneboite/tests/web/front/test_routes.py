@@ -77,12 +77,12 @@ class SearchEntreprisesTest(DatabaseTest):
 class EntreprisesLocationTest(AppTest):
 
     def test_get_location_no_arguments(self):
-        location, named_location = get_location({})
+        location, named_location, departements = get_location({})
         self.assertIsNone(location, named_location)
 
     def test_get_location_incorrect_coordinates(self):
         with mock.patch('labonneboite.common.geocoding.get_address', return_value=[]):
-            location, named_location = get_location({
+            location, named_location, departements = get_location({
                 'lat': 0,
                 'lon': 0
             })
@@ -100,7 +100,7 @@ class EntreprisesLocationTest(AppTest):
             'city': 'Wurst City'
         }
         with mock.patch('labonneboite.common.geocoding.get_coordinates', return_value=[metz]):
-            location, named_location = get_location({
+            location, named_location, departements = get_location({
                 'lat': '',
                 'lon': '',
                 'l': 'metz'
@@ -119,7 +119,7 @@ class EntreprisesLocationTest(AppTest):
             'zipcode': '666',
         }]
         with mock.patch('labonneboite.common.geocoding.get_address', return_value=addresses):
-            location, named_location = get_location({
+            location, named_location, departements = get_location({
                 'lat': -2,
                 'lon': -15
             })
@@ -133,7 +133,7 @@ class EntreprisesLocationTest(AppTest):
 
     def test_get_location_location_not_found(self):
         with mock.patch('labonneboite.common.geocoding.get_coordinates', return_value=[]):
-            location, named_location = get_location({
+            location, named_location, departements = get_location({
                 'l': 42,  # I swear, this happened in production
             })
         self.assertIsNone(location)

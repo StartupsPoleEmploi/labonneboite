@@ -158,6 +158,9 @@ function createMap(element, center, zoom) {
       $location.attr('placeholder', $location.val());
       $location.val('');
 
+      // remove department filter
+      $("#departments").val('');
+
       $('.js-search-form').trigger('submit', {async: true});
     };
     map.on('dragend', onMapDrag);

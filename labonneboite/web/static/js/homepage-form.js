@@ -55,6 +55,7 @@
     var inputLocation = $("#l");
     var inputLatitude = $("#lat");
     var inputLongitude = $("#lon");
+    var inputDepartments = $("#departments");
 
     var initialOccupation = inputOccupation.val();
 
@@ -70,6 +71,7 @@
       if (item) {
         inputLatitude.val(item.latitude);
         inputLongitude.val(item.longitude);
+        inputDepartments.val(item.department);
       }
     };
     if (!inputLocation.val() && inputLocation.attr("value")) {
