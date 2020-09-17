@@ -6,11 +6,11 @@ from labonneboite.conf import settings
 from labonneboite.common.geocoding import datagouv
 
 autocomplete_cal_formatted = [{
-    'departement': '14',
+    'department': '14',
     'label': 'Calvados (14)',
     'score': 0.5637810393596784,
 }, {
-    'departement': '62',
+    'department': '62',
     'label': 'Pas-de-Calais (62)',
     'score': 0.5262018995338849,
 }]
@@ -38,7 +38,7 @@ class DatagouvTest(TestCase):
         long_address = 'a' * 300
         short_address = 'a' * 200
         with mock.patch.object(datagouv, 'get_addresses', return_value=search_lelab_formatted) as mock_get_addresses, \
-            mock.patch.object(datagouv, 'get_districts', return_value=autocomplete_cal_formatted) as mock_get_districts:
+            mock.patch.object(datagouv, 'get_departments', return_value=autocomplete_cal_formatted) as mock_get_departments:
             result = datagouv.search(long_address)
             self.assertEqual(short_address, mock_get_addresses.call_args[1]['q'])
             self.assertEqual(autocomplete_cal_formatted[0], result[0])
@@ -46,27 +46,27 @@ class DatagouvTest(TestCase):
             self.assertEqual(search_lelab_formatted[0], result[2])
 
 
-class DistrictApiTest(TestCase):
+class DepartmentApiTest(TestCase):
 
     def setUp(self):
         datagouv.fetch_json.cache_clear()
 
     def test_autocomplete_cal(self):
         fixture = get_fixture('autocomplete-cal.json', 'geo.api.gouv.fr')
-        districts = datagouv.format_districts(fixture)
+        departments = datagouv.format_departments(fixture)
 
-        self.assertEqual(autocomplete_cal_formatted, districts)
+        self.assertEqual(autocomplete_cal_formatted, departments)
 
 
     def test_autocomplete_empty(self):
-        districts = datagouv.format_districts([])
+        departments = datagouv.format_departments([])
 
-        self.assertEqual([], districts)
+        self.assertEqual([], departments)
 
     def test_400_error(self):
         fixture = mock.Mock(status_code=400, json=mock.Mock(side_effect=ValueError))
         with mock.patch.object(datagouv.requests, 'get', return_value=fixture):
-            coordinates = datagouv.get_districts('anything')
+            coordinates = datagouv.get_departments('anything')
 
         self.assertEqual([], coordinates)
 

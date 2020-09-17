@@ -224,7 +224,7 @@ def get_parameters(args):
     if kwargs.get('sort') not in sorting.SORT_FILTERS:
         kwargs['sort'] = sorting.SORT_FILTER_DEFAULT
 
-    # prevent sorting by distance for departements
+    # prevent sorting by distance for departments
     if kwargs.get('sort') == sorting.SORT_FILTER_DISTANCE and 'departments' in args:
         kwargs['sort'] = sorting.SORT_FILTER_SCORE
 
@@ -464,17 +464,17 @@ def get_location(request_args):
 
         location (Location) or None
         named_location (NamedLocation) or None
-        departements (str)
+        departments (str)
     """
 
     # Parse location from latitude/longitude
     location = None
     named_location = None
-    departements = None
+    departments = None
     if 'departments' in request_args:
-        departements = request_args.get('departments')
-        # FIXME: this is a temporary shortcut, we should use the departement API to get the name and zipcode of the departement
-        zipcode = departements[0]
+        departments = request_args.get('departments')
+        # FIXME: this is a temporary shortcut, we should use the department API to get the name and zipcode of the department
+        zipcode = departments[0]
         location_name = city_name = request_args.get('l')
     else:
         zipcode = city_name = location_name = ''
@@ -519,7 +519,7 @@ def get_location(request_args):
     if zipcode and city_name and location_name:
         named_location = NamedLocation(zipcode, city_name, location_name)
 
-    return location, named_location, departements
+    return location, named_location, departments
 
 
 @searchBlueprint.route('/entreprises/commune/<commune_id>/rome/<rome_id>')

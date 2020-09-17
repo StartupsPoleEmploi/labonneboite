@@ -9,7 +9,7 @@ from labonneboite.tests.test_base import AppTest
 """
 
 class SearchFormTest(AppTest):
-    def test_validate_missing_longlat_districts(self):
+    def test_validate_missing_longlat_departments(self):
         with self.app_context():
             form = CompanySearchForm(MultiDict({
                 'j': 'test j',
@@ -51,7 +51,7 @@ class SearchFormTest(AppTest):
             }))
             self.assertEqual(form.validate(), False)
 
-    def test_validate_districts(self):
+    def test_validate_departments(self):
         with self.app_context():
             form = CompanySearchForm(MultiDict({
                 'j': 'test j',

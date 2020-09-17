@@ -21,7 +21,7 @@ def search(address, limit=10):
     corresponds to the required address. Perfect for autocomplete.
 
     This API mixess the results of the address API (https://api-adresse.data.gouv.fr/)
-    with the districts API (https://geo.api.gouv.fr/departements)
+    with the departments API (https://geo.api.gouv.fr/departements)
     """
     if not address:
         return []
@@ -30,9 +30,9 @@ def search(address, limit=10):
         'q': address[:200], # Longer requests cause a 413 error
         'limit': limit
     })
-    districts = get_districts(address, 2)
+    departments = get_departments(address, 2)
 
-    combined = districts + addresses
+    combined = departments + addresses
 
     return combined[0:limit]
 
@@ -107,30 +107,30 @@ def format_coordinates(addresses):
 
     return unique_elements(features, key=lambda x: (x['latitude'], x['longitude']))
 
-def get_districts(query, limit=10):
+def get_departments(query, limit=10):
     """
     Request the https://geo.api.gouv.fr/departements API
     Documentation: https://geo.api.gouv.fr/decoupage-administratif/departements
 
     Args:
-        query (str): the name of a district (département) - possibly incomplete
+        query (str): the name of a department (département) - possibly incomplete
     """
-    districts = fetch_json(
+    departments = fetch_json(
         url=settings.API_DISTRICSTS_URL,
         name='geo.api.gouv.fr/departements',
         is_array=True,
         **{'nom': query, 'limit': limit},
     )
-    return format_districts(districts)
+    return format_departments(departments)
 
-def format_districts(districts):
-    return list(map(format_single_district, districts))
+def format_departments(departments):
+    return list(map(format_single_department, departments))
 
-def format_single_district(district):
+def format_single_department(department):
     return {
-        'departement': district['code'],
-        'label': "%s (%s)" % (district['nom'], district['code']),
-        'score': district['_score']
+        'department': department['code'],
+        'label': "%s (%s)" % (department['nom'], department['code']),
+        'score': department['_score']
     }
 
 @lru_cache(1000)
