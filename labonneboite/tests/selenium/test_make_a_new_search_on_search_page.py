@@ -37,6 +37,8 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
         in a search results page using a form.
         """
         city = 'Nancy'
+        results_sentence = self.driver.find_element_by_css_selector('h1.lbb-result-info').text
+        primitive_results = re.match(r'(\d+)', results_sentence).group()
 
         shown_search_form = self.driver.find_element_by_css_selector('#shown-search-form')
 
@@ -49,16 +51,18 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
 
         shown_search_form.find_element_by_css_selector('button').click()
 
-        # There will be no result for Nancy/Comptabilité
-        # Look for the text "Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour Comptabilité à 10 km - Nancy."
         WebDriverWait(self.driver, 60)\
             .until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, '.tu-no-results'))
+                EC.visibility_of_element_located((By.CSS_SELECTOR, "h1.lbb-result-info"))
             )
 
-        results_sentence = self.driver.find_element_by_css_selector('.tu-no-results').text
+        results_sentence = self.driver.find_element_by_css_selector('h1.lbb-result-info').text
+        last_results = re.match(r'(\d+)', results_sentence).group()
 
         self.assertIn(city, results_sentence)
+        self.assertEqual(last_results, '3')
+        self.assertNotEqual(last_results, primitive_results)
+
 
 
     def test_make_a_new_search_changing_occupation(self):
