@@ -113,8 +113,7 @@ class ApprentissageExtractJob(Job):
                         statements = []
                         raise
                 try:
-                    required_fields = 4 if self.contract_name == "APPRENTISSAGE" else 5
-                    siret, hiring_date, departement = parse_alternance_line(line, required_fields)
+                    siret, hiring_date, departement = parse_alternance_line(line, required_fields=4)
                 except InvalidRowException:
                     logger.info("invalid_row met at row: %i", count)
                     self.invalid_row_errors += 1

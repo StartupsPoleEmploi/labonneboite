@@ -279,9 +279,9 @@ def get_fields_from_csv_line(line, delimiter='|'):
 
     return fields
 
-def parse_alternance_line(line, required_fields = 4):
+def parse_alternance_line(line):
     fields = get_fields_from_csv_line(line, delimiter=';')
-
+    required_fields = 4
     if len(fields) != required_fields:  # an assert statement here does not work from nosetests
         msg = f"found {len(fields)} fields instead of {required_fields} in line: {line}"
         logger.error(msg)
