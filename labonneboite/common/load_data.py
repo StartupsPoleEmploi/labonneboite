@@ -4,7 +4,7 @@ import csv
 import pandas as pd
 import math
 
-from functools import lru_cache
+from functools import lru_cache, reduce
 from collections import defaultdict
 
 USE_ROME_SLICING_DATASET = False  # Rome slicing dataset is not ready yet
@@ -101,6 +101,19 @@ def load_rows_as_dict_of_dict(rows):
             d[f1] = {f2: f3}
     return d
 
+
+@lru_cache(maxsize=None)
+def load_related_rome():
+    rows = load_csv_file("rome_connexe.csv", delimiter=',')
+    return reduce(reduceRelateRomes, rows, {})
+def reduceRelateRomes(aggr, row):
+    [code_insee, rome, rome_connexe, score] = row
+    entry_code_insee = aggr.get(code_insee, {})
+    entry_rome = entry_code_insee.get(rome, [])
+    entry_rome.append({rome_connexe, score})
+    entry_code_insee[rome] = entry_rome
+    aggr[code_insee] = entry_code_insee
+    return aggr
 
 @lru_cache(maxsize=None)
 def load_city_codes():

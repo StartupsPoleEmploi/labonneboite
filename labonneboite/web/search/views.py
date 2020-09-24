@@ -21,6 +21,7 @@ from labonneboite.common.maps import precompute
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.common.util import get_enum_from_value
+from labonneboite.common.load_data import load_related_rome
 from labonneboite.web.utils import fix_csrf_session
 
 from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter
@@ -29,6 +30,7 @@ from labonneboite.web.search.forms import make_company_search_form
 
 
 searchBlueprint = Blueprint('search', __name__)
+RELATED_ROMES = load_related_rome()
 
 
 @searchBlueprint.route('/suggest_job_labels')
@@ -283,6 +285,10 @@ def entreprises():
 
     rome = mapping_util.SLUGIFIED_ROME_LABELS.get(occupation)
     job_doesnt_exist = not rome
+
+    # Related romes
+    # TODO: check (location, named_location, departments) and return related romes
+    related_romes = None
 
     # Build form
     form_kwargs = {key: val for key, val in list(args.items()) if val}
