@@ -293,8 +293,7 @@ class PerfPredictionAndEffectiveHirings(CRUDMixin, Base):
     __tablename__ = "perf_prediction_and_effective_hirings"
 
     _id = Column('id', BigInteger, primary_key=True)
-    importer_cycle_infos_id = Column(Integer, ForeignKey('perf_importer_cycle_infos.id', ondelete='SET NULL'), nullable=True)
-    importer_cycle_infos = relationship('perf_importer_cycle_infos', foreign_keys=[importer_cycle_infos_id])
+    importer_cycle_infos_id = Column(BigInteger, ForeignKey('perf_importer_cycle_infos.id', ondelete='SET NULL'), nullable=True)
     siret = Column(String(191))
     naf = Column('codenaf', String(8))
     city_code = Column('codecommune', String(191))
@@ -317,8 +316,7 @@ class PerfDivisionPerRome(CRUDMixin, Base):
     __tablename__ = "perf_division_per_rome"
 
     _id = Column('id', BigInteger, primary_key=True)
-    importer_cycle_infos_id = Column(Integer, ForeignKey('perf_importer_cycle_infos.id', ondelete='SET NULL'), nullable=True)
-    importer_cycle_infos = relationship('perf_importer_cycle_infos', foreign_keys=[importer_cycle_infos_id])
+    importer_cycle_infos_id = Column(BigInteger, ForeignKey('perf_importer_cycle_infos.id', ondelete='SET NULL'), nullable=True)
     naf = Column('codenaf', String(8), nullable=False)
     rome = Column('coderome', String(8), nullable=False)
     threshold = Column(Float)
