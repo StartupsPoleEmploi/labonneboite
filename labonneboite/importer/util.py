@@ -80,6 +80,16 @@ def check_for_updates(input_folder):
     return new_files
 
 
+def get_backup_files_list(backup_folder, filename):
+    start_of_file = f"{filename}_backup_"
+    end_file = ".sql.gz"
+    backup_files_list = []
+    for file in os.listdir(backup_folder):
+        if file.startswith(start_of_file) and file.endswith(end_file):
+            backup_files_list.append(os.path.join(backup_folder,file))
+    
+    return backup_files_list
+
 @timeit
 def back_up(backup_folder, table, filename, timestamp, new_table_name=None):
     timestamp_filename = '%s_backup_%s.sql.gz' % (filename, timestamp)

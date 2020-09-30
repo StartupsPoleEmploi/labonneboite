@@ -348,6 +348,8 @@ run-importer-job-07-geocode:
 run-importer-job-08-populate-flags:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/populate_flags.py
 
+run-importer-job-09-performance-insert-data:
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/performance_insert_data.py
 
 # Redis useful commands
 # -----
