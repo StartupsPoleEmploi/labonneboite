@@ -57,6 +57,8 @@ def upgrade():
         sa.Column('enseigne', mysql.VARCHAR(collation='utf8mb4_unicode_ci', length=191), nullable=True),
         sa.Column('lbb_nb_predicted_hirings', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
         sa.Column('lba_nb_predicted_hirings', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
+        sa.Column('lbb_nb_predicted_hirings_score', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
+        sa.Column('lba_nb_predicted_hirings_score', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
         sa.Column('lbb_nb_effective_hirings', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
         sa.Column('lba_nb_effective_hirings', mysql.INTEGER(display_width=11), autoincrement=False, nullable=True),
         sa.Column('is_a_bonne_boite', mysql.TINYINT(display_width=1), autoincrement=False, nullable=True),
