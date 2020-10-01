@@ -20,7 +20,7 @@ def generate_google_sheet_service():
     if os.path.exists(TOKEN_FILE):
         with open(TOKEN_FILE, 'rb') as token:
             credentials = pickle.load(token)
-
+    
     if not credentials or not credentials.valid:
         if credentials and credentials.expired and credentials.refresh_token:
             credentials.refresh(Request())
@@ -62,9 +62,18 @@ class GoogleSheetReport:
         letter_first_column = start_cell[0]
         number_first_row = start_cell[1]
 
-        letter_last_column = string.ascii_uppercase[string.ascii_uppercase.index(letter_first_column) + nb_columns - 1]
-        number_last_row = str(int(number_first_row) + nb_rows - 1)
+        index_last_column = string.ascii_uppercase.index(letter_first_column) + nb_columns - 1
 
+        NUMBER_ALPHABET_LETTERS = len(string.ascii_uppercase) #26 letters in alphabet, we never know, if it changes one day...
+        if index_last_column >= NUMBER_ALPHABET_LETTERS:
+            # It means there are more than 26 columns to insert, then we have to move to the AA column on google sheets
+            first_letter_last_column = string.ascii_uppercase[int(index_last_column/NUMBER_ALPHABET_LETTERS)-1]
+            second_letter_last_column = string.ascii_uppercase[(index_last_column%NUMBER_ALPHABET_LETTERS)]
+            letter_last_column = f"{first_letter_last_column}{second_letter_last_column}"
+        else:
+            letter_last_column = string.ascii_uppercase[index_last_column]
+
+        number_last_row = str(int(number_first_row) + nb_rows - 1)
         end_cell = f'{letter_last_column}{number_last_row}'
 
         return end_cell
@@ -98,3 +107,17 @@ class GoogleSheetReport:
         )
 
         request.execute()
+
+if __name__ == '__main__':
+    # Never supposed to be called as main
+    # Just for development purposes debug
+    service = generate_google_sheet_service()
+    first_sheet_report = GoogleSheetReport(
+        service=service,
+        spreadsheet_id="toto",
+        sheet_index=0,
+        start_cell='B6',
+        values={"values":[[i for i in range(0,30)]]}
+    )
+    first_sheet_report.set_sheet_range()
+ 
