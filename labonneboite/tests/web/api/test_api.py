@@ -243,7 +243,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(
                 rv.data,
-                b'Invalid request argument: missing arguments: either commune_id or latitude and longitude'
+                b'Invalid request argument: missing arguments: either commune_id or departments or both latitude and longitude'
             )
 
     def test_invalid_longitude_or_latitude(self):
