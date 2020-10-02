@@ -316,7 +316,7 @@ def get_location(request_args):
         except ValueError:
             raise InvalidFetcherArgument('latitude and longitude must be float')
     elif 'departments' not in request_args:
-        raise InvalidFetcherArgument('missing arguments: either commune_id or latitude and longitude')
+        raise InvalidFetcherArgument('missing arguments: either commune_id or departments or both latitude and longitude')
 
     if 'departments' in request_args:
         departements = request_args.get('departments')
