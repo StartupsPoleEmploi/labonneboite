@@ -118,7 +118,7 @@ def get_departments(query, limit=10):
         query (str): the name of a department (département) - possibly incomplete
     """
     departments = fetch_json(
-        url=settings.API_DISTRICSTS_URL,
+        url=settings.API_DEPARTMENTS_URL,
         name='geo.api.gouv.fr/departements',
         is_array=True,
         **{'nom': query, 'limit': limit},

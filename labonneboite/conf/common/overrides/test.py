@@ -45,7 +45,7 @@ API_USERS = {
 }
 
 API_ADRESSE_BASE_URL = 'http://urlintrouvablepourlbb.fr'
-API_DISTRICSTS_URL = 'http://urlintrouvablepourlbb.fr'
+API_DEPARTMENTS_URL = 'http://urlintrouvablepourlbb.fr'
 
 SENTRY_ENVIRONMENT = "test"
 WTF_CSRF_ENABLED = False
