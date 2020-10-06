@@ -17,8 +17,6 @@
             <!-- This form will be submitted via Javascript when a new filter is used. -->
             {% include "includes/search_form.html" %}
           </div>
-
-          <h2 class="sr-only lbb-result-info">Trier les résultats de recherche</h2>
           <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
             <div class="lbb-sidebar">
               <div id="toggle-map-wrapper">
@@ -33,6 +31,15 @@
                  <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
                  <hr>
                </div>
+              <h3 class="sr-only lbb-result-info">Trier les résultats de recherche</h3>
+              {% if related_romes %}
+                  <h3>Romes connexes</h3>
+                  <ul>
+                  {% for rome in related_romes %}
+                  <li>{{rome.rome}}: score={{rome.score}}, {{rome.nafs|length}} nafs</li>
+                  {% endfor %}
+                  </ul>
+              {% endif %}
                {% if not departments %}
                <h3>Trier</h3>
                <div class="lbb-sidebar-item">

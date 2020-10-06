@@ -110,7 +110,7 @@ def reduceRelateRomes(aggr, row):
     [code_insee, rome, rome_connexe, score] = row
     entry_code_insee = aggr.get(code_insee, {})
     entry_rome = entry_code_insee.get(rome, [])
-    entry_rome.append({rome_connexe, score})
+    entry_rome.append({'rome': rome_connexe, 'score': score})
     entry_code_insee[rome] = entry_rome
     aggr[code_insee] = entry_code_insee
     return aggr

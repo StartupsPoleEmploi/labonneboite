@@ -49,5 +49,6 @@ class CityLocation(object):
 NamedLocation = namedtuple('NamedLocation', [
     'zipcode',
     'city',
-    'name'
+    'name',
+    'city_code'
 ])

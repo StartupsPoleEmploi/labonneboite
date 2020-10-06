@@ -79,6 +79,7 @@ def format_addresses(addresses):
                 'label': result['properties']['label'],
                 'zipcode': result['properties']['postcode'],
                 'city': result['properties']['city'],
+                'city_code': result['properties']['citycode'],
             })
         except KeyError:
             pass
@@ -94,6 +95,7 @@ def format_coordinates(addresses):
                 'label': result['properties']['label'],
                 'zipcode': result['properties']['postcode'],
                 'city': result['properties']['city'],
+                'city_code': result['properties']['citycode'],
                 'score': result['properties']['score'],
             }
             # The zipcode is normally always present in the label,

@@ -257,6 +257,11 @@ def results(city, zipcode, occupation):
     redirect_url = url_for('search.entreprises', **params)
     return redirect(redirect_url)
 
+def add_nafs(rome_object):
+    nafs = mapping_util.nafs_for_rome(rome_object.get('rome'))
+    if(nafs):
+        rome_object['nafs'] = nafs
+    return rome_object
 
 @searchBlueprint.route('/entreprises')
 def entreprises():
@@ -287,8 +292,10 @@ def entreprises():
     job_doesnt_exist = not rome
 
     # Related romes
-    # TODO: check (location, named_location, departments) and return related romes
     related_romes = None
+    related_city_codes = RELATED_ROMES.get(named_location.city_code, None)
+    if (related_city_codes and rome in related_city_codes):
+        related_romes = list(map(add_nafs, related_city_codes.get(rome)))
 
     # Build form
     form_kwargs = {key: val for key, val in list(args.items()) if val}
@@ -428,6 +435,7 @@ def entreprises():
         'travel_modes_french': maps_constants.TRAVEL_MODES_FRENCH,
         'duration_filter_enabled': duration_filter_enabled,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
+        'related_romes': related_romes,
     }
 
     activity_log_properties['distance'] = fetcher.distance
@@ -483,7 +491,7 @@ def get_location(request_args):
         zipcode = departments[0]
         location_name = city_name = request_args.get('l')
     else:
-        zipcode = city_name = location_name = ''
+        city_code = zipcode = city_name = location_name = ''
         if 'lat' in request_args and 'lon' in request_args:
             try:
                 latitude = float(request_args['lat'])
@@ -497,6 +505,7 @@ def get_location(request_args):
                     zipcode = addresses[0]['zipcode']
                     city_name = addresses[0]['city']
                     location_name = addresses[0]['label']
+                    city_code = addresses[0]['city_code']
 
         # Parse location from zipcode/city slug (slug is optional)
         if location is None and 'zipcode' in request_args:
@@ -523,7 +532,7 @@ def get_location(request_args):
                     location_name = result['label']
 
     if zipcode and city_name and location_name:
-        named_location = NamedLocation(zipcode, city_name, location_name)
+        named_location = NamedLocation(zipcode, city_name, location_name, city_code)
 
     return location, named_location, departments
 
