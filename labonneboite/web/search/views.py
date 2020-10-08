@@ -492,6 +492,7 @@ def get_location(request_args):
     location = None
     named_location = None
     departments = None
+    city_code = None
     if 'departments' in request_args:
         departments = request_args.get('departments')
         # FIXME: this is a temporary shortcut, we should use the department API to get the name and zipcode of the department

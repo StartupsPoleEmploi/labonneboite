@@ -36,10 +36,11 @@
                   <h3>Romes connexes</h3>
                   <ul id="form-related_romes">
                   {% for rome in related_romes %}
-                  <li><a
+                  <li><div
                       data-rome-description="{{rome.description}}"
                       data-rome-description-slug="{{rome.description | slugify}}"
-                      href="#">{{rome.description}}</a></li>
+                      href="#">{{rome.rome}} ({{rome.score}})</div></li>
+                  <!-- href="#">{{rome.description}}</a></li> -->
                   {% endfor %}
                   </ul>
               {% endif %}
