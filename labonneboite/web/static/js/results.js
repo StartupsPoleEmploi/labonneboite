@@ -229,6 +229,11 @@ var trackOutboundLink = function(url) {
     });
 
     shown_form.on('submit', function(e) {
+      // Reset the "naf" filter (Secteur d'activité)
+      // This is a quick fix to this problem: if the user changes the search location or job when she has previously selected a naf, the new search might not have result with the selected naf, so the selected naf will not appear in the dropdown which will display "tous les secteurs" while still filtering the results with the naf
+      // @see https://trello.com/c/Y6iboXeE/603-ano-erreur-valorisation-filtre-secteur-dactivit%C3%A9
+      $('#naf').val('')
+
       e.preventDefault();
       e.stopPropagation();
       var html_form = shown_form.html();
