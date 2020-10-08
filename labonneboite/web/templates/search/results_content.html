@@ -34,9 +34,12 @@
               <h3 class="sr-only lbb-result-info">Trier les résultats de recherche</h3>
               {% if related_romes %}
                   <h3>Romes connexes</h3>
-                  <ul>
+                  <ul id="form-related_romes">
                   {% for rome in related_romes %}
-                  <li>{{rome.rome}}: score={{rome.score}}, {{rome.nafs|length}} nafs</li>
+                  <li><a
+                      data-rome-description="{{rome.description}}"
+                      data-rome-description-slug="{{rome.description | slugify}}"
+                      href="#">{{rome.description}}</a></li>
                   {% endfor %}
                   </ul>
               {% endif %}

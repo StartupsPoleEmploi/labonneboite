@@ -32,7 +32,6 @@ from labonneboite.web.search.forms import make_company_search_form
 searchBlueprint = Blueprint('search', __name__)
 RELATED_ROMES = load_related_rome()
 
-
 @searchBlueprint.route('/suggest_job_labels')
 def suggest_job_labels():
     term = request.args.get('term', '')
@@ -257,10 +256,16 @@ def results(city, zipcode, occupation):
     redirect_url = url_for('search.entreprises', **params)
     return redirect(redirect_url)
 
-def add_nafs(rome_object):
-    nafs = mapping_util.nafs_for_rome(rome_object.get('rome'))
-    if(nafs):
-        rome_object['nafs'] = nafs
+# def add_nafs(rome_object):
+#     nafs = mapping_util.nafs_for_rome(rome_object.get('rome'))
+#     if(nafs):
+#         rome_object['nafs'] = nafs
+#     return rome_object
+
+def add_descriptions(rome_object):
+    description = settings.ROME_DESCRIPTIONS[rome_object.get('rome')]
+    if(description):
+        rome_object['description'] = description
     return rome_object
 
 @searchBlueprint.route('/entreprises')
@@ -295,7 +300,9 @@ def entreprises():
     related_romes = None
     related_city_codes = RELATED_ROMES.get(named_location.city_code, None)
     if (related_city_codes and rome in related_city_codes):
-        related_romes = list(map(add_nafs, related_city_codes.get(rome)))
+        related_romes = related_city_codes.get(rome)
+        # related_romes = list(map(add_nafs, related_romes))
+        related_romes = list(map(add_descriptions, related_romes))
 
     # Build form
     form_kwargs = {key: val for key, val in list(args.items()) if val}

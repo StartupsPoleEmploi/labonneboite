@@ -204,6 +204,17 @@ var trackOutboundLink = function(url) {
     var shown_form = this;
     var hidden_form = $('.js-search-form');
     var send_button = shown_form.find('button[type="submit"]');
+    var relativeRomes = $('#form-related_romes')
+
+    relativeRomes.on('click', function(e) {
+      var j = shown_form.find('#j');
+      var occupation = hidden_form.find('#occupation');
+      var rome_description = $(e.target).attr('data-rome-description');
+      var rome_description_slug = $(e.target).attr('data-rome-description-slug');
+      j.val(rome_description);
+      occupation.val(rome_description_slug);
+      shown_form.submit();
+    });
 
     send_button.on('click', function (e) {
       e.preventDefault();
