@@ -13,7 +13,10 @@ from labonneboite.importer.models.computing import PerfDivisionPerRome
 from labonneboite.importer.models.computing import PerfPredictionAndEffectiveHirings
 from datetime import datetime
 
-dict_df = {}
+dict_df_predict = {}
+dict_df_sum_predict = {}
+dict_df_predict_dep = {}
+dict_df_sum_predict_dep = {}
 
 #import donnée#######################################################################""
 
@@ -72,50 +75,54 @@ def load_csv_perf_prediction_and_effective_h(filename, delimiter=';'):
         db_session.commit()
 
 
-#cycle + naf #######################################################################""
 
-
-
-def get_nb_entreprise_par_cycle_et_naf():
+def get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne , nom):
     engine = import_util.create_sqlalchemy_engine()
-    query = 'SELECT importer_cycle_infos_id as cycle , codenaf as naf ,count(*) as nbTotal \
+    query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotal \
             FROM perf_prediction_and_effective_hirings ppaeh \
-            GROUP BY importer_cycle_infos_id , codenaf;'
+            GROUP BY importer_cycle_infos_id , {colonne};'
     df_nb_entreprise = pd.read_sql_query(query, engine)
     engine.close()
     return df_nb_entreprise
 
-def get_nb_entreprise_par_cycle_et_naf_isLBB():
+
+
+def get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBB(colonne ,nom):
     engine = import_util.create_sqlalchemy_engine()
-    query = 'SELECT importer_cycle_infos_id as cycle , codenaf as naf ,count(*) as nbTotalLBB \
+    query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotalLBB \
             FROM perf_prediction_and_effective_hirings ppaeh \
             WHERE is_a_bonne_boite is true \
-            GROUP BY importer_cycle_infos_id , codenaf;'
+            GROUP BY importer_cycle_infos_id , {colonne};'
     df_nb_entreprise_isLBB = pd.read_sql_query(query, engine)
     engine.close()
     return df_nb_entreprise_isLBB
 
 
-def get_sum_predict_par_cycle_et_naf(cycle,naf):
+
+def get_sum_predict_par_cycle_et_naf_ou_dep(cycle ,colonne ,nom ,value):
     engine = import_util.create_sqlalchemy_engine()
-    query = f'SELECT importer_cycle_infos_id as cycle , codenaf as naf ,sum(lbb_nb_predicted_hirings) as sommeTotal \
+    query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom},sum(lbb_nb_predicted_hirings) as sommeTotal \
             FROM perf_prediction_and_effective_hirings ppaeh \
-            WHERE importer_cycle_infos_id = {cycle} and codenaf = "{naf}"  \
+            WHERE importer_cycle_infos_id = {cycle} and {colonne} = "{value}"  \
             GROUP BY importer_cycle_infos_id , codenaf;'
     df_sum_predict = pd.read_sql_query(query, engine)
     engine.close()
     return df_sum_predict
 
 
-def get_predict_par_cycle_et_naf(cycle,naf):
+
+
+def get_predict_par_cycle_et_naf_ou_dep(cycle ,colonne ,value):
     engine = import_util.create_sqlalchemy_engine()
     query = f'SELECT lbb_nb_predicted_hirings as predict, lbb_nb_effective_hirings as effective \
             FROM perf_prediction_and_effective_hirings \
-            WHERE importer_cycle_infos_id = {cycle} and codenaf = "{naf}"  \
+            WHERE importer_cycle_infos_id = {cycle} and {colonne} = "{value}"  \
             ORDER BY lbb_nb_predicted_hirings desc '
     df_predict = pd.read_sql_query(query, engine)
     engine.close()
     return df_predict
+
+
 
 def get_cycle_infos():
     engine = import_util.create_sqlalchemy_engine()
@@ -127,10 +134,21 @@ def get_cycle_infos():
 
 
 
+#cycle + naf #######################################################################""
 
-def get_sum_predict_naf(row,i):
-    df_predict = get_predict_par_cycle_et_naf(row["cycle"],row["naf"])
-    df_sum_predict = get_sum_predict_par_cycle_et_naf(row["cycle"],row["naf"])
+def get_sum_predict(row,i,colonne,nom):
+    if i == 10:
+        df_predict = get_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,row[nom])
+        df_sum_predict = get_sum_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,nom,row[nom])
+        if row["cycle"] not in dict_df_predict:
+            dict_df_predict[row["cycle"]] = {}
+        dict_df_predict[row["cycle"]][row[nom]] = df_predict
+        if row["cycle"] not in dict_df_sum_predict:
+            dict_df_sum_predict[row["cycle"]] = {}       
+        dict_df_sum_predict[row["cycle"]][row[nom]] = df_sum_predict       
+    else :
+        df_predict = dict_df_predict[row["cycle"]][row[nom]]
+        df_sum_predict = dict_df_sum_predict[row["cycle"]][row[nom]]
     if i == 100:
         df_predict['RMSE'] = df_predict.apply(lambda row: calcul_rmse(row), axis=1)
         return math.sqrt(df_predict['RMSE'].sum() / row['nbTotal'])
@@ -146,93 +164,24 @@ def calcul_rmse(row):
     return  math.pow((row['effective'] - row['predict']),2)
 
 
-def lancement_requete_naf():
-    df_nb_entreprise = get_nb_entreprise_par_cycle_et_naf()
+def lancement_requete(colonne,nom):
+    df_nb_entreprise = get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne,nom)
 
     for i in range(10,110,10):
-        df_nb_entreprise[f'sum{i}'] = df_nb_entreprise.apply(lambda row: get_sum_predict_naf(row,i), axis=1)
+        df_nb_entreprise[f'sum{i}'] = df_nb_entreprise.apply(lambda row: get_sum_predict(row,i,colonne,nom), axis=1)
 
     df_nb_entreprise = df_nb_entreprise.rename(columns={'sum100':'RMSE'})
 
-    df_nb_entreprise_isLBB  = get_nb_entreprise_par_cycle_et_naf_isLBB()
-    df_result = pd.merge(df_nb_entreprise , df_nb_entreprise_isLBB , on=['cycle','naf'])
+    df_nb_entreprise_isLBB  = get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBB(colonne,nom)
+    df_result = pd.merge(df_nb_entreprise , df_nb_entreprise_isLBB , on=['cycle',nom])
     df_result['propRecrutNonLBB'] = df_result.apply(lambda row: get_prop_recrut_non_lbb(row), axis=1)
     return df_result
 
-#cycle + dep #######################################################################""
 
-
- 
-
-def get_nb_entreprise_par_cycle_et_dep():
-    engine = import_util.create_sqlalchemy_engine()
-    query = 'SELECT importer_cycle_infos_id as cycle , departement as dep ,count(*) as nbTotal \
-            FROM perf_prediction_and_effective_hirings ppaeh \
-            GROUP BY importer_cycle_infos_id , departement;'
-    df_nb_entreprise = pd.read_sql_query(query, engine)
-    engine.close()
-    return df_nb_entreprise
-
-def get_nb_entreprise_par_cycle_et_dep_isLBB():
-    engine = import_util.create_sqlalchemy_engine()
-    query = 'SELECT importer_cycle_infos_id as cycle , departement as dep ,count(*) as nbTotalLBB \
-            FROM perf_prediction_and_effective_hirings ppaeh \
-            WHERE is_a_bonne_boite is true \
-            GROUP BY importer_cycle_infos_id , departement;'
-    df_nb_entreprise_isLBB = pd.read_sql_query(query, engine)
-    engine.close()
-    return df_nb_entreprise_isLBB
-
-
-def get_sum_predict_par_cycle_et_dep(cycle,dep):
-    engine = import_util.create_sqlalchemy_engine()
-    query = f'SELECT importer_cycle_infos_id as cycle , departement as dep ,sum(lbb_nb_predicted_hirings) as sommeTotal \
-            FROM perf_prediction_and_effective_hirings ppaeh \
-            WHERE importer_cycle_infos_id = {cycle} and departement = "{dep}"  \
-            GROUP BY importer_cycle_infos_id , departement;'
-    df_sum_predict = pd.read_sql_query(query, engine)
-    engine.close()
-    return df_sum_predict
-
-
-def get_predict_par_cycle_et_dep(cycle,dep):
-    engine = import_util.create_sqlalchemy_engine()
-    query = f'SELECT lbb_nb_predicted_hirings as predict, lbb_nb_effective_hirings as effective \
-            FROM perf_prediction_and_effective_hirings \
-            WHERE importer_cycle_infos_id = {cycle} and departement = "{dep}"  \
-            ORDER BY lbb_nb_predicted_hirings desc '
-    df_predict = pd.read_sql_query(query, engine)
-    engine.close()
-    return df_predict
-
-def get_sum_predict_dep(row,i):
-    df_predict = get_predict_par_cycle_et_dep(row["cycle"],row["dep"])
-    df_sum_predict = get_sum_predict_par_cycle_et_dep(row["cycle"],row["dep"])
-    if i == 100:
-        df_predict['RMSE'] = df_predict.apply(lambda row: calcul_rmse(row), axis=1)
-        return math.sqrt(df_predict['RMSE'].sum() / row['nbTotal'])
-    df_head_predict =  df_predict.head(int(row['nbTotal']*i/100))
-    if df_sum_predict['sommeTotal'].sum() == 0 :
-        return 0
-    return  df_head_predict['predict'].sum() / df_sum_predict['sommeTotal'].sum()
-
-
-def lancement_requete_dep():
-    df_nb_entreprise = get_nb_entreprise_par_cycle_et_dep()
-
-    for i in range(10,110,10):
-        df_nb_entreprise[f'sum{i}'] = df_nb_entreprise.apply(lambda row: get_sum_predict_dep(row,i), axis=1)
-
-    df_nb_entreprise = df_nb_entreprise.rename(columns={'sum100':'RMSE'})
-
-    df_nb_entreprise_isLBB  = get_nb_entreprise_par_cycle_et_dep_isLBB()
-    df_result = pd.merge(df_nb_entreprise , df_nb_entreprise_isLBB , on=['cycle','dep'])
-    df_result['propRecrutNonLBB'] = df_result.apply(lambda row: get_prop_recrut_non_lbb(row), axis=1)
-    return df_result
 
 def prepare_google_sheet_data():
-    df_naf = lancement_requete_naf()
-    df_dep = lancement_requete_dep()
+    df_naf = lancement_requete("codenaf","naf")
+    df_dep = lancement_requete("departement","dep")
     df_cycle_infos = get_cycle_infos()
     df_naf = pd.merge(df_naf , df_cycle_infos , on=['cycle'])
     df_dep = pd.merge(df_dep , df_cycle_infos , on=['cycle'])
