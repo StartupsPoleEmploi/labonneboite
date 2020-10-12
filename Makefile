@@ -351,6 +351,10 @@ run-importer-job-08-populate-flags:
 run-importer-job-09-performance-insert-data:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/performance_insert_data.py
 
+
+run-importer-job-10-performance-compute-data:
+	export LBB_ENV=development && cd labonneboite/importer && python jobs/performance_compute_data.py
+
 # Redis useful commands
 # -----
 
