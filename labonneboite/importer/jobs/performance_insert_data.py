@@ -1,6 +1,6 @@
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings
-from labonneboite.importer.models.computing import PerfImporterCycleInfos
+from labonneboite.importer.models.computing import PerfImporterCycleInfos, PerfPredictionAndEffectiveHirings
 from labonneboite.common.database import db_session
 
 import os 
@@ -136,21 +136,21 @@ def insert_into_importer_cycle_infos(file, file_name):
         execution_date = execution_date,
         prediction_start_date = prediction_start_date,
         prediction_end_date = prediction_end_date,
-        file_name = file_name
+        file_name = file_name,
+        computed = False
     )
     db_session.add(importer_cycle_infos)
     db_session.commit()
     importer_cycle_infos = PerfImporterCycleInfos.query.filter(PerfImporterCycleInfos.file_name == file_name).first()
-    importer_cycle_infos_id = importer_cycle_infos._id
 
-    logger.info(f"id = {importer_cycle_infos_id}")
+    logger.info(f"id = {importer_cycle_infos._id}")
     logger.info(f"execution_date = {execution_date}")
     logger.info(f"prediction_start_date = {prediction_start_date}")
     logger.info(f"prediction_end_date = {prediction_end_date}")
     logger.info(f"file_name = {file_name}")
     logger.info("insertion into importer_cycle_infos OK")
 
-    return importer_cycle_infos_id
+    return importer_cycle_infos
 
 def insert_into_etablissements_predicted_and_effective_hirings(importer_cycle_infos_id, file_name, etab_list):
     logger.info(f"\n Start : Insert data into perf_prediction_and_effective_hirings from file {file_name}")
@@ -178,16 +178,69 @@ def insert_into_etablissements_predicted_and_effective_hirings(importer_cycle_in
 def insert_data(file,etab_list):
     file_name = os.path.basename(file)
     logger.info(f"\n Start : Insert data into database from file {file_name}")
-    importer_cycle_infos_id = insert_into_importer_cycle_infos(file, file_name)
-    insert_into_etablissements_predicted_and_effective_hirings(importer_cycle_infos_id, file_name, etab_list)
+    importer_cycle_infos = insert_into_importer_cycle_infos(file, file_name)
+    insert_into_etablissements_predicted_and_effective_hirings(importer_cycle_infos._id, file_name, etab_list)
+    return importer_cycle_infos
+
+def compute_effective_and_predicted_hirings():
+    logger.info(f"\n Start : Computing effective hirings")
+
+    importer_cycles_infos = PerfImporterCycleInfos.query.filter(PerfImporterCycleInfos.computed == False).all()
+    importer_cycles_infos_to_compute = []
+    for ici in importer_cycles_infos:
+        if os.environ["LBB_ENV"] == "development":
+            importer_cycles_infos_to_compute.append(ici)
+            continue
+        if ici.prediction_end_date < datetime.now():
+            importer_cycles_infos_to_compute.append(ici)
+
+    logger.info(f"Importer cycles infos which have not been computed yet : {[ i.file_name for i in importer_cycles_infos_to_compute]}")
+
+    for ici in importer_cycles_infos_to_compute:
+        logger.info(f"Start computing for importer cycle infos : {ici._id} - {ici.file_name}")
+
+        engine = import_util.create_sqlalchemy_engine()
+        query = f'SELECT id, siret \
+                FROM perf_prediction_and_effective_hirings\
+                WHERE importer_cycle_infos_id={ici._id};'
+        df_companies_list = pd.read_sql_query(query, engine)
+        logger.info(f"Nb offices to compute : {len(df_companies_list)}")
+
+        query_hirings_lbb = f"SELECT siret, count(*) as lbb_effective_nb_hirings \
+                FROM hirings\
+                WHERE hiring_date >= '{ici.prediction_start_date}'\
+                and hiring_date <= '{ici.prediction_end_date}'\
+                and (contract_type=1 or contract_type=2)\
+                GROUP BY siret;"
+        df_hirings_lbb = pd.read_sql_query(query_hirings_lbb,engine)
+        logger.info(f"Nb offices found in hirings for lbb : {len(df_hirings_lbb)}")
+
+
+        query_hirings_lba = f"SELECT siret, count(*) as lba_effective_nb_hirings \
+                FROM hirings\
+                WHERE hiring_date >= '{ici.prediction_start_date}'\
+                and hiring_date <= '{ici.prediction_end_date}'\
+                and (contract_type=11 or contract_type=12)\
+                GROUP BY siret;"
+        df_hirings_lba = pd.read_sql_query(query_hirings_lba,engine)
+        logger.info(f"Nb offices found in hirings for lba: {len(df_hirings_lba)}")
+
+        df_merge_hirings_tmp = pd.merge(df_companies_list, df_hirings_lbb, how='left', on="siret")
+        df_merged = pd.merge(df_merge_hirings_tmp, df_hirings_lba, how='left', on="siret")
+
+        import ipdb; ipdb.set_trace()
+        #TODO Compute the effective hirings from the score
+
 
 def main():
     # First part of insertion : Get data from the file exported after each importer cycle
     files_list = get_available_files_list()
     for file in files_list:
         etab_list = parse_backup_file_importer_output(file)
-        insert_data(file, etab_list)
+        importer_cycle_infos = insert_data(file, etab_list)
 
+    compute_effective_and_predicted_hirings()
+    
     # Second part : Compute nb of effective hirings
     # TODO
 
