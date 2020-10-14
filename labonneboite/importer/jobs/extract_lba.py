@@ -26,9 +26,9 @@ from labonneboite.common.database import db_session
 
 
 class ApprentissageExtractJob(Job):
-    file_type_apprentissage = "lba-app"
-    import_type = ImportTask.APPRENTISSAGE
-    table_name = settings.HIRING_TABLE
+    #file_type_apprentissage = "lba-app"
+    #import_type = ImportTask.APPRENTISSAGE
+    #table_name = settings.HIRING_TABLE
 
     def __init__(self, filename, contract_type = "APPRENTISSAGE"):
         self.input_filename = filename
@@ -87,10 +87,7 @@ class ApprentissageExtractJob(Job):
             con, cur = import_util.create_cursor()
             header_line = myfile.readline().strip()   # FIXME detect column positions from header
             
-            if b"Siret" not in header_line and self.file_type == DpaeStatistics.APR:
-                logger.debug(header_line)
-                raise Exception("wrong header line")
-            elif b"SIRET" not in header_line and self.file_type == DpaeStatistics.PRO:
+            if b"SIRET" not in header_line:
                 logger.debug(header_line)
                 raise Exception("wrong header line")
 
@@ -113,7 +110,7 @@ class ApprentissageExtractJob(Job):
                         statements = []
                         raise
                 try:
-                    siret, hiring_date, departement = parse_alternance_line(line, required_fields=4)
+                    siret, hiring_date, departement = parse_alternance_line(line)
                 except InvalidRowException:
                     logger.info("invalid_row met at row: %i", count)
                     self.invalid_row_errors += 1
