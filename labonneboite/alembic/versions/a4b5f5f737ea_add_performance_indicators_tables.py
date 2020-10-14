@@ -25,6 +25,7 @@ def upgrade():
         sa.Column('prediction_start_date', mysql.DATETIME(), nullable=True),
         sa.Column('prediction_end_date', mysql.DATETIME(), nullable=True),
         sa.Column('file_name', mysql.TEXT(collation='utf8mb4_unicode_ci'), nullable=True),
+        sa.Column('computed', mysql.TINYINT(display_width=1), autoincrement=False, nullable=True),
         sa.PrimaryKeyConstraint('id'),
         mysql_collate='utf8mb4_unicode_ci',
         mysql_default_charset='utf8mb4',
