@@ -285,6 +285,7 @@ class PerfImporterCycleInfos(CRUDMixin, Base):
     prediction_start_date = Column(DateTime, default=None)
     prediction_end_date = Column(DateTime, default=None)
     file_name = Column(Text)
+    computed = Column(Boolean)
 
 class PerfPredictionAndEffectiveHirings(CRUDMixin, Base):
     """
