@@ -297,17 +297,10 @@ def parse_alternance_line(line):
             raise InvalidSiretException(f"The siret {siret} is not valid")
 
     hiring_date_raw = fields[1]
-    hiring_date = datetime.strptime(hiring_date_raw, "%m%Y")
+    hiring_date = datetime.strptime(hiring_date_raw, "%d/%m/%Y")
 
-    departement = fields[3]
-    if departement == '' or departement is None or departement == '0':
-        raise InvalidZipCodeException
-    
-    if len(departement) == 1 and departement.isdigit():
-        departement = '0' + departement
-
-    if len(departement) > 3 and len(departement) < 2:
-        raise InvalidZipCodeException
+    zip_code = fields[3]
+    departement = get_departement_from_zipcode(zip_code)
 
     return siret, hiring_date, departement
 
