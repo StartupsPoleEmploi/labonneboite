@@ -62,7 +62,7 @@ class EsdToken(object):
         }
 
         response = _get_response(
-            url=ESD_TOKEN_ENDPOINT_URL,
+            url=ESD_TOKEN_ENDPOINT_URL + '?realm=%2Fpartenaire',
             headers=headers,
             method='POST',
             data=data,
