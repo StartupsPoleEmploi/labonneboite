@@ -48,6 +48,7 @@ class EsdToken(object):
     @classmethod
     def prepare_token(cls):
         data = urlencode([
+            ('realm', '/partenaire'),
             ('grant_type', 'client_credentials'),
             ('client_id', settings.PEAM_CLIENT_ID),
             ('client_secret', settings.PEAM_CLIENT_SECRET),
