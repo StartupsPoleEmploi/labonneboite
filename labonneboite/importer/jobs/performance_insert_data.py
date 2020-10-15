@@ -2,6 +2,7 @@ from labonneboite.importer import util as import_util
 from labonneboite.importer import settings
 from labonneboite.importer.models.computing import PerfImporterCycleInfos, PerfPredictionAndEffectiveHirings
 from labonneboite.common.database import db_session
+from labonneboite.common import scoring as scoring_util
 
 import os 
 import gzip
@@ -200,13 +201,13 @@ def compute_effective_and_predicted_hirings():
         logger.info(f"Start computing for importer cycle infos : {ici._id} - {ici.file_name}")
 
         engine = import_util.create_sqlalchemy_engine()
-        query = f'SELECT id, siret \
+        query = f'SELECT id, siret, lbb_nb_predicted_hirings_score, lba_nb_predicted_hirings_score \
                 FROM perf_prediction_and_effective_hirings\
                 WHERE importer_cycle_infos_id={ici._id};'
         df_companies_list = pd.read_sql_query(query, engine)
         logger.info(f"Nb offices to compute : {len(df_companies_list)}")
 
-        query_hirings_lbb = f"SELECT siret, count(*) as lbb_effective_nb_hirings \
+        query_hirings_lbb = f"SELECT siret, count(*) as lbb_nb_effective_hirings \
                 FROM hirings\
                 WHERE hiring_date >= '{ici.prediction_start_date}'\
                 and hiring_date <= '{ici.prediction_end_date}'\
@@ -215,8 +216,7 @@ def compute_effective_and_predicted_hirings():
         df_hirings_lbb = pd.read_sql_query(query_hirings_lbb,engine)
         logger.info(f"Nb offices found in hirings for lbb : {len(df_hirings_lbb)}")
 
-
-        query_hirings_lba = f"SELECT siret, count(*) as lba_effective_nb_hirings \
+        query_hirings_lba = f"SELECT siret, count(*) as lba_nb_effective_hirings \
                 FROM hirings\
                 WHERE hiring_date >= '{ici.prediction_start_date}'\
                 and hiring_date <= '{ici.prediction_end_date}'\
@@ -228,8 +228,56 @@ def compute_effective_and_predicted_hirings():
         df_merge_hirings_tmp = pd.merge(df_companies_list, df_hirings_lbb, how='left', on="siret")
         df_merged = pd.merge(df_merge_hirings_tmp, df_hirings_lba, how='left', on="siret")
 
-        import ipdb; ipdb.set_trace()
-        #TODO Compute the effective hirings from the score
+
+        #Compute the predicted hirings from the score
+        df_merged["lbb_nb_predicted_hirings"] = df_merged["lbb_nb_predicted_hirings_score"].apply(lambda x: scoring_util.get_hirings_from_score(x))
+        df_merged["lba_nb_predicted_hirings"] = df_merged["lba_nb_predicted_hirings_score"].apply(lambda x: scoring_util.get_hirings_from_score(x))
+
+        df_merged = df_merged.fillna(0)
+
+        cols_we_want_to_keep = [
+            "id", 
+            "siret", 
+            "lbb_nb_effective_hirings", 
+            "lba_nb_effective_hirings", 
+            "lbb_nb_predicted_hirings", 
+            "lba_nb_predicted_hirings" 
+        ]
+
+        df_merged = df_merged[cols_we_want_to_keep]
+
+        #INSERT THE VALUES COMPUTED IN THE SQL
+        values_to_update = df_merged.values.tolist()
+        count=0
+
+        for row in values_to_update:
+            id=row[0]
+            siret=row[1]
+            lbb_nb_effective_hirings=row[2]
+            lbb_nb_effective_hirings=row[3]
+            lbb_nb_predicted_hirings=row[4]
+            lba_nb_predicted_hirings=row[5]
+
+            pred_effective_hirings = PerfPredictionAndEffectiveHirings.query.filter(PerfPredictionAndEffectiveHirings._id == id).first()
+            pred_effective_hirings.lbb_nb_effective_hirings = lbb_nb_effective_hirings
+            pred_effective_hirings.lba_nb_effective_hirings = lbb_nb_effective_hirings
+            pred_effective_hirings.lbb_nb_predicted_hirings = int(lbb_nb_predicted_hirings)
+            pred_effective_hirings.lba_nb_predicted_hirings = int(lba_nb_predicted_hirings)
+
+            db_session.add(pred_effective_hirings)
+
+            #Commit all the 10 000 transactions
+            if count % 10000 == 0:
+                db_session.commit()
+
+            count += 1
+
+        #Commit for the remaining rows
+        db_session.commit()
+
+        ici.computed = True
+        db_session.add(ici)
+        db_session.commit()        
 
 
 def main():
