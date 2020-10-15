@@ -48,7 +48,6 @@ class EsdToken(object):
     @classmethod
     def prepare_token(cls):
         data = urlencode([
-            ('realm', '/partenaire'),
             ('grant_type', 'client_credentials'),
             ('client_id', settings.PEAM_CLIENT_ID),
             ('client_secret', settings.PEAM_CLIENT_SECRET),
@@ -62,7 +61,7 @@ class EsdToken(object):
         }
 
         response = _get_response(
-            url=ESD_TOKEN_ENDPOINT_URL,
+            url=ESD_TOKEN_ENDPOINT_URL + '?realm=%2Fpartenaire',
             headers=headers,
             method='POST',
             data=data,
