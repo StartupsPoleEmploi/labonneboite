@@ -125,36 +125,37 @@ class ApprentissageExtractJob(Job):
                     logger.info("invalid zip code met at row: %i", count)
                     self.invalid_zipcode_errors += 1
                     continue
+                
+                # This part of code is useless : 
+                #   The data used has a lot of late contracts inputs
+                #   So we have to insert ALL the contracts from different dates
 
-                alternance_contract_should_be_imported = (
-                    hiring_date > last_historical_data_date_in_db 
-                    and hiring_date <= self.last_historical_data_date_in_file
+                #  alternance_contract_should_be_imported = (
+                #      hiring_date > last_historical_data_date_in_db 
+                #      and hiring_date <= self.last_historical_data_date_in_file
+                #)
+
+                statement = (
+                    siret,
+                    hiring_date,
+                    self.contract_type,
+                    departement,
+                    None, #contract_duration
+                    None, #iiann
+                    None, #tranche_age
+                    None, #handicap_label
+                    None  #duree_pec
                 )
+                statements.append(statement)
+                imported_alternance_contracts += 1
 
-                if alternance_contract_should_be_imported:
-                    statement = (
-                        siret,
-                        hiring_date,
-                        self.contract_type,
-                        departement,
-                        None, #contract_duration
-                        None, #iiann
-                        None, #tranche_age
-                        None, #handicap_label
-                        None  #duree_pec
-                    )
-                    statements.append(statement)
-                    imported_alternance_contracts += 1
-
-                    if hiring_date.year not in imported_alternance_contracts_distribution:
-                        imported_alternance_contracts_distribution[hiring_date.year] = {}
-                    if hiring_date.month not in imported_alternance_contracts_distribution[hiring_date.year]:
-                        imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month] = {}
-                    if hiring_date.day not in imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month]:
-                        imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month][hiring_date.day] = 0
-                    imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month][hiring_date.day] += 1
-                else:
-                    not_imported_alternance_contracts += 1
+                if hiring_date.year not in imported_alternance_contracts_distribution:
+                    imported_alternance_contracts_distribution[hiring_date.year] = {}
+                if hiring_date.month not in imported_alternance_contracts_distribution[hiring_date.year]:
+                    imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month] = {}
+                if hiring_date.day not in imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month]:
+                    imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month][hiring_date.day] = 0
+                imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month][hiring_date.day] += 1
 
         # run remaining statements
         try:
