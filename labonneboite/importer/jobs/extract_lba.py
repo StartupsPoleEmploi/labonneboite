@@ -26,9 +26,9 @@ from labonneboite.common.database import db_session
 
 
 class ApprentissageExtractJob(Job):
-    #file_type_apprentissage = "lba-app"
-    #import_type = ImportTask.APPRENTISSAGE
-    #table_name = settings.HIRING_TABLE
+    file_type_apprentissage = "lba-app"
+    import_type = ImportTask.APPRENTISSAGE
+    table_name = settings.HIRING_TABLE
 
     def __init__(self, filename, contract_type = "APPRENTISSAGE"):
         self.input_filename = filename
