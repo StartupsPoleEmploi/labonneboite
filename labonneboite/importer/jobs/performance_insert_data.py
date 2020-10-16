@@ -1,8 +1,9 @@
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings
-from labonneboite.importer.models.computing import PerfImporterCycleInfos, PerfPredictionAndEffectiveHirings
+from labonneboite.importer.models.computing import PerfImporterCycleInfos, PerfPredictionAndEffectiveHirings, PerfDivisionPerRome
 from labonneboite.common.database import db_session
 from labonneboite.common import scoring as scoring_util
+from labonneboite.common import load_data
 
 import os 
 import gzip
@@ -181,7 +182,7 @@ def insert_data(file,etab_list):
     logger.info(f"\n Start : Insert data into database from file {file_name}")
     importer_cycle_infos = insert_into_importer_cycle_infos(file, file_name)
     insert_into_etablissements_predicted_and_effective_hirings(importer_cycle_infos._id, file_name, etab_list)
-    return importer_cycle_infos
+    return True
 
 def compute_effective_and_predicted_hirings():
     logger.info(f"\n Start : Computing effective hirings")
@@ -197,11 +198,30 @@ def compute_effective_and_predicted_hirings():
 
     logger.info(f"Importer cycles infos which have not been computed yet : {[ i.file_name for i in importer_cycles_infos_to_compute]}")
 
+    perf_division_per_rome_dict = {}
+
+    rome_naf_mapping = load_data.load_rome_naf_mapping()
+    #headers of this mapping : rome_id,rome_label,naf_id,naf_label,hirings
+    for rome_naf_row in rome_naf_mapping:
+        rome_code = rome_naf_row[0]
+        naf_code = rome_naf_row[2]
+        perf_division_per_rome_dict[naf_code] = []
+        perf_division_per_rome_dict[naf_code].append(
+            {
+                rome_code: {
+                    "threshold_lbb": scoring_util.get_score_minimum_for_rome(rome_code), #FIXME
+                    "nb_bonne_boites_lbb":0,
+                    "threshold_lba": scoring_util.get_score_minimum_for_rome(rome_code, alternance=True),
+                    "nb_bonne_boites_lba":0
+                }
+            }
+        )
+
     for ici in importer_cycles_infos_to_compute:
         logger.info(f"Start computing for importer cycle infos : {ici._id} - {ici.file_name}")
 
         engine = import_util.create_sqlalchemy_engine()
-        query = f'SELECT id, siret, lbb_nb_predicted_hirings_score, lba_nb_predicted_hirings_score \
+        query = f'SELECT id, siret, codenaf as naf, lbb_nb_predicted_hirings_score, lba_nb_predicted_hirings_score \
                 FROM perf_prediction_and_effective_hirings\
                 WHERE importer_cycle_infos_id={ici._id};'
         df_companies_list = pd.read_sql_query(query, engine)
@@ -225,6 +245,8 @@ def compute_effective_and_predicted_hirings():
         df_hirings_lba = pd.read_sql_query(query_hirings_lba,engine)
         logger.info(f"Nb offices found in hirings for lba: {len(df_hirings_lba)}")
 
+        engine.close()
+
         df_merge_hirings_tmp = pd.merge(df_companies_list, df_hirings_lbb, how='left', on="siret")
         df_merged = pd.merge(df_merge_hirings_tmp, df_hirings_lba, how='left', on="siret")
 
@@ -238,31 +260,66 @@ def compute_effective_and_predicted_hirings():
         cols_we_want_to_keep = [
             "id", 
             "siret", 
+            "naf",
             "lbb_nb_effective_hirings", 
             "lba_nb_effective_hirings", 
             "lbb_nb_predicted_hirings", 
-            "lba_nb_predicted_hirings" 
+            "lba_nb_predicted_hirings",
+            "lbb_nb_predicted_hirings_score",
+            "lba_nb_predicted_hirings_score",
         ]
 
         df_merged = df_merged[cols_we_want_to_keep]
 
-        #INSERT THE VALUES COMPUTED IN THE SQL
         values_to_update = df_merged.values.tolist()
         count=0
 
         for row in values_to_update:
-            id=row[0]
+            row_id=row[0]
             siret=row[1]
-            lbb_nb_effective_hirings=row[2]
+            naf=row[2]
             lbb_nb_effective_hirings=row[3]
-            lbb_nb_predicted_hirings=row[4]
-            lba_nb_predicted_hirings=row[5]
-
-            pred_effective_hirings = PerfPredictionAndEffectiveHirings.query.filter(PerfPredictionAndEffectiveHirings._id == id).first()
+            lba_nb_effective_hirings=row[4]
+            lbb_nb_predicted_hirings=row[5]
+            lba_nb_predicted_hirings=row[6]
+            lbb_nb_predicted_hirings_score=row[7]
+            lba_nb_predicted_hirings_score=row[8]
+            
+            pred_effective_hirings = PerfPredictionAndEffectiveHirings.query.filter(PerfPredictionAndEffectiveHirings._id == row_id).first()
+            #FIXME : For the first run it does not work, then it works
             pred_effective_hirings.lbb_nb_effective_hirings = lbb_nb_effective_hirings
-            pred_effective_hirings.lba_nb_effective_hirings = lbb_nb_effective_hirings
+            pred_effective_hirings.lba_nb_effective_hirings = lba_nb_effective_hirings
             pred_effective_hirings.lbb_nb_predicted_hirings = int(lbb_nb_predicted_hirings)
             pred_effective_hirings.lba_nb_predicted_hirings = int(lba_nb_predicted_hirings)
+
+            is_a_bonne_boite = False
+            is_a_bonne_alternance = False
+
+
+            # Dico { "codenaf" : [{"coderome" : {"threshold","nb_companies"}},]}
+
+            for rome_code_infos in perf_division_per_rome_dict[naf]:
+                rome_code = list(rome_code_infos.keys())[0]
+                score_lbb = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                        score=lbb_nb_predicted_hirings_score,
+                        rome_code=rome_code,
+                        naf_code=naf
+                    )
+                if score_lbb >= rome_code_infos[rome_code]["threshold_lbb"]:
+                    perf_division_per_rome_dict[naf][rome_code]["nb_bonne_boites_lbb"] += 1
+                    is_a_bonne_boite = True
+
+                score_lba = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                        score=lba_nb_predicted_hirings_score,
+                        rome_code=rome_code,
+                        naf_code=naf
+                    )
+                if score_lbb >= rome_code_infos[rome_code]["threshold_lba"]:
+                    perf_division_per_rome_dict[naf][rome_code]["nb_bonne_boites_lba"] += 1
+                    is_a_bonne_alternance = True
+
+            pred_effective_hirings.is_a_bonne_boite = is_a_bonne_boite
+            pred_effective_hirings.is_a_bonne_alternance = is_a_bonne_alternance
 
             db_session.add(pred_effective_hirings)
 
@@ -272,25 +329,37 @@ def compute_effective_and_predicted_hirings():
 
             count += 1
 
-        #Commit for the remaining rows
+        # Commit for the remaining rows
+        db_session.commit()
+        
+        for naf_code, romes_list in perf_division_per_rome_dict.items():
+            for rome_infos in romes_list:
+                rome_code = list(rome_infos.keys())[0]
+                division_per_rome = PerfDivisionPerRome(
+                    importer_cycle_infos_id = ici._id,
+                    naf = naf_code,
+                    rome = rome_code,
+                    threshold_lbb = rome_infos[rome_code]["threshold_lbb"],
+                    threshold_lba = rome_infos[rome_code]["threshold_lba"],
+                    nb_bonne_boites_lbb = rome_infos[rome_code]["nb_bonne_boites_lbb"],
+                    nb_bonne_boites_lba = rome_infos[rome_code]["nb_bonne_boites_lba"],
+                )
+                db_session.add(division_per_rome)
+
         db_session.commit()
 
         ici.computed = True
         db_session.add(ici)
-        db_session.commit()        
-
+        db_session.commit()
 
 def main():
     # First part of insertion : Get data from the file exported after each importer cycle
     files_list = get_available_files_list()
     for file in files_list:
         etab_list = parse_backup_file_importer_output(file)
-        importer_cycle_infos = insert_data(file, etab_list)
+        insert_data(file, etab_list)
 
     compute_effective_and_predicted_hirings()
     
-    # Second part : Compute nb of effective hirings
-    # TODO
-
 if __name__ == '__main__':
     main()

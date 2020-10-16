@@ -309,6 +309,7 @@ class PerfPredictionAndEffectiveHirings(CRUDMixin, Base):
     lbb_nb_effective_hirings = Column(Integer) #Nombre de recrutement effectifs pour LBB (en utilisant les DPAE)
     lba_nb_effective_hirings = Column(Integer) #Nombre de recrutements effectifs pour LBA (en utilisant APR et CP)
     is_a_bonne_boite = Column(Boolean) #Affiché ou non sur LBB (Dépasse pour au moins un rome le seuil) port_date = Column(DateTime, default=None)
+    is_a_bonne_alternance = Column(Boolean) #Affiché ou non sur LBA (Dépasse pour au moins un rome le seuil) port_date = Column(DateTime, default=None)
 
 class PerfDivisionPerRome(CRUDMixin, Base):
     """
@@ -320,5 +321,7 @@ class PerfDivisionPerRome(CRUDMixin, Base):
     importer_cycle_infos_id = Column(BigInteger, ForeignKey('perf_importer_cycle_infos.id', ondelete='SET NULL'), nullable=True)
     naf = Column('codenaf', String(8), nullable=False)
     rome = Column('coderome', String(8), nullable=False)
-    threshold = Column(Float)
-    nb_bonne_boites = Column(Integer)
+    threshold_lbb = Column(Float)
+    threshold_lba = Column(Float)
+    nb_bonne_boites_lbb = Column(Integer)
+    nb_bonne_boites_lba = Column(Integer)
