@@ -70,8 +70,7 @@ class DpaeExtractJob(Job):
         imported_dpae = 0
         imported_dpae_distribution = {}
         not_imported_dpae = 0
-        last_historical_data_date_in_db = DpaeStatistics.get_last_historical_data_date()
-
+        last_historical_data_date_in_db = DpaeStatistics.get_last_historical_data_date(DpaeStatistics.DPAE)
         logger.info("will now extract all dpae with hiring_date between %s and %s",
                     last_historical_data_date_in_db, self.last_historical_data_date_in_file)
 
@@ -176,6 +175,7 @@ class DpaeExtractJob(Job):
             statistics = DpaeStatistics(
                 last_import=datetime.now(),
                 most_recent_data_date=self.last_historical_data_date_in_file,
+                file_type=self.file_type
             )
             db_session.add(statistics)
             db_session.commit()
@@ -187,14 +187,13 @@ class DpaeExtractJob(Job):
             db_session.rollback()
             last_import_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             most_recent_date = self.last_historical_data_date_in_file.strftime('%Y-%m-%d %H:%M:%S')
-            query = f"insert into dpae_statistics (last_import, most_recent_data_date) values ('{last_import_date}','{most_recent_date}')"
+            query = f"insert into dpae_statistics (last_import, most_recent_data_date, file_type) values ('{last_import_date}','{most_recent_date}','{self.file_type}')"
             con, cur = import_util.create_cursor()
             cur.execute(query)
             con.commit()
             cur.close()
             con.close()
             logger.info("Second way to insert DPAE statistics in DB : OK")
-
 
         logger.info("finished importing dpae...")
         return something_new
