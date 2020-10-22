@@ -97,13 +97,14 @@ class VisibleMarketFetcher(Fetcher):
             # over LBB ones.
             for offer in office_offers:
                 if 'contact' in offer:
-                    if 'courriel' in offer:
+                    # FIXME: the address API will soon remove the emails
+                    if 'courriel' in offer: # FIXME: this should be if 'courriel' in offer['contact']
                         office.email = offer['contact']['courriel']
-                    if 'telephone' in offer:
+                    if 'telephone' in offer: # FIXME: same error to fix here
                         office.tel = offer['contact']['telephone']
-                    if 'urlPostulation' in offer:
+                    if 'urlPostulation' in offer: # FIXME: same error to fix here
                         office.website = offer['contact']['urlPostulation']
-                    elif 'urlRecruteur' in offer:
+                    elif 'urlRecruteur' in offer: # FIXME: same error to fix here
                         office.website = offer['contact']['urlRecruteur']
 
         self.office_count = len(offices)
