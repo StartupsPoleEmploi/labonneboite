@@ -2,6 +2,7 @@ import logging
 import datetime
 import time
 import requests
+import json
 from urllib.parse import urlencode
 from requests.exceptions import ConnectionError, ReadTimeout
 from labonneboite.conf import settings
@@ -138,10 +139,13 @@ def _get_response(url, headers, params=None, method='GET', data=None):
         error = '{} responded with a {} error: {}'.format(
             url,
             response.status_code,
-            response.content,
+            response.text,
         )
         log_level = logging.WARNING if response.status_code >= 500 else logging.ERROR
         logger.log(log_level, error)
-        raise RequestFailed("response={}".format(response.content))
+        raise RequestFailed("response={} ({})".format(
+            response.text,
+            response.status_code,
+        ))
 
     return response.json()
