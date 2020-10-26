@@ -52,6 +52,11 @@ COOKIE_SECURE = False
 
 WTF_CSRF_ENABLED = True
 
+# Setting for LBA search API
+# 'ONLY_ALTERNANCE_COMPANIES' or 'INCLUDE_DPAE_COMPANIES'
+# ALTERNANCE_SEARCH_MODE = 'INCLUDE_DPAE_COMPANIES'
+ALTERNANCE_SEARCH_MODE = 'ONLY_ALTERNANCE_COMPANIES'
+
 # Values below are *fake* and should be used in development and test environments only.
 # The real values are confidential, stored outside of github repository
 # and are only used in production+staging.

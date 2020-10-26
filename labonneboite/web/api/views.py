@@ -351,6 +351,7 @@ def create_visible_market_fetcher(request_args):
     if contract == hiring_type_util.CONTRACT_ALTERNANCE:
         hiring_type = hiring_type_util.CONTRACT_TO_HIRING_TYPE[contract]
     else:
+        # FIXME: if only contract = alternance is supported, remove the param hiring_type
         raise InvalidFetcherArgument('only contract=alternance is supported')
 
     return offers.VisibleMarketFetcher(
