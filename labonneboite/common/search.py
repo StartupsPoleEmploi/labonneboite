@@ -39,6 +39,8 @@ KEY_TO_LABEL_DISTANCES = {
 FILTERS = ['naf', 'headcount', 'hiring_type', 'distance']
 DISTANCE_FILTER_MAX = 3000
 
+DPAE_SCORE_FIELD_NAME = 'scores_by_rome'
+ALTERNANCE_SCORE_FIELD_NAME = 'scores_alternance_by_rome'
 
 class HiddenMarketFetcher(Fetcher):
     """
@@ -410,8 +412,8 @@ def aggregate_distance(aggregations_raw):
 
 def get_score_for_rome_field_name(hiring_type, rome_code):
     return {
-        hiring_type_util.DPAE: "scores_by_rome.%s",
-        hiring_type_util.ALTERNANCE: "scores_alternance_by_rome.%s",
+        hiring_type_util.DPAE: DPAE_SCORE_FIELD_NAME + ".%s",
+        hiring_type_util.ALTERNANCE: ALTERNANCE_SCORE_FIELD_NAME + ".%s",
     }[hiring_type] % rome_code
 
 
@@ -810,12 +812,22 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         office.position = position
 
         if len(rome_codes) > 1:
-            # Identify which rome_code actually matched this office.
-            keyname = get_score_for_rome_field_name(hiring_type, rome_codes[0]).split('.')[0]
-            all_scores = es_office['_source'][keyname]
+            # Get rome_codes actually matching this office.
+            all_scores = {}
+
+            # Case of "contract=alternance"
+            if hiring_type == hiring_type_util.ALTERNANCE and ALTERNANCE_SCORE_FIELD_NAME in es_office['_source']:
+                all_scores = es_office['_source'][ALTERNANCE_SCORE_FIELD_NAME]
+
+            # Case of DPAE and alternance, keep the DPAE scores in both cases
+            if DPAE_SCORE_FIELD_NAME in es_office['_source']:
+                dpae_scores = es_office['_source'][DPAE_SCORE_FIELD_NAME]
+                all_scores = {**dpae_scores, **all_scores} # This will merge the 2 dicts
+
             scores_of_searched_romes = dict([
                 (rome, all_scores[rome]) for rome in rome_codes if rome in all_scores
             ])
+
             # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
             rome_with_highest_score = max(scores_of_searched_romes, key=scores_of_searched_romes.get)
             # Store it as an extra attribute.
