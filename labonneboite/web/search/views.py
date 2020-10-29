@@ -544,13 +544,14 @@ def get_location(request_args):
 
     return location, named_location, departments
 
-
 @searchBlueprint.route('/entreprises/commune/<commune_id>/rome/<rome_id>')
 def results_by_commune_and_rome(commune_id, rome_id):
     """
     Convenience function to be used by Pôle Emploi, Bob Emploi and other partners
     Redirects internally to our real user-facing url displaying
     results for his search.
+
+    The partners may use our API to get companies count, which comes with the URL to this route. @see labonneboite/web/api/views.py:compute_frontend_url
 
     For more information about the differences between commune_id and zipcode,
     please consult README file
@@ -574,3 +575,35 @@ def results_by_commune_and_rome(commune_id, rome_id):
     # Pass all GET params to the redirect URL: this will allow users of the API to build web links
     # roughly equivalent to the result of an API call - see Trello #971.
     return redirect(url)
+
+@searchBlueprint.route('/entreprises/department/<department_code>/rome/<rome_id>')
+def results_by_departments_and_rome(department_code, rome_id):
+    """
+    http://localhost:8080/entreprises/departments/57/rome/M1805
+    Redirects internally to our real user-facing url displaying
+    results for his search.
+
+    The partners may use our API to get companies count, which comes with the URL to this route. @see labonneboite/web/api/views.py:compute_frontend_url
+    """
+    fix_csrf_session()
+    url = get_url_for_rome(rome_id, department_code)
+    if url is None:
+        abort(400, 'Department or rome not found')
+    return redirect(url)
+
+def get_url_for_rome(rome_id, department_code):
+    try:
+        rome_description = settings.ROME_DESCRIPTIONS[rome_id.upper()]
+        slugified_rome_description = slugify(rome_description)
+    except KeyError:
+        slugified_rome_description = None
+
+    if slugified_rome_description:
+        departmentData = geocoding.datagouv.get_department_by_code(department_code)
+        if departmentData:
+            return url_for('search.entreprises',
+                departments=department_code,
+                j=rome_id,
+                l=departmentData.get('label'),
+                occupation=slugified_rome_description)
+    return None

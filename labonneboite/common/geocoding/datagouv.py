@@ -125,6 +125,22 @@ def get_departments(query, limit=10):
     )
     return format_departments(departments)
 
+def get_department_by_code(code):
+    """
+    Request the https://geo.api.gouv.fr/departements API
+    Documentation: https://geo.api.gouv.fr/decoupage-administratif/departements
+
+    Args:
+        code (str): the code of a department (département)
+    """
+    print('get_department_by_code', settings.API_DEPARTMENTS_URL, code)
+    department = fetch_json(
+        url=settings.API_DEPARTMENTS_URL + '/' + code,
+        name='geo.api.gouv.fr/departements',
+        is_array=False,
+    )
+    return format_single_department(department)
+
 def format_departments(departments):
     return list(map(format_single_department, departments))
 
@@ -132,7 +148,7 @@ def format_single_department(department):
     return {
         'department': department['code'],
         'label': "%s (%s)" % (department['nom'], department['code']),
-        'score': department['_score']
+        'score': department['_score'] if '_score' in department else 0, # score is None when calling get_department_by_code
     }
 
 @lru_cache(1000)
