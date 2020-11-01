@@ -19,7 +19,7 @@ dict_df_predict_dep = {}
 dict_df_sum_predict_dep = {}
 
 #import donnée#######################################################################""
-
+#TODO : Remove from here to use during unit tests (not written yet)
 def load_csv_perf_division_per_rome(filename, delimiter=';'):
     #date_time_obj = datetime.datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S.%f')
     for row in load_data.load_csv_file(filename,delimiter):
@@ -197,8 +197,6 @@ def calcul_rmse(row):
 def lancement_requete(colonne,nom=None):
     df_nb_entreprise = get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne,nom)
 
-    import ipdb; ipdb.set_trace()
-
     for i in range(10,110,10):
         df_nb_entreprise[f'sum{i}'] = df_nb_entreprise.apply(lambda row: get_sum_predict(row,i,colonne,nom), axis=1)
 
@@ -211,6 +209,7 @@ def lancement_requete(colonne,nom=None):
 
 
 def prepare_google_sheet_data():
+    #TODO : Refacto this function
     df_naf = lancement_requete("codenaf","naf")
     df_dep = lancement_requete("departement","dep")
     df_global = lancement_requete("global")
@@ -295,26 +294,30 @@ def prepare_google_sheet_data():
     values_to_insert_naf = {'values': df_naf.values.tolist()}
     values_to_insert_dep = {'values': df_dep.values.tolist()}
     values_to_insert_global = {'values': df_global.values.tolist()}
+    
+    importer_cycle_infos_ids = df_cycle_infos["cycle"].values.tolist()
 
-    return values_to_insert_naf , values_to_insert_dep, values_to_insert_global
+    return values_to_insert_naf , values_to_insert_dep, values_to_insert_global, importer_cycle_infos_ids
 
+def set_importer_cycle_infos_google_sheets_boolean(importer_cycle_infos_id):
+    for ici_id in importer_cycle_infos_id:
+        ici = PerfImporterCycleInfos.query.filter(PerfImporterCycleInfos._id == ici_id).first()
+        ici.on_google_sheets = True
+        db_session.add(ici)
+        db_session.commit()
 
 def run_main():
     #load_csv_perf_importer_cycle_infos("../../importer/data/perf_importer_cycle_infos.csv")
     #load_csv_perf_division_per_rome("../../importer/data/perf_division_per_rome.csv")
     #load_csv_perf_prediction_and_effective_h("../../importer/data/perf_prediction_and_effective_h.csv")
-    values_to_insert_naf_sheet , values_to_insert_departement_sheet, values_to_insert_global_sheet = prepare_google_sheet_data()
+    values_to_insert_naf_sheet , values_to_insert_departement_sheet, values_to_insert_global_sheet, importer_cycle_infos_ids = prepare_google_sheet_data()
     service = generate_google_sheet_service()
-
-    # TODO: Get first available cell to write on google sheets
-
-    # TODO : Set the on-google-sheets boolean to True for the importer cycles done written
 
     naf_sheet_report = GoogleSheetReport(
         service=service,
         spreadsheet_id=settings.SPREADSHEET_IDS[2],
         sheet_index=0,
-        start_cell='A2',
+        start_cell=None,
         values=values_to_insert_naf_sheet
     )
     naf_sheet_report.set_sheet_range()
@@ -324,7 +327,7 @@ def run_main():
         service=service,
         spreadsheet_id=settings.SPREADSHEET_IDS[2],
         sheet_index=1,
-        start_cell='A2',
+        start_cell=None,
         values=values_to_insert_departement_sheet
     )
     departement_sheet_report.set_sheet_range()
@@ -334,11 +337,13 @@ def run_main():
         service=service,
         spreadsheet_id=settings.SPREADSHEET_IDS[2],
         sheet_index=2,
-        start_cell='A2',
+        start_cell=None,
         values=values_to_insert_global_sheet
     )
     global_sheet_report.set_sheet_range()
     global_sheet_report.write_data_into_sheet()
+
+    set_importer_cycle_infos_google_sheets_boolean(importer_cycle_infos_ids)
 
 
 if __name__ == '__main__':
