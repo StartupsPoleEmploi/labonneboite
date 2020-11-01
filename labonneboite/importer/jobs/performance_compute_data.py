@@ -26,16 +26,15 @@ def load_csv_perf_division_per_rome(filename, delimiter=';'):
         perf_div_per_rome = PerfDivisionPerRome(
             _id = row[0],
             importer_cycle_infos_id = row[1],
-            naf = row[2],
-            rome = row[3],
-            threshold =  row[4],
-            nb_bonne_boites = row[5]
+            naf = row[3],
+            rome = row[2],
+            threshold_lbb = row[4],
+            nb_bonne_boites_lbb = row[5],
+            threshold_lba = row[6],
+            nb_bonne_boites_lba = row[7]
         )
         db_session.add(perf_div_per_rome)
         db_session.commit()
-        
-
-
 
 def load_csv_perf_importer_cycle_infos(filename, delimiter=';'):
     #date_time_obj = datetime.datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S.%f')
@@ -45,7 +44,9 @@ def load_csv_perf_importer_cycle_infos(filename, delimiter=';'):
             execution_date = datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S.%f'),
             prediction_start_date = datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S.%f'),
             prediction_end_date = datetime.strptime(row[3], '%Y-%m-%d %H:%M:%S.%f'),
-            file_name =  row[4]
+            file_name =  row[4],
+            computed = (row[5] == 'True'),
+            on_google_sheets = (row[6] == 'True')
         )
         db_session.add(perf_importer_cycle_info)
         db_session.commit()
@@ -69,86 +70,116 @@ def load_csv_perf_prediction_and_effective_h(filename, delimiter=';'):
             lba_nb_predicted_hirings = row[12],
             lbb_nb_effective_hirings = row[13],
             lba_nb_effective_hirings = row[14],
-            is_a_bonne_boite = (row[15] == "True")
+            is_a_bonne_boite = (row[15] == "True"),
+            is_a_bonne_alternance = (row[16] == "True")
         )
         db_session.add(perf_importer_cycle_info)
         db_session.commit()
 
 
 
-def get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne , nom):
+def get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne, nom):
     engine = import_util.create_sqlalchemy_engine()
-    query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotal \
-            FROM perf_prediction_and_effective_hirings ppaeh \
-            GROUP BY importer_cycle_infos_id , {colonne};'
+    if colonne == "global":
+        query = f'SELECT importer_cycle_infos_id as cycle, count(*) as nbTotal \
+                FROM perf_prediction_and_effective_hirings ppaeh \
+                GROUP BY importer_cycle_infos_id;'
+    else: #colonne == Naf OR departement
+        query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotal \
+                FROM perf_prediction_and_effective_hirings ppaeh \
+                GROUP BY importer_cycle_infos_id , {colonne};'
     df_nb_entreprise = pd.read_sql_query(query, engine)
     engine.close()
     return df_nb_entreprise
 
-
-
-def get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBB(colonne ,nom):
+def get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBB(colonne, nom):
     engine = import_util.create_sqlalchemy_engine()
-    query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotalLBB \
-            FROM perf_prediction_and_effective_hirings ppaeh \
-            WHERE is_a_bonne_boite is true \
-            GROUP BY importer_cycle_infos_id , {colonne};'
+    if colonne == "global":
+        query = f'SELECT importer_cycle_infos_id as cycle,count(*) as nbTotalLBB \
+                FROM perf_prediction_and_effective_hirings ppaeh \
+                WHERE is_a_bonne_boite is true \
+                GROUP BY importer_cycle_infos_id;'
+    else: #colonne == Naf OR departement
+        query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotalLBB \
+                FROM perf_prediction_and_effective_hirings ppaeh \
+                WHERE is_a_bonne_boite is true \
+                GROUP BY importer_cycle_infos_id , {colonne};'
     df_nb_entreprise_isLBB = pd.read_sql_query(query, engine)
     engine.close()
     return df_nb_entreprise_isLBB
 
-
-
-def get_sum_predict_par_cycle_et_naf_ou_dep(cycle ,colonne ,nom ,value):
+def get_sum_predict_par_cycle_et_naf_ou_dep(cycle, colonne, nom=None, value=None):
     engine = import_util.create_sqlalchemy_engine()
-    query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom},sum(lbb_nb_predicted_hirings) as sommeTotal \
-            FROM perf_prediction_and_effective_hirings ppaeh \
-            WHERE importer_cycle_infos_id = {cycle} and {colonne} = "{value}"  \
-            GROUP BY importer_cycle_infos_id , codenaf;'
+    if colonne == "global":
+        query = f'SELECT importer_cycle_infos_id as cycle, sum(lbb_nb_predicted_hirings) as sommeTotal \
+                FROM perf_prediction_and_effective_hirings ppaeh \
+                WHERE importer_cycle_infos_id = {cycle} \
+                GROUP BY importer_cycle_infos_id;'
+    else: #colonne == Naf OR departement
+        query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom},sum(lbb_nb_predicted_hirings) as sommeTotal \
+                FROM perf_prediction_and_effective_hirings ppaeh \
+                WHERE importer_cycle_infos_id = {cycle} and {colonne} = "{value}"  \
+                GROUP BY importer_cycle_infos_id , {colonne};'
     df_sum_predict = pd.read_sql_query(query, engine)
     engine.close()
     return df_sum_predict
 
-
-
-
-def get_predict_par_cycle_et_naf_ou_dep(cycle ,colonne ,value):
+def get_predict_par_cycle_et_naf_ou_dep(cycle, colonne, value=None):
     engine = import_util.create_sqlalchemy_engine()
-    query = f'SELECT lbb_nb_predicted_hirings as predict, lbb_nb_effective_hirings as effective \
-            FROM perf_prediction_and_effective_hirings \
-            WHERE importer_cycle_infos_id = {cycle} and {colonne} = "{value}"  \
-            ORDER BY lbb_nb_predicted_hirings desc '
+    if colonne == "global":
+        query = f'SELECT lbb_nb_predicted_hirings as predict, lbb_nb_effective_hirings as effective \
+                FROM perf_prediction_and_effective_hirings \
+                WHERE importer_cycle_infos_id = {cycle}\
+                ORDER BY lbb_nb_predicted_hirings desc '
+    else:
+        query = f'SELECT lbb_nb_predicted_hirings as predict, lbb_nb_effective_hirings as effective \
+                FROM perf_prediction_and_effective_hirings \
+                WHERE importer_cycle_infos_id = {cycle} and {colonne} = "{value}"  \
+                ORDER BY lbb_nb_predicted_hirings desc'
     df_predict = pd.read_sql_query(query, engine)
     engine.close()
     return df_predict
-
-
 
 def get_cycle_infos():
     engine = import_util.create_sqlalchemy_engine()
     query = f'SELECT id as cycle, execution_date as dateExecution \
-            FROM perf_importer_cycle_infos ;'
+            FROM perf_importer_cycle_infos \
+            WHERE on_google_sheets = 0;'
     df_predict = pd.read_sql_query(query, engine)
     engine.close()
     return df_predict
 
-
-
 #cycle + naf #######################################################################""
 
-def get_sum_predict(row,i,colonne,nom):
+def get_sum_predict(row,i,colonne,nom=None):
+    if nom is not None:
+        row_nom = row[nom]
+    else:
+        row_nom = None
     if i == 10:
-        df_predict = get_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,row[nom])
-        df_sum_predict = get_sum_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,nom,row[nom])
-        if row["cycle"] not in dict_df_predict:
-            dict_df_predict[row["cycle"]] = {}
-        dict_df_predict[row["cycle"]][row[nom]] = df_predict
-        if row["cycle"] not in dict_df_sum_predict:
-            dict_df_sum_predict[row["cycle"]] = {}       
-        dict_df_sum_predict[row["cycle"]][row[nom]] = df_sum_predict       
+        df_predict = get_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,row_nom)
+        df_sum_predict = get_sum_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,nom,row_nom)
+        if colonne != "global":
+            if row["cycle"] not in dict_df_predict:
+                dict_df_predict[row["cycle"]] = {}
+            dict_df_predict[row["cycle"]][row[nom]] = df_predict
+            if row["cycle"] not in dict_df_sum_predict:
+                dict_df_sum_predict[row["cycle"]] = {}
+            dict_df_sum_predict[row["cycle"]][row[nom]] = df_sum_predict
+        else:
+            if row["cycle"] not in dict_df_predict:
+                dict_df_predict[row["cycle"]] = {}
+            dict_df_predict[row["cycle"]] = df_predict
+            if row["cycle"] not in dict_df_sum_predict:
+                dict_df_sum_predict[row["cycle"]] = {}
+            dict_df_sum_predict[row["cycle"]] = df_sum_predict
     else :
-        df_predict = dict_df_predict[row["cycle"]][row[nom]]
-        df_sum_predict = dict_df_sum_predict[row["cycle"]][row[nom]]
+        if colonne != "global":
+            df_predict = dict_df_predict[row["cycle"]][row[nom]]
+            df_sum_predict = dict_df_sum_predict[row["cycle"]][row[nom]]
+        else:
+            df_predict = dict_df_predict[row["cycle"]]
+            df_sum_predict = dict_df_sum_predict[row["cycle"]]
     if i == 100:
         df_predict['RMSE'] = df_predict.apply(lambda row: calcul_rmse(row), axis=1)
         return math.sqrt(df_predict['RMSE'].sum() / row['nbTotal'])
@@ -163,9 +194,10 @@ def get_prop_recrut_non_lbb(row):
 def calcul_rmse(row):
     return  math.pow((row['effective'] - row['predict']),2)
 
-
-def lancement_requete(colonne,nom):
+def lancement_requete(colonne,nom=None):
     df_nb_entreprise = get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne,nom)
+
+    import ipdb; ipdb.set_trace()
 
     for i in range(10,110,10):
         df_nb_entreprise[f'sum{i}'] = df_nb_entreprise.apply(lambda row: get_sum_predict(row,i,colonne,nom), axis=1)
@@ -178,16 +210,17 @@ def lancement_requete(colonne,nom):
     return df_result
 
 
-
 def prepare_google_sheet_data():
     df_naf = lancement_requete("codenaf","naf")
     df_dep = lancement_requete("departement","dep")
+    df_global = lancement_requete("global")
     df_cycle_infos = get_cycle_infos()
     df_naf = pd.merge(df_naf , df_cycle_infos , on=['cycle'])
     df_dep = pd.merge(df_dep , df_cycle_infos , on=['cycle'])
+    df_global = pd.merge(df_global , df_cycle_infos , on=['cycle'])
     df_naf['dateExecutionImp'] = df_naf['dateExecution'].dt.strftime('%d/%m/%Y')
     df_dep['dateExecutionImp'] = df_dep['dateExecution'].dt.strftime('%d/%m/%Y')
-
+    df_global['dateExecutionImp'] = df_global['dateExecution'].dt.strftime('%d/%m/%Y')
 
     ORDERING_COLUMN_NAF = [
         'cycle',
@@ -225,53 +258,88 @@ def prepare_google_sheet_data():
         'nbTotal',
         'nbTotalLBB',
     ]
+    ORDERING_COLUMN_GLOBAL = [
+        'cycle',
+        'dateExecutionImp',
+        'sum10',
+        'sum20',
+        'sum30',
+        'sum40',
+        'sum50',
+        'sum60',
+        'sum70',
+        'sum80',
+        'sum90',
+        'propRecrutNonLBB',
+        'RMSE',
+        'nbTotal',
+        'nbTotalLBB',
+    ]
 
     # Clean unecessary column
     df_naf = df_naf[ORDERING_COLUMN_NAF]
     df_dep = df_dep[ORDERING_COLUMN_DEP]
+    df_global = df_global[ORDERING_COLUMN_GLOBAL]
 
     # Ordering column
     df_naf = df_naf.loc[:, ORDERING_COLUMN_NAF]
     df_dep = df_dep.loc[:, ORDERING_COLUMN_DEP]
+    df_global = df_global.loc[:, ORDERING_COLUMN_GLOBAL]
 
     # clean NaN data
     df_naf = df_naf.replace(numpy.nan, '', regex=True)
     df_dep = df_dep.replace(numpy.nan, '', regex=True)
+    df_global = df_global.replace(numpy.nan, '', regex=True)
 
     # Define ValueJSON body to insert in Google Sheets
     values_to_insert_naf = {'values': df_naf.values.tolist()}
     values_to_insert_dep = {'values': df_dep.values.tolist()}
+    values_to_insert_global = {'values': df_global.values.tolist()}
 
-    return values_to_insert_naf , values_to_insert_dep
+    return values_to_insert_naf , values_to_insert_dep, values_to_insert_global
 
 
-def main():
+def run_main():
     #load_csv_perf_importer_cycle_infos("../../importer/data/perf_importer_cycle_infos.csv")
     #load_csv_perf_division_per_rome("../../importer/data/perf_division_per_rome.csv")
     #load_csv_perf_prediction_and_effective_h("../../importer/data/perf_prediction_and_effective_h.csv")
-    values_to_insert_first_sheet , values_to_insert_second_sheet = prepare_google_sheet_data()
+    values_to_insert_naf_sheet , values_to_insert_departement_sheet, values_to_insert_global_sheet = prepare_google_sheet_data()
     service = generate_google_sheet_service()
 
-    first_sheet_report = GoogleSheetReport(
+    # TODO: Get first available cell to write on google sheets
+
+    # TODO : Set the on-google-sheets boolean to True for the importer cycles done written
+
+    naf_sheet_report = GoogleSheetReport(
         service=service,
         spreadsheet_id=settings.SPREADSHEET_IDS[2],
         sheet_index=0,
         start_cell='A2',
-        values=values_to_insert_first_sheet
+        values=values_to_insert_naf_sheet
     )
-    first_sheet_report.set_sheet_range()
-    first_sheet_report.write_data_into_sheet()
+    naf_sheet_report.set_sheet_range()
+    naf_sheet_report.write_data_into_sheet()
 
-    second_sheet_report = GoogleSheetReport(
+    departement_sheet_report = GoogleSheetReport(
         service=service,
         spreadsheet_id=settings.SPREADSHEET_IDS[2],
         sheet_index=1,
         start_cell='A2',
-        values=values_to_insert_second_sheet
+        values=values_to_insert_departement_sheet
     )
-    second_sheet_report.set_sheet_range()
-    second_sheet_report.write_data_into_sheet()
+    departement_sheet_report.set_sheet_range()
+    departement_sheet_report.write_data_into_sheet()
+
+    global_sheet_report = GoogleSheetReport(
+        service=service,
+        spreadsheet_id=settings.SPREADSHEET_IDS[2],
+        sheet_index=2,
+        start_cell='A2',
+        values=values_to_insert_global_sheet
+    )
+    global_sheet_report.set_sheet_range()
+    global_sheet_report.write_data_into_sheet()
 
 
 if __name__ == '__main__':
-    main()
+    run_main()

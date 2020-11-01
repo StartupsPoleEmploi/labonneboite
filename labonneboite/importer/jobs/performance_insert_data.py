@@ -41,89 +41,42 @@ def get_available_files_list():
 
     return file_list_not_parsed_yet
 
-headers_name= [
-    "siret",
-    "raisonsociale",
-    "enseigne",
-    "codenaf",
-    "trancheeffectif",
-    "numerorue",
-    "libellerue",
-    "codepostal",
-    "tel",
-    "email",
-    "website",
-    "flag_alternance",
-    "flag_junior",
-    "flag_senior",
-    "flag_handicap",
-    "has_multi_geolocations",
-    "codecommune",
-    "coordinates_x",
-    "coordinates_y",
-    "departement",
-    "score",
-    "email_alternance",
-    "score_alternance",
-    "social_network",
-    "phone_alternance",
-    "website_alternance",
-    "contact_mode",
-    "flag_poe_afpr",
-    "flag_pmsmp"
-]
-
-headers_we_want_to_keep = [
-    "siret",
-    "raisonsociale",
-    "enseigne",
-    "codenaf",
-    "codepostal",
-    "codecommune",
-    "departement",
-    "score",
-    "score_alternance",
-]
-
-def clean_etab_data_from_output_importer(data):
-    """
-    data = list of 28 items
-    """
-    new_data = []
-    for header in headers_we_want_to_keep:
-        index_to_keep = headers_name.index(header)
-        clean_data = data[index_to_keep].replace('\'','').replace('(','').replace(')','').strip()
-        if 'score' in header:
-            clean_data = int(clean_data)
-        new_data.append(clean_data)
-
-    return new_data
-
-def parse_backup_file_importer_output(file):
-    #FIXME : Very ugly way to retrieve old data from importer
+def insert_into_sql_table_old_prediction_file(file):
     file_name = os.path.basename(file)
-    logger.info(f"\nStart : Parse all data in file {file_name}")
-    f = gzip.open(file, 'rt', encoding='utf8')
-    file_content = f.read()
-    f.close()
-    values_to_insert = str(file_content).split("INSERT INTO `etablissements_new` VALUES")[1].split(';')[0]
-    # values_to_insert is a string which looks like :
-    #" ('03880702000011','MUTUALITE FRANCAISE NORMANDE SSAM','EHPAD - R\\xc3\\xa9sidence les coquelicots','8710A','03','2','RUE DE LA TETE NOIRE','14700','','','',0,0,0,0,0,'14258',-0.186361,48.8906,'14',0,'',5,'','','','',1,1),('51146379600017','L.B.C ASSOCIES','','6622Z','03','30','RUE AUGUSTE FRESNEL','69800','0123456789','','http://www.lbcassocies.fr',0,0,0,0,0,'69290',4.96598,45.7181,'69',0,'',25,'','','','',1,0)"
-    values_to_insert = values_to_insert.split(',')
-    etab_list = []
-    LENGTH_LINE_TO_INSERT = 29
-    start_index = 0
-    end_index = start_index + LENGTH_LINE_TO_INSERT
+    logger.info(f"\n Start : Insert data into etablissements_new from file {file_name}")
+    con, cur = import_util.create_cursor()
+    sql_file = gzip.open(file, 'rt', encoding='utf8')
+    sql_as_string = sql_file.read()
 
-    while end_index <= len(values_to_insert):
-        etab_list.append(clean_etab_data_from_output_importer(values_to_insert[start_index:end_index]))
-        start_index = end_index
-        end_index = start_index + LENGTH_LINE_TO_INSERT
+    # Cant load the whole table at once, the file is to large ( ~ 400mb)
+    # So we have to split the sql file in multiple transactions
+    drop_statement = "DROP TABLE IF EXISTS `etablissements_new`;"
+    cur.execute(drop_statement)
 
-    logger.info(f"End : Parse all data in file {file_name}")
-    logger.info(f"Number of offices in the file {len(etab_list)}")
+    start_create_text="CREATE TABLE "
+    end_create_text="ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+    start_create_statement_index = sql_as_string.find(start_create_text) + len(start_create_text)
+    end_create_statement_index = sql_as_string.find(end_create_text, start_create_statement_index)
+    create_statement = start_create_text + sql_as_string[start_create_statement_index:end_create_statement_index] + end_create_text
+    cur.execute(create_statement)
 
-    return etab_list
+    cur.execute("LOCK TABLES `etablissements_new` WRITE;")
+
+    insert_statements = sql_as_string.split("INSERT INTO `etablissements_new` VALUES")[1:]
+    for statement in insert_statements:
+        if "/*!40000 ALTER TABLE `etablissements_new` ENABLE KEYS */;" in statement:
+            clean_insert_statement = "INSERT INTO `etablissements_new` VALUES" + statement.split("/*!40000 ALTER TABLE `etablissements_new` ENABLE KEYS */;")[0]
+        else:
+            clean_insert_statement = "INSERT INTO `etablissements_new` VALUES" + statement
+        print(clean_insert_statement)
+        cur.execute(clean_insert_statement)
+
+    cur.execute("UNLOCK TABLES;")
+
+    #con.commit()
+    cur.close()
+    con.close()
+    logger.info(f"\n End : Insert data into etablissements_new from file {file_name}")
 
 def insert_into_importer_cycle_infos(file, file_name):
     logger.info(f"\n Start : Insert data into importer_cycle_infos from file {file_name}")
@@ -139,7 +92,8 @@ def insert_into_importer_cycle_infos(file, file_name):
         prediction_start_date = prediction_start_date,
         prediction_end_date = prediction_end_date,
         file_name = file_name,
-        computed = False
+        computed = False,
+        on_google_sheets = False
     )
     db_session.add(importer_cycle_infos)
     db_session.commit()
@@ -156,12 +110,24 @@ def insert_into_importer_cycle_infos(file, file_name):
 
 def insert_into_etablissements_predicted_and_effective_hirings(importer_cycle_infos_id, file_name, etab_list):
     logger.info(f"\n Start : Insert data into perf_prediction_and_effective_hirings from file {file_name}")
-    table_columns_name = headers_we_want_to_keep
-    table_columns_name[table_columns_name.index("score")] = "lbb_nb_predicted_hirings_score"
-    table_columns_name[table_columns_name.index("score_alternance")] = "lba_nb_predicted_hirings_score"
-    df = pd.DataFrame(etab_list, columns=table_columns_name)
+
+    query = f'SELECT siret, \
+                    raisonsociale, \
+                    enseigne, \
+                    codenaf, \
+                    codepostal, \
+                    codecommune, \
+                    departement, \
+                    score, \
+                    score_alternance \
+               FROM etablissements_new;'
+
+    engine = import_util.create_sqlalchemy_engine()
+    df = pd.read_sql_query(query, engine)
+    engine.close()
 
     df['importer_cycle_infos_id'] = importer_cycle_infos_id
+    df = df.rename(columns={"score":"lbb_nb_predicted_hirings_score","score_alternance":"lba_nb_predicted_hirings_score"})
 
     df.reset_index(drop=True, inplace=True)
     engine = import_util.create_sqlalchemy_engine()
@@ -184,6 +150,30 @@ def insert_data(file,etab_list):
     insert_into_etablissements_predicted_and_effective_hirings(importer_cycle_infos._id, file_name, etab_list)
     return True
 
+def load_perf_division_per_rome_dict():
+    perf_division_per_rome_dict = {}
+
+    rome_naf_mapping = load_data.load_rome_naf_mapping()
+
+    #headers of this mapping : rome_id,rome_label,naf_id,naf_label,hirings
+    for rome_naf_row in rome_naf_mapping:
+        rome_code = rome_naf_row[0]
+        naf_code = rome_naf_row[2]
+        try:
+            perf_division_per_rome_dict[naf_code]
+        except KeyError: #Dict with naf_code not initialized
+            perf_division_per_rome_dict[naf_code] = {}
+
+        perf_division_per_rome_dict[naf_code][rome_code] = {
+            "threshold_lbb": scoring_util.get_score_minimum_for_rome(rome_code),
+            "nb_bonne_boites_lbb":0,
+            "threshold_lba": scoring_util.get_score_minimum_for_rome(rome_code, alternance=True),
+            "nb_bonne_boites_lba":0
+        }
+
+    return perf_division_per_rome_dict
+
+
 def compute_effective_and_predicted_hirings():
     logger.info(f"\n Start : Computing effective hirings")
 
@@ -198,26 +188,12 @@ def compute_effective_and_predicted_hirings():
 
     logger.info(f"Importer cycles infos which have not been computed yet : {[ i.file_name for i in importer_cycles_infos_to_compute]}")
 
-    perf_division_per_rome_dict = {}
-
-    rome_naf_mapping = load_data.load_rome_naf_mapping()
-    #headers of this mapping : rome_id,rome_label,naf_id,naf_label,hirings
-    for rome_naf_row in rome_naf_mapping:
-        rome_code = rome_naf_row[0]
-        naf_code = rome_naf_row[2]
-        perf_division_per_rome_dict[naf_code] = []
-        perf_division_per_rome_dict[naf_code].append(
-            {
-                rome_code: {
-                    "threshold_lbb": scoring_util.get_score_minimum_for_rome(rome_code), #FIXME
-                    "nb_bonne_boites_lbb":0,
-                    "threshold_lba": scoring_util.get_score_minimum_for_rome(rome_code, alternance=True),
-                    "nb_bonne_boites_lba":0
-                }
-            }
-        )
-
     for ici in importer_cycles_infos_to_compute:
+        perf_division_per_rome_dict = load_perf_division_per_rome_dict()
+
+        naf_not_founds = set()
+        nb_companies_with_naf_not_found = 0
+        
         logger.info(f"Start computing for importer cycle infos : {ici._id} - {ici.file_name}")
 
         engine = import_util.create_sqlalchemy_engine()
@@ -298,25 +274,33 @@ def compute_effective_and_predicted_hirings():
 
             # Dico { "codenaf" : [{"coderome" : {"threshold","nb_companies"}},]}
 
-            for rome_code_infos in perf_division_per_rome_dict[naf]:
-                rome_code = list(rome_code_infos.keys())[0]
-                score_lbb = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                        score=lbb_nb_predicted_hirings_score,
-                        rome_code=rome_code,
-                        naf_code=naf
-                    )
-                if score_lbb >= rome_code_infos[rome_code]["threshold_lbb"]:
-                    perf_division_per_rome_dict[naf][rome_code]["nb_bonne_boites_lbb"] += 1
-                    is_a_bonne_boite = True
+            try:
+                perf_division_per_rome_dict[naf]
+                naf_present_in_mapping_rome_naf = True
+            except KeyError: #There is no naf related to romes in the mapping rome naf
+                naf_present_in_mapping_rome_naf = False
+                naf_not_founds.add(naf)
+                nb_companies_with_naf_not_found += 1
+            
+            if naf_present_in_mapping_rome_naf:
+                for rome_code, values in perf_division_per_rome_dict[naf].items():
+                    score_lbb = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                            score=lbb_nb_predicted_hirings_score,
+                            rome_code=rome_code,
+                            naf_code=naf
+                        )
+                    if score_lbb >= values["threshold_lbb"]:
+                        perf_division_per_rome_dict[naf][rome_code]["nb_bonne_boites_lbb"] += 1
+                        is_a_bonne_boite = True
 
-                score_lba = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                        score=lba_nb_predicted_hirings_score,
-                        rome_code=rome_code,
-                        naf_code=naf
-                    )
-                if score_lbb >= rome_code_infos[rome_code]["threshold_lba"]:
-                    perf_division_per_rome_dict[naf][rome_code]["nb_bonne_boites_lba"] += 1
-                    is_a_bonne_alternance = True
+                    score_lba = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+                            score=lba_nb_predicted_hirings_score,
+                            rome_code=rome_code,
+                            naf_code=naf
+                        )
+                    if score_lbb >= values["threshold_lba"]:
+                        perf_division_per_rome_dict[naf][rome_code]["nb_bonne_boites_lba"] += 1
+                        is_a_bonne_alternance = True
 
             pred_effective_hirings.is_a_bonne_boite = is_a_bonne_boite
             pred_effective_hirings.is_a_bonne_alternance = is_a_bonne_alternance
@@ -325,24 +309,29 @@ def compute_effective_and_predicted_hirings():
 
             #Commit all the 10 000 transactions
             if count % 10000 == 0:
+                logger.info("10 000 companies have been treated")
                 db_session.commit()
 
             count += 1
 
         # Commit for the remaining rows
         db_session.commit()
-        
+                    
+        logger.info(f"Number of naf not found in the mapping rome naf for this importer cycle : {len(naf_not_founds)}")
+        logger.info(f"List of naf not found in the mapping rome naf for this importer cycle : {naf_not_founds}")
+        logger.info(f"Number of companies with naf not found in the mapping rome naf for this importer cycle : {nb_companies_with_naf_not_found}")
+        logger.info(f"Number of total companies : {count}")
+
         for naf_code, romes_list in perf_division_per_rome_dict.items():
-            for rome_infos in romes_list:
-                rome_code = list(rome_infos.keys())[0]
+            for rome_code, values in romes_list.items():
                 division_per_rome = PerfDivisionPerRome(
                     importer_cycle_infos_id = ici._id,
                     naf = naf_code,
                     rome = rome_code,
-                    threshold_lbb = rome_infos[rome_code]["threshold_lbb"],
-                    threshold_lba = rome_infos[rome_code]["threshold_lba"],
-                    nb_bonne_boites_lbb = rome_infos[rome_code]["nb_bonne_boites_lbb"],
-                    nb_bonne_boites_lba = rome_infos[rome_code]["nb_bonne_boites_lba"],
+                    threshold_lbb = values["threshold_lbb"],
+                    threshold_lba = values["threshold_lba"],
+                    nb_bonne_boites_lbb = values["nb_bonne_boites_lbb"],
+                    nb_bonne_boites_lba = values["nb_bonne_boites_lba"],
                 )
                 db_session.add(division_per_rome)
 
@@ -352,14 +341,14 @@ def compute_effective_and_predicted_hirings():
         db_session.add(ici)
         db_session.commit()
 
-def main():
+def run_main():
     # First part of insertion : Get data from the file exported after each importer cycle
     files_list = get_available_files_list()
     for file in files_list:
-        etab_list = parse_backup_file_importer_output(file)
+        etab_list = insert_into_sql_table_old_prediction_file(file)
         insert_data(file, etab_list)
 
     compute_effective_and_predicted_hirings()
     
 if __name__ == '__main__':
-    main()
+    run_main()
