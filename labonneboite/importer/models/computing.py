@@ -286,6 +286,7 @@ class PerfImporterCycleInfos(CRUDMixin, Base):
     prediction_end_date = Column(DateTime, default=None)
     file_name = Column(Text)
     computed = Column(Boolean)
+    on_google_sheets = Column(Boolean)
 
 class PerfPredictionAndEffectiveHirings(CRUDMixin, Base):
     """

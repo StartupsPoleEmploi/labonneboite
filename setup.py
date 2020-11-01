@@ -29,6 +29,8 @@ setup(
             'validate_scores = labonneboite.importer.jobs.validate_scores:run',
             'geocode = labonneboite.importer.jobs.geocode:run_main',
             'populate_flags = labonneboite.importer.jobs.populate_flags:run_main',
+            'performance_insert_data = labonneboite.importer.jobs.performance_insert_data:run_main',
+            'performance_compute_data = labonneboite.importer.jobs.performance_compute_data:run_main',
             'update_lbb_data = labonneboite.importer.importer:run',
             'daily_json_activity_parser = labonneboite.scripts.impact_retour_emploi.daily_json_activity_parser:run_main',
             'join_activity_logs_dpae = labonneboite.scripts.impact_retour_emploi.join_activity_logs_dpae:run_main',
