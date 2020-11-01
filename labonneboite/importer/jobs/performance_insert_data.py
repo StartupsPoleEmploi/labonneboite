@@ -68,7 +68,6 @@ def insert_into_sql_table_old_prediction_file(file):
             clean_insert_statement = "INSERT INTO `etablissements_new` VALUES" + statement.split("/*!40000 ALTER TABLE `etablissements_new` ENABLE KEYS */;")[0]
         else:
             clean_insert_statement = "INSERT INTO `etablissements_new` VALUES" + statement
-        print(clean_insert_statement)
         cur.execute(clean_insert_statement)
 
     cur.execute("UNLOCK TABLES;")
