@@ -17,7 +17,6 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common.locations import CityLocation, Location, NamedLocation
 from labonneboite.common.maps import constants as maps_constants
-from labonneboite.common.maps import precompute
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.common.util import get_enum_from_value
@@ -400,10 +399,6 @@ def entreprises():
         request.full_path,
     )
     current_page = pagination_manager.get_current_page()
-
-    # Anticipate future calls by pre-computing duration-related searches
-    if location:
-        precompute.isochrones((location.latitude, location.longitude))
 
     form.naf.choices = [('', 'Tous les secteurs')] + sorted(naf_codes_with_descriptions, key=lambda t: t[1])
     form.validate()

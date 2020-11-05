@@ -14,8 +14,8 @@ mapsBlueprint = Blueprint('maps', __name__)
 @mapsBlueprint.route('/isochrone')
 def isochrone():
     """
-    Display the isochrone for a given location and travel mode. This is
-    useful for debugging and pre-filling the cache in production.
+    Display the isochrone for a given location and travel mode.
+    Before we dropped redis, this was useful for debugging and pre-filling the cache in production.
 
     E.g: /maps/isochrone?zipcode=75010&dur=30&tr=public
 
