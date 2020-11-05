@@ -21,9 +21,6 @@ class mock_backend(object):
 
 class SearchIsochroneTests(unittest.TestCase):
 
-    def setUp(self):
-        search.travel.ISOCHRONE_CACHE.clear()
-
     def test_isochrone(self):
         latitude = 45
         longitude = 6

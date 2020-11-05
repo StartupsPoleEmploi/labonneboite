@@ -190,20 +190,6 @@ TRAVEL_VENDOR_BACKENDS = {
     },
 }
 
-# Redis cache (unnecessary if we use local travel cache)
-REDIS_SENTINELS = [] # e.g: [('localhost', 26379)]
-REDIS_SERVICE_NAME = 'redis-lbb' # same as declared by sentinel config file
-# The following are used only if REDIS_SENTINELS is empty. (useful in
-# development where there is no sentinel)
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6389
-
-# Set this to False to simply trash async tasks (useful in tests)
-PROCESS_ASYNC_TASKS = True
-
-# 'dummy, 'local' or 'redis'
-TRAVEL_CACHE = 'local'
-
 # IGN credentials for fetching travel durations and isochrones
 IGN_CREDENTIALS = {
     'key': '',
