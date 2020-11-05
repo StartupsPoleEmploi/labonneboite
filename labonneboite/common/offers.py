@@ -13,6 +13,8 @@ OFFRES_ESD_MAXIMUM_ROMES = 3
 OFFRES_ESD_MAXIMUM_PAGE_SIZE = 150
 OFFRES_ESD_MAXIMUM_DISTANCE = 200
 
+# FIXME: if only contract = alternance is supported, remove the param hiring_type
+#        and this contract feature here
 HIRING_TYPE_TO_CONTRACT_NATURE_CODES = {
     hiring_type_util.ALTERNANCE: ["E2", "FS"],
 }
