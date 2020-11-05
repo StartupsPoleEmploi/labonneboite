@@ -108,11 +108,11 @@ def offers_offices_list():
     except InvalidFetcherArgument as e:
         return response_400(e)
 
-    _, zipcode, _, _ = get_location(request.args)
+    _, zipcode, _, departements = get_location(request.args)
 
     offices = fetcher.get_offices()
 
-    result = build_result(fetcher, offices, fetcher.commune_id, zipcode, add_url=False)
+    result = build_result(fetcher, offices, fetcher.commune_id, departements, zipcode, add_url=False)
 
     return jsonify(result)
 
@@ -137,7 +137,7 @@ def company_list():
 
     offices, _ = fetcher.get_offices(add_suggestions=False)
 
-    result = build_result(fetcher, offices, commune_id, zipcode)
+    result = build_result(fetcher, offices, commune_id, departements, zipcode)
 
     latitude = location.latitude if location is not None else None
     longitude = location.longitude if location is not None else None
@@ -157,11 +157,11 @@ def company_count():
         return response_400(e)
 
     fetcher.compute_office_count()
-    result = get_result(fetcher, commune_id)
+    result = get_result(fetcher, commune_id, departements)
     return jsonify(result)
 
 
-def build_result(fetcher, offices, commune_id, zipcode, add_url=True):
+def build_result(fetcher, offices, commune_id, departements, zipcode, add_url=True):
     offices = [
         patch_office_result_with_sensitive_information(request.args['user'], request.args.get('origin_user'), office, office.as_json(
             rome_codes=fetcher.romes,
@@ -173,12 +173,12 @@ def build_result(fetcher, offices, commune_id, zipcode, add_url=True):
         for office in offices
     ]
 
-    result = get_result(fetcher, commune_id, add_url)
+    result = get_result(fetcher, commune_id, departements, add_url)
     result['companies'] = offices
     return result
 
 
-def get_result(fetcher, commune_id=None, add_url=True, add_count=True):
+def get_result(fetcher, commune_id=None, departments=None, add_url=True, add_count=True):
     result = {}
     if len(fetcher.romes) == 1:
         # Showing which rome_code matched at the result level and not the office level
@@ -190,11 +190,11 @@ def get_result(fetcher, commune_id=None, add_url=True, add_count=True):
     if add_count:
         result['companies_count'] = fetcher.get_office_count()
     if add_url:
-        result['url'] = compute_frontend_url(fetcher, get_ga_query_string(), commune_id)
+        result['url'] = compute_frontend_url(fetcher, get_ga_query_string(), commune_id, departments)
     return result
 
 
-def compute_frontend_url(fetcher, query_string, commune_id):
+def compute_frontend_url(fetcher, query_string, commune_id, departments):
     """
     Compute web page URL that corresponds to the API request.
     """
@@ -204,7 +204,7 @@ def compute_frontend_url(fetcher, query_string, commune_id):
         # (requested by PE.fr)
         return url_for('root.home', _external=True, **query_string)
 
-    if commune_id and fetcher.romes:
+    if fetcher.romes:
         # preserve parameters from original API request
         if fetcher.naf_codes:
             query_string['naf'] = fetcher.naf_codes[0]
@@ -217,15 +217,27 @@ def compute_frontend_url(fetcher, query_string, commune_id):
             'p': fetcher.audience,
         })
 
-        return url_for(
-            'search.results_by_commune_and_rome',
-            commune_id=commune_id,
-            # FIXME One day frontend will support multi rome, one day...
-            # In the meantime we just provide the URL for the first rome in the list.
-            rome_id=fetcher.romes[0],
-            _external=True,
-            **query_string
-        )
+        if commune_id:
+            return url_for(
+                'search.results_by_commune_and_rome',
+                commune_id=commune_id,
+                # FIXME One day frontend will support multi rome, one day...
+                # In the meantime we just provide the URL for the first rome in the list.
+                rome_id=fetcher.romes[0],
+                _external=True,
+                **query_string
+            )
+        elif departments:
+            department_code = departments.split(',')[0]
+            return url_for(
+                'search.results_by_departments_and_rome',
+                department_code=department_code,
+                # FIXME One day frontend will support multi rome, one day...
+                # In the meantime we just provide the URL for the first rome in the list.
+                rome_id=fetcher.romes[0],
+                _external=True,
+                **query_string
+            )
 
     # In case of search by longitude+latitude,
     # return home URL since we do not have a URL ready yet.
@@ -267,7 +279,7 @@ def company_filter_list():
         if 'hiring_type' in fetcher.aggregate_by:
             result['filters']['contract'] = fetcher.get_contract_aggregations()
 
-    result.update(get_result(fetcher, commune_id=None, add_url=False, add_count=False))
+    result.update(get_result(fetcher, commune_id=None, departments=None, add_url=False, add_count=False))
 
     return jsonify(result)
 

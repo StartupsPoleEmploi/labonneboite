@@ -8,7 +8,7 @@ from flask import url_for
 
 from labonneboite.conf import settings
 from labonneboite.tests.test_base import AppTest, DatabaseTest
-from labonneboite.web.search.views import get_canonical_results_url, get_location
+from labonneboite.web.search.views import get_canonical_results_url, get_location, get_url_for_rome 
 
 
 class SearchEntreprisesTest(DatabaseTest):
@@ -253,3 +253,13 @@ class GenericUrlSearchRedirectionTest(AppTest):
         parameters = dict(parse_qsl(querystring))
         self.assertEqual(expected_url, url)
         self.assertEqual(expected_parameters, parameters)
+
+    def test_get_url_for_rome_departments(self):
+        with self.app_context():
+            with mock.patch('labonneboite.common.geocoding.datagouv.get_department_by_code', return_value={"department": "57", "label": 'Moselle (57)'}):
+                url = get_url_for_rome('M1805', '57')
+                self.assertEqual(url, 'http://labonneboite.pole-emploi.fr/entreprises?departments=57&j=M1805&l=Moselle+%2857%29&occupation=etudes-et-developpement-informatique')
+            with mock.patch('labonneboite.common.geocoding.datagouv.get_department_by_code', return_value=None):
+                url = get_url_for_rome('M1805', '57')
+                self.assertEqual(url, None)
+
