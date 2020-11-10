@@ -62,6 +62,7 @@ def backend_func(func_name, mode, *args):
         mode (str): travel mode, one of TRAVEL_MODES or None
         *args: remaining arguments will be passed to the backend function. They
     """
+    backend_name, mode = backend_info(func_name, mode)
     backend = vendors.backend(backend_name)
     backend_func = getattr(backend, func_name)
     try:
