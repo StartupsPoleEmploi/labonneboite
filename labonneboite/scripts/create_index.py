@@ -4,6 +4,7 @@ import logging
 import glob
 import os
 import time
+import datetime
 
 import multiprocessing as mp
 from cProfile import Profile
@@ -26,7 +27,7 @@ from labonneboite.common.chunks import chunks
 from labonneboite.common.search import fetch_offices
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, OGR_ROME_CODES, load_siret_to_remove
-from labonneboite.common.models import Office
+from labonneboite.common.models import Office, HistoryBlacklist
 from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
 from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
@@ -701,11 +702,14 @@ def get_latest_scam_emails():
 @timeit
 def remove_scam_emails():
     scam_emails = get_latest_scam_emails()
-
     for scam_emails_chunk in chunks(scam_emails, 100):
         query = Office.query.filter(Office.email.in_(scam_emails_chunk))
         office_count = query.count()
         if office_count:
+            history = []
+            for office in query.all():
+                history.append(HistoryBlacklist(email=office.email, datetime_removal=datetime.datetime.now()))
+            db_session.add_all(history)
             query.update({Office.email: ''}, synchronize_session="fetch")
             db_session.commit()
         logger.info(
