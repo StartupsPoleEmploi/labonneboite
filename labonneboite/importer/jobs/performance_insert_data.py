@@ -1,7 +1,7 @@
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings
 from labonneboite.importer.models.computing import PerfImporterCycleInfos, PerfPredictionAndEffectiveHirings, \
-    PerfDivisionPerRome
+    PerfDivisionPerRome, Hiring
 from labonneboite.common.database import db_session
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import load_data
@@ -203,26 +203,35 @@ def compute_effective_and_predicted_hirings():
         logger.info(f"Start computing for importer cycle infos : {ici._id} - {ici.file_name}")
 
         engine = import_util.create_sqlalchemy_engine()
-        query = f'SELECT id, siret, codenaf as naf, lbb_nb_predicted_hirings_score, lba_nb_predicted_hirings_score \
-                FROM perf_prediction_and_effective_hirings\
-                WHERE importer_cycle_infos_id={ici._id};'
-        df_companies_list = pd.read_sql_query(query, engine)
+        ppaeh = PerfPredictionAndEffectiveHirings.query.filter(PerfPredictionAndEffectiveHirings.importer_cycle_infos_id==ici._id)
+        columns_companies = ["_id", "siret", "naf", "lbb_nb_predicted_hirings_score", "lba_nb_predicted_hirings_score"]
+        dict_df_companies = {}
+        dict_ppaeh = {}
+        for col in columns_companies:
+            dict_df_companies[col] = []
+        for perf in ppaeh:
+            dict_ppaeh[perf._id] = perf
+            for col in columns_companies:
+                dict_df_companies[col].append(getattr(perf, col))
+        del ppaeh
+        df_companies_list = pd.DataFrame(data=dict_df_companies)
+
         logger.info(f"Nb offices to compute : {len(df_companies_list)}")
 
         query_hirings_lbb = f"SELECT siret, count(*) as lbb_nb_effective_hirings \
                 FROM hirings\
                 WHERE hiring_date >= '{ici.prediction_start_date}'\
                 and hiring_date <= '{ici.prediction_end_date}'\
-                and (contract_type=1 or contract_type=2)\
+                and (contract_type={Hiring.CONTRACT_TYPE_CDD} or contract_type={Hiring.CONTRACT_TYPE_CDI})\
                 GROUP BY siret;"
         df_hirings_lbb = pd.read_sql_query(query_hirings_lbb, engine)
         logger.info(f"Nb offices found in hirings for lbb : {len(df_hirings_lbb)}")
-
+        
         query_hirings_lba = f"SELECT siret, count(*) as lba_nb_effective_hirings \
                 FROM hirings\
                 WHERE hiring_date >= '{ici.prediction_start_date}'\
                 and hiring_date <= '{ici.prediction_end_date}'\
-                and (contract_type=11 or contract_type=12)\
+                and (contract_type={Hiring.CONTRACT_TYPE_APR} or contract_type={Hiring.CONTRACT_TYPE_CP})\
                 GROUP BY siret;"
         df_hirings_lba = pd.read_sql_query(query_hirings_lba, engine)
         logger.info(f"Nb offices found in hirings for lba: {len(df_hirings_lba)}")
@@ -241,7 +250,7 @@ def compute_effective_and_predicted_hirings():
         df_merged = df_merged.fillna(0)
 
         cols_we_want_to_keep = [
-            "id",
+            "_id",
             "siret",
             "naf",
             "lbb_nb_effective_hirings",
@@ -259,6 +268,7 @@ def compute_effective_and_predicted_hirings():
 
         for row in values_to_update:
             row_id = row[0]
+            #import ipdb;ipdb.set_trace()
             siret = row[1]
             naf = row[2]
             params = dict(zip(["lbb_nb_effective_hirings", "lba_nb_effective_hirings", "lbb_nb_predicted_hirings",
@@ -266,8 +276,7 @@ def compute_effective_and_predicted_hirings():
             lbb_nb_predicted_hirings_score = row[7]
             lba_nb_predicted_hirings_score = row[8]
             # foo
-            pred_effective_hirings = PerfPredictionAndEffectiveHirings.query.filter(
-                PerfPredictionAndEffectiveHirings._id == row_id).first()
+            pred_effective_hirings = dict_ppaeh[row_id]
             for key, val in params.items():
                 setattr(pred_effective_hirings, key, int(val))
             is_a_bonne_boite = False
