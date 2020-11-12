@@ -226,7 +226,7 @@ def compute_effective_and_predicted_hirings():
                 GROUP BY siret;"
         df_hirings_lbb = pd.read_sql_query(query_hirings_lbb, engine)
         logger.info(f"Nb offices found in hirings for lbb : {len(df_hirings_lbb)}")
-        
+
         query_hirings_lba = f"SELECT siret, count(*) as lba_nb_effective_hirings \
                 FROM hirings\
                 WHERE hiring_date >= '{ici.prediction_start_date}'\
