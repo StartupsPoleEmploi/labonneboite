@@ -25,10 +25,10 @@ def get_date_from_file_name(file_name):
     return date_time_object
 
 
-def get_available_files_list():
+def get_available_files_list(path_folder=settings.BACKUP_OUTPUT_FOLDER):
     logger.info("\nStart : Get all the backup .gz files")
     backup_files_list = import_util.get_backup_files_list(
-        settings.BACKUP_OUTPUT_FOLDER,
+        path_folder,
         "export_etablissement"
     )
     file_list_not_parsed_yet = []
