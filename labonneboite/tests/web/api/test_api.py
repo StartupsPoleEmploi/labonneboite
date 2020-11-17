@@ -1544,6 +1544,21 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertIn("phone", company_with_info)
         self.assertIn("website", company_with_info)
 
+    def test_multiple_romes(self):
+        # contract=alternance&distance=60&latitude=48.845&longitude=2.3752&origin_user=idea&page_size=100&rome_codes=A1408&
+        with self.test_request_context():
+            params = self.add_security_params({
+                'contract': 'alternance',
+                'longitude': self.positions['toulon']['coords'][0]['lon'],
+                'latitude': self.positions['toulon']['coords'][0]['lat'],
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+            })
+
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+            # data_count = json.loads(rv.data.decode())
+
 
 class ApiOffersOfficesListTest(ApiBaseTest):
     """
