@@ -813,15 +813,16 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
 
         if len(rome_codes) > 1:
             # Get rome_codes actually matching this office.
-            all_scores = {}
-
             # Case of "contract=alternance"
-            if hiring_type == hiring_type_util.ALTERNANCE and ALTERNANCE_SCORE_FIELD_NAME in es_office['_source']:
-                all_scores = es_office['_source'][ALTERNANCE_SCORE_FIELD_NAME]
+            if hiring_type == hiring_type_util.ALTERNANCE:
+                # beware: sometimes the key ALTERNANCE_SCORE_FIELD_NAME is in _source but equals None
+                all_scores = es_office['_source'].get(ALTERNANCE_SCORE_FIELD_NAME, None) or {}
+            else:
+                all_scores = {}
 
             # Case of DPAE and alternance, keep the DPAE scores in both cases
-            if DPAE_SCORE_FIELD_NAME in es_office['_source']:
-                dpae_scores = es_office['_source'][DPAE_SCORE_FIELD_NAME]
+            dpae_scores = es_office['_source'].get(DPAE_SCORE_FIELD_NAME, None)
+            if dpae_scores:
                 all_scores = {**dpae_scores, **all_scores} # This will merge the 2 dicts
 
             scores_of_searched_romes = dict([
@@ -839,8 +840,8 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
         # Set boost flag
         office.boost = False
         boosted_rome_keyname = get_boosted_rome_field_name(hiring_type, rome_codes[0]).split('.')[0]
-        if boosted_rome_keyname in es_office['_source']:
-            boost_romes = es_office['_source'][boosted_rome_keyname]
+        boost_romes = es_office['_source'].get(boosted_rome_keyname, None)
+        if boost_romes:
             romes_intersection = set(rome_codes).intersection(boost_romes)
             office.boost = bool(romes_intersection)
 
