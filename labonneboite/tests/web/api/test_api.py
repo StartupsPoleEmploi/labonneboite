@@ -1544,6 +1544,45 @@ class ApiCompanyListTest(ApiBaseTest):
         self.assertIn("phone", company_with_info)
         self.assertIn("website", company_with_info)
 
+    def test_romes_boost(self):
+        with self.test_request_context():
+            params = self.add_security_params({
+                'contract': 'dpae',
+                'longitude': self.positions['toulon']['coords'][0]['lon'],
+                'latitude': self.positions['toulon']['coords'][0]['lat'],
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+            })
+
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+    def test_romes_boost_alternance(self):
+        with self.test_request_context():
+            params = self.add_security_params({
+                'contract': 'alternance',
+                'longitude': self.positions['toulon']['coords'][0]['lon'],
+                'latitude': self.positions['toulon']['coords'][0]['lat'],
+                'rome_codes': 'D1405',
+                'user': 'labonneboite',
+            })
+
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+
+    def test_multiple_romes(self):
+        # with mock.patch.object(settings, 'ALTERNANCE_SEARCH_MODE', 'xxx'):
+            with self.test_request_context():
+                params = self.add_security_params({
+                    'contract': 'alternance',
+                    'longitude': self.positions['toulon']['coords'][0]['lon'],
+                    'latitude': self.positions['toulon']['coords'][0]['lat'],
+                    'rome_codes': 'D1405,N4403',
+                    'user': 'labonneboite',
+                })
+
+                rv = self.app.get(self.url_for("api.company_list", **params))
+                self.assertEqual(rv.status_code, 200)
+
 
 class ApiOffersOfficesListTest(ApiBaseTest):
     """
