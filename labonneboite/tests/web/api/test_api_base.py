@@ -483,6 +483,8 @@ class ApiBaseTest(DatabaseTest):
                 'flag_pmsmp': 0,
                 'boosted_alternance_romes': None,
                 'boosted_romes': {'A1503': True, 'J1301': True, 'K1304': True, 'K1303': True, 'A1408': True, 'K1302': True, 'M1607': True},
+                'scores_by_rome': {'M1607': 45, 'G1203': 52, 'M1203': 20, 'K1207': 60, 'K1302': 50, 'K1303': 51},
+                'scores_alternance_by_rome': None,
                 'department': self.positions['toulon']['zip_code'][0:2],
             },
         ]
