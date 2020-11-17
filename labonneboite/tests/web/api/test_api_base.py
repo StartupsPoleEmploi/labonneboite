@@ -470,6 +470,21 @@ class ApiBaseTest(DatabaseTest):
                 'flag_pmsmp': 0,
                 'department': self.positions['limoges']['zip_code'][0:2],
             },
+            # For boost scores tests
+            {
+                'naf': '4646Z',  # Map to Rome D1405
+                'siret': '00000000000027',
+                'score': 43,
+                'score_alternance': 18,
+                'headcount': 53,
+                'locations': self.positions['toulon']['coords'],
+                'name': 'Office 27',
+                'flag_alternance': 1,
+                'flag_pmsmp': 0,
+                'boosted_alternance_romes': None,
+                'boosted_romes': {'A1503': True, 'J1301': True, 'K1304': True, 'K1303': True, 'A1408': True, 'K1302': True, 'M1607': True},
+                'department': self.positions['toulon']['zip_code'][0:2],
+            },
         ]
         for _, doc in enumerate(docs, start=1):
             # Build scores for relevant ROME codes.
