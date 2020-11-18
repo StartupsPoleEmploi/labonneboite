@@ -176,6 +176,7 @@ def get_cycle_infos():
 #cycle + naf #######################################################################""
 
 def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
+    logger.info(f"START - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']}")
     if nom is not None:
         row_nom = row[nom]
     else:
@@ -212,6 +213,7 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
     df_head_predict = df_predict.head(int(row['nbTotal']*i/100))
     if df_sum_predict['sommeTotal'].sum() == 0:
         return 0
+    logger.info(f"END - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']}")
     return df_head_predict['predict'].sum() / df_sum_predict['sommeTotal'].sum()
 
 
@@ -382,12 +384,14 @@ def fill_indicators_sheet(pdf, is_lbb):
     clear_useless_data(importer_cycle_infos_ids)
 
 def run_main():
-    logging.info("START GENERATE LBB PERFORMANCE INDICATORS")
+    logger.info(f"START - {str(datetime.now())}- Generate indicators for LBB")
     pdf = PayloadDataframe()
     fill_indicators_sheet(pdf, is_lbb=True)  # Perf indicators for LBB
+    logger.info(f"END - {str(datetime.now())}- Generate indicators for LBB")
     pdf.reset()
-    logging.info("START GENERATE LBA PERFORMANCE INDICATORS")
+    logger.info(f"START - {str(datetime.now())}- Generate indicators for LBA")
     fill_indicators_sheet(pdf, is_lbb=False)  # Perf indicators for LBA
+    logger.info(f"END - {str(datetime.now())}- Generate indicators for LBA")
 
 
 
