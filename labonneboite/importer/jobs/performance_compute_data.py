@@ -1,6 +1,7 @@
 import csv
 import numpy
 import pandas as pd
+import logging
 import math
 from labonneboite.common.database import db_session
 from labonneboite.importer import util as import_util
@@ -13,6 +14,7 @@ from labonneboite.importer.models.computing import PerfDivisionPerRome
 from labonneboite.importer.models.computing import PerfPredictionAndEffectiveHirings
 from datetime import datetime
 
+logger = logging.getLogger(__name__)
 
 class PayloadDataframe:
 
@@ -327,7 +329,9 @@ def set_importer_cycle_infos_google_sheets_boolean(importer_cycle_infos_id):
 def fill_indicators_sheet(pdf, is_lbb):
     # If it's not LBB we're seeking for, then we seeking LBA
     spreadsheet_id = settings.SPREADSHEET_IDS["perf_indicators_lbb"] if is_lbb else settings.SPREADSHEET_IDS["perf_indicators_lba"]
+    logger.info("START - PREPARE DATA SHEET")
     values_to_insert_naf_sheet, values_to_insert_departement_sheet, values_to_insert_global_sheet, importer_cycle_infos_ids = prepare_google_sheet_data(pdf, is_lbb)
+    logger.info("END - PREPARE DATA SHEET")
     service = generate_google_sheet_service()
 
     naf_sheet_report = GoogleSheetReport(
@@ -364,9 +368,11 @@ def fill_indicators_sheet(pdf, is_lbb):
 
 
 def run_main():
+    logging.info("START GENERATE LBB PERFORMANCE INDICATORS")
     pdf = PayloadDataframe()
     fill_indicators_sheet(pdf, is_lbb=True)  # Perf indicators for LBB
     pdf.reset()
+    logging.info("START GENERATE LBA PERFORMANCE INDICATORS")
     fill_indicators_sheet(pdf, is_lbb=False)  # Perf indicators for LBA
 
 
