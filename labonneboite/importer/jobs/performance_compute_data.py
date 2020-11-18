@@ -93,12 +93,16 @@ def load_csv_perf_prediction_and_effective_h(filename, delimiter=';'):
 def get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne, nom):
     engine = import_util.create_sqlalchemy_engine()
     if colonne == "global":
-        query = f'SELECT importer_cycle_infos_id as cycle, count(*) as nbTotal \
+        query = f"""SELECT importer_cycle_infos_id as cycle, count(*) as nbTotal \
                 FROM perf_prediction_and_effective_hirings ppaeh \
-                GROUP BY importer_cycle_infos_id;'
+                INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id
+                WHERE pici.computed is true
+                GROUP BY importer_cycle_infos_id;"""
     else: #colonne == Naf OR departement
         query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotal \
                 FROM perf_prediction_and_effective_hirings ppaeh \
+        INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id \
+        WHERE pici.computed is true \
                 GROUP BY importer_cycle_infos_id , {colonne};'
     df_nb_entreprise = pd.read_sql_query(query, engine)
     engine.close()
@@ -110,12 +114,16 @@ def get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBX(colonne, nom, is_lbb):
     if colonne == "global":
         query = f'SELECT importer_cycle_infos_id as cycle,count(*) as nbTotalLBX \
                 FROM perf_prediction_and_effective_hirings ppaeh \
-                WHERE {filter_lbx} is true \
+        INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id \
+        WHERE pici.computed is true \
+                AND {filter_lbx} is true \
                 GROUP BY importer_cycle_infos_id;'
     else: #colonne == Naf OR departement
         query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotalLBX \
                 FROM perf_prediction_and_effective_hirings ppaeh \
-                WHERE {filter_lbx} is true \
+        INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id \
+        WHERE pici.computed is true \
+                AND {filter_lbx} is true \
                 GROUP BY importer_cycle_infos_id , {colonne};'
     df_nb_entreprise_isLBX = pd.read_sql_query(query, engine)
     engine.close()
@@ -159,7 +167,8 @@ def get_cycle_infos():
     engine = import_util.create_sqlalchemy_engine()
     query = f'SELECT id as cycle, execution_date as dateExecution \
             FROM perf_importer_cycle_infos \
-            WHERE on_google_sheets = 0;'
+            WHERE on_google_sheets = 0 \
+            and computed is true;'
     df_predict = pd.read_sql_query(query, engine)
     engine.close()
     return df_predict
@@ -325,6 +334,11 @@ def set_importer_cycle_infos_google_sheets_boolean(importer_cycle_infos_id):
         db_session.add(ici)
         db_session.commit()
 
+def clear_useless_data(importer_cycle_infos_id):
+    con, cur = import_util.create_cursor()
+    for ici_id in importer_cycle_infos_id:
+        cur.execute("DELETE FROM perf_prediction_and_effective_hirings WHERE importer_cycle_infos_id = %s", [ici_id])
+
 
 def fill_indicators_sheet(pdf, is_lbb):
     # If it's not LBB we're seeking for, then we seeking LBA
@@ -365,7 +379,7 @@ def fill_indicators_sheet(pdf, is_lbb):
     global_sheet_report.write_data_into_sheet()
 
     set_importer_cycle_infos_google_sheets_boolean(importer_cycle_infos_ids)
-
+    clear_useless_data(importer_cycle_infos_ids)
 
 def run_main():
     logging.info("START GENERATE LBB PERFORMANCE INDICATORS")
