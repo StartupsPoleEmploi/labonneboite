@@ -360,7 +360,7 @@ def fill_indicators_sheet(pdf, is_lbb):
     global_sheet_report.set_sheet_range()
     global_sheet_report.write_data_into_sheet()
 
-    #set_importer_cycle_infos_google_sheets_boolean(importer_cycle_infos_ids)
+    set_importer_cycle_infos_google_sheets_boolean(importer_cycle_infos_ids)
 
 
 def run_main():
