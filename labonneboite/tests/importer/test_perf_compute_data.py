@@ -73,7 +73,6 @@ def load_csv_perf_division_per_rome(filename, delimiter=';'):
 
 
 def load_csv_perf_importer_cycle_infos(filename, delimiter=';'):
-    print("#" * 100, [(p._id, p.file_name, p.computed) for p in PerfImporterCycleInfos.query.all()])
     for row in load_data.load_csv_file(filename, delimiter):
         perf_importer_cycle_info = PerfImporterCycleInfos(
             _id=row[0],
