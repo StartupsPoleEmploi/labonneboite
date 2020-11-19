@@ -184,7 +184,7 @@ def get_cycle_infos():
 #cycle + naf #######################################################################""
 
 def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
-    logger.info(f"START - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']} and sum {i}")
+    logger.info(f"START - {str(datetime.now())}- is_lbb : {is_lbb} - computing sum predict by {colonne} for cycle importer {row['cycle']} and sum {i}")
     if nom is not None:
         row_nom = row[nom]
     else:
@@ -195,7 +195,7 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
         head_len = 0
         if colonne != "global":
             df_predict = pdf.dict_df_predict_global[row["cycle"]].query(f"{colonne} == '{row_nom}'")
-            df_sum_predict = df_predict["predict"].values.sum()
+            df_sum_predict = df_predict["effective"].values.sum()
             if row["cycle"] not in pdf.dict_df_predict:
                 pdf.dict_df_predict[row["cycle"]] = {}
             pdf.dict_df_predict[row["cycle"]][row[nom]] = df_predict
@@ -211,7 +211,7 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
             }
         else:
             df_predict = get_predict_par_cycle_et_naf_ou_dep(row["cycle"], colonne, row_nom, is_lbb=is_lbb)
-            df_sum_predict = df_predict["predict"].values.sum()
+            df_sum_predict = df_predict["effective"].values.sum()
             if row["cycle"] not in pdf.dict_df_predict_global:
                 pdf.dict_df_predict_global[row["cycle"]] = {}
             pdf.dict_df_predict_global[row["cycle"]] = df_predict
@@ -239,12 +239,14 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
     if i == 100:
         rmse_list = numpy.array([calcul_rmse(eff, pred) for eff, pred in zip(numpy.array(df_predict["effective"]),
                                                                              numpy.array(df_predict["predict"]))])
+        logger.info(
+            f"END - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']} and sum {i}")
         return math.sqrt(rmse_list.sum() / row['nbTotal'])
 
 
     # calculate top sum
     new_len_head = int(row['nbTotal']*i/100)
-    diff_sum = df_predict["predict"].values[head_len:new_len_head].sum()
+    diff_sum = df_predict["effective"].values[head_len:new_len_head].sum()
     head_sum += diff_sum
     head_len = new_len_head
     # update dict head with new values
@@ -270,16 +272,19 @@ def calcul_rmse(effective, predict):
 
 def lancement_requete(pdf, colonne,nom=None, is_lbb=True):
     df_nb_entreprise = get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne,nom)
+    if len(df_nb_entreprise) > 0:
+        for i in range(10,110,10):
+            df_nb_entreprise[f'sum{i}'] = df_nb_entreprise.apply(lambda row: get_sum_predict(pdf, row,i,colonne,nom,is_lbb), axis=1)
 
-    for i in range(10,110,10):
-        df_nb_entreprise[f'sum{i}'] = df_nb_entreprise.apply(lambda row: get_sum_predict(pdf, row,i,colonne,nom,is_lbb), axis=1)
+        df_nb_entreprise = df_nb_entreprise.rename(columns={'sum100':'RMSE'})
+        df_nb_entreprise_isLBX  = get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBX(colonne, nom, is_lbb)
+        df_result = pd.merge(df_nb_entreprise , df_nb_entreprise_isLBX , on=['cycle',nom])
+        df_result['propRecrutNonLBX'] = numpy.array([get_prop_recrut_non_lbx(total, total_lbx) for total, total_lbx in zip(numpy.array(df_result["nbTotal"]),
+                                                                                                       numpy.array(df_result["nbTotalLBX"]))])
+        return df_result
+    else:
+        raise Exception(f"Nothing to compute. (params: [colonne={colonne}, nom={nom}, is_lbb={is_lbb}])")
 
-    df_nb_entreprise = df_nb_entreprise.rename(columns={'sum100':'RMSE'})
-    df_nb_entreprise_isLBX  = get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBX(colonne, nom, is_lbb)
-    df_result = pd.merge(df_nb_entreprise , df_nb_entreprise_isLBX , on=['cycle',nom])
-    df_result['propRecrutNonLBX'] = numpy.array([get_prop_recrut_non_lbx(total, total_lbx) for total, total_lbx in zip(numpy.array(df_result["nbTotal"]),
-                                                                                                   numpy.array(df_result["nbTotalLBX"]))])
-    return df_result
 
 
 def prepare_google_sheet_data(pdf, is_lbb=True):
@@ -368,7 +373,7 @@ def prepare_google_sheet_data(pdf, is_lbb=True):
     values_to_insert_naf = {'values': df_naf.values.tolist()}
     values_to_insert_dep = {'values': df_dep.values.tolist()}
     values_to_insert_global = {'values': df_global.values.tolist()}
-    
+
     importer_cycle_infos_ids = df_cycle_infos["cycle"].values.tolist()
 
     return values_to_insert_naf , values_to_insert_dep, values_to_insert_global, importer_cycle_infos_ids
@@ -437,7 +442,6 @@ def run_main():
     logger.info(f"START - {str(datetime.now())}- Generate indicators for LBA")
     ici = fill_indicators_sheet(pdf, is_lbb=False)  # Perf indicators for LBA
     logger.info(f"END - {str(datetime.now())}- Generate indicators for LBA")
-    clear_useless_data(ici)
 
 
 
