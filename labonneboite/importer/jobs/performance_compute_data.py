@@ -237,8 +237,9 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
             head_sum = pdf.head_predict_global[row["cycle"]]["sum"]
             head_len = pdf.head_predict_global[row["cycle"]]["len"]
     if i == 100:
-        df_predict['RMSE'] = df_predict.apply(lambda row: calcul_rmse(row), axis=1)
-        return math.sqrt(df_predict['RMSE'].sum() / row['nbTotal'])
+        rmse_list = numpy.array([calcul_rmse(eff, pred) for eff, pred in zip(numpy.array(df_predict["effective"]),
+                                                                             numpy.array(df_predict["predict"]))])
+        return math.sqrt(rmse_list.sum() / row['nbTotal'])
 
 
     # calculate top sum
@@ -263,8 +264,8 @@ def get_prop_recrut_non_lbx(row):
     return (row['nbTotal'] - row['nbTotalLBX'])/ row['nbTotal']
 
 
-def calcul_rmse(row):
-    return  math.pow((row['effective'] - row['predict']),2)
+def calcul_rmse(effective, predict):
+    return math.pow((effective - predict), 2)
 
 
 def lancement_requete(pdf, colonne,nom=None, is_lbb=True):
