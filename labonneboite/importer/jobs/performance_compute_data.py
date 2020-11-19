@@ -260,8 +260,8 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
     return head_sum / df_sum_predict
 
 
-def get_prop_recrut_non_lbx(row):
-    return (row['nbTotal'] - row['nbTotalLBX'])/ row['nbTotal']
+def get_prop_recrut_non_lbx(total, total_lbx):
+    return (total - total_lbx)/ total
 
 
 def calcul_rmse(effective, predict):
@@ -277,7 +277,8 @@ def lancement_requete(pdf, colonne,nom=None, is_lbb=True):
     df_nb_entreprise = df_nb_entreprise.rename(columns={'sum100':'RMSE'})
     df_nb_entreprise_isLBX  = get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBX(colonne, nom, is_lbb)
     df_result = pd.merge(df_nb_entreprise , df_nb_entreprise_isLBX , on=['cycle',nom])
-    df_result['propRecrutNonLBX'] = df_result.apply(lambda row: get_prop_recrut_non_lbx(row), axis=1)
+    df_result['propRecrutNonLBX'] = numpy.array([get_prop_recrut_non_lbx(total, total_lbx) for total, total_lbx in zip(numpy.array(df_result["nbTotal"]),
+                                                                                                   numpy.array(df_result["nbTotalLBX"]))])
     return df_result
 
 
