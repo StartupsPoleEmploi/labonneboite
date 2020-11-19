@@ -23,11 +23,13 @@ class PayloadDataframe:
         self.dict_df_sum_predict = {}
         self.dict_df_predict_dep = {}
         self.dict_df_sum_predict_dep = {}
+        self.head_predict = {}
 
     def reset(self):
         self.dict_df_predict = {}
         self.dict_df_sum_predict = {}
         self.dict_df_predict_dep = {}
+        self.head_predict = {}
         self.dict_df_sum_predict_dep = {}
 
 #import donnée#######################################################################""
@@ -97,12 +99,14 @@ def get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne, nom):
                 FROM perf_prediction_and_effective_hirings ppaeh \
                 INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id
                 WHERE pici.computed is true
+                AND pici.on_google_sheets is false
                 GROUP BY importer_cycle_infos_id;"""
     else: #colonne == Naf OR departement
         query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotal \
                 FROM perf_prediction_and_effective_hirings ppaeh \
         INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id \
         WHERE pici.computed is true \
+        AND pici.on_google_sheets is false \
                 GROUP BY importer_cycle_infos_id , {colonne};'
     df_nb_entreprise = pd.read_sql_query(query, engine)
     engine.close()
@@ -116,6 +120,7 @@ def get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBX(colonne, nom, is_lbb):
                 FROM perf_prediction_and_effective_hirings ppaeh \
         INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id \
         WHERE pici.computed is true \
+        AND pici.on_google_sheets is false \
                 AND {filter_lbx} is true \
                 GROUP BY importer_cycle_infos_id;'
     else: #colonne == Naf OR departement
@@ -123,6 +128,7 @@ def get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBX(colonne, nom, is_lbb):
                 FROM perf_prediction_and_effective_hirings ppaeh \
         INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id \
         WHERE pici.computed is true \
+        AND pici.on_google_sheets is false \
                 AND {filter_lbx} is true \
                 GROUP BY importer_cycle_infos_id , {colonne};'
     df_nb_entreprise_isLBX = pd.read_sql_query(query, engine)
@@ -183,6 +189,8 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
         row_nom = None
 
     if i == 10:
+        head_sum = 0
+        head_len = 0
         df_predict = get_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,row_nom,is_lbb=is_lbb)
         df_sum_predict = get_sum_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,nom,row_nom, is_lbb=is_lbb)
         if colonne != "global":
@@ -191,30 +199,60 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
             pdf.dict_df_predict[row["cycle"]][row[nom]] = df_predict
             if row["cycle"] not in pdf.dict_df_sum_predict:
                 pdf.dict_df_sum_predict[row["cycle"]] = {}
-            pdf.dict_df_sum_predict[row["cycle"]][row[nom]] = df_sum_predict
+            pdf.dict_df_sum_predict[row["cycle"]][row[nom]] = df_sum_predict["sommeTotal"].values.sum()
+            df_sum_predict = pdf.dict_df_sum_predict[row["cycle"]][row[nom]]
+            if row["cycle"] not in pdf.head_predict:
+                pdf.head_predict[row["cycle"]] = {}
+            pdf.head_predict[row["cycle"]][row[nom]] = {
+                "len": head_len,
+                "sum": head_sum
+            }
         else:
             if row["cycle"] not in pdf.dict_df_predict:
                 pdf.dict_df_predict[row["cycle"]] = {}
             pdf.dict_df_predict[row["cycle"]] = df_predict
             if row["cycle"] not in pdf.dict_df_sum_predict:
                 pdf.dict_df_sum_predict[row["cycle"]] = {}
-            pdf.dict_df_sum_predict[row["cycle"]] = df_sum_predict
-    else :
+            pdf.dict_df_sum_predict[row["cycle"]] = df_sum_predict["sommeTotal"].values.sum()
+            df_sum_predict = pdf.dict_df_sum_predict[row["cycle"]]
+            if row["cycle"] not in pdf.head_predict:
+                pdf.head_predict[row["cycle"]] = {
+                    "len": head_len,
+                    "sum": head_sum
+                }
+
+    else:
         if colonne != "global":
             df_predict = pdf.dict_df_predict[row["cycle"]][row[nom]]
             df_sum_predict = pdf.dict_df_sum_predict[row["cycle"]][row[nom]]
+            head_sum = pdf.head_predict[row["cycle"]][row[nom]]["sum"]
+            head_len = pdf.head_predict[row["cycle"]][row[nom]]["len"]
         else:
             df_predict = pdf.dict_df_predict[row["cycle"]]
             df_sum_predict = pdf.dict_df_sum_predict[row["cycle"]]
+            head_sum = pdf.head_predict[row["cycle"]]["sum"]
+            head_len = pdf.head_predict[row["cycle"]]["len"]
     if i == 100:
         df_predict['RMSE'] = df_predict.apply(lambda row: calcul_rmse(row), axis=1)
         return math.sqrt(df_predict['RMSE'].sum() / row['nbTotal'])
 
-    df_head_predict = df_predict.head(int(row['nbTotal']*i/100))
-    if df_sum_predict['sommeTotal'].sum() == 0:
+
+    # calculate top sum
+    new_len_head = int(row['nbTotal']*i/100)
+    diff_sum = df_predict["predict"].values[head_len:new_len_head].sum()
+    head_sum += diff_sum
+    head_len = new_len_head
+    # update dict head with new values
+    if colonne != "global":
+        pdf.head_predict[row["cycle"]][row[nom]]["sum"] = head_sum
+        pdf.head_predict[row["cycle"]][row[nom]]["len"] = head_len
+    else:
+        pdf.head_predict[row["cycle"]]["sum"] = head_sum
+        pdf.head_predict[row["cycle"]]["len"] = head_len
+    if df_sum_predict == 0:
         return 0
     logger.info(f"END - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']}")
-    return df_head_predict['predict'].sum() / df_sum_predict['sommeTotal'].sum()
+    return head_sum / df_sum_predict
 
 
 def get_prop_recrut_non_lbx(row):
@@ -240,10 +278,10 @@ def lancement_requete(pdf, colonne,nom=None, is_lbb=True):
 
 def prepare_google_sheet_data(pdf, is_lbb=True):
     #TODO : Refacto this function
+    df_cycle_infos = get_cycle_infos()
     df_naf = lancement_requete(pdf, "codenaf", "naf", is_lbb)
     df_dep = lancement_requete(pdf, "departement","dep", is_lbb)
     df_global = lancement_requete(pdf, "global", is_lbb=is_lbb)
-    df_cycle_infos = get_cycle_infos()
     df_naf = pd.merge(df_naf , df_cycle_infos , on=['cycle'])
     df_dep = pd.merge(df_dep , df_cycle_infos , on=['cycle'])
     df_global = pd.merge(df_global , df_cycle_infos , on=['cycle'])
@@ -381,7 +419,8 @@ def fill_indicators_sheet(pdf, is_lbb):
     global_sheet_report.write_data_into_sheet()
 
     set_importer_cycle_infos_google_sheets_boolean(importer_cycle_infos_ids)
-    clear_useless_data(importer_cycle_infos_ids)
+    return importer_cycle_infos_ids
+
 
 def run_main():
     logger.info(f"START - {str(datetime.now())}- Generate indicators for LBB")
@@ -390,8 +429,9 @@ def run_main():
     logger.info(f"END - {str(datetime.now())}- Generate indicators for LBB")
     pdf.reset()
     logger.info(f"START - {str(datetime.now())}- Generate indicators for LBA")
-    fill_indicators_sheet(pdf, is_lbb=False)  # Perf indicators for LBA
+    ici = fill_indicators_sheet(pdf, is_lbb=False)  # Perf indicators for LBA
     logger.info(f"END - {str(datetime.now())}- Generate indicators for LBA")
+    clear_useless_data(ici)
 
 
 
