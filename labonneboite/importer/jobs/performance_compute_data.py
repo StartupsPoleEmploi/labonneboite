@@ -182,7 +182,7 @@ def get_cycle_infos():
 #cycle + naf #######################################################################""
 
 def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
-    logger.info(f"START - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']}")
+    logger.info(f"START - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']} and sum {i}")
     if nom is not None:
         row_nom = row[nom]
     else:
@@ -251,7 +251,7 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
         pdf.head_predict[row["cycle"]]["len"] = head_len
     if df_sum_predict == 0:
         return 0
-    logger.info(f"END - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']}")
+    logger.info(f"END - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']} and sum {i}")
     return head_sum / df_sum_predict
 
 
