@@ -72,100 +72,106 @@ function createMap(element, center, zoom) {
       }
     }
 
-    var map = createMap($map[0], center, zoom);
-    map.on("load", function() {
-      if (bounds) {
-        // We cannot fit to bounds in constructor: this feature was added in
-        // v0.51.0 of mapbox-gl.js while we are using v0.43.0.
-        // https://github.com/mapbox/mapbox-gl-js/pull/5518/files
-        map.fitBounds(bounds, { duration: 0 }, { initialZoom: true });
-      }
-      companies.forEach(function(company) {
-        var popup = new mapboxgl.Popup()
-          .setHTML(company.link);
-        var marker = new mapboxgl.Marker({color: "#54108E"})
-          .setLngLat(company.coords)
-          .setPopup(popup)
-          .addTo(map);
+    try {
+      var map = createMap($map[0], center, zoom);
+      map.on("load", function() {
+        if (bounds) {
+          // We cannot fit to bounds in constructor: this feature was added in
+          // v0.51.0 of mapbox-gl.js while we are using v0.43.0.
+          // https://github.com/mapbox/mapbox-gl-js/pull/5518/files
+          map.fitBounds(bounds, { duration: 0 }, { initialZoom: true });
+        }
+        companies.forEach(function(company) {
+          var popup = new mapboxgl.Popup()
+            .setHTML(company.link);
+          var marker = new mapboxgl.Marker({color: "#54108E"})
+            .setLngLat(company.coords)
+            .setPopup(popup)
+            .addTo(map);
+        });
       });
-    });
 
-    // Add auto-refresh check
-    $map.append("<div id='map-auto-refresh'><div id='map-auto-refresh-checkbox'><input type='checkbox'></input><span>Rechercher quand je déplace la carte<span></div></div>");
-    $("#map-auto-refresh input").prop('checked', autoRefreshActivated);
-    $("#map-auto-refresh input").change(function() {
-        autoRefreshActivated = $(this).is(':checked');
-        ga('send', 'event', 'Carte', 'toggle autorefresh', autoRefreshActivated ? 1 : 0);
-    });
+      // Add auto-refresh check
+      $map.append("<div id='map-auto-refresh'><div id='map-auto-refresh-checkbox'><input type='checkbox'></input><span>Rechercher quand je déplace la carte<span></div></div>");
+      $("#map-auto-refresh input").prop('checked', autoRefreshActivated);
+      $("#map-auto-refresh input").change(function() {
+          autoRefreshActivated = $(this).is(':checked');
+          ga('send', 'event', 'Carte', 'toggle autorefresh', autoRefreshActivated ? 1 : 0);
+      });
 
-    var onMapMove = function() {
-      if(autoRefreshActivated) {
-        updateMap();
+      var onMapMove = function() {
+        if(autoRefreshActivated) {
+          updateMap();
+        }
+        else {
+            $("#map-auto-refresh").html("<a class='btn btn-small btn-info' href='#''>Relancer la recherche ici</a>").addClass();
+            $("#map-auto-refresh a").click(function(e) {
+                ga('send', 'event', 'Carte', 'refresh');
+                e.preventDefault();
+                updateMap();
+            });
+        }
+      };
+      var onMapDrag = function() {
+        ga('send', 'event', 'Carte', 'drag');
+        onMapMove();
+      };
+      var onMapZoom = function(e) {
+        if (e.initialZoom) {
+          return;
+        }
+        ga('send', 'event', 'Carte', 'zoom');
+        onMapMove();
+      };
+      var onMapLoad = function() {
+        $('.mapboxgl-ctrl-attrib .mapboxgl-ctrl-attrib-inner')
+          .html('<a href="https://www.openstreetmap.org/copyright" target="_blank" title="© Contributeurs OpenStreetMap (ouverture dans un nouvel onglet)">&copy; Contributeurs OpenStreetMap</a>');
       }
-      else {
-          $("#map-auto-refresh").html("<a class='btn btn-small btn-info' href='#''>Relancer la recherche ici</a>").addClass();
-          $("#map-auto-refresh a").click(function(e) {
-              ga('send', 'event', 'Carte', 'refresh');
-              e.preventDefault();
-              updateMap();
-          });
-      }
-    };
-    var onMapDrag = function() {
-      ga('send', 'event', 'Carte', 'drag');
-      onMapMove();
-    };
-    var onMapZoom = function(e) {
-      if (e.initialZoom) {
-        return;
-      }
-      ga('send', 'event', 'Carte', 'zoom');
-      onMapMove();
-    };
-    var onMapLoad = function() {
-      $('.mapboxgl-ctrl-attrib .mapboxgl-ctrl-attrib-inner')
-        .html('<a href="https://www.openstreetmap.org/copyright" target="_blank" title="© Contributeurs OpenStreetMap (ouverture dans un nouvel onglet)">&copy; Contributeurs OpenStreetMap</a>');
+
+
+      var updateMap = function() {
+        ga('send', 'event', 'Carte', 'update');
+        center = map.getCenter();
+        zoom = map.getZoom();
+
+        $latitude.val(center.lat);
+        $longitude.val(center.lng);
+
+        // Adjust search radius
+        var distances = [5, 10, 30, 50, 100, 3000];
+        var earthPerimeterKm = 2 * 3.14159 * 6371;
+        var earthPerimeterAtCompanyLocationKm = earthPerimeterKm * Math.cos(center.lat);
+        // See leaflet.js zoom definition https://wiki.openstreetmap.org/wiki/Zoom_levels
+        var pixelSizeKm = earthPerimeterAtCompanyLocationKm / (256 * Math.pow(2, zoom));
+        var mapHeightPixels = map.getContainer().scrollHeight;
+        var windowHeightKm = pixelSizeKm * mapHeightPixels * 2;// 2 is an arbitrary scaling factor to include results just ouside the bounding box
+        var newDistance = distances[distances.length - 1];
+        for(var d=0; d < distances.length; d++) {
+            if(windowHeightKm < distances[d]) {
+                newDistance = distances[d];
+                break;
+            }
+        }
+        $("input[name='d']").val(newDistance);
+
+        // Clear the location field so that it gets auto-filled server-side
+        var $location = $('#l');
+        $location.attr('placeholder', $location.val());
+        $location.val('');
+
+        // remove department filter
+        $("#departments").val('');
+
+        $('.js-search-form').trigger('submit', {async: true});
+      };
+      map.on('dragend', onMapDrag);
+      map.on('zoomend', onMapZoom);
+      map.on('load', onMapLoad);
+    } catch(e) {
+      $map.hide();
+      // hide again in the next event cycle, because somewhere we show the map
+      setTimeout(function() { $map.hide(); });
     }
-
-
-    var updateMap = function() {
-      ga('send', 'event', 'Carte', 'update');
-      center = map.getCenter();
-      zoom = map.getZoom();
-
-      $latitude.val(center.lat);
-      $longitude.val(center.lng);
-
-      // Adjust search radius
-      var distances = [5, 10, 30, 50, 100, 3000];
-      var earthPerimeterKm = 2 * 3.14159 * 6371;
-      var earthPerimeterAtCompanyLocationKm = earthPerimeterKm * Math.cos(center.lat);
-      // See leaflet.js zoom definition https://wiki.openstreetmap.org/wiki/Zoom_levels
-      var pixelSizeKm = earthPerimeterAtCompanyLocationKm / (256 * Math.pow(2, zoom));
-      var mapHeightPixels = map.getContainer().scrollHeight;
-      var windowHeightKm = pixelSizeKm * mapHeightPixels * 2;// 2 is an arbitrary scaling factor to include results just ouside the bounding box
-      var newDistance = distances[distances.length - 1];
-      for(var d=0; d < distances.length; d++) {
-          if(windowHeightKm < distances[d]) {
-              newDistance = distances[d];
-              break;
-          }
-      }
-      $("input[name='d']").val(newDistance);
-
-      // Clear the location field so that it gets auto-filled server-side
-      var $location = $('#l');
-      $location.attr('placeholder', $location.val());
-      $location.val('');
-
-      // remove department filter
-      $("#departments").val('');
-
-      $('.js-search-form').trigger('submit', {async: true});
-    };
-    map.on('dragend', onMapDrag);
-    map.on('zoomend', onMapZoom);
-    map.on('load', onMapLoad);
   }
 
   $(document).on('lbbready', function () {
