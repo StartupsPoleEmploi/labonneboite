@@ -192,14 +192,14 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
         head_sum = 0
         head_len = 0
         df_predict = get_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,row_nom,is_lbb=is_lbb)
-        df_sum_predict = get_sum_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,nom,row_nom, is_lbb=is_lbb)
+        df_sum_predict = df_predict["predict"].values.sum()
         if colonne != "global":
             if row["cycle"] not in pdf.dict_df_predict:
                 pdf.dict_df_predict[row["cycle"]] = {}
             pdf.dict_df_predict[row["cycle"]][row[nom]] = df_predict
             if row["cycle"] not in pdf.dict_df_sum_predict:
                 pdf.dict_df_sum_predict[row["cycle"]] = {}
-            pdf.dict_df_sum_predict[row["cycle"]][row[nom]] = df_sum_predict["sommeTotal"].values.sum()
+            pdf.dict_df_sum_predict[row["cycle"]][row[nom]] = df_sum_predict
             df_sum_predict = pdf.dict_df_sum_predict[row["cycle"]][row[nom]]
             if row["cycle"] not in pdf.head_predict:
                 pdf.head_predict[row["cycle"]] = {}
@@ -213,7 +213,7 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
             pdf.dict_df_predict[row["cycle"]] = df_predict
             if row["cycle"] not in pdf.dict_df_sum_predict:
                 pdf.dict_df_sum_predict[row["cycle"]] = {}
-            pdf.dict_df_sum_predict[row["cycle"]] = df_sum_predict["sommeTotal"].values.sum()
+            pdf.dict_df_sum_predict[row["cycle"]] = df_sum_predict
             df_sum_predict = pdf.dict_df_sum_predict[row["cycle"]]
             if row["cycle"] not in pdf.head_predict:
                 pdf.head_predict[row["cycle"]] = {
