@@ -121,9 +121,9 @@ class TestPerfComputeData(DatabaseTest):
     def test_lancement_requete(self):
         load_data_set_up()
         pdf = PayloadDataframe()
+        df_global = lancement_requete(pdf, "global", is_lbb=True)
         df_naf = lancement_requete(pdf, "codenaf", "naf", is_lbb=True)
         df_dep = lancement_requete(pdf, "departement", "dep", is_lbb=True)
-        df_global = lancement_requete(pdf, "global", is_lbb=True)
         for df, results in [(df_naf,result_df_naf), (df_dep, result_df_dep), (df_global, result_df_global)]:
             for column in results.keys():
                 self.assertTrue(results[column] == df[column].tolist())

@@ -21,16 +21,18 @@ class PayloadDataframe:
     def __init__(self):
         self.dict_df_predict = {}
         self.dict_df_sum_predict = {}
-        self.dict_df_predict_dep = {}
-        self.dict_df_sum_predict_dep = {}
+        self.dict_df_predict_global = {}
+        self.dict_df_sum_predict_global = {}
         self.head_predict = {}
+        self.head_predict_global = {}
 
     def reset(self):
         self.dict_df_predict = {}
         self.dict_df_sum_predict = {}
-        self.dict_df_predict_dep = {}
+        self.dict_df_predict_global = {}
+        self.dict_df_sum_predict_global = {}
         self.head_predict = {}
-        self.dict_df_sum_predict_dep = {}
+        self.head_predict_global = {}
 
 #import donnée#######################################################################""
 #TODO : Remove from here to use during unit tests (not written yet)
@@ -156,12 +158,12 @@ def get_predict_par_cycle_et_naf_ou_dep(cycle, colonne, value=None, is_lbb=True)
     prefix_columns = "lbb" if is_lbb else "lba"
     engine = import_util.create_sqlalchemy_engine()
     if colonne == "global":
-        query = f'SELECT {prefix_columns}_nb_predicted_hirings as predict, {prefix_columns}_nb_effective_hirings as effective \
+        query = f'SELECT {prefix_columns}_nb_predicted_hirings as predict, {prefix_columns}_nb_effective_hirings as effective, codenaf, departement \
                 FROM perf_prediction_and_effective_hirings \
                 WHERE importer_cycle_infos_id = {cycle}\
                 ORDER BY {prefix_columns}_nb_predicted_hirings desc '
     else:
-        query = f'SELECT {prefix_columns}_nb_predicted_hirings as predict, {prefix_columns}_nb_effective_hirings as effective \
+        query = f'SELECT {prefix_columns}_nb_predicted_hirings as predict, {prefix_columns}_nb_effective_hirings as effective, codenaf, departement \
                 FROM perf_prediction_and_effective_hirings \
                 WHERE importer_cycle_infos_id = {cycle} and {colonne} = "{value}"  \
                 ORDER BY {prefix_columns}_nb_predicted_hirings desc'
@@ -182,7 +184,7 @@ def get_cycle_infos():
 #cycle + naf #######################################################################""
 
 def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
-    logger.info(f"START - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']} and sum {i}")
+    #logger.info(f"START - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']} and sum {i}")
     if nom is not None:
         row_nom = row[nom]
     else:
@@ -191,9 +193,9 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
     if i == 10:
         head_sum = 0
         head_len = 0
-        df_predict = get_predict_par_cycle_et_naf_ou_dep(row["cycle"],colonne,row_nom,is_lbb=is_lbb)
-        df_sum_predict = df_predict["predict"].values.sum()
         if colonne != "global":
+            df_predict = pdf.dict_df_predict_global[row["cycle"]].query(f"{colonne} == '{row_nom}'")
+            df_sum_predict = df_predict["predict"].values.sum()
             if row["cycle"] not in pdf.dict_df_predict:
                 pdf.dict_df_predict[row["cycle"]] = {}
             pdf.dict_df_predict[row["cycle"]][row[nom]] = df_predict
@@ -208,15 +210,17 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
                 "sum": head_sum
             }
         else:
-            if row["cycle"] not in pdf.dict_df_predict:
-                pdf.dict_df_predict[row["cycle"]] = {}
-            pdf.dict_df_predict[row["cycle"]] = df_predict
-            if row["cycle"] not in pdf.dict_df_sum_predict:
-                pdf.dict_df_sum_predict[row["cycle"]] = {}
-            pdf.dict_df_sum_predict[row["cycle"]] = df_sum_predict
-            df_sum_predict = pdf.dict_df_sum_predict[row["cycle"]]
-            if row["cycle"] not in pdf.head_predict:
-                pdf.head_predict[row["cycle"]] = {
+            df_predict = get_predict_par_cycle_et_naf_ou_dep(row["cycle"], colonne, row_nom, is_lbb=is_lbb)
+            df_sum_predict = df_predict["predict"].values.sum()
+            if row["cycle"] not in pdf.dict_df_predict_global:
+                pdf.dict_df_predict_global[row["cycle"]] = {}
+            pdf.dict_df_predict_global[row["cycle"]] = df_predict
+            if row["cycle"] not in pdf.dict_df_sum_predict_global:
+                pdf.dict_df_sum_predict_global[row["cycle"]] = {}
+            pdf.dict_df_sum_predict_global[row["cycle"]] = df_sum_predict
+            df_sum_predict = pdf.dict_df_sum_predict_global[row["cycle"]]
+            if row["cycle"] not in pdf.head_predict_global:
+                pdf.head_predict_global[row["cycle"]] = {
                     "len": head_len,
                     "sum": head_sum
                 }
@@ -228,10 +232,10 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
             head_sum = pdf.head_predict[row["cycle"]][row[nom]]["sum"]
             head_len = pdf.head_predict[row["cycle"]][row[nom]]["len"]
         else:
-            df_predict = pdf.dict_df_predict[row["cycle"]]
-            df_sum_predict = pdf.dict_df_sum_predict[row["cycle"]]
-            head_sum = pdf.head_predict[row["cycle"]]["sum"]
-            head_len = pdf.head_predict[row["cycle"]]["len"]
+            df_predict = pdf.dict_df_predict_global[row["cycle"]]
+            df_sum_predict = pdf.dict_df_sum_predict_global[row["cycle"]]
+            head_sum = pdf.head_predict_global[row["cycle"]]["sum"]
+            head_len = pdf.head_predict_global[row["cycle"]]["len"]
     if i == 100:
         df_predict['RMSE'] = df_predict.apply(lambda row: calcul_rmse(row), axis=1)
         return math.sqrt(df_predict['RMSE'].sum() / row['nbTotal'])
@@ -247,11 +251,11 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
         pdf.head_predict[row["cycle"]][row[nom]]["sum"] = head_sum
         pdf.head_predict[row["cycle"]][row[nom]]["len"] = head_len
     else:
-        pdf.head_predict[row["cycle"]]["sum"] = head_sum
-        pdf.head_predict[row["cycle"]]["len"] = head_len
+        pdf.head_predict_global[row["cycle"]]["sum"] = head_sum
+        pdf.head_predict_global[row["cycle"]]["len"] = head_len
     if df_sum_predict == 0:
         return 0
-    logger.info(f"END - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']} and sum {i}")
+    #logger.info(f"END - {str(datetime.now())}- computing sum predict by {colonne} for cycle importer {row['cycle']} and sum {i}")
     return head_sum / df_sum_predict
 
 
@@ -279,9 +283,9 @@ def lancement_requete(pdf, colonne,nom=None, is_lbb=True):
 def prepare_google_sheet_data(pdf, is_lbb=True):
     #TODO : Refacto this function
     df_cycle_infos = get_cycle_infos()
+    df_global = lancement_requete(pdf, "global", is_lbb=is_lbb)
     df_naf = lancement_requete(pdf, "codenaf", "naf", is_lbb)
     df_dep = lancement_requete(pdf, "departement","dep", is_lbb)
-    df_global = lancement_requete(pdf, "global", is_lbb=is_lbb)
     df_naf = pd.merge(df_naf , df_cycle_infos , on=['cycle'])
     df_dep = pd.merge(df_dep , df_cycle_infos , on=['cycle'])
     df_global = pd.merge(df_global , df_cycle_infos , on=['cycle'])
