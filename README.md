@@ -167,18 +167,6 @@ MacOS users, if you get a `ld: library not found for -lintl` error when running 
 The app is available on port `5000` on host machine. Open a web browser, load
 http://localhost:5000 and start browsing.
 
-## Run asynchronous tasks
-
-Some parts of the code are run in a separate task queue which can be launched with:
-
-    make consume-tasks
-
-Or in development:
-
-    make consume-tasks-dev
-
-Asynchronous tasks are backed by Redis and [Huey](https://huey.readthedocs.io/en/latest/).
-
 ## Run tests
 
 We are using [Nose](https://nose.readthedocs.io/):

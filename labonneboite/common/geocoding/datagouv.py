@@ -173,7 +173,6 @@ def fetch_json(url, name, is_array = False, **params):
             response.status_code, response.content
         )
         # We log an error only if we made an incorrect request
-        # FIXME Where does this log go? Not found in uwsgi log nor sentry.
         log_level = logging.WARNING if response.status_code >= 500 else logging.ERROR
         logger.log(log_level, error)
         return [] if is_array else {}
@@ -181,7 +180,6 @@ def fetch_json(url, name, is_array = False, **params):
         result = response.json()
     except Exception as e:
         error = name + ' responded with an invalid JSON. Error: {}'.format(e)
-        # FIXME Where does this log go? Not found in uwsgi log nor sentry.
         log_level = logging.WARNING if response.status_code >= 500 else logging.ERROR
         logger.log(log_level, error)
         return [] if is_array else {}

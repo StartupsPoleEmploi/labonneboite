@@ -61,8 +61,6 @@ TRAVEL_VENDOR_BACKENDS = {
     },
 }
 
-PROCESS_ASYNC_TASKS = False
-
 # Dummy IP addresses for test only
 VERSION_PRO_ALLOWED_IPS = [
     '198.49.0.0/30',
