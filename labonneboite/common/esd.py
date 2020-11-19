@@ -136,14 +136,15 @@ def _get_response(url, headers, params=None, method='GET', data=None):
     if response.status_code == http_too_many_requests:
         raise TooManyRequests
     elif response.status_code >= 400:
-        error = '{} responded with a {} error: {}'.format(
+        error = 'ESD request failed, {} responded with a {} error: {}'.format(
             url,
             response.status_code,
             response.text,
         )
         log_level = logging.WARNING if response.status_code >= 500 else logging.ERROR
         logger.log(log_level, error)
-        raise RequestFailed("response={} ({})".format(
+        raise RequestFailed("ESD request failed, url={}, response={} ({})".format(
+            url,
             response.text,
             response.status_code,
         ))
