@@ -94,17 +94,18 @@ def load_csv_perf_prediction_and_effective_h(filename, delimiter=';'):
 
 
 
-def get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne, nom):
+def get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne, nom, is_lbb=True):
     engine = import_util.create_sqlalchemy_engine()
+    prefix_columns = "lbb" if is_lbb else "lba"
     if colonne == "global":
-        query = f"""SELECT importer_cycle_infos_id as cycle, count(*) as nbTotal \
+        query = f"""SELECT importer_cycle_infos_id as cycle, sum({prefix_columns}_nb_effective_hirings) as nbTotalHirings, count(*) as nbTotal \
                 FROM perf_prediction_and_effective_hirings ppaeh \
                 INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id
                 WHERE pici.computed is true
                 AND pici.on_google_sheets is false
                 GROUP BY importer_cycle_infos_id;"""
     else: #colonne == Naf OR departement
-        query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotal \
+        query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,sum({prefix_columns}_nb_effective_hirings) as nbTotalHirings, count(*) as nbTotal \
                 FROM perf_prediction_and_effective_hirings ppaeh \
         INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id \
         WHERE pici.computed is true \
@@ -116,9 +117,10 @@ def get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne, nom):
 
 def get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBX(colonne, nom, is_lbb):
     filter_lbx = "is_a_bonne_boite" if is_lbb else "is_a_bonne_alternance"
+    prefix_columns = "lbb" if is_lbb else "lba"
     engine = import_util.create_sqlalchemy_engine()
     if colonne == "global":
-        query = f'SELECT importer_cycle_infos_id as cycle,count(*) as nbTotalLBX \
+        query = f'SELECT importer_cycle_infos_id as cycle,sum({prefix_columns}_nb_effective_hirings) as nbTotalLBXHirings, count(*) as nbTotalLBX \
                 FROM perf_prediction_and_effective_hirings ppaeh \
         INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id \
         WHERE pici.computed is true \
@@ -126,7 +128,7 @@ def get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBX(colonne, nom, is_lbb):
                 AND {filter_lbx} is true \
                 GROUP BY importer_cycle_infos_id;'
     else: #colonne == Naf OR departement
-        query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,count(*) as nbTotalLBX \
+        query = f'SELECT importer_cycle_infos_id as cycle , {colonne} as {nom} ,sum({prefix_columns}_nb_effective_hirings) as nbTotalLBXHirings, count(*) as nbTotalLBX \
                 FROM perf_prediction_and_effective_hirings ppaeh \
         INNER JOIN perf_importer_cycle_infos pici on pici.id = ppaeh.importer_cycle_infos_id \
         WHERE pici.computed is true \
@@ -263,7 +265,8 @@ def get_sum_predict(pdf, row,i,colonne,nom=None, is_lbb=True):
 
 
 def get_prop_recrut_non_lbx(total, total_lbx):
-    return (total - total_lbx)/ total
+    res = (total - total_lbx)/ total if total > 0 else 1
+    return res
 
 
 def calcul_rmse(effective, predict):
@@ -271,7 +274,7 @@ def calcul_rmse(effective, predict):
 
 
 def lancement_requete(pdf, colonne,nom=None, is_lbb=True):
-    df_nb_entreprise = get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne,nom)
+    df_nb_entreprise = get_nb_entreprise_par_cycle_et_naf_ou_dep(colonne,nom, is_lbb)
     if len(df_nb_entreprise) > 0:
         for i in range(10,110,10):
             df_nb_entreprise[f'sum{i}'] = df_nb_entreprise.apply(lambda row: get_sum_predict(pdf, row,i,colonne,nom,is_lbb), axis=1)
@@ -279,8 +282,8 @@ def lancement_requete(pdf, colonne,nom=None, is_lbb=True):
         df_nb_entreprise = df_nb_entreprise.rename(columns={'sum100':'RMSE'})
         df_nb_entreprise_isLBX  = get_nb_entreprise_par_cycle_et_naf_ou_dep_isLBX(colonne, nom, is_lbb)
         df_result = pd.merge(df_nb_entreprise , df_nb_entreprise_isLBX , on=['cycle',nom])
-        df_result['propRecrutNonLBX'] = numpy.array([get_prop_recrut_non_lbx(total, total_lbx) for total, total_lbx in zip(numpy.array(df_result["nbTotal"]),
-                                                                                                       numpy.array(df_result["nbTotalLBX"]))])
+        df_result['propRecrutNonLBX'] = numpy.array([get_prop_recrut_non_lbx(total, total_lbx) for total, total_lbx in zip(numpy.array(df_result["nbTotalHirings"]),
+                                                                                                       numpy.array(df_result["nbTotalLBXHirings"]))])
         return df_result
     else:
         raise Exception(f"Nothing to compute. (params: [colonne={colonne}, nom={nom}, is_lbb={is_lbb}])")
