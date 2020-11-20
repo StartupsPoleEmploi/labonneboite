@@ -12,6 +12,7 @@ import logging
 from datetime import datetime, timedelta
 from dateutil.relativedelta import *
 import re
+import argparse
 
 import pandas as pd
 
@@ -83,7 +84,7 @@ def insert_into_sql_table_old_prediction_file(file):
     logger.info(f"\n End : Insert data into etablissements_new from file {file_name}")
 
 
-def insert_into_importer_cycle_infos(file, file_name):
+def insert_into_importer_cycle_infos(file_name, months_time):
     logger.info(f"\n Start : Insert data into importer_cycle_infos from file {file_name}")
 
     # Insert into importer cycle infos
@@ -91,7 +92,7 @@ def insert_into_importer_cycle_infos(file, file_name):
     # TODO : Check that the prediction start date and end date match these ones
     execution_date = get_date_from_file_name(file_name)
     prediction_start_date = execution_date + relativedelta(months=+1) + relativedelta(day=1)  # First day of next month
-    prediction_end_date = prediction_start_date + relativedelta(months=+6)
+    prediction_end_date = prediction_start_date + relativedelta(months=+months_time)
     importer_cycle_infos = PerfImporterCycleInfos(
         execution_date=execution_date,
         prediction_start_date=prediction_start_date,
@@ -151,10 +152,10 @@ def insert_into_etablissements_predicted_and_effective_hirings(importer_cycle_in
     logger.info(f"Insertion of {len(df.index)} rows ")
 
 
-def insert_data(file):
+def insert_data(file, months_time):
     file_name = os.path.basename(file)
     logger.info(f"\n Start : Insert data into database from file {file_name}")
-    importer_cycle_infos = insert_into_importer_cycle_infos(file, file_name)
+    importer_cycle_infos = insert_into_importer_cycle_infos(file, months_time)
     insert_into_etablissements_predicted_and_effective_hirings(importer_cycle_infos._id, file_name)
     return True
 
@@ -312,7 +313,7 @@ def compute_effective_and_predicted_hirings():
             db_session.add(pred_effective_hirings)
 
             # Commit all the 10 000 transactions
-            if count % 1000 == 0:
+            if count % 10000 == 0:
                 logger.info(f"{count} companies have been treated")
                 db_session.commit()
 
@@ -349,13 +350,21 @@ def compute_effective_and_predicted_hirings():
 
 def run_main():
     # First part of insertion : Get data from the file exported after each importer cycle
-    files_list = get_available_files_list()
     for file in files_list:
         insert_into_sql_table_old_prediction_file(file)
-        insert_data(file)
+        insert_data(file, args.months)
 
     compute_effective_and_predicted_hirings()
 
 
 if __name__ == '__main__':
-    run_main()
+    parser = argparse.ArgumentParser(description="""Import into the database archives older than a certain amount of time, 
+        to generate indicators""")
+    parser.add_argument("-m", "--months", type=int, default=4)
+    args = parser.parse_args()
+    files_list = get_available_files_list()
+    print("Months", args.months)
+    print("== 4", args.months == 4)
+    print("== 6", args.months == 6)
+    #run_main()
+
