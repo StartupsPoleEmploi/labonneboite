@@ -348,11 +348,12 @@ def compute_effective_and_predicted_hirings():
         db_session.commit()
 
 
-def run_main():
+def run_main(months):
     # First part of insertion : Get data from the file exported after each importer cycle
+    files_list = get_available_files_list()
     for file in files_list:
         insert_into_sql_table_old_prediction_file(file)
-        insert_data(file, args.months)
+        insert_data(file, months)
 
     compute_effective_and_predicted_hirings()
 
@@ -362,9 +363,4 @@ if __name__ == '__main__':
         to generate indicators""")
     parser.add_argument("-m", "--months", type=int, default=4)
     args = parser.parse_args()
-    files_list = get_available_files_list()
-    print("Months", args.months)
-    print("== 4", args.months == 4)
-    print("== 6", args.months == 6)
-    #run_main()
-
+    run_main(args.months)
