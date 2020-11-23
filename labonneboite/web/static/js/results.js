@@ -1,14 +1,5 @@
 "use strict";
 
-/**
-* Global function that tracks a click on an outbound link in Google Analytics.
-* This function takes a valid URL string as an argument, and uses that URL string
-* as the event label.
-*/
-var trackOutboundLink = function(url) {
-  ga('send', 'event', 'outbound', 'click', url);
-};
-
 (function ($) {
 
   $(document).on('lbbready', function () {
@@ -19,17 +10,6 @@ var trackOutboundLink = function(url) {
     $('.js-result-toggle-details').toggleDetails();
     updateTravelDurations();
     $('#shown-search-form').checkChanges();
-
-    var eventLabel;
-    if ($('.ga-no-results').length) {
-      var eventLabel = "job:" + $('input[name="job"]').val() + ";location:" + $('input[name="location"]').val();
-      ga('send', 'event', 'Resultats', 'no results', eventLabel);
-    }
-
-    $('.ga-pdf-download-link').click(function (e) {
-      ga('send', 'event', 'Download', 'fiche entreprise', 1);
-    });
-
   });
 
   /*
@@ -108,14 +88,6 @@ var trackOutboundLink = function(url) {
 
       // Otherwise, show it.
       $resultContainer.addClass('active');
-
-      // Track the click.
-      var eventLabel = [
-        'position:', $resultContainer.find('input[name="position"]').val(),
-        ',effectif:', $resultContainer.find('input[name="headcount"]').val(),
-        ',distance:', $resultContainer.find('input[name="company_distance"]').val(),
-      ].join('');
-      ga('send', 'event', 'Fiche Entreprise', 'Deplier', eventLabel);
 
       // Init the map.
       var siret = $resultContainer.find('input[name="company-siret"]').val();
