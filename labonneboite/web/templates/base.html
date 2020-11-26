@@ -13,7 +13,9 @@
   {% block extrahead %}{% endblock %}
   {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
 
-  <script async src="https://cdn.tagcommander.com/5233/tc_lbb_31.js"></script>
+  {% if tag_manager_url %}
+    <script async src="{{ tag_manager_url }}"></script>
+  {% endif %}
 </head>
 
 <body>

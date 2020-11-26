@@ -149,6 +149,10 @@ MAILJET_API_SECRET = '<set it>'
 TO_EMAIL = '<set it>' # this was named `FORM_EMAIL`, but it is confusing
 FROM_EMAIL = '<set it>'
 
+# URL of a script to load for tag management
+# Leave blank to disable
+TAG_MANAGER_URL = ''
+
 MEMO_JS_URL = 'https://memo.pole-emploi.fr/js/importButton/memoButtonLBB-min.js'
 API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
 API_DEPARTMENTS_URL = 'https://geo.api.gouv.fr/departements'

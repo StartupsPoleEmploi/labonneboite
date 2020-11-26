@@ -184,6 +184,7 @@ def register_context_processors(flask_app):
             'login_url': auth_utils.login_url,
             'jepostule_globally_enabled': settings.JEPOSTULE_QUOTA > 0,
             'enable_isochrones': settings.ENABLE_ISOCHRONES,
+            'tag_manager_url': settings.TAG_MANAGER_URL,
         }
 
     def inject_user():
