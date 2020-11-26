@@ -27,16 +27,15 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
         # Wait a little bit more to ensure things are less flaky
         time.sleep(3)
 
-        # Accept RGPD, otherwise selecting isochrone filters is not possible. ¯\_(ツ)_/¯
-        self.driver.find_element_by_xpath("//button[@class='rgpd-accept']").click()
-
-
     def test_make_a_new_search_changing_location(self):
         """
         Test that a user can change location directly
         in a search results page using a form.
         """
         city = 'Nancy'
+        results_sentence = self.driver.find_element_by_css_selector('body').text
+        if "Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour votre recherche." in results_sentence:
+            print('Warning: there was no result for this search')
         results_sentence = self.driver.find_element_by_css_selector('h1.lbb-result-info').text
         primitive_results = re.match(r'(\d+)', results_sentence).group()
 

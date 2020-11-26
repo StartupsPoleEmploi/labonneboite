@@ -37,9 +37,6 @@ class TestSearchSelectingCar(LbbSeleniumTestCase):
         # Wait a little bit more to ensure things are less flaky
         time.sleep(3)
 
-        # Accept RGPD, otherwise selecting isochrone filters is not possible. ¯\_(ツ)_/¯
-        self.driver.find_element_by_xpath("//button[@class='rgpd-accept']").click()
-
 
     @parameterized.expand(DURATIONS)
     def test_isochrone_search(self, duration):
