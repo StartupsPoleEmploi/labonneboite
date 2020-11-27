@@ -27,15 +27,21 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
         # Wait a little bit more to ensure things are less flaky
         time.sleep(3)
 
+    def fail_if_no_results(self):
+        """
+        Fail if there is no result to the search
+        This is a check to make sure that the problem lies in the data or in the code
+        """
+        results_sentence = self.driver.find_element_by_css_selector('body').text
+        self.assertNotIn("Nous n'avons pas de résultat", results_sentence, 'There is no result for the current search (' + self.driver.current_url + ')')
+
     def test_make_a_new_search_changing_location(self):
         """
         Test that a user can change location directly
         in a search results page using a form.
         """
         city = 'Nancy'
-        results_sentence = self.driver.find_element_by_css_selector('body').text
-        if "Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour votre recherche." in results_sentence:
-            print('Warning: there was no result for this search')
+        self.fail_if_no_results()
         results_sentence = self.driver.find_element_by_css_selector('h1.lbb-result-info').text
         primitive_results = re.match(r'(\d+)', results_sentence).group()
 
@@ -50,6 +56,7 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
 
         shown_search_form.find_element_by_css_selector('button').click()
 
+        self.fail_if_no_results()
         WebDriverWait(self.driver, 60)\
             .until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, "h1.lbb-result-info"))
