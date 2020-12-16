@@ -30,6 +30,7 @@ LOG_FORMAT_USER_ACTIVITY = '%(message)s'
 GLOBAL_STATIC_PATH = '/tmp'
 
 ROME_DESCRIPTIONS = load_rome_labels()
+MAX_RELATED_ROMES = 5
 
 NAF_CODES = load_naf_labels()
 

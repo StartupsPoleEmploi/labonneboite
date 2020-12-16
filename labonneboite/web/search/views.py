@@ -161,6 +161,7 @@ def city_code_details():
 PARAMETER_FIELD_MAPPING = {
     'r': 'rome',
     'j': 'job',
+    'ij': 'related_rome_initial',
     'd': 'distance',
     'tr': 'travel_mode',
     'dur': 'duration',
@@ -302,6 +303,10 @@ def entreprises():
         related_romes = related_city_codes.get(rome)
         # related_romes = list(map(add_nafs, related_romes))
         related_romes = list(map(add_descriptions, related_romes))
+        # sort and limit size
+        related_romes.sort(key=lambda rome_: rome_.get('score'))
+        related_romes = related_romes[:settings.MAX_RELATED_ROMES]
+
 
     # Build form
     form_kwargs = {key: val for key, val in list(args.items()) if val}
@@ -438,6 +443,7 @@ def entreprises():
         'duration_filter_enabled': duration_filter_enabled,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
         'related_romes': related_romes,
+        'related_rome_initial': parameters.get('related_rome_initial', ''),
     }
 
     activity_log_properties['distance'] = fetcher.distance

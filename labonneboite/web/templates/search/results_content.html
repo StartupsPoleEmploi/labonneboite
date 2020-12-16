@@ -4,7 +4,7 @@
         {% include "includes/search_form.html" %}
       {% endwith %}
       <div class="lbb-sidebar-toggle-wrapper">
-        <a class="lbb-sidebar-toggle" href="#lbb-sidebar-wrapper">Trier / Filtrer »</a>
+        <a class="lbb-sidebar-toggle" href="#lbb-sidebar-wrapper">Triez / Filtrez »</a>
       </div>
     </div>
   </div>
@@ -31,26 +31,41 @@
                  <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
                  <hr>
                </div>
-              <h3 class="sr-only lbb-result-info">Trier les résultats de recherche</h3>
-              {% if related_romes %}
-                  <h3>Romes connexes</h3>
-                  <ul id="form-related_romes">
-                  {% for rome in related_romes %}
-                  <li><div
-                      data-rome-description="{{rome.description}}"
-                      data-rome-description-slug="{{rome.description | slugify}}"
-                      href="#">{{rome.rome}} ({{rome.score}})</div></li>
-                  <!-- href="#">{{rome.description}}</a></li> -->
-                  {% endfor %}
-                  </ul>
+              <h3 class="sr-only lbb-result-info">Triez les résultats de recherche</h3>
+              {% if related_rome_initial %}
+                  <div class="lbb-sidebar-item">
+                    <p>Recherche initiale</p>
+                    <a
+                      id="related_rome_initial"
+                      href="#"
+                      data-rome-description="{{ related_rome_initial }}"
+                      data-rome-description-slug="{{ related_rome_initial | slugify }}"
+                      >{{ related_rome_initial }}</a>
+                  </div>
               {% endif %}
-               {% if not departments %}
-               <h3>Trier</h3>
-               <div class="lbb-sidebar-item">
-                 {{ form.sort }}
-               </div>
-               <hr>
-               {% endif %}
+              {% if related_romes %}
+                  <h3>Ciblez les métiers qui recrutent</h3>
+                  <div class="lbb-sidebar-item">
+                    <p>{% if related_romes|length > 1 %}
+                      {{ related_romes|length }} métiers qui recrutent plus
+                    {% else %}
+                      Un métier qui recrute plus
+                    {%endif %}</p>
+                    <ul id="form-related_romes">
+                    {% for rome in related_romes %}
+                    <li><a
+                        href="#"
+                        data-rome-description="{{ rome.description }}"
+                        data-rome-description-slug="{{ rome.description | slugify }}"
+                        >{{ rome.description }}</a></li>
+                    {% endfor %}
+                    </ul>
+                  </div>
+                  <!-- END RELATED ROMES -->
+              {% endif %}
+              {% if related_rome_initial or related_romes %}
+                  <hr>
+              {% endif %}
                <h3>Affinez votre recherche</h3>
                <div class="lbb-sidebar-item">
                  <p>
@@ -103,6 +118,12 @@
                    {{ form.d }}
                  </div>
                  <!-- END DISTANCE DURATION SWITCH -->
+                 <hr>
+                 <h3>Triez</h3>
+                 <div class="lbb-sidebar-item">
+                   {{ form.sort }}
+                 </div>
+                 <!-- END SORT AND FILTERS -->
                {% endif %} {# endif not departments #}
                </div>
                {% if pro_version_enabled %}
