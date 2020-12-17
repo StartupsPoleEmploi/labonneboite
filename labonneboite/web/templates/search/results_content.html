@@ -46,11 +46,14 @@
               {% if related_romes %}
                   <h3>Ciblez les métiers qui recrutent</h3>
                   <div class="lbb-sidebar-item">
-                    <p>{% if related_romes|length > 1 %}
-                      {{ related_romes|length }} métiers qui recrutent plus
-                    {% else %}
-                      Un métier qui recrute plus
-                    {%endif %}</p>
+                    {% set text_reco %}
+                      {% if related_romes|length > 1 %}
+                        {{ related_romes|length }} métiers qui recrutent plus
+                      {% else %}
+                        Un métier qui recrute plus
+                      {%endif %}
+                    {% endset %}
+                    <p>{{ text_reco }} <span class="badge badge-large badge-info" data-show data-original-title="{{ text_reco }}" data-toggle="tooltip" data-placement="right" title="Recommandations exclusives La bonne boite basées sur l’analyse des métiers. Pour vous faire ces suggestions, La bonne boite compare le nombre de candidats par métier avec le nombre de recrutements prédits.">?</span></p>
                     <ul id="form-related_romes">
                     {% for rome in related_romes %}
                     <li><a
