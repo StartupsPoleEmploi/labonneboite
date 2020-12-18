@@ -208,7 +208,7 @@ var trackOutboundLink = function(url) {
     // handle related rome initial search
     $('#related_rome_initial').on('click', function(e) {
       var j = shown_form.find('#j');
-      var ij = shown_form.find('#ij');
+      var ij = hidden_form.find('#ij');
       var occupation = hidden_form.find('#occupation');
       var rome_description = $(e.target).attr('data-rome-description');
       var rome_description_slug = $(e.target).attr('data-rome-description-slug');
@@ -221,7 +221,7 @@ var trackOutboundLink = function(url) {
     // handle related romes
     $('#form-related_romes').on('click', function(e) {
       var j = shown_form.find('#j');
-      var ij = shown_form.find('#ij');
+      var ij = hidden_form.find('#ij');
       var occupation = hidden_form.find('#occupation');
       var rome_description = $(e.target).attr('data-rome-description');
       var rome_description_slug = $(e.target).attr('data-rome-description-slug');
@@ -240,6 +240,12 @@ var trackOutboundLink = function(url) {
       var occupation = shown_form.find('#j');
       location.attr('value', location.prop('value'));
       occupation.attr('value', occupation.prop('value'));
+
+      // Remove related rome initial search.
+      var ij = hidden_form.find('#ij');
+      ij.val('');
+
+      // Submit the form.
       shown_form.submit();
     });
 
