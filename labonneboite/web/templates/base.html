@@ -30,6 +30,18 @@
     </p>
   </div>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="lbb-flash-alerts">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} js-alert-close">
+            <p>{{ message }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
   <header role="banner" class="lbb-header-wrapper">
     <ul class="lbb-header">
       <li class="lbb-header-logo-lbb">
@@ -79,18 +91,6 @@
 
     </ul>
   </header>
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="lbb-flash-alerts">
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} js-alert-close">
-            <p>{{ message }}</p>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
 
   <main role="main" id="content">
     <a id="main-anchor" tabindex="-1"></a>
