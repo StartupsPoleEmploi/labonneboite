@@ -26,7 +26,7 @@
         <a href="{{ url_for('user.account') }}">Mon compte</a>
       </li>
       <li>
-        <a href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
+        <a class="gtmAccount gtmFavorites gtmConsult" href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
       </li>
       {% if user.is_admin %}
         <li>
