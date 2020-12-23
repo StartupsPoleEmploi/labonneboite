@@ -71,9 +71,9 @@
           {% if show_favorites and user.is_authenticated %}
             {% if (user_favs_as_sirets is defined) and (company.siret not in user_favs_as_sirets) %}
               <form action="{{ url_for('user.favorites_add', siret=company.siret) }}" method="post" class="form-inline">
-                <button class="invisible no-padding" type="submit">
-                  <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/heart.svg') }}"></span>
-                  <span class="btn btn-small invisible">Garder pour plus tard</span>
+                <button class="invisible no-padding gtmAccount gtmFavorites gtmAdd" type="submit">
+                  <span class="rounded-icon gtmAccount gtmFavorites gtmAdd"><img class="img-icon gtmAccount gtmFavorites gtmAdd" alt="" src="{{ url_for('static', filename='images/icons/heart.svg') }}"></span>
+                  <span class="btn btn-small invisible gtmAccount gtmFavorites gtmAdd">Garder pour plus tard</span>
                 </button>
                 <input type="hidden" name="next" value="{{ request.full_path | urlencode }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
