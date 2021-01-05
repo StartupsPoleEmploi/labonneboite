@@ -404,6 +404,15 @@ Use `make run-importer-jobs` to run all these jobs in local development environm
 
 The company search on the frontend only allows searching for a single ROME (a.k.a. rome_code). However, the API allows for multi-ROME search, both when sorting by distance and by score.
 
+## About alternative ROME suggestions
+
+There are 2 mechanisms for the suggestion of ROME codes:
+
+1. The one used when there is no result for a search, which suggests alternative ROMEs and distance filters. Suggestions are displayed in place of the company list on the search page. In the code this is called `rome mobility`, `alternative romes`, `alternative distances`
+2. The experiment done with PSE school, which displays suggestions in the side bar, based on the current search criteria location and ROME. In the code this is called `related romes`
+
+These two mechanisms will need to be unified because this will be easier to maintain, but for now they are in different places in the code, see `result_content.html` file which uses both `related_rome`/`related_rome_initial` and `alternative_rome_descriptions` (includedfrom `results_content.html`)
+
 ## How to contribute
 
 For devs in the core team, this repo follows the [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow).

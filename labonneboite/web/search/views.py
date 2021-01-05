@@ -418,6 +418,8 @@ def entreprises():
     context = {
         'alternative_distances': alternative_distances,
         'alternative_rome_descriptions': alternative_rome_descriptions,
+        'related_romes': related_romes,
+        'related_rome_initial': parameters.get('related_rome_initial', ''),
         'canonical_url': canonical_url,
         'companies': list(offices),
         'companies_per_page': pagination.OFFICES_PER_PAGE,
@@ -444,8 +446,6 @@ def entreprises():
         'travel_modes_french': maps_constants.TRAVEL_MODES_FRENCH,
         'duration_filter_enabled': duration_filter_enabled,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
-        'related_romes': related_romes,
-        'related_rome_initial': parameters.get('related_rome_initial', ''),
     }
 
     activity_log_properties['distance'] = fetcher.distance
