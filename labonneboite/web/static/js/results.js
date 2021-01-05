@@ -206,7 +206,8 @@ var trackOutboundLink = function(url) {
     var send_button = shown_form.find('button[type="submit"]');
 
     // handle related rome initial search
-    $('#related_rome_initial').on('click', function(e) {
+    var related_rome_initial = $('#related_rome_initial');
+    related_rome_initial.on('click', function(e) {
       var j = shown_form.find('#j');
       var ij = hidden_form.find('#ij');
       var occupation = hidden_form.find('#occupation');
@@ -216,10 +217,16 @@ var trackOutboundLink = function(url) {
       j.val(rome_description);
       occupation.val(rome_description_slug);
       shown_form.submit();
-    });
+    })
+
+    // trigger hotjar
+    if (related_rome_initial.length > 0 && window.hj) {
+      window.hj('trigger', 'related_rome_search');
+    }
 
     // handle related romes
-    $('#form-related_romes').on('click', function(e) {
+    var related_romes = $('#form-related_romes');
+    related_romes.on('click', function(e) {
       var j = shown_form.find('#j');
       var ij = hidden_form.find('#ij');
       var occupation = hidden_form.find('#occupation');
@@ -230,6 +237,11 @@ var trackOutboundLink = function(url) {
       occupation.val(rome_description_slug);
       shown_form.submit();
     });
+
+    // trigger hotjar
+    if (related_romes.length > 0 && window.hj) {
+      window.hj('trigger', 'related_rome_suggest');
+    }
 
     send_button.on('click', function (e) {
       e.preventDefault();
