@@ -394,7 +394,7 @@ def compute_hiring_aggregates(
 
 @timeit
 def train(df_etab, departement, prediction_beginning_date, last_historical_data_date,
-        months_per_period, training_periods, prefix_for_fields, score_field_name):
+        months_per_period, training_periods, prefix_for_fields, score_field_name, is_lbb=True):
     """
     Edits in place df_etab by adding final score columns
     (e.g. score and score_regr for DPAE/LBB, or score_alternance and score_alternance_regr for LBA).
@@ -529,7 +529,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
         logger.info("(%s %s) regression_train RMSE : %s", departement, prefix_for_fields, rmse_train)
         logger.info("(%s %s) regression_test RMSE : %s", departement, prefix_for_fields, rmse_test)
         if rmse_test >= importer_settings.RMSE_MAX:
-            raise_with_message("rmse_test too high : %s > %s" % (rmse_test, importer_settings.RMSE_MAX))
+            raise_with_message("is_lbb: %s, rmse_test too high : %s > %s" % (is_lbb, rmse_test, importer_settings.RMSE_MAX))
     except IndexError:
         logger.warning("not enough data to compute RMSE for %s", departement)
 
@@ -647,6 +647,7 @@ def run(
         training_periods=7,
         prefix_for_fields='alt',
         score_field_name='score_alternance',
+        is_lbb=False
     )
     logger.debug("Alternance/LBA training done for departement %s", departement)
 
