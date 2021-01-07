@@ -229,7 +229,11 @@ def get_parameters(args):
 
     # from value in GET to enum
     # audience filter defaults to ALL
-    kwargs['audience'] = get_enum_from_value(AudienceFilter, kwargs.get('audience'), AudienceFilter.ALL)
+    audience_str = kwargs.get('audience')
+    if audience_str.isdigit():
+        kwargs['audience'] = get_enum_from_value(AudienceFilter, int(audience_str), AudienceFilter.ALL)
+    else:
+        kwargs['audience'] = AudienceFilter.ALL
 
     # ensure PRO filters are never used in the public version
     if not pro.pro_version_enabled():
