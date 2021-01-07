@@ -6,7 +6,7 @@
   </button>
   <div id="menu-content" class="lbb-dropdown lbb-dropdown-right text-right">
     <p>
-    <a class="logo-pe-connect rgpd-consent-required" href="{{ login_url(next_url=next_url) }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Se connecter avec Pôle emploi"></a><br>
+    <a class="logo-pe-connect rgpd-consent-required" href="{{ login_url(next_url=next_url) }}"><img class="gtmAccount gtmConnectionwithPE" src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Se connecter avec Pôle emploi"></a><br>
       <i>Connectez-vous à La Bonne Boite en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
     </p>
   </div>
@@ -26,7 +26,7 @@
         <a href="{{ url_for('user.account') }}">Mon compte</a>
       </li>
       <li>
-        <a href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
+        <a class="gtmAccount gtmFavorites gtmConsult" href="{{ url_for('user.favorites_list') }}">Mes favoris</a>
       </li>
       {% if user.is_admin %}
         <li>
