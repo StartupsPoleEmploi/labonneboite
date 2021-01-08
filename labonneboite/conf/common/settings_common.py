@@ -205,10 +205,19 @@ IGN_CREDENTIALS = {
 NAVITIA_API_TOKEN = 'setme'
 
 # Ids of spreadsheets for local dev
-SPREADSHEET_IDS = [
-    '197iFVyuCHiNNuA0ns99TCTS-v2CmBITg-e0ztEcwPMA',
-    '1Gl_rWicSmLwpXAPJLR3eRbs5nWJ1ROf6GSmUGmL2DEk'
-]
+# SPREADSHEET_IDS = [
+#     '197iFVyuCHiNNuA0ns99TCTS-v2CmBITg-e0ztEcwPMA',#Impact retour à l'emploi
+#     '1Gl_rWicSmLwpXAPJLR3eRbs5nWJ1ROf6GSmUGmL2DEk',#Impact retour à l'emploi
+#     '1HFkQVLxzjT0zIACCCp8c6fJII1VieKDtdvdEkLLO16M',#Indicateurs de perf LBB
+#     '1hPq1X_VXM7-l38jhLFrxQaDdpoB4s5W1Ok612SVTHts'# Indicateurs de perf LBA
+# ]
+
+SPREADSHEET_IDS = {
+    "stats_ire": '197iFVyuCHiNNuA0ns99TCTS-v2CmBITg-e0ztEcwPMA',
+    "delay_activity_ire": '1Gl_rWicSmLwpXAPJLR3eRbs5nWJ1ROf6GSmUGmL2DEk',
+    "perf_indicators_lba": '1hPq1X_VXM7-l38jhLFrxQaDdpoB4s5W1Ok612SVTHts',
+    "perf_indicators_lbb": '1HFkQVLxzjT0zIACCCp8c6fJII1VieKDtdvdEkLLO16M'
+}
 
 # Encryption of user PEAM-U token between LBB and JePostule.
 # Dummy key used everywhere but in production.

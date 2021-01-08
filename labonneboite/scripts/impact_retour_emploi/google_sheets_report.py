@@ -42,14 +42,35 @@ class GoogleSheetReport:
         self.google_service = service
         self.spreadsheet_id = spreadsheet_id
         self.values = values
-        self.start_cell = start_cell
+        self.start_cell = start_cell #If start cell to None, we will automatically check the first available cell in the first column to write data
         self.sheet_index = sheet_index
 
     def set_sheet_range(self):
+        if self.start_cell == None:
+            self.start_cell = self.get_first_available_cell()
         nb_columns = self.get_nb_columns()
         nb_rows = self.get_nb_rows()
         end_cell = self.get_end_cell(self.start_cell, nb_columns, nb_rows)
         self.sheet_range = self.get_sheet_range(self.start_cell, end_cell)
+
+    def get_first_available_cell(self):
+        list_sheets = self.google_service.spreadsheets().get(
+            spreadsheetId=self.spreadsheet_id,
+            fields="sheets/properties"
+        ).execute()['sheets']
+
+        sheet = list_sheets[self.sheet_index]['properties']
+
+        result = self.google_service.spreadsheets().values().get(
+                spreadsheetId=self.spreadsheet_id,
+                range=f"{sheet['title']}!A1:A"
+            ).execute()
+
+        values = result.get('values', [])
+        line_number_cell = len(values) + 1
+        start_cell = f"A{line_number_cell}"
+
+        return start_cell
 
     def get_nb_columns(self):
         return len(self.values['values'][0])
@@ -58,9 +79,8 @@ class GoogleSheetReport:
         return len(self.values['values'])
 
     def get_end_cell(self, start_cell, nb_columns, nb_rows):
-        # FIXME : Cant accept long cells like ZZ32 for now
         letter_first_column = start_cell[0]
-        number_first_row = start_cell[1]
+        number_first_row = start_cell[1:len(start_cell)]
 
         index_last_column = string.ascii_uppercase.index(letter_first_column) + nb_columns - 1
 
@@ -90,6 +110,7 @@ class GoogleSheetReport:
         sheet = list_sheets[self.sheet_index]['properties']
 
         return f"{sheet['title']}!{start_cell}:{end_cell}"
+
 
     def write_data_into_sheet(self):
         # Clear old data
