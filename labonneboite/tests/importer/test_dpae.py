@@ -30,7 +30,8 @@ class TestDpae(DatabaseTest):
         self.assertEqual(Hiring.query.count(), 6)
         task = extract_dpae.DpaeExtractJob(filename_second_month)
         task.run()
-        self.assertEqual(Hiring.query.count(), 6+5)
+        # change 6+5 to 6+2, only 2 dpae is between 10/11/2016 and 10/12/2016 in SECOND_DPAE_FILE_NAME
+        self.assertEqual(Hiring.query.count(), 6+2)
 
     def test_extract_departement(self):
         departement = get_departement_from_zipcode("6600")
