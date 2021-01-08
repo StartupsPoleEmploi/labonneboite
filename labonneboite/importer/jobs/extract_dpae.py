@@ -24,7 +24,7 @@ from labonneboite.common.database import db_session
 
 
 class DpaeExtractJob(Job):
-    file_type = "dpae"
+    file_type = DpaeStatistics.DPAE
     import_type = ImportTask.DPAE
     table_name = settings.HIRING_TABLE
 
