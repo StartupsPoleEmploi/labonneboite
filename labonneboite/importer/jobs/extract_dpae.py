@@ -21,7 +21,7 @@ from labonneboite.importer.models.computing import DpaeStatistics, ImportTask, H
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 from labonneboite.common.database import db_session
-
+from labonneboite.importer.models.errors import DoublonException
 
 class DpaeExtractJob(Job):
     file_type = DpaeStatistics.DPAE
@@ -170,11 +170,11 @@ class DpaeExtractJob(Job):
         if self.invalid_row_errors > settings.MAXIMUM_INVALID_ROWS:
             raise IOError('too many invalid_row errors')
         logger.info("verifying good number of dpae imported.")
-        query = "select count(*) from hirings h where hiring_date > %s and hiring_date <= %s"
+        query = "select count(*) from hirings h where hiring_date > %s and hiring_date <= %s and h.contract_type in (1,2,3)"
         cur.execute(query, [last_historical_data_date_in_db, self.last_historical_data_date_in_file])
         res = cur.fetchone()
         if res[0] != imported_dpae:
-            raise Exception(f"Too many DPAE ({res[0]}) in DB compared to DPAE file ({imported_dpae}).")
+            raise DoublonException(f"Too many DPAE ({res[0]}) in DB compared to DPAE file ({imported_dpae}).")
         logger.info("verifying number of DPAE: OK.")
         con.commit()
         cur.close()
