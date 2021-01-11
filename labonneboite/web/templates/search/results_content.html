@@ -32,6 +32,9 @@
                  <hr>
                </div>
               <h3 class="sr-only lbb-result-info">Triez les résultats de recherche</h3>
+              {% if related_romes or related_rome_initial %}
+                  <h3>Ciblez les métiers qui recrutent</h3>
+              {% endif %}
               {% if related_rome_initial %}
                   <div class="lbb-sidebar-item">
                     <p>Recherche initiale</p>
@@ -44,7 +47,6 @@
                   </div>
               {% endif %}
               {% if related_romes %}
-                  <h3>Ciblez les métiers qui recrutent</h3>
                   <div class="lbb-sidebar-item">
                     {% set text_reco %}
                       {% if related_romes|length > 1 %}
@@ -183,18 +185,22 @@
               </p>
               {% if alternative_rome_descriptions and alternative_distances %}
                   <div class="grid-row grid-spacing">
-                    <div class="grid-col-6">
-                      <h3>Elargir aux métiers suivants :</h3>
-                      {% include "includes/alternative_rome_descriptions.html" %}
-                    </div>
+                    {% if not related_romes %}
+                        <div class="grid-col-6">
+                          <h3>Elargir aux métiers suivants :</h3>
+                          {% include "includes/alternative_rome_descriptions.html" %}
+                        </div>
+                    {% endif %}
                     <div class="grid-col-3">
                       <h3>Elargir aux alentours :</h3>
                       {% include "includes/alternative_distances.html" %}
                     </div>
                   </div>
               {% elif alternative_rome_descriptions %}
-                <h3>Elargir aux métiers suivants :</h3>
-                {% include "includes/alternative_rome_descriptions.html" %}
+                {% if not related_romes %}
+                    <h3>Elargir aux métiers suivants :</h3>
+                    {% include "includes/alternative_rome_descriptions.html" %}
+                {% endif %}
               {% elif alternative_distances %}
                 <h3>Elargir aux alentours :</h3>
                 {% include "includes/alternative_distances.html" %}
