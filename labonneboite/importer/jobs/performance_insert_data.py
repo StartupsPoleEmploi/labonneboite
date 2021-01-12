@@ -313,7 +313,7 @@ def compute_effective_and_predicted_hirings():
             db_session.add(pred_effective_hirings)
 
             # Commit all the 10 000 transactions
-            if count % 10000 == 0:
+            if count % 100000 == 0:
                 logger.info(f"{count} companies have been treated")
                 db_session.commit()
 

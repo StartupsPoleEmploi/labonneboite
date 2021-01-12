@@ -35,7 +35,7 @@ def get_db_string(db_params=None):
 ENGINE_PARAMS = {
     'convert_unicode': True,
     'echo': False,
-    'pool_recycle': 30,
+    'pool_recycle': 600,
 }
 
 engine = create_engine(get_db_string(), **ENGINE_PARAMS)
