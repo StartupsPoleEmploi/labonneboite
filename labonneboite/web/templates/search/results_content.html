@@ -68,7 +68,7 @@
                   </div>
                   <!-- END RELATED ROMES -->
               {% endif %}
-              {% if related_rome_initial or related_romes %}
+              {% if related_romes or related_rome_initial %}
                   <hr>
               {% endif %}
                <h3>Affinez votre recherche</h3>
@@ -221,8 +221,7 @@
           </div>
         {% endfor %}
 
-
-        {% if companies and companies|length < companies_per_page and (alternative_rome_descriptions or alternative_distances) %}
+        {% if not related_romes and companies and companies|length < companies_per_page and (alternative_rome_descriptions or alternative_distances) %}
           <div class="lbb-bright-container">
             <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
             {% if alternative_rome_descriptions %}
