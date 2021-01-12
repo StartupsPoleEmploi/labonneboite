@@ -4,7 +4,7 @@ import csv
 import pandas as pd
 import math
 
-from functools import lru_cache
+from functools import lru_cache, reduce
 from collections import defaultdict
 
 USE_ROME_SLICING_DATASET = False  # Rome slicing dataset is not ready yet
@@ -103,6 +103,26 @@ def load_rows_as_dict_of_dict(rows):
 
 
 @lru_cache(maxsize=None)
+def load_related_rome():
+    """
+    Build a dict with department code (code insee) as keys.
+    The values are dict with rome code as keys and a list of related rome codes as values.
+    Each related rome is a dict with `rome` and `score` properties.
+    Used for PSE study.
+    """
+    rows = load_csv_file("rome_connexe.csv", delimiter=',')
+    return reduce(reduceRelateRomes, rows, {})
+
+def reduceRelateRomes(aggr, row):
+    [code_insee, rome, rome_connexe, score] = row
+    entry_code_insee = aggr.get(code_insee, {})
+    entry_rome = entry_code_insee.get(rome, [])
+    entry_rome.append({'rome': rome_connexe, 'score': score})
+    entry_code_insee[rome] = entry_rome
+    aggr[code_insee] = entry_code_insee
+    return aggr
+
+@lru_cache(maxsize=None)
 def load_city_codes():
     rows = load_csv_file("city_codes.csv")
     commune_id_to_commune_name = load_rows_as_dict(rows)
@@ -111,8 +131,10 @@ def load_city_codes():
 
 @lru_cache(maxsize=None)
 def load_contact_modes():
-    # use comma delimiter instead of pipe so that it is recognized by github
-    # and can easily be edited online by the intrapreneurs
+    """
+    Use comma delimiter instead of pipe so that it is recognized by github
+    and can easily be edited online by the intrapreneurs.
+    """
     rows = load_csv_file("contact_modes.csv", delimiter=',')
     naf_prefix_to_rome_to_contact_mode = load_rows_as_dict_of_dict(rows)
     return naf_prefix_to_rome_to_contact_mode

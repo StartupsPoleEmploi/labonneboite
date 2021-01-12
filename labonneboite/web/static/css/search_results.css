@@ -7,7 +7,7 @@
 @media (min-width: 800px) {  /* For any browser width over 800px. */
 
     .lbb-content-with-sidebar {
-        padding-left: 255px;  /* 235px (.lbb-sidebar-wrapper width) + 20px (margin between sidebar and content) */
+        padding-left: 325px;  /* 300px (.lbb-sidebar-wrapper width) + 20px (margin between sidebar and content) */
     }
 
     .lbb-content-with-sidebar:after {
@@ -18,8 +18,8 @@
 
     .lbb-sidebar-wrapper {
         float: left;
-        margin-left: -255px;
-        width: 235px;
+        margin-left: -325px;
+        width: 305px;
         margin-top: 0;
     }
 
@@ -96,6 +96,7 @@
 .lbb-sidebar-item {
     margin-top: 24px;  /* Fallback in `px` for browsers that don't support rem. */
     margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .lbb-sidebar-item p,

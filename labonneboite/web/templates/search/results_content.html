@@ -4,7 +4,7 @@
         {% include "includes/search_form.html" %}
       {% endwith %}
       <div class="lbb-sidebar-toggle-wrapper">
-        <a class="lbb-sidebar-toggle" href="#lbb-sidebar-wrapper">Trier / Filtrer »</a>
+        <a class="lbb-sidebar-toggle" href="#lbb-sidebar-wrapper">Triez / Filtrez »</a>
       </div>
     </div>
   </div>
@@ -12,19 +12,17 @@
   <div class="lbb-content-wrapper">
     <div class="lbb-content">
       <div class="lbb-content-with-sidebar">
-        <form action="{{ url_for('search.entreprises') }}" class="js-search-form no-margin no-padding" method="get">
+        <form action="{{ url_for('search.entreprises') }}" class="js-search-form no-margin no-padding" method="get" autocomplete="off">
           <div id="hidden-search-form" class="hidden">
             <!-- This form will be submitted via Javascript when a new filter is used. -->
             {% include "includes/search_form.html" %}
           </div>
-
-          <h2 class="sr-only lbb-result-info">Trier les résultats de recherche</h2>
           <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
             <div class="lbb-sidebar">
-              <div id="toggle-map-wrapper">
-                <div class="switch">
-                  <input type="checkbox" id="toggle-map" checked="checked">
-                  <span id="map-switch-button" class="slider round"></span>
+              <div id="toggle-map-wrapper" class="gtmFilter gtmMap gtmHide">
+                <div class="switch gtmFilter gtmMap gtmHide">
+                  <input type="checkbox" id="toggle-map" checked="checked" lass="gtmFilter gtmMap gtmHide">
+                  <span id="map-switch-button" class="slider round gtmFilter gtmMap gtmHide"></span>
                 </div>
                 <label id="map-switch-text">Masquer la carte</label>
               </div>
@@ -33,13 +31,44 @@
                  <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
                  <hr>
                </div>
-               {% if not departments %}
-               <h3>Trier</h3>
-               <div class="lbb-sidebar-item">
-                 {{ form.sort }}
-               </div>
-               <hr>
-               {% endif %}
+              <h3 class="sr-only lbb-result-info">Triez les résultats de recherche</h3>
+              {% if related_rome_initial %}
+                  <div class="lbb-sidebar-item">
+                    <p>Recherche initiale</p>
+                    <a
+                      id="related_rome_initial"
+                      href="#"
+                      data-rome-description="{{ related_rome_initial }}"
+                      data-rome-description-slug="{{ related_rome_initial | slugify }}"
+                      >{{ related_rome_initial }}</a>
+                  </div>
+              {% endif %}
+              {% if related_romes %}
+                  <h3>Ciblez les métiers qui recrutent</h3>
+                  <div class="lbb-sidebar-item">
+                    {% set text_reco %}
+                      {% if related_romes|length > 1 %}
+                        {{ related_romes|length }} métiers qui recrutent plus
+                      {% else %}
+                        Un métier qui recrute plus
+                      {%endif %}
+                    {% endset %}
+                    <p>{{ text_reco }} <span class="badge badge-large badge-info" data-show data-hide-on-rollout data-original-title="{{ text_reco }}" data-toggle="tooltip" data-placement="right" title="Recommandations exclusives La bonne boite basées sur l’analyse des métiers. Pour vous faire ces suggestions, La bonne boite compare le nombre de candidats par métier avec le nombre de recrutements prédits.">?</span></p>
+                    <ul id="form-related_romes">
+                    {% for rome in related_romes %}
+                    <li><a
+                        href="#"
+                        data-rome-description="{{ rome.description }}"
+                        data-rome-description-slug="{{ rome.description | slugify }}"
+                        >{{ rome.description }}</a></li>
+                    {% endfor %}
+                    </ul>
+                  </div>
+                  <!-- END RELATED ROMES -->
+              {% endif %}
+              {% if related_romes or related_rome_initial %}
+                  <hr>
+              {% endif %}
                <h3>Affinez votre recherche</h3>
                <div class="lbb-sidebar-item">
                  <p>
@@ -92,6 +121,12 @@
                    {{ form.d }}
                  </div>
                  <!-- END DISTANCE DURATION SWITCH -->
+                 <hr>
+                 <h3>Triez</h3>
+                 <div class="lbb-sidebar-item">
+                   {{ form.sort }}
+                 </div>
+                 <!-- END SORT AND FILTERS -->
                {% endif %} {# endif not departments #}
                </div>
                {% if pro_version_enabled %}
@@ -148,18 +183,22 @@
               </p>
               {% if alternative_rome_descriptions and alternative_distances %}
                   <div class="grid-row grid-spacing">
+                    {% if not related_romes %}
+                        <div class="grid-col-6">
+                          <h3>Elargir aux métiers suivants :</h3>
+                          {% include "includes/alternative_rome_descriptions.html" %}
+                        </div>
+                    {% endif %}
                     <div class="grid-col-6">
-                      <h3>Elargir aux métiers suivants :</h3>
-                      {% include "includes/alternative_rome_descriptions.html" %}
-                    </div>
-                    <div class="grid-col-3">
                       <h3>Elargir aux alentours :</h3>
                       {% include "includes/alternative_distances.html" %}
                     </div>
                   </div>
               {% elif alternative_rome_descriptions %}
-                <h3>Elargir aux métiers suivants :</h3>
-                {% include "includes/alternative_rome_descriptions.html" %}
+                {% if not related_romes %}
+                    <h3>Elargir aux métiers suivants :</h3>
+                    {% include "includes/alternative_rome_descriptions.html" %}
+                {% endif %}
               {% elif alternative_distances %}
                 <h3>Elargir aux alentours :</h3>
                 {% include "includes/alternative_distances.html" %}
@@ -180,8 +219,7 @@
           </div>
         {% endfor %}
 
-
-        {% if companies and companies|length < companies_per_page and (alternative_rome_descriptions or alternative_distances) %}
+        {% if not related_romes and companies and companies|length < companies_per_page and (alternative_rome_descriptions or alternative_distances) %}
           <div class="lbb-bright-container">
             <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
             {% if alternative_rome_descriptions %}

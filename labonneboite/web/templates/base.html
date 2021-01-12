@@ -21,6 +21,18 @@
 <body>
   <a class="escape-link" href="#main-anchor">Passer directement au contenu principal</a>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="lbb-flash-alerts">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} js-alert-close">
+            <p>{{ message }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
   <header role="banner" class="lbb-header-wrapper">
     <ul class="lbb-header">
       <li class="lbb-header-logo-lbb">
@@ -39,16 +51,16 @@
 
       {# PRO ZONE #}
       {% if user_is_pro %}
-        <li class="float-right lbb-header-entry">
+        <li class="float-right lbb-header-entry gtmAccount gtmVersionPro">
           <a
-            class="lbb-header-btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}"
+            class="lbb-header-btn gtmAccount gtmVersionPro" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}"
             {% if pro_version_enabled %}
               title="Désactiver la version pro"
             {% else %}
               title="Activer la version pro"
             {% endif %}
           >
-            <span class="lbb-header-btn no-padding">
+            <span class="lbb-header-btn no-padding gtmAccount gtmVersionPro">
               {% if pro_version_enabled %}
                 <img class="no-margin" src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="Version PRO active" data-toggle="tooltip" data-placement="bottom" data-original-title="La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visibles aux conseillers Pôle emploi et à une sélection d'acteurs.">
               {% else %}
@@ -60,8 +72,8 @@
             {% else %}
               <p class="lbb-switch" aria-hidden="true">
             {% endif %}
-              <span class="on">On</span>
-              <span class="off">Off</span>
+              <span class="on gtmAccount gtmVersionPro">On</span>
+              <span class="off gtmAccount gtmVersionPro">Off</span>
             </p>
           </a>
         </li>
@@ -70,18 +82,6 @@
 
     </ul>
   </header>
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="lbb-flash-alerts">
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} js-alert-close">
-            <p>{{ message }}</p>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
 
   <main role="main" id="content">
     <a id="main-anchor" tabindex="-1"></a>

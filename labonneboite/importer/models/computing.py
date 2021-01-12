@@ -1,7 +1,8 @@
 import datetime
 
-from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime, Text
+from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime, Text, ForeignKey, Boolean
 from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy.orm import relationship
 
 from labonneboite.importer import settings as importer_settings
 from labonneboite.common.database import Base
@@ -69,7 +70,7 @@ class RawOffice(PrimitiveOfficeMixin, CRUDMixin, Base):
         PrimaryKeyConstraint('siret'),
         
         # Improve performance of importer compute_scores parallel jobs
-        # by quickly fetching all offices of any given departement.        
+        # by quickly fetching all offices of any given departement.     
         Index('_departement', 'departement'),
     )
 
@@ -237,6 +238,7 @@ StatusJobExecution = {
     'error' : 2
 }
 
+
 class HistoryImporterJobs(CRUDMixin, Base):
     """
     Used to store details about the running of the different importer jobs
@@ -270,3 +272,57 @@ class HistoryImporterJobs(CRUDMixin, Base):
 
         return most_recent_job_history.status == StatusJobExecution['done']
 
+## Tables needed for performance indicators
+# -----------------------
+class PerfImporterCycleInfos(CRUDMixin, Base):
+    """
+    Used to store details about the previous cycles of importer which have run (nb rows = NB_IMPORTER_CYCLES)
+    """
+    __tablename__ = "perf_importer_cycle_infos"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    execution_date = Column(DateTime, default=None)
+    prediction_start_date = Column(DateTime, default=None)
+    prediction_end_date = Column(DateTime, default=None)
+    file_name = Column(Text)
+    computed = Column(Boolean)
+    on_google_sheets = Column(Boolean)
+
+class PerfPredictionAndEffectiveHirings(CRUDMixin, Base):
+    """
+    Used to compare effective (real) hirings in companies VS predicted hirings by importer algorithm (nb rows = NB_OFFICES * NB_IMPORTER_CYCLES)
+    """
+    __tablename__ = "perf_prediction_and_effective_hirings"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    importer_cycle_infos_id = Column(BigInteger, ForeignKey('perf_importer_cycle_infos.id', ondelete='SET NULL'), nullable=True)
+    siret = Column(String(191))
+    naf = Column('codenaf', String(8))
+    city_code = Column('codecommune', String(191))
+    zipcode = Column('codepostal', String(8))
+    departement = Column(String(8))
+    company_name = Column('raisonsociale', String(191))
+    office_name = Column('enseigne', String(191), default='')
+    lbb_nb_predicted_hirings_score = Column(Integer) #Score associé au Nombre de recrutement prédits pour LBB (en utilisant les DPAE)
+    lba_nb_predicted_hirings_score = Column(Integer) #Score associé au Nombre de recrutements prédits pour LBA (en utilisant APR et CP)
+    lbb_nb_predicted_hirings = Column(Integer) #Nombre de recrutement prédits pour LBB (en utilisant les DPAE)
+    lba_nb_predicted_hirings = Column(Integer) #Nombre de recrutements prédits pour LBA (en utilisant APR et CP)
+    lbb_nb_effective_hirings = Column(Integer) #Nombre de recrutement effectifs pour LBB (en utilisant les DPAE)
+    lba_nb_effective_hirings = Column(Integer) #Nombre de recrutements effectifs pour LBA (en utilisant APR et CP)
+    is_a_bonne_boite = Column(Boolean) #Affiché ou non sur LBB (Dépasse pour au moins un rome le seuil) port_date = Column(DateTime, default=None)
+    is_a_bonne_alternance = Column(Boolean) #Affiché ou non sur LBA (Dépasse pour au moins un rome le seuil) port_date = Column(DateTime, default=None)
+
+class PerfDivisionPerRome(CRUDMixin, Base):
+    """
+    Used to check the repartition by rome code of the number of companies (nb rows = NB_DISTINCT_ROME_CODE * NB_IMPORTER_CYCLES)
+    """
+    __tablename__ = "perf_division_per_rome"
+
+    _id = Column('id', BigInteger, primary_key=True)
+    importer_cycle_infos_id = Column(BigInteger, ForeignKey('perf_importer_cycle_infos.id', ondelete='SET NULL'), nullable=True)
+    naf = Column('codenaf', String(8), nullable=False)
+    rome = Column('coderome', String(8), nullable=False)
+    threshold_lbb = Column(Float)
+    threshold_lba = Column(Float)
+    nb_bonne_boites_lbb = Column(Integer)
+    nb_bonne_boites_lba = Column(Integer)
