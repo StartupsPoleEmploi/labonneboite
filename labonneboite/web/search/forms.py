@@ -48,6 +48,8 @@ class CompanySearchForm(FlaskForm):
 
     # Typed job
     j = StringField('Métier recherché', validators=[DataRequired()])
+    ij = HiddenField(validators=[Optional()])
+
     # Corresponding occupation found by autocomplete
     occupation = HiddenField('', validators=[DataRequired()])
 

@@ -18,6 +18,7 @@
     color: #222;
     padding: 16px 20px;  /* Fallback in `px` for browsers that don't support rem. */
     padding: 1rem;
+    text-align: center;
 }
 
 .alert-warning {
@@ -26,7 +27,7 @@
 }
 
 .alert-success {
-    background: #10863c;
+    background: #1c86f2;
     color: #fff;
 }
 
@@ -76,7 +77,6 @@
     display: inline-block;
     margin: 0 10px;
     float: right;
-    color: #5d5d5d;
     font-size: 20px;  /* Fallback in `px` for browsers that don't support rem. */
     font-size: 1.25rem;
     text-decoration: none;

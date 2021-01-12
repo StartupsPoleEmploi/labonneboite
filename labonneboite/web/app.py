@@ -9,6 +9,7 @@ from raven.contrib.flask import Sentry
 from social_core import exceptions as social_exceptions
 from social_flask_sqlalchemy.models import init_social
 from werkzeug.contrib.fixers import ProxyFix
+from slugify import slugify
 
 # Flask.
 from flask import g, flash, Flask, redirect, render_template, request, session, url_for
@@ -405,6 +406,9 @@ def internal_error(error):
     # Exception was already logged by flask somewhere, no need to process it
     return render_template('error/500.html'), 500
 
+@app.template_filter('slugify')
+def slugify_filter(text):
+    return slugify(text)
 
 if __name__ == '__main__':
     if get_current_env() == ENV_DEVELOPMENT:

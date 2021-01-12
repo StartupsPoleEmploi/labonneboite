@@ -18,6 +18,7 @@ class SearchEntreprisesTest(DatabaseTest):
         self.gotham_city = {
             'label': 'Gotham City 19100',
             'zipcode': '19100',
+            'city_code': '19111',
             'city': 'Gotham'
         }
 
@@ -116,6 +117,7 @@ class EntreprisesLocationTest(AppTest):
         addresses = [{
             'label': 'Copacabana',
             'city': 'Rio',
+            'city_code': '19111',
             'zipcode': '666',
         }]
         with mock.patch('labonneboite.common.geocoding.get_address', return_value=addresses):

@@ -30,6 +30,7 @@ LOG_FORMAT_USER_ACTIVITY = '%(message)s'
 GLOBAL_STATIC_PATH = '/tmp'
 
 ROME_DESCRIPTIONS = load_rome_labels()
+MAX_RELATED_ROMES = 5 # set this to 0 in order to deactivate
 
 NAF_CODES = load_naf_labels()
 

@@ -21,6 +21,7 @@ search_lelab_formatted = [{
     'label': '22 Allée Darius Milhaud 75019 Paris',
     'score': 0.9421181818181817,
     'city': 'Paris',
+    'city_code': '75119',
     'zipcode': '75019',
 }]
 
@@ -124,6 +125,7 @@ class AdresseApiTest(TestCase):
         self.assertEqual([{
             'city': 'Paris',
             'zipcode': '75019',
+            'city_code': '75119',
             'label': '22 Allée Darius Milhaud 75019 Paris',
         }], address)
 
