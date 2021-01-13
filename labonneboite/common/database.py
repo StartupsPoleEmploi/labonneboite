@@ -2,6 +2,7 @@
 # http://flask.pocoo.org/docs/0.12/patterns/sqlalchemy/#declarative
 # http://docs.sqlalchemy.org/en/rel_1_1/
 import logging
+import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -32,10 +33,12 @@ def get_db_string(db_params=None):
     db_params = db_params or DATABASE
     return "mysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}?charset=utf8mb4".format(**db_params)
 
+pool_recycle = int(os.environ.get("DB_CONNECTION_TIMEOUT", "30"))
+
 ENGINE_PARAMS = {
     'convert_unicode': True,
     'echo': False,
-    'pool_recycle': 30,
+    'pool_recycle': pool_recycle,
 }
 
 engine = create_engine(get_db_string(), **ENGINE_PARAMS)
