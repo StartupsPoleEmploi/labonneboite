@@ -37,6 +37,7 @@ from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
 import sqlalchemy
 from sqlalchemy.pool import NullPool
+from sqlalchemy import func
 from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import DpaeStatistics, Hiring, RawOffice
@@ -300,7 +301,10 @@ def compute_prediction_beginning_date():
     """
     We predict hirings starting from the 1st of the current month.
     """
-    now = datetime.now()
+    # foo
+    dpae_statistics = DpaeStatistics.query.filter(DpaeStatistics.file_type==DpaeStatistics.DPAE)\
+        .order_by(DpaeStatistics.most_recent_data_date.desc()).first()
+    now = dpae_statistics.most_recent_data_date
     prediction_beginning_date = now.replace(day=1)  # get 1st of the month
     logger.info("prediction_beginning_date = %s", prediction_beginning_date)
     return prediction_beginning_date
