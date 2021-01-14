@@ -208,15 +208,17 @@ var trackOutboundLink = function(url) {
     // handle related rome initial search
     var related_rome_initial = $('#related_rome_initial');
     related_rome_initial.on('click', function(e) {
-      var j = shown_form.find('#j');
-      var ij = hidden_form.find('#ij');
+      var ij = hidden_form.find('#ij'); // initial search (related romes case)
+      var j = shown_form.find('#j'); // j stands for job
+      var hiddenJ = hidden_form.find('#j'); // this is the same "job" param, in the hidden form
       var occupation = hidden_form.find('#occupation');
       var rome_description = $(e.target).attr('data-rome-description');
       var rome_description_slug = $(e.target).attr('data-rome-description-slug');
       ij.val('');
       j.val(rome_description);
+      hiddenJ.val(rome_description);
       occupation.val(rome_description_slug);
-      shown_form.submit();
+      hidden_form.submit();
     })
 
     // trigger hotjar
@@ -227,15 +229,17 @@ var trackOutboundLink = function(url) {
     // handle related romes
     var related_romes = $('#form-related_romes');
     related_romes.on('click', function(e) {
-      var j = shown_form.find('#j');
-      var ij = hidden_form.find('#ij');
+      var ij = hidden_form.find('#ij'); // initial search (related romes case)
+      var j = shown_form.find('#j'); // j stands for job
+      var hiddenJ = hidden_form.find('#j'); // this is the same "job" param, in the hidden form
       var occupation = hidden_form.find('#occupation');
       var rome_description = $(e.target).attr('data-rome-description');
       var rome_description_slug = $(e.target).attr('data-rome-description-slug');
       ij.val(j.val());
       j.val(rome_description);
+      hiddenJ.val(rome_description);
       occupation.val(rome_description_slug);
-      shown_form.submit();
+      hidden_form.submit();
     });
 
     // trigger hotjar
