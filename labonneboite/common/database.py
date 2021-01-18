@@ -34,11 +34,15 @@ def get_db_string(db_params=None):
     return "mysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}?charset=utf8mb4".format(**db_params)
 
 pool_recycle = int(os.environ.get("DB_CONNECTION_TIMEOUT", "30"))
+connect_timeout = int(os.environ.get("CONNECT_TIMEOUT", "5"))
 
 ENGINE_PARAMS = {
     'convert_unicode': True,
     'echo': False,
     'pool_recycle': pool_recycle,
+    'connect_args': {
+        'connect_timeout': connect_timeout
+    }
 }
 
 engine = create_engine(get_db_string(), **ENGINE_PARAMS)
