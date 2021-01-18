@@ -311,7 +311,7 @@ def entreprises():
             related_romes.sort(key=lambda rome_: rome_.get('score'))
             related_romes = related_romes[:settings.MAX_RELATED_ROMES]
             if (len(related_romes) > 0):
-                flash('Nouvelle fonctionnalité : Grâce aux nouveaux filtres, élargissez votre recherche aux métiers qui recrutent !', 'success')
+                flash('Nouvelle fonctionnalité : Grâce aux nouveaux filtres, élargissez votre recherche aux métiers qui recrutent !', 'info')
 
 
     # Build form
