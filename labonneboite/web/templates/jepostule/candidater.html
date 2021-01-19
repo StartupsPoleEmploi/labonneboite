@@ -16,11 +16,14 @@
             } else if(data.action === "quit") {
                 window.location = data.label;
             } else {
+                ga('send', 'event', 'jepostule', data.action, data.label, data.value);
                 if (data.action === 'navigate') {
-                    // the page is now '/candidat/' + data.label
+                    // send virtual page view for funnel
+                    ga('send', 'pageview', '/candidat/' + data.label);
                 }
                 if (data.action === 'navigate' && data.label === '#fin' && window.hj !== undefined) {
-                    // the candidate process is over
+                    // trigger hotjar scenario
+                    hj('trigger', 'sondage-candidat-jepostule');
                 }
             }
         }

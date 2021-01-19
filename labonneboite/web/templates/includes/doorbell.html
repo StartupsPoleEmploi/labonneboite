@@ -1,0 +1,45 @@
+<script>
+    window.doorbellOptions = {
+        {% if 'press' in doorbell_tags %}
+            strings: {
+            'feedback-button-text': "Vous voulez parler de La Bonne Boite ?",
+            'title': "Vous voulez parler de La Bonne Boite ?",
+            'feedback-textarea-placeholder': "Votre message",
+            'submit-button-text': "Envoyer",
+            'message-success' : "Message envoyé",
+            },
+        {% endif %}
+        appKey: 'THXAF5JYNl5PXqaQIsyBwXhJwudQIPl55JENDymGK0LQobxnS4b3GUNa5B6xSztm',
+        tags: "{{ ','.join(doorbell_tags) }}",
+        onShown: function() {
+            // Accessibility : doorbell not provide label for its form
+            // But we can add it manually when form is shown
+            createLabel('doorbell-feedback');
+            createLabel('doorbell-email');
+            createLabel('doorbell-submit-button');
+
+            // Specify that this button is a submit button
+            document.querySelector('#doorbell-submit-button').type = 'submit';
+        }
+    };
+    (function(d, t) {
+        var g = d.createElement(t);
+        g.id = 'doorbellScript';
+        g.type = 'text/javascript';
+        g.async = true;
+        g.src = 'https://embed.doorbell.io/button/3346?t=' + (new Date().getTime());
+        (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(g);
+    }(document, 'script'));
+
+    function createLabel(formId) {
+        var $input = document.querySelector('#' + formId);
+        if(document.querySelector("label[for='" + formId + "']") !== null) return;
+
+        var $label = document.createElement('label');
+        $label.textContent = $input.getAttribute('placeholder') || $input.textContent;
+        $label.classList = 'sr-onl';
+        $label.htmlFor = $input.getAttribute('id');
+        $input.parentNode.insertBefore($label, $input);
+
+    }
+</script>

@@ -20,6 +20,7 @@ from flask_login import current_user, LoginManager
 from flask_wtf.csrf import CSRFProtect
 
 # labonneboite.
+from labonneboite.common import hotjar
 from labonneboite.common import pro
 from labonneboite.common.database import db_session, engine  # This is how we talk to the database.
 from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
@@ -103,6 +104,7 @@ def register_blueprints(flask_app):
     from labonneboite.web.jepostule.views import jepostuleBlueprint
     from labonneboite.web.root.views import rootBlueprint
     from labonneboite.web.search.views import searchBlueprint
+    from labonneboite.web.tilkee.views import tilkeeBlueprint
     from labonneboite.web.user.views import userBlueprint
     from social_flask.routes import social_auth
     flask_app.register_blueprint(apiBlueprint, url_prefix='/api/v1')
@@ -115,6 +117,7 @@ def register_blueprints(flask_app):
     flask_app.register_blueprint(jepostuleBlueprint, url_prefix='/jepostule')
     flask_app.register_blueprint(rootBlueprint)
     flask_app.register_blueprint(searchBlueprint)
+    flask_app.register_blueprint(tilkeeBlueprint, url_prefix='/candidature')
     flask_app.register_blueprint(userBlueprint, url_prefix='/user')
     flask_app.register_blueprint(social_auth, url_prefix='/authorize')
 
@@ -177,15 +180,20 @@ def register_context_processors(flask_app):
     """
     def inject_dict_for_all_templates():
         return {
+            'hotjar_tag': hotjar.get_hotjar_tag(),
             'memo_js_url': settings.MEMO_JS_URL,
             'user_is_pro': pro.user_is_pro(),
             'pro_version_enabled': pro.pro_version_enabled(),
             'last_data_deploy_date': Office.get_date_of_last_data_deploy(),
+            'google_analytics_id': settings.GOOGLE_ANALYTICS_ID,
+            'seo_google_analytics_id': settings.SEO_GOOGLE_ANALYTICS_ID,
+            'enable_google_optimize': settings.ENABLE_GOOGLE_OPTIMIZE,
+            'google_optimize_id': settings.GOOGLE_OPTIMIZE_ID,
+            'tilkee_enabled': settings.TILKEE_ENABLED,
             'google_site_verification_code': settings.GOOGLE_SITE_VERIFICATION_CODE,
             'login_url': auth_utils.login_url,
             'jepostule_globally_enabled': settings.JEPOSTULE_QUOTA > 0,
             'enable_isochrones': settings.ENABLE_ISOCHRONES,
-            'tag_manager_url': settings.TAG_MANAGER_URL,
         }
 
     def inject_user():
@@ -252,6 +260,7 @@ def create_app():
         'js/vendor/js.cookie.js',
         # LBB.
         'js/alerts.js',
+        'js/rgpd.js',
         'js/clipboard.js',
         'js/dropdowns.js',
         'js/homepage-form.js',
@@ -260,6 +269,7 @@ def create_app():
         'js/prevent-double-form-submit.js',
         'js/results-toggle-sidebar.js',
         'js/results.js',
+        'js/tilkee.js',
         'js/toggle-long-text.js',
         'js/tooltip.js',  # Depends on 'js/vendor/bootstrap-tooltip.js'.
         'js/unobfuscate.js',
@@ -289,6 +299,8 @@ def create_app():
         'css/breadcrumb.css',
         'css/buttons.css',
         'css/cookbook.css',
+        'css/rgpd_banner.css',
+        'css/doorbell.css',
         'css/dropdowns.css',
         'css/forms.css',
         'css/grid.css',
@@ -300,6 +312,7 @@ def create_app():
         'css/ratings.css',
         'css/search_results.css',
         'css/switch.css',
+        'css/tilkee.css',
         # Vendor.
         'css/vendor/bootstrap-tooltip.css',
         'css/vendor/jquery-ui.css',
