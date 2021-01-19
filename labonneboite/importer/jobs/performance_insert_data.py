@@ -267,9 +267,9 @@ def compute_effective_and_predicted_hirings():
         values_to_update = df_merged.values.tolist()
         count = 0
 
+        updated_ppaeh = []
         for row in values_to_update:
             row_id = row[0]
-            #import ipdb;ipdb.set_trace()
             siret = row[1]
             naf = row[2]
             params = dict(zip(["lbb_nb_effective_hirings", "lba_nb_effective_hirings", "lbb_nb_predicted_hirings",
@@ -278,8 +278,11 @@ def compute_effective_and_predicted_hirings():
             lba_nb_predicted_hirings_score = row[8]
             # foo
             pred_effective_hirings = dict_ppaeh[row_id]
+            updated_values = {
+                "_id": row_id
+            }
             for key, val in params.items():
-                setattr(pred_effective_hirings, key, int(val))
+                updated_values[key] = val
             is_a_bonne_boite = False
             is_a_bonne_alternance = False
 
@@ -309,18 +312,22 @@ def compute_effective_and_predicted_hirings():
                 nb_companies_with_naf_not_found += 1
             pred_effective_hirings.is_a_bonne_boite = is_a_bonne_boite
             pred_effective_hirings.is_a_bonne_alternance = is_a_bonne_alternance
+            updated_values["is_a_bonne_boite"] = is_a_bonne_boite
+            updated_values["is_a_bonne_alternance"] = is_a_bonne_alternance
 
-            db_session.add(pred_effective_hirings)
+            updated_ppaeh.append(updated_values)
 
             # Commit all the 10 000 transactions
-            if count % 100000 == 0:
+            if len(updated_ppaeh) % 100000 == 0:
                 logger.info(f"{count} companies have been treated")
+                db_session.bulk_update_mappings(PerfPredictionAndEffectiveHirings, updated_ppaeh)
                 db_session.commit()
-
-            count += 1
-
+                updated_ppaeh = []
+       
         # Commit for the remaining rows
+        db_session.bulk_update_mappings(PerfPredictionAndEffectiveHirings, updated_ppaeh)
         db_session.commit()
+        updated_ppaeh = []
 
         logger.info(f"Number of naf not found in the mapping rome naf for this importer cycle : {len(naf_not_founds)}")
         logger.info(f"List of naf not found in the mapping rome naf for this importer cycle : {naf_not_founds}")
