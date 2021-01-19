@@ -36,7 +36,7 @@ def get_available_files_list(path_folder=settings.BACKUP_OUTPUT_FOLDER):
     for file in backup_files_list:
         file_name = os.path.basename(file)
         logger.info(f"file to check : {file_name}")
-        if PerfImporterCycleInfos.query.filter(PerfImporterCycleInfos.file_name == file_name).count() == 0:
+        if PerfImporterCycleInfos.query.filter(PerfImporterCycleInfos.file_name.ilike(f"%{file_name}%")).count() == 0:
             file_list_not_parsed_yet.append(file)
             logger.info(f"file {file_name} not parsed yet")
         else:
