@@ -186,7 +186,7 @@ def compute_effective_and_predicted_hirings():
     importer_cycles_infos = PerfImporterCycleInfos.query.filter(PerfImporterCycleInfos.computed == False).all()
     importer_cycles_infos_to_compute = []
     for ici in importer_cycles_infos:
-        if os.environ["LBB_ENV"] == "development":
+        if os.environ["LBB_ENV"] in ["development", "test"]:
             importer_cycles_infos_to_compute.append(ici)
             continue
         if ici.prediction_end_date < datetime.now():
@@ -318,12 +318,12 @@ def compute_effective_and_predicted_hirings():
             updated_ppaeh.append(updated_values)
 
             # Commit all the 10 000 transactions
-            if len(updated_ppaeh) % 100000 == 0:
+            if len(updated_ppaeh) % 10000 == 0:
                 logger.info(f"{count} companies have been treated")
                 db_session.bulk_update_mappings(PerfPredictionAndEffectiveHirings, updated_ppaeh)
                 db_session.commit()
                 updated_ppaeh = []
-       
+
         # Commit for the remaining rows
         db_session.bulk_update_mappings(PerfPredictionAndEffectiveHirings, updated_ppaeh)
         db_session.commit()
