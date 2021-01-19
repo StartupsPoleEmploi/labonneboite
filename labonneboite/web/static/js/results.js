@@ -1,14 +1,5 @@
 "use strict";
 
-/**
-* Global function that tracks a click on an outbound link in Google Analytics.
-* This function takes a valid URL string as an argument, and uses that URL string
-* as the event label.
-*/
-var trackOutboundLink = function(url) {
-  ga('send', 'event', 'outbound', 'click', url);
-};
-
 (function ($) {
 
   $(document).on('lbbready', function () {
@@ -19,17 +10,6 @@ var trackOutboundLink = function(url) {
     $('.js-result-toggle-details').toggleDetails();
     updateTravelDurations();
     $('#shown-search-form').checkChanges();
-
-    var eventLabel;
-    if ($('.ga-no-results').length) {
-      var eventLabel = "job:" + $('input[name="job"]').val() + ";location:" + $('input[name="location"]').val();
-      ga('send', 'event', 'Resultats', 'no results', eventLabel);
-    }
-
-    $('.ga-pdf-download-link').click(function (e) {
-      ga('send', 'event', 'Download', 'fiche entreprise', 1);
-    });
-
   });
 
   /*
@@ -108,14 +88,6 @@ var trackOutboundLink = function(url) {
 
       // Otherwise, show it.
       $resultContainer.addClass('active');
-
-      // Track the click.
-      var eventLabel = [
-        'position:', $resultContainer.find('input[name="position"]').val(),
-        ',effectif:', $resultContainer.find('input[name="headcount"]').val(),
-        ',distance:', $resultContainer.find('input[name="company_distance"]').val(),
-      ].join('');
-      ga('send', 'event', 'Fiche Entreprise', 'Deplier', eventLabel);
 
       // Init the map.
       var siret = $resultContainer.find('input[name="company-siret"]').val();
@@ -208,15 +180,17 @@ var trackOutboundLink = function(url) {
     // handle related rome initial search
     var related_rome_initial = $('#related_rome_initial');
     related_rome_initial.on('click', function(e) {
-      var j = shown_form.find('#j');
-      var ij = hidden_form.find('#ij');
+      var ij = hidden_form.find('#ij'); // initial search (related romes case)
+      var j = shown_form.find('#j'); // j stands for job
+      var hiddenJ = hidden_form.find('#j'); // this is the same "job" param, in the hidden form
       var occupation = hidden_form.find('#occupation');
       var rome_description = $(e.target).attr('data-rome-description');
       var rome_description_slug = $(e.target).attr('data-rome-description-slug');
       ij.val('');
       j.val(rome_description);
+      hiddenJ.val(rome_description);
       occupation.val(rome_description_slug);
-      shown_form.submit();
+      hidden_form.submit();
     })
 
     // trigger hotjar
@@ -227,15 +201,17 @@ var trackOutboundLink = function(url) {
     // handle related romes
     var related_romes = $('#form-related_romes');
     related_romes.on('click', function(e) {
-      var j = shown_form.find('#j');
-      var ij = hidden_form.find('#ij');
+      var ij = hidden_form.find('#ij'); // initial search (related romes case)
+      var j = shown_form.find('#j'); // j stands for job
+      var hiddenJ = hidden_form.find('#j'); // this is the same "job" param, in the hidden form
       var occupation = hidden_form.find('#occupation');
       var rome_description = $(e.target).attr('data-rome-description');
       var rome_description_slug = $(e.target).attr('data-rome-description-slug');
       ij.val(j.val());
       j.val(rome_description);
+      hiddenJ.val(rome_description);
       occupation.val(rome_description_slug);
-      shown_form.submit();
+      hidden_form.submit();
     });
 
     // trigger hotjar
