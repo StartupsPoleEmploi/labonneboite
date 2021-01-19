@@ -9,6 +9,7 @@ var FOCUSABLE_ELEMENTS = 'a[href], area[href], input:not([disabled]):not([type="
 
 function closeModals() {
     if (jQuery(".modal").not(".modal-closed")) {
+        ga('send', 'event', 'Modal', 'close');
         jQuery(".modal").addClass("modal-closed");
         jQuery(".modal").attr("aria-hidden", "true");
         jQuery(".modal-overlay").addClass("modal-closed");

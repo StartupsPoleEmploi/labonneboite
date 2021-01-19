@@ -10,6 +10,7 @@ from flask_login import current_user
 from labonneboite.common import activity
 from labonneboite.common import autocomplete
 from labonneboite.common import geocoding
+from labonneboite.common import doorbell
 from labonneboite.common import pro
 from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
@@ -311,7 +312,7 @@ def entreprises():
             related_romes.sort(key=lambda rome_: rome_.get('score'))
             related_romes = related_romes[:settings.MAX_RELATED_ROMES]
             if (len(related_romes) > 0):
-                flash('Nouvelle fonctionnalité : Grâce aux nouveaux filtres, élargissez votre recherche aux métiers qui recrutent !', 'info')
+                flash('Nouvelle fonctionnalité : Grâce aux nouveaux filtres, élargissez votre recherche aux métiers qui recrutent !', 'success')
 
 
     # Build form
@@ -429,6 +430,7 @@ def entreprises():
         'companies_per_page': pagination.OFFICES_PER_PAGE,
         'company_count': office_count,
         'distance': fetcher.distance,
+        'doorbell_tags': doorbell.get_tags('results'),
         'form': form,
         'headcount': fetcher.headcount,
         'job_doesnt_exist': False,

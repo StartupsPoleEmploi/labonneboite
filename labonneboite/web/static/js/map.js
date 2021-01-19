@@ -49,6 +49,7 @@ function createMap(element, center, zoom) {
 
     $map.on("click", "a.map-marker", function(e) {
         var href = this.attributes.href.value;
+        ga('send', 'event', 'Carte', 'click entreprise', href);
         // Toggle company details on click on link
         $(href).find(".js-result-toggle-details").click();
     });
@@ -95,6 +96,7 @@ function createMap(element, center, zoom) {
       $("#map-auto-refresh input").prop('checked', autoRefreshActivated);
       $("#map-auto-refresh input").change(function() {
           autoRefreshActivated = $(this).is(':checked');
+          ga('send', 'event', 'Carte', 'toggle autorefresh', autoRefreshActivated ? 1 : 0);
       });
 
       var onMapMove = function() {
@@ -104,18 +106,21 @@ function createMap(element, center, zoom) {
         else {
             $("#map-auto-refresh").html("<a class='btn btn-small btn-info' href='#''>Relancer la recherche ici</a>").addClass();
             $("#map-auto-refresh a").click(function(e) {
+                ga('send', 'event', 'Carte', 'refresh');
                 e.preventDefault();
                 updateMap();
             });
         }
       };
       var onMapDrag = function() {
+        ga('send', 'event', 'Carte', 'drag');
         onMapMove();
       };
       var onMapZoom = function(e) {
         if (e.initialZoom) {
           return;
         }
+        ga('send', 'event', 'Carte', 'zoom');
         onMapMove();
       };
       var onMapLoad = function() {
@@ -125,6 +130,7 @@ function createMap(element, center, zoom) {
 
 
       var updateMap = function() {
+        ga('send', 'event', 'Carte', 'update');
         center = map.getCenter();
         zoom = map.getZoom();
 

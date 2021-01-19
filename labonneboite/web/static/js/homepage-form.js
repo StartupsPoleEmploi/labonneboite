@@ -186,6 +186,7 @@
         var switchValue = e.currentTarget.attributes["data-switch-value"].value;
         var currentSwitchValue = $('#distance-duration-switch').attr('data-switch-value-selected');
         if (currentSwitchValue !== switchValue) {
+          ga('send', 'event', 'Form', 'click', switchValue);
           $('#distance-duration-switch').attr('data-switch-value-selected', switchValue);
         }
     });
@@ -214,6 +215,7 @@
         var travelMode = $(this).attr("data-travelmode");
         searchForm.find('.travelmode-choice a').toggleClass('hidden');
         searchForm.find("[name='tr']").attr("value", travelMode);
+        ga('send', 'event', 'Form', 'click', 'travelmode-' + travelMode);
         if (searchForm.find('#isochrone-durations input').is(':checked')) {
           searchForm.find('#isochrone-durations input').prop('checked', false);
         }

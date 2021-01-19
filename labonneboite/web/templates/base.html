@@ -13,13 +13,22 @@
   {% block extrahead %}{% endblock %}
   {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
 
-  {% if tag_manager_url %}
-    <script async src="{{ tag_manager_url }}"></script>
-  {% endif %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ seo_google_analytics_id }}"></script>
 </head>
 
 <body>
   <a class="escape-link" href="#main-anchor">Passer directement au contenu principal</a>
+
+  <div class="rgpd-banner">
+    <p>En poursuivant votre navigation sur ce site, vous acceptez nos conditions d'utilisation de vos données personnelles (RGPD).</p>
+    <p>
+      <button class="rgpd-accept"><b>Accepter</b></button>
+      -
+      <button class="rgpd-info" aria-haspopup="true" aria-controls="#modal-id">En savoir plus</button>
+      -
+      <button class="rgpd-reject"><b>Refuser</b></button>
+    </p>
+  </div>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -145,6 +154,54 @@
     </div>
   </footer>
 
+  <div id="rgpd-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true" aria-labelledby="#rgpd-modal-title">
+    <button class="modal-close-button"><img alt="Fermer la fenêtre" src="{{ url_for('static', filename='images/icons/times.svg') }}"></button>
+    <div class="modal-content modal-content-inner">
+      <h1 class="text-center" id="rgpd-modal-title">
+        Politique de confidentialité et utilisation de vos données personnelles
+      </h1>
+
+      <p>
+        Pour utiliser le service La Bonne Boite, vous devez accepter la Politique de confidentialité de La Bonne Boite.
+      </p>
+
+      <p>
+        Sans ce consentement, vous ne serez pas en mesure d'utiliser le service La Bonne Boite.
+      </p>
+
+      <p>
+        La Bonne Boite dépose des cookies nécessaires au bon fonctionnement du site :<br>
+      </p>
+      <ul>
+        <li>des cookies de mesure d'audience via les sites Google Analytics, Hotjar et Doorbell</li>
+        <li>des cookies techniques pour permettre l'enregistrement de vos préférences ou de l'état de votre interface</li>
+      </ul>
+
+      <p>
+        Dans le cas où vous vous identifiez via PE Connect, voici les informations recueillies par le site La Bonne Boite :<br>
+      </p>
+      <ul>
+        <li>Données relatives à votre compte La Bonne Boite (dates de connexion, liste de vos entreprises favorites)</li>
+        <li>Données relatives à votre compte Pôle emploi connect (adresse postale, ROME d'inscription)</li>
+        <li>Données relatives à votre navigateur</li>
+      </ul>
+
+      <p>
+        Toutes ces informations ont pour but d'assurer le bon fonctionnement du site et nous permettent également d'améliorer l'intérêt et l'ergonomie de nos services.
+      </p>
+
+      <p>
+        Pôle emploi et La Bonne Boite s'engagent à ne pas communiquer vos données personnelles à des organismes tiers.
+      </p>
+
+      <p class="text-center ">
+        <button type="button" class="btn rgpd-accept">Accepter</button>
+        <button type="button" class="btn rgpd-reject">Refuser</button>
+      </p>
+
+    </div>
+  </div>
+
   <div class="modal-overlay modal-closed">
   </div>
   <div id="tilkee-modal" class="modal modal-closed" aria-modal="true" aria-hidden="true">
@@ -194,6 +251,7 @@
 
   <script>
     $(".jepostule-not-authentified").on('click', function() {
+      ga('send', 'event', 'Modal', 'open', 'jepostule-not-authentified-modal');
       showModal("#jepostule-not-authentified-modal");
     });
   </script>
@@ -205,6 +263,33 @@
             $(document).trigger('lbbready');
           });
       })(jQuery);
+  </script>
+
+  {% include "includes/ga.html" %}
+
+  {# GA for SEO #}
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <!-- https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers#working_with_multiple_trackers -->
+  <!-- https://developers.google.com/analytics/devguides/collection/gtagjs/pages -->
+  <script>
+    ga('create', '{{ seo_google_analytics_id }}', 'auto', { cookieExpires: 31536000, name: 'gaSEO' });
+    ga('gaSEO.send', 'pageview');
+  </script>
+
+  {# Hotjar Tracking Code for labonneboite.pole-emploi.fr #}
+  <script>
+    // disable Hotjar if RGPD consent is rejected
+    if (userHasOptOutRGPD() === false) {
+      (function(h,o,t,j,a,r){
+          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+          h._hjSettings={hjid:381821,hjsv:5};
+          a=o.getElementsByTagName('head')[0];
+          r=o.createElement('script');r.async=1;
+          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+          a.appendChild(r);
+      })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+      hj('tagRecording', ['{{ hotjar_tag }}']);
+    }
   </script>
 
   {# Memo button code #}
