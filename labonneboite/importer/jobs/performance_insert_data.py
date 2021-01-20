@@ -316,9 +316,9 @@ def compute_effective_and_predicted_hirings():
             updated_values["is_a_bonne_alternance"] = is_a_bonne_alternance
 
             updated_ppaeh.append(updated_values)
-
+            count += 1
             # Commit all the 10 000 transactions
-            if len(updated_ppaeh) % 10000 == 0:
+            if len(updated_ppaeh) % 100000 == 0:
                 logger.info(f"{count} companies have been treated")
                 db_session.bulk_update_mappings(PerfPredictionAndEffectiveHirings, updated_ppaeh)
                 db_session.commit()
