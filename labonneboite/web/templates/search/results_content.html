@@ -183,7 +183,7 @@
               </p>
               {% if alternative_rome_descriptions and alternative_distances %}
                   <div class="grid-row grid-spacing">
-                    {% if not related_romes %}
+                    {% if not related_romes and not hide_suggestions %}
                         <div class="grid-col-6">
                           <h3>Elargir aux métiers suivants :</h3>
                           {% include "includes/alternative_rome_descriptions.html" %}
@@ -195,7 +195,7 @@
                     </div>
                   </div>
               {% elif alternative_rome_descriptions %}
-                {% if not related_romes %}
+                {% if not related_romes and not hide_suggestions %}
                     <h3>Elargir aux métiers suivants :</h3>
                     {% include "includes/alternative_rome_descriptions.html" %}
                 {% endif %}
@@ -219,10 +219,10 @@
           </div>
         {% endfor %}
 
-        {% if not related_romes and companies and companies|length < companies_per_page and (alternative_rome_descriptions or alternative_distances) %}
+        {% if companies and companies|length < companies_per_page and (alternative_rome_descriptions or alternative_distances) %}
           <div class="lbb-bright-container">
             <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
-            {% if alternative_rome_descriptions %}
+            {% if not related_romes and not hide_suggestions and alternative_rome_descriptions %}
               <p>...dans d'autres métiers :</p>
               {% include "includes/alternative_rome_descriptions.html" %}
             {% endif %}
