@@ -20,7 +20,7 @@ from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.common.util import get_enum_from_value
-from labonneboite.common.load_data import load_related_rome
+from labonneboite.common.load_data import load_related_rome, load_related_rome_hide_suggestions
 from labonneboite.web.utils import fix_csrf_session
 
 from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter
@@ -30,6 +30,7 @@ from labonneboite.web.search.forms import make_company_search_form
 
 searchBlueprint = Blueprint('search', __name__)
 RELATED_ROMES = load_related_rome()
+RELATED_ROMES_HIDE_SUGGESTIONS = load_related_rome_hide_suggestions()
 
 @searchBlueprint.route('/suggest_job_labels')
 def suggest_job_labels():
@@ -302,8 +303,11 @@ def entreprises():
 
     # Related romes
     related_romes = None
+    hide_suggestions = False
     if (named_location):
         related_city_codes = RELATED_ROMES.get(named_location.city_code, None)
+        if (rome in RELATED_ROMES_HIDE_SUGGESTIONS.get(named_location.city_code, [])):
+            hide_suggestions = True
         if (related_city_codes and rome in related_city_codes):
             related_romes = related_city_codes.get(rome)
             # related_romes = list(map(add_nafs, related_romes))
@@ -425,6 +429,7 @@ def entreprises():
         'alternative_rome_descriptions': alternative_rome_descriptions,
         'related_romes': related_romes,
         'related_rome_initial': parameters.get('related_rome_initial', ''),
+        'hide_suggestions': hide_suggestions,
         'canonical_url': canonical_url,
         'companies': list(offices),
         'companies_per_page': pagination.OFFICES_PER_PAGE,
