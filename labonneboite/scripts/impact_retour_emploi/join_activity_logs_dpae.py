@@ -118,13 +118,16 @@ class JoinActivityLogsDPAE:
         file_exists = os.path.isfile(self.path_to_csv)
 
         # We want to rewrite the CSV file after each new execution of Join activity Logs DPAE extraction
-        if iteration == 0:  # First iteration
-            if file_exists:
-                os.remove(self.path_to_csv)
-            df_dpae_act.to_csv(self.path_to_csv, encoding='utf-8', sep='|')
-        else:
+        # if iteration == 0:  # First iteration
+        #     if file_exists:
+        #         os.remove(self.path_to_csv)
+        #     df_dpae_act.to_csv(self.path_to_csv, encoding='utf-8', sep='|')
+        # else:
+        if file_exists:
             with open(self.path_to_csv, 'a') as f:
                 df_dpae_act.to_csv(f, header=False, sep='|')
+        else:
+            df_dpae_act.to_csv(self.path_to_csv, encoding='utf-8', sep='|')
 
     def join_dpae_activity_logs(self):
 
