@@ -52,7 +52,9 @@ class JoinActivityLogsDPAE:
         return df_activity.astype(str)
 
     def set_most_recent_dpae_file(self):
-        self.most_recent_dpae_file = self.get_most_recent_dpae_file()
+        #self.most_recent_dpae_file = self.get_most_recent_dpae_file()
+        dpae_paths = os.listdir(self.dpae_folder_path)
+        return sorted([i for i in dpae_paths if i.startswith('lbb_xdpdpae_delta')])
         # FIXME : Remove this line to pass a specific dpae file for initialisation, we'll have to parse older DPAE files
         # self.most_recent_dpae_file = "lbb_xdpdpae_delta_201908102200.bz2"
 
@@ -207,11 +209,12 @@ class JoinActivityLogsDPAE:
 def run_main():
     join_act_log = JoinActivityLogsDPAE()
 
-    join_act_log.set_most_recent_dpae_file()
-    join_act_log.set_df_activity()
-    join_act_log.set_last_recorded_hiring_date()
+    for file_path in join_act_log.set_most_recent_dpae_file():
+        join_act_log.most_recent_dpae_file = file_path
+        join_act_log.set_df_activity()
+        join_act_log.set_last_recorded_hiring_date()
 
-    join_act_log.join_dpae_activity_logs()
+        join_act_log.join_dpae_activity_logs()
 
 
 if __name__ == '__main__':
