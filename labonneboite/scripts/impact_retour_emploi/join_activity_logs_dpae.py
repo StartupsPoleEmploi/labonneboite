@@ -17,6 +17,10 @@ from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
 # function used to create a new column from dateheure column in dpae
 
 
+list_files = [
+
+]
+
 def get_date(row):
     return row['kd_dateembauche'][:10]
 
@@ -54,7 +58,7 @@ class JoinActivityLogsDPAE:
     def set_most_recent_dpae_file(self):
         #self.most_recent_dpae_file = self.get_most_recent_dpae_file()
         dpae_paths = os.listdir(self.dpae_folder_path)
-        return sorted([i for i in dpae_paths if i.startswith('lbb_xdpdpae_delta')])
+        return ["LBB_XDPDPAE_2019-09-11_2018-08-01.bz2"] + sorted([i for i in dpae_paths if i.startswith('lbb_xdpdpae_delta')])
         # FIXME : Remove this line to pass a specific dpae file for initialisation, we'll have to parse older DPAE files
         # self.most_recent_dpae_file = "lbb_xdpdpae_delta_201908102200.bz2"
 
@@ -213,6 +217,7 @@ def run_main():
     join_act_log = JoinActivityLogsDPAE()
 
     for file_path in join_act_log.set_most_recent_dpae_file():
+        print(f"working file {file_path}")
         join_act_log.most_recent_dpae_file = file_path
         join_act_log.set_df_activity()
         join_act_log.set_last_recorded_hiring_date()
