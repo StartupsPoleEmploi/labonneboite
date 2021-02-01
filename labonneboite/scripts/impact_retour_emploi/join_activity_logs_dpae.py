@@ -209,19 +209,19 @@ class JoinActivityLogsDPAE:
             logger.info("\n-------------------------")
 
             i += 1
-
+        print(f"update date last recorded hiring {df_dpae_act['kd_dateembauche_bis'].max()}")
+        self.date_last_recorded_hiring = df_dpae_act['kd_dateembauche_bis'].max()
         return self.path_to_csv, df_dpae_act
 
 
 def run_main():
     join_act_log = JoinActivityLogsDPAE()
+    join_act_log.set_last_recorded_hiring_date()
 
     for file_path in join_act_log.set_most_recent_dpae_file():
         print(f"working file {file_path}")
         join_act_log.most_recent_dpae_file = file_path
         join_act_log.set_df_activity()
-        join_act_log.set_last_recorded_hiring_date()
-
         join_act_log.join_dpae_activity_logs()
 
 
