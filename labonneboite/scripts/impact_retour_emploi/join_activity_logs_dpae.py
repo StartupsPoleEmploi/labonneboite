@@ -190,7 +190,7 @@ class JoinActivityLogsDPAE:
             # filter on the fact that dateheure activity must be inferior to kd_dateembauche
             df_dpae_act = df_dpae_act[df_dpae_act.kd_dateembauche_bis > df_dpae_act.dateheure]
             logger.info(f"update date last recorded hiring {df_dpae_act['kd_dateembauche_bis'].max()}")
-            self.date_last_recorded_hiring = df_dpae_act['kd_dateembauche_bis'].max()
+            last_date_recording = df_dpae_act['kd_dateembauche_bis'].max()
             df_dpae_act = df_dpae_act.drop(['kd_dateembauche_bis'], axis=1)
             nb_rows = df_dpae_act.shape[0]
             logger.info(f"Sample of merged activity/DPAE with the good dates has : {nb_rows} rows")
@@ -211,7 +211,8 @@ class JoinActivityLogsDPAE:
             logger.info("\n-------------------------")
 
             i += 1
-
+        logger.info(f"update date last recorded hiring {last_date_recording}")
+        self.date_last_recorded_hiring = last_date_recording
         return self.path_to_csv, df_dpae_act
 
 
