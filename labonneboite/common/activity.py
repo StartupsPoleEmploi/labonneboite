@@ -36,6 +36,7 @@ def log(event_name, user=None, source=None, **properties):
     data['idutilisateur'] = user.id if user else None
     data['idutilisateur-peconnect'] = user.external_id if user else None
     data['url'] = request.full_path if has_request_context() else None
+    data['args'] = request.args.copy() if has_request_context() else None
     data['proprietes'] = properties
     userLogger.info(json.dumps(data))
 
