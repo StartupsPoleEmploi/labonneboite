@@ -153,7 +153,7 @@ class JoinActivityLogsDPAE:
         total_dpae_rows_used = 0
 
         self.path_to_csv = self.get_path_to_saved_csv()
-
+        last_date_recording = self.date_last_recorded_hiring
         for df_dpae in pd.read_csv(self.dpae_folder_path + self.most_recent_dpae_file,
                                    header=None,
                                    compression=self.get_compression_to_use_by_pandas_according_to_file(),
