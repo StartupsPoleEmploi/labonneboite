@@ -58,7 +58,7 @@ class JoinActivityLogsDPAE:
     def set_most_recent_dpae_file(self):
         #self.most_recent_dpae_file = self.get_most_recent_dpae_file()
         dpae_paths = os.listdir(self.dpae_folder_path)
-        return ["LBB_XDPDPAE_2019-09-11_2018-08-01.bz2"] + sorted([i for i in dpae_paths if i.startswith('lbb_xdpdpae_delta')])
+        return sorted([i for i in dpae_paths if i.startswith('lbb_xdpdpae_delta')])
         # FIXME : Remove this line to pass a specific dpae file for initialisation, we'll have to parse older DPAE files
         # self.most_recent_dpae_file = "lbb_xdpdpae_delta_201908102200.bz2"
 
@@ -190,7 +190,8 @@ class JoinActivityLogsDPAE:
             # filter on the fact that dateheure activity must be inferior to kd_dateembauche
             df_dpae_act = df_dpae_act[df_dpae_act.kd_dateembauche_bis > df_dpae_act.dateheure]
             logger.info(f"update date last recorded hiring {df_dpae_act['kd_dateembauche_bis'].max()}")
-            last_date_recording = df_dpae_act['kd_dateembauche_bis'].max()
+            if not pd.isna(df_dpae_act['kd_dateembauche_bis'].max()):
+                last_date_recording = df_dpae_act['kd_dateembauche_bis'].max()
             df_dpae_act = df_dpae_act.drop(['kd_dateembauche_bis'], axis=1)
             nb_rows = df_dpae_act.shape[0]
             logger.info(f"Sample of merged activity/DPAE with the good dates has : {nb_rows} rows")
