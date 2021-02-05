@@ -157,7 +157,6 @@ def ask_recruiter_pe_connect():
         siret=request.args.get('siret', ''),
         action_name=action_name,
         title=title,
-        custom_ga_pageview='/recruteur/%s/connexion' % action_name,
     )
 
 
@@ -226,7 +225,6 @@ def change_info():
         use_lba_template=is_recruiter_from_lba(),
         show_disclaimer=True,
         hide_return=True,
-        custom_ga_pageview='/recruteur/%s/identification' % action_name,
     )
 
 
@@ -236,7 +234,6 @@ def ask_action():
         title='Que voulez-vous faire ?',
         use_lba_template=is_recruiter_from_lba(),
         siret=request.args.get('siret', ''),
-        custom_ga_pageview='/recruteur/choix-action',
     )
 
 
@@ -295,7 +292,6 @@ def update_coordinates_form():
 
             params = request.args.to_dict()
             params.update({
-                'custom_ga_pageview': '/recruteur/update_coordinates/success',
                 'suggest_update_jobs': '1',
             })
             return redirect(url_for('contact_form.success', **params))
@@ -307,7 +303,6 @@ def update_coordinates_form():
         use_lba_template=is_recruiter_from_lba(),
         show_entreprise_page=True,
         show_coordinates_disclaimer=True,
-        custom_ga_pageview='/recruteur/update_coordinates/update_coordinates',
     )
 
 
@@ -365,7 +360,6 @@ def update_jobs_form():
 
         params = request.args.to_dict()
         params.update({
-            'custom_ga_pageview': '/recruteur/update_jobs/success',
             'suggest_update_coordinates': '1',
         })
         return redirect(url_for('contact_form.success', **params))
@@ -386,7 +380,6 @@ def update_jobs_form():
         params=urlencode(get_office_identification_data()),
         use_lba_template=is_recruiter_from_lba(),
         extra_added_jobs=extra_added_jobs,
-        custom_ga_pageview='/recruteur/update_jobs/update_jobs',
     )
 
 
@@ -409,9 +402,6 @@ def delete_form():
         sendMail(mail_content=mail_content, subject=get_subject())
 
         params = request.args.to_dict()
-        params.update({
-            'custom_ga_pageview': '/recruteur/delete/success',
-        })
         return redirect(url_for('contact_form.success', **params))
 
     return render_template('contact_form/form.html',
@@ -419,7 +409,6 @@ def delete_form():
         form=form,
         params=urlencode(get_office_identification_data()),
         use_lba_template=is_recruiter_from_lba(),
-        custom_ga_pageview='/recruteur/delete/delete',
     )
 
 
@@ -442,9 +431,6 @@ def other_form():
         sendMail(mail_content=mail_content, subject=get_subject())
 
         params = request.args.to_dict()
-        params.update({
-            'custom_ga_pageview': '/recruteur/other/success',
-        })
         return redirect(url_for('contact_form.success', **params))
 
     return render_template(
@@ -454,7 +440,6 @@ def other_form():
         params=urlencode(get_office_identification_data()),
         use_lba_template=is_recruiter_from_lba(),
         show_required_disclaimer=True,
-        custom_ga_pageview='/recruteur/other/other',
     )
 
 
@@ -475,5 +460,4 @@ def success():
         action_form_url=url_for('contact_form.ask_action', **request.args),
         suggest_update_coordinates='suggest_update_coordinates' in request.args,
         suggest_update_jobs='suggest_update_jobs' in request.args,
-        custom_ga_pageview=request.args.get('custom_ga_pageview'),
     )

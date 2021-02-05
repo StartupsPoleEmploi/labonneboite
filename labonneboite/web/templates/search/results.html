@@ -16,17 +16,9 @@
 {% block scripts %}
   {{ super() }}
   {% include "includes/map-scripts.html" %}
-  {% include "includes/doorbell.html" %}
 {% endblock %}
 
 {% block content %}
 {% include 'search/results_content.html' %}
 {% endblock %}
 
-{% block footer_scripts %}
-  <script>
-    ga('set', 'dimension3', "{{ city_name }}");
-    ga('set', 'dimension4', "{{ rome_description }}");
-    ga('set', 'dimension5', "{{ distance }}");
-  </script>
-{% endblock %}

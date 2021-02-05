@@ -150,12 +150,9 @@ MAILJET_API_SECRET = '<set it>'
 TO_EMAIL = '<set it>' # this was named `FORM_EMAIL`, but it is confusing
 FROM_EMAIL = '<set it>'
 
-# GA/GO snippets are only useful in production and staging,
-# we use dummy values everywhere else
-GOOGLE_ANALYTICS_ID = 'UA-00000000-0'
-SEO_GOOGLE_ANALYTICS_ID = 'UA-00000000-1'
-ENABLE_GOOGLE_OPTIMIZE = False
-GOOGLE_OPTIMIZE_ID = 'GTM-AAAA00A'
+# URL of a script to load for tag management
+# Leave blank to disable
+TAG_MANAGER_URL = ''
 
 MEMO_JS_URL = 'https://memo.pole-emploi.fr/js/importButton/memoButtonLBB-min.js'
 API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
@@ -167,14 +164,6 @@ JEPOSTULE_CLIENT_ID = '<set it>'
 JEPOSTULE_CLIENT_SECRET = '<set it>'
 JEPOSTULE_BETA_EMAILS = []
 JEPOSTULE_QUOTA = 0
-
-# Tilkee parameters: credentials are provided by the Tilkee tech team
-TILKEE_ENABLED = False
-TILKEE_API_BASE_URL = 'https://api.tilkee.com'
-TILKEE_VERIFY_SSL = True
-TILKEE_ACCESS_TOKEN = '<set it>'
-TILKEE_X_REF = '<set it>'
-TILKEE_COMPANY_ID = '<set it>'
 
 # Google site verification code - for linking with Google Search Console
 GOOGLE_SITE_VERIFICATION_CODE = None

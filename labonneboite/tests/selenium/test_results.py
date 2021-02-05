@@ -32,12 +32,6 @@ class TestResults(LbbSeleniumTestCase):
             memo_button_close_button[0].click()
             time.sleep(0.5)
 
-        # Hide RGPD modal if present.
-        rgpd_accept_button = self.driver.find_elements_by_class_name('rgpd-accept')
-        if rgpd_accept_button:
-            rgpd_accept_button[0].click()
-            time.sleep(0.5)
-
         toggle_details = self.driver.find_elements_by_class_name('js-result-toggle-details')[0]
         time.sleep(0.5)
 

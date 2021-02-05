@@ -6,7 +6,6 @@ from flask import abort, send_from_directory, redirect, render_template, request
 from flask_login import current_user
 
 from labonneboite.common import activity
-from labonneboite.common import doorbell
 from labonneboite.common import pro
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.conf import settings
@@ -40,10 +39,7 @@ def static_from_root():
 
 @rootBlueprint.route('/espace-presse')
 def press():
-    context = {
-        'doorbell_tags': doorbell.get_tags('press'),
-    }
-    return render_template('root/press.html', **context)
+    return render_template('root/press.html')
 
 @rootBlueprint.route('/accessibilite')
 def accessibility():
@@ -52,18 +48,12 @@ def accessibility():
 
 @rootBlueprint.route('/comment-faire-une-candidature-spontanee')
 def lbb_help():
-    context = {
-        'doorbell_tags': doorbell.get_tags('help'),
-    }
-    return render_template('root/help.html', **context)
+    return render_template('root/help.html')
 
 
 @rootBlueprint.route('/faq')
 def faq():
-    context = {
-        'doorbell_tags': doorbell.get_tags('faq'),
-    }
-    return render_template('root/faq.html', **context)
+    return render_template('root/faq.html')
 
 
 @rootBlueprint.route('/conditions-generales')

@@ -10,7 +10,6 @@ from flask_login import current_user
 from labonneboite.common import activity
 from labonneboite.common import autocomplete
 from labonneboite.common import geocoding
-from labonneboite.common import doorbell
 from labonneboite.common import pro
 from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
@@ -435,7 +434,6 @@ def entreprises():
         'companies_per_page': pagination.OFFICES_PER_PAGE,
         'company_count': office_count,
         'distance': fetcher.distance,
-        'doorbell_tags': doorbell.get_tags('results'),
         'form': form,
         'headcount': fetcher.headcount,
         'job_doesnt_exist': False,
