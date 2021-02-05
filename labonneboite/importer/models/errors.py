@@ -1,0 +1,2 @@
+class DoublonException(Exception):
+    pass

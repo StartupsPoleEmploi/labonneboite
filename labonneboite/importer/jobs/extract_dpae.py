@@ -21,10 +21,10 @@ from labonneboite.importer.models.computing import DpaeStatistics, ImportTask, H
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 from labonneboite.common.database import db_session
-
+from labonneboite.importer.models.errors import DoublonException
 
 class DpaeExtractJob(Job):
-    file_type = "dpae"
+    file_type = DpaeStatistics.DPAE
     import_type = ImportTask.DPAE
     table_name = settings.HIRING_TABLE
 
@@ -36,6 +36,7 @@ class DpaeExtractJob(Job):
 
     @timeit
     def run_task(self):
+        date_insertion = datetime.now()
         logger.info("extracting %s ", self.input_filename)
         # this pattern matches the first date
         # e.g. 'lbb_xdpdpae_delta_201611102200.bz2'
@@ -63,9 +64,10 @@ class DpaeExtractJob(Job):
                 iiann,
                 tranche_age,
                 handicap_label,
-                duree_pec
+                duree_pec,
+                date_insertion
                 )
-            values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
+            values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
         """ % settings.HIRING_TABLE
         imported_dpae = 0
         imported_dpae_distribution = {}
@@ -135,6 +137,7 @@ class DpaeExtractJob(Job):
                         tranche_age,
                         handicap_label,
                         duree_pec,
+                        date_insertion
                     )
                     statements.append(statement)
                     imported_dpae += 1
@@ -166,7 +169,13 @@ class DpaeExtractJob(Job):
             raise IOError('too many zipcode errors')
         if self.invalid_row_errors > settings.MAXIMUM_INVALID_ROWS:
             raise IOError('too many invalid_row errors')
-
+        logger.info("verifying good number of dpae imported.")
+        query = "select count(*) from hirings h where hiring_date > %s and hiring_date <= %s and h.contract_type in (1,2,3)"
+        cur.execute(query, [last_historical_data_date_in_db, self.last_historical_data_date_in_file])
+        res = cur.fetchone()
+        if res[0] != imported_dpae:
+            raise DoublonException(f"Too many DPAE ({res[0]}) in DB compared to DPAE file ({imported_dpae}).")
+        logger.info("verifying number of DPAE: OK.")
         con.commit()
         cur.close()
         con.close()

@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime, Text, ForeignKey, Boolean
+from sqlalchemy import Column, Index, Integer, BigInteger, String, Float, DateTime, Text, ForeignKey, Boolean, Date
 from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 
@@ -55,6 +55,7 @@ class Hiring(CRUDMixin, Base):
     age_group = Column('tranche_age', String(191))
     handicap_label = Column(String(191))
     duree_pec = Column(Integer, nullable=True)
+    date_insertion = Column(DateTime, nullable=True)
 
     def __str__(self):
         return '%s %s' % (self.siret, self.hiring_date)

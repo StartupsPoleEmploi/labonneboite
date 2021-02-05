@@ -26,7 +26,6 @@ from labonneboite.common.database import db_session
 
 
 class ApprentissageExtractJob(Job):
-    file_type_apprentissage = "lba-app"
     import_type = ImportTask.APPRENTISSAGE
     table_name = settings.HIRING_TABLE
 
@@ -135,27 +134,28 @@ class ApprentissageExtractJob(Job):
                 #      and hiring_date <= self.last_historical_data_date_in_file
                 #)
 
-                statement = (
-                    siret,
-                    hiring_date,
-                    self.contract_type,
-                    departement,
-                    None, #contract_duration
-                    None, #iiann
-                    None, #tranche_age
-                    None, #handicap_label
-                    None  #duree_pec
-                )
-                statements.append(statement)
-                imported_alternance_contracts += 1
+                if hiring_date <= self.last_historical_data_date_in_file:
+                    statement = (
+                        siret,
+                        hiring_date,
+                        self.contract_type,
+                        departement,
+                        None, #contract_duration
+                        None, #iiann
+                        None, #tranche_age
+                        None, #handicap_label
+                        None  #duree_pec
+                    )
+                    statements.append(statement)
+                    imported_alternance_contracts += 1
 
-                if hiring_date.year not in imported_alternance_contracts_distribution:
-                    imported_alternance_contracts_distribution[hiring_date.year] = {}
-                if hiring_date.month not in imported_alternance_contracts_distribution[hiring_date.year]:
-                    imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month] = {}
-                if hiring_date.day not in imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month]:
-                    imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month][hiring_date.day] = 0
-                imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month][hiring_date.day] += 1
+                    if hiring_date.year not in imported_alternance_contracts_distribution:
+                        imported_alternance_contracts_distribution[hiring_date.year] = {}
+                    if hiring_date.month not in imported_alternance_contracts_distribution[hiring_date.year]:
+                        imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month] = {}
+                    if hiring_date.day not in imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month]:
+                        imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month][hiring_date.day] = 0
+                    imported_alternance_contracts_distribution[hiring_date.year][hiring_date.month][hiring_date.day] += 1
 
         # run remaining statements
         try:
