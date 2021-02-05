@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from datetime import datetime
+from urllib.parse import urlparse, parse_qs
 import json
 import logging
 import socket
@@ -26,6 +27,25 @@ userLogger.addHandler(settings.LOGGING_HANDLER_USER_ACTIVITY)
 def log(event_name, user=None, source=None, **properties):
     if not user and current_user and not current_user.is_anonymous:
         user = current_user
+
+    if has_request_context():
+        # When we log in the context of an ajax call, e.g. 'detail entreprise',
+        #   the params of the search are not present in the URL,
+        #   so we log the params in the query string of the referrer
+        if request.is_xhr:
+            # Parse the referrer URL
+            referrer = urlparse(request.referrer)
+            # Parse the query to get all the params as key => [...values] pairs
+            referrerArgs = parse_qs(referrer.query)
+            # Flatten the values to get key => value pairs when possible
+            args = {key: values[0] if len(values) == 1 else values for key, values in referrerArgs.items()}
+            # Merge the referrer params with the request params
+            args.update(request.args)
+        else:
+            args = request.args.copy()
+    else:
+        args = None
+
     source = source or 'site'
 
     data = OrderedDict()
@@ -36,6 +56,7 @@ def log(event_name, user=None, source=None, **properties):
     data['idutilisateur'] = user.id if user else None
     data['idutilisateur-peconnect'] = user.external_id if user else None
     data['url'] = request.full_path if has_request_context() else None
+    data['args'] = args
     data['proprietes'] = properties
     userLogger.info(json.dumps(data))
 
