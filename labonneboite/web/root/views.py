@@ -21,10 +21,6 @@ def home():
     fix_csrf_session()
     activity.log(
         event_name='home',
-        # GA tracking is used in PSE 2019-2020 experiment
-        utm_medium=request.args.get('utm_medium', ''),
-        utm_source=request.args.get('utm_source', ''),
-        utm_campaign=request.args.get('utm_campaign', ''),
     )
 
     refresh_token_result = attempt_to_refresh_peam_token()
