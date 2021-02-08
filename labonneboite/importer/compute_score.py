@@ -610,13 +610,14 @@ def compare_new_scores_to_old_ones(departement, df_etab):
 @timeit
 def run(
         departement,
-        prediction_beginning_date=compute_prediction_beginning_date(),
+        prediction_beginning_date=None,
         return_df_etab_if_successful=False,
     ):
     """
     Returns True if computation successful and False otherwise.
     """
-
+    if prediction_beginning_date is None:
+        prediction_beginning_date = compute_prediction_beginning_date()
     check_prediction_beginning_date(prediction_beginning_date)
     # get df_etab with monthly hirings for each hiring_type
     # hirings are not yet grouped by period (i.e. 6 months for DPAE / 6 months for Alternance)
