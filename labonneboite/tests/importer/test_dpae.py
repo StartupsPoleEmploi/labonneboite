@@ -1,7 +1,8 @@
 from labonneboite.importer.jobs import check_dpae
 from labonneboite.importer.jobs import extract_dpae
-from labonneboite.importer.models.computing import Hiring
+from labonneboite.importer.models.computing import Hiring, ImportTask, DpaeStatistics
 from labonneboite.importer.util import get_departement_from_zipcode
+from labonneboite.importer.models.errors import DoublonException
 from .test_base import DatabaseTest
 
 FIRST_DPAE_FILE_NAME = "lbb_xdpdpae_delta_201611102200.csv"
@@ -20,6 +21,8 @@ class TestDpae(DatabaseTest):
         task = extract_dpae.DpaeExtractJob(filename)
         task.run()
         self.assertEqual(Hiring.query.count(), 6)
+        # check if date_insertion is filled
+        self.assertEqual(Hiring.query.filter(Hiring.date_insertion == None).count(), 0)
 
     def test_extract_dpae_two_files_diff(self):
         # Second file contains one record from the future
@@ -30,7 +33,22 @@ class TestDpae(DatabaseTest):
         self.assertEqual(Hiring.query.count(), 6)
         task = extract_dpae.DpaeExtractJob(filename_second_month)
         task.run()
-        self.assertEqual(Hiring.query.count(), 6+5)
+        # change 6+5 to 6+2, only 2 dpae is between 10/11/2016 and 10/12/2016 in SECOND_DPAE_FILE_NAME
+        self.assertEqual(Hiring.query.count(), 6+2)
+
+    def test_verify_right_number_dpae(self):
+        self.assertEqual(Hiring.query.count(), 0)
+        filename = self.get_data_file_path(FIRST_DPAE_FILE_NAME)
+        task = extract_dpae.DpaeExtractJob(filename)
+        task.run()
+        self.assertEqual(Hiring.query.count(), 6)
+        # delete the file in the registry to simulate if importer job crash before regitring the file
+        ImportTask.query.filter(ImportTask.filename == FIRST_DPAE_FILE_NAME).delete()
+        DpaeStatistics.query.order_by(DpaeStatistics.most_recent_data_date.desc()).first().delete()
+        task = extract_dpae.DpaeExtractJob(filename)
+        with self.assertRaises(DoublonException):
+           task.run()
+        self.assertEqual(Hiring.query.count(), 6)
 
     def test_extract_departement(self):
         departement = get_departement_from_zipcode("6600")

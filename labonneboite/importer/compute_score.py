@@ -37,6 +37,7 @@ from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
 import sqlalchemy
 from sqlalchemy.pool import NullPool
+from sqlalchemy import func
 from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import DpaeStatistics, Hiring, RawOffice
@@ -300,7 +301,10 @@ def compute_prediction_beginning_date():
     """
     We predict hirings starting from the 1st of the current month.
     """
-    now = datetime.now()
+    # foo
+    dpae_statistics = DpaeStatistics.query.filter(DpaeStatistics.file_type==DpaeStatistics.DPAE)\
+        .order_by(DpaeStatistics.most_recent_data_date.desc()).first()
+    now = dpae_statistics.most_recent_data_date
     prediction_beginning_date = now.replace(day=1)  # get 1st of the month
     logger.info("prediction_beginning_date = %s", prediction_beginning_date)
     return prediction_beginning_date
@@ -606,13 +610,14 @@ def compare_new_scores_to_old_ones(departement, df_etab):
 @timeit
 def run(
         departement,
-        prediction_beginning_date=compute_prediction_beginning_date(),
+        prediction_beginning_date=None,
         return_df_etab_if_successful=False,
     ):
     """
     Returns True if computation successful and False otherwise.
     """
-
+    if prediction_beginning_date is None:
+        prediction_beginning_date = compute_prediction_beginning_date()
     check_prediction_beginning_date(prediction_beginning_date)
     # get df_etab with monthly hirings for each hiring_type
     # hirings are not yet grouped by period (i.e. 6 months for DPAE / 6 months for Alternance)

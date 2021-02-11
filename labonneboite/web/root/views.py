@@ -6,7 +6,6 @@ from flask import abort, send_from_directory, redirect, render_template, request
 from flask_login import current_user
 
 from labonneboite.common import activity
-from labonneboite.common import doorbell
 from labonneboite.common import pro
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.conf import settings
@@ -21,10 +20,6 @@ def home():
     fix_csrf_session()
     activity.log(
         event_name='home',
-        # GA tracking is used in PSE 2019-2020 experiment
-        utm_medium=request.args.get('utm_medium', ''),
-        utm_source=request.args.get('utm_source', ''),
-        utm_campaign=request.args.get('utm_campaign', ''),
     )
 
     refresh_token_result = attempt_to_refresh_peam_token()
@@ -44,10 +39,7 @@ def static_from_root():
 
 @rootBlueprint.route('/espace-presse')
 def press():
-    context = {
-        'doorbell_tags': doorbell.get_tags('press'),
-    }
-    return render_template('root/press.html', **context)
+    return render_template('root/press.html')
 
 @rootBlueprint.route('/accessibilite')
 def accessibility():
@@ -56,18 +48,12 @@ def accessibility():
 
 @rootBlueprint.route('/comment-faire-une-candidature-spontanee')
 def lbb_help():
-    context = {
-        'doorbell_tags': doorbell.get_tags('help'),
-    }
-    return render_template('root/help.html', **context)
+    return render_template('root/help.html')
 
 
 @rootBlueprint.route('/faq')
 def faq():
-    context = {
-        'doorbell_tags': doorbell.get_tags('faq'),
-    }
-    return render_template('root/faq.html', **context)
+    return render_template('root/faq.html')
 
 
 @rootBlueprint.route('/conditions-generales')

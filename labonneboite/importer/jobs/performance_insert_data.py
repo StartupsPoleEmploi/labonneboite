@@ -36,7 +36,7 @@ def get_available_files_list(path_folder=settings.BACKUP_OUTPUT_FOLDER):
     for file in backup_files_list:
         file_name = os.path.basename(file)
         logger.info(f"file to check : {file_name}")
-        if PerfImporterCycleInfos.query.filter(PerfImporterCycleInfos.file_name == file_name).count() == 0:
+        if PerfImporterCycleInfos.query.filter(PerfImporterCycleInfos.file_name.ilike(f"%{file_name}%")).count() == 0:
             file_list_not_parsed_yet.append(file)
             logger.info(f"file {file_name} not parsed yet")
         else:
@@ -186,7 +186,7 @@ def compute_effective_and_predicted_hirings():
     importer_cycles_infos = PerfImporterCycleInfos.query.filter(PerfImporterCycleInfos.computed == False).all()
     importer_cycles_infos_to_compute = []
     for ici in importer_cycles_infos:
-        if os.environ["LBB_ENV"] == "development":
+        if os.environ["LBB_ENV"] in ["development", "test"]:
             importer_cycles_infos_to_compute.append(ici)
             continue
         if ici.prediction_end_date < datetime.now():
@@ -267,9 +267,9 @@ def compute_effective_and_predicted_hirings():
         values_to_update = df_merged.values.tolist()
         count = 0
 
+        updated_ppaeh = []
         for row in values_to_update:
             row_id = row[0]
-            #import ipdb;ipdb.set_trace()
             siret = row[1]
             naf = row[2]
             params = dict(zip(["lbb_nb_effective_hirings", "lba_nb_effective_hirings", "lbb_nb_predicted_hirings",
@@ -278,8 +278,11 @@ def compute_effective_and_predicted_hirings():
             lba_nb_predicted_hirings_score = row[8]
             # foo
             pred_effective_hirings = dict_ppaeh[row_id]
+            updated_values = {
+                "_id": row_id
+            }
             for key, val in params.items():
-                setattr(pred_effective_hirings, key, int(val))
+                updated_values[key] = val
             is_a_bonne_boite = False
             is_a_bonne_alternance = False
 
@@ -309,18 +312,22 @@ def compute_effective_and_predicted_hirings():
                 nb_companies_with_naf_not_found += 1
             pred_effective_hirings.is_a_bonne_boite = is_a_bonne_boite
             pred_effective_hirings.is_a_bonne_alternance = is_a_bonne_alternance
+            updated_values["is_a_bonne_boite"] = is_a_bonne_boite
+            updated_values["is_a_bonne_alternance"] = is_a_bonne_alternance
 
-            db_session.add(pred_effective_hirings)
-
-            # Commit all the 10 000 transactions
-            if count % 10000 == 0:
-                logger.info(f"{count} companies have been treated")
-                db_session.commit()
-
+            updated_ppaeh.append(updated_values)
             count += 1
+            # Commit all the 10 000 transactions
+            if len(updated_ppaeh) % 100000 == 0:
+                logger.info(f"{count} companies have been treated")
+                db_session.bulk_update_mappings(PerfPredictionAndEffectiveHirings, updated_ppaeh)
+                db_session.commit()
+                updated_ppaeh = []
 
         # Commit for the remaining rows
+        db_session.bulk_update_mappings(PerfPredictionAndEffectiveHirings, updated_ppaeh)
         db_session.commit()
+        updated_ppaeh = []
 
         logger.info(f"Number of naf not found in the mapping rome naf for this importer cycle : {len(naf_not_founds)}")
         logger.info(f"List of naf not found in the mapping rome naf for this importer cycle : {naf_not_founds}")
