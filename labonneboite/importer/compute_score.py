@@ -42,7 +42,7 @@ from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import DpaeStatistics, Hiring, RawOffice
 from labonneboite.common import scoring as scoring_util
-from labonneboite.common.database import get_db_string
+from labonneboite.common.database import get_db_string, engine
 from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
 from .debug import listen
 from .jobs.common import logger
@@ -50,7 +50,7 @@ from .jobs.common import logger
 listen()
 
 def get_engine():
-    return sqlalchemy.create_engine(get_db_string(), poolclass=NullPool)
+    return engine
 
 # Output additional debug info about these sirets
 # To disable, set to an empty list []
