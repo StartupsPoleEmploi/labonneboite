@@ -32,7 +32,7 @@ COMPUTE_SCORES_DEBUG_DEPARTEMENTS = ["90"]
 
 # If parallel computing is enabled, you cannot use debugger like ipdb from
 # within a job.
-DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING = True
+DISABLE_PARALLEL_COMPUTING_FOR_DEBUGGING = False
 
 
 def apply_async(pool, func, departement):
