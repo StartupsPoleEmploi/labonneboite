@@ -35,7 +35,6 @@ def get_db_string(db_params=None):
 
 pool_recycle = int(os.environ.get("DB_CONNECTION_TIMEOUT", "30"))
 connect_timeout = int(os.environ.get("CONNECT_TIMEOUT", "5"))
-wait_timeout = int(os.environ.get("WAIT_TIMEOUT", "300"))
 ENGINE_PARAMS = {
     'convert_unicode': True,
     'echo': False,
@@ -43,7 +42,6 @@ ENGINE_PARAMS = {
     'connect_args': {
         'connect_timeout': connect_timeout
     },
-    "wait_timeout": wait_timeout
 }
 
 engine = create_engine(get_db_string(), **ENGINE_PARAMS)
