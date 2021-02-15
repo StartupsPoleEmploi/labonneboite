@@ -50,7 +50,7 @@ from .jobs.common import logger
 listen()
 
 def get_engine():
-    return engine
+    return sqlalchemy.create_engine(get_db_string(), poolclass=NullPool)
 
 # Output additional debug info about these sirets
 # To disable, set to an empty list []
