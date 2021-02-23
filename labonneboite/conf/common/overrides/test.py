@@ -9,11 +9,11 @@ ES_INDEX = 'labonneboite_unit_test'
 ES_TIMEOUT = int(os.environ.get('ES_TIMEOUT', 60)) or None
 
 DB_HOST = os.environ.get('DB_HOST', '127.0.0.1')
-DB_PORT = int(os.environ.get('DB_PORT', 3307))
+DB_PORT = int(os.environ.get('DB_PORT', 3306))
 DB_NAME = os.environ.get('DB_NAME', 'lbb_test')
 DB_USER = os.environ.get('DB_USER', 'lbb_test')
 DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
-REDIS_HOST = 'incorrecthost'
+print('starting DB with', DB_HOST, DB_PORT, DB_USER, DB_NAME)
 
 LOG_LEVEL_USER_ACTIVITY = logging.ERROR
 

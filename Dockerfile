@@ -18,6 +18,8 @@ RUN apt update && \
         libssl-dev \
         # scipy
         gfortran libblas-dev liblapack-dev libatlas-base-dev \
+        # for test
+        chromium-chromedriver \
     && pip3 install virtualenv
 
 # Install python requirements

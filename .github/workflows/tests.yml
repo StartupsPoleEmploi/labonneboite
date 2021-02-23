@@ -1,0 +1,26 @@
+on: [push]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: app_name.settings.dev
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      PORT: 8000
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Start test containers
+      run: make ci-test-up
+    - name: Check running containers
+      run: docker ps -a
+    - name: Check logs
+      run: docker logs backend
+    - name: Installation of LBB
+      run: docker exec labonneboite make 
+    - name: Run test suite
+      run: make ci-test-run
+    - name: Stop test containers
+      run: make ci-test-down

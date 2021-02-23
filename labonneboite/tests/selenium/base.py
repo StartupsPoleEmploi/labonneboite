@@ -52,7 +52,7 @@ class LbbSeleniumTestCase(LiveServerTestCase):
             # headless display server such as Xvfb is highly non-trivial. In
             # those cases, we just run Chrome. It's fun and allows the user to
             # view the tests running in real time.
-            print("Xvfb is not available. Running selenium tests in non-virtual display.")
+            print("Warning: Xvfb is not available. Running selenium tests in non-virtual display.")
 
         # Chromedriver is often in /usr/lib/chromium-browser/chromedriver
         chromedriver_path = distutils.spawn.find_executable('chromedriver')
@@ -66,9 +66,11 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         capabilities['loggingPrefs'] = {'browser': 'ALL'}
 
         chrome_options = Options()
-        #chrome_options.add_argument("--disable-extensions")
-        #chrome_options.add_argument("--disable-gpu")
+        # chrome_options.add_argument("--disable-extensions")
+        # chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
+        # chrome_options.add_argument("--disable-dev-shm-usage")
 
         self.driver = webdriver.Chrome(
             desired_capabilities=capabilities,

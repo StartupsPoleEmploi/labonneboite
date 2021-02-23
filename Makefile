@@ -15,42 +15,44 @@ services:
 
 # Launch services and wait until mysql is ready.
 # Wait only if /var/lib/mysql folder is not present yet.
-init-services: services
+init-services: services wait-services
+
+wait-services:
 	cd docker && docker-compose run mysql stat /var/lib/mysql >/dev/null || until docker-compose logs mysql | grep "MySQL init process done. Ready for start up."; do echo "waiting for mysql initialization..."; sleep 4; done
 
 database: database-dev database-test
 
 database-dev: services
-	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS labonneboite DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
-	mysql -u root --host 127.0.0.1 --port 3307 -e 'GRANT ALL ON labonneboite.* TO "labonneboite"@"%" IDENTIFIED BY "labonneboite";'
+	mysql -u root --host 127.0.0.1 --port 3306 -e 'CREATE DATABASE IF NOT EXISTS labonneboite DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
+	mysql -u root --host 127.0.0.1 --port 3306 -e 'GRANT ALL ON labonneboite.* TO "labonneboite"@"%" IDENTIFIED BY "labonneboite";'
 
 database-test: services
-	mysql -u root --host 127.0.0.1 --port 3307 -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
-	mysql -u root --host 127.0.0.1 --port 3307 -e 'GRANT ALL ON lbb_test.* TO "lbb_test"@"%" IDENTIFIED BY "";'
+	mysql -u root --host 127.0.0.1 --port 3306 -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
+	mysql -u root --host 127.0.0.1 --port 3306 -e 'GRANT ALL ON lbb_test.* TO "lbb_test"@"%" IDENTIFIED BY "";'
 
 data: database alembic-migrate populate-data-dev
 
 populate-data-dev:
-	mysql -u root --host 127.0.0.1 --port 3307 labonneboite < ./labonneboite/alembic/sql/etablissements.sql
+	mysql -u root --host 127.0.0.1 --port 3306 labonneboite < ./labonneboite/alembic/sql/etablissements.sql
 	LBB_ENV=development python ./labonneboite/scripts/create_index.py --full
 
 populate-data-test:
 	LBB_ENV=test alembic upgrade head
-	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
+	mysql -u root --host 127.0.0.1 --port 3306 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
 	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
 
 populate-data-test-selenium:
 	LBB_ENV=test alembic upgrade head
-	mysql -u root --host 127.0.0.1 --port 3307 lbb_test < ./labonneboite/alembic/sql/etablissements_tests_selenium.sql
+	mysql -u root --host 127.0.0.1 --port 3306 lbb_test < ./labonneboite/alembic/sql/etablissements_tests_selenium.sql
 	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
 
 clear-data: clear-data-dev clear-data-test
 
 clear-data-dev: services
-	mysql -u root --host 127.0.0.1 --port 3307 -e 'DROP DATABASE IF EXISTS labonneboite;'
+	mysql -u root --host 127.0.0.1 --port 3306 -e 'DROP DATABASE IF EXISTS labonneboite;'
 
 clear-data-test: services
-	mysql -u root --host 127.0.0.1 --port 3307 -e 'DROP DATABASE IF EXISTS lbb_test;'
+	mysql -u root --host 127.0.0.1 --port 3306 -e 'DROP DATABASE IF EXISTS lbb_test;'
 
 rebuild-data-dev : clear-data-dev database-dev alembic-migrate populate-data-dev
 
@@ -60,6 +62,44 @@ rebuild-data: rebuild-data-test rebuild-data-dev
 
 stop-services:
 	cd docker/ && docker-compose stop
+
+ci-test-wait:
+	cd docker && docker-compose -f docker-compose.yml -f docker-compose.tests.yml run mysql stat /var/lib/mysql >/dev/null || until docker-compose -f docker-compose.yml -f docker-compose.tests.yml logs mysql | grep "MySQL init process done. Ready for start up."; do echo "waiting for mysql initialization..."; sleep 4; done
+	echo "MySQL ready"
+
+ci-test-build:
+	cd docker && docker-compose -f docker-compose.yml -f docker-compose.tests.yml build
+
+ci-test-up:
+	cd docker/ && docker-compose -f docker-compose.yml -f docker-compose.tests.yml up -d --remove-orphans
+
+ci-test-create: ci-test-wait
+	# populate-data-test
+	mysql -u root --host 127.0.0.1 --port 3306 -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
+	mysql -u root --host 127.0.0.1 --port 3306 -e 'GRANT ALL ON lbb_test.* TO "lbb_test"@"%" IDENTIFIED BY "";'
+	LBB_ENV=test DB_HOST="127.0.0.1" DB_USER=root DB_TABLE=lbb_test alembic upgrade head
+	mysql -u root --host 127.0.0.1 --port 3306 lbb_test < ./labonneboite/alembic/sql/etablissements.sql
+	#cd labonneboite && LBB_ENV=test DB_HOST="127.0.0.1" DB_USER=root DB_TABLE=lbb_test python scripts/create_index.py --full
+
+ci-test-bash:
+	cd docker/ && docker-compose -f docker-compose.yml -f docker-compose.tests.yml exec labonneboite /bin/bash
+
+ci-test-down:
+	cd docker/ && docker-compose -f docker-compose.yml -f docker-compose.tests.yml down
+
+ci-test-run: ci-test-wait ci-test-run-unit ci-test-run-selenium ci-test-run-integration
+
+ci-test-run-unit:
+	cd docker && docker-compose -f docker-compose.yml -f docker-compose.tests.yml exec labonneboite /bin/bash -c "source /labonneboite/env/bin/activate && make test-unit"
+
+ci-test-run-one:
+	cd docker && docker-compose -f docker-compose.yml -f docker-compose.tests.yml exec labonneboite /bin/bash -c "source /labonneboite/env/bin/activate && LBB_ENV=test nosetests -s labonneboite/tests/selenium/test_simple.py"
+
+ci-test-run-selenium:
+	cd docker && docker-compose -f docker-compose.yml -f docker-compose.tests.yml exec labonneboite /bin/bash -c "source /labonneboite/env/bin/activate && LBB_ENV=test nosetests -s labonneboite/tests/selenium"
+
+ci-test-run-integration:
+	cd docker && docker-compose -f docker-compose.yml -f docker-compose.tests.yml exec labonneboite /bin/bash -c "source /labonneboite/env/bin/activate && LBB_ENV=test nosetests -s labonneboite/tests/integration"
 
 # Cleanup
 # -------
@@ -125,7 +165,7 @@ create-index-from-scratch-with-profiling-line-by-line:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && kernprof -v -l scripts/create_index.py --partial --profile
 
 mysql-local-shell:
-	mysql -u root --host 127.0.0.1 --port 3307 labonneboite
+	mysql -u root --host 127.0.0.1 --port 3306 labonneboite
 
 rebuild-simplified-rome-naf-mapping:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/rebuild_simplified_rome_naf_mapping.py
@@ -255,10 +295,10 @@ run-impact-retour-emploi-jobs:
 
 prepare-impact-retour-emploi-00:
 	export LBB_ENV=development && \
-		echo delete from logs_activity            | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		echo delete from logs_activity_recherche  | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		echo delete from logs_idpe_connect        | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		echo delete from logs_activity_dpae_clean | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from logs_activity            | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
+		echo delete from logs_activity_recherche  | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
+		echo delete from logs_idpe_connect        | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
+		echo delete from logs_activity_dpae_clean | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
 		rm labonneboite/importer/data/act_dpae-*.csv && \
 		echo "completed impact retour emploi run preparation."
 
@@ -295,13 +335,13 @@ run-importer-jobs:
 run-importer-job-00-prepare-all: alembic-migrate
 	export LBB_ENV=development && \
 		cd labonneboite/importer && \
-		echo delete from hirings                   | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		echo delete from import_tasks              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		echo delete from etablissements_raw        | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		echo delete from etablissements_backoffice | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		echo delete from etablissements_exportable | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
-		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307 && \
+		echo delete from hirings                   | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
+		echo delete from import_tasks              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
+		echo delete from etablissements_raw        | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
+		echo delete from etablissements_backoffice | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
+		echo delete from etablissements_exportable | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
+		echo delete from geolocations              | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
+		echo delete from dpae_statistics           | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306 && \
 		rm data/lbb_xdpdpae_delta_201611102200.csv data/lbb_etablissement_full_201612192300.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
 		cp ../tests/importer/data/lbb_xdpdpae_delta_201611102200.csv data/ && \
 		cp ../tests/importer/data/lbb_etablissement_full_201612192300.csv data/ && \
@@ -323,7 +363,7 @@ run-importer-job-04-extract-dpae:
 run-importer-job-04hack-create-fake-alternance-hirings:
 	export LBB_ENV=development && \
 		cd labonneboite/importer && \
-		cat scripts/create_fake_alternance_hirings.sql | mysql -u root -D labonneboite --host 127.0.0.1 --port 3307
+		cat scripts/create_fake_alternance_hirings.sql | mysql -u root -D labonneboite --host 127.0.0.1 --port 3306
 
 run-importer-job-04-check-lba:
 	export LBB_ENV=development && cd labonneboite/importer && python jobs/check_lba.py

@@ -20,22 +20,14 @@ services:
 
   mysql:
     image: mysql:5.6.36
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --bind-address=0.0.0.0
     #restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ''
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    expose:
+      - 3306
     ports:
-      - 3307:3306
+      - 3306:3306 # required for make data create-index
+      - 3307:3306 # required for normal docker access
 
-  redis:
-    image: redis:5
-    command: ["redis-server", "/redis.conf"]
-    ports:
-      - "6389:6389"
-    volumes:
-      - ./redis.conf:/redis.conf:ro
-      - redis:/data
-
-volumes:
-  redis:

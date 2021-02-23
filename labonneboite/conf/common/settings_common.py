@@ -123,11 +123,11 @@ ES_INDEX = 'labonneboite'
 # Set ES_TIMEOUT environment variable to 0 to remove ES timeouts entirely
 ES_TIMEOUT = int(os.environ.get('ES_TIMEOUT', 10)) or None
 ES_HOST = 'localhost:9200'
-DB_HOST = 'localhost'
+DB_HOST = 'mysql'
 DB_PORT = 3306
 DB_NAME = 'labonneboite'
-DB_USER = 'labonneboite'
-DB_PASSWORD = 'labonneboite'
+DB_USER = 'root'
+DB_PASSWORD = ''
 OFFICE_TABLE = 'etablissements'
 
 TILE_SERVER_URL = "http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}"

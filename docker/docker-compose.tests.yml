@@ -1,0 +1,22 @@
+version: "3"
+services:
+  labonneboite:
+    image: labonneboite:latest
+    container_name: labonneboite # used later on to attach and execute tests
+    build: ..
+    restart: unless-stopped
+    ports:
+      # todo: remove ports
+      - 8000:8000
+    links:
+      - elasticsearch
+      - mysql
+    depends_on:
+      - elasticsearch
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+    #volumes:
+    #  - ../:/labonneboite/src # share for debug
+

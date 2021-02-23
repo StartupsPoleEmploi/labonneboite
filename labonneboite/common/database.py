@@ -18,11 +18,11 @@ CURRENT_ENV = get_current_env()
 # -----------------------------------------------------------------------------
 
 DATABASE = {
-    'HOST': settings.DB_HOST,
-    'PORT': settings.DB_PORT,
-    'NAME': settings.DB_NAME,
-    'USER': settings.DB_USER,
-    'PASSWORD': settings.DB_PASSWORD,
+    'HOST': os.environ.get("DB_HOST", settings.DB_HOST),
+    'PORT': os.environ.get("DB_PORT", settings.DB_PORT),
+    'NAME': os.environ.get("DB_NAME", settings.DB_NAME),
+    'USER': os.environ.get("DB_USER", settings.DB_USER),
+    'PASSWORD': os.environ.get("DB_PASSWORD", settings.DB_PASSWORD),
 }
 
 def get_db_string(db_params=None):
