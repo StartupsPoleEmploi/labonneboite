@@ -44,6 +44,7 @@ ENABLE_TIMEIT_TIMERS = True
 
 SENTRY_DSN = None
 SENTRY_ENVIRONMENT = ""
+SENTRY_SAMPLE_RATE = 0.1 # set to 0 to disable sentry performance monitoring, @see https://docs.sentry.io/platforms/python/guides/flask/performance/#configure-the-sample-rate
 
 ADMIN_EMAIL = 'no-reply@labonneboite.pole-emploi.fr'
 LBB_EMAIL = 'labonneboite@pole-emploi.fr'

@@ -30,6 +30,7 @@ pip-tools
 pycallgraph
 pyprof2calltree
 line-profiler
+sentry-sdk>0.20.0
 
 # Databases and migrations.
 alembic
