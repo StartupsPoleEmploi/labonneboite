@@ -77,7 +77,8 @@ def activate_logging(flask_app):
         sentry_sdk.init(
             dsn=settings.SENTRY_DSN,
             integrations=[FlaskIntegration()],
-            traces_sample_rate=settings.SENTRY_SAMPLE_RATE
+            traces_sample_rate=settings.SENTRY_SAMPLE_RATE,
+            environment=settings.SENTRY_ENVIRONMENT
         )
         flask_app.logger.debug("sentry is enabled")
     else:
