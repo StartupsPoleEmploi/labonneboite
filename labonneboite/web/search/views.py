@@ -19,7 +19,7 @@ from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.common.util import get_enum_from_value
-from labonneboite.common.load_data import load_related_rome, load_related_rome_hide_suggestions
+from labonneboite.common.load_data import load_related_rome
 from labonneboite.web.utils import fix_csrf_session
 
 from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter
@@ -28,8 +28,8 @@ from labonneboite.web.search.forms import make_company_search_form
 
 
 searchBlueprint = Blueprint('search', __name__)
+
 RELATED_ROMES = load_related_rome() if settings.ENABLE_RELATED_ROMES else []
-RELATED_ROMES_HIDE_SUGGESTIONS = load_related_rome_hide_suggestions() if settings.ENABLE_RELATED_ROMES else []
 
 @searchBlueprint.route('/suggest_job_labels')
 def suggest_job_labels():
@@ -306,17 +306,19 @@ def entreprises():
         hide_suggestions = False
         if (named_location):
             related_city_codes = RELATED_ROMES.get(named_location.city_code, None)
-            if (rome in RELATED_ROMES_HIDE_SUGGESTIONS.get(named_location.city_code, [])):
+            if (related_city_codes):
+                # Hide suggestions for places which may have suggestions
                 hide_suggestions = True
-            if (related_city_codes and rome in related_city_codes):
-                related_romes = related_city_codes.get(rome)
-                # related_romes = list(map(add_nafs, related_romes))
-                related_romes = list(map(add_descriptions, related_romes))
-                # sort and limit size
-                related_romes.sort(key=lambda rome_: rome_.get('score'))
-                related_romes = related_romes[:settings.MAX_RELATED_ROMES]
-                if (len(related_romes) > 0):
-                    flash('Nouvelle fonctionnalité : Grâce aux nouveaux filtres, élargissez votre recherche aux métiers qui recrutent !', 'info')
+                if (rome in related_city_codes):
+                    # Case where there are suggestions for this rome and this location
+                    related_romes = related_city_codes.get(rome)
+                    # related_romes = list(map(add_nafs, related_romes))
+                    related_romes = list(map(add_descriptions, related_romes))
+                    # sort and limit size
+                    related_romes.sort(key=lambda rome_: rome_.get('score'))
+                    related_romes = related_romes[:settings.MAX_RELATED_ROMES]
+                    if (len(related_romes) > 0):
+                        flash('Nouvelle fonctionnalité : Grâce aux nouveaux filtres, élargissez votre recherche aux métiers qui recrutent !', 'info')
     else:
         related_romes = []
         hide_suggestions = False

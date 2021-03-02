@@ -123,24 +123,6 @@ def reduceRelateRomes(aggr, row):
     return aggr
 
 @lru_cache(maxsize=None)
-def load_related_rome_hide_suggestions():
-    """
-    Build a dict with department code (code insee) as keys.
-    The values are dict with rome code as keys and a list of related rome codes as values.
-    Each related rome is a dict with `rome` and `score` properties.
-    Used for PSE study.
-    """
-    rows = load_csv_file("rome_connexe_hide_suggestions.csv", delimiter=',')
-    return reduce(reduceRelateRomesHideSuggestions, rows, {})
-
-def reduceRelateRomesHideSuggestions(aggr, row):
-    [code_insee, rome] = row
-    entry_code_insee = aggr.get(code_insee, [])
-    entry_code_insee.append(rome)
-    aggr[code_insee] = entry_code_insee
-    return aggr
-
-@lru_cache(maxsize=None)
 def load_city_codes():
     rows = load_csv_file("city_codes.csv")
     commune_id_to_commune_name = load_rows_as_dict(rows)
