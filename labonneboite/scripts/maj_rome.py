@@ -16,7 +16,7 @@ def concat_rome_columns(row):
 
 
 def load_main_rome_arbo():
-    file_name = "common/data/arbo_rome_ogr_2020.csv"
+    file_name = "common/data/arbo_rome_ogr_2021.csv"
     df_main = pd.read_csv(file_name, delimiter=';')
     df_main['Rome'] = df_main.apply(lambda row: concat_rome_columns(row), axis=1)
 
@@ -83,7 +83,7 @@ def update_ogr_rome_mapping(df_main):
 
 
 def update_rome_naf_mapping(df_rome_labels):
-    df_rome_naf_mapping_old = pd.read_csv("common/data/rome_naf_mapping_2019.csv", delimiter=',')
+    df_rome_naf_mapping_old = pd.read_csv("common/data/rome_naf_mapping_2020.csv", delimiter=',')
     df_rome_naf_mapping = df_rome_naf_mapping_old.merge(df_rome_labels, on=('rome_id'), suffixes=('_old', '_new'))
     df_rome_naf_mapping = df_rome_naf_mapping[["rome_id", "rome_label_new", "naf_id", "naf_label", "hirings"]]
     df_rome_naf_mapping.rename(columns={'rome_label_new': 'rome_label'}, inplace=True)

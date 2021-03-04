@@ -5,7 +5,8 @@ import locale
 import logging
 
 # External packages.
-from raven.contrib.flask import Sentry
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 from social_core import exceptions as social_exceptions
 from social_flask_sqlalchemy.models import init_social
 from werkzeug.contrib.fixers import ProxyFix
@@ -73,7 +74,12 @@ def activate_logging(flask_app):
         engine.logger.addHandler(handler)
 
     if settings.SENTRY_DSN:
-        Sentry(flask_app, dsn=settings.SENTRY_DSN, logging=True, level=logging.ERROR)
+        sentry_sdk.init(
+            dsn=settings.SENTRY_DSN,
+            integrations=[FlaskIntegration()],
+            traces_sample_rate=settings.SENTRY_SAMPLE_RATE,
+            environment=settings.SENTRY_ENVIRONMENT
+        )
         flask_app.logger.debug("sentry is enabled")
     else:
         flask_app.logger.debug("sentry is disabled")
