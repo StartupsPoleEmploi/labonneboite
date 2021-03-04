@@ -207,26 +207,6 @@
       })(jQuery);
   </script>
 
-  {# Memo button code #}
-  <script>
-    (function(d,s,id) {
-        {% if tilkee_enabled or hide_memo_introjs %}
-        // Disable memo introjs in some situations
-        // => on company page (e.g. for PSE experiment mailing)
-        // => when tilkee is enabled (legacy)
-        localStorage.setItem("lastMemoIntroJs", new Date().getTime() - 13*24*60*60*1000);
-        {% endif %}
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if(!d.getElementById(id)) {
-            js = d.createElement(s);
-            js.id = id;
-            js.async = true;
-            js.src = "{{ memo_js_url }}";
-            fjs.parentNode.insertBefore(js,fjs);
-        }
-    })(document,"script","memoButton");
-  </script>
-
   <script type="text/javascript">
     var ua = window.navigator.userAgent;
     // MSIE : IE6 -> 10 & Trident: IE 11

@@ -41,7 +41,6 @@ def details(siret):
     context = {
         'company': company,
         'rome_code': rome_code,
-        'hide_memo_introjs': True,
         'next_url_modal': url_for('jepostule.application', siret=siret, rome_code=rome_code),
     }
     activity.log(
