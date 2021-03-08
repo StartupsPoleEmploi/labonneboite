@@ -19,7 +19,7 @@ from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.common.util import get_enum_from_value
-from labonneboite.common.load_data import load_related_rome
+from labonneboite.common.load_data import load_related_rome, load_related_rome_areas
 from labonneboite.web.utils import fix_csrf_session
 
 from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter
@@ -31,6 +31,7 @@ from sentry_sdk import start_transaction
 searchBlueprint = Blueprint('search', __name__)
 
 RELATED_ROMES = load_related_rome() if settings.ENABLE_RELATED_ROMES else []
+RELATED_ROMES_AREAS = load_related_rome_areas() if settings.ENABLE_RELATED_ROMES else []
 
 @searchBlueprint.route('/suggest_job_labels')
 def suggest_job_labels():
@@ -307,14 +308,14 @@ def entreprises():
         hide_suggestions = False
         if (named_location):
             with start_transaction(op='related_romes_get', name='rome_' + rome):
-
-                related_city_codes = RELATED_ROMES.get(named_location.city_code, None)
-                if (related_city_codes):
+                related_area = RELATED_ROMES_AREAS.get(named_location.city_code,None)
+                if (related_area):
                     # Hide suggestions for places which may have suggestions
                     hide_suggestions = True
-                    if (rome in related_city_codes):
+                    romes = RELATED_ROMES.get(related_area, [])
+                    if (rome in romes):
                         # Case where there are suggestions for this rome and this location
-                        related_romes = related_city_codes.get(rome)
+                        related_romes = romes.get(rome)
                         # related_romes = list(map(add_nafs, related_romes))
                         related_romes = list(map(add_descriptions, related_romes))
                         # sort and limit size

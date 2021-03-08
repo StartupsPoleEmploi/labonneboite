@@ -103,23 +103,37 @@ def load_rows_as_dict_of_dict(rows):
 
 
 @lru_cache(maxsize=None)
+def load_related_rome_areas():
+    """
+    Build a dict with department code (code insee) as keys and area code as values (bassins d'emploi).
+    Used for PSE study in 2021.
+    """
+    rows = load_csv_file("lbb-pse_bassin-emploi_code-insee.csv", delimiter=';')
+    return reduce(reduceRelateRomesAreas, rows, {})
+
+def reduceRelateRomesAreas(aggr, row):
+    [code_area, code_insee] = row
+    aggr[code_insee] = code_area
+    return aggr
+
+@lru_cache(maxsize=None)
 def load_related_rome():
     """
-    Build a dict with department code (code insee) as keys.
+    Build a dict with area code (bassin d'emploi) as keys.
     The values are dict with rome code as keys and a list of related rome codes as values.
     Each related rome is a dict with `rome` and `score` properties.
     Used for PSE study.
     """
-    rows = load_csv_file("rome_connexe.csv", delimiter=',')
+    rows = load_csv_file("lbb-pse_bassin-emploi_rome-connexe.csv", delimiter=';')
     return reduce(reduceRelateRomes, rows, {})
 
 def reduceRelateRomes(aggr, row):
-    [code_insee, rome, rome_connexe, score] = row
-    entry_code_insee = aggr.get(code_insee, {})
-    entry_rome = entry_code_insee.get(rome, [])
+    [code_area, rome, rome_connexe, score] = row
+    entry_code_area = aggr.get(code_area, {})
+    entry_rome = entry_code_area.get(rome, [])
     entry_rome.append({'rome': rome_connexe, 'score': score})
-    entry_code_insee[rome] = entry_rome
-    aggr[code_insee] = entry_code_insee
+    entry_code_area[rome] = entry_rome
+    aggr[code_area] = entry_code_area
     return aggr
 
 @lru_cache(maxsize=None)
