@@ -93,7 +93,7 @@
         </div>
         <div class="row">
           {# START Memo button. #}
-          <a rel="nofollow" class="link-item btn-memo btn-memo-on" href="{{memo_url}}?url={{ url_for('api.office_details', siret=company.siret, _external=True) }}&job={{ rome_description }}" target="_blank" title="Enregistrer dans MEMO">
+          <a rel="nofollow" class="link-item btn-memo btn-memo-on" href="{{memo_url}}?url={{ url_for('office.details', siret=company.siret, _external=True) }}&job={{ rome_description }}" target="_blank" title="Enregistrer dans MEMO">
             <span>Enregistrer dans MEMO</span>
             <span class="sr-only">Enregistrer la fiche entreprise dans MEMO (Ouvre une fenêtre popup)</span>
           </a>
