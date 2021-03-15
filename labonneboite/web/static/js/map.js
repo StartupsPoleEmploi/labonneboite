@@ -2,7 +2,7 @@
 function createMap(element, center, zoom) {
   var mapEl = new mapboxgl.Map({
     container: element,
-    style: 'https://maps.labonneboite.pole-emploi.fr/styles/osm-bright/style.json',
+    style: 'https://maps.pole-emploi.fr/styles/osm-bright/style.json',
     attributionControl: false,
     center: center,
     zoom: zoom
