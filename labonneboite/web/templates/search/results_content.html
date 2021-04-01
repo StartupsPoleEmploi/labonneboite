@@ -19,10 +19,10 @@
           </div>
           <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
             <div class="lbb-sidebar">
-              <div id="toggle-map-wrapper" class="gtmFilter gtmMap gtmHide">
-                <div class="switch gtmFilter gtmMap gtmHide">
-                  <input type="checkbox" id="toggle-map" checked="checked" lass="gtmFilter gtmMap gtmHide">
-                  <span id="map-switch-button" class="slider round gtmFilter gtmMap gtmHide"></span>
+              <div id="toggle-map-wrapper" class="gtmFilter gtmHideMap">
+                <div class="switch">
+                  <input type="checkbox" id="toggle-map" checked="checked">
+                  <span id="map-switch-button" class="slider round"></span>
                 </div>
                 <label id="map-switch-text">Masquer la carte</label>
               </div>
@@ -227,7 +227,7 @@
               {% include "includes/alternative_rome_descriptions.html" %}
             {% endif %}
             {% if alternative_distances %}
-              <p class="gtmSearch gtmMoreResults">...plus loin :</p>
+              <p>...plus loin :</p>
               {% include "includes/alternative_distances.html" %}
             {% endif %}
           </div>
