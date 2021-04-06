@@ -108,11 +108,11 @@ def load_related_rome_areas():
     Build a dict with department code (code insee) as keys and area code as values (bassins d'emploi).
     Used for PSE study in 2021.
     """
-    rows = load_csv_file("lbb-pse_bassin-emploi_code-insee.csv", delimiter=';')
+    rows = load_csv_file("lbb-pse_bassin-emploi_code-insee.csv", delimiter=',')
     return reduce(reduceRelateRomesAreas, rows, {})
 
 def reduceRelateRomesAreas(aggr, row):
-    [code_area, code_insee] = row
+    [code_insee, code_area] = row
     aggr[code_insee] = code_area
     return aggr
 
@@ -124,7 +124,7 @@ def load_related_rome():
     Each related rome is a dict with `rome` and `score` properties.
     Used for PSE study.
     """
-    rows = load_csv_file("lbb-pse_bassin-emploi_rome-connexe.csv", delimiter=';')
+    rows = load_csv_file("lbb-pse_bassin-emploi_rome-connexe.csv", delimiter=',')
     return reduce(reduceRelateRomes, rows, {})
 
 def reduceRelateRomes(aggr, row):
