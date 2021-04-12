@@ -11,6 +11,7 @@ import time
 from datetime import datetime
 import sys
 from sqlalchemy.exc import OperationalError
+from sqlalchemy import func
 import os
 
 from labonneboite.importer import settings
@@ -72,7 +73,7 @@ class DpaeExtractJob(Job):
         imported_dpae = 0
         imported_dpae_distribution = {}
         not_imported_dpae = 0
-        last_historical_data_date_in_db = DpaeStatistics.get_last_historical_data_date(DpaeStatistics.DPAE)
+        last_historical_data_date_in_db = db_session.query(func.max(Hiring.hiring_date)).first()[0]
         logger.info("will now extract all dpae with hiring_date between %s and %s",
                     last_historical_data_date_in_db, self.last_historical_data_date_in_file)
 
