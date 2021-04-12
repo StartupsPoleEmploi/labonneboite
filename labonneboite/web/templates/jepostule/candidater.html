@@ -21,6 +21,8 @@
                 }
                 if (data.action === 'navigate' && data.label === '#fin' && window.hj !== undefined) {
                     // the candidate process is over
+                    // trigger hotjar scenario
+                    hj('trigger', 'sondage-candidat-jepostule');
                 }
             }
         }
