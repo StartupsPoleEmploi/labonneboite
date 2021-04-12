@@ -77,6 +77,7 @@ def check_for_updates(input_folder):
             new_files.append(full_name)
         else:
             logger.info("file %s was already processed and will thus be ignored", full_name)
+    new_files.sort()
     return new_files
 
 
