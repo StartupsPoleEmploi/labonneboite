@@ -73,7 +73,10 @@ class DpaeExtractJob(Job):
         imported_dpae = 0
         imported_dpae_distribution = {}
         not_imported_dpae = 0
-        last_historical_data_date_in_db = db_session.query(func.max(Hiring.hiring_date)).first()[0]
+        last_historical_data_date_in_db = db_session.query(func.max(Hiring.hiring_date)) \
+                                        .filter(Hiring.contract_type.in_((Hiring.CONTRACT_TYPE_CDI,
+                                                                          Hiring.CONTRACT_TYPE_CDD,
+                                                                          Hiring.CONTRACT_TYPE_CTT))).first()[0]
         logger.info("will now extract all dpae with hiring_date between %s and %s",
                     last_historical_data_date_in_db, self.last_historical_data_date_in_file)
 

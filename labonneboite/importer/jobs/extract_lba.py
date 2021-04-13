@@ -12,6 +12,7 @@ from datetime import datetime
 import sys
 from sqlalchemy.exc import OperationalError
 import os
+from sqlalchemy import func
 import pandas
 import traceback
 
@@ -77,7 +78,9 @@ class ApprentissageExtractJob(Job):
         imported_alternance_contracts_distribution = {}
         not_imported_alternance_contracts = 0
 
-        last_historical_data_date_in_db = DpaeStatistics.get_last_historical_data_date(self.file_type)
+        last_historical_data_date_in_db = db_session.query(func.max(Hiring.hiring_date))\
+                                                            .filter(Hiring.contract_type.in_((Hiring.CONTRACT_TYPE_APP,
+                                                                                              Hiring.CONTRACT_TYPE_PRO))).first()[0]
 
         logger.info("will now extract all alternance contracts with hiring_date between %s and %s",
                     last_historical_data_date_in_db, self.last_historical_data_date_in_file)
