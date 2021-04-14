@@ -121,58 +121,60 @@ class EtablissementExtractJob(Job):
         # because it needs the whole CSV dataset in memory
         # FIXME improve this by processing the CSV on-the-fly instead
         self.benchmark_loading_using_pandas()
-        self.csv_offices = self.get_offices_from_file()
-        self.csv_sirets = list(self.csv_offices.keys())
         self.existing_sirets = self.get_sirets_from_database()
-        csv_set = set(self.csv_sirets)
-        existing_set = set(self.existing_sirets)
-        # 1 - create offices which did not exist before
-        self.creatable_sirets = csv_set - existing_set
+        num_created = 0
 
-        
-        logger.info("nombre d'etablissement dans le csv : %i" % len(csv_set))
+        for offices in self.get_offices_from_file():
+            self.csv_offices = offices
+            self.csv_sirets = list(self.csv_offices.keys())
+            csv_set = set(self.csv_sirets)
+            existing_set = set(self.existing_sirets)
+            # 1 - create offices which did not exist before
+            self.creatable_sirets = csv_set - existing_set
+    
+            logger.info("nombre d'etablissement dans le csv : %i" % len(csv_set))
 
-        i = 0 
-        logger.info("liste de 20 sirets dans le csv" )
-        if csv_set :
-            while  i < 20 :
-                i=i+1
-                value_test = csv_set.pop()
-                csv_set.add(value_test)
-                logger.info(" siret : %s" % value_test )
-
-
-        logger.info("nombre d'etablissement existant : %i" % len(existing_set))
-
-        i = 0 
-        logger.info("liste de 20 sirets existant" )
-        if existing_set :
-            while  i < 20 :
-                i=i+1
-                value_test = existing_set.pop()
-                existing_set.add(value_test)
-                logger.info(" siret : %s" % value_test )
+            i = 0
+            logger.info("liste de 20 sirets dans le csv" )
+            if csv_set :
+                while  i < 20 :
+                    i=i+1
+                    value_test = csv_set.pop()
+                    csv_set.add(value_test)
+                    logger.info(" siret : %s" % value_test )
 
 
-        logger.info("nombre d'etablissement à créer : %i" % len(self.creatable_sirets))
+            logger.info("nombre d'etablissement existant : %i" % len(existing_set))
 
-        i = 0 
-        logger.info("liste de 20 sirets à créer" )
-        if self.creatable_sirets :
-            while  i < 20 :
-                i=i+1
-                value_test = self.creatable_sirets.pop()
-                self.creatable_sirets.add(value_test)
-                logger.info(" siret : %s" % value_test )
-        
-        num_created = self.create_creatable_offices()
+            i = 0
+            logger.info("liste de 20 sirets existant" )
+            if existing_set :
+                while  i < 20 :
+                    i=i+1
+                    value_test = existing_set.pop()
+                    existing_set.add(value_test)
+                    logger.info(" siret : %s" % value_test )
 
-        # 2 - delete offices which no longer exist
-        self.deletable_sirets = existing_set - csv_set
-        self.delete_deletable_offices()
-        # 3 - update existing offices
-        self.updatable_sirets = existing_set - self.deletable_sirets
-        self.update_updatable_offices()
+
+            logger.info("nombre d'etablissement à créer : %i" % len(self.creatable_sirets))
+
+            i = 0
+            logger.info("liste de 20 sirets à créer" )
+            if self.creatable_sirets :
+                while  i < 20 :
+                    i=i+1
+                    value_test = self.creatable_sirets.pop()
+                    self.creatable_sirets.add(value_test)
+                    logger.info(" siret : %s" % value_test )
+
+            num_created += self.create_creatable_offices()
+
+            # 2 - delete offices which no longer exist
+            self.deletable_sirets = existing_set - csv_set
+            self.delete_deletable_offices()
+            # 3 - update existing offices
+            self.updatable_sirets = existing_set - self.deletable_sirets
+            self.update_updatable_offices()
         return num_created
 
     @timeit
@@ -322,8 +324,7 @@ class EtablissementExtractJob(Job):
             for line in myfile:
                 line = line.decode()
                 count += 1
-                if not count % 100000:
-                    logger.debug("processed %s lines", count)
+
 
                 try:
                     fields = import_util.get_fields_from_csv_line(line)
@@ -416,6 +417,10 @@ class EtablissementExtractJob(Job):
                         unprocessable_departement_errors += 1
                 else:
                     no_zipcode_count += 1
+                if not count % 100000:
+                    logger.debug("processed %s lines", count)
+                    yield offices
+                    offices = {}
 
         logger.info("%i offices total", count)
         logger.info("%i offices without email before and have now thanks to RGPD mails", emails_not_here_before_rgpd)
