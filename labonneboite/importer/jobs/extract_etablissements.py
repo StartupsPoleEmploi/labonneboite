@@ -123,14 +123,16 @@ class EtablissementExtractJob(Job):
         self.benchmark_loading_using_pandas()
         self.existing_sirets = self.get_sirets_from_database()
         num_created = 0
+        sirets_inserted = set()
+        existing_set = set(self.existing_sirets)
 
         for offices in self.get_offices_from_file():
             self.csv_offices = offices
             self.csv_sirets = list(self.csv_offices.keys())
             csv_set = set(self.csv_sirets)
-            existing_set = set(self.existing_sirets)
+
             # 1 - create offices which did not exist before
-            self.creatable_sirets = csv_set - existing_set
+            self.creatable_sirets = csv_set
             num_created += len(self.creatable_sirets)
 
             logger.info("nombre d'etablissement dans le csv : %i" % len(csv_set))
@@ -168,13 +170,11 @@ class EtablissementExtractJob(Job):
                     self.creatable_sirets.add(value_test)
                     logger.info(" siret : %s" % value_test )
 
-            self.create_creatable_offices()
-            # 2 - delete offices which no longer exist
-            self.deletable_sirets = existing_set - csv_set
-            self.delete_deletable_offices()
-            # 3 - update existing offices
-            self.updatable_sirets = existing_set - self.deletable_sirets
-            self.update_updatable_offices()
+            self.create_update_offices()
+            sirets_inserted = sirets_inserted.union(csv_set)
+        # 2 - delete offices which no longer exist
+        self.deletable_sirets = existing_set - sirets_inserted
+        self.delete_deletable_offices()
         return num_created
 
     @timeit
@@ -231,7 +231,7 @@ class EtablissementExtractJob(Job):
         logger.info("%i offices updated.", count)
 
     @timeit
-    def create_creatable_offices(self):
+    def create_update_offices(self):
         """
         create new offices (that are not yet in our etablissement table)
         """
@@ -239,14 +239,29 @@ class EtablissementExtractJob(Job):
         query = """INSERT into %s(siret, raisonsociale, enseigne, codenaf, numerorue,
             libellerue, codecommune, codepostal, email, tel, departement, trancheeffectif,
             website, flag_poe_afpr, flag_pmsmp)
-        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.RAW_OFFICE_TABLE
+        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
+        ON DUPLICATE KEY UPDATE
+            raisonsociale=%%s,
+            enseigne=%%s,
+            codenaf=%%s,
+            numerorue=%%s,
+            libellerue=%%s,
+            codecommune=%%s,
+            codepostal=%%s,
+            email=%%s,
+            tel=%%s,
+            departement=%%s,
+            trancheeffectif=%%s,
+            website=%%s,
+            flag_poe_afpr=%%s,
+            flag_pmsmp=%%s""" % settings.RAW_OFFICE_TABLE
 
         count = 1
         logger.info("create new offices in table %s", settings.RAW_OFFICE_TABLE)
         statements = []
         MAX_COUNT_EXECUTE = 500
         for siret in self.creatable_sirets:
-            statement = self.csv_offices[siret]["create_fields"]
+            statement = self.csv_offices[siret]["create_fields"]+self.csv_offices[siret]["update_fields"][:-1] # except siret value at the end
             statements.append(statement)
             count += 1
             if not count % MAX_COUNT_EXECUTE:
