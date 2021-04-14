@@ -131,6 +131,7 @@ class EtablissementExtractJob(Job):
             existing_set = set(self.existing_sirets)
             # 1 - create offices which did not exist before
             self.creatable_sirets = csv_set - existing_set
+            num_created += len(self.creatable_sirets)
 
             logger.info("nombre d'etablissement dans le csv : %i" % len(csv_set))
 
@@ -167,8 +168,7 @@ class EtablissementExtractJob(Job):
                     self.creatable_sirets.add(value_test)
                     logger.info(" siret : %s" % value_test )
 
-            num_created += self.create_creatable_offices()
-
+            self.create_creatable_offices()
             # 2 - delete offices which no longer exist
             self.deletable_sirets = existing_set - csv_set
             self.delete_deletable_offices()
