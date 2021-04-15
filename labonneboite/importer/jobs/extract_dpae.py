@@ -211,13 +211,16 @@ class DpaeExtractJob(Job):
         logger.info("finished importing dpae...")
         return something_new
 
+
 @history_importer_job_decorator(os.path.basename(__file__))
 def run_main():
     import logging
     logging.basicConfig(level=logging.DEBUG)
-    dpae_filename = import_util.detect_runnable_file("dpae")
-    task = DpaeExtractJob(dpae_filename)
-    task.run()
+    dpae_filenames = import_util.detect_runnable_file("dpae", bulk=True)
+    for filename in dpae_filenames:
+        logger.info("PROCESSING %s" % filename)
+        task = DpaeExtractJob(filename)
+        task.run()
 
 
 if __name__ == '__main__':

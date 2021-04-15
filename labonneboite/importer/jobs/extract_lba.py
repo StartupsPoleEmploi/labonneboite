@@ -79,8 +79,7 @@ class ApprentissageExtractJob(Job):
         not_imported_alternance_contracts = 0
 
         last_historical_data_date_in_db = db_session.query(func.max(Hiring.hiring_date))\
-                                                            .filter(Hiring.contract_type.in_((Hiring.CONTRACT_TYPE_APP,
-                                                                                              Hiring.CONTRACT_TYPE_PRO))).first()[0]
+                                                            .filter(Hiring.contract_type == self.contract_type).first()[0]
 
         logger.info("will now extract all alternance contracts with hiring_date between %s and %s",
                     last_historical_data_date_in_db, self.last_historical_data_date_in_file)
@@ -212,18 +211,23 @@ class ApprentissageExtractJob(Job):
         logger.info("finished importing dpae...")
         return something_new
 
+
 @history_importer_job_decorator(os.path.basename(__file__))
 def run_main():
     import logging
     logging.basicConfig(level=logging.DEBUG)
 
-    lba_app_filename = import_util.detect_runnable_file("lba-app")
-    task_app = ApprentissageExtractJob(lba_app_filename, contract_type = 'APPRENTISSAGE')
-    task_app.run()
+    lba_app_filenames = import_util.detect_runnable_file("lba-app", bulk=True)
+    for filename in lba_app_filenames:
+        logger.info("PROCESSING %s" % filename)
+        task_app = ApprentissageExtractJob(filename, contract_type = 'APPRENTISSAGE')
+        task_app.run()
 
-    lba_pro_filename = import_util.detect_runnable_file("lba-pro")
-    task_pro = ApprentissageExtractJob(lba_pro_filename, contract_type = 'CONTRAT_PRO')
-    task_pro.run()
+    lba_pro_filenames = import_util.detect_runnable_file("lba-pro", bulk=True)
+    for filename in lba_pro_filenames:
+        logger.info("PROCESSING %s" % filename)
+        task_pro = ApprentissageExtractJob(filename, contract_type = 'CONTRAT_PRO')
+        task_pro.run()
 
 if __name__ == '__main__':
     run_main()
