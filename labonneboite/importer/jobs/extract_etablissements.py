@@ -241,27 +241,27 @@ class EtablissementExtractJob(Job):
             website, flag_poe_afpr, flag_pmsmp)
         values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
         ON DUPLICATE KEY UPDATE
-            raisonsociale=%%s,
-            enseigne=%%s,
-            codenaf=%%s,
-            numerorue=%%s,
-            libellerue=%%s,
-            codecommune=%%s,
-            codepostal=%%s,
-            email=%%s,
-            tel=%%s,
-            departement=%%s,
-            trancheeffectif=%%s,
-            website=%%s,
-            flag_poe_afpr=%%s,
-            flag_pmsmp=%%s""" % settings.RAW_OFFICE_TABLE
+            raisonsociale=VALUES(raisonsociale),
+            enseigne=VALUES(enseigne),
+            codenaf=VALUES(codenaf),
+            numerorue=VALUES(numerorue),
+            libellerue=VALUES(libellerue),
+            codecommune=VALUES(codecommune),
+            codepostal=VALUES(codepostal),
+            email=VALUES(email),
+            tel=VALUES(tel),
+            departement=VALUES(departement),
+            trancheeffectif=VALUES(trancheeffectif),
+            website=VALUES(website),
+            flag_poe_afpr=VALUES(flag_poe_afpr),
+            flag_pmsmp=VALUES(flag_pmsmp)""" % settings.RAW_OFFICE_TABLE
 
         count = 1
         logger.info("create new offices in table %s", settings.RAW_OFFICE_TABLE)
         statements = []
         MAX_COUNT_EXECUTE = 500
         for siret in self.creatable_sirets:
-            statement = self.csv_offices[siret]["create_fields"]+self.csv_offices[siret]["update_fields"][:-1] # except siret value at the end
+            statement = self.csv_offices[siret]["create_fields"]
             statements.append(statement)
             count += 1
             if not count % MAX_COUNT_EXECUTE:
