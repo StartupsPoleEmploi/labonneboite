@@ -73,7 +73,7 @@ class ApprentissageExtractJob(Job):
                 handicap_label,
                 duree_pec
                 )
-            values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
+            values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
         """ % settings.HIRING_TABLE
         imported_alternance_contracts = 0
         imported_alternance_contracts_distribution = {}
