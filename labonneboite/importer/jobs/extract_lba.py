@@ -71,7 +71,8 @@ class ApprentissageExtractJob(Job):
                 iiann,
                 tranche_age,
                 handicap_label,
-                duree_pec
+                duree_pec,
+                date_insertion
                 )
             values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
         """ % settings.HIRING_TABLE
