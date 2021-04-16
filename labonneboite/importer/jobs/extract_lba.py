@@ -46,6 +46,7 @@ class ApprentissageExtractJob(Job):
 
     @timeit
     def run_task(self):
+        date_insertion = datetime.now()
         logger.info("extracting %s ", self.input_filename)
         # this pattern matches the first date
         # e.g. '20200803ExtractApp'
@@ -146,7 +147,9 @@ class ApprentissageExtractJob(Job):
                         None, #iiann
                         None, #tranche_age
                         None, #handicap_label
-                        None  #duree_pec
+                        None,  #duree_pec
+                        date_insertion
+
                     )
                     statements.append(statement)
                     imported_alternance_contracts += 1
