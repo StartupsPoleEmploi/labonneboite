@@ -177,7 +177,7 @@ class GeocodeJob(Job):
         con.close()
 
     @timeit
-    def run_geocoding_jobs(self, geocoding_jobs, disable_multithreading=False):
+    def run_geocoding_jobs(self, geocoding_jobs, disable_multithreading=True):
         adresses_not_geolocated[:] = []
         coordinates_updates[:] = []
 
