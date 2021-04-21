@@ -177,7 +177,7 @@ class GeocodeJob(Job):
         con.close()
 
     @timeit
-    def run_geocoding_jobs(self, geocoding_jobs, disable_multithreading=True):
+    def run_geocoding_jobs(self, geocoding_jobs, disable_multithreading=False):
         adresses_not_geolocated[:] = []
         coordinates_updates[:] = []
 
@@ -226,7 +226,7 @@ class GeocodeJob(Job):
                 'cache_misses', 0) + 1
 
     @timeit
-    def run_missing_geocoding_jobs(self, csv_max_rows=5000, disable_multithreading=True):
+    def run_missing_geocoding_jobs(self, csv_max_rows=5000, disable_multithreading=False):
         # The CSV file to send to API must not be > 8mb (https://adresse.data.gouv.fr/api)
         # This line :"03880702000011,2 RUE DE LA TETE NOIRE 14700 FALAISE,14258"
         # was copied 100000 times in a file, and the size was 5.77 MB,
