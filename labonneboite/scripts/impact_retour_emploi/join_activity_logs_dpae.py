@@ -142,7 +142,7 @@ class JoinActivityLogsDPAE:
                         'kn_trancheage', 'duree_pec', 'dc_ididentiteexterne', 'premiere_embauche']
 
         total_dpae_rows_used = 0
-
+        logger.info(f"CHUNSIZE DF CSV DPAE: {chunksize}")
         self.path_to_csv = self.get_path_to_saved_csv()
 
         for df_dpae in pd.read_csv(self.dpae_folder_path + self.most_recent_dpae_file,
