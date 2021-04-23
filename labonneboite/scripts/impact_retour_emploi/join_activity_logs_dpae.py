@@ -54,8 +54,8 @@ class JoinActivityLogsDPAE:
 
     def get_logs_activities_by_sirets(self, sirets):
         engine = import_util.create_sqlalchemy_engine()
-        query = "select * from logs_activity where sirets in %s"
-        df_activity = pd.read_sql_query(query, engine, params=[tuple(sirets)])
+        query = "select * from logs_activity where siret in %s" % tuple(sirets)
+        df_activity = pd.read_sql_query(query, engine)
         engine.close()
         return df_activity.astype(str)
 
