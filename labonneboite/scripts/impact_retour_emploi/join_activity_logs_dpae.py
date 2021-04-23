@@ -164,7 +164,7 @@ class JoinActivityLogsDPAE:
 
             nb_rows = df_dpae.shape[0]
             logger.info(f"Sample of DPAE has : {nb_rows} rows")
-            df_activity = self.get_logs_activities_by_sirets(list(df_dpae.siret.unique()))
+            df_activity = self.get_logs_activities_by_sirets(list(df_dpae.kc_siret.unique()))
             # We keep rows in the DPAE file that has a date > to the date_last_recorded_hiring
             # The dpae used must be after the last recorded emabuche date
             df_dpae['kd_dateembauche_bis'] = df_dpae.apply(lambda row: get_date(row), axis=1)
