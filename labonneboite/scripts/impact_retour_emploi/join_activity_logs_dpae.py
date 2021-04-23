@@ -52,6 +52,14 @@ class JoinActivityLogsDPAE:
 
         return df_activity.astype(str)
 
+    def get_logs_activities_by_sirets(self, sirets):
+        engine = import_util.create_sqlalchemy_engine()
+        query = "select * from logs_activity where sirets in %s"
+        df_activity = pd.read_sql_query(query, engine, params=[tuple(sirets)])
+        engine.close()
+        return df_activity.astype(str)
+
+
     def set_most_recent_dpae_file(self):
         self.most_recent_dpae_file = self.get_most_recent_dpae_file()
         # FIXME : Remove this line to pass a specific dpae file for initialisation, we'll have to parse older DPAE files
@@ -156,7 +164,7 @@ class JoinActivityLogsDPAE:
 
             nb_rows = df_dpae.shape[0]
             logger.info(f"Sample of DPAE has : {nb_rows} rows")
-
+            df_activity = self.get_logs_activities_by_sirets(list(df_dpae.siret.unique()))
             # We keep rows in the DPAE file that has a date > to the date_last_recorded_hiring
             # The dpae used must be after the last recorded emabuche date
             df_dpae['kd_dateembauche_bis'] = df_dpae.apply(lambda row: get_date(row), axis=1)
@@ -170,7 +178,7 @@ class JoinActivityLogsDPAE:
             # We join the dpae and activity logs dataframe
             df_dpae_act = pd.merge(
                 df_dpae,
-                self.df_activity,
+                df_activity,
                 how='left',
                 left_on=['dc_ididentiteexterne', 'kc_siret'],
                 right_on=['idutilisateur_peconnect', 'siret']
@@ -209,7 +217,6 @@ def run_main():
     join_act_log = JoinActivityLogsDPAE()
 
     join_act_log.set_most_recent_dpae_file()
-    join_act_log.set_df_activity()
     join_act_log.set_last_recorded_hiring_date()
 
     join_act_log.join_dpae_activity_logs()
