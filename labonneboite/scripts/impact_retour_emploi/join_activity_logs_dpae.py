@@ -30,6 +30,7 @@ class JoinActivityLogsDPAE:
         self.df_activity = self.get_activity_logs()
 
     def get_activity_logs(self):
+        logger.info("Loading logs activities")
         engine = import_util.create_sqlalchemy_engine()
 
         query = "select * from logs_activity"
