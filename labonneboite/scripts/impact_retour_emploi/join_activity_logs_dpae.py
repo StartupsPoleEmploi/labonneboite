@@ -139,7 +139,7 @@ class JoinActivityLogsDPAE:
         if DEBUG:
             chunksize = 10 ** 2
         else:
-            chunksize = 1000
+            chunksize = 10000
 
         i = 0
         column_names = ['kc_siret', 'dc_naf_id', 'dc_adresse', 'dc_codepostal', '_',
