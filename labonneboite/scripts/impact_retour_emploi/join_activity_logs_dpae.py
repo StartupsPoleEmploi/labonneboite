@@ -33,7 +33,7 @@ class JoinActivityLogsDPAE:
         logger.info("Loading logs activities")
         engine = import_util.create_sqlalchemy_engine()
 
-        query = "select * from logs_activity"
+        query = "select * from logs_activity order by id"
         if DEBUG:
             query += " ORDER BY RAND() LIMIT 10000"
         df_activity = pd.read_sql_query(query, engine)
@@ -54,7 +54,7 @@ class JoinActivityLogsDPAE:
 
     def get_logs_activities_by_sirets(self, sirets):
         engine = import_util.create_sqlalchemy_engine()
-        query = "select * from logs_activity where siret in %s" % str(tuple(sirets))
+        query = "select * from logs_activity where siret in %s order by dateheure asc;" % str(tuple(sirets))
         df_activity = pd.read_sql_query(query, engine)
         engine.close()
         return df_activity.astype(str)
@@ -72,7 +72,7 @@ class JoinActivityLogsDPAE:
         dpae_paths = [i for i in dpae_paths if i.startswith('lbb_xdpdpae_delta')]
 
         dpae_paths.sort()
-        most_recent_dpae_file = dpae_paths[-1]
+        most_recent_dape_file = dpae_paths
         if get_current_env() == ENV_DEVELOPMENT:
             most_recent_dpae_file = 'lbb_xdpdpae_delta_201511102200.csv'
 
@@ -154,61 +154,63 @@ class JoinActivityLogsDPAE:
         logger.info(f"CHUNSIZE DF CSV DPAE: {chunksize}")
         self.path_to_csv = self.get_path_to_saved_csv()
 
-        for df_dpae in pd.read_csv(self.dpae_folder_path + self.most_recent_dpae_file,
-                                   header=None,
-                                   compression=self.get_compression_to_use_by_pandas_according_to_file(),
-                                   names=column_names,
-                                   sep='|',
-                                   index_col=False,
-                                   chunksize=chunksize):
+        for dpae_file in self.most_recent_dpae_file:
+            self.set_last_recorded_hiring_date()
+            for df_dpae in pd.read_csv(self.dpae_folder_path + dpae_file,
+                                       header=None,
+                                       compression=self.get_compression_to_use_by_pandas_according_to_file(),
+                                       names=column_names,
+                                       sep='|',
+                                       index_col=False,
+                                       chunksize=chunksize):
 
-            nb_rows = df_dpae.shape[0]
-            logger.info(f"Sample of DPAE has : {nb_rows} rows")
-            df_activity = self.get_logs_activities_by_sirets(list(df_dpae.kc_siret.unique()))
-            # We keep rows in the DPAE file that has a date > to the date_last_recorded_hiring
-            # The dpae used must be after the last recorded emabuche date
-            df_dpae['kd_dateembauche_bis'] = df_dpae.apply(lambda row: get_date(row), axis=1)
-            df_dpae = df_dpae[df_dpae.kd_dateembauche_bis > self.date_last_recorded_hiring]
-            nb_rows = df_dpae.shape[0]
-            logger.info(f"Sample of DPAE minus old dates has : {nb_rows} rows")
+                nb_rows = df_dpae.shape[0]
+                logger.info(f"Sample of DPAE has : {nb_rows} rows")
+                # We keep rows in the DPAE file that has a date > to the date_last_recorded_hiring
+                # The dpae used must be after the last recorded emabuche date
+                df_dpae['kd_dateembauche_bis'] = df_dpae.apply(lambda row: get_date(row), axis=1)
+                df_dpae = df_dpae[df_dpae.kd_dateembauche_bis > self.date_last_recorded_hiring]
+                nb_rows = df_dpae.shape[0]
+                df_activity = self.get_logs_activities_by_sirets(list(df_dpae.kc_siret.unique()))
+                logger.info(f"Sample of DPAE minus old dates has : {nb_rows} rows")
 
-            # convert df dpae columns to 'object'
-            df_dpae = df_dpae.astype(str)
+                # convert df dpae columns to 'object'
+                df_dpae = df_dpae.astype(str)
 
-            # We join the dpae and activity logs dataframe
-            df_dpae_act = pd.merge(
-                df_dpae,
-                df_activity,
-                how='left',
-                left_on=['dc_ididentiteexterne', 'kc_siret'],
-                right_on=['idutilisateur_peconnect', 'siret']
-            )
+                # We join the dpae and activity logs dataframe
+                df_dpae_act = pd.merge(
+                    df_dpae,
+                    df_activity,
+                    how='left',
+                    left_on=['dc_ididentiteexterne', 'kc_siret'],
+                    right_on=['idutilisateur_peconnect', 'siret']
+                )
 
-            nb_rows = df_dpae_act.shape[0]
-            logger.info(f"Sample of merged activity/DPAE has : {nb_rows} rows")
+                nb_rows = df_dpae_act.shape[0]
+                logger.info(f"Sample of merged activity/DPAE has : {nb_rows} rows")
 
-            # filter on the fact that dateheure activity must be inferior to kd_dateembauche
-            df_dpae_act = df_dpae_act[df_dpae_act.kd_dateembauche_bis > df_dpae_act.dateheure]
-            df_dpae_act = df_dpae_act.drop(['kd_dateembauche_bis'], axis=1)
-            nb_rows = df_dpae_act.shape[0]
-            logger.info(f"Sample of merged activity/DPAE with the good dates has : {nb_rows} rows")
+                # filter on the fact that dateheure activity must be inferior to kd_dateembauche
+                df_dpae_act = df_dpae_act[df_dpae_act.kd_dateembauche_bis > df_dpae_act.dateheure]
+                df_dpae_act = df_dpae_act.drop(['kd_dateembauche_bis'], axis=1)
+                nb_rows = df_dpae_act.shape[0]
+                logger.info(f"Sample of merged activity/DPAE with the good dates has : {nb_rows} rows")
 
-            df_dpae_act = df_dpae_act.astype(str)
+                df_dpae_act = df_dpae_act.astype(str)
 
-            # We save the lines of the join we want to keep
-            self.save_csv_file(df_dpae_act, i)
+                # We save the lines of the join we want to keep
+                self.save_csv_file(df_dpae_act, i)
 
-            nb_rows = df_dpae_act.shape[0]
-            logger.info(f" ==> Nb rows we keep in this sample : {nb_rows} rows")
+                nb_rows = df_dpae_act.shape[0]
+                logger.info(f" ==> Nb rows we keep in this sample : {nb_rows} rows")
 
-            total_dpae_rows_used += df_dpae_act.shape[0]
-            logger.info(f" ==> Nb total rows that have been kept : {total_dpae_rows_used} rows")
+                total_dpae_rows_used += df_dpae_act.shape[0]
+                logger.info(f" ==> Nb total rows that have been kept : {total_dpae_rows_used} rows")
 
-            nb_total_rows_dpae_used = (i+1) * chunksize
-            logger.info(f" ==> Nb total rows of DPAE that have been used : {nb_total_rows_dpae_used} rows")
-            logger.info("\n-------------------------")
+                nb_total_rows_dpae_used = (i+1) * chunksize
+                logger.info(f" ==> Nb total rows of DPAE that have been used : {nb_total_rows_dpae_used} rows")
+                logger.info("\n-------------------------")
 
-            i += 1
+                i += 1
 
         return self.path_to_csv, df_dpae_act
 
