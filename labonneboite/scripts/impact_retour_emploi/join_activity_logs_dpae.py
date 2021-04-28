@@ -72,7 +72,7 @@ class JoinActivityLogsDPAE:
         dpae_paths = [i for i in dpae_paths if i.startswith('lbb_xdpdpae_delta')]
 
         dpae_paths.sort()
-        most_recent_dape_file = dpae_paths
+        most_recent_dpae_file = dpae_paths
         if get_current_env() == ENV_DEVELOPMENT:
             most_recent_dpae_file = 'lbb_xdpdpae_delta_201511102200.csv'
 
