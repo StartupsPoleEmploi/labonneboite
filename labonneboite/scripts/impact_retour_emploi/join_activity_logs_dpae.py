@@ -105,8 +105,8 @@ class JoinActivityLogsDPAE:
 
         return date_last_recorded_hiring
 
-    def get_compression_to_use_by_pandas_according_to_file(self):
-        dpae_file_extension = self.most_recent_dpae_file.split('.')[-1]
+    def get_compression_to_use_by_pandas_according_to_file(self, dpae_path):
+        dpae_file_extension = dpae_path.split('.')[-1]
         if dpae_file_extension == 'csv':
             compression = 'infer'
         else:
@@ -158,7 +158,7 @@ class JoinActivityLogsDPAE:
             self.set_last_recorded_hiring_date()
             for df_dpae in pd.read_csv(self.dpae_folder_path + dpae_file,
                                        header=None,
-                                       compression=self.get_compression_to_use_by_pandas_according_to_file(),
+                                       compression=self.get_compression_to_use_by_pandas_according_to_file(dpae_file),
                                        names=column_names,
                                        sep='|',
                                        index_col=False,
