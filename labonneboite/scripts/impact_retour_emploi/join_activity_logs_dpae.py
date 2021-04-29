@@ -139,7 +139,7 @@ class JoinActivityLogsDPAE:
         if DEBUG:
             chunksize = 10 ** 2
         else:
-            chunksize = 10000
+            chunksize = 100000000
 
         i = 0
         column_names = ['kc_siret', 'dc_naf_id', 'dc_adresse', 'dc_codepostal', '_',
@@ -172,7 +172,7 @@ class JoinActivityLogsDPAE:
                 df_dpae['kd_dateembauche_bis'] = df_dpae.apply(lambda row: get_date(row), axis=1)
                 df_dpae = df_dpae[df_dpae.kd_dateembauche_bis > self.date_last_recorded_hiring]
                 nb_rows = df_dpae.shape[0]
-                df_activity = self.get_logs_activities_by_sirets(list(df_dpae.kc_siret.unique()))
+                df_activity = self.get_activity_logs()
                 logger.info(f"Sample of DPAE minus old dates has : {nb_rows} rows")
 
                 # convert df dpae columns to 'object'
