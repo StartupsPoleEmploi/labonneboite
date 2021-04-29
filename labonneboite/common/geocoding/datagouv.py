@@ -133,7 +133,6 @@ def get_department_by_code(code):
     Args:
         code (str): the code of a department (département)
     """
-    print('get_department_by_code', settings.API_DEPARTMENTS_URL, code)
     department = fetch_json(
         url=settings.API_DEPARTMENTS_URL + '/' + code,
         name='geo.api.gouv.fr/departements',
