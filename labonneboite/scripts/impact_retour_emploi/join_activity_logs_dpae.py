@@ -139,7 +139,7 @@ class JoinActivityLogsDPAE:
         if DEBUG:
             chunksize = 10 ** 2
         else:
-            chunksize = 50000
+            chunksize = 10000
 
         i = 0
         column_names = ['kc_siret', 'dc_naf_id', 'dc_adresse', 'dc_codepostal', '_',
@@ -155,6 +155,7 @@ class JoinActivityLogsDPAE:
         self.path_to_csv = self.get_path_to_saved_csv()
 
         for dpae_file in self.most_recent_dpae_file:
+            logger.info(f"PROCESSING FILE: {dpae_file}")
             self.set_last_recorded_hiring_date()
             for df_dpae in pd.read_csv(self.dpae_folder_path + dpae_file,
                                        header=None,
