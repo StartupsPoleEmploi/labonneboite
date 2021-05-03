@@ -42,7 +42,9 @@
       </li>
 
       <li class="float-right lbb-header-logo-pole-emploi">
-        <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
+        <a href="https://www.pole-emploi.fr/accueil/">
+          <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
+        </a>
       </li>
 
       <li class="float-right" id="user-header">
@@ -133,8 +135,12 @@
         {% endif %}
       </ul>
       <div class="lbb-sponsor-logos">
-        <img src="{{ url_for('static', filename='images/logo-ue.svg') }}" alt="Union Européenne">
-        <img src="{{ url_for('static', filename='images/logo-FSE-color.svg') }}" alt="L'Europe s'engage en France">
+        <a href="https://europa.eu/european-union/index_fr">
+          <img src="{{ url_for('static', filename='images/logo-ue.svg') }}" alt="Union Européenne">
+        </a>
+        <a href="http://www.fse.gouv.fr/">
+          <img src="{{ url_for('static', filename='images/logo-FSE-color.svg') }}" alt="L'Europe s'engage en France">
+        </a>
       </div>
       <div class="lbb-sponsor-text">
         <p>Ce dispositif est cofinancé par le Fonds Social Européen dans le cadre du Programme opérationnel national "emploi et inclusion" 2014-2020</p>
