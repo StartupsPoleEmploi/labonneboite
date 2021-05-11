@@ -42,7 +42,9 @@
       </li>
 
       <li class="float-right lbb-header-logo-pole-emploi">
-        <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
+        <a href="https://www.pole-emploi.fr/accueil/">
+          <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
+        </a>
       </li>
 
       <li class="float-right" id="user-header">
@@ -51,16 +53,16 @@
 
       {# PRO ZONE #}
       {% if user_is_pro %}
-        <li class="float-right lbb-header-entry gtmAccount gtmVersionPro">
+        <li class="float-right lbb-header-entry gtm-pro-version">
           <a
-            class="lbb-header-btn gtmAccount gtmVersionPro" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}"
+            class="lbb-header-btn" href="{{ url_for('user.pro_version') }}?next={{ request.url | urlencode }}"
             {% if pro_version_enabled %}
               title="Désactiver la version pro"
             {% else %}
               title="Activer la version pro"
             {% endif %}
           >
-            <span class="lbb-header-btn no-padding gtmAccount gtmVersionPro">
+            <span class="lbb-header-btn no-padding">
               {% if pro_version_enabled %}
                 <img class="no-margin" src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="Version PRO active" data-toggle="tooltip" data-placement="bottom" data-original-title="La version PRO affiche des indicateurs exclusifs (Junior, Senior et BOE [Bénéficiaire de l'Obligation d'Emploi]) non disponibles au public, uniquement visibles aux conseillers Pôle emploi et à une sélection d'acteurs.">
               {% else %}
@@ -72,8 +74,8 @@
             {% else %}
               <p class="lbb-switch" aria-hidden="true">
             {% endif %}
-              <span class="on gtmAccount gtmVersionPro">On</span>
-              <span class="off gtmAccount gtmVersionPro">Off</span>
+              <span class="on">On</span>
+              <span class="off">Off</span>
             </p>
           </a>
         </li>
@@ -109,9 +111,6 @@
         <li>
           <a href="{{ url_for('root.press') }}" title="Espace presse - Contenu à destination de la presse">Espace Presse</a>
         </li>
-        <li>
-          <a href="#" class="rgpd-info" title="Politique de confidentialité et utilisation de vos données personnelles">Cookies</a>
-        </li>
         <li class="text-bold">
           <a href="{{ url_for('contact_form.ask_action') }}" title="Accès recruteurs pour modification de vos données entreprises">Accès recruteurs</a>
         </li>
@@ -133,8 +132,12 @@
         {% endif %}
       </ul>
       <div class="lbb-sponsor-logos">
-        <img src="{{ url_for('static', filename='images/logo-ue.svg') }}" alt="Union Européenne">
-        <img src="{{ url_for('static', filename='images/logo-FSE-color.svg') }}" alt="L'Europe s'engage en France">
+        <a href="https://europa.eu/european-union/index_fr">
+          <img src="{{ url_for('static', filename='images/logo-ue.svg') }}" alt="Union Européenne">
+        </a>
+        <a href="http://www.fse.gouv.fr/">
+          <img src="{{ url_for('static', filename='images/logo-FSE-color.svg') }}" alt="L'Europe s'engage en France">
+        </a>
       </div>
       <div class="lbb-sponsor-text">
         <p>Ce dispositif est cofinancé par le Fonds Social Européen dans le cadre du Programme opérationnel national "emploi et inclusion" 2014-2020</p>

@@ -2,7 +2,7 @@
   {% for rome, alternative, slugified, count in alternative_rome_descriptions %}
     {% if count %}
       <li>
-        <a href="#" class="js-extend-search-occupation gtmSearch gtmMoreResults gtmOccupation" id="alternative-{{ rome }}" data-occupation="{{ slugified }}">{{ alternative }} ({{ count }})</a>
+        <a href="#" class="js-extend-search-occupation gtm-extend-search-occupation" id="alternative-{{ rome }}" data-occupation="{{ slugified }}">{{ alternative }} ({{ count }})</a>
     </li>
     {% endif %}
   {% endfor %}

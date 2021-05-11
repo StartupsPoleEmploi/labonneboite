@@ -37,7 +37,7 @@
           {% endif %}
           {% if company.website %}
           <li>
-            <a class="gtmCompany gtmWebsite" href="{{ company.website }}" target="_blank">Site internet</a>
+            <a class="gtm-company-detail-website" href="{{ company.website }}" target="_blank">Site internet</a>
           </li>
           {% endif %}
         </ul>
@@ -93,7 +93,7 @@
     </div>
 
     <div class="lbb-result__content__actions">
-      <a class="btn btn-small gtmCompany gtmDownloadPDF" href="{{ url_for('office.download', siret=company.siret) }}">Télécharger la fiche en PDF</a>
+      <a class="btn btn-small gtm-company-download-pdf" href="{{ url_for('office.download', siret=company.siret) }}">Télécharger la fiche en PDF</a>
     </div>
 
   </div>
