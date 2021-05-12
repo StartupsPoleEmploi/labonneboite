@@ -220,7 +220,6 @@ def run_main():
 
     join_act_log.set_most_recent_dpae_file()
     join_act_log.set_df_activity()
-    join_act_log.set_last_recorded_hiring_date()
 
     join_act_log.join_dpae_activity_logs()
 
