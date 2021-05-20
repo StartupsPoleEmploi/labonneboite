@@ -328,12 +328,12 @@ class EtablissementExtractJob(Job):
                 try:
                     fields = import_util.get_fields_from_csv_line(line)
 
-                    if len(fields) != 23:
+                    if len(fields) != 22:
                         logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
 
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
-                        libellerue, codecommune, codepostal, first_email, rgpd_email, \
+                        libellerue, codecommune, codepostal, email, \
                         tel, trancheeffectif_etablissement, effectif_reel, _, _, \
                         website1, website2, better_tel, \
                         website3, _, contrat_afpr, contrat_poe, contrat_pmsmp = fields
@@ -373,15 +373,6 @@ class EtablissementExtractJob(Job):
                 flag_poe_afpr = 0
                 if contrat_poe == "O" or contrat_afpr == "O":
                     flag_poe_afpr = 1
-
-                if has_text_content(rgpd_email):
-                    email = encoding_util.strip_french_accents(rgpd_email)
-                    if has_text_content(first_email):
-                        emails_here_before_rgpd += 1
-                    else:
-                        emails_not_here_before_rgpd += 1
-                else:
-                    email = encoding_util.strip_french_accents(first_email)
 
                 if codecommune.strip():
                     departement = import_util.get_departement_from_zipcode(codepostal)

@@ -88,7 +88,7 @@ class TestEtablissements(DatabaseTest):
         _, _, _, _, _, _, \
         _, _, email, _, _, _, \
         _, _, _ = etabs.get('00565014800033').get('create_fields')
-        self.assertEqual(email, 'laf2@example.eu') #The office has 2 emails, and the rgpd email is the main
+        self.assertEqual(email, 'laf@example.eu') #The office has 2 emails, and the rgpd email is the main
 
         _, _, _, _, _, _, \
         _, _, email, _, _, _, \
