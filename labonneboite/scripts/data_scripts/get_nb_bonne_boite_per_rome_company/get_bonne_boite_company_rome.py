@@ -24,6 +24,7 @@ def get_total_hirings_per_office():
                 codecommune,\
                 trancheeffectif,\
                 greatest(0, floor(score_regr)) as total_hirings\
+                greatest(0, floor(score_alternance_regr)) as total_hirings_alt\
              from \
                 etablissements_backoffice"
 
@@ -65,6 +66,10 @@ def get_score(row):
     return scoring_util._get_score_from_hirings(row['total_hirings'])
 
 
+def get_score_alt(row):
+    return scoring_util._get_score_from_hirings(row['total_hirings_alt'])
+
+
 def get_romes(row):
     try:
         romes = mapping_util.get_romes_for_naf(row['codenaf'])
@@ -82,17 +87,28 @@ def get_true_score(row):
         naf_code=row['codenaf'])
 
 
+def get_true_score_alt(row):
+    return scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
+        score=row['total_score_alt'],
+        rome_code=row['rome'],
+        naf_code=row['codenaf'])
+
+
 def get_true_hirings(row):
-    return scoring_util.get_hirings_from_score(row['score'])
+    return scoring_util.get_hirings_from_score(row['score_alt'])
 
 
 def is_a_bonne_boite(row):
     return row['score'] >= row['seuil']
 
+def is_a_bonne_alternance(row):
+    return row['score_alt'] >= row['seuil_alt']
+
 
 def get_offices_are_bonne_boite(df_total_hirings):
 
     df_total_hirings['total_score'] = df_total_hirings.apply(lambda row: get_score(row), axis=1)
+    df_total_hirings['total_score_alt'] = df_total_hirings.apply(lambda row: get_score(row), axis=1)
     logger.info("Total score just has been computed for each row")
 
     df_total_hirings['rome'] = df_total_hirings.apply(lambda row: get_romes(row), axis=1)
@@ -102,9 +118,11 @@ def get_offices_are_bonne_boite(df_total_hirings):
     logger.info("We split each row from 1 naf multiple romes --> 1 naf 1 rome")
 
     df_total_hirings['score'] = df_total_hirings.apply(lambda row: get_true_score(row), axis=1)
+    df_total_hirings['score_alt'] = df_total_hirings.apply(lambda row: get_true_score_alt(row), axis=1)
     logger.info("We compute the true score for each row")
 
     df_total_hirings['nb_recrutements_predits'] = df_total_hirings.apply(lambda row: get_true_hirings(row), axis=1)
+    df_total_hirings['nb_recrutements_predits_alt'] = df_total_hirings.apply(lambda row: get_true_hirings(row), axis=1)
     logger.info("We compute the true hirings for each row")
 
     cols_of_interest = ['siret',
@@ -119,14 +137,17 @@ def get_offices_are_bonne_boite(df_total_hirings):
                         'codecommune',
                         'trancheeffectif',
                         'nb_recrutements_predits',
-                        'score']
+                        'score',
+                        'score_alt']
 
     df_total_hirings = df_total_hirings[cols_of_interest]
 
     df_total_hirings['seuil'] = df_total_hirings['rome'].apply(lambda x: scoring_util.get_score_minimum_for_rome(x))
+    df_total_hirings['seuil_alt'] = df_total_hirings['rome'].apply(lambda x: scoring_util.get_score_minimum_for_rome(x, alternance=True))
     logger.info("We compute the threshold, related to the score column. If a score is >= to this threshold, it's considered as a office")
 
     df_total_hirings['is a bonne boite ?'] = df_total_hirings.apply(lambda row: is_a_bonne_boite(row), axis=1)
+    df_total_hirings['is a bonne alternance ?'] = df_total_hirings.apply(lambda row: is_a_bonne_alternance(row), axis=1)
     logger.info("We added a column to tell if its a bonne boite or no")
 
     return df_total_hirings
