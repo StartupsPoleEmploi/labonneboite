@@ -30,9 +30,10 @@ class JoinActivityLogsDPAE:
         self.df_activity = self.get_activity_logs()
 
     def get_activity_logs(self):
+        logger.info("Loading logs activities")
         engine = import_util.create_sqlalchemy_engine()
 
-        query = "select * from logs_activity"
+        query = "select * from logs_activity order by id"
         if DEBUG:
             query += " ORDER BY RAND() LIMIT 10000"
         df_activity = pd.read_sql_query(query, engine)
@@ -50,6 +51,14 @@ class JoinActivityLogsDPAE:
         logger.info('Activities logs are loaded')
 
         return df_activity.astype(str)
+
+    def get_logs_activities_by_sirets(self, sirets):
+        engine = import_util.create_sqlalchemy_engine()
+        query = "select * from logs_activity where siret in %s order by dateheure asc;" % str(tuple(sirets))
+        df_activity = pd.read_sql_query(query, engine)
+        engine.close()
+        return df_activity.astype(str)
+
 
     def set_most_recent_dpae_file(self):
         self.most_recent_dpae_file = self.get_most_recent_dpae_file()
@@ -96,8 +105,8 @@ class JoinActivityLogsDPAE:
 
         return date_last_recorded_hiring
 
-    def get_compression_to_use_by_pandas_according_to_file(self):
-        dpae_file_extension = self.most_recent_dpae_file.split('.')[-1]
+    def get_compression_to_use_by_pandas_according_to_file(self, dpae_path):
+        dpae_file_extension = dpae_path.split('.')[-1]
         if dpae_file_extension == 'csv':
             compression = 'infer'
         else:
@@ -142,12 +151,14 @@ class JoinActivityLogsDPAE:
                         'kn_trancheage', 'duree_pec', 'dc_ididentiteexterne', 'premiere_embauche']
 
         total_dpae_rows_used = 0
-
+        logger.info(f"CHUNSIZE DF CSV DPAE: {chunksize}")
         self.path_to_csv = self.get_path_to_saved_csv()
-
-        for df_dpae in pd.read_csv(self.dpae_folder_path + self.most_recent_dpae_file,
+        dpae_file = self.most_recent_dpae_file
+        logger.info(f"PROCESSING FILE: {dpae_file}")
+        self.set_last_recorded_hiring_date()
+        for df_dpae in pd.read_csv(self.dpae_folder_path + dpae_file,
                                    header=None,
-                                   compression=self.get_compression_to_use_by_pandas_according_to_file(),
+                                   compression=self.get_compression_to_use_by_pandas_according_to_file(dpae_file),
                                    names=column_names,
                                    sep='|',
                                    index_col=False,
@@ -155,12 +166,12 @@ class JoinActivityLogsDPAE:
 
             nb_rows = df_dpae.shape[0]
             logger.info(f"Sample of DPAE has : {nb_rows} rows")
-
             # We keep rows in the DPAE file that has a date > to the date_last_recorded_hiring
             # The dpae used must be after the last recorded emabuche date
             df_dpae['kd_dateembauche_bis'] = df_dpae.apply(lambda row: get_date(row), axis=1)
             df_dpae = df_dpae[df_dpae.kd_dateembauche_bis > self.date_last_recorded_hiring]
             nb_rows = df_dpae.shape[0]
+
             logger.info(f"Sample of DPAE minus old dates has : {nb_rows} rows")
 
             # convert df dpae columns to 'object'
@@ -209,7 +220,6 @@ def run_main():
 
     join_act_log.set_most_recent_dpae_file()
     join_act_log.set_df_activity()
-    join_act_log.set_last_recorded_hiring_date()
 
     join_act_log.join_dpae_activity_logs()
 
