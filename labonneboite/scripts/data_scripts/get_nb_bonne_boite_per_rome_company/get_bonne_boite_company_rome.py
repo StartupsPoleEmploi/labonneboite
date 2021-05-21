@@ -23,7 +23,7 @@ def get_total_hirings_per_office():
                 codepostal,\
                 codecommune,\
                 trancheeffectif,\
-                greatest(0, floor(score_regr)) as total_hirings\
+                greatest(0, floor(score_regr)) as total_hirings,\
                 greatest(0, floor(score_alternance_regr)) as total_hirings_alt\
              from \
                 etablissements_backoffice"
