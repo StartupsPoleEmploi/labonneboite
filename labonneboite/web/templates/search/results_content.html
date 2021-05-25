@@ -178,7 +178,9 @@
         <div id="lbb-result-map" class="lbb-bright-container" aria-hidden="true"></div>
 
         {% if related_romes %}
-          <div class="lbb-feature-banner">Nouvelle fonctionnalité : Grâce aux nouveaux filtres, élargissez votre recherche aux métiers qui recrutent !</div>
+        <div class="lbb-feature-banner">Nouvelle fonctionnalité : Grâce aux nouveaux filtres, élargissez votre recherche aux métiers qui recrutent !</div>
+        {% elif related_rome_initial %}
+        <div class="lbb-feature-banner">Métier similaire à votre recherche: {{ rome_description }}</div>
         {% endif %}
 
         {% if not companies %}
