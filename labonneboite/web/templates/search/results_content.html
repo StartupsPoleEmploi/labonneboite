@@ -19,16 +19,9 @@
           </div>
           <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
             <div class="lbb-sidebar">
-              <div id="toggle-map-wrapper" class="gtm-filter-hidemap">
-                <div class="switch">
-                  <input type="checkbox" id="toggle-map" checked="checked">
-                  <span id="map-switch-button" class="slider round"></span>
-                </div>
-                <label id="map-switch-text">Masquer la carte</label>
-              </div>
-             <div class="js-form-search-filters">
-               <div class="lbb-sidebar-toggle-wrapper">
-                 <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
+              <div class="js-form-search-filters">
+                <div class="lbb-sidebar-toggle-wrapper">
+                  <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
                  <hr>
                </div>
 
@@ -173,6 +166,15 @@
 
 
         <h2 class="sr-only lbb-result-info">Résultats de la recherche</h2>
+
+        <div id="toggle-map-wrapper" class="gtm-filter-hidemap">
+          <div class="switch">
+            <input type="checkbox" id="toggle-map" checked="checked">
+            <span id="map-switch-button" class="slider round"></span>
+          </div>
+          <label id="map-switch-text">Masquer la carte</label>
+        </div>
+
         <div id="lbb-result-map" class="lbb-bright-container" aria-hidden="true"></div>
 
         {% if related_romes %}
