@@ -62,13 +62,18 @@
         display: block;
     }
 
+    /* buttons to open the side bar on mobile: "triez" and "retour" */
     .lbb-sidebar-toggle:link,
     .lbb-sidebar-toggle:visited,
     .lbb-sidebar-toggle:active,
     .lbb-sidebar-toggle:hover {
-        font-weight: bold;
-        font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
-        font-size: 1.1rem;
+        font-weight: 600;
+        font-size: 13px;
+        font-size: 0.90em;
+        color: white;
+        background-color: #54108E;
+        padding: 5px;
+        border-radius: 4px;
         text-decoration: none;
     }
 
