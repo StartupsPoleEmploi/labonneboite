@@ -340,3 +340,20 @@
 .mapboxgl-marker {
   cursor: pointer;
 }
+
+/* Related romes features
+=========================================================================== */
+
+.lbb-feature-banner {
+  background-color: #c8287e;
+  color: white;
+  border-radius: 3px;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.lbb-feature-banner-small {
+  padding: 5px;
+  margin: 10px 0;
+  text-align: center;
+}
