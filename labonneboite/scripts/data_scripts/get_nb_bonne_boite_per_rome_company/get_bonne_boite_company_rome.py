@@ -108,7 +108,7 @@ def is_a_bonne_alternance(row):
 def get_offices_are_bonne_boite(df_total_hirings):
 
     df_total_hirings['total_score'] = df_total_hirings.apply(lambda row: get_score(row), axis=1)
-    df_total_hirings['total_score_alt'] = df_total_hirings.apply(lambda row: get_score(row), axis=1)
+    df_total_hirings['total_score_alt'] = df_total_hirings.apply(lambda row: get_score_alt(row), axis=1)
     logger.info("Total score just has been computed for each row")
 
     df_total_hirings['rome'] = df_total_hirings.apply(lambda row: get_romes(row), axis=1)
