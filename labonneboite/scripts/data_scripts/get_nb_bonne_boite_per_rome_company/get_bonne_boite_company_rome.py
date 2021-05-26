@@ -95,8 +95,10 @@ def get_true_score_alt(row):
 
 
 def get_true_hirings(row):
-    return scoring_util.get_hirings_from_score(row['score_alt'])
+    return scoring_util.get_hirings_from_score(row['score'])
 
+def get_true_hirings_alt(row):
+    return scoring_util.get_hirings_from_score(row['score_alt'])
 
 def is_a_bonne_boite(row):
     return row['score'] >= row['seuil']
@@ -122,7 +124,7 @@ def get_offices_are_bonne_boite(df_total_hirings):
     logger.info("We compute the true score for each row")
 
     df_total_hirings['nb_recrutements_predits'] = df_total_hirings.apply(lambda row: get_true_hirings(row), axis=1)
-    df_total_hirings['nb_recrutements_predits_alt'] = df_total_hirings.apply(lambda row: get_true_hirings(row), axis=1)
+    df_total_hirings['nb_recrutements_predits_alt'] = df_total_hirings.apply(lambda row: get_true_hirings_alt(row), axis=1)
     logger.info("We compute the true hirings for each row")
 
     cols_of_interest = ['siret',
