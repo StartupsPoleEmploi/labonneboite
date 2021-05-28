@@ -52,7 +52,7 @@
                         Un métier équivalent
                       {%endif %}
                     {% endset %}
-                    <p>{{ text_reco }} <span class="badge badge-large badge-info" data-show data-hide-on-rollout data-original-title="{{ text_reco }}" data-toggle="tooltip" data-placement="right" title="Recommandations exclusives La bonne boite basées sur l’analyse des métiers. Pour vous faire ces suggestions, La bonne boite compare le nombre de candidats par métier avec le nombre de recrutements prédits.">?</span></p>
+                    <p>{{ text_reco }} <span class="badge badge-large badge-info" data-show data-hide-on-rollout data-original-title="{{ text_reco }}" data-toggle="tooltip" data-placement="right" title="Métiers proches en terme de compétences, à plus fort potentiel d’embauche">?</span></p>
                     <ul id="form-related_romes" class="gtm-related-rome-suggest">
                     {% for rome in related_romes %}
                     <li><a
@@ -178,7 +178,7 @@
         <div id="lbb-result-map" class="lbb-bright-container" aria-hidden="true"></div>
 
         {% if related_romes %}
-        <div class="lbb-feature-banner">Nouvelle fonctionnalité : Grâce aux nouveaux filtres, élargissez votre recherche aux métiers qui recrutent !</div>
+        <div class="lbb-feature-banner">Nouveau filtre « Ciblez d’autres métiers »: des métiers proches du vôtre à fort potentiel d’embauche</div>
         {% elif related_rome_initial %}
         <div class="lbb-feature-banner">Métier similaire à votre recherche: {{ rome_description }}</div>
         {% endif %}
