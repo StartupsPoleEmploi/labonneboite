@@ -43,16 +43,10 @@
                   </div>
               {% endif %}
               {% if related_romes %}
-                  <h3>Ciblez d'autres métiers</h3>
+                  <h3 class="flex-title">
+                    Ciblez d'autres métiers <span class="badge badge-large badge-info" data-show data-hide-on-rollout data-original-title="{{ text_reco }}" data-toggle="tooltip" data-placement="right" title="Métiers proches en terme de compétences, à plus fort potentiel d’embauche">?</span>
+                  </h3>
                   <div class="lbb-sidebar-item">
-                    {% set text_reco %}
-                      {% if related_romes|length > 1 %}
-                        {{ related_romes|length }} métiers équivalents
-                      {% else %}
-                        Un métier équivalent
-                      {%endif %}
-                    {% endset %}
-                    <p>{{ text_reco }} <span class="badge badge-large badge-info" data-show data-hide-on-rollout data-original-title="{{ text_reco }}" data-toggle="tooltip" data-placement="right" title="Métiers proches en terme de compétences, à plus fort potentiel d’embauche">?</span></p>
                     <ul id="form-related_romes" class="gtm-related-rome-suggest">
                     {% for rome in related_romes %}
                     <li><a

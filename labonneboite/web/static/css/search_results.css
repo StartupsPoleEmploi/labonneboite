@@ -94,6 +94,11 @@
     margin-top: 0;
 }
 
+.lbb-sidebar h3.flex-title {
+  display: flex;
+  justify-content: space-between;
+}
+
 .lbb-sidebar hr {
     margin-bottom: 24px;
 }
