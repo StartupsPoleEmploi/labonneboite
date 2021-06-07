@@ -231,7 +231,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 1)
             self.assertEqual(data['companies'][0]['siret'], '00000000000011')
             self.assertTrue(data['companies'][0]['alternance'])
-            self.assertIn('https://labonnealternance.pole-emploi.fr/details-entreprises/', data['companies'][0]['url'])
+            self.assertIn('https://labonneboite.pole-emploi.fr/00000000000011/details', data['companies'][0]['url'])
 
     def test_missing_communeid_or_latitudelongitude(self):
         with self.test_request_context():

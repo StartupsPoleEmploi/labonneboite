@@ -607,9 +607,6 @@ def get_office_details(siret, alternance=False):
     if alternance and office.is_removed_from_lba:
         abort(404)
 
-    # If alternance flag, we use an other URL
-    url = office.url_alternance if alternance else office.url
-
     result = {
         'headcount_text': office.headcount_text,
         'lat': office.y,
@@ -621,7 +618,7 @@ def get_office_details(siret, alternance=False):
         'siret': office.siret,
         'stars': office.stars,
         'alternance': office.qualifies_for_alternance(),
-        'url': url,
+        'url': office.url,
         'social_network': office.social_network or '',
         'address': {
             'city': office.city,
