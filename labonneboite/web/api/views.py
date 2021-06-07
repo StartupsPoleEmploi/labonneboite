@@ -589,6 +589,9 @@ def office_details(siret):
 
 
 def get_office_details(siret, alternance=False):
+    """
+    This code is very similar to the code in labonneboite/web/office/views.py
+    """
     office = Office.query.filter_by(siret=siret).first()
     if not office:
         abort(404)
