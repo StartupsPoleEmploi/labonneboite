@@ -62,18 +62,13 @@
         display: block;
     }
 
-    /* buttons to open the side bar on mobile: "triez" and "retour" */
     .lbb-sidebar-toggle:link,
     .lbb-sidebar-toggle:visited,
     .lbb-sidebar-toggle:active,
     .lbb-sidebar-toggle:hover {
-        font-weight: 600;
-        font-size: 13px;
-        font-size: 0.90em;
-        color: white;
-        background-color: #54108E;
-        padding: 5px;
-        border-radius: 4px;
+        font-weight: bold;
+        font-size: 16px;  /* Fallback in `px` for browsers that don't support rem. */
+        font-size: 1.1rem;
         text-decoration: none;
     }
 
@@ -92,11 +87,6 @@
     font-size: 18px;
     font-weight: 500;
     margin-top: 0;
-}
-
-.lbb-sidebar h3.flex-title {
-  display: flex;
-  justify-content: space-between;
 }
 
 .lbb-sidebar hr {
@@ -300,7 +290,7 @@
 
 #lbb-result-map {
     width: 100%;
-    height: 150px;
+    height: 240px;
     margin: 0;
     padding: 0;
 }
@@ -349,21 +339,4 @@
 /* Mapbox-specific */
 .mapboxgl-marker {
   cursor: pointer;
-}
-
-/* Related romes features
-=========================================================================== */
-
-.lbb-feature-banner {
-  background-color: #c8287e;
-  color: white;
-  border-radius: 3px;
-  padding: 10px;
-  font-weight: bold;
-}
-
-.lbb-feature-banner-small {
-  padding: 5px;
-  margin: 10px 0;
-  text-align: center;
 }
