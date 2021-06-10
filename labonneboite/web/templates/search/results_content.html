@@ -19,19 +19,18 @@
           </div>
           <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
             <div class="lbb-sidebar">
-              <div id="toggle-map-wrapper" class="gtm-filter-hidemap">
-                <div class="switch">
-                  <input type="checkbox" id="toggle-map" checked="checked">
-                  <span id="map-switch-button" class="slider round"></span>
-                </div>
-                <label id="map-switch-text">Masquer la carte</label>
-              </div>
-             <div class="js-form-search-filters">
-               <div class="lbb-sidebar-toggle-wrapper">
-                 <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
+              <div class="js-form-search-filters">
+                <div class="lbb-sidebar-toggle-wrapper">
+                  <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
                  <hr>
                </div>
-              <h3 class="sr-only lbb-result-info">Triez les résultats de recherche</h3>
+
+               {% if related_romes %}
+               <div class="lbb-feature-banner lbb-feature-banner-small">Nouveau filtre de recherche</div>
+               {% endif %}
+
+ 
+               <h3 class="sr-only lbb-result-info">Triez les résultats de recherche</h3>
               {% if related_rome_initial %}
                   <div class="lbb-sidebar-item">
                     <p>Recherche initiale</p>
@@ -44,16 +43,10 @@
                   </div>
               {% endif %}
               {% if related_romes %}
-                  <h3>Ciblez les métiers qui recrutent</h3>
+                  <h3 class="flex-title">
+                    Ciblez d'autres métiers <span class="badge badge-large badge-info" data-show data-hide-on-rollout data-original-title="{{ text_reco }}" data-toggle="tooltip" data-placement="right" title="Métiers proches en terme de compétences, à plus fort potentiel d’embauche">?</span>
+                  </h3>
                   <div class="lbb-sidebar-item">
-                    {% set text_reco %}
-                      {% if related_romes|length > 1 %}
-                        {{ related_romes|length }} métiers qui recrutent plus
-                      {% else %}
-                        Un métier qui recrute plus
-                      {%endif %}
-                    {% endset %}
-                    <p>{{ text_reco }} <span class="badge badge-large badge-info" data-show data-hide-on-rollout data-original-title="{{ text_reco }}" data-toggle="tooltip" data-placement="right" title="Recommandations exclusives La bonne boite basées sur l’analyse des métiers. Pour vous faire ces suggestions, La bonne boite compare le nombre de candidats par métier avec le nombre de recrutements prédits.">?</span></p>
                     <ul id="form-related_romes" class="gtm-related-rome-suggest">
                     {% for rome in related_romes %}
                     <li><a
@@ -167,7 +160,22 @@
 
 
         <h2 class="sr-only lbb-result-info">Résultats de la recherche</h2>
+
+        <div id="toggle-map-wrapper" class="gtm-filter-hidemap">
+          <div class="switch">
+            <input type="checkbox" id="toggle-map" checked="checked">
+            <span id="map-switch-button" class="slider round"></span>
+          </div>
+          <label id="map-switch-text">Masquer la carte</label>
+        </div>
+
         <div id="lbb-result-map" class="lbb-bright-container" aria-hidden="true"></div>
+
+        {% if related_romes %}
+        <div class="lbb-feature-banner">Nouveau filtre « Ciblez d’autres métiers »: des métiers proches du vôtre à fort potentiel d’embauche</div>
+        {% elif related_rome_initial %}
+        <div class="lbb-feature-banner">Métier similaire à votre recherche: {{ rome_description }}</div>
+        {% endif %}
 
         {% if not companies %}
           <div class="lbb-bright-container ga-no-results">
