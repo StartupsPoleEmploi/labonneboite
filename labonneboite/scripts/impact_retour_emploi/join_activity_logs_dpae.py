@@ -139,7 +139,7 @@ class JoinActivityLogsDPAE:
         if DEBUG:
             chunksize = 10 ** 2
         else:
-            chunksize = 10 ** 6
+            chunksize = 10000
 
         i = 0
         column_names = ['kc_siret', 'dc_naf_id', 'dc_adresse', 'dc_codepostal', '_',
@@ -170,6 +170,7 @@ class JoinActivityLogsDPAE:
             # The dpae used must be after the last recorded emabuche date
             df_dpae['kd_dateembauche_bis'] = df_dpae.apply(lambda row: get_date(row), axis=1)
             df_dpae = df_dpae[df_dpae.kd_dateembauche_bis > self.date_last_recorded_hiring]
+            df_activity = self.get_logs_activities_by_sirets(list(df_dpae.kc_siret.unique()))
             nb_rows = df_dpae.shape[0]
 
             logger.info(f"Sample of DPAE minus old dates has : {nb_rows} rows")
@@ -180,7 +181,7 @@ class JoinActivityLogsDPAE:
             # We join the dpae and activity logs dataframe
             df_dpae_act = pd.merge(
                 df_dpae,
-                self.df_activity,
+                df_activity,
                 how='left',
                 left_on=['dc_ididentiteexterne', 'kc_siret'],
                 right_on=['idutilisateur_peconnect', 'siret']
@@ -217,10 +218,7 @@ class JoinActivityLogsDPAE:
 
 def run_main():
     join_act_log = JoinActivityLogsDPAE()
-
     join_act_log.set_most_recent_dpae_file()
-    join_act_log.set_df_activity()
-
     join_act_log.join_dpae_activity_logs()
 
 
