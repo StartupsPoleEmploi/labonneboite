@@ -101,8 +101,25 @@
         .not($resultContainer)
         .removeClass('active');
 
+      // Get all URL params, used for activity logs
+      var query = window.location.search.substring(1)
+        .split('&')
+        .reduce(function(acc, keyVal) {
+          try {
+            var [key, val] = keyVal.split('=');
+            return {
+              ...acc,
+              [key]: val,
+            }
+          } catch(e) {
+            // no destructuring support
+            return acc
+          }
+        }, {})
+      // Add CSRF token
+      query['csrf_token'] = CSRF_TOKEN;
       // Trigger event
-      $.post('/events/toggle-details/' + siret, {'csrf_token': CSRF_TOKEN});
+      $.post('/events/toggle-details/' + siret, query);
     });
 
   };

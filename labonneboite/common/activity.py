@@ -31,18 +31,11 @@ def log(event_name, user=None, source=None, **properties):
     if has_request_context():
         # When we log in the context of an ajax call, e.g. 'detail entreprise',
         #   the params of the search are not present in the URL,
-        #   so we log the params in the query string of the referrer
-        if request.is_xhr:
-            # Parse the referrer URL
-            referrer = urlparse(request.referrer)
-            # Parse the query to get all the params as key => [...values] pairs
-            referrerArgs = parse_qs(referrer.query)
-            # Flatten the values to get key => value pairs when possible
-            args = {key: values[0] if len(values) == 1 else values for key, values in referrerArgs.items()}
-            # Merge the referrer params with the request params
-            args.update(request.args)
-        else:
-            args = request.args.copy()
+        # Also the referrer will not have any query params
+        # In local dev it has but not in production, because of a header and security
+        # So we expect ajax calls to send params explicitely
+        args = request.values.to_dict()
+        args.pop('csrf_token', None) # Keep this out of the logs
     else:
         args = None
 
