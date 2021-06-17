@@ -173,7 +173,7 @@ class JoinActivityLogsDPAE:
             if len(list(df_dpae.kc_siret.unique())) > 0:
                 df_activity = self.get_logs_activities_by_sirets(list(df_dpae.kc_siret.unique()))
             else:
-                df_activity = pd.DataFrame([], columns=df_dpae.columns.to_list())
+                df_activity = pd.DataFrame([], columns=df_dpae.columns.tolist())
 
             nb_rows = df_dpae.shape[0]
 
