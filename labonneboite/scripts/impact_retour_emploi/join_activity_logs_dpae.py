@@ -172,44 +172,46 @@ class JoinActivityLogsDPAE:
             df_dpae = df_dpae[df_dpae.kd_dateembauche_bis > self.date_last_recorded_hiring]
             if len(list(df_dpae.kc_siret.unique())) > 0:
                 df_activity = self.get_logs_activities_by_sirets(list(df_dpae.kc_siret.unique()))
+                nb_rows = df_dpae.shape[0]
+
+                logger.info(f"Sample of DPAE minus old dates has : {nb_rows} rows")
+
+                # convert df dpae columns to 'object'
+                df_dpae = df_dpae.astype(str)
+
+                # We join the dpae and activity logs dataframe
+                df_dpae_act = pd.merge(
+                    df_dpae,
+                    df_activity,
+                    how='left',
+                    left_on=['dc_ididentiteexterne', 'kc_siret'],
+                    right_on=['idutilisateur_peconnect', 'siret']
+                )
+
+                nb_rows = df_dpae_act.shape[0]
+                logger.info(f"Sample of merged activity/DPAE has : {nb_rows} rows")
+
+                # filter on the fact that dateheure activity must be inferior to kd_dateembauche
+                df_dpae_act = df_dpae_act[df_dpae_act.kd_dateembauche_bis > df_dpae_act.dateheure]
+                df_dpae_act = df_dpae_act.drop(['kd_dateembauche_bis'], axis=1)
+                nb_rows = df_dpae_act.shape[0]
+                logger.info(f"Sample of merged activity/DPAE with the good dates has : {nb_rows} rows")
+
+                df_dpae_act = df_dpae_act.astype(str)
+
+                # We save the lines of the join we want to keep
+                self.save_csv_file(df_dpae_act, i)
+
+                nb_rows = df_dpae_act.shape[0]
+                logger.info(f" ==> Nb rows we keep in this sample : {nb_rows} rows")
+
+                total_dpae_rows_used += df_dpae_act.shape[0]
+                logger.info(f" ==> Nb total rows that have been kept : {total_dpae_rows_used} rows")
             else:
-                df_activity = pd.DataFrame([], columns=df_dpae.columns.tolist())
+                logger.info(f"Sample of merged activity/DPAE with the good dates has : 0 rows")
+                logger.info(f" ==> Nb rows we keep in this sample : 0 rows")
+                logger.info(f" ==> Nb total rows that have been kept : 0 rows")
 
-            nb_rows = df_dpae.shape[0]
-
-            logger.info(f"Sample of DPAE minus old dates has : {nb_rows} rows")
-
-            # convert df dpae columns to 'object'
-            df_dpae = df_dpae.astype(str)
-
-            # We join the dpae and activity logs dataframe
-            df_dpae_act = pd.merge(
-                df_dpae,
-                df_activity,
-                how='left',
-                left_on=['dc_ididentiteexterne', 'kc_siret'],
-                right_on=['idutilisateur_peconnect', 'siret']
-            )
-
-            nb_rows = df_dpae_act.shape[0]
-            logger.info(f"Sample of merged activity/DPAE has : {nb_rows} rows")
-
-            # filter on the fact that dateheure activity must be inferior to kd_dateembauche
-            df_dpae_act = df_dpae_act[df_dpae_act.kd_dateembauche_bis > df_dpae_act.dateheure]
-            df_dpae_act = df_dpae_act.drop(['kd_dateembauche_bis'], axis=1)
-            nb_rows = df_dpae_act.shape[0]
-            logger.info(f"Sample of merged activity/DPAE with the good dates has : {nb_rows} rows")
-
-            df_dpae_act = df_dpae_act.astype(str)
-
-            # We save the lines of the join we want to keep
-            self.save_csv_file(df_dpae_act, i)
-
-            nb_rows = df_dpae_act.shape[0]
-            logger.info(f" ==> Nb rows we keep in this sample : {nb_rows} rows")
-
-            total_dpae_rows_used += df_dpae_act.shape[0]
-            logger.info(f" ==> Nb total rows that have been kept : {total_dpae_rows_used} rows")
 
             nb_total_rows_dpae_used = (i+1) * chunksize
             logger.info(f" ==> Nb total rows of DPAE that have been used : {nb_total_rows_dpae_used} rows")
