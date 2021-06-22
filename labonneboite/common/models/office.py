@@ -309,21 +309,11 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         return self.get_url_for_rome_code(None)
 
-    @property
-    def url_alternance(self):
-        """
-        Returns the URL of `La Bonne Alternance` page or `None` if we are outside of a Flask's application context.
-        """
-        return 'https://labonnealternance.pole-emploi.fr/details-entreprises/{}'.format(self.siret)
-
     def get_url_for_rome_code(self, rome_code, alternance=False, **query_string):
-        if alternance:
-            return '{}?{}'.format(self.url_alternance, urlencode(query_string))
-
         try:
             if rome_code:
-                return url_for('office.details', siret=self.siret, rome_code=rome_code, _external=True, **query_string)
-            return url_for('office.details', siret=self.siret, _external=True, **query_string)
+                return url_for('office.details', siret=self.siret, rome_code=rome_code, _external=True, contract='alternance' if alternance else None, **query_string)
+            return url_for('office.details', siret=self.siret, contract='alternance' if alternance else None, _external=True, **query_string)
         except RuntimeError:
             # RuntimeError is raised when we are outside of a Flask's application context.
             # Here, we cannot properly generate an URL via url_for.
