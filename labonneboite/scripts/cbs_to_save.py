@@ -3,6 +3,7 @@
     This script manages data we add to the SAVE DB programatically as part of an experiment with CBS school
     usage:
         LBB_ENV=development ENABLE_DB_INFILE=1 python labonneboite/scripts/cbs_to_save.py count
+    Params: insert, delete, count
 """
 # 32419887800021
 # DANIEL PAUL - METZ
