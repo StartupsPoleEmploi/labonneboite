@@ -55,7 +55,7 @@ def main():
     # os.environ['LBB_ENV'] = 'development'
     command = sys.argv[1]
 
-    print('\nStarting script with LBB_ENV=', os.environ['LBB_ENV'], ' and command:', command, '\n')
+    print('\nStarting script with LBB_ENV=', os.environ.get('LBB_ENV', None), ' and command:', command, '\n')
 
     if(command == 'count'): cbs_count_records()
 
