@@ -2,14 +2,11 @@
 """
     This script manages data we add to the SAVE DB programatically as part of an experiment with CBS school
     usage:
-        LBB_ENV=development ENABLE_DB_INFILE=1 python labonneboite/scripts/cbs_to_save.py count
+        ENABLE_DB_INFILE=1 python labonneboite/scripts/cbs_to_save.py count
     Params: insert, delete, count
+    When using insert you can provide the path to the CSV file (defaults to labonneboite/common/data/cbs_data_test.csv), e.g. `ENABLE_DB_INFILE=1 python labonneboite/scripts/cbs_to_save.py insert ../tirage_LBA_170621.csv`
+    Note: when running the script locally it requires the `LBB_ENV=development` env var
 """
-# 32419887800021
-# DANIEL PAUL - METZ
-# http://localhost:8080/entreprises?j=Animation+de+vente&l=Puget-Ville+83390&naf=&h=1&tr=&d=3000&sort=score&ij=&occupation=animation-de-vente&lat=43.27875&lon=6.155912&departments=&tr=
-# http://localhost:8080/32419887800021/details
-
 import sys
 import os
 import time
