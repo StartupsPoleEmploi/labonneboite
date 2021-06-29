@@ -24,6 +24,9 @@ from labonneboite.importer.jobs.common import logger
 from labonneboite.common.database import db_session
 from labonneboite.importer.models.errors import DoublonException
 
+
+DEFAULT_DATETIME_DPAE = datetime(2012, 1, 1, 0, 0)
+
 class DpaeExtractJob(Job):
     file_type = DpaeStatistics.DPAE
     import_type = ImportTask.DPAE
@@ -77,6 +80,8 @@ class DpaeExtractJob(Job):
                                         .filter(Hiring.contract_type.in_((Hiring.CONTRACT_TYPE_CDI,
                                                                           Hiring.CONTRACT_TYPE_CDD,
                                                                           Hiring.CONTRACT_TYPE_CTT))).first()[0]
+        if last_historical_data_date_in_db is None:
+            last_historical_data_date_in_db = DEFAULT_DATETIME_DPAE
         logger.info("will now extract all dpae with hiring_date between %s and %s",
                     last_historical_data_date_in_db, self.last_historical_data_date_in_file)
 

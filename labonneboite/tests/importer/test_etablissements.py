@@ -34,7 +34,10 @@ class TestEtablissements(DatabaseTest):
     def test_get_offices_from_file(self):
         filename = self.get_data_file_path(ETABLISSEMENT_FILE)
         task = EtablissementExtractJob(filename)
-        etabs = task.get_offices_from_file()
+        etabs = {}
+        for off in task.get_offices_from_file():
+            etabs.update(off)
+        task.csv_offices = etabs
         self.assertEqual(len(list(etabs.keys())), 26)
         _, raisonsociale, _, _, _, _, \
         _, _, email, _, _, _, \
@@ -50,21 +53,28 @@ class TestEtablissements(DatabaseTest):
     def test_create_new_offices(self):
         filename = self.get_data_file_path(ETABLISSEMENT_FILE)
         task = EtablissementExtractJob(filename)
-        task.csv_offices = task.get_offices_from_file()
+
+        csv_offices = {}
+        for off in task.get_offices_from_file():
+            csv_offices.update(off)
+        task.csv_offices = csv_offices
         task.creatable_sirets = [
             "00565014800033", "00685016800011"
         ]
-        task.create_creatable_offices()
+        task.create_update_offices()
         self.assertEqual(len(RawOffice.query.all()), 2)
 
     def test_delete_offices(self):
         filename = self.get_data_file_path(ETABLISSEMENT_FILE)
         task = EtablissementExtractJob(filename)
-        task.csv_offices = task.get_offices_from_file()
+        csv_offices = {}
+        for off in task.get_offices_from_file():
+            csv_offices.update(off)
+        task.csv_offices = csv_offices
         task.creatable_sirets = [
             "00565014800033", "00685016800011"
         ]
-        task.create_creatable_offices()
+        task.create_update_offices()
         task.deletable_sirets = set(["00565014800033"])
         task.delete_deletable_offices()
         self.assertEqual(len(RawOffice.query.all()), 1)
@@ -83,7 +93,10 @@ class TestEtablissements(DatabaseTest):
     def test_emails_rgpd(self):
         filename = self.get_data_file_path(ETABLISSEMENT_FILE)
         task = EtablissementExtractJob(filename)
-        etabs = task.get_offices_from_file()
+        etabs = {}
+        for off in task.get_offices_from_file():
+            etabs.update(off)
+        task.csv_offices = etabs
 
         _, _, _, _, _, _, \
         _, _, email, _, _, _, \
