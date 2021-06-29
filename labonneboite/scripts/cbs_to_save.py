@@ -40,11 +40,11 @@ def cbs_delete_records():
 
 def cbs_insert_records():
     try:
-        print('> Inserting CBS records...')
+        file = sys.argv[2] if len(sys.argv) > 2 else 'labonneboite/common/data/cbs_data_test.csv'
+        print('> Inserting CBS records...', file)
         sql = text("""
-            LOAD DATA LOCAL INFILE '%s' into table etablissements_admin_update FIELDS TERMINATED BY ','  LINES TERMINATED BY '\\n' IGNORE 1 ROWS (@score,@siret) SET score_alternance=@score, sirets=@siret;
-        """ % ('labonneboite/common/data/cbs_data_test.csv'))
-        # """ % ('tirage_LBA_170621.csv'))
+            LOAD DATA LOCAL INFILE '%s' into table etablissements_admin_update FIELDS ENCLOSED BY '\"' TERMINATED BY ','  LINES TERMINATED BY '\\n' IGNORE 1 ROWS (@score,@siret) SET score_alternance=@score, sirets=@siret;
+        """ % (file))
         db_session.execute(sql)
         db_session.commit()
         print('> Done')
