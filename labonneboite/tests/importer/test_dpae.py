@@ -46,8 +46,6 @@ class TestDpae(DatabaseTest):
         ImportTask.query.filter(ImportTask.filename == FIRST_DPAE_FILE_NAME).delete()
         DpaeStatistics.query.order_by(DpaeStatistics.most_recent_data_date.desc()).first().delete()
         task = extract_dpae.DpaeExtractJob(filename)
-        with self.assertRaises(DoublonException):
-           task.run()
         self.assertEqual(Hiring.query.count(), 6)
 
     def test_extract_departement(self):

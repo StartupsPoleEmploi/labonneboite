@@ -17,6 +17,7 @@ from labonneboite.common.chunks import chunks
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 from labonneboite.common.load_data import load_effectif_labels
+from labonneboite.common.env import get_current_env, ENV_TEST
 
 # This list contains siret that must not be found in data,
 # we use it as a test : if one of those is found in data, we stop the importer
@@ -439,24 +440,25 @@ class EtablissementExtractJob(Job):
         logger.info("per departement read %s", departement_count)
         logger.info("finished reading offices...")
 
-        if unprocessable_departement_errors > 2500:
-            raise ValueError("too many unprocessable_departement_errors")
-        if no_zipcode_count > 75000:
-            raise ValueError("too many no_zipcode_count")
-        if format_errors > 5:
-            raise ValueError("too many format_errors")
-        if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
-            msg = "incorrect total number of departements : %s instead of expected %s" % (
-                len(departement_counter_dic),
-                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
-            )
-            raise ValueError(msg)
-        for departement, count in departement_count:
-            if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
-                logger.exception("only %s offices in departement %s", count, departement)
-                raise ValueError("not enough offices in at least one departement")
+        if get_current_env() != ENV_TEST:
+            if unprocessable_departement_errors > 2500:
+                raise ValueError("too many unprocessable_departement_errors")
+            if no_zipcode_count > 75000:
+                raise ValueError("too many no_zipcode_count")
+            if format_errors > 5:
+                raise ValueError("too many format_errors")
+            if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
+                msg = "incorrect total number of departements : %s instead of expected %s" % (
+                    len(departement_counter_dic),
+                    settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
+                )
+                raise ValueError(msg)
+            for departement, count in departement_count:
+                if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
+                    logger.exception("only %s offices in departement %s", count, departement)
+                    raise ValueError("not enough offices in at least one departement")
 
-        return offices
+        yield offices
 
 @history_importer_job_decorator(os.path.basename(__file__))
 def run():
