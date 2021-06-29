@@ -16,10 +16,12 @@ import time
 from sqlalchemy import text
 from labonneboite.common.database import db_session, engine
 
+REASON_KEY = 'cbs_xp'
+
 def cbs_count_records():
     sql = text("""
-        SELECT COUNT(*) FROM labonneboite.etablissements_admin_update where date_created="0000-00-00 00:00:00";
-    """)
+        SELECT COUNT(*) FROM labonneboite.etablissements_admin_update where reason='%s';
+    """ % (REASON_KEY))
     try:
         res = db_session.execute(sql)
         print('> CBS records count: ', res.first()[0])
@@ -30,8 +32,8 @@ def cbs_delete_records():
     try:
         print('> Deleting CBS records...')
         sql = text("""
-            delete from labonneboite.etablissements_admin_update where date_created="0000-00-00 00:00:00";
-        """)
+            delete from labonneboite.etablissements_admin_update where reason='%s';
+        """ % (REASON_KEY))
         db_session.execute(sql)
         db_session.commit()
         print('> Done')
@@ -43,8 +45,8 @@ def cbs_insert_records():
         file = sys.argv[2] if len(sys.argv) > 2 else 'labonneboite/common/data/cbs_data_test.csv'
         print('> Inserting CBS records...', file)
         sql = text("""
-            LOAD DATA LOCAL INFILE '%s' into table etablissements_admin_update FIELDS ENCLOSED BY '\"' TERMINATED BY ','  LINES TERMINATED BY '\\n' IGNORE 1 ROWS (@score,@siret) SET score_alternance=@score, sirets=@siret;
-        """ % (file))
+            LOAD DATA LOCAL INFILE '%s' into table etablissements_admin_update FIELDS ENCLOSED BY '\"' TERMINATED BY ','  LINES TERMINATED BY '\\n' IGNORE 1 ROWS (@score,@siret) SET score_alternance=@score, sirets=@siret, reason='%s', date_created=NOW();
+        """ % (file, REASON_KEY))
         db_session.execute(sql)
         db_session.commit()
         print('> Done')
