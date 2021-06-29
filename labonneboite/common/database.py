@@ -29,9 +29,14 @@ def get_db_string(db_params=None):
     """
     Returns the database URI that should be used for the connection.
     It can be overriden (e.g. in tests) by hardcoding the value of `db_params`.
+    The environment variable ENABLE_DB_INFILE may be set to enable `LOAD DATA LOCAL INFILE` SQL instructions
     """
+    # Build the connection string
     db_params = db_params or DATABASE
-    return "mysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}?charset=utf8mb4".format(**db_params)
+    str = "mysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}?charset=utf8mb4".format(**db_params)
+    # Add the optional param to enable `LOAD DATA LOCAL INFILE` SQL instructions
+    str = str + "&local_infile=1" if os.environ.get('ENABLE_DB_INFILE') else str
+    return str
 
 pool_recycle = int(os.environ.get("DB_CONNECTION_TIMEOUT", "30"))
 connect_timeout = int(os.environ.get("CONNECT_TIMEOUT", "5"))
