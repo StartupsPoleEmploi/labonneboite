@@ -40,7 +40,7 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
         Test that a user can change location directly
         in a search results page using a form.
         """
-        city = 'Nancy'
+        city = 'Metz'
         self.fail_if_no_results()
         results_sentence = self.driver.find_element_by_css_selector('h1.lbb-result-info').text
         primitive_results = re.match(r'(\d+)', results_sentence).group()
