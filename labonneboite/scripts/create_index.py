@@ -601,7 +601,7 @@ def update_offices():
                 offices_attributes = ["company_name", "office_name", "email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance", "social_network", "contact_mode"]
                 update_attributes = ["new_company_name", "new_office_name", "email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance", "social_network", "contact_mode"]
                 for office_attr, update_attr in list(zip(offices_attributes, update_attributes)):
-                    if getattr(office, office_attr) != getattr(office_to_update, update_attr):
+                    if getattr(office, office_attr) != getattr(office_to_update, update_attr) and getattr(office_to_update, update_attr) is not None:
                         setattr(office, office_attr, getattr(office_to_update, update_attr))
                         is_updated = True
 
