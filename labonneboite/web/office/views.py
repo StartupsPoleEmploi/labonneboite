@@ -27,15 +27,30 @@ def details(siret):
     """
     Display the details of an office.
     In case the context of a rome_code is given, display appropriate score value for this rome_code
+    This code is very similar to the code in labonneboite/web/api/views.py
     """
     fix_csrf_session()
     rome_code = request.args.get('rome_code', None)
     company = Office.query.filter_by(siret=siret).first()
+
     if not company:
         abort(404)
 
-    # Check if company is hidden by SAVE
-    if not company.score:
+    # Alternance case
+    alternance = 'contract' in request.args and request.args['contract'] == 'alternance'
+    # If an office score equals 0 it means it is not supposed
+    # to be shown on LBB frontend/api
+    # and/or it was specifically removed via SAVE,
+    # and thus it should not be accessible by siret.
+    if not alternance and not company.score:
+        # The company is hidden by SAVE
+        abort(404)
+
+    # Offices having score_alternance equal 0 may still be accessed
+    # by siret in case of LBA offices from the visible market (i.e. having
+    # at least one job offer obtained from the API Offers V2).
+    # However we should not show them if they were specifically removed via SAVE.
+    if alternance and company.is_removed_from_lba:
         abort(404)
 
     context = {

@@ -319,10 +319,8 @@ def entreprises():
                         # related_romes = list(map(add_nafs, related_romes))
                         related_romes = list(map(add_descriptions, related_romes))
                         # sort and limit size
-                        related_romes.sort(key=lambda rome_: rome_.get('score'))
+                        related_romes.sort(key=lambda rome_: -rome_.get('score'))
                         related_romes = related_romes[:settings.MAX_RELATED_ROMES]
-                        if (len(related_romes) > 0):
-                            flash('Nouvelle fonctionnalité : Grâce aux nouveaux filtres, élargissez votre recherche aux métiers qui recrutent !', 'info')
     else:
         related_romes = []
         hide_suggestions = False

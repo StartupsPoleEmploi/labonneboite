@@ -413,6 +413,11 @@ There are 2 mechanisms for the suggestion of ROME codes:
 
 These two mechanisms will need to be unified because this will be easier to maintain, but for now they are in different places in the code, see `result_content.html` file which uses both `related_rome`/`related_rome_initial` and `alternative_rome_descriptions` (includedfrom `results_content.html`)
 
+## About CBS experiments
+
+CBS stands for Copenhagen Business School. They are providing a CSV file which is used to change the score_alternance field of companies. This data is manually injected in the SAVE tables with the script [cbs_to_save.py](labonneboite/scripts/cbs_to_save.py). [Here is a sample file to test](labonneboite/common/data/cbs_data_test.csv). Then the SAVE data is applied to change the companies records.
+
+
 ## How to contribute
 
 For devs in the core team, this repo follows the [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow).
