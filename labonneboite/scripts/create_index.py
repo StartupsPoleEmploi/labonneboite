@@ -605,7 +605,16 @@ def update_offices():
                         setattr(office, office_attr, getattr(office_to_update, update_attr))
                         is_updated = True
 
-                for attr in ["email", "tel", "website"]:
+                if office_to_update.remove_phone:
+                    if office.tel != '':
+                        office.tel = ''
+                        is_updated = True
+                else:
+                    if office.tel != office_to_update.new_phone:
+                        office.tel = office_to_update.new_phone
+                        is_updated = True
+
+                for attr in ["email", "website"]:
                     if getattr(office_to_update, f"remove_{attr}"):
                         if getattr(office, attr) != '':
                             setattr(office, attr, '')
