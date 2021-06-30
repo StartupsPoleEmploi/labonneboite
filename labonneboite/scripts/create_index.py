@@ -595,65 +595,70 @@ def update_offices():
             office = Office.query.filter_by(siret=siret).first()
 
             if office:
+                is_updated = False
                 # Apply changes in DB.
-                office.company_name = office_to_update.new_company_name or office.company_name
-                office.office_name = office_to_update.new_office_name or office.office_name
-                office.email = '' if office_to_update.remove_email else (office_to_update.new_email or office.email)
-                office.tel = '' if office_to_update.remove_phone else (office_to_update.new_phone or office.tel)
-                office.website = '' if office_to_update.remove_website else (office_to_update.new_website or office.website)
+                # , "email", "tel", "website"
+                offices_attributes = ["company_name", "office_name", "email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance", "social_network", "contact_mode"]
+                update_attributes = ["new_company_name", "new_office_name", "email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance", "social_network", "contact_mode"]
+                for office_attr, update_attr in list(zip(offices_attributes, update_attributes)):
+                    if getattr(office, office_attr) != getattr(office_to_update, update_attr):
+                        setattr(office, office_attr, getattr(office_to_update, update_attr))
+                        is_updated = True
 
-                office.email_alternance = office_to_update.email_alternance
-                office.phone_alternance = office_to_update.phone_alternance
-                office.website_alternance = office_to_update.website_alternance
+                for attr in ["email", "tel", "website"]:
+                    if getattr(office_to_update, f"remove_{attr}"):
+                        if getattr(office, attr) != '':
+                            setattr(office, attr, '')
+                            is_updated = True
+                    else:
+                        if getattr(office, attr) != getattr(office_to_update, f"new_{attr}"):
+                            setattr(office, attr, getattr(office_to_update, f"new_{attr}"))
+                            is_updated = True
 
-                # Note : we need to handle when score and score_alternance = 0
-                office.score = office_to_update.score if office_to_update.score is not None else office.score
-                office.score_alternance = office_to_update.score_alternance if office_to_update.score_alternance is not None else office.score_alternance
-                office.social_network = office_to_update.social_network
-                office.contact_mode = office_to_update.contact_mode
-                office.save()
+                if is_updated:
+                    office.save()
 
-                # Apply changes in ElasticSearch.
-                body = {'doc':
-                    {'email': office.email, 'phone': office.tel, 'website': office.website,
-                    'flag_alternance': 1 if office.flag_alternance else 0}
-                }
-
-                scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)
-                if scores_by_rome:
-                    body['doc']['scores_by_rome'] = scores_by_rome
-                    body['doc']['boosted_romes'] = boosted_romes
-                if scores_alternance_by_rome:
-                    body['doc']['scores_alternance_by_rome'] = scores_alternance_by_rome
-                    body['doc']['boosted_alternance_romes'] = boosted_alternance_romes
-
-                # The update API makes partial updates: existing `scalar` fields are overwritten,
-                # but `objects` fields are merged together.
-                # https://www.elastic.co/guide/en/elasticsearch/guide/1.x/partial-updates.html
-                # However `scores_by_rome` and `boosted_romes` need to be overwritten because they
-                # may change over time.
-                # To do this, we perform 2 requests: the first one resets `scores_by_rome` and
-                # `boosted_romes` and the second one populates them.
-                delete_body = {'doc': {}}
-                delete_body = {
-                    'doc': {
-                        'scores_by_rome': None,
-                        'boosted_romes': None,
-                        'scores_alternance_by_rome': None,
-                        'boosted_alternance_romes': None
+                    # Apply changes in ElasticSearch.
+                    body = {'doc':
+                        {'email': office.email, 'phone': office.tel, 'website': office.website,
+                        'flag_alternance': 1 if office.flag_alternance else 0}
                     }
-                }
 
-                # Unfortunately these cannot easily be bulked :-(
-                # The reason is there is no way to tell bulk to ignore missing documents (404)
-                # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
-                es.Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=delete_body,
-                        params={'ignore': 404})
-                es.Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=body,
-                        params={'ignore': 404})
+                    scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)
+                    if scores_by_rome:
+                        body['doc']['scores_by_rome'] = scores_by_rome
+                        body['doc']['boosted_romes'] = boosted_romes
+                    if scores_alternance_by_rome:
+                        body['doc']['scores_alternance_by_rome'] = scores_alternance_by_rome
+                        body['doc']['boosted_alternance_romes'] = boosted_alternance_romes
 
-                # Delete the current PDF thus it will be regenerated at the next download attempt.
-                pdf_util.delete_file(office)
+                    # The update API makes partial updates: existing `scalar` fields are overwritten,
+                    # but `objects` fields are merged together.
+                    # https://www.elastic.co/guide/en/elasticsearch/guide/1.x/partial-updates.html
+                    # However `scores_by_rome` and `boosted_romes` need to be overwritten because they
+                    # may change over time.
+                    # To do this, we perform 2 requests: the first one resets `scores_by_rome` and
+                    # `boosted_romes` and the second one populates them.
+                    delete_body = {'doc': {}}
+                    delete_body = {
+                        'doc': {
+                            'scores_by_rome': None,
+                            'boosted_romes': None,
+                            'scores_alternance_by_rome': None,
+                            'boosted_alternance_romes': None
+                        }
+                    }
+
+                    # Unfortunately these cannot easily be bulked :-(
+                    # The reason is there is no way to tell bulk to ignore missing documents (404)
+                    # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
+                    es.Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=delete_body,
+                            params={'ignore': 404})
+                    es.Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=body,
+                            params={'ignore': 404})
+
+                    # Delete the current PDF thus it will be regenerated at the next download attempt.
+                    pdf_util.delete_file(office)
 
 
 @timeit
