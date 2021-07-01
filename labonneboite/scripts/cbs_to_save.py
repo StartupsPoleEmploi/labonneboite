@@ -6,6 +6,14 @@
     Params: insert, delete, count
     When using insert you can provide the path to the CSV file (defaults to labonneboite/common/data/cbs_data_test.csv), e.g. `ENABLE_DB_INFILE=1 python labonneboite/scripts/cbs_to_save.py insert ../tirage_LBA_170621.csv`
     Note: when running the script locally it requires the `LBB_ENV=development` env var
+    Note: apply in production
+    ```
+    $ ssh lbbprod1
+    $ docker exec -it labonneboite_labonneboite_1 bash
+    # python labonneboite/scripts/cbs_to_save.py delete
+    # source /labonneboite/env/bin/activate
+    # ENABLE_DB_INFILE=1 python labonneboite/scripts/cbs_to_save.py insert ../tirage_LBA_170621.csv
+    ```
 """
 import sys
 import os
