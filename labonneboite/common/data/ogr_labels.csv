@@ -11,7 +11,7 @@ ogr_id|ogr_label
 10209|Accompagnateur / Accompagnatrice de tourisme équestre
 10210|Accompagnateur / Accompagnatrice de tourisme sportif
 10211|Accompagnateur / Accompagnatrice de voyages
-10212|Accompagnateur / Accompagnatrice de voyages ou d'activités culturelles, sportives et de plein air
+10212|Accompagnateur / Accompagnatrice de voyages ou d'activités culturelles; sportives et de plein air
 10213|Accompagnateur / Accompagnatrice d'enfants ou d'adolescents
 10214|Accompagnateur / Accompagnatrice d'excursions
 10215|Accompagnateur / Accompagnatrice en écotourisme
@@ -59,7 +59,7 @@ ogr_id|ogr_label
 10258|Acheteur / Acheteuse public
 10259|Acheteur vendeur / Acheteuse vendeuse en dépôt-vente
 10260|Acousticien / Acousticienne BTP
-10261|Acousticien / Acousticienne en études, recherche et développement
+10261|Acousticien / Acousticienne en études; recherche et développement
 10262|Acrobate
 10263|Acteur / Actrice
 10264|Acteur / Actrice de complément
@@ -88,7 +88,7 @@ ogr_id|ogr_label
 10287|Adjoint / Adjointe chef de fabrication en industrie du bois
 10288|Adjoint / Adjointe chef de laboratoire d'analyse industrielle
 10289|Adjoint / Adjointe chef de scierie
-10290|Adjoint / Adjointe de contrôle de la concurrence, de la consommation et de la répression des fraudes
+10290|Adjoint / Adjointe de contrôle de la concurrence; de la consommation et de la répression des fraudes
 10291|Adjoint / Adjointe de direction bancaire
 10292|Adjoint / Adjointe de laboratoire d'analyse industrielle
 10293|Adjoint / Adjointe de sécurité de la police nationale
@@ -117,7 +117,7 @@ ogr_id|ogr_label
 10316|Administrateur / Administratrice système informatique
 10317|Administrateur / Administratrice Systèmes d'Information Géographique -SIG-
 10319|Médiateur / Médiatrice adulte relais
-10320|Aérodynamicien / Aérodynamicienne en études, recherche et développement
+10320|Aérodynamicien / Aérodynamicienne en études; recherche et développement
 10321|Afficheur / Afficheuse
 10322|Afficheur / Afficheuse colle
 10323|Afficheur / Afficheuse déroulant
@@ -161,7 +161,7 @@ ogr_id|ogr_label
 10361|Agent commercial / Agente commerciale en assurances
 10362|Agent commercial / Agente commerciale en immobilier
 10363|Agent commercial / Agente commerciale et de contrôle train
-10364|Agent / Agente comptable d'établissement public à caractère scientifique, culturel et professionnel -EPSCP-
+10364|Agent / Agente comptable d'établissement public à caractère scientifique; culturel et professionnel -EPSCP-
 10365|Agent / Agente comptable responsable de service
 10366|Agent conducteur / Agente conductrice de chien
 10367|Agent conducteur / Agente conductrice de chien de défense
@@ -178,7 +178,7 @@ ogr_id|ogr_label
 10379|Agent / Agente d'affrètement
 10380|Agent / Agente d'ambiance des transports en commun
 10381|Agent / Agente d'ambiance et de prévention
-10382|Agent / Agente d'aménagement des circuits pédestres, équestres et Vtt
+10382|Agent / Agente d'aménagement des circuits pédestres; équestres et Vtt
 10383|Agent / Agente d'aménagement des haies et fossés
 10384|Agent / Agente d'amphithéâtre
 10385|Agent / Agente d'approvisionnement de distributeurs automatiques
@@ -229,7 +229,7 @@ ogr_id|ogr_label
 10430|Agent / Agente de débit de matériaux
 10431|Agent / Agente de déchets urbains et industriels
 10432|Agent / Agente de déchetterie
-10433|Agent / Agente de décontamination en Nucléaire, Radiologique, Bactériologique, Chimique -NRBC-
+10433|Agent / Agente de décontamination en Nucléaire; Radiologique; Bactériologique; Chimique -NRBC-
 10434|Agent / Agente de découpage de matériaux
 10435|Agent / Agente de démarque
 10436|Agent / Agente de désinsectisation
@@ -372,7 +372,7 @@ ogr_id|ogr_label
 10574|Agent / Agente de propreté hospitalière
 10575|Agent / Agente de propreté tertiaire
 10576|Agent / Agente de propreté urbaine
-10577|Agent / Agente de propreté, de nettoiement et de collecte
+10577|Agent / Agente de propreté; de nettoiement et de collecte
 10578|Agent / Agente de protection rapprochée
 10579|Agent / Agente de quai manutentionnaire
 10580|Agent / Agente de quai réceptionnaire
@@ -395,7 +395,7 @@ ogr_id|ogr_label
 10597|Agent / Agente de salubrité en assainissement
 10598|Agent / Agente de secteur de gardiennage
 10599|Agent / Agente de sécurité
-10600|Agent / Agente de sécurité boîte de nuit, discothèque
+10600|Agent / Agente de sécurité boîte de nuit; discothèque
 10601|Agent / Agente de sécurité incendie
 10602|Agent / Agente de sécurité SSIAP 1
 10603|Agent / Agente de service avion
@@ -426,7 +426,7 @@ ogr_id|ogr_label
 10628|Agent / Agente de traitement de surface
 10629|Agent / Agente de traitement des déchets
 10630|Agent / Agente de traitement thermique
-10631|Agent / Agente de traitement dépolluant en Nucléaire Radiologique, Bactériologique, Chimique -NRBC-
+10631|Agent / Agente de traitement dépolluant en Nucléaire Radiologique; Bactériologique; Chimique -NRBC-
 10632|Agent / Agente de transit
 10633|Agent / Agente de transit aérien
 10634|Agent / Agente de transit export
@@ -775,7 +775,7 @@ ogr_id|ogr_label
 10979|Animateur / Animatrice d'activités audiovisuelles
 10980|Animateur / Animatrice d'activités culturelles et de détente
 10981|Animateur / Animatrice d'activités culturelles et techniques
-10982|Animateur / Animatrice d'activités culturelles, techniques ou ludiques
+10982|Animateur / Animatrice d'activités culturelles; techniques ou ludiques
 10983|Animateur / Animatrice d'activités périscolaires
 10984|Animateur / Animatrice d'activités sociales et de vie locale
 10985|Animateur / Animatrice d'arts plastiques
@@ -917,7 +917,7 @@ ogr_id|ogr_label
 11124|Architecte produit industriel
 11125|Architecte réseaux informatiques
 11126|Architecte réseaux de télécoms
-11127|Architecte spatial / spatiale en études, recherche et développement
+11127|Architecte spatial / spatiale en études; recherche et développement
 11128|Architecte système d'information
 11129|Architecte système informatique
 11130|Architecte technique informatique
@@ -967,7 +967,7 @@ ogr_id|ogr_label
 11174|Assembleur / Assembleuse en produits électroniques
 11175|Assembleur monteur / Assembleuse monteuse
 11176|Assembleur / Assembleuse photogrammètre cartographe
-11177|Assembleur-monteur / Assembleuse-monteuse des industries de l'habillement en cuir, peaux et matériaux associés
+11177|Assembleur-monteur / Assembleuse-monteuse des industries de l'habillement en cuir; peaux et matériaux associés
 11178|Assistant / Assistante à la direction d'un établissement hôtelier
 11179|Assistant / Assistante à la direction d'un restaurant
 11180|Assistant / Assistante accueil petite enfance
@@ -1089,7 +1089,7 @@ ogr_id|ogr_label
 11296|Assistant / Assistante ludothécaire
 11297|Assistant / Assistante maître d'hôtel
 11298|Assistant / Assistante maîtrise d'ouvrage des systèmes d'information
-11299|Assistant manager / Assistante manageuse en restauration
+11299|Assistant / Assistante manager en restauration
 11300|Assistant maquilleur coiffeur perruquier / Assistante maquilleuse coiffeuse perruquière spectacle
 11301|Assistant maquilleur / Assistante maquilleuse spectacle
 11302|Assistant / Assistante marché produits bancaires
@@ -1137,7 +1137,7 @@ ogr_id|ogr_label
 11346|Assistant / Assistante technique d'études en recherche
 11347|Assistant / Assistante technique d'expérimentation
 11348|Assistant / Assistante technique d'ingénieur / d'ingénieure de production
-11349|Assistant / Assistante technique d'ingénieur / d'ingénieure en études, recherche et développement en industrie
+11349|Assistant / Assistante technique d'ingénieur / d'ingénieure en études; recherche et développement en industrie
 11350|Assistant / Assistante technique en tourisme d'affaires
 11351|Assistant / Assistante technique ingénierie
 11352|Assistant / Assistante technique podo-orthésiste
@@ -1297,7 +1297,7 @@ ogr_id|ogr_label
 11518|Biochimiste en laboratoire de contrôle en industrie
 11519|Biographe
 11520|Biographe littéraire
-11521|Bioinformaticien / Bioinformaticienne en études, recherche et développement
+11521|Bioinformaticien / Bioinformaticienne en études; recherche et développement
 11522|Bio-ingénieur / Bio-ingénieure
 11523|Biologiste de contrôle fabrication en industrie
 11524|Biologiste de la recherche scientifique
@@ -1443,7 +1443,7 @@ ogr_id|ogr_label
 11664|Canneur rempailleur / Canneuse rempailleuse
 11665|Cantonnier / Cantonnière de la voirie
 11666|Caoutchouteur industriel / Caoutchoutrice industrielle
-11667|Capitaine de la navigation fluviale en automoteur, remorqueur pousseur
+11667|Capitaine de la navigation fluviale en automoteur; remorqueur pousseur
 11668|Capitaine de pêche
 11669|Capitaine de police
 11670|Capitaine de port
@@ -1560,7 +1560,7 @@ ogr_id|ogr_label
 11782|Chargé / Chargée de communication interne
 11783|Chargé / Chargée de communication scientifique
 11784|Chargé / Chargée de communication sociale
-11785|Chargé / Chargée de comptes Incendie, Accidents, Risques Divers -IARD-
+11785|Chargé / Chargée de comptes Incendie; Accidents; Risques Divers -IARD-
 11786|Chargé / Chargée de comptes bancaires professionnels
 11787|Chargé / Chargée de conduite en production d'énergie
 11788|Chargé / Chargée de cours
@@ -1702,7 +1702,7 @@ ogr_id|ogr_label
 11929|Chargé / Chargée d'information des droits des femmes
 11930|Chargé / Chargée d'information jeunesse
 11931|Chargé / Chargée d'information juridique et sociale
-11932|Chargé / Chargée d'information, de médiation sociale/médicosociale
+11932|Chargé / Chargée d'information; de médiation sociale/médicosociale
 11933|Chargé / Chargée d'intervention sociale
 11934|Chargé / Chargée d'opération réseaux de télécoms
 11935|Chargé / Chargée d'opérations immobilières
@@ -1849,7 +1849,7 @@ ogr_id|ogr_label
 12078|Chef de camionnage
 12079|Chef de carrière
 12080|Chef de cave
-12081|Chef de cellule d'intervention -NBC- Nucléaire, Bactériologique et Chimique
+12081|Chef de cellule d'intervention -NBC- Nucléaire; Bactériologique et Chimique
 12082|Chef de cellule d'intervention risques technologiques - naturels
 12083|Chef de cellule grue et portique de l'armée
 12084|Chef de centre de détention pénitentiaire
@@ -1866,7 +1866,7 @@ ogr_id|ogr_label
 12095|Chef de chantier gros oeuvre
 12096|Chef de chantier montage de structures métalliques
 12097|Chef de chantier nettoyage de locaux
-12098|Chef de chantier pétrole, gaz
+12098|Chef de chantier pétrole; gaz
 12099|Chef de chantier principal / principale
 12100|Chef de chantier second oeuvre
 12101|Chef de chantier travaux publics
@@ -1988,10 +1988,10 @@ ogr_id|ogr_label
 12219|Chef de produit à l'international
 12220|Chef de produit assurance épargne retraite
 12221|Chef de produit assurance vie
-12222|Chef de produit en assurance Incendie, Accidents, Risques Divers -IARD-
+12222|Chef de produit en assurance Incendie; Accidents; Risques Divers -IARD-
 12223|Chef de produit en assurances
 12224|Chef de produit en production industrielle
-12225|Chef de produit études, recherche et développement
+12225|Chef de produit études; recherche et développement
 12226|Chef de produit Internet
 12227|Chef de produit tourisme
 12228|Chef de produits bancaires
@@ -2224,7 +2224,7 @@ ogr_id|ogr_label
 12459|Chef d'équipe en industrie graphique
 12460|Chef d'équipe en maroquinerie
 12461|Chef d'équipe en matériaux de construction/céramique
-12462|Chef d'équipe en menuiserie, ameublement, agencement
+12462|Chef d'équipe en menuiserie; ameublement; agencement
 12463|Chef d'équipe en métallurgie
 12464|Chef d'équipe en mobilier urbain et publicitaire
 12465|Chef d'équipe en plastique/caoutchouc
@@ -2749,7 +2749,7 @@ ogr_id|ogr_label
 12969|Conducteur / Conductrice de haveuse
 12970|Conducteur / Conductrice de jigger
 12971|Conducteur / Conductrice de jumbo
-12972|Conducteur / Conductrice de la navigation fluviale en automoteur, remorqueur pousseur
+12972|Conducteur / Conductrice de la navigation fluviale en automoteur; remorqueur pousseur
 12973|Conducteur / Conductrice de laineuses en ennoblissement textile
 12974|Conducteur / Conductrice de laminage en production/transformation du verre
 12975|Conducteur / Conductrice de laminoirs en métallurgie
@@ -2997,7 +2997,7 @@ ogr_id|ogr_label
 13220|Conducteur / Conductrice de travaux publics
 13221|Conducteur / Conductrice de travaux second oeuvre
 13222|Conducteur / Conductrice de travaux tous corps d'état
-13223|Conducteur / Conductrice de travaux Voirie, Réseaux Divers -VRD-
+13223|Conducteur / Conductrice de travaux Voirie; Réseaux Divers -VRD-
 13224|Conducteur / Conductrice de traxcavator
 13225|Conducteur / Conductrice de trempe
 13226|Conducteur / Conductrice de trolleybus
@@ -3235,13 +3235,13 @@ ogr_id|ogr_label
 13462|Conseiller / Conseillère gestion banque privée
 13463|Conseiller / Conseillère gestion sinistres
 13464|Conseiller / Conseillère immobilier
-13465|Conseiller / Conseillère Incendie, Accidents, Risques Divers -IARD-
+13465|Conseiller / Conseillère Incendie; Accidents; Risques Divers -IARD-
 13466|Conseiller / Conseillère littéraire
 13467|Conseiller / Conseillère logistique entrepôt
 13468|Conseiller matrimonial / Conseillère matrimoniale
 13469|Conseiller / Conseillère méthodes en industrie
 13470|Conseiller / Conseillère mutualiste
-13471|Conseiller / Conseillère mutualiste Incendie, Accidents, Risques Divers -IARD-
+13471|Conseiller / Conseillère mutualiste Incendie; Accidents; Risques Divers -IARD-
 13472|Conseiller / Conseillère prévoyance santé
 13473|Conseiller principal / Conseillère principale d'éducation
 13474|Conseiller professionnel / Conseillère professionnelle
@@ -3376,7 +3376,7 @@ ogr_id|ogr_label
 13604|Contrôleur / Contrôleuse de gestion d'usine
 13605|Contrôleur / Contrôleuse de gestion financière
 13606|Contrôleur / Contrôleuse de gestion industrielle
-13607|Contrôleur / Contrôleuse de la concurrence, de la consommation et de la répression des fraudes
+13607|Contrôleur / Contrôleuse de la concurrence; de la consommation et de la répression des fraudes
 13608|Contrôleur / Contrôleuse de la défense aérienne
 13609|Contrôleur / Contrôleuse de la navigation aérienne
 13610|Contrôleur / Contrôleuse de matériel en électricité
@@ -3485,8 +3485,8 @@ ogr_id|ogr_label
 13717|Coordonnateur / Coordonnatrice handling
 13718|Coordonnateur / Coordonnatrice logistique de distribution d'imprimés
 13719|Coordonnateur / Coordonnatrice méthodes-ordonnancement en industrie
-13720|Coordonnateur / Coordonnatrice Ordonnancement, Pilotage et Coordination de chantier -OPC-
-13721|Coordonnateur / Coordonnatrice Sécurité, Protection de la Santé -SPS-
+13720|Coordonnateur / Coordonnatrice Ordonnancement; Pilotage et Coordination de chantier -OPC-
+13721|Coordonnateur / Coordonnatrice Sécurité; Protection de la Santé -SPS-
 13722|Coordonnateur / Coordonnatrice sur installation de pâte à papier
 13723|Copilote d'aéronef
 13724|Copiste
@@ -3612,7 +3612,7 @@ ogr_id|ogr_label
 13844|Crêpier / Crêpière
 13845|Crépisseur / Crépisseuse
 13846|Cressiculteur / Cressicultrice
-13847|Critique d'art, cinéma, théâtre, littérature, musique
+13847|Critique d'art; cinéma; théâtre; littérature; musique
 13848|Croupier / Croupière
 13849|Croupier / Croupière bout de table
 13850|Croupier / Croupière de boule
@@ -3664,8 +3664,8 @@ ogr_id|ogr_label
 13897|Déchargeur / Déchargeuse manutentionnaire
 13898|Décolleteur / Décolleteuse
 13899|Décompteur / Décompteuse de prestations
-13900|Décontamineur / Décontamineuse d'atelier en Nucléaire, Radiologique, Bactériologique, Chimique -NRBC-
-13901|Décontamineur / Décontamineuse sur chantier en Nucléaire, Radiologique, Bactériologique, Chimique -NRBC-
+13900|Décontamineur / Décontamineuse d'atelier en Nucléaire; Radiologique; Bactériologique; Chimique -NRBC-
+13901|Décontamineur / Décontamineuse sur chantier en Nucléaire; Radiologique; Bactériologique; Chimique -NRBC-
 13902|Décorateur / Décoratrice conseil
 13903|Décorateur / Décoratrice d'intérieur
 13904|Décorateur / Décoratrice en verrerie
@@ -3742,7 +3742,7 @@ ogr_id|ogr_label
 13975|Dépanneur / Dépanneuse en micro-informatique grand public
 13976|Dépanneur / Dépanneuse en régulation d'installations de chauffage et de conditionnement d'air
 13977|Dépanneur / Dépanneuse en serrurerie
-13978|Dépanneur / Dépanneuse en télévision, hi-fi
+13978|Dépanneur / Dépanneuse en télévision; hi-fi
 13979|Dépanneur mécanicien / Dépanneuse mécanicienne en équipements industriels
 13980|Dépanneur metteur / Dépanneuse metteuse au point de brûleurs
 13981|Dépanneur-remorqueur / Dépanneuse-remorqueuse de véhicules automobiles
@@ -3887,7 +3887,7 @@ ogr_id|ogr_label
 14091|Dessinateur vérificateur / Dessinatrice vérificatrice du BTP
 140914|Concepteur / Conceptrice paysagiste
 14092|Dessinateur-illustrateur / Dessinatrice-illustratrice
-140924|Réparateur / Réparatrice en smartphone, téléphonie mobile, tablette
+140924|Réparateur / Réparatrice en smartphone; téléphonie mobile; tablette
 140925|Réparateur / Réparatrice en produits de télécommunication et multimédia
 140927|Cuviste
 140928|Groom chevaux
@@ -4018,7 +4018,7 @@ ogr_id|ogr_label
 14184|Directeur adjoint / Directrice adjointe d'unité de services au public
 14185|Directeur administratif / Directrice administrative
 14186|Directeur administratif et financier / Directrice administrative et financière -DAF-
-14187|Directeur administratif, financier / Directrice administrative, financière et du contrôle de gestion
+14187|Directeur administratif; financier / Directrice administrative; financière et du contrôle de gestion
 14188|Directeur / Directrice artistique communication multimédia
 14189|Directeur / Directrice artistique en danse
 14190|Directeur / Directrice artistique en design produit
@@ -4232,7 +4232,7 @@ ogr_id|ogr_label
 14401|Directeur / Directrice d'établissement privé de santé
 14402|Directeur / Directrice d'Établissement Public à caractère Administratif -EPA-
 14403|Directeur / Directrice d'Établissement Public à caractère Scientifique et Technologique -EPST-
-14404|Directeur / Directrice d'Établissement Public à caractère Scientifique, Culturel et Professionnel -EPSCP-
+14404|Directeur / Directrice d'Établissement Public à caractère Scientifique; Culturel et Professionnel -EPSCP-
 14405|Directeur / Directrice d'Établissement Public de Coopération Culturelle -EPCC-
 14406|Directeur / Directrice d'Établissement Public et Commercial -EPIC-
 14407|Directeur / Directrice d'établissement thermal
@@ -4278,7 +4278,7 @@ ogr_id|ogr_label
 14448|Directeur général délégué / Directrice générale déléguée de grande entreprise
 14449|Directeur général / Directrice générale d'établissement public
 14450|Directeur général / Directrice générale fonction publique et assimilé
-14451|Directeur / Directrice Hygiène, Sécurité et Environnement en industrie -HSE-
+14451|Directeur / Directrice Hygiène; Sécurité et Environnement en industrie -HSE-
 14452|Directeur / Directrice immobilier
 14453|Directeur / Directrice industrialisation
 14454|Directeur industriel / Directrice industrielle
@@ -4580,7 +4580,7 @@ ogr_id|ogr_label
 14755|Employé / Employée de «picking»
 14756|Employé / Employée de blanchisserie industrielle
 14757|Employé / Employée de bureau
-14758|Employé / Employée de café, bar-brasserie
+14758|Employé / Employée de café; bar-brasserie
 14759|Employé / Employée de cafétéria
 14760|Employé / Employée de cantine
 14761|Employé / Employée de chai
@@ -4782,7 +4782,7 @@ ogr_id|ogr_label
 14957|Expert / Experte réseaux et télécoms
 14958|Expert / Experte risques en assurances
 14959|Expert / Experte sécurité informatique
-14960|Expert / Experte sécurité, méthode et qualité informatique
+14960|Expert / Experte sécurité; méthode et qualité informatique
 14961|Expert / Experte support technique
 14962|Expert / Experte système d'exploitation
 14963|Expert / Experte système et réseaux
@@ -4797,7 +4797,7 @@ ogr_id|ogr_label
 14972|Exploitant / Exploitante de bar-brasserie
 14973|Exploitant / Exploitante de cabaret
 14974|Exploitant / Exploitante de café
-14975|Exploitant / Exploitante de café, bar-brasserie
+14975|Exploitant / Exploitante de café; bar-brasserie
 14976|Exploitant / Exploitante de camping
 14977|Exploitant / Exploitante de casino des jeux
 14978|Exploitant / Exploitante de centre équestre
@@ -5090,7 +5090,7 @@ ogr_id|ogr_label
 15275|Gérant / Gérante de banque privée
 15276|Gérant / Gérante de bar-tabac
 15277|Gérant / Gérante de bureau de tabac
-15278|Gérant / Gérante de café, bar-brasserie
+15278|Gérant / Gérante de café; bar-brasserie
 15279|Gérant / Gérante de camping
 15280|Gérant / Gérante de cantine scolaire
 15281|Gérant / Gérante de centre nautique
@@ -5184,7 +5184,7 @@ ogr_id|ogr_label
 15370|Gestionnaire prestations en assurances
 15371|Gestionnaire risques bancaires
 15372|Gestionnaire santé en assurances
-15373|Gestionnaire sinistre Incendie, Accidents, Risques Divers -IARD-
+15373|Gestionnaire sinistre Incendie; Accidents; Risques Divers -IARD-
 15374|Gestionnaire Systèmes d'Information Géographique -SIG-
 15375|Giletier / Giletière
 15376|Glacier / Glacière
@@ -5275,7 +5275,7 @@ ogr_id|ogr_label
 15461|Gypsier / Gypsière
 15462|Habilleur / Habilleuse
 15463|Habilleur / Habilleuse cuir
-15464|Habilleur / Habilleuse en industrie des cuirs, peaux et matériaux associés
+15464|Habilleur / Habilleuse en industrie des cuirs; peaux et matériaux associés
 15465|Haut-commissaire
 15466|Haut-fourniste
 15467|Héliciculteur / Hélicicultrice (escargots)
@@ -5389,7 +5389,7 @@ ogr_id|ogr_label
 15576|Ingénieur / Ingénieure agro-halieute
 15577|Ingénieur / Ingénieure agronome
 15578|Ingénieur / Ingénieure agronome de production
-15579|Ingénieur / Ingénieure agronome en études, recherche et développement
+15579|Ingénieur / Ingénieure agronome en études; recherche et développement
 15580|Ingénieur / Ingénieure analyste en système d'information
 15581|Ingénieur / Ingénieure analyste informatique
 15582|Ingénieur analyste-programmeur / Ingénieure analyste-programmeuse
@@ -5474,7 +5474,7 @@ ogr_id|ogr_label
 15664|Ingénieur / Ingénieure de promotion des ventes
 15665|Ingénieur / Ingénieure de réalisation informatique
 15666|Ingénieur / Ingénieure de recherche biomédicale
-15667|Ingénieur / Ingénieure de recherche en Hygiène, Sécurité et Environnement en industrie
+15667|Ingénieur / Ingénieure de recherche en Hygiène; Sécurité et Environnement en industrie
 15668|Ingénieur / Ingénieure de recherche fondamentale
 15669|Ingénieur / Ingénieure de recherche procédés en industrie
 15670|Ingénieur / Ingénieure de recherche produits en industrie
@@ -5501,7 +5501,7 @@ ogr_id|ogr_label
 15691|Ingénieur / Ingénieure des travaux publics de l'État
 15692|Ingénieur / Ingénieure des travaux ruraux
 15693|Ingénieur / Ingénieure d'essais en études et développement en industrie
-15694|Ingénieur / Ingénieure d'essais en études, recherche et développement
+15694|Ingénieur / Ingénieure d'essais en études; recherche et développement
 15695|Ingénieur / Ingénieure d'essais méthodes en industrie
 15696|Ingénieur / Ingénieure d'étude en applications scientifiques informatiques
 15697|Ingénieur / Ingénieure d'étude en informatique de gestion
@@ -5582,7 +5582,7 @@ ogr_id|ogr_label
 15775|Ingénieur / Ingénieure en organisation
 15776|Ingénieur / Ingénieure en prévention des risques industriels
 15777|Ingénieur / Ingénieure en procédés en production
-15778|Ingénieur / Ingénieure en procédés, études et développement
+15778|Ingénieur / Ingénieure en procédés; études et développement
 15779|Ingénieur / Ingénieure en processus en production
 15781|Ingénieur / Ingénieure en propriété industrielle
 15782|Ingénieur / Ingénieure en radioprotection
@@ -5622,7 +5622,7 @@ ogr_id|ogr_label
 15817|Ingénieur / Ingénieure hydrochimiste en industrie
 15818|Ingénieur / Ingénieure hydrogéologue
 15819|Ingénieur / Ingénieure hydrographe
-15820|Ingénieur / Ingénieure Hygiène, Sécurité et Environnement en industrie -HSE-
+15820|Ingénieur / Ingénieure Hygiène; Sécurité et Environnement en industrie -HSE-
 15822|Ingénieur / Ingénieure industrialisation
 15823|Ingénieur informaticien / Ingénieure informaticienne
 15824|Ingénieur / Ingénieure informatique développement en temps réel
@@ -5647,8 +5647,8 @@ ogr_id|ogr_label
 15843|Ingénieur / Ingénieure militaire en recherche et développement
 15844|Ingénieur / Ingénieure motoriste en industrie
 15845|Ingénieur navigant / Ingénieure navigante aéronautique de l'armée
-15846|Ingénieur navigant, navigateur / Ingénieure navigante, navigatrice de l'armée
-15847|Ingénieur / Ingénieure normalisation en études, recherche et développement
+15846|Ingénieur navigant; navigateur / Ingénieure navigante; navigatrice de l'armée
+15847|Ingénieur / Ingénieure normalisation en études; recherche et développement
 15848|Ingénieur / Ingénieure numérique de la recherche scientifique
 15849|Ingénieur / Ingénieure ordonnancement en industrie
 15850|Ingénieur / Ingénieure ordonnancement-planification en industrie
@@ -5723,7 +5723,7 @@ ogr_id|ogr_label
 15919|Inspecteur commercial / Inspectrice commerciale
 15920|Inspecteur comptable et financier / Inspectrice comptable et financière
 15921|Inspecteur d'académie adjoint / Inspectrice d'académie adjointe -IAA-
-15922|Inspecteur / Inspectrice d'académie, directeur/directrice des services départementaux de l'Éducation nationale -IA-DSDEN-
+15922|Inspecteur / Inspectrice d'académie; directeur/directrice des services départementaux de l'Éducation nationale -IA-DSDEN-
 15923|Inspecteur / Inspectrice de conformité d'ascenseurs
 15924|Inspecteur / Inspectrice de conformité de matériel
 15925|Inspecteur / Inspectrice de conformité d'équipements sous pression
@@ -5740,7 +5740,7 @@ ogr_id|ogr_label
 15936|Inspecteur / Inspectrice de fabrication en mécanique et travail des métaux
 15937|Inspecteur / Inspectrice de gérance immobilière
 15938|Inspecteur / Inspectrice de gestion immobilière
-15939|Inspecteur / Inspectrice de la concurrence, de la consommation et de la répression des fraudes
+15939|Inspecteur / Inspectrice de la concurrence; de la consommation et de la répression des fraudes
 15940|Inspecteur / Inspectrice de la conduite et de la sécurité routière
 15941|Inspecteur / Inspectrice de la danse
 15942|Inspecteur / Inspectrice de la formation professionnelle
@@ -5785,7 +5785,7 @@ ogr_id|ogr_label
 15981|Inspecteur général / Inspectrice générale de l'Éducation nationale -IGEN-
 15982|Inspecteur indemnisateur / Inspectrice indemnisatrice en assurances
 15983|Inspecteur / Inspectrice nettoyage de locaux
-15984|Inspecteur pédagogique régional, inspecteur d'académie / Inspectrice pédagogique régionale, inspectrice d'académie -IPR-IA-
+15984|Inspecteur pédagogique régional; inspecteur d'académie / Inspectrice pédagogique régionale; inspectrice d'académie -IPR-IA-
 15985|Inspecteur principal / Inspectrice principale de l'enseignement technique -IPET-
 15986|Inspecteur principal / Inspectrice principale des impôts
 15987|Inspecteur / Inspectrice qualité en mécanique et travail des métaux
@@ -5802,7 +5802,7 @@ ogr_id|ogr_label
 16000|Installateur / Installatrice de cuisines
 16001|Installateur / Installatrice de matériels de reprographie
 16002|Installateur / Installatrice de stands
-16003|Installateur / Installatrice de systèmes de sécurité, alarme et détection incendie
+16003|Installateur / Installatrice de systèmes de sécurité; alarme et détection incendie
 16004|Installateur / Installatrice en sanitaire
 16005|Installateur / Installatrice en télécommunications
 16006|Installateur-poseur / Installatrice-poseuse de piscines préfabriquées
@@ -5833,7 +5833,7 @@ ogr_id|ogr_label
 16032|Intégrateur / Intégratrice multimédia
 16033|Intégrateur / Intégratrice texte/image
 16034|Intendant / Intendante de restaurant de collectivité
-16035|Intendant / Intendante d'établissement scolaire (lycée, collège...)
+16035|Intendant / Intendante d'établissement scolaire (lycée; collège...)
 16036|Intendant / Intendante d'exploitation agricole
 16037|Intendant / Intendante d'université
 16038|Intercepteur / Interceptrice graphie aux armées
@@ -6123,15 +6123,15 @@ ogr_id|ogr_label
 16328|Malaxeur/mélangeur / Malaxeuse/mélangeuse
 16329|Malletier / Malletière
 16330|Manadier / Manadière
-16331|Manager / Manageuse d'artiste
-16332|Manager / Manageuse de caisses
-16333|Manager / Manageuse de rayon alimentaire hors produits frais
-16334|Manager / Manageuse de rayon produits non alimentaires
-16335|Manager / Manageuse en restauration rapide
-16336|Manager / Manageuse en terminal de cuisson
-16337|Manager / Manageuse produits frais
-16338|Manager / Manageuse rayon alimentaire
-16339|Manager animateur / Manageuse animatrice de club sportif
+16331|Manager d'artiste
+16332|Manager de caisses
+16333|Manager de rayon alimentaire hors produits frais
+16334|Manager de rayon produits non alimentaires
+16335|Manager en restauration rapide
+16336|Manager en terminal de cuisson
+16337|Manager produits frais
+16338|Manager rayon alimentaire
+16339|Manager animateur / Manager animatrice de club sportif
 16340|Mandataire de justice
 16341|Mandataire en vente de fonds de commerce
 16342|Mandataire liquidateur / liquidatrice
@@ -6246,7 +6246,7 @@ ogr_id|ogr_label
 16451|Mécanicien / Mécanicienne avionique
 16452|Mécanicien / Mécanicienne cabine
 16453|Mécanicien / Mécanicienne cellule hydraulique
-16454|Mécanicien / Mécanicienne Cellule, Moteur, Électricité -CME-
+16454|Mécanicien / Mécanicienne Cellule; Moteur; Électricité -CME-
 16455|Mécanicien / Mécanicienne collection des industries de l'habillement
 16456|Mécanicien / Mécanicienne d'armement aéronautique
 16457|Mécanicien / Mécanicienne de systèmes d'armes
@@ -6297,7 +6297,7 @@ ogr_id|ogr_label
 16502|Mécanicien / Mécanicienne diéséliste
 16503|Mécanicien / Mécanicienne diéséliste marine
 16504|Mécanicien / Mécanicienne diéséliste moteurs inbord
-16505|Mécanicien / Mécanicienne Électricité, Instrument de bord, Radio -EIR-
+16505|Mécanicien / Mécanicienne Électricité; Instrument de bord; Radio -EIR-
 16506|Mécanicien / Mécanicienne en confection
 16507|Mécanicien / Mécanicienne en cycles et motocycles
 16508|Mécanicien / Mécanicienne en fourrure
@@ -6496,10 +6496,10 @@ ogr_id|ogr_label
 16707|Modeleur traditionnel / Modeleuse traditionnelle en céramique
 16708|Modélisateur / Modélisatrice 3D
 16709|Modéliste chaussures
-16710|Modéliste en bijouterie, orfèvrerie, joaillerie
+16710|Modéliste en bijouterie; orfèvrerie; joaillerie
 16711|Modéliste en industrie de l'habillement et autres fabrications à base d'étoffes
 16712|Modéliste en industrie de l'habillement et du textile
-16713|Modéliste en industrie des cuirs, peaux et matériaux associés
+16713|Modéliste en industrie des cuirs; peaux et matériaux associés
 16714|Modéliste en maroquinerie
 16715|Modéliste industriel / industrielle
 16716|Modéliste-maquettiste en bijouterie
@@ -6838,7 +6838,7 @@ ogr_id|ogr_label
 17057|Opérateur / Opératrice d'agglomération en métallurgie
 17058|Opérateur / Opératrice d'analyse de laboratoire
 17059|Opérateur / Opératrice d'approvisionnement et de préparation en industrie
-17060|Opérateur / Opératrice d'assemblage - montage des industries des cuirs, peaux et matériaux associés (hors vêtements)
+17060|Opérateur / Opératrice d'assemblage - montage des industries des cuirs; peaux et matériaux associés (hors vêtements)
 17061|Opérateur / Opératrice d'assemblage en horlogerie
 17062|Opérateur / Opératrice d'assemblage mécanique
 17063|Opérateur / Opératrice d'attraction
@@ -6878,7 +6878,7 @@ ogr_id|ogr_label
 17099|Opérateur / Opératrice de finition en industrie des matériaux souples
 17100|Opérateur / Opératrice de finition manuelle
 17101|Opérateur / Opératrice de finition sur articles en cuir et autres matériaux souples
-17102|Opérateur / Opératrice de finition sur lisseuse, presse ou palisson
+17102|Opérateur / Opératrice de finition sur lisseuse; presse ou palisson
 17103|Opérateur / Opératrice de four de crémation
 17104|Opérateur / Opératrice de haut-fourneau
 17105|Opérateur / Opératrice de laboratoire cinématographique
@@ -6969,7 +6969,7 @@ ogr_id|ogr_label
 17196|Opérateur / Opératrice en chaudronnerie
 17197|Opérateur / Opératrice en confection
 17198|Opérateur / Opératrice en cordonnerie et multiservices
-17199|Opérateur / Opératrice en défense Nucléaire, Biologique et Chimique -NBC-
+17199|Opérateur / Opératrice en défense Nucléaire; Biologique et Chimique -NBC-
 17200|Opérateur / Opératrice en distillerie industrielle
 17201|Opérateur / Opératrice en fabrication de produits non-tissés
 17202|Opérateur / Opératrice en huilerie alimentaire industrielle
@@ -7351,7 +7351,7 @@ ogr_id|ogr_label
 17587|Patronnier / Patronnière CAO/DAO
 17588|Patronnier / Patronnière en chaussures
 17589|Patronnier metteur / Patronnière metteuse au point en chaussures
-17590|Patronnier metteur / Patronnière metteuse au point en industrie des cuirs, peaux et matériaux associés
+17590|Patronnier metteur / Patronnière metteuse au point en industrie des cuirs; peaux et matériaux associés
 17591|Patronnier-gradeur / Patronnière-gradeuse
 17592|Patronnier-gradeur / Patronnière-gradeuse en industrie de l'habillement et autres fabrications à base d'étoffes
 17593|Patronnier-gradeur / Patronnière-gradeuse en industrie des matériaux souples
@@ -7760,7 +7760,7 @@ ogr_id|ogr_label
 18006|Préparateur / Préparatrice de pâte en industrie papetière
 18007|Préparateur / Préparatrice de piste en industrie
 18008|Préparateur / Préparatrice de produit d'enduction
-18009|Préparateur / Préparatrice de produits pour teinture, apprêts et impression
+18009|Préparateur / Préparatrice de produits pour teinture; apprêts et impression
 18010|Préparateur / Préparatrice de recettes
 18011|Préparateur / Préparatrice de robot de peinture
 18012|Préparateur / Préparatrice de sable en fonderie
@@ -7947,7 +7947,7 @@ ogr_id|ogr_label
 18196|Projectionniste de laboratoire cinématographique
 18197|Projeteur / Projeteuse béton armé
 18198|Projeteur / Projeteuse chef de groupe en électricité-électronique
-18199|Projeteur / Projeteuse en conception électronique, électrique
+18199|Projeteur / Projeteuse en conception électronique; électrique
 18200|Projeteur / Projeteuse thermique
 18201|Projeteur / Projeteuse Voirie Réseaux Divers (VRD)
 18202|Promoteur / Promotrice de linéaires
@@ -8269,7 +8269,7 @@ ogr_id|ogr_label
 18527|Réparateur / Réparatrice en habillement
 18528|Réparateur / Réparatrice en maroquinerie
 18529|Réparateur / Réparatrice en systèmes horlogers
-18530|Réparateur / Réparatrice en télévision, hi-fi
+18530|Réparateur / Réparatrice en télévision; hi-fi
 18531|Réparateur rhabilleur / Réparatrice rhabilleuse en horlogerie
 18532|Répartiteur / Répartitrice de dépôt logistique
 18533|Répartiteur / Répartitrice de dépôt transport routier de personnes
@@ -8316,7 +8316,7 @@ ogr_id|ogr_label
 18574|Responsable administratif / administrative et de gestion du personnel
 18575|Responsable administratif et financier / administrative et financière
 18576|Responsable administratif / administrative et pédagogique
-18577|Responsable administratif, comptable et financier / Responsable administrative, comptable et financière
+18577|Responsable administratif; comptable et financier / Responsable administrative; comptable et financière
 18579|Responsable animateur / animatrice des forces de vente
 18580|Responsable animateur / animatrice des ventes
 18581|Responsable application industrielle
@@ -8471,7 +8471,7 @@ ogr_id|ogr_label
 18732|Responsable de la gestion des cadres
 18733|Responsable de la gestion des carrières et des affaires sociales
 18734|Responsable de la gestion des commandes
-18735|Responsable de la gestion des effectifs, des emplois et des compétences
+18735|Responsable de la gestion des effectifs; des emplois et des compétences
 18737|Responsable de la gestion des Ressources Humaines
 18738|Responsable de la gestion du personnel
 18739|Responsable de la gestion et des services généraux
@@ -9136,7 +9136,7 @@ ogr_id|ogr_label
 19418|Serrurier métallier industriel / Serrurière métallière industrielle
 19419|Serrurier-poseur / Serrurière-poseuse
 19420|Sertisseur / Sertisseuse
-19421|Sertisseur / Sertisseuse en bijouterie, joaillerie
+19421|Sertisseur / Sertisseuse en bijouterie; joaillerie
 19422|Servant / Servante d'arme
 19423|Servant / Servante de machine en construction mécanique
 19424|Serveur / Serveuse de banquet
@@ -9203,7 +9203,7 @@ ogr_id|ogr_label
 19486|Sous-officier / Sous-officière météorologue
 19487|Souscripteur / Souscriptrice assurance collective
 19488|Souscripteur / Souscriptrice en assurances
-19489|Souscripteur / Souscriptrice Incendie, Accidents, Risques Divers -IARD-
+19489|Souscripteur / Souscriptrice Incendie; Accidents; Risques Divers -IARD-
 19490|Souscripteur / Souscriptrice responsabilité civile en assurances
 19491|Souscripteur / Souscriptrice vie collective en assurances
 19492|Souscripteur / Souscriptrice vie en assurances
@@ -9220,7 +9220,7 @@ ogr_id|ogr_label
 19503|Spécialiste des travaux acrobatiques du bâtiment
 19504|Spécialiste des travaux en hauteur du bâtiment
 19505|Spécialiste des travaux sur cordes du bâtiment
-19506|Spécialiste en défense Nucléaire, Biologique et Chimique -NBC-
+19506|Spécialiste en défense Nucléaire; Biologique et Chimique -NBC-
 19507|Spécialiste en géodésie et satellites
 19508|Spécialiste en traitement des eaux des armées
 19509|Spécialiste METOC Météorologie Océanographie
@@ -9261,7 +9261,7 @@ ogr_id|ogr_label
 19544|Styliste fil
 19545|Styliste graphiste
 19546|Styliste habillement
-19547|Styliste lingerie, corseterie
+19547|Styliste lingerie; corseterie
 19548|Styliste maroquinerie
 19549|Styliste prêt-à-porter
 19550|Styliste textile
@@ -9424,7 +9424,7 @@ ogr_id|ogr_label
 19710|Technicien / Technicienne d'analyse et d'essais métallurgique
 19711|Technicien / Technicienne d'analyse industrielle
 19712|Technicien / Technicienne d'analyses chimiques en industries
-19713|Technicien / Technicienne d'assainissement Nucléaire, Radiologique, Bactériologique, Chimique -NRBC-
+19713|Technicien / Technicienne d'assainissement Nucléaire; Radiologique; Bactériologique; Chimique -NRBC-
 19714|Technicien / Technicienne d'atelier de bobinage en électricité
 19715|Technicien / Technicienne d'atelier de fabrication de la construction mécanique
 19716|Technicien / Technicienne d'atelier de fabrication du travail des métaux
@@ -9766,10 +9766,19 @@ ogr_id|ogr_label
 20016|Technicien / Technicienne d'opération en microélectronique
 20017|Technicien / Technicienne d'opérations multi modales de transport international de marchandises
 20018|Technicien / Technicienne d'ordonnancement de production industrielle
+200180| Conseiller / Conseillère en gestion de patrimoine immobilier
+200181|Manager de centre-ville
+200182|Contrôleur / Contrôleuse de gestion sociale
 20019|Technicien / Technicienne du génie rural
 20020|Technicien / Technicienne du génie sanitaire et environnement
+200200|Ostéopathe animalier / animalière
+200201| Assistant / Assistante galeriste
+200202|Socio-coiffeur / Socio-coiffeuse
+200203|Interface de communication
+200204|Catalogueur / Catalogueuse
 20021|Technicien / Technicienne du nettoiement et de l'assainissement
 20022|Technicien / Technicienne du son
+200220|Destination Wedding planner
 20023|Technicien électricien / Technicienne électricienne de maintenance process
 20024|Technicien électricien / Technicienne électricienne Service Après-Vente -SAV-
 20025|Technicien électricien-électronicien / Technicienne électricienne-électronicienne automobile
@@ -9793,14 +9802,14 @@ ogr_id|ogr_label
 20043|Technicien / Technicienne en coloration
 20044|Technicien / Technicienne en communication
 20045|Technicien / Technicienne en conception de systèmes automatisés
-20046|Technicien / Technicienne en conception électronique, électrique
+20046|Technicien / Technicienne en conception électronique; électrique
 20047|Technicien / Technicienne en conception industrielle en mécanique
 20048|Technicien / Technicienne en contrôle de plates-formes en électricité
 20049|Technicien / Technicienne en contrôle de plates-formes en électronique
 20050|Technicien / Technicienne en contrôle et qualité en mécanique et travail des métaux
 20051|Technicien / Technicienne en Contrôle Non Destructif -CND- en mécanique et travail des métaux
-20052|Technicien / Technicienne en décontamination Nucléaire, Radiologique, Bactériologique, Chimique -NRBC-
-20053|Technicien / Technicienne en dépollution Nucléaire, Radiologique, Bactériologique, Chimique -NRBC-
+20052|Technicien / Technicienne en décontamination Nucléaire; Radiologique; Bactériologique; Chimique -NRBC-
+20053|Technicien / Technicienne en dépollution Nucléaire; Radiologique; Bactériologique; Chimique -NRBC-
 20054|Technicien / Technicienne en développement
 20055|Technicien / Technicienne en développement de procédés
 20056|Technicien / Technicienne en diagnostic et réparation automobile
@@ -9810,7 +9819,7 @@ ogr_id|ogr_label
 20060|Technicien / Technicienne en électronique études et développement
 20061|Technicien / Technicienne en électrotechnique études et développement
 20062|Technicien / Technicienne en environnement industriel
-20063|Technicien / Technicienne en environnement, sécurité et conditions de travail
+20063|Technicien / Technicienne en environnement; sécurité et conditions de travail
 20064|Technicien / Technicienne en expérimentation animale
 20065|Technicien / Technicienne en expérimentation végétale
 20066|Technicien / Technicienne en fabrication fromagère
@@ -9819,7 +9828,7 @@ ogr_id|ogr_label
 20069|Technicien / Technicienne en gestion de production industrielle
 20070|Technicien / Technicienne en gestion et production laboratoire
 20071|Technicien / Technicienne en hygiène et environnement
-20072|Technicien / Technicienne en Hygiène, Sécurité, Environnement industriel -HSE-
+20072|Technicien / Technicienne en Hygiène; Sécurité; Environnement industriel -HSE-
 20073|Technicien / Technicienne en image de synthèse 3D
 20074|Technicien / Technicienne en imagerie médicale
 20075|Technicien / Technicienne en imagerie médicale et radiologie thérapeutique
@@ -9874,7 +9883,7 @@ ogr_id|ogr_label
 20128|Technicien / Technicienne en télécommunications
 20129|Technicien / Technicienne en télécommunications et réseaux d'entreprise
 20130|Technicien / Technicienne en télécommunications études et développement
-20131|Technicien / Technicienne en télévision, hi-fi
+20131|Technicien / Technicienne en télévision; hi-fi
 20132|Technicien / Technicienne en traitement des déchets
 20133|Technicien / Technicienne en traitement des eaux
 20134|Technicien / Technicienne énergie
@@ -10155,7 +10164,7 @@ ogr_id|ogr_label
 20416|Traducteur-interprète / Traductrice-interprète
 20417|Traducteur-réviseur / Traductrice-réviseuse
 20418|Traffic manager
-20419|Traitant / Traitante hygiène, sécurité, conditions de travail
+20419|Traitant / Traitante hygiène; sécurité; conditions de travail
 20420|Traitant / Traitante protection environnement
 20421|Traminot / Employée de tramway
 20422|Trancheur / Trancheuse bois
@@ -10358,7 +10367,7 @@ ogr_id|ogr_label
 20623|Vendeur / Vendeuse en produits frais
 20624|Vendeur / Vendeuse en produits ludiques
 20625|Vendeur / Vendeuse en quincaillerie
-20626|Vendeur / Vendeuse en revêtement de mur, sol
+20626|Vendeur / Vendeuse en revêtement de mur; sol
 20627|Vendeur / Vendeuse en rôtisserie
 20628|Vendeur / Vendeuse en ski
 20629|Vendeur / Vendeuse en téléphonie
@@ -10480,7 +10489,7 @@ ogr_id|ogr_label
 24848|Danse thérapeute
 24849|Junior planner
 24851|Psychodramatiste
-24852|Rayonneur / Rayonneuse de roues de cycles, motocycles, motoculteurs
+24852|Rayonneur / Rayonneuse de roues de cycles; motocycles; motoculteurs
 24853|Rhéologue
 24854|Senior planner
 24855|Superviseur / Superviseuse help desk en informatique
@@ -10641,20 +10650,20 @@ ogr_id|ogr_label
 38249|Danseur / Danseuse danse contemporaine
 38250|Danseur / Danseuse danses de variétés
 38251|Danseur / Danseuse danses ethniques et traditionnelles
-38252|Danseur / Danseuse danses urbaines, hip-hop
-38253|Danseur / Danseuse de revue, music hall, comédie musicale
-38254|Danseur / Danseuse jazz, modern jazz
+38252|Danseur / Danseuse danses urbaines; hip-hop
+38253|Danseur / Danseuse de revue; music hall; comédie musicale
+38254|Danseur / Danseuse jazz; modern jazz
 38255|Strip-teaseur / Strip-teaseuse
 38256|Accordéoniste
 38257|Altiste
 38258|Bassiste
 38259|Bassoniste
 38260|Batteur / Batteuse
-38261|Chanteur / Chanteuse de bals, soirées privées
+38261|Chanteur / Chanteuse de bals; soirées privées
 38262|Chanteur / Chanteuse de jazz et funk
 38263|Chanteur / Chanteuse de musique ethnique et traditionnelle
 38264|Chanteur / Chanteuse de rap
-38265|Chanteur / Chanteuse de revue, music-hall, comédie musicale
+38265|Chanteur / Chanteuse de revue; music-hall; comédie musicale
 38266|Chanteur / Chanteuse de rock-pop
 38267|Chanteuse lyrique alto contre-alto
 38268|Chanteuse lyrique mezzo-soprano
@@ -10723,7 +10732,7 @@ ogr_id|ogr_label
 38353|Professeur / Professeure de chinois
 38354|Professeur / Professeure de portugais
 38355|Professeur / Professeure de sciences économiques et sociales
-38356|Professeur / Professeure de physique, chimie, biologie
+38356|Professeur / Professeure de physique; chimie; biologie
 38357|Conseiller commercial / Conseillère commerciale en articles de décoration auprès des particuliers
 38358|Conseiller commercial / Conseillère commerciale en bien-être et diététique auprès des particuliers
 38359|Conseiller commercial / Conseillère commerciale en distribution d'énergie auprès des particuliers
@@ -10736,7 +10745,7 @@ ogr_id|ogr_label
 38379|Technicien / Technicienne de rivière
 38380|Confiturier / Confiturière
 38381|Vendeur / Vendeuse en articles de bazar
-38382|Vendeur / Vendeuse en matériel médical, paramédical
+38382|Vendeur / Vendeuse en matériel médical; paramédical
 38383|Community manager
 38384|Assistant conducteur / Assistante conductrice de travaux
 38385|Chef de chantier génie civil
@@ -10845,11 +10854,11 @@ ogr_id|ogr_label
 38520|Matelot pont de la marine nationale
 38571|Aide caviste
 38572|Vendeur / Vendeuse en produits multimédia
-38573|Manager commercial / Manageuse commerciale des forces de vente
-38574|Manager commercial junior / Manageuse commerciale junior des forces de vente
+38573|Manager commercial des forces de vente
+38574|Manager commercial junior des forces de vente
 38575|Caissier / Caissière en restauration
 38576|Chef de projets traduction
-38577|Animateur / Animatrice d'activités ludiques (jeux, jouets)
+38577|Animateur / Animatrice d'activités ludiques (jeux; jouets)
 38578|Employé / Employée de ménage en hôtellerie de plein air
 38579|Équipier / Équipière de banquet
 38580|Demi-chef de partie
@@ -10872,7 +10881,7 @@ ogr_id|ogr_label
 38597|Chargé / Chargée de terrain - management et gestion d'enquêtes
 38621|Médiateur social / Médiatrice sociale en milieu scolaire
 38628|Éducateur / Éducatrice canin
-38629|Acheteur vendeur / Acheteuse vendeuse d'or, de métaux précieux
+38629|Acheteur vendeur / Acheteuse vendeuse d'or; de métaux précieux
 38630|Vendeur / Vendeuse conseil en aquariophilie
 38631|Permanencier / Permanencière auxiliaire de régulation médicale
 38632|Façadier / Façadière isolation thermique par l'extérieur - ITE
@@ -10990,14 +10999,14 @@ ogr_id|ogr_label
 38835|Consultant / Consultante SaaS - Software as a Service
 38851|Chasseur / Chasseuse immobilier
 38852|Chef d'équipe travaux publics
-38853|Installateur / Installatrice en chauffage, climatisation, sanitaire et énergies renouvelables
+38853|Installateur / Installatrice en chauffage; climatisation; sanitaire et énergies renouvelables
 38854|Technicien / Technicienne d'études cliniques
 38855|Inspecteur / Inspectrice de conformité d'équipements sportifs et aires de jeux
 38856|Chargé / Chargée d'affaires réglementaires et qualité en industrie cosmétique
 38857|Dépanneur électromécanicien / Dépanneuse électromécanicienne d'équipements industriels
 38858|Technicien / Technicienne d'intervention sur matériels d'assistance respiratoire
 38859|Cadre de santé infirmier / infirmière
-38860|Opérateur / Opératrice de tri, récupération et recyclage de véhicules hors d'usage - VHU
+38860|Opérateur / Opératrice de tri; récupération et recyclage de véhicules hors d'usage - VHU
 38861|Pupitreur / Pupitreuse régie lumière
 38862|Office manager
 38870|Autoclaviste en industrie alimentaire
