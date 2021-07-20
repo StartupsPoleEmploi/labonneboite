@@ -55,7 +55,7 @@ def send_mail(mail_content, subject):
         subject=subject,
         html_content=mail_content,
         from_email=settings.FROM_EMAIL,
-        recipients=[settings.TO_EMAIL]
+        recipients=settings.TO_EMAILS
     )
 
 def generate_update_coordinates_mail(form, recruiter_message):

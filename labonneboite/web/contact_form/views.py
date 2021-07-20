@@ -120,7 +120,7 @@ def sendMail(mail_content, subject):
         else:
             break
     else:
-        logger.critical('Mail not sent (to settings.TO_EMAIL)', subject, mail_content)
+        logger.critical('Mail not sent (to settings.TO_EMAILS)', subject, mail_content)
         flash(generate_fail_flash_content(), 'error')
 
 @contactFormBlueprint.route('/verification-informations-entreprise', methods=['GET'])
