@@ -150,7 +150,7 @@ PEAM_CLIENT_SECRET = '<set it>'
 
 MAILJET_API_KEY = '<set it>'
 MAILJET_API_SECRET = '<set it>'
-TO_EMAIL = '<set it>' # this was named `FORM_EMAIL`, but it is confusing
+TO_EMAILS = ['<set it>'] # this was named `FORM_EMAIL`, but it is confusing
 FROM_EMAIL = '<set it>'
 
 # URL of a script to load for tag management
