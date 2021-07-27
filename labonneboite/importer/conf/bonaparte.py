@@ -12,7 +12,7 @@ MAXIMUM_INVALID_ROWS = 100
 
 # --- job 5/8 : compute_scores
 SCORE_COEFFICIENT_OF_VARIATION_MAX = 2.0
-RMSE_MAX = 4000  # On 2020.08.20 departement 11 reached RMSE=1822 and department 73 reached RMSE=1829
+RMSE_MAX = 8000  # On 2020.08.20 departement 11 reached RMSE=1822 and department 73 reached RMSE=1829
 HIGH_SCORE_COMPANIES_DIFF_MAX = 85  # On 2020.08.04 department 43 reached evolution 81.65 ==> Exception('evolution too high: 81.65289256198348 > 75',)
 
 # --- job 6/8 : validate_scores
