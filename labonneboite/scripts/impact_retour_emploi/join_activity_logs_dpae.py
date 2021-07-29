@@ -53,8 +53,12 @@ class JoinActivityLogsDPAE:
         return df_activity.astype(str)
 
     def get_logs_activities_by_sirets(self, sirets):
+        if len(sirets) > 1:
+            sub_query = "in %s" % str(tuple(sirets))
+        else:
+            sub_query = "= %s" % sirets[0]
         engine = import_util.create_sqlalchemy_engine()
-        query = "select * from logs_activity where siret in %s order by dateheure asc;" % str(tuple(sirets))
+        query = "select * from logs_activity where siret %s order by dateheure asc;" % sub_query
         df_activity = pd.read_sql_query(query, engine)
         engine.close()
         return df_activity.astype(str)
