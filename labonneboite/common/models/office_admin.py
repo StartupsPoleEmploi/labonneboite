@@ -6,11 +6,13 @@ from dateutil.relativedelta import relativedelta
 from sqlalchemy import Boolean, DateTime, Integer, String, Text
 from sqlalchemy.dialects import mysql
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy import desc
+from sqlalchemy import desc, text
 from sqlalchemy.dialects import mysql
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
+
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
 from labonneboite.common import geocoding
 from labonneboite.common.database import Base
@@ -98,18 +100,8 @@ class OfficeAdminRemove(CRUDMixin, Base):
         'order_by': desc(date_created),  # Default order_by for all queries.
     }
 
-
-class OfficeAdminUpdate(CRUDMixin, Base):
-    """
-    Upon requests received from employers, we can update some offices info.
-    This model collects the changes to apply to offices.
-    """
-
-    __tablename__ = 'etablissements_admin_update'
-
+class OfficeUpdateMixin(object):
     SEPARATORS = ['\n', '\r']
-
-    id = Column(Integer, primary_key=True)
 
     # Stores a list of SIRET as a string separated by `SEPARATORS`
     sirets = Column(Text, default='', nullable=False, unique=False)
@@ -176,15 +168,6 @@ class OfficeAdminUpdate(CRUDMixin, Base):
     # Metadata.
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
     date_updated = Column(DateTime, nullable=True)
-    created_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
-    updated_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
-    # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
-    created_by = relationship('User', foreign_keys=[created_by_id])
-    updated_by = relationship('User', foreign_keys=[updated_by_id])
-
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
 
     def clean(self):
         """
@@ -217,6 +200,18 @@ class OfficeAdminUpdate(CRUDMixin, Base):
             html.append("{0} - {1}".format(rome, settings.ROME_DESCRIPTIONS[rome]))
         return '<br>'.join(html)
 
+class OfficeAdminUpdate(OfficeUpdateMixin, CRUDMixin, Base):
+    """
+    Upon requests received from employers, we can update some offices info.
+    This model collects the changes to apply to offices.
+    """
+
+    __tablename__ = 'etablissements_admin_update'
+    id = Column(Integer, ForeignKey('etablissements_admin_update.id'), primary_key=True)
+
+    __mapper_args__ = {
+        'order_by': desc(text('etablissements_admin_update.date_created')),  # Default order_by for all queries.
+    }
 
 class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     """
