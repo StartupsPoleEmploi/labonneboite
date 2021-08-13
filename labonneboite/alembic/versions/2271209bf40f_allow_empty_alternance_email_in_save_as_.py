@@ -18,6 +18,7 @@ depends_on = None
 
 
 def upgrade():
+    # FIXME: TEXT columns will not accept default value
     op.alter_column('etablissements_admin_update', 'email_alternance', nullable=False, server_default='', existing_type=mysql.TEXT())
     op.alter_column('etablissements_admin_add', 'email_alternance', nullable=False, server_default='', existing_type=mysql.TEXT())
     op.alter_column('etablissements_exportable', 'email_alternance', nullable=False, server_default='', existing_type=mysql.TEXT())
