@@ -112,10 +112,28 @@
 
 .lbb-dropdown--peconnect_text {
     padding: 0 8px;
+    margin-top: 0px !important;
 }
 
 .lbb-dropdown--peconnect_text,
 .lbb-dropdown--peconnect_text strong {
-    font-size: 20px !important;
+    font-size: 18px !important;
     line-height: 24px;
+}
+
+.lbb-dropdown .lbb-create-pe-account__block
+{
+    text-align: center;
+    margin-top: 8px !important;
+}
+
+.lbb-dropdown .lbb-create-pe-account__block .lbb-create-pe-account__link
+{
+    text-decoration: underline;
+    font-size: 18px !important;
+    font-weight: bold;
+    line-height: 25px;
+    letter-spacing: 0px;
+    color: #1B2E57;
+    opacity: 1;
 }
