@@ -100,6 +100,12 @@
     width: 360px;
 }
 
+@media only screen and (max-width: 540px) {
+    .lbb-dropdown .logo-pe-connect {
+        width: 220px;
+    }
+}
+
 .lbb-dropdown .logo-pe-connect img {
     display: block;
 }
