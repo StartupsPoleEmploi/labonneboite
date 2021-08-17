@@ -24,6 +24,13 @@
     background: white;
     box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.9);
 }
+
+#jepostule-not-authentified-modal.modal
+{
+    height: 520px;
+}
+
+
 .modal-closed {
     display: none;
 }
@@ -67,4 +74,16 @@
 .modal-content-inner {
     display: table-cell;
     vertical-align: middle;
+}
+
+
+.modal .lbb-create-pe-account__link
+{
+    text-decoration: underline;
+    font-size: 20px !important;
+    font-weight: bold;
+    line-height: 25px;
+    letter-spacing: 0px;
+    color: #1B2E57;
+    opacity: 1;
 }
