@@ -88,6 +88,13 @@
 /* Dropdowns > PE Connect logo (temporary)
 =========================================================================== */
 
+.lbb-dropdown.lbb-dropdown--peconnect
+{
+    padding: 20px;
+    color: #707070;
+    opacity: 1;    
+}
+
 .lbb-dropdown .logo-pe-connect {
     display: inline-block;
     width: 360px;
@@ -95,4 +102,14 @@
 
 .lbb-dropdown .logo-pe-connect img {
     display: block;
+}
+
+.lbb-dropdown--peconnect_text {
+    padding: 0 8px;
+}
+
+.lbb-dropdown--peconnect_text,
+.lbb-dropdown--peconnect_text strong {
+    font-size: 20px !important;
+    line-height: 24px;
 }

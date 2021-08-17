@@ -4,12 +4,10 @@
     <img src="{{ url_for('static', filename='images/user.svg') }}" alt="">
     <span>Connexion</span>
   </button>
-  <div id="menu-content" class="lbb-dropdown lbb-dropdown-right text-right">
-    <p>
-    <span><strong>Connectez-vous à La Bonne Boite</strong> en utilisant des identifiants Pôle emploi.</span>  
+  <div id="menu-content" class="lbb-dropdown lbb-dropdown-right lbb-dropdown--peconnect">
+    <div class="lbb-dropdown--peconnect_text"><strong>Connectez-vous à La Bonne Boite</strong> en utilisant des identifiants Pôle emploi.</div>  
     <a class="logo-pe-connect rgpd-consent-required" href="{{ login_url(next_url=next_url) }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Se connecter avec Pôle emploi"></a><br>
-    <span>Vous n'avez pas de compte ?<br />Créez-en un sur le site Pôle Emploi et revenez postuler spontanément sur La bonne boite !</span>
-    </p>
+    <div class="lbb-dropdown--peconnect_text">Vous n'avez pas de compte ?<br />Créez-en un sur le site Pôle Emploi et revenez postuler spontanément sur La bonne boite !</div>
   </div>
 </div>
 {% else %}
