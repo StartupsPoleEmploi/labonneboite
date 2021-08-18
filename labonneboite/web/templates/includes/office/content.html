@@ -27,37 +27,21 @@
       </div>
       <div class="grid-col-4">
 
-        {% if company.email or company.phone or company.website %}
-        <h4>Contact</h4>
-        <ul>
-          {% if company.email %}
-          <li>
-            <a href="mailto:{{ company.email }}" class="break-word">{{ company.email }}</a>
-          </li>
-          {% endif %}
-          {% if company.phone %}
-          <li>
-            <a href="tel:{{ company.phone }}">{{ company.phone }}</a>
-          </li>
-          {% endif %}
-          {% if company.website %}
-          <li>
-            <a class="gtm-company-detail-website" href="{{ company.website }}" target="_blank">Site internet</a>
-          </li>
-          {% endif %}
-        </ul>
+        {% if company.website %}
+        <h4>Visiter le site Internet</h4>
+        <p>
+            <a class="gtm-company-detail-website" href="{{ company.website }}" target="_blank" rel="noopener noreferrer">{{ company.website }}</a>
+        </p>
         {% endif %}
-
-        <h4 class="lbb-purple">C'est mon entreprise !</h4>
-        <p><a href="{{ url_for('contact_form.change_info_or_apply_for_job', siret=company.siret) }}" target="_blank">Modifier ces informations</a></p>
-
-      </div>
-      <div class="grid-col-4">
 
         {% if company.contact_mode %}{# Not available everywhere, we can live without it most of the time. #}
         <h4>Mode de contact à privilégier</h4>
         <p>{{ company.contact_mode }}</p>
         {% endif %}
+
+
+      </div>
+      <div class="grid-col-4">
 
         <h4>Informations supplémentaires</h4>
         <ul>
@@ -71,6 +55,9 @@
             SIRET : {{ company.siret }}
           </li>
         </ul>
+
+        <h4 class="lbb-purple">C'est mon entreprise !</h4>
+        <p><a href="{{ url_for('contact_form.change_info_or_apply_for_job', siret=company.siret) }}" target="_blank">Modifier ces informations</a></p>
 
       </div>
     </div>
