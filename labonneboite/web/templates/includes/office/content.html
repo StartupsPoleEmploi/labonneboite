@@ -46,10 +46,10 @@
         <h4>Informations supplémentaires</h4>
         <ul>
           <li>
-            <a href="{{ company.google_url }}" target="_blank" onclick="trackOutboundLink('{{ company.google_url }}');">Google</a>
+            <a href="{{ company.google_url }}" target="_blank" rel="noopener noreferrer" onclick="trackOutboundLink('{{ company.google_url }}');">Google</a>
           </li>
           <li>
-            <a href="{{ company.kompass_url }}" target="_blank" onclick="trackOutboundLink('{{ company.kompass_url }}');">Kompass</a>
+            <a href="{{ company.kompass_url }}" target="_blank" rel="noopener noreferrer" onclick="trackOutboundLink('{{ company.kompass_url }}');">Kompass</a>
           </li>
           <li class="small">
             SIRET : {{ company.siret }}
@@ -57,7 +57,7 @@
         </ul>
 
         <h4 class="lbb-purple">C'est mon entreprise !</h4>
-        <p><a href="{{ url_for('contact_form.change_info_or_apply_for_job', siret=company.siret) }}" target="_blank">Modifier ces informations</a></p>
+        <p><a href="{{ url_for('contact_form.change_info_or_apply_for_job', siret=company.siret) }}" target="_blank" rel="noopener noreferrer">Modifier ces informations</a></p>
 
       </div>
     </div>
