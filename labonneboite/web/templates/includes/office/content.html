@@ -7,11 +7,6 @@
         <h4>Raison sociale</h4>
         <p>{{ company.company_name }}</p>
 
-        {% if company.office_name %}
-        <h4>Enseigne</h4>
-        <p>{{ company.office_name }}</p>
-        {% endif %}
-
         {% if company.phone %}
         <h4>Téléphone</h4>
         <p><a href="tel:{{ company.phone }}">{{ company.phone }}</a></p>
