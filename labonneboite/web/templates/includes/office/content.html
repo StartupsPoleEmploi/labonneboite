@@ -12,6 +12,11 @@
         <p>{{ company.office_name }}</p>
         {% endif %}
 
+        {% if company.phone %}
+        <h4>Téléphone</h4>
+        <p><a href="tel:{{ company.phone }}">{{ company.phone }}</a></p>
+        {% endif %}
+
         <h4>Adresse</h4>
         <p class="easy-copy-paste">
           {% for f in company.address_fields %}
