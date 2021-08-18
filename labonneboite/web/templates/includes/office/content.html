@@ -40,6 +40,11 @@
         {% endif %}
 
 
+        {% if jepostule_globally_enabled and (jepostule_enabled(user, company) or (not user.is_authenticated and company.email)) %}
+        <h4>Comment postuler ?</h4>
+        <p>Cliquer sur le bouton "Postuler" de l'entreprise pour envoyer votre candidature en quelques clics !</p>
+        {% endif %}
+
       </div>
       <div class="grid-col-4">
 
