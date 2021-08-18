@@ -7,7 +7,6 @@
       <b>Nombre de salariés</b> {{ company.headcount_text }}<br>
     </td>
     <td style="vertical-align: top;">
-      {% if company.email %}<b><a href="mailto:{{ company.email }}">{{ company.email }}</a></b><br>{% endif %}
       {% if company.website %}<b><a href="{{ company.website }}">{{ company.website }}</a></b><br>{% endif %}
       {% if company.phone %}<b>Téléphone</b> : {{ company.phone }}<br>{% endif %}
       <b>Adresse</b>
