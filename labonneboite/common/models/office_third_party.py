@@ -13,5 +13,5 @@ from labonneboite.common.models import OfficeAdminUpdate, OfficeUpdateMixin
 class OfficeThirdPartyUpdate(OfficeUpdateMixin, CRUDMixin, Base):
 
     __tablename__ = 'etablissements_third_party_update'
-    id = Column(Integer, ForeignKey('etablissements_third_party_update.id'), primary_key=True)
+    id = Column(Integer, primary_key=True)
 

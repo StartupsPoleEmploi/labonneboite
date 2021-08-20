@@ -207,7 +207,7 @@ class OfficeAdminUpdate(OfficeUpdateMixin, CRUDMixin, Base):
     """
 
     __tablename__ = 'etablissements_admin_update'
-    id = Column(Integer, ForeignKey('etablissements_admin_update.id'), primary_key=True)
+    id = Column(Integer, primary_key=True)
 
     __mapper_args__ = {
         'order_by': desc(text('etablissements_admin_update.date_created')),  # Default order_by for all queries.
