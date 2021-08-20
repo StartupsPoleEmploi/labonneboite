@@ -233,3 +233,5 @@ elif get_current_env() == ENV_DEVELOPMENT:
 elif get_current_env() == ENV_TEST:
     # pylint: disable=wildcard-import,unused-wildcard-import
     from .overrides.test import *
+
+ALLOW_INDEXING = False
