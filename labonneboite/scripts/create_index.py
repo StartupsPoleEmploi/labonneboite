@@ -804,6 +804,7 @@ def display_performance_stats(departement):
 
 
 def update_data(create_full, create_partial, disable_parallel_computing):
+    logger.info("[update data] Creation of ES index")
     if create_partial:
         with switch_es_index():
             create_offices_for_departement('57')
@@ -817,15 +818,21 @@ def update_data(create_full, create_partial, disable_parallel_computing):
 
     # Upon requests received from employers we can add, remove or update offices.
     # This permits us to complete or overload the data provided by the importer.
+    logger.info("[update data] Add offices (SAVE)")
     add_offices()
+    logger.info("[update data] Remove offices (SAVE)")
     remove_offices()
+    logger.info("[update data] Update offices (SAVE)")
     update_offices(OfficeAdminUpdate)
+    logger.info("[update data] Update offices (third party)")
     update_offices(OfficeThirdPartyUpdate)
     #update_offices_geolocations()
 
+    logger.info("[update data] Remove scam emails")
     remove_scam_emails()
 
     if create_full:
+        logger.info("[update data] Sanity check rome codes")
         sanity_check_rome_codes()
 
 
