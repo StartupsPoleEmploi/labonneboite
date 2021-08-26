@@ -108,7 +108,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         )
 
         office_to_update.save(commit=True)
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         # Available for LBB but not for LBA
         params = self.add_security_params({'user': 'emploi_store_dev'})
@@ -134,7 +134,7 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         )
 
         office_to_update.save(commit=True)
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         # Available for LBA but not for LBB
         params = self.add_security_params({'user': 'emploi_store_dev'})

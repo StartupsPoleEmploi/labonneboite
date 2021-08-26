@@ -28,7 +28,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             romes_alternance_to_boost="D1211",  # Boost score only for this ROME.
         )
         office_to_update.save(commit=True)
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
         es.Elasticsearch().indices.flush()
 
         params = self.add_security_params({
@@ -62,7 +62,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             boost_alternance=True
         )
         office_to_update.save()
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
         es.Elasticsearch().indices.flush()
 
         params = self.add_security_params({

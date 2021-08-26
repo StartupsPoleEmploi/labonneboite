@@ -28,7 +28,7 @@ from labonneboite.common.search import fetch_offices
 from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, OGR_ROME_CODES, load_siret_to_remove
 from labonneboite.common.models import Office, HistoryBlacklist
-from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove
+from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove, OfficeThirdPartyUpdate
 from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer import util as importer_util
@@ -579,18 +579,18 @@ def remove_offices():
 
 
 @timeit
-def update_offices():
+def update_offices(table):
     """
     Update offices (overload the data provided by the importer).
     """
     # Good engineering eliminates users being able to do the wrong thing as much as possible.
     # But since it is possible to store multiple SIRETs, there is no longer any constraint of uniqueness
-    # on a SIRET. As a result, it shouldn't but there may be `n` entries in `OfficeAdminUpdate`
+    # on a SIRET. As a result, it shouldn't but there may be `n` entries in `table`
     # for the same SIRET. We order the query by creation date ASC so that the most recent changes take
     # priority over any older ones.
-    for office_to_update in db_session.query(OfficeAdminUpdate).order_by(asc(OfficeAdminUpdate.date_created)).all():
+    for office_to_update in db_session.query(table).order_by(asc(table.date_created)).all():
 
-        for siret in OfficeAdminUpdate.as_list(office_to_update.sirets):
+        for siret in table.as_list(office_to_update.sirets):
 
             office = Office.query.filter_by(siret=siret).first()
 
@@ -818,6 +818,7 @@ def display_performance_stats(departement):
 
 
 def update_data(create_full, create_partial, disable_parallel_computing):
+    logger.info("[update data] Creation of ES index")
     if create_partial:
         with switch_es_index():
             create_offices_for_departement('57')
@@ -831,14 +832,21 @@ def update_data(create_full, create_partial, disable_parallel_computing):
 
     # Upon requests received from employers we can add, remove or update offices.
     # This permits us to complete or overload the data provided by the importer.
+    logger.info("[update data] Add offices (SAVE)")
     add_offices()
+    logger.info("[update data] Remove offices (SAVE)")
     remove_offices()
-    update_offices()
-    update_offices_geolocations()
+    logger.info("[update data] Update offices (SAVE)")
+    update_offices(OfficeAdminUpdate)
+    logger.info("[update data] Update offices (third party)")
+    update_offices(OfficeThirdPartyUpdate)
+    #update_offices_geolocations()
 
+    logger.info("[update data] Remove scam emails")
     remove_scam_emails()
 
     if create_full:
+        logger.info("[update data] Sanity check rome codes")
         sanity_check_rome_codes()
 
 
