@@ -7,9 +7,9 @@
         <h4>Raison sociale</h4>
         <p>{{ company.company_name }}</p>
 
-        {% if company.office_name %}
-        <h4>Enseigne</h4>
-        <p>{{ company.office_name }}</p>
+        {% if company.phone %}
+        <h4>Téléphone</h4>
+        <p><a href="tel:{{ company.phone }}">{{ company.phone }}</a></p>
         {% endif %}
 
         <h4>Adresse</h4>
@@ -22,50 +22,42 @@
       </div>
       <div class="grid-col-4">
 
-        {% if company.email or company.phone or company.website %}
-        <h4>Contact</h4>
-        <ul>
-          {% if company.email %}
-          <li>
-            <a href="mailto:{{ company.email }}" class="break-word">{{ company.email }}</a>
-          </li>
-          {% endif %}
-          {% if company.phone %}
-          <li>
-            <a href="tel:{{ company.phone }}">{{ company.phone }}</a>
-          </li>
-          {% endif %}
-          {% if company.website %}
-          <li>
-            <a class="gtm-company-detail-website" href="{{ company.website }}" target="_blank">Site internet</a>
-          </li>
-          {% endif %}
-        </ul>
+        {% if company.website %}
+        <h4>Visiter le site Internet</h4>
+        <p>
+            <a class="gtm-company-detail-website break-word" href="{{ company.website }}" target="_blank" rel="noopener noreferrer">{{ company.website }}</a>
+        </p>
         {% endif %}
-
-        <h4 class="lbb-purple">C'est mon entreprise !</h4>
-        <p><a href="{{ url_for('contact_form.change_info_or_apply_for_job', siret=company.siret) }}" target="_blank">Modifier ces informations</a></p>
-
-      </div>
-      <div class="grid-col-4">
 
         {% if company.contact_mode %}{# Not available everywhere, we can live without it most of the time. #}
         <h4>Mode de contact à privilégier</h4>
         <p>{{ company.contact_mode }}</p>
         {% endif %}
 
+
+        {% if jepostule_globally_enabled and (jepostule_enabled(user, company) or (not user.is_authenticated and company.email)) %}
+        <h4>Comment postuler ?</h4>
+        <p>Cliquer sur le bouton "Postuler" de l'entreprise pour envoyer votre candidature en quelques clics !</p>
+        {% endif %}
+
+      </div>
+      <div class="grid-col-4">
+
         <h4>Informations supplémentaires</h4>
         <ul>
           <li>
-            <a href="{{ company.google_url }}" target="_blank" onclick="trackOutboundLink('{{ company.google_url }}');">Google</a>
+            <a href="{{ company.google_url }}" target="_blank" rel="noopener noreferrer" onclick="trackOutboundLink('{{ company.google_url }}');">Google</a>
           </li>
           <li>
-            <a href="{{ company.kompass_url }}" target="_blank" onclick="trackOutboundLink('{{ company.kompass_url }}');">Kompass</a>
+            <a href="{{ company.kompass_url }}" target="_blank" rel="noopener noreferrer" onclick="trackOutboundLink('{{ company.kompass_url }}');">Kompass</a>
           </li>
           <li class="small">
             SIRET : {{ company.siret }}
           </li>
         </ul>
+
+        <h4 class="lbb-purple">C'est mon entreprise !</h4>
+        <p><a href="{{ url_for('contact_form.change_info_or_apply_for_job', siret=company.siret) }}" target="_blank">Modifier ces informations</a></p>
 
       </div>
     </div>

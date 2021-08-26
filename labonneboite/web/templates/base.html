@@ -37,7 +37,7 @@
     <ul class="lbb-header">
       <li class="lbb-header-logo-lbb">
         <a href="/">
-          <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite - Pôle Emploi">
+          <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite - Pôle emploi">
         </a>
       </li>
 
@@ -173,6 +173,14 @@
             <a class="logo-pe-connect rgpd-accept" href="{{ url_for('social.auth', backend='peam-openidconnect') }}?next={{ (next_url_modal or next_url or request.url) | urlencode }}">
               <img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Se connecter avec Pôle emploi">
             </a>
+        </p>
+        <p>
+          Vous n'avez pas de compte ?
+          <br />
+          Créez-en un sur le site Pôle emploi et revenez postuler spontanément sur La bonne boite !
+        </p>
+        <p>
+          <a class="lbb-create-pe-account__link gtmCreationComptePE" href="https://candidat.pole-emploi.fr/compte/creation/preambule" target="_blank" rel="noreferrer noopener">Créer un compte Pôle emploi</a>
         </p>
       </div>
     </div>
