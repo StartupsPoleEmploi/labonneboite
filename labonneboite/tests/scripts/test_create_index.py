@@ -382,7 +382,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         with mock.patch.object(
             script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0
         ), mock.patch.object(script.scoring_util, 'SCORE_ALTERNANCE_FOR_ROME_MINIMUM', 0):
-            script.update_offices()
+            script.update_offices(OfficeAdminUpdate)
 
         for office in [self.office1, self.office2]:
             romes_for_office = [rome.code for rome in mapping_util.romes_for_naf(office.naf)]
@@ -413,7 +413,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         office = Office.get(self.office1.siret)
         self.assertEqual(office.company_name, office_to_update.new_company_name)
@@ -454,7 +454,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         office = Office.get(self.office1.siret)
         self.assertEqual(office.email, '')
@@ -487,7 +487,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         office = Office.get(self.office1.siret)
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
@@ -517,7 +517,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         office = Office.get(self.office1.siret)
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
@@ -550,7 +550,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         office = Office.get(self.office1.siret)
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
@@ -579,7 +579,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             website_alternance="http://example-alternance.com",
         )
         office_to_update.save(commit=True)
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         office = Office.get(self.office1.siret)
         self.assertEqual(office.email_alternance, "email_alternance@mail.com")
@@ -602,7 +602,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertNotEqual(office.score_alternance, 0)
 
         office_to_update.save(commit=True)
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         # Expected score alternance = 0
         office = Office.get(self.office1.siret)
@@ -625,7 +625,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         self.assertNotEqual(office.score, 0)
 
         office_to_update.save(commit=True)
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         # Expected score_rome = 0
         office = Office.get(self.office1.siret)
@@ -647,7 +647,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         # and avoid removing romes if their score is too low.
         with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0),\
                 mock.patch.object(script.scoring_util, 'MINIMUM_POSSIBLE_SCORE', 0):
-            script.update_offices()
+            script.update_offices(OfficeAdminUpdate)
 
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office1.siret)
         self.assertEqual(len(set(romes_for_office)), len(res['_source']['scores_by_rome']))
@@ -665,7 +665,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         for siret in sirets:
             office = Office.get(siret)
@@ -690,7 +690,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             website_alternance="http://example-alternance.com",
         )
         office_to_update.save(commit=True)
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         for siret in sirets:
             office = Office.get(siret)
@@ -708,7 +708,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             boost=True,
         )
         office_to_update.save(commit=True)
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         for siret in sirets:
             office = Office.get(siret)
@@ -734,7 +734,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             remove_website=False,
         )
         office_to_update.save()
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         for siret in sirets:
             office = Office.get(siret)
@@ -765,7 +765,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         # and avoid removing romes if their score is too low.
         with mock.patch.object(script.scoring_util, 'SCORE_FOR_ROME_MINIMUM', 0),\
                 mock.patch.object(script.scoring_util, 'MINIMUM_POSSIBLE_SCORE', 0):
-            script.update_offices()
+            script.update_offices(OfficeAdminUpdate)
 
 
         for siret in sirets:
@@ -790,7 +790,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         for siret in sirets:
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
@@ -818,7 +818,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         for siret in sirets:
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
@@ -845,7 +845,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
 
@@ -871,7 +871,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         for siret in sirets:
             res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
@@ -899,7 +899,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
         office_to_update.save()
 
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         office = Office.get(self.office1.siret)
         res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
@@ -921,7 +921,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             social_network="https://www.facebook.com/poleemploi/",
         )
         office_to_update.save()
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
         office = Office.get(self.office1.siret)
         # Check contact mode
         self.assertEqual("https://www.facebook.com/poleemploi/", office.social_network)
@@ -938,7 +938,7 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         )
 
         office_to_update.save()
-        script.update_offices()
+        script.update_offices(OfficeAdminUpdate)
 
         office = Office.get(self.office1.siret)
 

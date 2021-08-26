@@ -231,6 +231,10 @@ Note that we only have data in Metz region.
 
 Any search on another region than Metz will give zero results.
 
+You may need to specify the `development` environment for the scripts to connect to local DB on port `3307`:
+
+    $ LBB_ENV=development python labonneboite/scripts/create_index.py
+
 ## Running scripts
 
 For example `create_index`:
@@ -399,6 +403,23 @@ Here is their normal workflow:
 `check_etab` => `extract_etab` => `check_dpae` => `extract_dpae` => `compute_scores` => `validate_scores` => `geocode` => `populate_flags`
 
 Use `make run-importer-jobs` to run all these jobs in local development environment.
+
+
+After the importer has run, we execute the `labonneboite/scripts/create_index.py` which updates the importer data from the table `etablissements`, with several goals:
+
+* Populate the `office` type in ElasticSearch
+* Create the `ogr` type in ElasticSearch
+* Create the `location` type in ElasticSearch
+* Add offices to DB and ES - these changes are made with the back office (SAVE)
+* Remove offices from DB and ES - these changes are made with the back office (SAVE)
+* Update offices in DB and ES with changes are made with the back office (SAVE)
+* Update offices in DB and ES with changes from experiments (see `labonneboite/scripts/manage_third_party_updates.py`)
+
+Notes:
+
+* the table `etablissements_third_party_update` has the same structure as the table `etablissements_admin_update `
+* both table are used in `labonneboite/scripts/create_index.py` to update the table etablissements after the execution of the importer
+* the table `etablissements_third_party_update` is managed with the script `labonneboite/scripts/manage_third_party_updates.py`, and it contains changes necessary for experiments with third party researcherse
 
 ## Single-ROME vs Multi-ROME search
 

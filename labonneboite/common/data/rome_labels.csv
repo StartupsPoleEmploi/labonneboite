@@ -23,7 +23,7 @@ A1412|Fabrication et affinage de fromages
 A1413|Fermentation de boissons alcoolisées
 A1414|Horticulture et maraîchage
 A1415|Équipage de la pêche
-A1416|Polyculture, élevage
+A1416|Polyculture; élevage
 A1417|Saliculture
 A1501|Aide aux soins animaux
 A1502|Podologie animale
@@ -34,12 +34,12 @@ B1201|Réalisation d'objets décoratifs et utilitaires en céramique et matéria
 B1301|Décoration d'espaces de vente et d'exposition
 B1302|Décoration d'objets d'art et artisanaux
 B1303|Gravure - ciselure
-B1401|Réalisation d'objets en lianes, fibres et brins végétaux
+B1401|Réalisation d'objets en lianes; fibres et brins végétaux
 B1402|Reliure et restauration de livres et archives
 B1501|Fabrication et réparation d'instruments de musique
 B1601|Métallerie d'art
 B1602|Réalisation d'objets artistiques et fonctionnels en verre
-B1603|Réalisation d'ouvrages en bijouterie, joaillerie et orfèvrerie
+B1603|Réalisation d'ouvrages en bijouterie; joaillerie et orfèvrerie
 B1604|Réparation - montage en systèmes horlogers
 B1701|Conservation et reconstitution d'espèces animales
 B1801|Réalisation d'articles de chapellerie
@@ -76,11 +76,11 @@ C1504|Transaction immobilière
 D1101|Boucherie
 D1102|Boulangerie - viennoiserie
 D1103|Charcuterie - traiteur
-D1104|Pâtisserie, confiserie, chocolaterie et glacerie
+D1104|Pâtisserie; confiserie; chocolaterie et glacerie
 D1105|Poissonnerie
 D1106|Vente en alimentation
 D1107|Vente en gros de produits frais
-D1201|Achat vente d'objets d'art, anciens ou d'occasion
+D1201|Achat vente d'objets d'art; anciens ou d'occasion
 D1202|Coiffure
 D1203|Hydrothérapie
 D1204|Location de véhicules ou de matériel de loisirs
@@ -113,13 +113,13 @@ D1507|Mise en rayon libre-service
 D1508|Encadrement du personnel de caisses
 D1509|Management de département en grande distribution
 E1101|Animation de site multimédia
-E1102|Écriture d'ouvrages, de livres
+E1102|Écriture d'ouvrages; de livres
 E1103|Communication
 E1104|Conception de contenus multimédias
 E1105|Coordination d'édition
 E1106|Journalisme et information média
 E1107|Organisation d'évènementiel
-E1108|Traduction, interprétariat
+E1108|Traduction; interprétariat
 E1201|Photographie
 E1202|Production en laboratoire cinématographique
 E1203|Production en laboratoire photographique
@@ -154,7 +154,7 @@ F1402|Extraction solide
 F1501|Montage de structures et de charpentes bois
 F1502|Montage de structures métalliques
 F1503|Réalisation - installation d'ossatures bois
-F1601|Application et décoration en plâtre, stuc et staff
+F1601|Application et décoration en plâtre; stuc et staff
 F1602|Électricité bâtiment
 F1603|Installation d'équipements sanitaires et thermiques
 F1604|Montage d'agencements
@@ -175,7 +175,7 @@ F1705|Pose de canalisations
 F1706|Préfabrication en béton industriel
 G1101|Accueil touristique
 G1102|Promotion du tourisme local
-G1201|Accompagnement de voyages, d'activités culturelles ou sportives
+G1201|Accompagnement de voyages; d'activités culturelles ou sportives
 G1202|Animation d'activités culturelles ou ludiques
 G1203|Animation de loisirs auprès d'enfants ou d'adolescents
 G1204|Éducation en activités sportives
@@ -199,7 +199,7 @@ G1605|Plonge en restauration
 G1701|Conciergerie en hôtellerie
 G1702|Personnel du hall
 G1703|Réception en hôtellerie
-G1801|Café, bar brasserie
+G1801|Café; bar brasserie
 G1802|Management du service en restauration
 G1803|Service en restauration
 G1804|Sommellerie
@@ -210,11 +210,11 @@ H1202|Conception et dessin de produits électriques et électroniques
 H1203|Conception et dessin produits mécaniques
 H1204|Design industriel
 H1205|Études - modèles en industrie des matériaux souples
-H1206|Management et ingénierie études, recherche et développement industriel
+H1206|Management et ingénierie études; recherche et développement industriel
 H1207|Rédaction technique
 H1208|Intervention technique en études et conception en automatisme
 H1209|Intervention technique en études et développement électronique
-H1210|Intervention technique en études, recherche et développement
+H1210|Intervention technique en études; recherche et développement
 H1301|Inspection de conformité
 H1302|Management et ingénierie Hygiène Sécurité Environnement -HSE- industriels
 H1303|Intervention technique en Hygiène Sécurité Environnement -HSE- industriel
@@ -240,7 +240,7 @@ H2207|Réalisation de meubles en bois
 H2208|Réalisation d'ouvrages décoratifs en bois
 H2209|Intervention technique en ameublement et bois
 H2301|Conduite d'équipement de production chimique ou pharmaceutique
-H2401|Assemblage - montage d'articles en cuirs, peaux
+H2401|Assemblage - montage d'articles en cuirs; peaux
 H2402|Assemblage - montage de vêtements et produits textiles
 H2403|Conduite de machine de fabrication de produits textiles
 H2404|Conduite de machine de production et transformation des fils
@@ -248,11 +248,11 @@ H2405|Conduite de machine de textiles nontissés
 H2406|Conduite de machine de traitement textile
 H2407|Conduite de machine de transformation et de finition des cuirs et peaux
 H2408|Conduite de machine d'impression textile
-H2409|Coupe cuir, textile et matériaux souples
-H2410|Mise en forme, repassage et finitions en industrie textile
+H2409|Coupe cuir; textile et matériaux souples
+H2410|Mise en forme; repassage et finitions en industrie textile
 H2411|Montage de prototype cuir et matériaux souples
 H2412|Patronnage - gradation
-H2413|Préparation de fils, montage de métiers textiles
+H2413|Préparation de fils; montage de métiers textiles
 H2414|Préparation et finition d'articles en cuir et matériaux souples
 H2415|Contrôle en industrie du cuir et du textile
 H2501|Encadrement de production de matériel électrique et électronique
@@ -262,14 +262,14 @@ H2504|Encadrement d'équipe en industrie de transformation
 H2505|Encadrement d'équipe ou d'atelier en matériaux souples
 H2601|Bobinage électrique
 H2602|Câblage électrique et électromécanique
-H2603|Conduite d'installation automatisée de production électrique, électronique et microélectronique
+H2603|Conduite d'installation automatisée de production électrique; électronique et microélectronique
 H2604|Montage de produits électriques et électroniques
 H2605|Montage et câblage électronique
 H2701|Pilotage d'installation énergétique et pétrochimique
 H2801|Conduite d'équipement de transformation du verre
 H2802|Conduite d'installation de production de matériaux de construction
 H2803|Façonnage et émaillage en industrie céramique
-H2804|Pilotage de centrale à béton prêt à l'emploi, ciment, enrobés et granulats
+H2804|Pilotage de centrale à béton prêt à l'emploi; ciment; enrobés et granulats
 H2805|Pilotage d'installation de production verrière
 H2901|Ajustement et montage de fabrication
 H2902|Chaudronnerie - tôlerie
@@ -291,8 +291,8 @@ H3201|Conduite d'équipement de formage des plastiques et caoutchoucs
 H3202|Réglage d'équipement de formage des plastiques et caoutchoucs
 H3203|Fabrication de pièces en matériaux composites
 H3301|Conduite d'équipement de conditionnement
-H3302|Opérations manuelles d'assemblage, tri ou emballage
-H3303|Préparation de matières et produits industriels (broyage, mélange, ...)
+H3302|Opérations manuelles d'assemblage; tri ou emballage
+H3303|Préparation de matières et produits industriels (broyage; mélange; ...)
 H3401|Conduite de traitement d'abrasion de surface
 H3402|Conduite de traitement par dépôt de surface
 H3403|Conduite de traitement thermique
@@ -308,7 +308,7 @@ I1302|Installation et maintenance d'automatismes
 I1303|Installation et maintenance de distributeurs automatiques
 I1304|Installation et maintenance d'équipements industriels et d'exploitation
 I1305|Installation et maintenance électronique
-I1306|Installation et maintenance en froid, conditionnement d'air
+I1306|Installation et maintenance en froid; conditionnement d'air
 I1307|Installation et maintenance télécoms et courants faibles
 I1308|Maintenance d'installation de chauffage
 I1309|Maintenance électrique
@@ -320,11 +320,11 @@ I1502|Intervention en milieu subaquatique
 I1503|Intervention en milieux et produits nocifs
 I1601|Installation et maintenance en nautisme
 I1602|Maintenance d'aéronefs
-I1603|Maintenance d'engins de chantier, levage, manutention et de machines agricoles
+I1603|Maintenance d'engins de chantier; levage; manutention et de machines agricoles
 I1604|Mécanique automobile et entretien de véhicules
 I1605|Mécanique de marine
 I1606|Réparation de carrosserie
-I1607|Réparation de cycles, motocycles et motoculteurs de loisirs
+I1607|Réparation de cycles; motocycles et motoculteurs de loisirs
 J1101|Médecine de prévention
 J1102|Médecine généraliste et spécialisée
 J1103|Médecine dentaire
@@ -350,7 +350,7 @@ J1409|Pédicurie et podologie
 J1410|Prothèses dentaires
 J1411|Prothèses et orthèses
 J1412|Rééducation en psychomotricité
-J1501|Soins d'hygiène, de confort du patient
+J1501|Soins d'hygiène; de confort du patient
 J1502|Coordination de services médicaux ou paramédicaux
 J1503|Soins infirmiers spécialisés en anesthésie
 J1504|Soins infirmiers spécialisés en bloc opératoire
@@ -375,7 +375,7 @@ K1304|Services domestiques
 K1305|Intervention sociale et familiale
 K1401|Conception et pilotage de la politique des pouvoirs publics
 K1402|Conseil en Santé Publique
-K1403|Management de structure de santé, sociale ou pénitentiaire
+K1403|Management de structure de santé; sociale ou pénitentiaire
 K1404|Mise en oeuvre et pilotage de la politique des pouvoirs publics
 K1405|Représentation de l'État sur le territoire national ou international
 K1501|Application des règles financières publiques
@@ -421,7 +421,7 @@ K2304|Revalorisation de produits industriels
 K2305|Salubrité et traitement de nuisibles
 K2306|Supervision d'exploitation éco-industrielle
 K2401|Recherche en sciences de l'homme et de la société
-K2402|Recherche en sciences de l'univers, de la matière et du vivant
+K2402|Recherche en sciences de l'univers; de la matière et du vivant
 K2501|Gardiennage de locaux
 K2502|Management de sécurité privée
 K2503|Sécurité et surveillance privées
@@ -436,7 +436,7 @@ L1202|Musique et chant
 L1203|Art dramatique
 L1204|Arts du cirque et arts visuels
 L1301|Mise en scène de spectacles vivants
-L1302|Production et administration spectacle, cinéma et audiovisuel
+L1302|Production et administration spectacle; cinéma et audiovisuel
 L1303|Promotion d'artistes et de spectacles
 L1304|Réalisation cinématographique et audiovisuelle
 L1401|Sportif professionnel

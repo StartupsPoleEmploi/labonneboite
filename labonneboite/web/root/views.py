@@ -28,14 +28,22 @@ def home():
 
     return render_template('home.html', form=CompanySearchForm())
 
+@rootBlueprint.route('/googleaece67026df0ee76.html')
+def static_from_root():
+    """
+    Generic handler for files in static folder
+    """
+    return send_from_directory(current_app.static_folder, request.path[1:])
+
 @rootBlueprint.route('/favicon.ico')
 def favicon():
     return send_from_directory(current_app.static_folder, 'images/favicon.ico')
 
 @rootBlueprint.route('/robots.txt')
-@rootBlueprint.route('/googleaece67026df0ee76.html')
-def static_from_root():
-    return send_from_directory(current_app.static_folder, request.path[1:])
+def robot_txt():
+    static_folder = os.path.join(current_app.root_path, 'static/')
+    file_name = 'robots.prod.txt' if settings.ALLOW_INDEXING else 'robots.others.txt'
+    return send_from_directory(static_folder, file_name)
 
 @rootBlueprint.route('/espace-presse')
 def press():

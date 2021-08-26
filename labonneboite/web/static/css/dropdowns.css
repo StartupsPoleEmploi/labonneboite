@@ -88,11 +88,52 @@
 /* Dropdowns > PE Connect logo (temporary)
 =========================================================================== */
 
+.lbb-dropdown.lbb-dropdown--peconnect
+{
+    padding: 20px;
+    color: #707070;
+    opacity: 1;    
+}
+
 .lbb-dropdown .logo-pe-connect {
     display: inline-block;
-    width: 200px;
+    width: 360px;
+}
+
+@media only screen and (max-width: 540px) {
+    .lbb-dropdown .logo-pe-connect {
+        width: 220px;
+    }
 }
 
 .lbb-dropdown .logo-pe-connect img {
     display: block;
+}
+
+.lbb-dropdown--peconnect_text {
+    padding: 0 8px;
+    margin-top: 0px !important;
+}
+
+.lbb-dropdown--peconnect_text,
+.lbb-dropdown--peconnect_text strong {
+    font-size: 14px !important;
+    line-height: 24px;
+}
+
+.lbb-dropdown .lbb-create-pe-account__block
+{
+    text-align: center;
+    margin-top: 8px !important;
+}
+
+.lbb-dropdown .lbb-create-pe-account__block .lbb-create-pe-account__link
+{
+    text-decoration: underline;
+    font-size: 14px !important;
+    font-weight: bold;
+    line-height: 25px;
+    letter-spacing: 0px;
+    color: #1B2E57;
+    opacity: 1;
 }
