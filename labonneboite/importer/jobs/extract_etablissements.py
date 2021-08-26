@@ -17,6 +17,7 @@ from labonneboite.common.chunks import chunks
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 from labonneboite.common.load_data import load_effectif_labels
+from labonneboite.common.env import get_current_env, ENV_TEST
 
 # This list contains siret that must not be found in data,
 # we use it as a test : if one of those is found in data, we stop the importer
@@ -121,58 +122,60 @@ class EtablissementExtractJob(Job):
         # because it needs the whole CSV dataset in memory
         # FIXME improve this by processing the CSV on-the-fly instead
         self.benchmark_loading_using_pandas()
-        self.csv_offices = self.get_offices_from_file()
-        self.csv_sirets = list(self.csv_offices.keys())
         self.existing_sirets = self.get_sirets_from_database()
-        csv_set = set(self.csv_sirets)
+        num_created = 0
+        sirets_inserted = set()
         existing_set = set(self.existing_sirets)
-        # 1 - create offices which did not exist before
-        self.creatable_sirets = csv_set - existing_set
 
-        
-        logger.info("nombre d'etablissement dans le csv : %i" % len(csv_set))
+        for offices in self.get_offices_from_file():
+            self.csv_offices = offices
+            self.csv_sirets = list(self.csv_offices.keys())
+            csv_set = set(self.csv_sirets)
 
-        i = 0 
-        logger.info("liste de 20 sirets dans le csv" )
-        if csv_set :
-            while  i < 20 :
-                i=i+1
-                value_test = csv_set.pop()
-                csv_set.add(value_test)
-                logger.info(" siret : %s" % value_test )
+            # 1 - create offices which did not exist before
+            self.creatable_sirets = csv_set
+            num_created += len(self.creatable_sirets)
 
+            logger.info("nombre d'etablissement dans le csv : %i" % len(csv_set))
 
-        logger.info("nombre d'etablissement existant : %i" % len(existing_set))
-
-        i = 0 
-        logger.info("liste de 20 sirets existant" )
-        if existing_set :
-            while  i < 20 :
-                i=i+1
-                value_test = existing_set.pop()
-                existing_set.add(value_test)
-                logger.info(" siret : %s" % value_test )
+            i = 0
+            logger.info("liste de 20 sirets dans le csv" )
+            if csv_set :
+                while  i < 20 :
+                    i=i+1
+                    value_test = csv_set.pop()
+                    csv_set.add(value_test)
+                    logger.info(" siret : %s" % value_test )
 
 
-        logger.info("nombre d'etablissement à créer : %i" % len(self.creatable_sirets))
+            logger.info("nombre d'etablissement existant : %i" % len(existing_set))
 
-        i = 0 
-        logger.info("liste de 20 sirets à créer" )
-        if self.creatable_sirets :
-            while  i < 20 :
-                i=i+1
-                value_test = self.creatable_sirets.pop()
-                self.creatable_sirets.add(value_test)
-                logger.info(" siret : %s" % value_test )
-        
-        num_created = self.create_creatable_offices()
+            i = 0
+            logger.info("liste de 20 sirets existant" )
+            if existing_set :
+                while  i < 20 :
+                    i=i+1
+                    value_test = existing_set.pop()
+                    existing_set.add(value_test)
+                    logger.info(" siret : %s" % value_test )
 
+
+            logger.info("nombre d'etablissement à créer : %i" % len(self.creatable_sirets))
+
+            i = 0
+            logger.info("liste de 20 sirets à créer" )
+            if self.creatable_sirets :
+                while  i < 20 :
+                    i=i+1
+                    value_test = self.creatable_sirets.pop()
+                    self.creatable_sirets.add(value_test)
+                    logger.info(" siret : %s" % value_test )
+
+            self.create_update_offices()
+            sirets_inserted = sirets_inserted.union(csv_set)
         # 2 - delete offices which no longer exist
-        self.deletable_sirets = existing_set - csv_set
+        self.deletable_sirets = existing_set - sirets_inserted
         self.delete_deletable_offices()
-        # 3 - update existing offices
-        self.updatable_sirets = existing_set - self.deletable_sirets
-        self.update_updatable_offices()
         return num_created
 
     @timeit
@@ -229,7 +232,7 @@ class EtablissementExtractJob(Job):
         logger.info("%i offices updated.", count)
 
     @timeit
-    def create_creatable_offices(self):
+    def create_update_offices(self):
         """
         create new offices (that are not yet in our etablissement table)
         """
@@ -237,7 +240,22 @@ class EtablissementExtractJob(Job):
         query = """INSERT into %s(siret, raisonsociale, enseigne, codenaf, numerorue,
             libellerue, codecommune, codepostal, email, tel, departement, trancheeffectif,
             website, flag_poe_afpr, flag_pmsmp)
-        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)""" % settings.RAW_OFFICE_TABLE
+        values(%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)
+        ON DUPLICATE KEY UPDATE
+            raisonsociale=VALUES(raisonsociale),
+            enseigne=VALUES(enseigne),
+            codenaf=VALUES(codenaf),
+            numerorue=VALUES(numerorue),
+            libellerue=VALUES(libellerue),
+            codecommune=VALUES(codecommune),
+            codepostal=VALUES(codepostal),
+            email=VALUES(email),
+            tel=VALUES(tel),
+            departement=VALUES(departement),
+            trancheeffectif=VALUES(trancheeffectif),
+            website=VALUES(website),
+            flag_poe_afpr=VALUES(flag_poe_afpr),
+            flag_pmsmp=VALUES(flag_pmsmp)""" % settings.RAW_OFFICE_TABLE
 
         count = 1
         logger.info("create new offices in table %s", settings.RAW_OFFICE_TABLE)
@@ -322,18 +340,17 @@ class EtablissementExtractJob(Job):
             for line in myfile:
                 line = line.decode()
                 count += 1
-                if not count % 100000:
-                    logger.debug("processed %s lines", count)
+
 
                 try:
                     fields = import_util.get_fields_from_csv_line(line)
 
-                    if len(fields) != 23:
+                    if len(fields) != 22:
                         logger.exception("wrong number of fields in line %s", line)
                         raise ValueError
 
                     siret, raisonsociale, enseigne, codenaf, numerorue, \
-                        libellerue, codecommune, codepostal, first_email, rgpd_email, \
+                        libellerue, codecommune, codepostal, email, \
                         tel, trancheeffectif_etablissement, effectif_reel, _, _, \
                         website1, website2, better_tel, \
                         website3, _, contrat_afpr, contrat_poe, contrat_pmsmp = fields
@@ -374,15 +391,6 @@ class EtablissementExtractJob(Job):
                 if contrat_poe == "O" or contrat_afpr == "O":
                     flag_poe_afpr = 1
 
-                if has_text_content(rgpd_email):
-                    email = encoding_util.strip_french_accents(rgpd_email)
-                    if has_text_content(first_email):
-                        emails_here_before_rgpd += 1
-                    else:
-                        emails_not_here_before_rgpd += 1
-                else:
-                    email = encoding_util.strip_french_accents(first_email)
-
                 if codecommune.strip():
                     departement = import_util.get_departement_from_zipcode(codepostal)
                     process_this_departement = departement in departements
@@ -416,6 +424,10 @@ class EtablissementExtractJob(Job):
                         unprocessable_departement_errors += 1
                 else:
                     no_zipcode_count += 1
+                if not count % 100000:
+                    logger.debug("processed %s lines", count)
+                    yield offices
+                    offices = {}
 
         logger.info("%i offices total", count)
         logger.info("%i offices without email before and have now thanks to RGPD mails", emails_not_here_before_rgpd)
@@ -428,24 +440,25 @@ class EtablissementExtractJob(Job):
         logger.info("per departement read %s", departement_count)
         logger.info("finished reading offices...")
 
-        if unprocessable_departement_errors > 2500:
-            raise ValueError("too many unprocessable_departement_errors")
-        if no_zipcode_count > 75000:
-            raise ValueError("too many no_zipcode_count")
-        if format_errors > 5:
-            raise ValueError("too many format_errors")
-        if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
-            msg = "incorrect total number of departements : %s instead of expected %s" % (
-                len(departement_counter_dic),
-                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
-            )
-            raise ValueError(msg)
-        for departement, count in departement_count:
-            if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
-                logger.exception("only %s offices in departement %s", count, departement)
-                raise ValueError("not enough offices in at least one departement")
+        if get_current_env() != ENV_TEST:
+            if unprocessable_departement_errors > 2500:
+                raise ValueError("too many unprocessable_departement_errors")
+            if no_zipcode_count > 75000:
+                raise ValueError("too many no_zipcode_count")
+            if format_errors > 5:
+                raise ValueError("too many format_errors")
+            if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
+                msg = "incorrect total number of departements : %s instead of expected %s" % (
+                    len(departement_counter_dic),
+                    settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
+                )
+                raise ValueError(msg)
+            for departement, count in departement_count:
+                if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
+                    logger.exception("only %s offices in departement %s", count, departement)
+                    raise ValueError("not enough offices in at least one departement")
 
-        return offices
+        yield offices
 
 @history_importer_job_decorator(os.path.basename(__file__))
 def run():

@@ -11,6 +11,7 @@ import time
 from datetime import datetime
 import sys
 from sqlalchemy.exc import OperationalError
+from sqlalchemy import func
 import os
 
 from labonneboite.importer import settings
@@ -22,6 +23,9 @@ from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
 from labonneboite.common.database import db_session
 from labonneboite.importer.models.errors import DoublonException
+
+
+DEFAULT_DATETIME_DPAE = datetime(2012, 1, 1, 0, 0)
 
 class DpaeExtractJob(Job):
     file_type = DpaeStatistics.DPAE
@@ -72,7 +76,12 @@ class DpaeExtractJob(Job):
         imported_dpae = 0
         imported_dpae_distribution = {}
         not_imported_dpae = 0
-        last_historical_data_date_in_db = DpaeStatistics.get_last_historical_data_date(DpaeStatistics.DPAE)
+        last_historical_data_date_in_db = db_session.query(func.max(Hiring.hiring_date)) \
+                                        .filter(Hiring.contract_type.in_((Hiring.CONTRACT_TYPE_CDI,
+                                                                          Hiring.CONTRACT_TYPE_CDD,
+                                                                          Hiring.CONTRACT_TYPE_CTT))).first()[0]
+        if last_historical_data_date_in_db is None:
+            last_historical_data_date_in_db = DEFAULT_DATETIME_DPAE
         logger.info("will now extract all dpae with hiring_date between %s and %s",
                     last_historical_data_date_in_db, self.last_historical_data_date_in_file)
 
@@ -207,13 +216,16 @@ class DpaeExtractJob(Job):
         logger.info("finished importing dpae...")
         return something_new
 
+
 @history_importer_job_decorator(os.path.basename(__file__))
 def run_main():
     import logging
     logging.basicConfig(level=logging.DEBUG)
-    dpae_filename = import_util.detect_runnable_file("dpae")
-    task = DpaeExtractJob(dpae_filename)
-    task.run()
+    dpae_filenames = import_util.detect_runnable_file("dpae", bulk=True)
+    for filename in dpae_filenames:
+        logger.info("PROCESSING %s" % filename)
+        task = DpaeExtractJob(filename)
+        task.run()
 
 
 if __name__ == '__main__':

@@ -302,7 +302,7 @@ class GeocodeJob(Job):
             try:
                 logger.info(
                     "API addr gouv response on CSV {} OK".format(csv_path))
-                decoded_content = response.content.decode('utf-8')
+                decoded_content = response.text
                 df_geocodes = pd.read_csv(io.StringIO(
                     decoded_content), dtype={'siret': str})
                 csv_api_back_path = csv_path + '-api'

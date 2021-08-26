@@ -77,6 +77,7 @@ def check_for_updates(input_folder):
             new_files.append(full_name)
         else:
             logger.info("file %s was already processed and will thus be ignored", full_name)
+    new_files.sort()
     return new_files
 
 
@@ -154,15 +155,23 @@ def check_runnable(filename, file_type):
     return re.match(patterns[file_type], base_name) and not is_processed(base_name)
 
 
-def detect_runnable_file(file_type):
+def detect_runnable_file(file_type, bulk=False):
     logger.info("detect runnable file for file type: %s", file_type)
+    filenames = []
     for filename in check_for_updates(importer_settings.INPUT_SOURCE_FOLDER):
         logger.info("inspecting file %s", filename)
         if check_runnable(filename, file_type):
-            logger.info("will run this file : %s", filename)
-            return filename
-    logger.info("no runnable file found!")
-    return None
+            if not bulk:
+                logger.info("will run this file : %s", filename)
+                return filename
+            else:
+                filenames.append(filename)
+    if filenames:
+        logger.info("will run this file : %s", filenames)
+        return filenames
+    else:
+        logger.info("no runnable file found!")
+        return None
 
 
 @timeit
