@@ -186,7 +186,7 @@ class OfficeUpdateMixin(object):
         """
         if not codes:
             return []
-        separators = OfficeAdminUpdate.SEPARATORS
+        separators = OfficeUpdateMixin.SEPARATORS
         codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
         return sorted(set(codes))
 
