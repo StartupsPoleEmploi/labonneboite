@@ -598,8 +598,14 @@ def update_offices(table):
                 is_updated = False
                 # Apply changes in DB.
                 # , "email", "tel", "website"
-                offices_attributes = ["company_name", "office_name", "email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance", "social_network", "contact_mode"]
-                update_attributes = ["new_company_name", "new_office_name", "email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance", "social_network", "contact_mode"]
+                if office_to_update.new_company_name and office.company_name != office_to_update.new_company_name:
+                    office.company_name = office_to_update.new_company_name
+                    is_updated = True
+                if office_to_update.new_office_name and office.office_name != office_to_update.new_office_name:
+                    office.office_name = office_to_update.new_office_name
+                    is_updated = True
+                offices_attributes = ["email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance", "social_network", "contact_mode"]
+                update_attributes = ["email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance", "social_network", "contact_mode"]
                 for office_attr, update_attr in list(zip(offices_attributes, update_attributes)):
                     if getattr(office, office_attr) != getattr(office_to_update, update_attr) and getattr(office_to_update, update_attr) is not None:
                         setattr(office, office_attr, getattr(office_to_update, update_attr))

@@ -437,6 +437,96 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         for rome in mapping_util.romes_for_naf(office.naf):
             self.assertTrue(res['_source']['boosted_romes'][rome.code])
 
+    def test_update_office_with_blank_new_name_companny_office(self):
+        """
+        Test `update_offices` to update an office: update names, email and website, keep current phone.
+        """
+        office = Office.get(self.office1.siret)
+        old_company_name = office.company_name
+        old_office_name = office.office_name
+        office_to_update = OfficeAdminUpdate(
+            sirets=self.office1.siret,
+            name=self.office1.name,
+            new_company_name="",
+            new_office_name="",
+            boost=True,
+            new_email="foo@pole-emploi.fr",
+            new_phone="",  # Leave empty on purpose: it should not be modified.
+            new_website="https://foo.pole-emploi.fr",
+            remove_email=False,
+            remove_phone=False,
+            remove_website=False,
+        )
+        office_to_update.save()
+
+        script.update_offices(OfficeAdminUpdate)
+
+        office = Office.get(self.office1.siret)
+        self.assertEqual(office.company_name, old_office_name)
+        self.assertEqual(office.office_name, old_office_name)
+        self.assertEqual(office.email, office_to_update.new_email)
+        self.assertEqual(office.score, office.score)  # This value should not be modified.
+        self.assertEqual(office.tel, self.office1.tel)  # This value should not be modified.
+        self.assertEqual(office.website, office_to_update.new_website)
+
+        res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
+
+        self.assertEqual(res['_source']['email'], office.email)
+        self.assertEqual(res['_source']['phone'], office.tel)
+        self.assertEqual(res['_source']['website'], office.website)
+
+        # Global score should always be the same.
+        self.assertEqual(res['_source']['score'], office.score)
+        # Check scores for ROME.
+        # Since `romes_to_boost` is empty, all romes should be boosted.
+        self.assertEqual(office_to_update.romes_to_boost, "")
+        for rome in mapping_util.romes_for_naf(office.naf):
+            self.assertTrue(res['_source']['boosted_romes'][rome.code])
+
+    def test_update_office_with_no_new_name_companny_office(self):
+        """
+        Test `update_offices` to update an office: update names, email and website, keep current phone.
+        """
+        office = Office.get(self.office1.siret)
+        old_company_name = office.company_name
+        old_office_name = office.office_name
+        office_to_update = OfficeAdminUpdate(
+            sirets=self.office1.siret,
+            name=self.office1.name,
+            boost=True,
+            new_email="foo@pole-emploi.fr",
+            new_phone="",  # Leave empty on purpose: it should not be modified.
+            new_website="https://foo.pole-emploi.fr",
+            remove_email=False,
+            remove_phone=False,
+            remove_website=False,
+        )
+        office_to_update.save()
+
+        script.update_offices(OfficeAdminUpdate)
+
+        office = Office.get(self.office1.siret)
+        self.assertEqual(office.company_name, old_office_name)
+        self.assertEqual(office.office_name, old_office_name)
+        self.assertEqual(office.email, office_to_update.new_email)
+        self.assertEqual(office.score, office.score)  # This value should not be modified.
+        self.assertEqual(office.tel, self.office1.tel)  # This value should not be modified.
+        self.assertEqual(office.website, office_to_update.new_website)
+
+        res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office.siret)
+
+        self.assertEqual(res['_source']['email'], office.email)
+        self.assertEqual(res['_source']['phone'], office.tel)
+        self.assertEqual(res['_source']['website'], office.website)
+
+        # Global score should always be the same.
+        self.assertEqual(res['_source']['score'], office.score)
+        # Check scores for ROME.
+        # Since `romes_to_boost` is empty, all romes should be boosted.
+        self.assertEqual(office_to_update.romes_to_boost, "")
+        for rome in mapping_util.romes_for_naf(office.naf):
+            self.assertTrue(res['_source']['boosted_romes'][rome.code])
+
     def test_update_office_by_removing_contact(self):
         """
         Test `update_offices` to update an office: remove email, phone and website.
