@@ -578,6 +578,26 @@ def remove_offices():
             pdf_util.delete_file(office)
 
 
+def _yield_limit(qry, pk_attr, maxrq=100):
+    """
+    specialized windowed query generator (using LIMIT/OFFSET)
+    This recipe is to select through a large number of rows thats too
+    large to fetch at once. The technique depends on the primary key
+    of the FROM clause being an integer value, and selects items
+    using LIMIT.
+    """
+    firstid = None
+    while True:
+        q = qry
+        if firstid is not None:
+            q = qry.filter(pk_attr > firstid)
+        rec = None
+        for rec in q.order_by(pk_attr).limit(maxrq):
+            yield rec
+        if rec is None:
+            break
+        firstid = pk_attr.__get__(rec, pk_attr) if rec else None
+
 @timeit
 def update_offices(table):
     """
@@ -588,7 +608,9 @@ def update_offices(table):
     # on a SIRET. As a result, it shouldn't but there may be `n` entries in `table`
     # for the same SIRET. We order the query by creation date ASC so that the most recent changes take
     # priority over any older ones.
-    for office_to_update in db_session.query(table).order_by(asc(table.date_created)).all():
+    #for office_to_update in _yield_limit(db_session.query(table), asc(table.date_created)):
+    #for office_to_update in _yield_limit(db_session.query(table), table.date_created):
+    for office_to_update in _yield_limit(db_session.query(table), table.id):
 
         for siret in table.as_list(office_to_update.sirets):
 
@@ -846,6 +868,7 @@ def update_data(create_full, create_partial, disable_parallel_computing):
     update_offices(OfficeAdminUpdate)
     logger.info("[update data] Update offices (third party)")
     update_offices(OfficeThirdPartyUpdate)
+
     #update_offices_geolocations()
 
     logger.info("[update data] Remove scam emails")
