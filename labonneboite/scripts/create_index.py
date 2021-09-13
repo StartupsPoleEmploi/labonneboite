@@ -578,9 +578,11 @@ def remove_offices():
             pdf_util.delete_file(office)
 
 
-def _yield_limit(qry, pk_attr, maxrq=100):
+LIMIT = 100
+def to_iterator(qry, key):
     """
-    specialized windowed query generator (using LIMIT/OFFSET)
+    This function comes from this doc: https://github.com/sqlalchemy/sqlalchemy/wiki/RangeQuery-and-WindowedRangeQuery
+    Specialized windowed query generator (using LIMIT/OFFSET)
     This recipe is to select through a large number of rows thats too
     large to fetch at once. The technique depends on the primary key
     of the FROM clause being an integer value, and selects items
@@ -590,13 +592,13 @@ def _yield_limit(qry, pk_attr, maxrq=100):
     while True:
         q = qry
         if firstid is not None:
-            q = qry.filter(pk_attr > firstid)
+            q = qry.filter(key > firstid)
         rec = None
-        for rec in q.order_by(pk_attr).limit(maxrq):
+        for rec in q.order_by(key).limit(LIMIT):
             yield rec
         if rec is None:
             break
-        firstid = pk_attr.__get__(rec, pk_attr) if rec else None
+        firstid = key.__get__(rec, key) if rec else None
 
 @timeit
 def update_offices(table):
@@ -608,9 +610,7 @@ def update_offices(table):
     # on a SIRET. As a result, it shouldn't but there may be `n` entries in `table`
     # for the same SIRET. We order the query by creation date ASC so that the most recent changes take
     # priority over any older ones.
-    #for office_to_update in _yield_limit(db_session.query(table), asc(table.date_created)):
-    #for office_to_update in _yield_limit(db_session.query(table), table.date_created):
-    for office_to_update in _yield_limit(db_session.query(table), table.id):
+    for office_to_update in to_iterator(db_session.query(table), table.id):
 
         for siret in table.as_list(office_to_update.sirets):
 
