@@ -1,6 +1,8 @@
 from urllib.parse import urlencode
 import json
+import types
 
+from functools import wraps
 from slugify import slugify
 
 from flask import abort, make_response, redirect, render_template, request, session, url_for
@@ -33,14 +35,42 @@ searchBlueprint = Blueprint('search', __name__)
 RELATED_ROMES = load_related_rome() if settings.ENABLE_RELATED_ROMES else []
 RELATED_ROMES_AREAS = load_related_rome_areas() if settings.ENABLE_RELATED_ROMES else []
 
-@searchBlueprint.route('/suggest_job_labels')
+def js_route(self, rule, **options):
+    """
+    Alternative Bleuprint route, specifically for json responses.
+    Wether this approach is preferable to a simple decorator is debatable,
+    but it's probably the less obtrusive one.
+
+    The decorator factory creates wrappers able to serialize the raw
+    json output and prepare a response with the right json mimetype.
+    """
+    def decorator(function):
+        endpoint = options.pop("endpoint", function.__name__)
+
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            raw_response = function(*args, **kwargs)
+            response = make_response(json.dumps(raw_response))
+            response.mimetype = 'application/json'
+            return response
+
+        self.add_url_rule(rule, endpoint, wrapper, **options)
+
+        return wrapper
+    return decorator
+
+
+searchBlueprint.js_route = types.MethodType(js_route, searchBlueprint)
+
+
+@searchBlueprint.js_route('/suggest_job_labels')
 def suggest_job_labels():
     term = request.args.get('term', '')
     suggestions = autocomplete.build_job_label_suggestions(term)
-    return make_response(json.dumps(suggestions))
+    return suggestions
 
 
-@searchBlueprint.route('/suggest_locations')
+@searchBlueprint.js_route('/suggest_locations')
 def suggest_locations():
     """
     This route uses our internal search mechanism (elastic)
@@ -53,10 +83,10 @@ def suggest_locations():
     """
     term = request.args.get('term', '')
     suggestions = autocomplete.build_location_suggestions(term)
-    return make_response(json.dumps(suggestions))
+    return suggestions
 
 
-@searchBlueprint.route('/autocomplete/locations')
+@searchBlueprint.js_route('/autocomplete/locations')
 def autocomplete_locations():
     """
     This route trys to get an address from api-adresse.data.gouv.fr API
@@ -78,10 +108,10 @@ def autocomplete_locations():
             pass  # FIXME log BAN LIKELY DOWN event
     for suggestion in suggestions:
         suggestion['value'] = suggestion['label']
-    return make_response(json.dumps(suggestions))
+    return suggestions
 
 
-@searchBlueprint.route('/job_slug_details')
+@searchBlueprint.js_route('/job_slug_details')
 def job_slug_details():
     result = []
 
@@ -99,10 +129,10 @@ def job_slug_details():
                 'label': settings.ROME_DESCRIPTIONS.get(rome, ''),
             })
 
-    return make_response(json.dumps(result))
+    return result
 
 
-@searchBlueprint.route('/city_slug_details')
+@searchBlueprint.js_route('/city_slug_details')
 def city_slug_details():
     """
     Endpoint used by La Bonne Alternance only.
@@ -130,10 +160,10 @@ def city_slug_details():
         'longitude': city_location.location.longitude,
         'latitude': city_location.location.latitude,
     }
-    return make_response(json.dumps(result))
+    return result
 
 
-@searchBlueprint.route('/city_code_details')
+@searchBlueprint.js_route('/city_code_details')
 def city_code_details():
     """
     Endpoint used by La Bonne Alternance only.
@@ -157,7 +187,7 @@ def city_code_details():
         'latitude': city['coords']['lat'],
     }
 
-    return make_response(json.dumps(result))
+    return result
 
 
 PARAMETER_FIELD_MAPPING = {
