@@ -28,6 +28,7 @@ def home():
 
     return render_template('home.html', form=CompanySearchForm())
 
+@rootBlueprint.route('/sitemap.xml')
 @rootBlueprint.route('/googleaece67026df0ee76.html')
 def static_from_root():
     """
