@@ -133,12 +133,19 @@
                    </p>
                    {{ form.p }}
                  </div>
-               {% endif %}
-               <div class="lbb-sidebar-item">
-                 Pour l’alternance <a href="http://labonnealternance.pole-emploi.fr" target="_blank">c'est ici</a>.
-               </div>
+               {% endif %}               
              </div>
             </div> <!-- lbb-sidebar -->
+
+            <div class="lbb-sidebar-item lbb-sidebar-item__external">
+              Pour l’alternance <a href="http://labonnealternance.pole-emploi.fr" target="_blank">c'est ici</a>.
+            </div>
+
+            {% if last_data_deploy_date %}
+              <div class="lbb-sidebar-item lbb-sidebar-item__external">
+                Données mises à jour le {{ last_data_deploy_date }}
+              </div>
+            {% endif %}
           </div> <!-- lbb-sidebar-wrapper -->
           {{ form.hidden_tag() }}
 
