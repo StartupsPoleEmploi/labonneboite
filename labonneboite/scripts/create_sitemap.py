@@ -11,6 +11,9 @@ from slugify import slugify
 from labonneboite.common import geocoding
 from labonneboite.conf import settings
 
+# max URLs in a sitemap
+# See https://en.wikipedia.org/wiki/Sitemaps#Sitemap_limits
+MAX_URLS = 50000
 
 app = Flask(__name__)
 
@@ -40,20 +43,27 @@ def sitemap():
             url = "https://labonneboite.pole-emploi.fr/entreprises/%s-%s/%s" % (city, zipcode, occupation)
             pages.append((url, now_str))
 
-    # A sitemap should have at most 50K URLs.
+    # Handle max URLs in a sitemap
     # See https://en.wikipedia.org/wiki/Sitemaps#Sitemap_limits
-    if len(pages) >= 50000:
-        raise Exception("sitemap should have at most 50K URLs")
+    initialCount = len(pages)
+    if initialCount > MAX_URLS:
+        lineStart = '\n * SKIPPED: '
+        print('Warning: sitemap should have at most 50K URLs\nDrop these URLs, they will not be indexed in sitemap.xml', lineStart, lineStart.join(map(lambda p: p[0], pages[50000:])))
+        pages = pages[:MAX_URLS]
 
+    # Write the sitemap to file
     sitemap_xml = render_template('sitemap.xml', pages=pages)
     sitemap_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../web/static/sitemap.xml")
     with open(sitemap_filename, "w") as f:
         f.write(sitemap_xml)
 
-    print("generated sitemap.xml using %s pages (%s cities x %s rome_descriptions)" % (
+    # Print summary
+    print("Generated sitemap.xml using %s pages. Dropped %s pages\nTotal: %s cities x %s rome_descriptions = %s pages" % (
         len(pages),
+        initialCount - len(pages),
         len(top_cities),
-        len(rome_descriptions)
+        len(rome_descriptions),
+        initialCount,
     ))
 
 if __name__ == "__main__":

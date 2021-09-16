@@ -109,6 +109,10 @@
     margin-bottom: 1.5rem;
 }
 
+.lbb-sidebar-item__external {
+    font-size: 0.90em;
+}
+
 .lbb-sidebar-item p,
 .lbb-sidebar-item ul {
     margin: 0 0 5px 0;
