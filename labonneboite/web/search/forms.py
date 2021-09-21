@@ -80,7 +80,7 @@ class CompanySearchForm(FlaskForm):
         validators=[Optional()])
 
     d = RadioField(
-        'Distance',
+        'Rayon de recherche',
         choices=DISTANCE_CHOICES,
         default=settings.DISTANCE_FILTER_DEFAULT,
         validators=[Optional()])
