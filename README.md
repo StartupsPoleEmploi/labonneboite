@@ -444,8 +444,8 @@ CBS stands for Copenhagen Business School. They are providing a CSV file which i
 
 This is a list to be udated:
 
-- public transports durations: [Navitia](http://doc.navitia.io/#journeys)
-- car durations: [IGN](https://geoservices.ign.fr/documentation/geoservices/isochrones.html)
+- [removed] public transports durations: [Navitia](http://doc.navitia.io/#journeys)
+- [removed] car durations: [IGN](https://geoservices.ign.fr/documentation/geoservices/isochrones.html)
 
 ## How to contribute
 
