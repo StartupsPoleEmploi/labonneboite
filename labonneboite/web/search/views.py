@@ -15,7 +15,6 @@ from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common.locations import CityLocation, Location, NamedLocation
-from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.common.util import get_enum_from_value
@@ -186,10 +185,6 @@ def get_parameters(args):
         kwargs['distance'] = int(kwargs.get('distance'))
     except ValueError:
         kwargs['distance'] = settings.DISTANCE_FILTER_DEFAULT
-
-    kwargs['travel_mode'] = kwargs.get('travel_mode')
-    if kwargs['travel_mode'] not in maps_constants.TRAVEL_MODES:
-        kwargs['travel_mode'] = maps_constants.DEFAULT_TRAVEL_MODE
 
     try:
         kwargs['headcount'] = int(kwargs.get('headcount'))
@@ -446,8 +441,6 @@ def entreprises():
         'sort': fetcher.sort,
         'tile_server_url': settings.TILE_SERVER_URL,
         'travel_mode': fetcher.travel_mode,
-        'travel_modes': maps_constants.TRAVEL_MODES,
-        'travel_modes_french': maps_constants.TRAVEL_MODES_FRENCH,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
     }
 

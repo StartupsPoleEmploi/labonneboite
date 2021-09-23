@@ -188,7 +188,6 @@ def register_context_processors(flask_app):
             'google_site_verification_code': settings.GOOGLE_SITE_VERIFICATION_CODE,
             'login_url': auth_utils.login_url,
             'jepostule_globally_enabled': settings.JEPOSTULE_QUOTA > 0,
-            'enable_isochrones': settings.ENABLE_ISOCHRONES,
             'tag_manager_url': settings.TAG_MANAGER_URL,
         }
 
