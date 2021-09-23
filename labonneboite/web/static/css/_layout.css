@@ -107,7 +107,26 @@ ul.lbb-header {
 }
 
 .lbb-header-logo-lbb {
+    width: 120px;
+}
+.lbb-header-logo-mariane {
+    width: 80px;
+}
+@media (min-width: 450px) {
+  .lbb-header-logo-lbb {
     width: 160px;
+  }
+  .lbb-header-logo-mariane {
+    width: 100px;
+  }
+}
+@media (min-width: 700px) {
+  .lbb-header-logo-mariane {
+    width: 160px;
+  }
+  .lbb-header-logo-mariane img {
+    margin-right: 60px;
+  }
 }
 .lbb-header-logo-pole-emploi {
     width: 74px;
