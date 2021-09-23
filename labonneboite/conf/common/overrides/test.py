@@ -50,17 +50,6 @@ API_DEPARTMENTS_URL = 'http://urlintrouvablepourlbb.fr'
 SENTRY_ENVIRONMENT = "test"
 WTF_CSRF_ENABLED = False
 
-TRAVEL_VENDOR_BACKENDS = {
-    'isochrone': {
-        'car': 'ign_mock',
-        'public': 'navitia_mock',
-    },
-    'durations': {
-        'car': 'ign_mock',
-        'public': 'navitia_mock',
-    },
-}
-
 # Dummy IP addresses for test only
 VERSION_PRO_ALLOWED_IPS = [
     '198.49.0.0/30',
