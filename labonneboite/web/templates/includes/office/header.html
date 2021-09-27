@@ -40,7 +40,22 @@
         <h4>Cette entreprise recrute aussi dans votre région.</h4>
       {% elif company.distance %}
         <p class="travel-distance-duration">
-          <img class="img-icon-large" alt="" src="{{ url_for('static', filename='images/icons/travel/km.svg') }}"> {{ company.distance }} km de votre lieu de recherche
+          <img class="img-icon-large" alt="" src="{{ url_for('static', filename='images/icons/km.svg') }}"> {{ company.distance }} km de votre lieu de recherche
+          <a
+            class="travel-link"
+            href="https://maps.google.com/maps?q={{company.latitude}},{{company.longitude}}"
+            target="_blank" rel="noopener noreferrer"
+            >Obtenir l'itinéraire</a>
+          <a
+            class="travel-link"
+            href="https://www.openstreetmap.org/?mlat={{company.latitude}}&mlon={{company.longitude}}#map=20/{{company.latitude}}/{{company.longitude}}"
+            target="_blank" rel="noopener noreferrer"
+            >Test OSM</a>
+          <a
+            class="travel-link"
+            href="https://tripgo.com/to:{{company.latitude}},{{company.longitude}}+"
+            target="_blank" rel="noopener noreferrer"
+            >Test Tripgo</a>
         </p>
       {% endif %}
     </div>
