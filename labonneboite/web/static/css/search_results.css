@@ -200,7 +200,7 @@
 }
 
 .lbb-result .travel-distance-duration .travel-link:before {
-  background-image: url("/static/images/icons/pinmap-location.svg");
+  background-image: url("/static/images/icons/map-marker-light.svg");
 }
 
 .lbb-result .travel-distance-duration .travel-link:after {
