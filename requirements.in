@@ -21,7 +21,6 @@ speaklater
 
 # Development tools.
 Flask-DebugToolbar
-ipdb
 ipython
 pylint
 pip-tools
@@ -55,7 +54,6 @@ social-auth-core[openidconnect]
 # Unit tests.
 nose
 selenium
-PyVirtualDisplay
 Flask-Testing
 parameterized
 
