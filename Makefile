@@ -172,6 +172,7 @@ NOSETESTS = nosetests -s $(NOSETESTS_OPTS)
 test-unit: clean-pyc
 	LBB_ENV=test $(NOSETESTS) \
 			labonneboite/tests/app/ \
+			labonneboite/tests/web/ \
 			labonneboite/tests/scripts/ \
 			labonneboite/tests/importer/
 
