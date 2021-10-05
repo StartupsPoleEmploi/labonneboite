@@ -60,6 +60,7 @@ class HiddenMarketFetcher(Fetcher):
         sort=None,
         hiring_type=None,
         from_number=1,
+        # FIXME: the variable to_number is useless, remove it and use OFFICES_PER_PAGE where needed
         to_number=OFFICES_PER_PAGE,
         audience=None,
         headcount=None,
@@ -270,7 +271,7 @@ class HiddenMarketFetcher(Fetcher):
         result = {}
         aggregations = {}
         if self.office_count:
-            result, _, aggregations = fetch_offices(
+            result, new_count, aggregations = fetch_offices(
                 self.naf_codes,
                 self.romes,
                 self.latitude,
@@ -290,6 +291,7 @@ class HiddenMarketFetcher(Fetcher):
                 flag_pmsmp=self.flag_pmsmp,
                 aggregate_by=self.aggregate_by,
             )
+            self.office_count = new_count
 
         if self.office_count <= current_page_size and add_suggestions:
 
@@ -351,6 +353,8 @@ def fetch_offices(naf_codes, rome_codes, latitude, longitude, distance, aggregat
         sort=sort,
         rome_codes=rome_codes,
         hiring_type=kwargs['hiring_type'],
+        from_number=kwargs.get('from_number', None),
+        to_number=kwargs.get('to_number', None),
     )
 
     # Extract aggregations
@@ -722,20 +726,24 @@ def build_json_body_elastic_search(
                 }
 
     # Process from_number and to_number.
+    # if from_number:
+    #     json_body["from"] = from_number - 1
+    #     if to_number:
+    #         if to_number < from_number:
+    #             # this should never happen
+    #             logger.exception("to_number < from_number : %s < %s", to_number, from_number)
+    #             raise Exception("to_number < from_number")
+    #         json_body["size"] = to_number - from_number + 1
+
+    # Prevent default page size in ES
     if from_number:
-        json_body["from"] = from_number - 1
-        if to_number:
-            if to_number < from_number:
-                # this should never happen
-                logger.exception("to_number < from_number : %s < %s", to_number, from_number)
-                raise Exception("to_number < from_number")
-            json_body["size"] = to_number - from_number + 1
+        json_body["size"] = 1000
 
 
     return json_body
 
 
-def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
+def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type, from_number=None, to_number=None):
     """
     Fetch offices first from Elasticsearch, then from the database.
 
@@ -847,6 +855,12 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
 
         # Set contact mode and position
         office.contact_mode = util.get_contact_mode_for_rome_and_office(rome_code_for_contact_mode, office)
+
+    # Filter results
+    offices = list(filter(lambda office: office.score>settings.OFFICE_SCORE_THRESHOLD, offices))
+    office_count = len(offices)
+    if from_number and to_number:
+        offices = offices[from_number:to_number+1]
 
     try:
         aggregations = res['aggregations']
