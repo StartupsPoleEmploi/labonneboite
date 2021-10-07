@@ -72,7 +72,7 @@ SCORE_100_HIRINGS = 500.0
 
 # Filter offices with these values
 # Filter is applied in labonneboite.common.search.HiddenMarketFetcher
-OFFICE_SCORE_THRESHOLD=80
+OFFICE_SCORE_THRESHOLD=60
 
 # API keys used to sign requests and check that a user is authorised to use the API
 # Note for API proxies such as ESD: they have api keys and need to sign the requests with it
