@@ -14,6 +14,7 @@ from labonneboite.common import pro
 from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
+from labonneboite.common.user_info import get_user_info
 from labonneboite.common.locations import CityLocation, Location, NamedLocation
 from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.models import UserFavoriteOffice
@@ -430,7 +431,11 @@ def entreprises():
         occupation
     ) if named_location else ''
 
+    user_info = get_user_info(current_user)
+    print('user_info', user_info)
+
     context = {
+        'user_info': user_info,
         'alternative_distances': alternative_distances,
         'alternative_rome_descriptions': alternative_rome_descriptions,
         'related_romes': related_romes,
