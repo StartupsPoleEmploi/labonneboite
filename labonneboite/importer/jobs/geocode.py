@@ -377,11 +377,11 @@ class GeocodeJob(Job):
         geocoding_jobs = self.create_geocoding_jobs()
         logger.info(
             "requesting BAN for all the adresses we need to geocode for...")
-        self.run_geocoding_jobs(geocoding_jobs)
+        self.run_geocoding_jobs(geocoding_jobs, disable_multithreading=True)
         if DEBUG_MODE:
             self.run_missing_geocoding_jobs(csv_max_rows=500)
         else:
-            self.run_missing_geocoding_jobs()
+            self.run_missing_geocoding_jobs(disable_multithreading=True)
         logger.info("updating coordinates...")
         self.update_coordinates(coordinates_updates)
         logger.info("updated %i coordinates !", len(coordinates_updates))
