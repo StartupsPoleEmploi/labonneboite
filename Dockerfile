@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:21.04
 
 # Set timezone
 ENV TZ=Europe/Paris

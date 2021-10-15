@@ -25,11 +25,11 @@ ipython
 pylint
 pip-tools
 
-# profiling tools used in create_index.py
-pycallgraph
-pyprof2calltree
-line-profiler
-sentry-sdk>0.20.0
+# # profiling tools used in create_index.py
+# pycallgraph
+# pyprof2calltree
+# line-profiler
+sentry-sdk
 
 # Databases and migrations.
 alembic
@@ -68,13 +68,12 @@ html5lib
 xhtml2pdf
 
 # Utils.
-gevent  # only used by geocode importer job and locust load testing
 python-slugify
 requests
 validators
 geopy
 mailjet_rest
-cryptography
+cryptography==2.8
 
 # Deployment and production
 uWSGI
@@ -82,14 +81,14 @@ uwsgitop
 raven[flask]
 
 # Load testing.
-locustio
+locust
 pyzmq
 remote-pdb
 
 #Fix markupsafe issue 1.0
 markupsafe==1.1.1
 
-#Impact retour emploi.
-google-api-python-client
-google-auth-httplib2
-google-auth-oauthlib
+# #Impact retour emploi.
+# google-api-python-client
+# google-auth-httplib2
+# google-auth-oauthlib
