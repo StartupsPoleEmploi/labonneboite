@@ -115,6 +115,12 @@ You might need to add `labonneboite` base directory to the Python path. This has
 
     $ add2virtualenv $PWD
 
+If you use virtualenv:
+
+    $ virtualenv -p python3.6 lbb
+
+Then add `export PYTHONPATH=path/to/project:$PYTHONPATH` to `lbb/bin/activate`
+
 ### Install python requirements:
 
 Our requirements are managed with [`pip-tools`](https://github.com/jazzband/pip-tools).
