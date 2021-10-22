@@ -19,17 +19,13 @@ services:
   - mysql
   - elasticsearch
 before_script:
-  - sleep 60
+  - sleep 10
 before_install:
   - mysql -u travis -e 'CREATE DATABASE IF NOT EXISTS lbb_test DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;'
 install:
   - echo GREPME started initial install
   - sudo locale-gen fr_FR
   - sudo update-locale
-  - curl https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.7.4.deb -o elasticsearch.deb
-  - sudo dpkg -i --force-confnew elasticsearch.deb
-  - sudo chown -R elasticsearch:elasticsearch /etc/default/elasticsearch
-  - sudo service elasticsearch restart
   - pip install -r requirements.txt
   - python setup.py develop
   - echo GREPME completed initial install
