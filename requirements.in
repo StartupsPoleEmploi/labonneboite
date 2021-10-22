@@ -61,10 +61,10 @@ Flask-Testing
 parameterized
 
 # Data and Importer.
-# numpy
-# pandas
-# scikit-learn
-# scipy
+numpy
+pandas
+scikit-learn
+scipy
 
 # PDF utils and dependencies.
 html5lib
