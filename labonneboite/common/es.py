@@ -98,12 +98,12 @@ def create_index(index):
         "ngram_filter": {
             "type": "ngram",
             "min_gram": 2,
-            "max_gram": 20,
+            "max_gram": 3,
         },
         "edge_ngram_filter": {
             "type": "edge_ngram",
             "min_gram": 1,
-            "max_gram": 20,
+            "max_gram": 2,
         },
     }
 
@@ -142,32 +142,28 @@ def create_index(index):
 
     mapping_ogr = {
         # https://www.elastic.co/guide/en/elasticsearch/reference/1.7/mapping-all-field.html
-        "_all": {
-            "type": "string",
-            "index_analyzer": "ngram_analyzer",
-            "search_analyzer": "standard",
-        },
+        # "_all": {
+        #     "type": "text",
+        #     "analyzer": "ngram_analyzer",
+        #     "search_analyzer": "standard",
+        # },
         "properties": {
             "ogr_code": {
-                "type": "string",
-                "index": "not_analyzed",
+                "type": "text",
             },
             "ogr_description": {
-                "type": "string",
-                "include_in_all": True,
+                "type": "text",
                 "term_vector": "yes",
-                "index_analyzer": "ngram_analyzer",
+                "analyzer": "ngram_analyzer",
                 "search_analyzer": "standard",
             },
             "rome_code": {
-                "type": "string",
-                "index": "not_analyzed",
+                "type": "text",
             },
             "rome_description": {
-                "type": "string",
-                "include_in_all": True,
+                "type": "text",
                 "term_vector": "yes",
-                "index_analyzer": "ngram_analyzer",
+                "analyzer": "ngram_analyzer",
                 "search_analyzer": "standard",
             },
         },
@@ -176,20 +172,19 @@ def create_index(index):
     mapping_location = {
         "properties": {
             "city_name": {
-                "type": "multi_field",
+                "type": "text",
                 "fields": {
                     "raw": {
-                        "type": "string",
-                        "index": "not_analyzed",
+                        "type": "text",
                     },
                     "autocomplete" : {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "autocomplete",
                     },
                     "stemmed": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "stemmed",
-                        "store": "yes",
+                        "store": "true",
                         "term_vector": "yes",
                     },
                 },
@@ -201,12 +196,10 @@ def create_index(index):
                 "type": "integer",
             },
             "slug": {
-                "type": "string",
-                "index": "not_analyzed",
+                "type": "text",
             },
             "zipcode": {
-                "type": "string",
-                "index": "not_analyzed",
+                "type": "text",
             },
         },
     }
@@ -214,60 +207,46 @@ def create_index(index):
     mapping_office = {
         "properties": {
             "naf": {
-                "type": "string",
-                "index": "not_analyzed",
+                "type": "text",
             },
             "siret": {
-                "type": "string",
-                "index": "not_analyzed",
+                "type": "text",
             },
             "name": {
-                "type": "string",
-                "index": "not_analyzed",
+                "type": "text",
             },
             "email": {
-                "type": "string",
-                "index": "not_analyzed",
+                "type": "text",
             },
             "tel": {
-                "type": "string",
-                "index": "not_analyzed",
+                "type": "text",
             },
             "website": {
-                "type": "string",
-                "index": "not_analyzed",
+                "type": "text",
             },
             "score": {
                 "type": "integer",
-                "index": "not_analyzed",
             },
             "scores_by_rome": {
                 "type": "object",
-                "index": "not_analyzed",
             },
             "score_alternance": {
                 "type": "integer",
-                "index": "not_analyzed",
             },
             "scores_alternance_by_rome": {
                 "type": "object",
-                "index": "not_analyzed",
             },
             "boosted_romes": {
                 "type": "object",
-                "index": "not_analyzed",
             },
             "boosted_alternance_romes": {
                 "type": "object",
-                "index": "not_analyzed",
             },
             "headcount": {
                 "type": "integer",
-                "index": "not_analyzed",
             },
             "department": {
-                "type": "string",
-                "index": "not_analyzed"
+                "type": "text",
             },
             "locations": {
                 "type": "geo_point",
@@ -284,16 +263,18 @@ def create_index(index):
             },
         },
         "mappings":  {
-            "ogr": mapping_ogr,
-            "location": mapping_location,
-            "office": mapping_office,
+            "properties": {
+                "ogr": mapping_ogr,
+                "location": mapping_location,
+                "office": mapping_office,
+            },
         },
     }
 
     Elasticsearch().indices.create(index=index, body=create_body)
 
-    fake_doc = fake_office()
-    Elasticsearch().index(index=index, doc_type=OFFICE_TYPE, id=fake_doc['siret'], body=fake_doc)
+    # fake_doc = fake_office()
+    # Elasticsearch().index(index=index, doc_type=OFFICE_TYPE, id=fake_doc['siret'], body=fake_doc)
 
 # This fake office having a zero but existing score for each rome is designed
 # as a workaround of the following bug:
@@ -314,16 +295,16 @@ def create_index(index):
 # the search result will be empty anyway, but this is no longer possible with a multi rome search.
 #
 # This fake office ensures no rome will ever be orphaned.
-def fake_office():
-    doc = {
-        'siret': "0",
-        # fields required even if not used by function_score
-        'score': 0,
-        'score_alternance': 0,
-    }
-
-    # all fields used by function_score which could potentially be orphaned and thus cause the bug
-    doc['scores_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
-    doc['scores_alternance_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
-
-    return doc
+# def fake_office():
+#     doc = {
+#         'siret': "0",
+#         # fields required even if not used by function_score
+#         'score': 0,
+#         'score_alternance': 0,
+#     }
+# 
+#     # all fields used by function_score which could potentially be orphaned and thus cause the bug
+#     doc['scores_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
+#     doc['scores_alternance_by_rome'] = {rome: 0 for rome in settings.ROME_DESCRIPTIONS}
+# 
+#     return doc

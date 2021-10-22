@@ -10,6 +10,7 @@ services:
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
       - "cluster.name=lbb"
       - "bootstrap.memory_lock=true"
+      - discovery.type=single-node
     ulimits:
       memlock:
         soft: -1
@@ -18,6 +19,7 @@ services:
     ports:
       # TODO remap port
       - 9200:9200
+      - 9300:9300
 
   mysql:
     image: mysql:5.6.36

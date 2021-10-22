@@ -45,7 +45,7 @@ SQLAlchemy
 # To figure out which 1.x.y version is the latest, run:
 # pip install --upgrade "elasticsearch>=1.0.0,<2.0.0"
 # elasticsearch<2.0.0
-elasticsearch
+elasticsearch==7.15.1
 
 # Users and auth management.
 Flask-Login

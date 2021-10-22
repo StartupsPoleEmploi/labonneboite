@@ -71,13 +71,16 @@ def switch_es_index():
     except NotFoundError:
         old_index_names = []
 
+    logger.info("activate new")
     # Activate new index
     new_index_name = es.get_new_index_name()
     settings.ES_INDEX = new_index_name
 
+    logger.info("activate new 2", new_index_name)
     # Create new index
     es.create_index(new_index_name)
 
+    logger.info("activate new 3")
     try:
         yield
     except:
@@ -852,9 +855,13 @@ def update_data(create_full, create_partial, disable_parallel_computing):
             create_offices_for_departement('57')
         return
 
+    logger.info("[update data] DONE")
     if create_full:
+        logger.info("CREATE FULL")
         with switch_es_index():
+            logger.info("[switch es index] BEFORE")
             create_offices(disable_parallel_computing)
+            logger.info("[switch es index] DONE")
             create_job_codes()
             create_locations()
 

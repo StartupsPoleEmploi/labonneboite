@@ -574,7 +574,7 @@ def build_json_body_elastic_search(
                 })
 
     main_query = {
-        "filtered": {
+        "bool": {
             "filter": {
                 "bool": {
                     "must": filters,
@@ -585,7 +585,7 @@ def build_json_body_elastic_search(
 
     if should_filters:
         # 'should' filters means that at least 1 of the filters should match
-        main_query['filtered']['filter']['bool']['should'] = should_filters
+        main_query['bool']['filter']['bool']['should'] = should_filters
 
     # Build sorting.
 
