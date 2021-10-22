@@ -44,7 +44,8 @@ SQLAlchemy
 # we should thus use the major 1.x.y version of the python library.
 # To figure out which 1.x.y version is the latest, run:
 # pip install --upgrade "elasticsearch>=1.0.0,<2.0.0"
-elasticsearch<2.0.0
+# elasticsearch<2.0.0
+elasticsearch
 
 # Users and auth management.
 Flask-Login
@@ -60,10 +61,10 @@ Flask-Testing
 parameterized
 
 # Data and Importer.
-numpy
-pandas
-scikit-learn
-scipy
+# numpy
+# pandas
+# scikit-learn
+# scipy
 
 # PDF utils and dependencies.
 html5lib
