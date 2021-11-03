@@ -1,0 +1,50 @@
+version: "3"
+services:
+  nginx:
+    restart: always
+    image: nginx:1.13
+    volumes:
+    - ./nginx/etc/nginx/conf.d:/etc/nginx/conf.d
+    - ./nginx/var/log/jepostule:/var/log/nginx/jepostule
+    - ./nginx/jepostule/static:/jepostule/static
+    ports:
+    - ${HTTP_PORT:-8000}:8000
+    depends_on:
+    - labonneboite
+
+  ###### 3rd-party services
+  elasticsearch:
+    extends:
+      file: docker/docker-compose.yml
+      service: elasticsearch
+
+  mysql:
+    extends:
+      file: docker/docker-compose.yml
+      service: mysql
+  
+  ###### Je Postule
+  labonneboite:
+    restart: always
+    build:
+      context: .
+    volumes:
+    - ./labonneboite/logs:/labonneboite/logs
+    - .:/labonneboite/src
+    depends_on:
+    - elasticsearch
+    - mysql
+
+  # backups:
+  #   restart: always
+  #   build:
+  #     context: .
+  #     dockerfile: dockerfile_backups
+  #     args:
+  #     - ENV_TYPE=${ENV_TYPE:-production}
+  #     - TIMEZONE=${TIMEZONE:-Europe/Paris}
+  #   hostname: backups
+  #   volumes:
+  #   - ./:/home/docker
+  #   - ./backups/home/backups:/home/backups
+  #   - /mnt:/mnt
