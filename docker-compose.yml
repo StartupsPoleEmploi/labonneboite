@@ -5,10 +5,10 @@ services:
     image: nginx:1.13
     volumes:
     - ./nginx/etc/nginx/conf.d:/etc/nginx/conf.d
-    - ./nginx/var/log/jepostule:/var/log/nginx/jepostule
-    - ./nginx/jepostule/static:/jepostule/static
+    - ./nginx/var/log/labonneboite:/var/log/nginx/labonneboite
+    - ./nginx/labonneboite/static:/labonneboite/static
     ports:
-    - ${HTTP_PORT:-8000}:8000
+    - ${HTTP_PORT:-8080}:8000
     depends_on:
     - labonneboite
 
@@ -34,6 +34,8 @@ services:
     depends_on:
     - elasticsearch
     - mysql
+    environment:
+      LBB_ENV: ${LBB_ENV:-bonaparte}
 
   # backups:
   #   restart: always
