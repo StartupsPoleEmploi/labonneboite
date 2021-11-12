@@ -1,14 +1,14 @@
 import logging
 from urllib.parse import urlencode
 
-from flask import abort, Blueprint, render_template, request, flash, url_for, redirect
-from flask_login import current_user
 import requests
+from flask import abort, Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user
 
-from labonneboite.conf import settings
 from labonneboite.common import crypto
 from labonneboite.common.models.office import Office
-from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
+from labonneboite.common.refresh_peam_token import refresh_peam_token
+from labonneboite.conf import settings
 
 from .utils import jepostule_enabled
 
@@ -16,16 +16,13 @@ logger = logging.getLogger('main')
 jepostuleBlueprint = Blueprint('jepostule', __name__)
 
 
+@refresh_peam_token
 @jepostuleBlueprint.route('/candidater/<siret>')
 def application(siret):
     company = Office.query.filter_by(siret=siret).first()
     if not jepostule_enabled(current_user, company):
         abort(404)
 
-    refresh_token_result = attempt_to_refresh_peam_token()
-    if refresh_token_result["token_has_expired"]:
-        return redirect(refresh_token_result["redirect_url"])
-    
     data = {
         'candidate_first_name': current_user.first_name,
         'candidate_last_name': current_user.last_name,

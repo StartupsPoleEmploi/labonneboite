@@ -18,3 +18,11 @@ def attempt_to_refresh_peam_token():
     return {
         "token_has_expired": False,
     }
+
+def refresh_peam_token(func):
+    def decorator(*args, **kwarg):
+        refresh_token_result = attempt_to_refresh_peam_token()
+        if refresh_token_result["token_has_expired"]:
+            return redirect(refresh_token_result["redirect_url"])
+        return func(*args, **kwarg)
+    return decorator

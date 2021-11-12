@@ -1,32 +1,24 @@
-from urllib.parse import urlencode
 import json
+from urllib.parse import urlencode
 
+from flask import abort, Blueprint, flash, make_response, redirect, render_template, request, session, url_for
+from flask_login import current_user
+from sentry_sdk import start_transaction
 from slugify import slugify
 
-from flask import abort, make_response, redirect, render_template, request, session, url_for
-from flask import Blueprint, flash
-from flask_login import current_user
-
-from labonneboite.common import activity
-from labonneboite.common import autocomplete
-from labonneboite.common import geocoding
-from labonneboite.common import pro
-from labonneboite.common import sorting
+from labonneboite.common import activity, autocomplete, geocoding
 from labonneboite.common import mapping as mapping_util
-from labonneboite.common import pagination
+from labonneboite.common import pagination, pro, sorting
+from labonneboite.common.load_data import load_related_rome, load_related_rome_areas
 from labonneboite.common.locations import CityLocation, Location, NamedLocation
 from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.models import UserFavoriteOffice
-from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
+from labonneboite.common.refresh_peam_token import refresh_peam_token
+from labonneboite.common.search import AudienceFilter, HiddenMarketFetcher
 from labonneboite.common.util import get_enum_from_value
-from labonneboite.common.load_data import load_related_rome, load_related_rome_areas
-from labonneboite.web.utils import fix_csrf_session
-
-from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter
 from labonneboite.conf import settings
 from labonneboite.web.search.forms import make_company_search_form
-from sentry_sdk import start_transaction
-
+from labonneboite.web.utils import fix_csrf_session
 
 searchBlueprint = Blueprint('search', __name__)
 
@@ -274,6 +266,7 @@ def add_descriptions(rome_object):
         rome_object['description'] = description
     return rome_object
 
+@refresh_peam_token
 @searchBlueprint.route('/entreprises')
 def entreprises():
     """
@@ -283,10 +276,6 @@ def entreprises():
     selected office search form.
     """
     fix_csrf_session()
-
-    refresh_token_result = attempt_to_refresh_peam_token()
-    if refresh_token_result["token_has_expired"]:
-        return redirect(refresh_token_result["redirect_url"])
 
     # filter empty url params
     args = {key: request.args[key] for key in request.args if request.args[key] != ''}
@@ -461,6 +450,7 @@ def entreprises():
         'travel_modes_french': maps_constants.TRAVEL_MODES_FRENCH,
         'duration_filter_enabled': duration_filter_enabled,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
+        'user_is_long_duration_job_seekers': getattr(current_user, 'is_long_duration_job_seekers', False)
     }
 
     activity_log_properties['distance'] = fetcher.distance
