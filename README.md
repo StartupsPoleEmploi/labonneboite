@@ -160,6 +160,27 @@ You may have to run `sudo usermod -a -G docker $USER`, then reboot your computer
 
 MacOS users, if you get a `ld: library not found for -lintl` error when running `pip-sync`, try this fix: `ln -s /usr/local/Cellar/gettext/0.19.8.1/lib/libintl.* /usr/local/lib/`. For more information see [this post](https://github.com/unbit/uwsgi-docs/issues/363).
 
+### emploi-store API configuration
+
+You may configure the emploi-store API to enable *Pole-Emploi Connect*. However you will receive the following error :
+
+> invalid_client Client authentication failed 
+
+Create a file `labonneboite/conf/local_settings.py` with following variables :
+
+```python
+PEAM_CLIENT_ID = 'PAR_xxxxxxxxxxxxxxxxxxxxx_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+PEAM_CLIENT_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+```
+created from : https://pole-emploi.io/compte (staging: https://peio.pe-qvr.fr/)
+
+with following authorized apps :
+
+- [Pôle emploi Connect](https://pole-emploi.io/data/api/pole-emploi-connect)
+- [Candidature Spontanéev](https://pole-emploi.io/data/api/candidature-spontanee)
+- [indemnisations](https://pole-emploi.io/data/api/pole-emploi-connect/indemnisations)
+- [Offres d'emploi](https://pole-emploi.io/data/api/offres-emploi)
+
 ## Launch web app
 
     make serve-web-app
