@@ -12,13 +12,14 @@
             }
         </style>
         {% include "includes/map-scripts.html" %}
+        {% assets "js_vendors" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
     </head>
 
     <body>
         <div id="map"></div>
     </body>
     
-    {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+    {% assets "js_lbb" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
     <script>
         var isochrone = {{ isochrone }};
         var map = createMap("map", [{{ longitude }}, {{ latitude }}], 11);

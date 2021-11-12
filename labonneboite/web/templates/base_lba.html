@@ -7,6 +7,7 @@
   <title>{% block fulltitle %}{% block title %}{% endblock %} | La Bonne Boite{% endblock %}</title>
 
   {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
+  {% assets "js_vendors" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/lba-design.css') }}" type="text/css">
 </head>
 
@@ -40,7 +41,7 @@
   </main>
 
   {# Load libraries before template scripts to make jQuery and co available. #}
-  {% assets "js_all" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% assets "js_lbb" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 
   {% block scripts %}{% endblock %}
 

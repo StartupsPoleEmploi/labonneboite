@@ -12,6 +12,7 @@
 
   {% block extrahead %}{% endblock %}
   {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
+  {% assets "js_vendors" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 
   {% if tag_manager_url %}
     <script async src="{{ tag_manager_url }}"></script>
@@ -194,7 +195,7 @@
   </script>
 
   {# Load libraries before template scripts to make jQuery and co available. #}
-  {% assets "js_all" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% assets "js_lbb" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 
   {% block scripts %}{% endblock %}
 
