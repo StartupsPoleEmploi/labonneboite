@@ -4,16 +4,25 @@ Provides user registration and login using PEAM (Pôle Emploi Access Management)
 Useful documentation of social-auth-core:
 https://python-social-auth.readthedocs.io/en/latest/
 """
+from typing import Dict, List, Mapping, Union
+
 import requests
-
-from social_core.exceptions import AuthUnreachableProvider
 from social_core.backends.open_id_connect import OpenIdConnectAuth
+from social_core.exceptions import AuthUnreachableProvider
 
-from labonneboite.conf import settings
 from labonneboite.common import activity
 from labonneboite.common.constants import GENDER_OTHER
 from labonneboite.common.models import User
+from labonneboite.conf import settings
+
 from .exceptions import AuthFailedMissingReturnValues
+
+Indemnisations = Dict[str, bool]  # TODO: use TypedDict
+
+# class Indemnisations(TypedDict):
+#     beneficiairePrestationSolidarite: bool
+#     beneficiaireAssuranceChomage: bool
+
 
 # pylint:disable=abstract-method
 class PEAMOpenIdConnect(OpenIdConnectAuth):
@@ -22,13 +31,14 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     """
     name = 'peam-openidconnect'
 
-    AUTHORIZATION_URL = "{}/connexion/oauth2/authorize".format(settings.PEAM_AUTH_BASE_URL)
-    ACCESS_TOKEN_URL = "{}/connexion/oauth2/access_token".format(settings.PEAM_AUTH_BASE_URL)
-    REFRESH_TOKEN_URL = "{}/connexion/oauth2/access_token?realm=%2Findividu".format(settings.PEAM_AUTH_BASE_URL)
-    USERINFO_URL = "{}/partenaire/peconnect-individu/v1/userinfo".format(settings.PEAM_API_BASE_URL)
+    AUTHORIZATION_URL = f"{settings.PEAM_AUTH_BASE_URL}/connexion/oauth2/authorize"
+    ACCESS_TOKEN_URL = f"{settings.PEAM_AUTH_BASE_URL}/connexion/oauth2/access_token"
+    REFRESH_TOKEN_URL = f"{settings.PEAM_AUTH_BASE_URL}/connexion/oauth2/access_token?realm=%2Findividu"
+    USERINFO_URL = f"{settings.PEAM_API_BASE_URL}/partenaire/peconnect-individu/v1/userinfo"
+    INDEMNISATIONS_URL = f"{settings.PEAM_API_BASE_URL}/partenaire/peconnect-indemnisations/v1/indemnisation"
 
     # as documented in https://python-social-auth.readthedocs.io/en/latest/use_cases.html#multiple-scopes-per-provider
-    def get_scope(self):
+    def get_scope(self) -> List[str]:
         scope = super(PEAMOpenIdConnect, self).get_scope()
         if settings.ENABLE_PEAM_HIGHER_QOS:
             # enable higher quota of req/s to avoid 429 HTTP errors
@@ -41,15 +51,35 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         result = self.get_json(*args, **kwargs)
         return result
 
+    @classmethod
+    def get_indemnisations_url(cls) -> str:
+        return cls.INDEMNISATIONS_URL
+
+    # TODO: refacto [POC] --> migrer dans un service dedié ou dans une fonction
+    def get_user_indemnisations(self, access_token) -> Indemnisations:
+        # user_indemnisations = self.get_json(
+        #     self.get_indemnisations_url(),
+        #     params={'realm': '/individu'},
+        #     headers={'Authorization': f'Bearer {access_token}'}
+        # )
+        user_indemnisations = {
+            'beneficiairePrestationSolidarite': True,
+        }
+        return user_indemnisations
+
+    # TODO: refacto [POC] --> migrer dans un service dedié ou dans une fonction
+    def get_user_is_long_duration_job_seekers(self, access_token) -> bool:
+        user_indemnisations = self.get_user_indemnisations(access_token)
+        return user_indemnisations['beneficiairePrestationSolidarite']
+
     def user_data(self, access_token, *args, **kwargs):
         url = self.userinfo_url()
         try:
             return self.get_json(
-                url, params={'realm': '/individu'},
-                headers={'Authorization': 'Bearer {0}'.format(access_token)}
+                url, params={'realm': '/individu'}, headers={'Authorization': 'Bearer {0}'.format(access_token)}
             )
         except requests.HTTPError as e:
-            if e.response.status_code == 502: # Bad Gateway
+            if e.response.status_code == 502:  # Bad Gateway
                 # 502 errors are not properly handled by social_core (see
                 # handle_http_errors decorator in social_core.utils)
                 # If we don't raise an exception, the user sees a spinning wheel.
@@ -64,6 +94,8 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
             'external_id': response.get('sub'),
             'first_name': response.get('given_name'),
             'last_name': response.get('family_name'),
+            # TODO: refacto [POC] --> migrer dans un backend dedié ou dans une fonction
+            'is_long_duration_job_seekers': self.get_user_is_long_duration_job_seekers(response['access_token'])
         }
         # Sometimes PEAM responds without the user details. For instance, the
         # email address is empty when a user has not validated its account.
@@ -77,6 +109,7 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         if existing_user_query.count():
             existing_user = existing_user_query.first()
             existing_user.email = user_details['email']
+            existing_user.is_long_duration_job_seekers = user_details['is_long_duration_job_seekers']
             existing_user.save()
         return user_details
 

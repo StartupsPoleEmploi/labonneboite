@@ -50,6 +50,7 @@ class User(CRUDMixin, UserMixin, Base):
     active = Column(Boolean, default=True)
     # The ID used by third party auth providers (if available).
     external_id = Column(String(191), nullable=True)
+    is_long_duration_job_seekers = Column(Boolean, nullable=True)  # todo: refacto (POC)
     favorite_offices = relationship('UserFavoriteOffice', order_by=desc('date_created'))
     # Designates whether this user can access the admin site.
     is_admin = Column(Boolean, default=False)

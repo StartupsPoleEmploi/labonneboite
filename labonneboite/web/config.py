@@ -36,8 +36,8 @@ class Config(object):
     SOCIAL_AUTH_INACTIVE_USER_URL = '/'
 
     # Persist user authentication in cookie, and not just in session
-    SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = [settings.REMEMBER_ME_ARG_NAME] # used by social_core
-    REMEMBER_COOKIE_NAME = 'auth' # used by social_flask and flask_login
+    SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = [settings.REMEMBER_ME_ARG_NAME]  # used by social_core
+    REMEMBER_COOKIE_NAME = 'auth'  # used by social_flask and flask_login
     REMEMBER_COOKIE_DURATION = timedelta(days=365)
 
     # List of supported third party authentication providers.
@@ -69,8 +69,9 @@ class Config(object):
     SOCIAL_AUTH_SCOPE = [
         'application_%s' % settings.PEAM_CLIENT_ID,
         'api_peconnect-individuv1',
+        'api_peconnect-indemnisationsv1',
     ]
-    SOCIAL_AUTH_USER_FIELDS = ['external_id', 'email', 'gender', 'first_name', 'last_name']
+    SOCIAL_AUTH_USER_FIELDS = ['external_id', 'email', 'gender', 'first_name', 'last_name', 'is_long_duration_job_seekers']
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_AUTH_EXTRA_ARGUMENTS = {'realm': '/individu'}
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_AUTH_EXTRA_ARGUMENTS = {'realm': '/individu', 'prompt': 'none'}
     # For some reason, the redirect passed to "next=..." is not sent back by
@@ -80,5 +81,6 @@ class Config(object):
     # Define connection timeouts to make sure LBB is not going to timeout before PEAM
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_URLOPEN_TIMEOUT = 8
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_URLOPEN_TIMEOUT = 5
+
 
 CONFIG = Config()
