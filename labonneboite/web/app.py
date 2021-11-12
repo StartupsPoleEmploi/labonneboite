@@ -1,6 +1,5 @@
 import os
 
-print(os.environ['LBB_ENV'])
 # Python standard library.
 import locale
 import logging
