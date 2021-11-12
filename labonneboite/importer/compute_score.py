@@ -418,9 +418,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     check_last_historical_data_date(last_historical_data_date)
 
     data_gap_in_months = months_between_dates(last_historical_data_date, prediction_beginning_date)
-    # math.ceil returns a float and not an int, thus we still need to cast it to int.
-    # `1.0 * int/int` trick is needed because otherwise int/int gives the floor int value.
-    data_gap_in_periods = int(math.ceil(data_gap_in_months / months_per_period))
+    data_gap_in_periods = math.ceil(data_gap_in_months / months_per_period)
 
     #Since August 2020, we have all alternance data, so there should be no gap anymore
     if get_current_env() == ENV_DEVELOPMENT:
