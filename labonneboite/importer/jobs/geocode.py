@@ -7,33 +7,33 @@ Documentation about the open data API we use here:
 https://adresse.data.gouv.fr/api
 https://adresse.data.gouv.fr/faq
 """
-from multiprocessing import Manager, Pool
+import csv
 import io
 import os
-import csv
 import time
+from multiprocessing import Manager, Pool
+
+import numpy
+import pandas as pd
 import requests
 from sqlalchemy.exc import IntegrityError
-import pandas as pd
-import numpy
 
 from labonneboite.common.database import db_session
+from labonneboite.common.get_full_adress import get_full_adress, IncorrectAdressDataException
 from labonneboite.common.load_data import load_city_codes
+from labonneboite.common.util import timeit
 from labonneboite.importer import settings
 from labonneboite.importer import util as import_util
-from labonneboite.importer.util import history_importer_job_decorator
-from labonneboite.common.util import timeit
-from labonneboite.importer.models.computing import Geolocation
 from labonneboite.importer.jobs.base import Job
 from labonneboite.importer.jobs.common import logger
+from labonneboite.importer.models.computing import Geolocation
+from labonneboite.importer.util import history_importer_job_decorator
 
 DEBUG_MODE = False
 
 pool_size = 8
 connection_limit = pool_size
-adapter = requests.adapters.HTTPAdapter(pool_connections=connection_limit,
-                                        pool_maxsize=connection_limit,
-                                        max_retries=4)
+adapter = requests.adapters.HTTPAdapter(pool_connections=connection_limit, pool_maxsize=connection_limit, max_retries=4)
 session = requests.session()
 session.mount('http://', adapter)
 jobs = []
@@ -56,29 +56,11 @@ GEOCODING_STATS = manager.dict()
 csv_api_back = manager.list()
 
 
-class IncorrectAdressDataException(Exception):
-    pass
-
-
 class AbnormallyLowGeocodingRatioException(Exception):
     pass
 
 
 class GeocodeJob(Job):
-
-    def get_full_adress(self, street_number, street_name, zipcode, city):
-        if "arrondissement" in city.lower():
-            city = city.split(" ")[0]
-            if city.lower() not in ["paris", "lyon", "marseille"]:
-                raise IncorrectAdressDataException
-
-        if "LIEU DIT " in street_name:
-            street_name = street_name.replace("LIEU DIT ", "")
-            street_number = ""
-
-        full_address = "%s %s %s %s" % (
-            street_number, street_name, zipcode, city)
-        return full_address.strip()
 
     @timeit
     def create_geocoding_jobs(self):
@@ -109,19 +91,15 @@ class GeocodeJob(Job):
                 logger.warning("wrong codecommune: %s", codecommune)
                 continue
             try:
-                full_address = self.get_full_adress(
-                    street_number, street_name, zipcode, city)
+                full_address = get_full_adress(street_number, street_name, zipcode, city)
                 initial_coordinates = [coordinates_x, coordinates_y]
-                geocoding_jobs.append(
-                    [siret, full_address, initial_coordinates, codecommune])
+                geocoding_jobs.append([siret, full_address, initial_coordinates, codecommune])
             except IncorrectAdressDataException:
-                logger.warning("incorrect address for %s %s %s %s",
-                               street_number, street_name, zipcode, city)
+                logger.warning("incorrect address for %s %s %s %s", street_number, street_name, zipcode, city)
             count += 1
             GEOCODING_STATS['jobs'] = GEOCODING_STATS.get('jobs', 0) + 1
             if not count % 10000:
-                logger.info(
-                    "loading geocoding jobs from db... loaded %s rows", count)
+                logger.info("loading geocoding jobs from db... loaded %s rows", count)
         logger.info("%i geocoding jobs created...", len(geocoding_jobs))
         cur.close()
         con.close()
@@ -141,15 +119,13 @@ class GeocodeJob(Job):
             count += 1
             statements.append([coordinates[0], coordinates[1], siret])
             if len(statements) == 1000:
-                logger.info("geocoding with ban... %i of %i done",
-                            count, len(updates))
+                logger.info("geocoding with ban... %i of %i done", count, len(updates))
                 cur.executemany(update_query, statements)
                 con.commit()
                 statements = []
 
         if len(statements) >= 1:
-            logger.info("geocoding with ban... %i of %i done",
-                        count, len(updates))
+            logger.info("geocoding with ban... %i of %i done", count, len(updates))
             cur.executemany(update_query, statements)
             con.commit()
 
@@ -181,26 +157,30 @@ class GeocodeJob(Job):
         adresses_not_geolocated[:] = []
         coordinates_updates[:] = []
 
-        logger.info("Nombre de geocoding jobs : {}".format(
-            len(geocoding_jobs)))
+        logger.info("Nombre de geocoding jobs : {}".format(len(geocoding_jobs)))
 
         if disable_multithreading:
             for siret, full_address, initial_coordinates, city_code in geocoding_jobs:
-                self.find_coordinates_for_address(
-                    siret, full_address, initial_coordinates, city_code)
+                self.find_coordinates_for_address(siret, full_address, initial_coordinates, city_code)
         else:
             pool = Pool(processes=pool_size)
             for siret, full_address, initial_coordinates, city_code in geocoding_jobs:
-                pool.apply_async(self.find_coordinates_for_address,
-                                 (siret, full_address, initial_coordinates, city_code,))
+                pool.apply_async(
+                    self.find_coordinates_for_address, (
+                        siret,
+                        full_address,
+                        initial_coordinates,
+                        city_code,
+                    )
+                )
             pool.close()
             pool.join()
 
-        logger.info("run geocoding jobs : collected {} coordinates on {} jobs, need to geocode {}".format(
-            GEOCODING_STATS.get('cache_hits', 0),
-            len(geocoding_jobs),
-            len(adresses_not_geolocated)
-        ))
+        logger.info(
+            "run geocoding jobs : collected {} coordinates on {} jobs, need to geocode {}".format(
+                GEOCODING_STATS.get('cache_hits', 0), len(geocoding_jobs), len(adresses_not_geolocated)
+            )
+        )
         return adresses_not_geolocated
 
     def find_coordinates_for_address(self, siret, full_address, initial_coordinates, city_code):
@@ -209,21 +189,16 @@ class GeocodeJob(Job):
         if geolocation:
             # coordinates were already queried and cached before
             coordinates = [geolocation.x, geolocation.y]
-            GEOCODING_STATS['cache_hits'] = GEOCODING_STATS.get(
-                'cache_hits', 0) + 1
+            GEOCODING_STATS['cache_hits'] = GEOCODING_STATS.get('cache_hits', 0) + 1
             if coordinates == initial_coordinates:
-                GEOCODING_STATS['unchanged_coordinates'] = GEOCODING_STATS.get(
-                    'unchanged_coordinates', 0) + 1
+                GEOCODING_STATS['unchanged_coordinates'] = GEOCODING_STATS.get('unchanged_coordinates', 0) + 1
             else:
-                GEOCODING_STATS['existing_coordinates_to_update'] = GEOCODING_STATS.get(
-                    'existing_coordinates_to_update', 0) + 1
-                coordinates_updates.append(
-                    [siret, coordinates])
+                GEOCODING_STATS['existing_coordinates_to_update'
+                                ] = GEOCODING_STATS.get('existing_coordinates_to_update', 0) + 1
+                coordinates_updates.append([siret, coordinates])
         else:
-            adresses_not_geolocated.append(
-                [siret, full_address, city_code])
-            GEOCODING_STATS['cache_misses'] = GEOCODING_STATS.get(
-                'cache_misses', 0) + 1
+            adresses_not_geolocated.append([siret, full_address, city_code])
+            GEOCODING_STATS['cache_misses'] = GEOCODING_STATS.get('cache_misses', 0) + 1
 
     @timeit
     def run_missing_geocoding_jobs(self, csv_max_rows=5000, disable_multithreading=False):
@@ -244,8 +219,7 @@ class GeocodeJob(Job):
                 wr.writerow(("siret", "full_address", "city_code"))
                 wr.writerows(adresses_not_geolocated[start:end])
             csv_files.append(csv_path)
-            GEOCODING_STATS['number created CSV'] = GEOCODING_STATS.get(
-                'number created CSV', 0) + 1
+            GEOCODING_STATS['number created CSV'] = GEOCODING_STATS.get('number created CSV', 0) + 1
             logger.debug("wrote CSV file to %s", csv_path)
 
         logger.info("GEOCODING_STATS = %s", GEOCODING_STATS)
@@ -288,8 +262,7 @@ class GeocodeJob(Job):
         while not job_done and retry_counter > 0:
             response = session.post(BASE, files=files, data=values)
             response.close()
-            logger.info('STATUS RESPONSE : {} pour le csv {}'.format(
-                response.status_code, csv_path))
+            logger.info('STATUS RESPONSE : {} pour le csv {}'.format(response.status_code, csv_path))
             if response.status_code == 200:
                 job_done = True
             else:
@@ -297,26 +270,20 @@ class GeocodeJob(Job):
                 time.sleep(5)
 
         if job_done:
-            GEOCODING_STATS['API status 200 for CSV'] = GEOCODING_STATS.get(
-                'API status 200 for CSV', 0) + 1
+            GEOCODING_STATS['API status 200 for CSV'] = GEOCODING_STATS.get('API status 200 for CSV', 0) + 1
             try:
-                logger.info(
-                    "API addr gouv response on CSV {} OK".format(csv_path))
+                logger.info("API addr gouv response on CSV {} OK".format(csv_path))
                 decoded_content = response.text
-                df_geocodes = pd.read_csv(io.StringIO(
-                    decoded_content), dtype={'siret': str})
+                df_geocodes = pd.read_csv(io.StringIO(decoded_content), dtype={'siret': str})
                 csv_api_back_path = csv_path + '-api'
                 df_geocodes.to_csv(csv_api_back_path, index=False)
                 csv_api_back.append(csv_api_back_path)
-                logger.info(
-                    "Wrote CSV sent back by API : {}".format(csv_api_back_path))
+                logger.info("Wrote CSV sent back by API : {}".format(csv_api_back_path))
             except ValueError:
-                logger.warning(
-                    'ValueError in json-ing features result %s', response.text)
+                logger.warning('ValueError in json-ing features result %s', response.text)
         else:
             logger.info("The csv {} was not saved correctly".format(csv_path))
-        logger.info("GEOCODING_STATS = {} for CSV {}".format(
-            GEOCODING_STATS, csv_path))
+        logger.info("GEOCODING_STATS = {} for CSV {}".format(GEOCODING_STATS, csv_path))
 
     # Takes the CSV which has been sent by the API with coordinates, and will parse the CSV
     def get_geocode_from_csv(self, csv_api_path):
@@ -332,17 +299,11 @@ class GeocodeJob(Job):
                 # in the database
                 if geolocation:
                     logger.info("Geolocation already found")
-                    GEOCODING_STATS['updatable_coordinates'] = GEOCODING_STATS.get(
-                        'updatable_coordinates', 0) + 1
-                    coordinates_updates.append(
-                        [row.siret, coordinates])
+                    GEOCODING_STATS['updatable_coordinates'] = GEOCODING_STATS.get('updatable_coordinates', 0) + 1
+                    coordinates_updates.append([row.siret, coordinates])
                 else:
                     logger.info("Geolocation not found")
-                    geolocation = Geolocation(
-                        full_address=row.full_address,
-                        x=coordinates[0],
-                        y=coordinates[1]
-                    )
+                    geolocation = Geolocation(full_address=row.full_address, x=coordinates[0], y=coordinates[1])
                     db_session.add(geolocation)
                     # as this method is run in parallel jobs,
                     # let's commit often so that each job see each other's changes
@@ -353,30 +314,24 @@ class GeocodeJob(Job):
                         # however it is not the case in our project
                         # because autoflush=False
                         db_session.flush()
-                        GEOCODING_STATS['flushes'] = GEOCODING_STATS.get(
-                            'flushes', 0) + 1
+                        GEOCODING_STATS['flushes'] = GEOCODING_STATS.get('flushes', 0) + 1
                     except IntegrityError:
                         # happens when a job tries to insert an already existing full_address
                         # rollback needed otherwise db_session is left
                         # in a state unusable by the other parallel jobs
                         db_session.rollback()
-                        GEOCODING_STATS['rollbacks'] = GEOCODING_STATS.get(
-                            'rollbacks', 0) + 1
+                        GEOCODING_STATS['rollbacks'] = GEOCODING_STATS.get('rollbacks', 0) + 1
                     if coordinates:
-                        GEOCODING_STATS['updatable_coordinates'] = GEOCODING_STATS.get(
-                            'updatable_coordinates', 0) + 1
-                        coordinates_updates.append(
-                            [row.siret, coordinates])
+                        GEOCODING_STATS['updatable_coordinates'] = GEOCODING_STATS.get('updatable_coordinates', 0) + 1
+                        coordinates_updates.append([row.siret, coordinates])
             else:
-                GEOCODING_STATS['coordinates_not_found'] = GEOCODING_STATS.get(
-                    'coordinates_not_found', 0) + 1
+                GEOCODING_STATS['coordinates_not_found'] = GEOCODING_STATS.get('coordinates_not_found', 0) + 1
 
     @timeit
     def run(self):
         logger.info("starting geocoding task...")
         geocoding_jobs = self.create_geocoding_jobs()
-        logger.info(
-            "requesting BAN for all the adresses we need to geocode for...")
+        logger.info("requesting BAN for all the adresses we need to geocode for...")
         self.run_geocoding_jobs(geocoding_jobs)
         if DEBUG_MODE:
             self.run_missing_geocoding_jobs(csv_max_rows=500)
@@ -389,6 +344,7 @@ class GeocodeJob(Job):
         self.validate_coordinates()
         logger.info("validated coordinates !")
         logger.info("completed geocoding task.")
+
 
 @history_importer_job_decorator(os.path.basename(__file__))
 def run_main():
