@@ -292,7 +292,7 @@ def entreprises():
     job_doesnt_exist = not rome
 
     # Related romes
-    if settings.ENABLE_RELATED_ROMES:
+    if settings.ENABLE_RELATED_ROMES and not job_doesnt_exist:
         related_romes = None
         hide_suggestions = False
         if (named_location):
