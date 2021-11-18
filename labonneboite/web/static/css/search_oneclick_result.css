@@ -1,0 +1,15 @@
+#long-duration-job-seeker-oneclick-apply 
+    .companies 
+        .company {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #54108E;
+        }
+
+@media (min-width: 800px) {
+    #long-duration-job-seeker-oneclick-apply 
+        .companies 
+            .company {
+                width: 20%;
+            }
+}

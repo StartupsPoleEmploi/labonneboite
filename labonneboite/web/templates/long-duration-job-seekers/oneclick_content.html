@@ -1,0 +1,159 @@
+{% if user_is_long_duration_job_seekers and jepostule_globally_enabled %}
+<div class="alert alert-error text-center">
+  Nouveauté pour vous : postulez en un clic !
+</div>
+<div
+  id="long-duration-job-seeker-oneclick-apply"
+  class="lbb-bright-container lbb-result lbb-highlight-result"
+>
+  <div class="lbb-result__header">
+    <div class="grid-row">
+      <div class="grid-col-8">
+        <h3>
+          Découvrez une sélection de {{companies[:10] | list | length }}
+          entreprises qui recrutent
+        </h3>
+      </div>
+      <div class="grid-col-4 md-text-right">
+        <h4>
+          Potentiel d'embauche<br />
+          <span class="rating-stars text-left">
+            <b style="width: 100%">5</b>
+          </span>
+          <span class="rating-value">5</span>
+        </h4>
+      </div>
+    </div>
+    <div class="grid-row companies">
+      <div class="grid-col-8">
+        <div class="grid-row">
+          {% for company in companies[:10] %}
+          <div class="grid-col- company text-left">{{ company.name }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="grid-col-4"></div>
+    </div>
+
+    <div
+      class="form-errorlist"
+      style="padding: 0; height: 0px; overflow: hidden"
+    ></div>
+
+    <div class="lbb-result__actions">
+      <div class="grid-row">
+        <!-- empty space -->
+        <div class="grid-col-9"></div>
+        <!-- right buttons -->
+        <div class="grid-col-3 text-right">
+          <div class="row">
+            {#
+            <a
+              class="jepostule-button no-underline"
+              href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}"
+              target="_blank"
+              rel="noopener"
+            >
+              #}
+              <button
+                class="go btn btn-error btn-small full-width"
+                type="submit"
+              >
+                Postuler en un clic
+                <span class="loading spinner" style="display: none"></span>
+              </button>
+              <div
+                class="done full-width text-center"
+                style="display: none; position: relative; top: -35px; margin-bottom: -35px; height: 35px"
+              >
+                <img
+                  alt="Terminer"
+                  src="{{ url_for('static', filename='images/icons/tick.svg') }}"
+                />
+              </div>
+
+              {#
+            </a>
+            #}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).on("lbbready", () => {
+    const sirets = [
+      "{{ companies[:10] | map(attribute='siret') | join('",
+      "' | safe) }}",
+    ];
+    const job = "{{request.args['j'] or rome_description}}"
+    const modal = $("#long-duration-job-seeker-oneclick-apply", document);
+    const actionButton = $(".go", modal);
+
+    checkStatus = async (response /*: Response*/) => {
+      if (response.ok) return response;
+      else {
+        throw new Error();
+      }
+    };
+
+    startAction = async () => {
+      setLoading();
+      $.ajax({
+        method: "POST",
+        url: "/jepostule/auto-apply.json",
+        cache: false,
+        error: setFailure,
+        success: setSuccess,
+        data: JSON.stringify({ sirets, job }),
+        contentType: "application/json",
+        dataType: "json",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token() }}",
+        },
+      });
+    };
+
+    setLoading = () => {
+      setErrorMessage();
+      actionButton.prop("disabled", true);
+      $(".loading", modal)
+        .css({ width: 0, height: 0 })
+        .show()
+        .animate({ width: 21, height: 21 });
+    };
+
+    setErrorMessage = (strErrorMessage) => {
+      if (strErrorMessage)
+        $(".form-errorlist", modal)
+          .prepend($("<center></center>").text(strErrorMessage))
+          .animate({ height: 60 });
+      else $(".form-errorlist", modal).animate({ height: 0 }).text("");
+    };
+
+    setUnloading = () => {
+      actionButton.prop("disabled", false);
+      $(".loading", modal).animate({ width: 0, height: 0 });
+    };
+
+    setSuccess = () => {
+      actionButton.off("click", startAction);
+      $(".loading", modal).fadeOut(500);
+      $(".done", modal).fadeIn();
+      /* actionButton.fadeOut(500, () => {
+      }); */
+    };
+
+    setFailure = () => {
+      setErrorMessage(
+        "Une erreur s'est produite, veuillez réessayer ultérieurement."
+      );
+      setUnloading();
+    };
+
+    actionButton.on("click", startAction);
+  });
+</script>
+{% endif %}

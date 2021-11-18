@@ -180,6 +180,10 @@
     margin-left: 8px;
 }
 
+.lbb-result.lbb-highlight-result {
+    border: 1px solid #f03c69 
+}
+
 
 /* Actions header (office name, address, ...)
 =========================================================================== */

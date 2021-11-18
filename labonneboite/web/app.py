@@ -314,6 +314,7 @@ def create_app():
         'css/progressbar.css',
         'css/ratings.css',
         'css/search_results.css',
+        'css/search_oneclick_result.css',
         'css/switch.css',
         # Vendor.
         'css/vendor/bootstrap-tooltip.css',

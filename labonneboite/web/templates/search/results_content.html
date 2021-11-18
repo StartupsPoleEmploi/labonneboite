@@ -222,6 +222,8 @@
               Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour votre recherche.
             {% endif %}
           </div>
+        {% else %}
+          {% include "long-duration-job-seekers/oneclick_content.html" %}
         {% endif %}
 
 
