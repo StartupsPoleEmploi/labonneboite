@@ -13,6 +13,12 @@ PEAM_VERIFY_SSL = False
 SENTRY_ENVIRONMENT = "development"
 
 
+PEAM_AUTH_BASE_URL = 'https://authentification-candidat-r.pe-qvr.fr'
+PEAM_AUTH_RECRUITER_BASE_URL = 'https://entreprise.pe-qvr.fr/'
+PEAM_API_BASE_URL = "https://api.peio.pe-qvr.fr"
+PEAM_TOKEN_BASE_URL = 'https://entreprise.pe-qvr.fr'
+
+
 # Isochrone data available to work locally but only for the Metz area
 # and only for isochrones.
 # Concerning commute time available in office details (in results search page),
