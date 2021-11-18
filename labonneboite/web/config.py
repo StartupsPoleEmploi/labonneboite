@@ -69,7 +69,6 @@ class Config(object):
     SOCIAL_AUTH_SCOPE = [
         'application_%s' % settings.PEAM_CLIENT_ID,
         'api_peconnect-individuv1',
-        'api_peconnect-indemnisationsv1',
     ]
     SOCIAL_AUTH_USER_FIELDS = ['external_id', 'email', 'gender', 'first_name', 'last_name', 'is_long_duration_job_seekers']
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_AUTH_EXTRA_ARGUMENTS = {'realm': '/individu'}

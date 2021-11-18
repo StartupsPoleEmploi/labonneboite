@@ -43,7 +43,15 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         if settings.ENABLE_PEAM_HIGHER_QOS:
             # enable higher quota of req/s to avoid 429 HTTP errors
             scope += ['qos_silver_peconnect-individuv1']
-        scope += ['api_candidaturespontaneev1', 'ami', 'amiW']
+        scope += [
+            'api_candidaturespontaneev1',
+            'ami',
+            'amiW',
+            'api_peconnect-indemnisationsv1',
+            'indemnisation',
+            'api_peconnect-coordonneesv1',
+            'coordonnees',
+        ]
         return scope
 
     def request_access_token(self, *args, **kwargs):
@@ -57,14 +65,15 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
 
     # TODO: refacto [POC] --> migrer dans un service dedié ou dans une fonction
     def get_user_indemnisations(self, access_token) -> Indemnisations:
-        # user_indemnisations = self.get_json(
-        #     self.get_indemnisations_url(),
-        #     params={'realm': '/individu'},
-        #     headers={'Authorization': f'Bearer {access_token}'}
-        # )
-        user_indemnisations = {
-            'beneficiairePrestationSolidarite': True,
-        }
+        user_indemnisations = self.get_json(
+            self.get_indemnisations_url(),
+            params={'realm': '/individu'},
+            headers={'Authorization': f'Bearer {access_token}'}
+        )
+        if settings.DEBUG:  # TODO: debug [POC] --> To remove
+            user_indemnisations = {
+                'beneficiairePrestationSolidarite': True,
+            }
         return user_indemnisations
 
     # TODO: refacto [POC] --> migrer dans un service dedié ou dans une fonction
