@@ -323,6 +323,7 @@ class EtablissementExtractJob(Job):
         departements = dpt.DEPARTEMENTS
         count = 0
         no_zipcode_count = 0
+        sirets_zipcount_empty = []
         unprocessable_departement_errors = 0
         format_errors = 0
         # KPI expected after the add of the RGPD email column
@@ -424,6 +425,7 @@ class EtablissementExtractJob(Job):
                         unprocessable_departement_errors += 1
                 else:
                     no_zipcode_count += 1
+                    sirets_zipcount_empty.append(siret)
                 if not count % 100000:
                     logger.debug("processed %s lines", count)
                     yield offices
