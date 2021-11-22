@@ -444,7 +444,7 @@ class EtablissementExtractJob(Job):
             if unprocessable_departement_errors > 2500:
                 raise ValueError("too many unprocessable_departement_errors")
             if no_zipcode_count > 75000:
-                raise ValueError("too many no_zipcode_count")
+                raise ValueError(f"too many no_zipcode_count: {no_zipcode_count}")
             if format_errors > 5:
                 raise ValueError("too many format_errors")
             if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
