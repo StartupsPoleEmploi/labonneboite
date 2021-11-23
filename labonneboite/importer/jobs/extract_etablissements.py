@@ -392,7 +392,7 @@ class EtablissementExtractJob(Job):
                 if contrat_poe == "O" or contrat_afpr == "O":
                     flag_poe_afpr = 1
 
-                if codecommune.strip():
+                if codecommune != '':
                     departement = import_util.get_departement_from_zipcode(codepostal)
                     process_this_departement = departement in departements
                     if process_this_departement:
