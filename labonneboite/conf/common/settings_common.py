@@ -131,6 +131,7 @@ DB_USER = 'labonneboite'
 DB_PASSWORD = 'labonneboite'
 OFFICE_TABLE = 'etablissements'
 
+# 2020-05-13: The tile API of OpenRouteService (api.openrouteservice.org) will be discontinued in June 2020.
 TILE_SERVER_URL = "http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}"
 
 ROME_NAF_PROBABILITY_CUTOFF = 0.05
@@ -172,29 +173,6 @@ JEPOSTULE_QUOTA = 0
 GOOGLE_SITE_VERIFICATION_CODE = None
 
 SCAM_EMAILS_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'scripts', 'scam_emails')
-
-# Isochrones
-ENABLE_ISOCHRONES = True
-
-# Available backends: dummy, ign, navitia
-TRAVEL_VENDOR_BACKENDS = {
-    'isochrone': {
-        'car': 'ign',
-        'public': 'navitia',
-    },
-    'durations': {
-        'car': 'ign',
-        'public': 'navitia',
-    },
-}
-
-# IGN credentials for fetching travel durations and isochrones
-IGN_CREDENTIALS = {
-    'key': '',
-    'username': '',
-    'password': ''
-}
-NAVITIA_API_TOKEN = 'setme'
 
 # Ids of spreadsheets for local dev
 # SPREADSHEET_IDS = [

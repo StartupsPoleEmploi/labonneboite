@@ -54,20 +54,3 @@ from flask import current_app
 current_app.logger.critical('HEY, SHOW ME!')
 ```
 
-## Isochrone tests
-
-They use custom backends to mock API calls: `ign_mock` and `navitia_mock`. Check that they are activated in your test settings:
-
-_conf/common/overrides/test.py_
-```
-TRAVEL_VENDOR_BACKENDS = {
-    'isochrone': {
-        'car': 'ign_mock',
-        'public': 'navitia_mock',
-    },
-    'durations': {
-        'car': 'ign_mock',
-        'public': 'navitia_mock',
-    },
-}
-```

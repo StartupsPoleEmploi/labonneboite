@@ -15,7 +15,6 @@ from labonneboite.common.fetcher import Fetcher
 from labonneboite.common.es import Elasticsearch
 from labonneboite.conf import settings
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
-from .maps import travel
 
 
 logger = logging.getLogger('main')
@@ -55,7 +54,6 @@ class HiddenMarketFetcher(Fetcher):
         departments,
         romes=None,
         distance=None,
-        duration=None,
         travel_mode=None,
         sort=None,
         hiring_type=None,
@@ -73,7 +71,6 @@ class HiddenMarketFetcher(Fetcher):
 
         self.romes = romes
         self.distance = distance
-        self.duration = duration
         self.travel_mode = travel_mode
         self.sort = sort
         self.hiring_type = hiring_type
@@ -134,7 +131,6 @@ class HiddenMarketFetcher(Fetcher):
             self.latitude,
             self.longitude,
             distance,
-            duration=self.duration,
             travel_mode=self.travel_mode,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
@@ -154,7 +150,6 @@ class HiddenMarketFetcher(Fetcher):
             self.latitude,
             self.longitude,
             self.distance,
-            duration=self.duration,
             travel_mode=self.travel_mode,
             aggregate_by=["naf"],  # Only naf aggregate
             flag_junior=self.flag_junior,
@@ -174,7 +169,6 @@ class HiddenMarketFetcher(Fetcher):
             self.latitude,
             self.longitude,
             self.distance,
-            duration=self.duration,
             travel_mode=self.travel_mode,
             aggregate_by=["headcount"],  # Only headcount aggregate
             flag_junior=self.flag_junior,
@@ -199,7 +193,6 @@ class HiddenMarketFetcher(Fetcher):
             self.latitude,
             self.longitude,
             self.distance,
-            duration=self.duration,
             travel_mode=self.travel_mode,
             flag_junior=self.flag_junior,
             flag_senior=self.flag_senior,
@@ -234,7 +227,6 @@ class HiddenMarketFetcher(Fetcher):
             self.latitude,
             self.longitude,
             DISTANCE_FILTER_MAX,  # France
-            duration=self.duration,
             travel_mode=self.travel_mode,
             aggregate_by=["distance"],
             flag_junior=self.flag_junior,
@@ -276,7 +268,6 @@ class HiddenMarketFetcher(Fetcher):
                 self.latitude,
                 self.longitude,
                 self.distance,
-                duration=self.duration,
                 travel_mode=self.travel_mode,
                 from_number=self.from_number,
                 to_number=self.to_number,
@@ -432,7 +423,6 @@ def build_json_body_elastic_search(
     latitude,
     longitude,
     distance,
-    duration=None,
     travel_mode=None,
     from_number=None,
     to_number=None,
@@ -560,18 +550,6 @@ def build_json_body_elastic_search(
                 "flag_pmsmp": 1,
             }
         })
-
-    if duration is not None and gps_available:
-        isochrone = travel.isochrone((latitude, longitude), duration, mode=travel_mode)
-        if isochrone:
-            for polygon in isochrone:
-                should_filters.append({
-                    "geo_polygon": {
-                        "locations": {
-                            "points": [[p[1], p[0]] for p in polygon]
-                        }
-                    }
-                })
 
     main_query = {
         "filtered": {
