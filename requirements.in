@@ -27,7 +27,7 @@ pylint
 pip-tools
 
 # profiling tools used in create_index.py
-pycallgraph
+# pycallgraph
 pyprof2calltree
 line-profiler
 sentry-sdk>0.20.0
