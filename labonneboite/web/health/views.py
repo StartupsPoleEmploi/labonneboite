@@ -56,21 +56,5 @@ def health_uwsgi():
     return health_response(health_util.is_uwsgi_alive())
 
 
-@healthBlueprint.route('/ign/duration')
-def health_ign_duration():
-    """
-    Health check to test if IGN API duration is up.
-    """
-    return health_response(health_util.is_ign_duration_alive())
-
-
-@healthBlueprint.route('/ign/isochrone')
-def health_ign_isochrone():
-    """
-    Health check to test if IGN API isochrone is up.
-    """
-    return health_response(health_util.is_ign_isochrone_alive())
-
-
 def health_response(is_healthy):
     return make_response("yes" if is_healthy else "no")

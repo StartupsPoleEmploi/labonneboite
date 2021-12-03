@@ -8,7 +8,6 @@ from wtforms.widgets import HiddenInput
 from labonneboite.conf import settings
 from labonneboite.common import pro
 from labonneboite.common import sorting
-from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.search import AudienceFilter
 
 
@@ -33,10 +32,6 @@ class CompanySearchForm(FlaskForm):
         ('100', '100 km'),
         ('3000', '+ de 100 km'),
     )
-
-    DURATION_CHOICES = [
-        (str(dur), 'Moins de {:d} min'.format(dur)) for dur in maps_constants.ISOCHRONE_DURATIONS_MINUTES
-    ]
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -80,22 +75,10 @@ class CompanySearchForm(FlaskForm):
         validators=[Optional()])
 
     d = RadioField(
-        'Distance',
+        'Rayon de recherche',
         choices=DISTANCE_CHOICES,
         default=settings.DISTANCE_FILTER_DEFAULT,
         validators=[Optional()])
-
-    tr = HiddenField(
-        'Mode de transport',
-        default=maps_constants.DEFAULT_TRAVEL_MODE,
-        validators=[Optional()]
-    )
-
-    dur = RadioField(
-        'Temps de trajet',
-        choices=DURATION_CHOICES,
-        validators=[Optional()]
-    )
 
     def validate(self):
         """

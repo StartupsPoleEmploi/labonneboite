@@ -15,7 +15,6 @@ from labonneboite.common import sorting
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common.locations import CityLocation, Location, NamedLocation
-from labonneboite.common.maps import constants as maps_constants
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.common.util import get_enum_from_value
@@ -166,7 +165,6 @@ PARAMETER_FIELD_MAPPING = {
     'ij': 'related_rome_initial',
     'd': 'distance',
     'tr': 'travel_mode',
-    'dur': 'duration',
     'l': 'location',
     'h': 'headcount',
     'naf': 'naf',
@@ -187,17 +185,6 @@ def get_parameters(args):
         kwargs['distance'] = int(kwargs.get('distance'))
     except ValueError:
         kwargs['distance'] = settings.DISTANCE_FILTER_DEFAULT
-
-    kwargs['travel_mode'] = kwargs.get('travel_mode')
-    if kwargs['travel_mode'] not in maps_constants.TRAVEL_MODES:
-        kwargs['travel_mode'] = maps_constants.DEFAULT_TRAVEL_MODE
-
-    try:
-        kwargs['duration'] = int(kwargs.get('duration'))
-        if kwargs['duration'] not in maps_constants.ISOCHRONE_DURATIONS_MINUTES:
-            kwargs['duration'] = None
-    except (ValueError, TypeError):
-        kwargs['duration'] = None
 
     try:
         kwargs['headcount'] = int(kwargs.get('headcount'))
@@ -377,7 +364,6 @@ def entreprises():
         romes=[rome],
         distance=parameters['distance'],
         travel_mode=parameters['travel_mode'],
-        duration=parameters['duration'],
         sort=parameters['sort'],
         from_number=parameters['from_number'],
         to_number=parameters['to_number'],
@@ -410,8 +396,6 @@ def entreprises():
         for naf_aggregate in aggregations['naf']:
             naf_description = '%s (%s)' % (settings.NAF_CODES.get(naf_aggregate["code"]), naf_aggregate["count"])
             naf_codes_with_descriptions.append((naf_aggregate["code"], naf_description))
-
-    duration_filter_enabled = fetcher.duration is not None
 
     # Pagination.
     pagination_manager = pagination.PaginationManager(
@@ -457,9 +441,6 @@ def entreprises():
         'sort': fetcher.sort,
         'tile_server_url': settings.TILE_SERVER_URL,
         'travel_mode': fetcher.travel_mode,
-        'travel_modes': maps_constants.TRAVEL_MODES,
-        'travel_modes_french': maps_constants.TRAVEL_MODES_FRENCH,
-        'duration_filter_enabled': duration_filter_enabled,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
     }
 

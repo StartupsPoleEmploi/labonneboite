@@ -66,6 +66,7 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 - [Algo LBB : importer scripts and cycle](#importer)
 - [Algo LBB : weighted shuffling aka randomization of results](/labonneboite/doc/README-randomization.md)
 - [Single ROME versus multi-ROME search](#single-rome-vs-multi-rome-search)
+- [External services we use](#external-services-we-use)
 - [How to contribute](#how-to-contribute)
 - [Je Postule](#je-postule)
 - [Sending job applications to PE internal service AMI (API CSP)](/labonneboite/doc/README-ami-api-csp.md)
@@ -152,7 +153,7 @@ If needed, run `make clear-data` to clear any old/partial data you might already
 
 This is required for autocomplete and search to work
 
-    $ make create-index
+    $ make create-index-from-scratch
 
 #### Known issues
 
@@ -438,6 +439,13 @@ These two mechanisms will need to be unified because this will be easier to main
 
 CBS stands for Copenhagen Business School. They are providing a CSV file which is used to change the score_alternance field of companies. This data is manually injected in the SAVE tables with the script [cbs_to_save.py](labonneboite/scripts/cbs_to_save.py). [Here is a sample file to test](labonneboite/common/data/cbs_data_test.csv). Then the SAVE data is applied to change the companies records.
 
+
+## External services we use
+
+This is a list to be udated:
+
+- [removed] public transports durations: [Navitia](http://doc.navitia.io/#journeys)
+- [removed] car durations: [IGN](https://geoservices.ign.fr/documentation/geoservices/isochrones.html)
 
 ## How to contribute
 
