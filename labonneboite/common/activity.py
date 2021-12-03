@@ -34,7 +34,8 @@ def log(event_name, user=None, source=None, **properties):
         # Also the referrer will not have any query params
         # In local dev it has but not in production, because of a header and security
         # So we expect ajax calls to send params explicitely
-        args = request.values.to_dict()
+        dic = request.values.to_dict()
+        args = dict((k.lower(), v) for k, v in dic.items()) # all keys to lowercase as this will be stored as JSON
         args.pop('csrf_token', None) # Keep this out of the logs
     else:
         args = None
