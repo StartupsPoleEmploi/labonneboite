@@ -258,12 +258,14 @@ def update_coordinates_form():
         'new_contact_mode',
         CONTACT_MODES_LABEL_TO_FORM_VALUE.get(office.contact_mode, '')
     )
+    # populate public data
     form.new_website.data = request.form.get('new_website', office.website)
-    form.new_email.data = request.form.get('new_email', office.email)
-    form.new_phone.data = request.form.get('new_phone', office.phone)
     form.social_network.data = request.form.get('social_network', office.social_network)
-    form.new_phone_alternance.data = request.form.get('new_phone_alternance', office.phone_alternance)
-    form.new_email_alternance.data = request.form.get('new_email_alternance', office.email_alternance)
+    # retrive sensible data but keep it private (do not display)
+    new_email = request.form.get('new_email', office.email)
+    new_phone = request.form.get('new_phone', office.phone)
+    new_phone_alternance = request.form.get('new_phone_alternance', office.phone_alternance)
+    new_email_alternance = request.form.get('new_email_alternance', office.email_alternance)
 
     if form.validate_on_submit():
         form_valid = True
@@ -273,10 +275,10 @@ def update_coordinates_form():
         if contact_mode == 'website' and not form.new_website.data:
             flash(ERROR_CONTACT_MODE_MESSAGE.format('Via votre site internet', 'Site Internet'), 'error')
             form_valid = False
-        elif contact_mode == 'phone' and not form.new_phone.data:
+        elif contact_mode == 'phone' and not form.new_phone.data and not new_phone:
             flash(ERROR_CONTACT_MODE_MESSAGE.format('Par téléphone', 'Téléphone'), 'error')
             form_valid = False
-        elif contact_mode == 'email' and not form.new_email.data:
+        elif contact_mode == 'email' and not form.new_email.data and not new_email:
             flash(ERROR_CONTACT_MODE_MESSAGE.format('Par email', 'Email recruteur'), 'error')
             form_valid = False
 
