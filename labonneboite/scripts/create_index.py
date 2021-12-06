@@ -658,6 +658,7 @@ def update_offices(table):
                     # Apply changes in ElasticSearch.
                     body = {'doc':
                         {'email': office.email, 'phone': office.tel, 'website': office.website,
+                         "score": office.score, "score_alternance": office.score_alternance,
                         'flag_alternance': 1 if office.flag_alternance else 0}
                     }
 
