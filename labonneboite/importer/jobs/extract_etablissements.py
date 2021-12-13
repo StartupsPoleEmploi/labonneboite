@@ -445,7 +445,7 @@ class EtablissementExtractJob(Job):
         if get_current_env() != ENV_TEST:
             if unprocessable_departement_errors > 2500:
                 raise ValueError("too many unprocessable_departement_errors")
-            if no_zipcode_count > 78000: # 77k without zipcode
+            if no_zipcode_count > 85000: # 77k without zipcode
                 raise ValueError(f"too many no_zipcode_count: {no_zipcode_count}, sirets: {sirets_zipcount_empty}")
             if format_errors > 5:
                 raise ValueError("too many format_errors")
