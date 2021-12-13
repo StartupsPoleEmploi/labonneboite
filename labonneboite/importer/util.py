@@ -250,7 +250,9 @@ def get_select_fields_for_backoffice():
     fields += ", effectif, score_regr"
     for i in range(7, 0, -1):  # [7, 6, 5, 4, 3, 2, 1]
         fields += ", `dpae-period-%s`" % i
-    fields += ", score_alternance"
+    fields += ", score_alternance, score_alternance_regr"
+    for i in range(7, 0, -1):  # [7, 6, 5, 4, 3, 2, 1]
+        fields += ", `alt-period-%s`" % i
     fields += ', flag_poe_afpr, flag_pmsmp'
     return fields
 
@@ -443,6 +445,8 @@ IMPORTER_JOBS_ORDER = [
     'extract_etablissements',
     'check_dpae',
     'extract_dpae',
+    'check_lba',
+    'extract_lba',
     'compute_scores',
     'validate_scores',
     'geocode',
