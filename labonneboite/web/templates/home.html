@@ -25,21 +25,25 @@
 
       {% include "includes/search_form.html" %}
 
-      <div class="form-search-additional-fields">
-        La Bonne Boite vous aide à identifier les entreprises qui recrutent autour de vous. Recherchez, Postulez et
-        Trouvez votre prochain employeur
-      </div>
-
       {{ form.hidden_tag() }}
 
     </form>
 
-    {% if not pro_version_enabled %}
-      <p class="lbb-home-explanation lbb-grey small">
-        *Grâce à un algorithme exclusif de Pôle emploi détectant les entreprises qui vont probablement embaucher ces 6
-        prochains mois.
-      </p>
-    {% endif %}
+    {% set steps = [
+      (
+        "components/icon/transparency.svg",
+        "Recherchez un <strong>métier</strong> et la <strong>ville</strong> où vous voulez travailler" | safe
+      ), (
+        "components/icon/job.svg",
+        "Identifiez <strong>les entreprises qui vous intéressent</strong>" | safe
+      ), (
+        "components/icon/check.svg",
+        "Envoyez votre <strong>candidature spontanée</strong> !" | safe
+      )
+    ] %}
+    <section class="lbb-home-steps-view">
+      {% include "components/steps-view.html" %}
+    </section>
 
   </div>
 </div>

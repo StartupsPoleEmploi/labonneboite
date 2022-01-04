@@ -1,6 +1,10 @@
 /* Home Page.
 =========================================================================== */
 
+.lbb-home-steps-view .steps-view {
+    margin-top: 40px;
+}
+
 @media (min-width: 800px) {  /* For any browser width over 800px. */
 
     .lbb-home-title,

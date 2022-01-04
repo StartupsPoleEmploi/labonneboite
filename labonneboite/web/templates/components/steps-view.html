@@ -1,0 +1,65 @@
+<style>
+    .steps-view {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .steps-view::before {
+        content: "";
+        border-top: 4px dotted #54108E;
+        width: calc(min(100% - 40px, 930px) * 2 / 3);
+        position: absolute;
+        margin-left: calc(min(100% - 40px, 930px) / 6 + 20px);
+        margin-top: calc(60px + 24px + 46px / 2);
+        z-index: -1;
+    }
+    .steps-view--element {
+        justify-content: start;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        margin: 0;
+    }
+
+    .steps-view--element--icon {
+        height: 60px;
+    }
+
+    .steps-view--element--item {
+        display: flex;
+        justify-content: center;
+        border-radius: 50%;
+        align-self: center;
+        margin-top: 24px;
+
+        background-color: #54108E;
+        height: 46px;
+        width: 47.32px;
+        color: white;
+        font-family: Open Sans;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 33px;
+        line-height: 45px;
+    }
+
+    .steps-view--element--text {
+        padding: 18px 16px 0;
+    }
+</style>
+
+<div class="steps-view">
+    {% for step in steps %}
+        <div class="steps-view--element">
+            <div class="steps-view--element--icon">
+                {% include step[0] %}
+            </div>
+            <div class="steps-view--element--item">
+                    {{ loop.index }}
+            </div>
+            <div class="steps-view--element--text">
+                {{ step[1] }}
+            </div>
+        </div>
+    {% endfor %}
+</div>

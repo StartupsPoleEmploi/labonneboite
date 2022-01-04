@@ -1602,7 +1602,29 @@
     </div>
   </div>
 
+  <!-- ********************************** Steps-view ********************************** -->
+  <div class="lbb-content" id="steps-view">
+    <div class="lbb-single-column-content">
+      <div class="cookbook-title">steps-view</div>
+
+      {% set steps = [
+        (
+          "components/icon/transparency.svg",
+          "Recherchez un <strong>métier</strong> et la <strong>ville</strong> où vous voulez travailler" | safe
+        ), (
+          "components/icon/job.svg",
+          "Identifiez <strong>les entreprises qui vous intéressent</strong>" | safe
+        ), (
+          "components/icon/check.svg",
+          "Envoyez votre <strong>candidature spontanée</strong> !" | safe
+        )
+      ] %}
+      {% include "components/steps-view.html" %}
+    </div>
+  </div>
+  
   <!-- ********************************** Footer ********************************** -->
+  <div class="cookbook-title">Footer</div>
   <footer class="lbb-footer-wrapper">
     <div class="lbb-footer">
       <ul>
