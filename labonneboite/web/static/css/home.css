@@ -3,6 +3,7 @@
 
 .lbb-home-steps-view .steps-view {
     margin-top: 40px;
+    margin-bottom: 145px;
 }
 
 @media (min-width: 800px) {  /* For any browser width over 800px. */
@@ -17,4 +18,8 @@
         font-size: 0.85em;
     }
 
+    .lbb-home-steps-view .steps-view {
+        margin-top: 51px;
+        margin-bottom: 51px;
+    }
 }
