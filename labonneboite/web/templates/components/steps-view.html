@@ -1,0 +1,103 @@
+<style>
+    .steps-view {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .steps-view-dots {
+        content: "";
+        border-top: 4px dotted #54108E;
+        position: absolute;
+        margin-top: calc(60px + 24px + 46px / 2);
+        z-index: -1;
+    }
+
+    .steps-view--element {
+        justify-content: start;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        margin: 0;
+        flex: 1;
+    }
+
+    .steps-view--element--icon {
+        height: 60px;
+    }
+
+    .steps-view--element--item {
+        display: flex;
+        justify-content: center;
+        border-radius: 50%;
+        align-self: center;
+        margin-top: 24px;
+
+        background-color: #54108E;
+        height: 46px;
+        width: 47.32px;
+        color: white;
+        font-family: Open Sans;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 33px;
+        line-height: 45px;
+    }
+
+    .steps-view--element--text {
+        padding: 18px 16px 0;
+        font-size: 26px;
+    }
+
+    @media (max-width: 800px) {  /* Only for browsers < 800px. */
+        .steps-view {
+            flex-direction: column;
+        }
+
+        .steps-view-dots {
+            display: none;
+            
+        }
+
+        .steps-view--element:not(:last-child)::after {
+            content: '';
+            display: block;
+            height: 50px;
+            width: 0;
+            margin: 17px auto;
+            border-left: 4px dotted #54108E;
+        }
+
+        .steps-view--element--icon {
+            height: inherit;
+        }
+
+        .steps-view--element--item {
+            margin-top: 24px;
+        }
+
+        .steps-view--element--text {
+            margin-top: 0;
+            padding: 0;
+            font-size: 22px;
+        }
+    }
+</style>
+
+<div class="steps-view">
+    <div class="steps-view-dots" style="
+        width: calc(min(100% - 40px, 930px) * {{steps|length - 1}} / {{steps|length}});
+        margin-left: calc(min(100% - 40px, 930px) / {{steps|length * 2}} + 20px);"></div>
+    {% for step in steps %}
+        <div class="steps-view--element">
+            <div class="steps-view--element--icon">
+                {% include step[0] %}
+            </div>
+            <div class="steps-view--element--item">
+                    {{ loop.index }}
+            </div>
+            <div class="steps-view--element--text">
+                {{ step[1] }}
+            </div>
+        </div>
+    {% endfor %}
+</div>
