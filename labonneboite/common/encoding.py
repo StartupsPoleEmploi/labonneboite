@@ -1,4 +1,4 @@
-import unidecode
+from text_unidecode import unidecode
 
 def sanitize_string(s):
     """

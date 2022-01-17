@@ -9,7 +9,7 @@ import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from social_core import exceptions as social_exceptions
 from social_flask_sqlalchemy.models import init_social
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 from slugify import slugify
 
 # Flask.

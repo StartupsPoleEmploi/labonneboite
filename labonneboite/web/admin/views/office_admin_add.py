@@ -184,7 +184,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         },
         'x': {
             'filters': [strip_filter, nospace_filter],
-            'validators': [validators.required()],
+            'validators': [validators.DataRequired()],
         },
         'y': {
             'filters': [strip_filter, nospace_filter],

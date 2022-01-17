@@ -20,7 +20,7 @@ from labonneboite.common.util import get_enum_from_value
 from labonneboite.web.api import util as api_util
 from labonneboite.conf import settings
 from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter, FILTERS, DISTANCE_FILTER_MAX
-from flask.ext.cors import cross_origin
+from flask_cors import cross_origin
 
 apiBlueprint = Blueprint('api', __name__)
 

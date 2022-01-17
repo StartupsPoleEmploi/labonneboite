@@ -17,10 +17,10 @@ logger = logging.getLogger('main')
 
 
 class Job(object):
-    file_type = None
-    table_name = None
-    import_type = None
-    input_filename = None
+    file_type: str
+    table_name: str
+    import_type: int
+    input_filename: str
 
     @timeit
     def run(self):

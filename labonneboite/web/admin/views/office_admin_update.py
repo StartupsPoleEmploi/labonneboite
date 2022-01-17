@@ -37,11 +37,14 @@ HIDE_CHECKBOXES = {
 
 LITTLE_BOOST_VALUE = 75
 
+
 class RomeToRemoveException(Exception):
     pass
 
+
 class RomeToBoostException(Exception):
     pass
+
 
 class InvalidRome(Exception):
     pass
@@ -91,11 +94,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'new_office_name',
         'new_email',
         'new_phone',
-
         'email_alternance',
         'phone_alternance',
         'website_alternance',
-
         'new_website',
         'social_network',
         'remove_email',
@@ -105,10 +106,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'requested_by_first_name',
         'requested_by_last_name',
         'requested_by_phone',
-
         'certified_recruiter',
         'recruiter_uid',
-
         'reason',
         'created_by',
         'date_created',
@@ -140,39 +139,31 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'new_email': "Nouvel email",
         'new_phone': "Nouveau téléphone",
         'new_website': "Nouveau site web",
-
         'social_network': 'Réseau social',
-
         'remove_email': "Ne pas afficher l'email",
         'remove_phone': "Ne pas afficher le téléphone",
         'remove_website': "Ne pas afficher le site web",
         'email_alternance': "Email dédié à l'alternance",
         'phone_alternance': "Téléphone dédié à l'alternance",
         'website_alternance': "Site web dédié à l'alternance",
-
         'score': 'Modifier le score LBB',
         'score_alternance': 'Modifier le score LBA',
-
         'requested_by_email': "Email",
         'requested_by_first_name': "Prénom",
         'requested_by_last_name': "Nom",
         'requested_by_phone': "Téléphone",
         'date_created': "Date de création",
         'date_updated': "Date de modification",
-
         'certified_recruiter': 'Recruteur certifié',
         'recruiter_uid': 'Identifiant unique du recruteur',
-
         'created_by': "Créé par",
         'updated_by': "Modifié par",
     }
 
     column_descriptions = {
-        'sirets': Markup(
-            "Veuillez entrer un siret par ligne"
-            "<br>"
-            "Tous les sirets doivent être associés au même NAF (le premier NAF servant de référence)"
-        ),
+        'sirets': Markup("Veuillez entrer un siret par ligne"
+                         "<br>"
+                         "Tous les sirets doivent être associés au même NAF (le premier NAF servant de référence)"),
         'requested_by_email': "Email de la personne qui demande la modification.",
         'requested_by_first_name': "Prénom de la personne qui demande la modification.",
         'requested_by_last_name': "Nom de la personne qui demande la modification.",
@@ -183,26 +174,21 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             "<br>"
             "Si ce champ est renseigné, le score sera forcé uniquement pour le(s) ROME spécifié(s)."
             "<br>"
-            "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
-        ),
-        'nafs_to_add': Markup(
-            "Veuillez entrer un NAF par ligne."
-        ),
+            "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."),
+        'nafs_to_add': Markup("Veuillez entrer un NAF par ligne."),
         'romes_to_remove': Markup(
             "Veuillez entrer un ROME par ligne."
             "<br>"
             "Si ce champ est renseigné, le(s) ROME spécifié(s) ne seront plus associés à cette entreprise sur LBB."
             "<br>"
-            "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
-        ),
+            "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."),
         'romes_alternance_to_remove': Markup(
             "Veuillez entrer un ROME par ligne."
             "<br>"
             "Si ce champ est renseigné, le(s) ROME spécifié(s) "
             "ne seront plus associés à cette entreprise - pour l'alternance."
             "<br>"
-            "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."
-        ),
+            "<a href=\"/data/romes-for-siret\" target=\"_blank\">Trouver les ROME pour un SIRET</a>."),
         'new_company_name': "Laisser vide s'il n'y a pas de modification à apporter",
         'new_office_name': "Laisser vide s'il n'y a pas de modification à apporter",
         'new_email': "Laisser vide s'il n'y a pas de modification à apporter",
@@ -340,14 +326,12 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         company siret.
         """
         if name == 'create_view':
-            recruiter_message = self.get_recruiter_message(
-                request.args.get('recruiter_message_type'),
-                request.args.get('recruiter_message_id')
-            )
+            recruiter_message = self.get_recruiter_message(request.args.get('recruiter_message_type'),
+                                                           request.args.get('recruiter_message_id'))
             if recruiter_message:
                 office_update_conflict = models.OfficeAdminUpdate.query.filter(
-                    models.OfficeAdminUpdate.sirets.contains(recruiter_message.siret)
-                )
+                    models.OfficeAdminUpdate.sirets.contains(recruiter_message.siret)).order_by(
+                        OfficeAdminUpdate.date_created.desc())
                 if office_update_conflict.count():
                     params = {
                         'recruiter_message_id': recruiter_message.id,
@@ -388,10 +372,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         # Clean all styles before all
         self.form_widget_args = {}
 
-        recruiter_message = self.get_recruiter_message(
-            request.args.get('recruiter_message_type'),
-            request.args.get('recruiter_message_id')
-        )
+        recruiter_message = self.get_recruiter_message(request.args.get('recruiter_message_type'),
+                                                       request.args.get('recruiter_message_id'))
         if not recruiter_message:
             return form
 
@@ -409,8 +391,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         # we assume that he wants to appear on LBB
         # so we improve his score if too low
         ask_job_or_coordinate_changes = recruiter_message.name in [
-            models.UpdateCoordinatesRecruiterMessage.name,
-            models.UpdateJobsRecruiterMessage.name
+            models.UpdateCoordinatesRecruiterMessage.name, models.UpdateJobsRecruiterMessage.name
         ]
 
         if office and ask_job_or_coordinate_changes:
@@ -422,26 +403,19 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 self.set_update_style('score_alternance')
                 self.set_little_boost(form['score_alternance'], office.score_alternance)
 
-        office_admin_update = models.OfficeAdminUpdate.query.filter(models.OfficeAdminUpdate.id == form_id).first()
+        office_admin_update = models.OfficeAdminUpdate.query.filter(models.OfficeAdminUpdate.id == form_id).order_by(
+            OfficeAdminUpdate.date_created.desc()).first()
 
         # Common behavior
         recruiter_phone = recruiter_message.requested_by_phone
         recruiter_phone = clean_phone(recruiter_phone) if recruiter_phone else None
 
         self.handle_diff('requested_by_last_name', recruiter_message.requested_by_last_name, office_admin_update, form)
-        self.handle_diff(
-            'requested_by_first_name',
-            recruiter_message.requested_by_first_name,
-            office_admin_update,
-            form
-        )
+        self.handle_diff('requested_by_first_name', recruiter_message.requested_by_first_name, office_admin_update,
+                         form)
         self.handle_diff('requested_by_email', recruiter_message.requested_by_email, office_admin_update, form)
-        self.handle_diff(
-            'requested_by_first_name',
-            recruiter_message.requested_by_first_name,
-            office_admin_update,
-            form
-        )
+        self.handle_diff('requested_by_first_name', recruiter_message.requested_by_first_name, office_admin_update,
+                         form)
         self.handle_diff('requested_by_last_name', recruiter_message.requested_by_last_name, office_admin_update, form)
         self.handle_diff('requested_by_phone', recruiter_phone, office_admin_update, form)
         self.handle_diff('certified_recruiter', recruiter_message.certified_recruiter, office_admin_update, form)
@@ -459,12 +433,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             self.handle_diff('social_network', recruiter_message.social_network, office_admin_update, form)
             self.handle_diff('phone_alternance', new_phone_alternance, office_admin_update, form)
             self.handle_diff('email_alternance', recruiter_message.new_email_alternance, office_admin_update, form)
-            self.handle_diff(
-                'contact_mode',
-                CONTACT_MODES.get(recruiter_message.contact_mode, ''),
-                office_admin_update,
-                form
-            )
+            self.handle_diff('contact_mode', CONTACT_MODES.get(recruiter_message.contact_mode, ''), office_admin_update,
+                             form)
 
         elif recruiter_message.name == models.RemoveRecruiterMessage.name:
             # The field is a boolean in contact form but an integer in the OfficeAdminpdate
@@ -474,36 +444,20 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             self.handle_diff('score_alternance', new_score_alternance, office_admin_update, form)
 
         elif recruiter_message.name == models.UpdateJobsRecruiterMessage.name:
-            self.handle_diff(
-                'romes_to_boost',
-                self.format(recruiter_message.romes_to_add),
-                office_admin_update,
-                form
-            )
-            self.handle_diff(
-                'romes_alternance_to_boost',
-                self.format(recruiter_message.romes_alternance_to_add),
-                office_admin_update,
-                form
-            )
-            self.handle_diff(
-                'romes_to_remove',
-                self.format(self.filter_romes(recruiter_message.romes_to_remove, office.naf)),
-                office_admin_update,
-                form
-            )
-            self.handle_diff(
-                'romes_alternance_to_remove',
-                self.format(self.filter_romes(recruiter_message.romes_alternance_to_remove, office.naf)),
-                office_admin_update,
-                form
-            )
+            self.handle_diff('romes_to_boost', self.format(recruiter_message.romes_to_add), office_admin_update, form)
+            self.handle_diff('romes_alternance_to_boost', self.format(recruiter_message.romes_alternance_to_add),
+                             office_admin_update, form)
+            self.handle_diff('romes_to_remove',
+                             self.format(self.filter_romes(recruiter_message.romes_to_remove, office.naf)),
+                             office_admin_update, form)
+            self.handle_diff('romes_alternance_to_remove',
+                             self.format(self.filter_romes(recruiter_message.romes_alternance_to_remove, office.naf)),
+                             office_admin_update, form)
 
         elif recruiter_message.name == models.OtherRecruiterMessage.name:
             self.handle_diff('reason', recruiter_message.comment, office_admin_update, form)
 
         return form
-
 
     def handle_diff(self, form_field, new_value, office_admin_update, form):
         """
@@ -525,7 +479,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 self.check_checkbox(form, HIDE_CHECKBOXES[form_field])
             return
 
-
         # OfficeAdminUpdate update
         current_value = getattr(office_admin_update, form_field)
 
@@ -533,8 +486,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         if is_empty_field(current_value) and is_empty_field(new_value):
             self.set_update_style(form_field)
             return
-
-
 
         if current_value != new_value:
             form[form_field].data = new_value
@@ -553,32 +504,26 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 elif checkbox_field and new_value:
                     self.uncheck_checkbox(form, checkbox_field_name)
 
-
             # Update description with old value, added to the current description
             current_description = self.column_descriptions.get(form_field, '')
             new_description = Markup(DESCRIPTION_TEMPLATE.format(Markup.escape(current_value), current_description))
             form[form_field].description = new_description
 
-
         # Handle None and empty string value
         if is_empty_field(current_value) and is_empty_field(new_value):
             return
-
 
     def check_checkbox(self, form, checkbox_field_name):
         checkbox_current_description = self.column_descriptions.get(checkbox_field_name, '')
         form[checkbox_field_name].data = True
         form[checkbox_field_name].description = Markup(
-            DESCRIPTION_TEMPLATE.format("Case non cochée", checkbox_current_description)
-        )
+            DESCRIPTION_TEMPLATE.format("Case non cochée", checkbox_current_description))
 
     def uncheck_checkbox(self, form, checkbox_field_name):
         checkbox_current_description = self.column_descriptions.get(checkbox_field_name, '')
         form[checkbox_field_name].data = False
         form[checkbox_field_name].description = Markup(
-            DESCRIPTION_TEMPLATE.format("Case cochée", checkbox_current_description)
-        )
-
+            DESCRIPTION_TEMPLATE.format("Case cochée", checkbox_current_description))
 
     def validate_form(self, form):
         # Add http:// is missing
@@ -621,13 +566,11 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 # Avoid conflict with itself if update by adding id != request.args['id']
                 office_update_conflict = models.OfficeAdminUpdate.query.filter(
                     models.OfficeAdminUpdate.sirets.like("%{}%".format(siret)),
-                    models.OfficeAdminUpdate.id != request.args['id']
-                )
+                    models.OfficeAdminUpdate.id != request.args['id'])
             else:
                 office_update_conflict = models.OfficeAdminUpdate.query.filter(
-                    models.OfficeAdminUpdate.sirets.like("%{}%".format(siret))
-                )
-
+                    models.OfficeAdminUpdate.sirets.like("%{}%".format(siret)))
+            office_update_conflict = office_update_conflict.order_by(OfficeAdminUpdate.date_created.desc())
             if office_update_conflict.count() > 0:
                 message = """"
                     Le siret {} est déjà présent dans la fiche n°{}
@@ -694,7 +637,6 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
         return is_valid
 
-
     def validate_romes_to_remove(self, form, romes_to_remove_field, office_naf=None):
         romes_to_remove = form.data.get(romes_to_remove_field)
 
@@ -705,11 +647,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
                 office_romes = [item.code for item in mapping_util.romes_for_naf(office_naf)]
                 if rome not in office_romes:
                     msg = "`%s` n'est pas un code ROME lié au NAF de cette entreprise. Champ : '%s'" % (
-                            rome,
-                            self.column_labels[romes_to_remove_field]
-                        )
+                        rome, self.column_labels[romes_to_remove_field])
                     raise RomeToRemoveException(msg)
-
 
     def validate_romes_to_boost(self, form, romes_boost_field, boost_field):
         romes_to_boost = form.data.get(romes_boost_field)
@@ -718,21 +657,13 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             msg = "Vous devez cocher la case `%s`. " % self.column_labels[boost_field]
             raise RomeToBoostException(msg)
 
-
         for rome in models.OfficeAdminUpdate.as_list(romes_to_boost):
             self.validate_rome(rome, romes_boost_field)
-
 
     def validate_rome(self, rome, field_name):
         if not mapping_util.rome_is_valid(rome):
             msg = "`{}` n'est pas un code ROME valide. Assurez-vous de ne saisir qu'un élément par ligne. Champ : '{}'"
-            raise InvalidRome(
-                msg.format(
-                    rome,
-                    self.column_labels[field_name]
-                )
-            )
-
+            raise InvalidRome(msg.format(rome, self.column_labels[field_name]))
 
     def format(self, romes_str, char=','):
         return romes_str.replace(char, models.OfficeAdminUpdate.SEPARATORS[0]) if romes_str else romes_str
@@ -767,12 +698,13 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             </strong>
         """).format(score)
 
-
     def set_update_style(self, field_name):
-        self.form_widget_args.update({field_name:{'style': UPDATE_STYLE}})
+        self.form_widget_args.update({field_name: {'style': UPDATE_STYLE}})
+
 
 def clean_phone(phone):
     return phone.replace(" ", "").replace(".", "")
+
 
 def format_url(value):
     # Auto-adding http:// if missing

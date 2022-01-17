@@ -27,7 +27,7 @@ ERROR_CONTACT_MODE_MESSAGE = 'Vous avez indiqué vouloir être contacté \'{}\' 
 ERROR_MISSING_CONTACT_INFO = "Veuillez tout d'abord renseigner vos informations de contact"
 
 # Get form value from office.contact_mode text
-CONTACT_MODES_LABEL_TO_FORM_VALUE = {v:k for k, v in CONTACT_MODES.items()}
+CONTACT_MODES_LABEL_TO_FORM_VALUE = {v: k for k, v in CONTACT_MODES.items()}
 
 ACTION_NAMES = [
     'update_coordinates',
@@ -37,17 +37,13 @@ ACTION_NAMES = [
 ]
 
 ACTION_NAME_TO_TITLE = {
-    'update_coordinates':
-        "Demande de modification des informations d'une entreprise",
-    'update_jobs':
-        """
+    'update_coordinates': "Demande de modification des informations d'une entreprise",
+    'update_jobs': """
             Demande de modification des métiers pour lesquels
             une entreprise reçoit des candidatures spontanées
         """,
-    'delete':
-        "Demande de suppression d'une entreprise",
-    'other':
-        "Autre demande",
+    'delete': "Demande de suppression d'une entreprise",
+    'other': "Autre demande",
 }
 
 
@@ -55,6 +51,7 @@ def office_identification_required(function):
     """
     Decorator that validates office identification info.
     """
+
     @wraps(function)
     def decorated(*args, **kwargs):
         form = forms.OfficeHiddenIdentificationForm(data=request.values, meta={'csrf': False})
@@ -62,6 +59,7 @@ def office_identification_required(function):
             flash(ERROR_MISSING_CONTACT_INFO, 'error')
             return redirect(url_for('contact_form.change_info'))
         return function(*args, **kwargs)
+
     return decorated
 
 
@@ -104,7 +102,10 @@ def unknown_siret_message():
 def get_office_identification_data():
     return forms.OfficeHiddenIdentificationForm(data=request.args, meta={'csrf': False}).data
 
+
 MAX_ATTEMPTS = 2
+
+
 def sendMail(mail_content, subject):
     '''
         This function will send an email to us and retry in case of failure
@@ -122,6 +123,7 @@ def sendMail(mail_content, subject):
     else:
         logger.critical('Mail not sent (to settings.TO_EMAILS)', subject, mail_content)
         flash(generate_fail_flash_content(), 'error')
+
 
 @contactFormBlueprint.route('/verification-informations-entreprise', methods=['GET'])
 @contactFormBlueprint.route('/verification-informations-entreprise/<siret>', methods=['GET'])
@@ -210,12 +212,13 @@ def change_info():
         else:
             params = {key: form.data[key] for key in ['siret', 'last_name', 'first_name', 'phone', 'email']}
             if is_recruiter_from_lba():
-                params.update({"origin":"labonnealternance"})
+                params.update({"origin": "labonnealternance"})
             action_form_url = "contact_form.%s_form" % action_name
             url = url_for(action_form_url, **params)
             return redirect(url)
 
-    return render_template('contact_form/form.html',
+    return render_template(
+        'contact_form/form.html',
         title='Identifiez-vous',
         submit_text='suivant',
         extra_submit_class='identification-form',
@@ -230,7 +233,8 @@ def change_info():
 
 @contactFormBlueprint.route('/informations-entreprise/action', methods=['GET'])
 def ask_action():
-    return render_template('contact_form/ask_action.html',
+    return render_template(
+        'contact_form/ask_action.html',
         title='Que voulez-vous faire ?',
         use_lba_template=is_recruiter_from_lba(),
         siret=request.args.get('siret', ''),
@@ -254,10 +258,8 @@ def update_coordinates_form():
     form = forms.OfficeUpdateCoordinatesForm(data=form_data)
 
     # Fill form with form value (or office value by default)
-    form.new_contact_mode.data = request.form.get(
-        'new_contact_mode',
-        CONTACT_MODES_LABEL_TO_FORM_VALUE.get(office.contact_mode, '')
-    )
+    form.new_contact_mode.data = request.form.get('new_contact_mode',
+                                                  CONTACT_MODES_LABEL_TO_FORM_VALUE.get(office.contact_mode, ''))
     # populate public data
     form.new_website.data = request.form.get('new_website', office.website)
     form.social_network.data = request.form.get('social_network', office.social_network)
@@ -286,8 +288,7 @@ def update_coordinates_form():
             recruiter_message = models.UpdateCoordinatesRecruiterMessage.create_from_form(
                 form,
                 is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
-                uid=peam_recruiter.get_recruiter_uid()
-            )
+                uid=peam_recruiter.get_recruiter_uid())
             mail_content = mail.generate_update_coordinates_mail(form, recruiter_message)
 
             sendMail(mail_content=mail_content, subject=get_subject())
@@ -298,7 +299,8 @@ def update_coordinates_form():
             })
             return redirect(url_for('contact_form.success', **params))
 
-    return render_template('contact_form/form.html',
+    return render_template(
+        'contact_form/form.html',
         title='Modifier ma fiche entreprise',
         form=form,
         params=urlencode(get_office_identification_data()),
@@ -331,7 +333,9 @@ def update_jobs_form():
         extra_romes_to_add = set()
         extra_romes_alternance_to_add = set()
 
-        office_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets == office.siret).first()
+        office_filter = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets == office.siret).order_by(
+            OfficeAdminUpdate.date_created.desc())
+        office_update = office_filter.first()
         if office_update:
             if office_update.romes_to_boost:
                 romes_to_boost = set(OfficeAdminUpdate.as_list(office_update.romes_to_boost))
@@ -354,8 +358,7 @@ def update_jobs_form():
         recruiter_message = models.UpdateJobsRecruiterMessage.create_from_form(
             form,
             is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
-            uid=peam_recruiter.get_recruiter_uid()
-        )
+            uid=peam_recruiter.get_recruiter_uid())
         mail_content = mail.generate_update_jobs_mail(form, recruiter_message)
 
         sendMail(mail_content=mail_content, subject=get_subject())
@@ -366,17 +369,15 @@ def update_jobs_form():
         })
         return redirect(url_for('contact_form.success', **params))
 
-    extra_added_jobs = [
-        {
-            'rome_code': rome_code,
-            'label': settings.ROME_DESCRIPTIONS[rome_code],
-            'lbb': rome_code in extra_romes_to_add,
-            'lba': rome_code in extra_romes_alternance_to_add,
-        }
-        for rome_code in extra_romes_to_add | extra_romes_alternance_to_add
-    ]
+    extra_added_jobs = [{
+        'rome_code': rome_code,
+        'label': settings.ROME_DESCRIPTIONS[rome_code],
+        'lbb': rome_code in extra_romes_to_add,
+        'lba': rome_code in extra_romes_alternance_to_add,
+    } for rome_code in extra_romes_to_add | extra_romes_alternance_to_add]
 
-    return render_template('contact_form/change_job_infos.html',
+    return render_template(
+        'contact_form/change_job_infos.html',
         title='Demande de modification des métiers',
         form=form,
         params=urlencode(get_office_identification_data()),
@@ -397,8 +398,7 @@ def delete_form():
         recruiter_message = models.RemoveRecruiterMessage.create_from_form(
             form,
             is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
-            uid=peam_recruiter.get_recruiter_uid()
-        )
+            uid=peam_recruiter.get_recruiter_uid())
         mail_content = mail.generate_delete_mail(form, recruiter_message)
 
         sendMail(mail_content=mail_content, subject=get_subject())
@@ -406,7 +406,8 @@ def delete_form():
         params = request.args.to_dict()
         return redirect(url_for('contact_form.success', **params))
 
-    return render_template('contact_form/form.html',
+    return render_template(
+        'contact_form/form.html',
         title='Supprimer mon entreprise',
         form=form,
         params=urlencode(get_office_identification_data()),
@@ -426,8 +427,7 @@ def other_form():
         recruiter_message = models.OtherRecruiterMessage.create_from_form(
             form,
             is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
-            uid=peam_recruiter.get_recruiter_uid()
-        )
+            uid=peam_recruiter.get_recruiter_uid())
         mail_content = mail.generate_other_mail(form, recruiter_message)
 
         sendMail(mail_content=mail_content, subject=get_subject())
@@ -453,7 +453,8 @@ def success():
     if is_lba:
         params.update({'origin': 'labonnealternance'})
 
-    return render_template('contact_form/success_message.html',
+    return render_template(
+        'contact_form/success_message.html',
         use_lba_template=is_lba,
         email=settings.LBA_EMAIL if is_lba else settings.LBB_EMAIL,
         home_url="https://labonnealternance.pole-emploi.fr" if is_lba else url_for('root.home'),

@@ -6,7 +6,7 @@ from babel.dates import format_date
 from flask import url_for
 from slugify import slugify
 from sqlalchemy import PrimaryKeyConstraint, Index
-from werkzeug import cached_property
+from werkzeug.utils import cached_property
 
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import hiring_type_util
@@ -22,7 +22,6 @@ from labonneboite.importer import settings as importer_settings
 from labonneboite.common.models import FinalOfficeMixin, OfficeAdminUpdate
 
 logger = logging.getLogger('main')
-
 
 CITY_NAMES = load_city_codes()
 
@@ -72,13 +71,14 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     def __unicode__(self):
         return "%s - %s" % (self.siret, self.name)
 
-    def as_json(self,
-            rome_codes=None,
-            hiring_type=None,
-            distance=None,
-            zipcode=None,
-            extra_query_string=None,
-        ):
+    def as_json(
+        self,
+        rome_codes=None,
+        hiring_type=None,
+        distance=None,
+        zipcode=None,
+        extra_query_string=None,
+    ):
         """
         `rome_codes`: optional parameter, used only in case of being in the context
         of a search by ROME codes (single rome or multi rome).
@@ -97,11 +97,11 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         `extra_query_string` (dict): extra query string to be added to the API
         urls for each office. Typically some Google Analytics trackers.
         """
-        if rome_codes is None:        # no rome search context
+        if rome_codes is None:  # no rome search context
             rome_code = None
-        elif len(rome_codes) == 1:    # single rome search context
+        elif len(rome_codes) == 1:  # single rome search context
             rome_code = rome_codes[0]
-        else:                         # multi rome search context
+        else:  # multi rome search context
             rome_code = self.matched_rome
 
         alternance = hiring_type == hiring_type_util.ALTERNANCE
@@ -118,7 +118,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             'name': self.name,
             'siret': self.siret,
             'stars': self.get_stars_for_rome_code(rome_code, hiring_type),
-            'url':  self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
+            'url': self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
             'contact_mode': util.get_contact_mode_for_rome_and_office(rome_code, self),
             'social_network': self.social_network or '',
             'alternance': self.qualifies_for_alternance(),
@@ -217,9 +217,10 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         # such a score.
         # We still have to check that there actually is a SAVE record
         # specifically asking for this removal.
-        office_admin_update = OfficeAdminUpdate.query.filter(
-            OfficeAdminUpdate.sirets.like("%{}%".format(self.siret))
-        ).filter_by(score_alternance=0).first()
+        office_admin_filter = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets.like(f"%{self.siret}%"))
+        office_admin_filter = office_admin_filter.filter_by(score_alternance=0)
+        office_admin_filter = office_admin_filter.order_by(OfficeAdminUpdate.date_created.desc())
+        office_admin_update: OfficeAdminUpdate = office_admin_filter.first()
         return bool(office_admin_update)
 
     @property
@@ -283,11 +284,9 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         if hiring_type not in hiring_type_util.VALUES:
             raise ValueError("Unknown hiring_type")
         raw_score = self.score if hiring_type == hiring_type_util.DPAE else self.score_alternance
-        return scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-            score=raw_score,
-            rome_code=rome_code,
-            naf_code=self.naf
-            )
+        return scoring_util.get_score_adjusted_to_rome_code_and_naf_code(score=raw_score,
+                                                                         rome_code=rome_code,
+                                                                         naf_code=self.naf)
 
     def get_stars_for_rome_code(self, rome_code, hiring_type=None):
         score = self.get_score_for_rome_code(rome_code, hiring_type)
@@ -312,8 +311,17 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     def get_url_for_rome_code(self, rome_code, alternance=False, **query_string):
         try:
             if rome_code:
-                return url_for('office.details', siret=self.siret, rome_code=rome_code, _external=True, contract='alternance' if alternance else None, **query_string)
-            return url_for('office.details', siret=self.siret, contract='alternance' if alternance else None, _external=True, **query_string)
+                return url_for('office.details',
+                               siret=self.siret,
+                               rome_code=rome_code,
+                               _external=True,
+                               contract='alternance' if alternance else None,
+                               **query_string)
+            return url_for('office.details',
+                           siret=self.siret,
+                           contract='alternance' if alternance else None,
+                           _external=True,
+                           **query_string)
         except RuntimeError:
             # RuntimeError is raised when we are outside of a Flask's application context.
             # Here, we cannot properly generate an URL via url_for.

@@ -10,6 +10,7 @@ from labonneboite.common import mailjet
 from labonneboite.web.contact_form import forms
 from labonneboite.web.auth.backends.peam_recruiter import SessionKeys, is_certified_recruiter
 
+
 def compute_action_name(form):
     form_to_action = {
         'OfficeUpdateCoordinatesForm': 'Mise à jour des coordonnées',
@@ -47,16 +48,17 @@ def common_mail_template(form):
         unique_recruiter_id,
     )
 
+
 # get ready to send emails
 mailJetClient = mailjet.MailJetClient(settings.MAILJET_API_KEY, settings.MAILJET_API_SECRET)
 
+
 def send_mail(mail_content, subject):
-    mailJetClient.send(
-        subject=subject,
-        html_content=mail_content,
-        from_email=settings.FROM_EMAIL,
-        recipients=settings.TO_EMAILS
-    )
+    mailJetClient.send(subject=subject,
+                       html_content=mail_content,
+                       from_email=settings.FROM_EMAIL,
+                       recipients=settings.TO_EMAILS)
+
 
 def generate_update_coordinates_mail(form, recruiter_message):
     return """
@@ -77,21 +79,14 @@ def generate_update_coordinates_mail(form, recruiter_message):
         La Bonne Boite & La Bonne alternance
     """.format(
         common_mail_template(form),
-
         escape(form.new_website.data),
         escape(form.new_email.data),
         escape(form.new_phone.data),
-
         forms.OfficeUpdateCoordinatesForm.CONTACT_MODES_LABELS.get(form.new_contact_mode.data, 'Inconnu'),
-
         escape(form.new_email_alternance.data),
         escape(form.new_phone_alternance.data),
         escape(form.social_network.data),
-        make_save_suggestion(
-            form,
-            recruiter_message,
-            models.UpdateCoordinatesRecruiterMessage.name
-        ),
+        make_save_suggestion(form, recruiter_message, models.UpdateCoordinatesRecruiterMessage.name),
     )
 
 
@@ -190,15 +185,15 @@ def make_save_suggestion(form, recruiter_message, recruiter_message_type):
         return 'Aucune entreprise trouvée avec le siret {}'.format(form.siret.data)
 
     # OfficeAdminAdd already exists ?
-    office_admin_add = OfficeAdminAdd.query.filter_by(siret=form.siret.data).first()
+    office_admin_add = OfficeAdminAdd.query.filter_by(siret=form.siret.data).order_by(
+        OfficeAdminAdd.date_created.desc()).first()
     if office_admin_add:
         url = url_for("officeadminadd.edit_view", id=office_admin_add.id, **params)
         return "Entreprise créée via Save : <a href='{}'>Voir la fiche d'ajout</a>".format(url)
 
     # OfficeAdminUpdate already exits ?
-    office_admin_update = OfficeAdminUpdate.query.filter(
-        OfficeAdminUpdate.sirets.contains(form.siret.data)
-    ).first()
+    office_admin_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets.contains(form.siret.data)).order_by(
+        OfficeAdminUpdate.date_created.desc()).first()
     if office_admin_update:
         url = url_for("officeadminupdate.edit_view", id=office_admin_update.id, **params)
         return "Entreprise modifiée via Save : <a href='{}'>Voir la fiche de modification</a>".format(url)

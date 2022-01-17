@@ -1,4 +1,3 @@
-
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
 from labonneboite.common.models import UserFavoriteOffice
@@ -202,7 +201,8 @@ class FavoriteTest(FavoriteBaseTest):
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, url_search_with_domain)
 
-            favorites = UserFavoriteOffice.query.filter(UserFavoriteOffice.user_id == self.user.id).all()
+            favorites = UserFavoriteOffice.query.filter(UserFavoriteOffice.user_id == self.user.id).filter(
+                UserFavoriteOffice.date_created.desc()).all()
             self.assertEqual(1, len(favorites))
             self.assertEqual(office.siret, favorites[0].office_siret)
 

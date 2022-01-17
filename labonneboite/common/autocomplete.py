@@ -1,6 +1,6 @@
 from functools import lru_cache
 from slugify import slugify
-import unidecode
+from text_unidecode import unidecode
 from labonneboite.common.es import Elasticsearch
 from labonneboite.conf import settings
 

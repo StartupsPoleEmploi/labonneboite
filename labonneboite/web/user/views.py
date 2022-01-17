@@ -26,7 +26,6 @@ from labonneboite.common.pagination import Pagination, FAVORITES_PER_PAGE
 from labonneboite.web.user.forms import UserAccountDeleteForm
 from labonneboite.web.utils import fix_csrf_session
 
-
 userBlueprint = Blueprint('user', __name__)
 
 
@@ -117,15 +116,20 @@ def favorites_list_as_csv():
         attachment_name='mes_favoris.csv',
     )
 
+
 @userBlueprint.route('/favorites/list/download/pdf')
 @flask_login.login_required
 def favorites_list_as_pdf():
-    favorites = UserFavoriteOffice.query.filter(UserFavoriteOffice.user_id == current_user.id)
+    favorites = UserFavoriteOffice.query.filter(UserFavoriteOffice.user_id == current_user.id).filter(
+        UserFavoriteOffice.date_created.desc())
     # TODO this is probably wildly inefficient. Can we do this in just one query?
     companies = [favorite.office for favorite in favorites]
     pdf_file = pdf_util.render_favorites(companies)
-    return send_file(pdf_file, mimetype='application/pdf', as_attachment=True,
-                     attachment_filename='mes_favoris.pdf', cache_timeout=5)
+    return send_file(pdf_file,
+                     mimetype='application/pdf',
+                     as_attachment=True,
+                     attachment_filename='mes_favoris.pdf',
+                     cache_timeout=5)
 
 
 def make_csv_response(csv_text, attachment_name):
@@ -148,7 +152,8 @@ def favorites_list():
     except (TypeError, ValueError):
         page = 1
 
-    favorites = UserFavoriteOffice.query.filter(UserFavoriteOffice.user_id == current_user.id)
+    favorites = UserFavoriteOffice.query.filter(UserFavoriteOffice.user_id == current_user.id).filter(
+        UserFavoriteOffice.date_created.desc())
     limit = FAVORITES_PER_PAGE
     pagination = Pagination(page, limit, favorites.count())
     if page > 1:
@@ -214,7 +219,8 @@ def favorites_delete(siret):
     if current_app.config['WTF_CSRF_ENABLED']:
         csrf.validate_csrf(request.form.get('csrf_token'))
 
-    fav = UserFavoriteOffice.query.filter_by(office_siret=siret, user_id=current_user.id).first()
+    fav = UserFavoriteOffice.query.filter_by(office_siret=siret, user_id=current_user.id).filter(
+        UserFavoriteOffice.date_created.desc()).first()
     if not fav:
         abort(404)
 

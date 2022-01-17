@@ -4,6 +4,7 @@ import logging
 
 from enum import auto, Enum
 from slugify import slugify
+from typing import Optional
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import sorting
@@ -46,6 +47,7 @@ class HiddenMarketFetcher(Fetcher):
     Fetch offices having a high hiring potential whether or not they
     have public job offers.
     """
+    office_count: Optional[int]
 
     def __init__(
         self,
