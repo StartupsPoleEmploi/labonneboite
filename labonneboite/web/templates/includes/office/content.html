@@ -48,9 +48,11 @@
           <li>
             <a href="{{ company.google_url }}" target="_blank" rel="noopener noreferrer" onclick="trackOutboundLink('{{ company.google_url }}');">Google</a>
           </li>
+          {% if user_is_pro %}
           <li>
             <a href="{{ company.kompass_url }}" target="_blank" rel="noopener noreferrer" onclick="trackOutboundLink('{{ company.kompass_url }}');">Kompass</a>
           </li>
+          {% endif %}
           <li class="small">
             SIRET : {{ company.siret }}
           </li>
