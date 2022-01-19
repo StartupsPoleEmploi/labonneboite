@@ -615,3 +615,10 @@ class ApiBaseTest(DatabaseTest):
     def get_fixture(self, fixture):
         fixture_path = os.path.join(os.path.dirname(__file__), 'fixtures', fixture)
         return json.load(open(fixture_path))
+
+    def get_json(self, response: Response) -> dict:
+        self.assertEqual(response.content_type, 'application/json')
+        data: bytes = response.data
+        text: str = data.decode(response.content_encoding or 'utf-8')
+        json_response = json.loads(text)
+        return json_response
