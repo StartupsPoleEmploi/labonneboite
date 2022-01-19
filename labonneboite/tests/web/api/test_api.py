@@ -1469,14 +1469,17 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertNotIn('/entreprises', data['url'])
             self.assertIn(url_for("root.home", _external=True), data['url'])
 
-    def test_empty_result_returns_home_url_instead_of_search_url(self):
+    def test_empty_result_returns_a_valid_search_url(self):
+        commune_id = self.positions['caen']['commune_id']
+        rome_codes = 'J1103'  # no office has this ROME code
+
         with self.test_request_context():
             params = self.add_security_params({
-                'commune_id': self.positions['caen']['commune_id'],
+                'commune_id': commune_id,
                 'distance': 20,
                 'page': 1,
                 'page_size': 2,
-                'rome_codes': 'J1103',  # no office has this ROME code
+                'rome_codes': rome_codes,
                 'user': 'labonneboite',
             })
 
@@ -1488,8 +1491,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 0)
 
             # ensure we return home URL and not search URL
-            self.assertNotIn('/entreprises', data['url'])
-            self.assertIn(url_for("root.home", _external=True), data['url'])
+            expect = f'/entreprises/commune/{commune_id}/rome/{rome_codes}'
+            self.assertIn(expect, data['url'])
 
     def test_company_count_endpoint(self):
         with self.test_request_context():

@@ -199,11 +199,6 @@ def compute_frontend_url(fetcher, query_string, commune_id, departments):
     Compute web page URL that corresponds to the API request.
     """
 
-    if not fetcher.office_count >= 1:
-        # Always return home URL if zero results
-        # (requested by PE.fr)
-        return url_for('root.home', _external=True, **query_string)
-
     if fetcher.romes:
         # preserve parameters from original API request
         if fetcher.naf_codes:
