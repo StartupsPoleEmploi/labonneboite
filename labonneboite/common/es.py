@@ -1,6 +1,7 @@
-from datetime import datetime
 import random
 import string
+from datetime import datetime
+from typing import Optional
 
 import elasticsearch
 
@@ -12,10 +13,10 @@ LOCATION_TYPE = 'location'
 
 
 class ConnectionPool(object):
-    ELASTICSEARCH_INSTANCE = None
+    ELASTICSEARCH_INSTANCE: Optional[elasticsearch.Elasticsearch] = None
 
 
-def Elasticsearch():
+def Elasticsearch() -> elasticsearch.Elasticsearch:
     """
     Elasticsearch client singleton. All connections to ES should go through
     this client, so that we can reuse ES connections and not flood ES with new
@@ -26,15 +27,12 @@ def Elasticsearch():
     return ConnectionPool.ELASTICSEARCH_INSTANCE
 
 
-def new_elasticsearch_instance():
+def new_elasticsearch_instance() -> elasticsearch.Elasticsearch:
     """
     In some cases e.g. parallel jobs you may need a dedicated es connection for each
     of your threads.
     """
-    return elasticsearch.Elasticsearch(
-        hosts=[settings.ES_HOST],
-        timeout=settings.ES_TIMEOUT
-    )
+    return elasticsearch.Elasticsearch(hosts=[settings.ES_HOST], timeout=settings.ES_TIMEOUT)
 
 
 def drop_and_create_index():
@@ -182,7 +180,7 @@ def create_index(index):
                         "type": "string",
                         "index": "not_analyzed",
                     },
-                    "autocomplete" : {
+                    "autocomplete": {
                         "type": "string",
                         "analyzer": "autocomplete",
                     },
@@ -283,7 +281,7 @@ def create_index(index):
                 },
             },
         },
-        "mappings":  {
+        "mappings": {
             "ogr": mapping_ogr,
             "location": mapping_location,
             "office": mapping_office,
@@ -294,6 +292,7 @@ def create_index(index):
 
     fake_doc = fake_office()
     Elasticsearch().index(index=index, doc_type=OFFICE_TYPE, id=fake_doc['siret'], body=fake_doc)
+
 
 # This fake office having a zero but existing score for each rome is designed
 # as a workaround of the following bug:

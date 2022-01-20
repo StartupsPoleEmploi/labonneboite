@@ -122,3 +122,4 @@ werkzeug==0.11.10         # via flask, flask-debugtoolbar
 wrapt==1.10.10            # via astroid
 wtforms==2.1
 xhtml2pdf==0.2.2
+zipp==3.6.0
