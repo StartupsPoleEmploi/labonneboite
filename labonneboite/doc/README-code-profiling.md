@@ -70,7 +70,3 @@ def get_scores_by_rome(office, office_to_update=None):
 ```
 
 You can perfectly profile methods in other parts of the code than `create_index.py`.
-
-Here is an example of output:
-
-![](https://www.evernote.com/l/ABJdN3iVDEJFgLeH2HgHyYOVMjOYK0a30e4B/image.png)
