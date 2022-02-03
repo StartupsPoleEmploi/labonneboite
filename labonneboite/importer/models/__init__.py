@@ -1,0 +1,16 @@
+from .computing import (
+    Hiring,
+    RawOffice,
+    ExportableOffice,
+    Geolocation,
+    ImportTask,
+    DpaeStatistics,
+    LogsIDPEConnect,
+    LogsActivity,
+    LogsActivityRecherche,
+    LogsActivityDPAEClean,
+    HistoryImporterJobs,
+    PerfImporterCycleInfos,
+    PerfPredictionAndEffectiveHirings,
+    PerfDivisionPerRome,
+)

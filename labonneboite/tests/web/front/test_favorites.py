@@ -1,4 +1,3 @@
-
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
 from labonneboite.common.models import UserFavoriteOffice
@@ -35,7 +34,10 @@ class FavoriteBaseTest(DatabaseTest):
         super(FavoriteBaseTest, self).setUp()
 
         # Create a user.
-        self.user = User.create(email='j@test.com', gender='male', first_name='John', last_name='Doe')
+        self.user = User.create(email='j@test.com',
+                                gender='male',
+                                first_name='John',
+                                last_name='Doe')
 
         # Insert test data into Elasticsearch.
         docs = [
@@ -73,7 +75,10 @@ class FavoriteBaseTest(DatabaseTest):
             },
         ]
         for i, doc in enumerate(docs, start=1):
-            self.es.index(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=i, body=doc)
+            self.es.index(index=settings.ES_INDEX,
+                          doc_type=es.OFFICE_TYPE,
+                          id=i,
+                          body=doc)
 
         # Required by ES to register new documents, flaky test here otherwise.
         self.es.indices.flush(index=settings.ES_INDEX)
@@ -92,7 +97,9 @@ class FavoriteBaseTest(DatabaseTest):
                     break
 
             if not commune_id:
-                raise ValueError("Cannot create an entry in Office with a city absent from self.positions.")
+                raise ValueError(
+                    "Cannot create an entry in Office with a city absent from self.positions."
+                )
 
             office = Office(
                 company_name=doc['name'],
@@ -133,7 +140,8 @@ class FavoriteTest(FavoriteBaseTest):
             self.login(self.user)
 
             # Create a favorite for the user.
-            UserFavoriteOffice.create(user_id=self.user.id, office_siret=office.siret)
+            UserFavoriteOffice.create(user_id=self.user.id,
+                                      office_siret=office.siret)
 
             rv = self.app.get(url)
             self.assertEqual(rv.status_code, 200)
@@ -158,10 +166,12 @@ class FavoriteTest(FavoriteBaseTest):
 
             rv = self.app.get(url_list)
             self.assertEqual(rv.status_code, 200)
-            self.assertTrue('Aucun favori pour le moment.' in rv.data.decode('utf-8'))
+            self.assertTrue(
+                'Aucun favori pour le moment.' in rv.data.decode('utf-8'))
 
             # Create a favorite for the user.
-            UserFavoriteOffice.create(user_id=self.user.id, office_siret=office.siret)
+            UserFavoriteOffice.create(user_id=self.user.id,
+                                      office_siret=office.siret)
 
             rv = self.app.get(url_list)
             self.assertEqual(rv.status_code, 200)
@@ -172,9 +182,12 @@ class FavoriteTest(FavoriteBaseTest):
         """
         Test the creation of a favorite.
         """
+        rome_code = 'M1805'
         office = Office.query.filter(Office.siret == '00000000000002').one()
         url_list = self.url_for('user.favorites_list')
-        url_add = self.url_for('user.favorites_add', siret=office.siret)
+        url_add = self.url_for('user.favorites_add',
+                               siret=office.siret,
+                               rome_code=rome_code)
         url_search_without_domain = '/entreprises/nancy-54100/strategie-commerciale'
         url_search_with_domain = 'http://labonneboite.pole-emploi.fr' + url_search_without_domain
 
@@ -188,7 +201,8 @@ class FavoriteTest(FavoriteBaseTest):
 
             rv = self.app.get(url_list)
             self.assertEqual(rv.status_code, 200)
-            self.assertTrue('Aucun favori pour le moment.' in rv.data.decode('utf-8'))
+            self.assertTrue(
+                'Aucun favori pour le moment.' in rv.data.decode('utf-8'))
 
             # Adding favorite without next_url :
             # User should be redirected to the favorites list by default.
@@ -198,13 +212,16 @@ class FavoriteTest(FavoriteBaseTest):
 
             # Adding favorite from search results - the realistic case.
             # User should be redirected back to the search results.
-            rv = self.app.post(url_add, data={'next': url_search_without_domain})
+            rv = self.app.post(url_add,
+                               data={'next': url_search_without_domain})
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, url_search_with_domain)
 
-            favorites = UserFavoriteOffice.query.filter(UserFavoriteOffice.user_id == self.user.id).all()
+            favorites = UserFavoriteOffice.query.filter(
+                UserFavoriteOffice.user_id == self.user.id).all()
             self.assertEqual(1, len(favorites))
             self.assertEqual(office.siret, favorites[0].office_siret)
+            self.assertEqual(rome_code, favorites[0].rome_code)
 
             rv = self.app.get(url_list)
             self.assertEqual(rv.status_code, 200)
@@ -218,6 +235,27 @@ class FavoriteTest(FavoriteBaseTest):
             # Understand why this is working inside the `with` clause:
             # user = User.query.filter(User.id == self.user.id).one()
             # self.assertEqual(1, len(user.favorite_offices))
+
+    def test_favorites_add_without_rome_code(self):
+        """
+        Test the creation of a favorite.
+        """
+        siret = '00000000000002'
+        url_add = self.url_for('user.favorites_add', siret=siret)
+
+        self.assertEqual(0, UserFavoriteOffice.query.filter(
+            UserFavoriteOffice.user_id == self.user.id).count())
+        with self.test_request_context():
+            self.login(self.user)
+
+            rv = self.app.post(url_add)
+            self.assertEqual(rv.status_code, 302)
+
+        favorites = UserFavoriteOffice.query.filter(
+            UserFavoriteOffice.user_id == self.user.id).all()
+        self.assertEqual(1, len(favorites))
+        self.assertEqual(siret, favorites[0].office_siret)
+        self.assertIsNone(favorites[0].rome_code)
 
     def test_favorites_delete(self):
         """
@@ -238,7 +276,8 @@ class FavoriteTest(FavoriteBaseTest):
             self.login(self.user)
 
             # Create a favorite for the user.
-            UserFavoriteOffice.create(user_id=self.user.id, office_siret=office.siret)
+            UserFavoriteOffice.create(user_id=self.user.id,
+                                      office_siret=office.siret)
 
             rv = self.app.get(url_list)
             self.assertEqual(rv.status_code, 200)
@@ -252,22 +291,26 @@ class FavoriteTest(FavoriteBaseTest):
             self.assertEqual(rv.location, url_list)
 
             # Create again the favorite for the user.
-            UserFavoriteOffice.create(user_id=self.user.id, office_siret=office.siret)
+            UserFavoriteOffice.create(user_id=self.user.id,
+                                      office_siret=office.siret)
 
             # Deleting favorite from search results - the realistic case.
             # User should be redirected back to the search results.
-            rv = self.app.post(url_delete, data={'next': url_search_without_domain})
+            rv = self.app.post(url_delete,
+                               data={'next': url_search_without_domain})
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, url_search_with_domain)
 
             rv = self.app.get(url_list)
             self.assertEqual(rv.status_code, 200)
-            self.assertTrue('Aucun favori pour le moment.' in rv.data.decode('utf-8'))
+            self.assertTrue(
+                'Aucun favori pour le moment.' in rv.data.decode('utf-8'))
 
     def test_favorites_download_list_as_pdf(self):
         url_favorites_download = self.url_for('user.favorites_list_as_pdf')
         office = Office.query.filter(Office.siret == '00000000000001').one()
-        UserFavoriteOffice.create(user_id=self.user.id, office_siret=office.siret)
+        UserFavoriteOffice.create(user_id=self.user.id,
+                                  office_siret=office.siret)
 
         with self.test_request_context():
             self.login(self.user)

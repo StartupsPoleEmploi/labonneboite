@@ -1,17 +1,17 @@
 import datetime
+import io
+from typing import Optional
 
-from sqlalchemy import Column, ForeignKey, UniqueConstraint
-from sqlalchemy import desc
-from sqlalchemy import Integer, String, DateTime
+from labonneboite.common import csv
+from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String,
+                        UniqueConstraint, desc)
 from sqlalchemy.orm import relationship
 
-from labonneboite.common.database import Base
-from labonneboite.common.database import db_session
-from labonneboite.common.models.base import CRUDMixin
-from labonneboite.common.env import get_current_env, ENV_BONAPARTE
+from ..database import Base, db_session
+from ..env import ENV_BONAPARTE, get_current_env
+from . import Office, User
+from .base import CRUDMixin
 
-import io
-from labonneboite.common import csv
 
 class UserFavoriteOffice(CRUDMixin, Base):
     """
@@ -43,6 +43,7 @@ class UserFavoriteOffice(CRUDMixin, Base):
     date_created = Column(DateTime,
                           default=datetime.datetime.utcnow,
                           nullable=False)
+    rome_code = Column(String(5), default=None, nullable=True)
 
     user = relationship('User')
     if get_current_env() == ENV_BONAPARTE:
@@ -57,7 +58,10 @@ class UserFavoriteOffice(CRUDMixin, Base):
     }
 
     @classmethod
-    def add_favorite(cls, user, office):
+    def add_favorite(cls,
+                     user: User,
+                     office: Office,
+                     rome_code: Optional[str] = None):
         """
         Add a favorite to a user.
         Avoid as much as possible replication errors by ignoring duplicates.
@@ -65,6 +69,7 @@ class UserFavoriteOffice(CRUDMixin, Base):
         statement = cls.__table__.insert().prefix_with("IGNORE").values(
             user_id=user.id,
             office_siret=office.siret,
+            rome_code=rome_code,
         )
         db_session.execute(statement)
         db_session.commit()
@@ -94,8 +99,7 @@ class UserFavoriteOffice(CRUDMixin, Base):
         if not user.is_anonymous:
             writer.writerows(
                 fav.as_csv_row()
-                for fav in db_session.query(cls).filter_by(user_id=user.id)
-            )
+                for fav in db_session.query(cls).filter_by(user_id=user.id))
         return output.getvalue()
 
     @classmethod
