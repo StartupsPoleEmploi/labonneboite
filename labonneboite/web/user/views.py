@@ -2,6 +2,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import io
 
 from flask import Blueprint, Markup
 from flask import abort, current_app, flash, make_response
@@ -12,7 +13,7 @@ from flask_login import current_user
 from flask_wtf import csrf
 from social_flask_sqlalchemy.models import UserSocialAuth
 
-from labonneboite.common import activity
+from labonneboite.common import activity, csv
 from labonneboite.common.database import db_session
 from labonneboite.common.models import get_user_social_auth
 from labonneboite.common.models import Office
@@ -91,17 +92,17 @@ def personal_data_as_csv():
     """
     Download as a CSV the personal data of a user.
     """
-    header_row = 'prénom;nom;email'
-    values = [
+    output = io.StringIO()
+    writer = csv.writer(output, dialect='excel-semi')
+    writer.writerow(['prénom', 'nom', 'email'])
+    writer.writerow([
         current_user.first_name,
         current_user.last_name,
         current_user.email,
-    ]
-    content_row = ";".join(values)
-    csv_text = "%s\r\n%s" % (header_row, content_row)
+    ])
 
     return make_csv_response(
-        csv_text=csv_text,
+        csv_text=output.getvalue(),
         attachment_name='mes_données_personnelles.csv',
     )
 

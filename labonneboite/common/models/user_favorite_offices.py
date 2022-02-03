@@ -1,4 +1,3 @@
-
 import datetime
 
 from sqlalchemy import Column, ForeignKey, UniqueConstraint
@@ -11,6 +10,8 @@ from labonneboite.common.database import db_session
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.common.env import get_current_env, ENV_BONAPARTE
 
+import io
+from labonneboite.common import csv
 
 class UserFavoriteOffice(CRUDMixin, Base):
     """
@@ -25,16 +26,23 @@ class UserFavoriteOffice(CRUDMixin, Base):
     during import. Favorites linked to no longer existing offices will be dropped.
     """
     __tablename__ = 'user_favorite_offices'
-    __table_args__ = (
-        UniqueConstraint('user_id', 'office_siret', name='_user_fav_office'),
-    )
+    __table_args__ = (UniqueConstraint('user_id',
+                                       'office_siret',
+                                       name='_user_fav_office'), )
 
     id = Column(Integer, primary_key=True)
     # Set `ondelete` to `CASCADE`: when a `user` is deleted, all his `favorites` are deleted too.
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user_id = Column(Integer,
+                     ForeignKey('users.id', ondelete='CASCADE'),
+                     nullable=False)
     # Set `ondelete` to `CASCADE`: when an `office` is deleted, all related `favorites` are deleted too.
-    office_siret = Column(String(191), ForeignKey('etablissements.siret', ondelete='CASCADE'), nullable=True)
-    date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    office_siret = Column(String(191),
+                          ForeignKey('etablissements.siret',
+                                     ondelete='CASCADE'),
+                          nullable=True)
+    date_created = Column(DateTime,
+                          default=datetime.datetime.utcnow,
+                          nullable=False)
 
     user = relationship('User')
     if get_current_env() == ENV_BONAPARTE:
@@ -69,7 +77,10 @@ class UserFavoriteOffice(CRUDMixin, Base):
         """
         if user.is_anonymous:
             return []
-        sirets = [fav.office_siret for fav in db_session.query(cls).filter_by(user_id=user.id)]
+        sirets = [
+            fav.office_siret
+            for fav in db_session.query(cls).filter_by(user_id=user.id)
+        ]
         return sirets
 
     @classmethod
@@ -77,29 +88,26 @@ class UserFavoriteOffice(CRUDMixin, Base):
         """
         Returns the favorites offices of a user as a CSV text.
         """
-        header_row = cls.as_csv_header_row()
-
-        if user.is_anonymous:
-            return header_row
-
-        rows = [fav.as_csv_row() for fav in db_session.query(cls).filter_by(user_id=user.id)]
-        csv_text = "%s\r\n%s" % (
-            header_row,
-            "\r\n".join(rows),
-        )
-        return csv_text
+        output = io.StringIO()
+        writer = csv.writer(output, dialect='excel-semi')
+        writer.writerow(cls.as_csv_header_row())
+        if not user.is_anonymous:
+            writer.writerows(
+                fav.as_csv_row()
+                for fav in db_session.query(cls).filter_by(user_id=user.id)
+            )
+        return output.getvalue()
 
     @classmethod
     def as_csv_header_row(cls):
-        return 'siret;nom;adresse;ville;url'
+        return ["siret", "nom", "adresse", "ville", "url"]
 
     def as_csv_row(self):
         values = [
             self.office_siret,
             self.office.name,
-            # add quotes to escape `,` frequently occuring in addresses
-            '"%s"' % self.office.address_as_text,
+            self.office.address_as_text,
             self.office.city,
             self.office.url,
         ]
-        return ";".join(values)
+        return values
