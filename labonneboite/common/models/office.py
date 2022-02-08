@@ -74,7 +74,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     def as_json(
         self,
-        rome_codes=None,
+        rome_codes: Optional[str] = None,
         hiring_type=None,
         distance=None,
         zipcode=None,
@@ -340,7 +340,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             # Here, we cannot properly generate an URL via url_for.
             return None
 
-    def show_multi_geolocations_msg(self, distance=None, zipcode=None):
+    def show_multi_geolocations_msg(self, distance: Optional[int]=None, zipcode: Optional[str] = None):
         """
         Returns True if a message that indicates that the current office recruits beyond
         the boundaries of its own departement should be displayed, False otherwise.

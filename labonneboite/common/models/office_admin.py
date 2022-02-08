@@ -118,7 +118,7 @@ class OfficeUpdateMixin(object):
     social_network = Column(mysql.TINYTEXT, nullable=True)
     contact_mode = Column(mysql.TINYTEXT, nullable=True)
 
-    email_alternance = Column(mysql.TINYTEXT, default='', nullable=True)
+    email_alternance = Column(mysql.TINYTEXT, default='', nullable=False)
     phone_alternance = Column(mysql.TINYTEXT, nullable=True)
     website_alternance = Column(mysql.TINYTEXT, nullable=True)
 
