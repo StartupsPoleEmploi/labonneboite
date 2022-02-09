@@ -221,6 +221,7 @@ a:hover {
 a[target="_blank"]::after {
     font: normal 700 normal 1rem/1 dsfr-icon;
     content: "\00a0";
+    font-size: inherit;
 }
 
 a[target="_blank"].fr-raw-link {
