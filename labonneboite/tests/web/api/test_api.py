@@ -1,4 +1,3 @@
-
 import datetime
 import json
 from unittest import mock
@@ -120,9 +119,8 @@ class ApiSecurityTest(ApiBaseTest):
                 'rome_codes': 'D1405',
                 'user': 'labonneboite',
             })
-            params['timestamp'] = (
-                datetime.datetime.now() - datetime.timedelta(minutes=20)
-            ).strftime('%Y-%m-%dT%H:%M:%S')
+            params['timestamp'] = (datetime.datetime.now() -
+                                   datetime.timedelta(minutes=20)).strftime('%Y-%m-%dT%H:%M:%S')
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(rv.data, b'timestamp has expired')
@@ -256,10 +254,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get(self.url_for('api.company_list', **params))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(
-                rv.data,
-                b'Invalid request argument: latitude and longitude must be float'
-            )
+            self.assertEqual(rv.data, b'Invalid request argument: latitude and longitude must be float')
 
     def test_unknown_commune_id(self):
         with self.test_request_context():
@@ -274,9 +269,7 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(
-                rv.data,
-                b'Invalid request argument: could not resolve latitude and longitude from given commune_id'
-            )
+                rv.data, b'Invalid request argument: could not resolve latitude and longitude from given commune_id')
 
     def test_correct_headcount_text(self):
         with self.test_request_context():
@@ -305,11 +298,8 @@ class ApiCompanyListTest(ApiBaseTest):
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(
-                rv.data.decode(),
-                'Invalid request argument: page_size is too large. Maximum value is %s' % (
-                    pagination.OFFICES_MAXIMUM_PAGE_SIZE
-                )
-            )
+                rv.data.decode(), 'Invalid request argument: page_size is too large. Maximum value is %s' %
+                (pagination.OFFICES_MAXIMUM_PAGE_SIZE))
 
     def test_maximum_page_size_is_ok(self):
         with self.test_request_context():
@@ -372,30 +362,32 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(
-                rv.data,
-                b'Invalid request argument: you must use rome_codes or rome_codes_keyword_search'
-            )
+            self.assertEqual(rv.data, b'Invalid request argument: you must use rome_codes or rome_codes_keyword_search')
 
     def test_rome_codes_search_by_keyword_normal_case(self):
-        self.es.index(index=settings.ES_INDEX, doc_type='ogr', id=1, body={
-            'ogr_code': '10974',
-            'ogr_description': 'Animateur commercial / Animatrice commerciale',
-            'rome_code': 'D1501',
-            'rome_description': 'Animation de vente'
-        })
+        rome_codes = 'D1213'
+        rome_codes_keyword_search = 'animateur vente'
+        commune_id = self.positions['lille']['commune_id']
+
+        self.es.index(index=settings.ES_INDEX,
+                      doc_type='ogr',
+                      id=1,
+                      body={
+                          'ogr_code': '10974',
+                          'ogr_description': 'Animateur commercial / Animatrice commerciale',
+                          'rome_code': rome_codes,
+                          'rome_description': 'Animation de vente'
+                      })
         self.es.indices.flush(index=settings.ES_INDEX)
 
         with self.test_request_context():
-            rome_codes = 'D1501'
-            rome_codes_keyword_search = 'animateur vente'
 
             # ensure the keyword search matches the right rome_code
             suggestions = autocomplete.build_job_label_suggestions(rome_codes_keyword_search)
             self.assertEqual(suggestions[0]['id'], rome_codes)
 
             params = self.add_security_params({
-                'commune_id': self.positions['caen']['commune_id'],
+                'commune_id': commune_id,
                 'user': 'labonneboite',
                 'rome_codes': rome_codes,
             })
@@ -404,7 +396,7 @@ class ApiCompanyListTest(ApiBaseTest):
             data_direct_search = self.get_json(rv)
 
             params = self.add_security_params({
-                'commune_id': self.positions['caen']['commune_id'],
+                'commune_id': commune_id,
                 'user': 'labonneboite',
                 'rome_codes_keyword_search': rome_codes_keyword_search,
             })
@@ -415,12 +407,15 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data_direct_search, data_keyword_search)
 
     def test_rome_codes_search_by_keyword_when_accented_unicode_character(self):
-        self.es.index(index=settings.ES_INDEX, doc_type='ogr', id=1, body={
-            'ogr_code': 'OGRCODE',
-            'ogr_description': 'Secrétaire de l\'enfer',
-            'rome_code': 'M1607',
-            'rome_description': 'Secrétariat'
-        })
+        self.es.index(index=settings.ES_INDEX,
+                      doc_type='ogr',
+                      id=1,
+                      body={
+                          'ogr_code': 'OGRCODE',
+                          'ogr_description': 'Secrétaire de l\'enfer',
+                          'rome_code': 'M1607',
+                          'rome_description': 'Secrétariat'
+                      })
         self.es.indices.flush(index=settings.ES_INDEX)
 
         with self.test_request_context():
@@ -448,10 +443,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(
-                rv.data,
-                b'Invalid request argument: No match found for rome_codes_keyword_search.'
-            )
+            self.assertEqual(rv.data, b'Invalid request argument: No match found for rome_codes_keyword_search.')
 
     def test_rome_code_and_label_are_present_in_response(self):
         with self.test_request_context():
@@ -619,10 +611,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = self.get_json(rv)
             self.assertEqual(data['companies_count'], 2)
-            self.assertEqual(
-                set([c['siret'] for c in data['companies']]),
-                set(['00000000000004', '00000000000007'])
-            )
+            self.assertEqual(set([c['siret'] for c in data['companies']]), set(['00000000000004', '00000000000007']))
             self.assertFalse('distance' in data['companies'][0])
 
     def test_query_by_departement_geoloc(self):
@@ -770,12 +759,14 @@ class ApiCompanyListTest(ApiBaseTest):
 
     def test_empty_result_does_not_crash(self):
         with self.test_request_context():
+            commune_id = self.positions['caen']['commune_id']
+            rome_codes = 'J1103'  # no office has this ROME code
             params = self.add_security_params({
-                'commune_id': self.positions['caen']['commune_id'],
+                'commune_id': commune_id,
                 'distance': 20,
                 'page': 1,
                 'page_size': 2,
-                'rome_codes': 'J1103',  # no office has this ROME code
+                'rome_codes': rome_codes,  # no office has this ROME code
                 'user': 'labonneboite',
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
@@ -865,10 +856,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertIn('matched_rome_code', data['companies'][1])
             self.assertIn('matched_rome_label', data['companies'][1])
             self.assertIn('matched_rome_slug', data['companies'][1])
-            self.assertEqual(
-                set([c['siret'] for c in data['companies']]),
-                set(['00000000000004', '00000000000005'])
-            )
+            self.assertEqual(set([c['siret'] for c in data['companies']]), set(['00000000000004', '00000000000005']))
 
             # 4) Multi rome search for both `D1405` and `M1801` ROME codes, sorting by score.
             params = self.add_security_params({
@@ -887,10 +875,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertIn('matched_rome_code', data['companies'][1])
             self.assertIn('matched_rome_label', data['companies'][1])
             self.assertIn('matched_rome_slug', data['companies'][1])
-            self.assertEqual(
-                set([c['siret'] for c in data['companies']]),
-                set(['00000000000004', '00000000000005'])
-            )
+            self.assertEqual(set([c['siret'] for c in data['companies']]), set(['00000000000004', '00000000000005']))
 
     def test_wrong_naf_value(self):
         with self.test_request_context():
@@ -1130,7 +1115,7 @@ class ApiCompanyListTest(ApiBaseTest):
             params = self.add_security_params({
                 'commune_id': self.positions['paris']['commune_id'],
                 'rome_codes': 'N1202',
-                'user': 'supertrusteduser', # needs to have access to pmsmp
+                'user': 'supertrusteduser',  # needs to have access to pmsmp
                 'flag_pmsmp': '18',
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
@@ -1146,7 +1131,7 @@ class ApiCompanyListTest(ApiBaseTest):
             params = self.add_security_params({
                 'commune_id': self.positions['paris']['commune_id'],
                 'rome_codes': 'N1202',
-                'user': 'supertrusteduser', # needs to have access to pmsmp
+                'user': 'supertrusteduser',  # needs to have access to pmsmp
                 'flag_pmsmp': '0',
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
@@ -1191,7 +1176,7 @@ class ApiCompanyListTest(ApiBaseTest):
             params = self.add_security_params({
                 'commune_id': self.positions['paris']['commune_id'],
                 'rome_codes': 'N1202',
-                'user': 'supertrusteduser', # needs to have access to pmsmp
+                'user': 'supertrusteduser',  # needs to have access to pmsmp
                 'flag_pmsmp': '1',
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
@@ -1469,14 +1454,17 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertNotIn('/entreprises', data['url'])
             self.assertIn(url_for("root.home", _external=True), data['url'])
 
-    def test_empty_result_returns_home_url_instead_of_search_url(self):
+    def test_empty_result_returns_a_valid_search_url(self):
+        commune_id = self.positions['caen']['commune_id']
+        rome_codes = 'J1103'  # no office has this ROME code
+
         with self.test_request_context():
             params = self.add_security_params({
-                'commune_id': self.positions['caen']['commune_id'],
+                'commune_id': commune_id,
                 'distance': 20,
                 'page': 1,
                 'page_size': 2,
-                'rome_codes': 'J1103',  # no office has this ROME code
+                'rome_codes': rome_codes,
                 'user': 'labonneboite',
             })
 
@@ -1488,8 +1476,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(len(data['companies']), 0)
 
             # ensure we return home URL and not search URL
-            self.assertNotIn('/entreprises', data['url'])
-            self.assertIn(url_for("root.home", _external=True), data['url'])
+            expect = f'/entreprises/commune/{commune_id}/rome/{rome_codes}'
+            self.assertIn(expect, data['url'])
 
     def test_company_count_endpoint(self):
         with self.test_request_context():
@@ -1529,7 +1517,7 @@ class ApiCompanyListTest(ApiBaseTest):
             'commune_id': self.positions['caen']['commune_id'],
             'rome_codes': 'D1405',
             'distance': '10',
-            'user': 'supertrusteduser', # needs to have access to pmsmp
+            'user': 'supertrusteduser',  # needs to have access to pmsmp
         })
 
         response_privileged = self.app.get(self.url_for("api.company_list", **params))
@@ -1556,6 +1544,7 @@ class ApiCompanyListTest(ApiBaseTest):
 
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 200)
+
     def test_romes_boost_alternance(self):
         with self.test_request_context():
             params = self.add_security_params({
@@ -1571,17 +1560,17 @@ class ApiCompanyListTest(ApiBaseTest):
 
     def test_multiple_romes(self):
         # with mock.patch.object(settings, 'ALTERNANCE_SEARCH_MODE', 'xxx'):
-            with self.test_request_context():
-                params = self.add_security_params({
-                    'contract': 'alternance',
-                    'longitude': self.positions['toulon']['coords'][0]['lon'],
-                    'latitude': self.positions['toulon']['coords'][0]['lat'],
-                    'rome_codes': 'D1405,N4403',
-                    'user': 'labonneboite',
-                })
+        with self.test_request_context():
+            params = self.add_security_params({
+                'contract': 'alternance',
+                'longitude': self.positions['toulon']['coords'][0]['lon'],
+                'latitude': self.positions['toulon']['coords'][0]['lat'],
+                'rome_codes': 'D1405,N4403',
+                'user': 'labonneboite',
+            })
 
-                rv = self.app.get(self.url_for("api.company_list", **params))
-                self.assertEqual(rv.status_code, 200)
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
 
 
 class ApiOffersOfficesListTest(ApiBaseTest):
@@ -1599,7 +1588,8 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 'distance': 50,
             })
 
-            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-offres-happypath.json')) as mock_response:
+            with mock.patch('labonneboite.common.esd.get_response',
+                            return_value=self.get_fixture('esd-offres-happypath.json')) as mock_response:
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
                 mock_response.assert_called_once()
 
@@ -1628,7 +1618,8 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 'distance': 50,
             })
 
-            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-offres-happypath.json')) as mock_response:
+            with mock.patch('labonneboite.common.esd.get_response',
+                            return_value=self.get_fixture('esd-offres-happypath.json')) as mock_response:
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
                 # romes are batched by 3 - 3 romes is 1 batch
                 mock_response.assert_called_once()
@@ -1652,7 +1643,8 @@ class ApiOffersOfficesListTest(ApiBaseTest):
                 'distance': 50,
             })
 
-            with mock.patch('labonneboite.common.esd.get_response', return_value=self.get_fixture('esd-offres-happypath.json')) as mock_response:
+            with mock.patch('labonneboite.common.esd.get_response',
+                            return_value=self.get_fixture('esd-offres-happypath.json')) as mock_response:
                 rv = self.app.get(url_for("api.offers_offices_list", **params))
                 # romes are batched by 3 - 4 romes is 2 batches
                 self.assertEqual(mock_response.call_count, 2)

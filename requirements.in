@@ -37,6 +37,7 @@ alembic
 mysqlclient
 SQLAlchemy-Utils
 SQLAlchemy
+zipp<3.7.0  # No matching distribution found for zipp==3.7.0
 
 # Elasticsearch
 # as of Jan 2018 we are using Elasticsearch 1.7, a very old version.
