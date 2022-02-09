@@ -40,7 +40,7 @@
         </div>
       {% else %}
         {% for fav in favorites %}
-          {% with company = fav.office %}
+          {% with company = fav.office, rome_code = fav.rome_code %}
             <div class="lbb-bright-container lbb-result">
               {% with show_more_info=1 %}
                 {% include "includes/office/header.html" %}
