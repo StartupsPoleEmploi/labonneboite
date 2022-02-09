@@ -1,31 +1,24 @@
-from urllib.parse import urlencode
 import json
+from typing import Any, Dict, Optional, Tuple, Union
+from urllib.parse import urlencode
 
+from flask import abort, Blueprint, flash, make_response, redirect, render_template, request, session, url_for
+from flask_login import current_user
+from sentry_sdk import start_transaction
 from slugify import slugify
 
-from flask import abort, make_response, redirect, render_template, request, session, url_for
-from flask import Blueprint, flash
-from flask_login import current_user
-
-from labonneboite.common import activity
-from labonneboite.common import autocomplete
-from labonneboite.common import geocoding
-from labonneboite.common import pro
-from labonneboite.common import sorting
+from labonneboite.common import activity, autocomplete, geocoding
 from labonneboite.common import mapping as mapping_util
-from labonneboite.common import pagination
+from labonneboite.common import pagination, pro, sorting
+from labonneboite.common.load_data import load_related_rome, load_related_rome_areas
 from labonneboite.common.locations import CityLocation, Location, NamedLocation
 from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
+from labonneboite.common.search import AudienceFilter, HiddenMarketFetcher
 from labonneboite.common.util import get_enum_from_value
-from labonneboite.common.load_data import load_related_rome, load_related_rome_areas
-from labonneboite.web.utils import fix_csrf_session
-
-from labonneboite.common.search import HiddenMarketFetcher, AudienceFilter
 from labonneboite.conf import settings
 from labonneboite.web.search.forms import make_company_search_form
-from sentry_sdk import start_transaction
-
+from labonneboite.web.utils import fix_csrf_session
 
 searchBlueprint = Blueprint('search', __name__)
 
@@ -476,7 +469,7 @@ def get_canonical_results_url(zipcode, city, occupation):
     ])
 
 
-def get_location(request_args):
+def get_location(request_args: Dict[str, Union[str, int]]) -> Tuple[Optional[Location], Optional[NamedLocation], Optional[str]]:
     """
     Parse request parameters to extract a desired location and location names.
 
