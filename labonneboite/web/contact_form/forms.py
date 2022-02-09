@@ -36,7 +36,9 @@ class OfficeIdentificationForm(FlaskForm):
             DataRequired(),
             Regexp(SIRET_REGEX, message=("Le siret de l'établissement est invalide (14 chiffres)"))
         ],
-        description="14 chiffres, sans espace. Exemple: 36252187900034",
+        description=
+            "14 chiffres, sans espace. Exemple: 36252187900034<br />"
+            '<a title="Annuaire des entreprise - ouvre une nouvelle fenêtre" href="https://annuaire-entreprises.data.gouv.fr/" target="_blank" rel="noopener">Retrouver mon numéro de siret </a>',
     )
 
     last_name = StringField('Nom *', validators=[DataRequired()])
