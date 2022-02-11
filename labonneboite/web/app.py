@@ -34,6 +34,7 @@ from labonneboite.web.auth import utils as auth_utils
 from labonneboite.web.auth.backends.exceptions import AuthFailedMissingReturnValues
 from labonneboite.web.config import CONFIG
 from labonneboite.web.jepostule.utils import jepostule_enabled
+from labonneboite.web.templates_functions import register_templates_functions
 
 
 # Fix a bug with Python 2, strftime and Unicode.
@@ -244,6 +245,7 @@ def create_app():
     register_context_processors(flask_app)
     register_teardown_appcontext(flask_app)
     register_teardown_appcontext(flask_app)
+    register_templates_functions(flask_app)
 
     # Assets.
     assets = Environment(app=flask_app)

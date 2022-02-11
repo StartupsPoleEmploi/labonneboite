@@ -1,12 +1,12 @@
-import requests
 import os
 
-from flask import Blueprint, current_app, flash, url_for
-from flask import abort, send_from_directory, redirect, render_template, request
+import requests
+from flask import abort, Blueprint, current_app, flash, redirect, render_template, request, send_from_directory, url_for
 from flask_login import current_user
 
-from labonneboite.common import activity
-from labonneboite.common import pro
+from labonneboite.common import activity, pro
+from labonneboite.common.database import db_session
+from labonneboite.common.models import Office
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.conf import settings
 from labonneboite.web.search.forms import CompanySearchForm
@@ -18,15 +18,14 @@ rootBlueprint = Blueprint('root', __name__)
 @rootBlueprint.route('/')
 def home():
     fix_csrf_session()
-    activity.log(
-        event_name='home',
-    )
+    activity.log(event_name='home',)
 
     refresh_token_result = attempt_to_refresh_peam_token()
     if refresh_token_result["token_has_expired"]:
         return redirect(refresh_token_result["redirect_url"])
 
     return render_template('home.html', form=CompanySearchForm())
+
 
 @rootBlueprint.route('/sitemap.xml')
 @rootBlueprint.route('/googleaece67026df0ee76.html')
@@ -36,9 +35,11 @@ def static_from_root():
     """
     return send_from_directory(current_app.static_folder, request.path[1:])
 
+
 @rootBlueprint.route('/favicon.ico')
 def favicon():
     return send_from_directory(current_app.static_folder, 'images/favicon.ico')
+
 
 @rootBlueprint.route('/robots.txt')
 def robot_txt():
@@ -46,9 +47,11 @@ def robot_txt():
     file_name = 'robots.prod.txt' if settings.ALLOW_INDEXING else 'robots.others.txt'
     return send_from_directory(static_folder, file_name)
 
+
 @rootBlueprint.route('/espace-presse')
 def press():
     return render_template('root/press.html')
+
 
 @rootBlueprint.route('/accessibilite')
 def accessibility():
@@ -73,7 +76,8 @@ def cgu():
 
 @rootBlueprint.route('/cookbook')
 def cookbook():
-    return render_template('root/cookbook.html')
+    office = Office(company_name='Nom SAS', siret='0000000000001', city_code='75056', naf='0111Z', score=3)
+    return render_template('root/cookbook.html', company=office)
 
 
 @rootBlueprint.route('/stats')
@@ -89,6 +93,7 @@ def widget():
         print(e)
         abort(418)
 
+
 @rootBlueprint.route('/widget-esd-staging')
 def widget_staging():
     try:
@@ -96,6 +101,7 @@ def widget_staging():
     except Exception as e:
         print(e)
         abort(418)
+
 
 def get_widget_access_token():
     ACCESS_TOKEN_URL = "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Fpartenaire"
@@ -110,7 +116,7 @@ def get_widget_access_token():
     resp = requests.post(
         ACCESS_TOKEN_URL,
         data=data,
-        headers={'Content-Type':'application/x-www-form-urlencoded'},
+        headers={'Content-Type': 'application/x-www-form-urlencoded'},
         verify=False,
     )
     response = resp.json()
@@ -121,14 +127,18 @@ def get_widget_access_token():
 def widget_no_esd():
     return render_template('root/widget-no-esd.html')
 
+
 @rootBlueprint.route('/widget-no-esd-staging')
 def widget_no_esd_staging():
     return render_template('root/widget-no-esd-staging.html')
 
+
 # Private files, for PRO only (lgged in PRO users)
 # html files are expected to be in the template folder, in a `static_kit` subfolder
 # all other files will be served as is
-FOLDER_NAME = 'static_kit' # this is the name of a folder in web/ and a folder in web/template/
+FOLDER_NAME = 'static_kit'  # this is the name of a folder in web/ and a folder in web/template/
+
+
 @rootBlueprint.route('/boite-a-outils/')
 @rootBlueprint.route('/boite-a-outils/<path:page>')
 def kit(page='index.html'):

@@ -41,6 +41,11 @@
     color: #fff;
 }
 
+.alert-hilight {
+    background-color: #000;
+    color: #fff;
+}
+
 /* Links etc. inside an alert. */
 
 .alert a:link,
@@ -64,7 +69,12 @@
 .alert-error a:link,
 .alert-error a:visited,
 .alert-error a:active,
-.alert-error a:hover {
+.alert-error a:hover,
+/*hilight*/
+.alert-hilight a:link,
+.alert-hilight a:visited,
+.alert-hilight a:active,
+.alert-hilight a:hover {
     color: #fff;
 }
 
@@ -88,4 +98,28 @@
 
 .alert__close + * {
     margin-top: 0;  /* Cancel default spacing across block-level elements inside. */
+}
+
+/* alert arrows */
+
+.alert.with-bottom-arrow {
+    position: relative;
+    height: auto;
+}
+
+.alert.with-bottom-arrow {
+    padding-bottom: 24.248711306px; /* 28px * sqrt(3) / 2 */
+}
+
+.alert.with-bottom-arrow::after {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    top:100%;
+    left: 50%;
+    margin-left: calc(28px * -0.5);
+    content: '';
+    transform: rotate(45deg);
+    margin-top: calc(28px * -0.5);
+    background-color: inherit;
 }
