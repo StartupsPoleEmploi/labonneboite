@@ -435,6 +435,7 @@ def entreprises():
         'tile_server_url': settings.TILE_SERVER_URL,
         'travel_mode': fetcher.travel_mode,
         'user_favs_as_sirets': UserFavoriteOffice.user_favs_as_sirets(current_user),
+        'show_mobiville': pagination_manager.company_count <= settings.MOBIVILLE_MAX_COMPANY_COUNT,
     }
 
     activity_log_properties['distance'] = fetcher.distance

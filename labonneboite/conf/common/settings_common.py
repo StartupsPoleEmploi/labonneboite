@@ -213,3 +213,6 @@ elif get_current_env() == ENV_TEST:
     from .overrides.test import *
 
 ALLOW_INDEXING = False
+
+# Mobiville
+MOBIVILLE_MAX_COMPANY_COUNT = 5

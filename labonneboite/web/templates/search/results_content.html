@@ -202,6 +202,10 @@
           </div>
         {% endfor %}
 
+        {% if show_mobiville %}
+          {% include "includes/office/mobiville.html" %}
+        {% endif %}
+
         {% if companies and companies|length < companies_per_page and (alternative_rome_descriptions or alternative_distances) %}
           <div class="lbb-bright-container">
             <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
