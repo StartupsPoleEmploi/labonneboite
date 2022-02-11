@@ -13,7 +13,7 @@ import logging
 import os
 
 from labonneboite.common.env import get_current_env, ENV_BONAPARTE, ENV_DEVELOPMENT, ENV_TEST
-from labonneboite.common.load_data import load_rome_labels, load_naf_labels
+from labonneboite.common.load_data import load_rome_labels, load_naf_labels, load_rows_as_set, load_csv_file
 
 DEBUG = False
 TESTING = False
@@ -216,3 +216,4 @@ ALLOW_INDEXING = False
 
 # Mobiville
 MOBIVILLE_MAX_COMPANY_COUNT = 5
+MOBIVILLE_ROMES = load_rows_as_set(load_csv_file('mobiville/romes.csv'))
