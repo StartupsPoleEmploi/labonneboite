@@ -445,8 +445,6 @@ IMPORTER_JOBS_ORDER = [
     'extract_etablissements',
     'check_dpae',
     'extract_dpae',
-    'check_lba',
-    'extract_lba',
     'compute_scores',
     'validate_scores',
     'geocode',
