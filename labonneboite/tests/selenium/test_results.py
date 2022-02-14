@@ -18,7 +18,7 @@ class TestResults(LbbSeleniumTestCase):
         self.driver.get(url)
 
         # Get the HTML element that contains all company informations.
-        company_container = self.driver.find_elements_by_class_name('lbb-result')[0]
+        company_container = self.driver.find_elements_by_class_name('lbb-company')[0]
         time.sleep(0.5)
 
         # Inspect default state.

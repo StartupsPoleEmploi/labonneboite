@@ -78,7 +78,7 @@
 
       e.preventDefault();
 
-      var $resultContainer = $(this).closest('.lbb-result');
+      var $resultContainer = $(this).closest('.lbb-company');
 
       // If the clicked element is already active, hide it.
       if ($resultContainer.hasClass('active')) {
@@ -97,7 +97,7 @@
       }
 
       // Hide any already opened company block.
-      $('.lbb-result')
+      $('.lbb-company')
         .not($resultContainer)
         .removeClass('active');
 

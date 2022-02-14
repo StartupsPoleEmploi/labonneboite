@@ -22,5 +22,5 @@ class TestSimple(LbbSeleniumTestCase):
         self.driver.find_element_by_id('l').send_keys(Keys.DOWN)
         self.driver.find_element_by_id('l').send_keys(Keys.RETURN)
         self.driver.find_element_by_css_selector('.lbb-home-form-search button').click()
-        elements = self.driver.find_elements_by_class_name('lbb-result')
+        elements = self.driver.find_elements_by_class_name('lbb-company')
         self.assertEqual(1, len(elements))
