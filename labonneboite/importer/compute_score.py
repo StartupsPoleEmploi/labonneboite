@@ -643,18 +643,20 @@ def run(
     logger.debug("DPAE/LBB training done for departement %s", departement)
 
     # LBA / Alternance.
-    train(
-        df_etab,
-        departement,
-        prediction_beginning_date=prediction_beginning_date,
-        last_historical_data_date=go_back_last_day_of_the_month(DpaeStatistics.get_last_historical_data_date(DpaeStatistics.APR)),
-        months_per_period=6,
-        training_periods=7,
-        prefix_for_fields='alt',
-        score_field_name='score_alternance',
-        is_lbb=False
-    )
-    logger.debug("Alternance/LBA training done for departement %s", departement)
+    df_etab["score_alternance"] = 0
+    # Disabled due to ArgoWorkflow scoring (importer v2)
+    # train(
+    #     df_etab,
+    #     departement,
+    #     prediction_beginning_date=prediction_beginning_date,
+    #     last_historical_data_date=go_back_last_day_of_the_month(DpaeStatistics.get_last_historical_data_date(DpaeStatistics.APR)),
+    #     months_per_period=6,
+    #     training_periods=7,
+    #     prefix_for_fields='alt',
+    #     score_field_name='score_alternance',
+    #     is_lbb=False
+    # )
+    # logger.debug("Alternance/LBA training done for departement %s", departement)
 
     # Final data export.
 
