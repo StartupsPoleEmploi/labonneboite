@@ -16,7 +16,6 @@ from labonneboite.common.es import Elasticsearch
 from labonneboite.conf import settings
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
 
-
 logger = logging.getLogger('main')
 
 
@@ -40,6 +39,7 @@ DISTANCE_FILTER_MAX = 3000
 
 DPAE_SCORE_FIELD_NAME = 'scores_by_rome'
 ALTERNANCE_SCORE_FIELD_NAME = 'scores_alternance_by_rome'
+
 
 class HiddenMarketFetcher(Fetcher):
     """
@@ -325,15 +325,13 @@ def count_offices_from_es(json_body):
 
 
 def fetch_offices(naf_codes, rome_codes, latitude, longitude, distance, aggregate_by=None, **kwargs):
-    json_body = build_json_body_elastic_search(
-        naf_codes,
-        rome_codes,
-        latitude,
-        longitude,
-        distance,
-        aggregate_by=aggregate_by,
-        **kwargs
-    )
+    json_body = build_json_body_elastic_search(naf_codes,
+                                               rome_codes,
+                                               latitude,
+                                               longitude,
+                                               distance,
+                                               aggregate_by=aggregate_by,
+                                               **kwargs)
 
     sort = kwargs.get('sort', sorting.SORT_FILTER_DEFAULT)
 
@@ -361,13 +359,11 @@ def fetch_offices(naf_codes, rome_codes, latitude, longitude, distance, aggregat
 
 
 def aggregate_naf(aggregations_raw):
-    return [
-        {
-            "code": naf_aggregate['key'],
-            "count": naf_aggregate['doc_count'],
-            'label': settings.NAF_CODES.get(naf_aggregate['key']),
-        } for naf_aggregate in aggregations_raw['naf']['buckets']
-    ]
+    return [{
+        "code": naf_aggregate['key'],
+        "count": naf_aggregate['doc_count'],
+        'label': settings.NAF_CODES.get(naf_aggregate['key']),
+    } for naf_aggregate in aggregations_raw['naf']['buckets']]
 
 
 def aggregate_headcount(aggregations_raw):
@@ -442,14 +438,12 @@ def build_json_body_elastic_search(
 
     if hiring_type == hiring_type_util.DPAE or settings.ALTERNANCE_SEARCH_MODE == 'ONLY_ALTERNANCE_COMPANIES':
         # Case of a search for DPAE **or** ALTERNANCE companies
-        score_for_rome_field_names = [
-            get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes
-        ]
+        score_for_rome_field_names = [get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes]
     else:
         # Case of a search for DPAE **and** ALTERNANCE companies
         score_for_rome_field_names = [
             get_score_for_rome_field_name(h_type, r_code)
-                for h_type, r_code in [(h_type, r_code) for h_type in hiring_type_util.VALUES for r_code in rome_codes]
+            for h_type, r_code in [(h_type, r_code) for h_type in hiring_type_util.VALUES for r_code in rome_codes]
         ]
 
     # FIXME one day make boosted_rome logic compatible with multi rome, right now it only
@@ -459,16 +453,14 @@ def build_json_body_elastic_search(
     boosted_rome_field_name = get_boosted_rome_field_name(hiring_type, rome_code)
 
     # Build filters.
-    filters = []
+    filters = [{"range": {"score": {"gt": 0,}}}]
     should_filters = []
     if naf_codes:
-        filters = [
-            {
-                "terms": {
-                    "naf": naf_codes,
-                },
-            }
-        ]
+        filters = [{
+            "terms": {
+                "naf": naf_codes,
+            },
+        }]
 
     # in some cases, a string is given as input, let's ensure it is an int from now on
     try:
@@ -488,78 +480,44 @@ def build_json_body_elastic_search(
             headcount = {"gte": min_office_size}
         if max_office_size:
             headcount = {"lte": max_office_size}
-        filters.append({
-            "numeric_range": {
-                "headcount": headcount,
-            }
-        })
+        filters.append({"numeric_range": {"headcount": headcount,}})
 
     if flag_junior == 1:
-        filters.append({
-            "term": {
-                "flag_junior": 1,
-            }
-        })
+        filters.append({"term": {"flag_junior": 1,}})
 
     if flag_senior == 1:
-        filters.append({
-            "term": {
-                "flag_senior": 1,
-            }
-        })
+        filters.append({"term": {"flag_senior": 1,}})
 
     if flag_handicap == 1:
-        filters.append({
-            "term": {
-                "flag_handicap": 1,
-            }
-        })
+        filters.append({"term": {"flag_handicap": 1,}})
 
     # at least one of these fields should exist
-    filters.append({
-        "bool": {
+    filters.append(
+        {"bool": {
             "should": [{
                 "exists": {
                     "field": field_name,
                 }
             } for field_name in score_for_rome_field_names]
-        }
-    })
+        }})
 
     if gps_available:
-        filters.append({
-            "geo_distance": {
+        filters.append(
+            {"geo_distance": {
                 "distance": "%skm" % distance,
                 "locations": {
                     "lat": latitude,
                     "lon": longitude,
                 }
-            }
-        })
+            }})
 
     if departments:
-        filters.append({
-            'terms': {
-                'department': departments,
-            }
-        })
+        filters.append({'terms': {'department': departments,}})
 
     if flag_pmsmp == 1:
-        filters.append({
-            "term": {
-                "flag_pmsmp": 1,
-            }
-        })
+        filters.append({"term": {"flag_pmsmp": 1,}})
 
-    main_query = {
-        "filtered": {
-            "filter": {
-                "bool": {
-                    "must": filters,
-                }
-            }
-        }
-    }
+    main_query = {"filtered": {"filter": {"bool": {"must": filters,}}}}
 
     if should_filters:
         # 'should' filters means that at least 1 of the filters should match
@@ -657,13 +615,10 @@ def build_json_body_elastic_search(
         randomized_score_sort = "_score"
         sort_attrs.append(randomized_score_sort)
         if gps_available:
-            sort_attrs.append(distance_sort)  # required so that office distance can be extracted and displayed on frontend
+            sort_attrs.append(
+                distance_sort)  # required so that office distance can be extracted and displayed on frontend
         else:
-            sort_attrs.append({
-                "department": {
-                    "order": "asc",
-                }
-            })
+            sort_attrs.append({"department": {"order": "asc",}})
 
     elif sort == sorting.SORT_FILTER_DISTANCE:
         # no randomization nor boosting happens when sorting by distance
@@ -685,7 +640,17 @@ def build_json_body_elastic_search(
                         "field": "locations",
                         "origin": "%s,%s" % (latitude, longitude),
                         'unit': 'km',
-                        'ranges': [{'to': 10}, {'to': 30}, {'to': 50}, {'to': 100}, {'to': 3000}],
+                        'ranges': [{
+                            'to': 10
+                        }, {
+                            'to': 30
+                        }, {
+                            'to': 50
+                        }, {
+                            'to': 100
+                        }, {
+                            'to': 3000
+                        }],
                     }
                 }
             # We cannot use aggregation for contract=dpae/alternance, as both kinds use different
@@ -693,11 +658,7 @@ def build_json_body_elastic_search(
             elif aggregate == 'contract':
                 pass
             else:
-                json_body['aggs'][aggregate] = {
-                    "terms": {
-                        "field": aggregate,
-                    }
-                }
+                json_body['aggs'][aggregate] = {"terms": {"field": aggregate,}}
 
     # Process from_number and to_number.
     if from_number:
@@ -708,7 +669,6 @@ def build_json_body_elastic_search(
                 logger.exception("to_number < from_number : %s < %s", to_number, from_number)
                 raise Exception("to_number < from_number")
             json_body["size"] = to_number - from_number + 1
-
 
     return json_body
 
@@ -761,9 +721,7 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
     # FIXME it's not great to add new properties to an existing object. It
     # would be better to wrap the office objects in a new OfficeResult
     # class that would add new properties related to the query.
-    es_offices_by_siret = {
-        item['_source']['siret']: item for item in res['hits']['hits']
-    }
+    es_offices_by_siret = {item['_source']['siret']: item for item in res['hits']['hits']}
     # FIXME These hardcoded values are soooooo ugly, unfortunately it is not so
     # easy to make it DNRY. For the corresponding code see method build_json_body_elastic_search().
     distance_sort_index = {
@@ -801,11 +759,9 @@ def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
             # Case of DPAE and alternance, keep the DPAE scores in both cases
             dpae_scores = es_office['_source'].get(DPAE_SCORE_FIELD_NAME, None)
             if dpae_scores:
-                all_scores = {**dpae_scores, **all_scores} # This will merge the 2 dicts
+                all_scores = {**dpae_scores, **all_scores}  # This will merge the 2 dicts
 
-            scores_of_searched_romes = dict([
-                (rome, all_scores[rome]) for rome in rome_codes if rome in all_scores
-            ])
+            scores_of_searched_romes = dict([(rome, all_scores[rome]) for rome in rome_codes if rome in all_scores])
 
             # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
             rome_with_highest_score = max(scores_of_searched_romes, key=scores_of_searched_romes.get)
