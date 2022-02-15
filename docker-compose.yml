@@ -13,15 +13,53 @@ services:
     - labonneboite
 
   ###### 3rd-party services
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+  # https://www.elastic.co/blog/how-to-make-a-dockerfile-for-elasticsearch
   elasticsearch:
-    extends:
-      file: docker/docker-compose.yml
-      service: elasticsearch
+    image: elasticsearch:1.7.2
+    environment:
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+      - "cluster.name=lbb"
+      - "bootstrap.memory_lock=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    #restart: "unless-stopped"
+    ports:
+      # TODO remap port
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - labonneboite_elk
+      - labonneboite_default
+
+  kibana:
+    image: kibana:1.7.2
+    environment:
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "cluster.name=lbb"
+      - "bootstrap.memory_lock=true"
+      - "vm.max_map_count=4g"
+    ports:
+      - 5601:5601
+    networks:
+      - labonneboite_elk
+    depends_on:
+      - elasticsearch
 
   mysql:
-    extends:
-      file: docker/docker-compose.yml
-      service: mysql
+    image: mysql:5.6.36
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    #restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ''
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - 3306:3306
+    networks:
+      - labonneboite_default
+
   
   ###### Je Postule
   labonneboite:
@@ -48,3 +86,7 @@ services:
   #   - ./:/home/docker
   #   - ./backups/home/backups:/home/backups
   #   - /mnt:/mnt
+
+networks:
+  labonneboite_elk:
+  labonneboite_default:

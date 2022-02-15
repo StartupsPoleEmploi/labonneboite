@@ -232,7 +232,7 @@ Note that we only have data in Metz region.
 
 Any search on another region than Metz will give zero results.
 
-You may need to specify the `development` environment for the scripts to connect to local DB on port `3307`:
+You may need to specify the `development` environment for the scripts to connect to local DB on port `3306`:
 
     $ LBB_ENV=development python labonneboite/scripts/create_index.py
 
