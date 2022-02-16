@@ -1,4 +1,3 @@
-
 from werkzeug.datastructures import MultiDict
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, HiddenField, RadioField, DecimalField
@@ -56,29 +55,19 @@ class CompanySearchForm(FlaskForm):
     departments = StringField(widget=HiddenInput(), validators=[Optional(), Regexp('([0-9]+,?)+')])
 
     # Headcount
-    h = RadioField(
-        'Taille de l\'entreprise',
-        default=1,
-        choices=HEADCOUNT_CHOICES,
-        validators=[Optional()])
+    h = RadioField('Taille de l\'entreprise', default=1, choices=HEADCOUNT_CHOICES, validators=[Optional()])
 
-    sort = RadioField(
-        'Classement par',
-        choices=sorting.SORTING_CHOICES,
-        default=sorting.SORT_FILTER_DEFAULT,
-        validators=[Optional()])
+    sort = RadioField('Classement par',
+                      choices=sorting.SORTING_CHOICES,
+                      default=sorting.SORT_FILTER_DEFAULT,
+                      validators=[Optional()])
 
-    naf = SelectField(
-        'Secteur d\'activité',
-        choices=NAF_CHOICES,
-        default='',
-        validators=[Optional()])
+    naf = SelectField('Secteur d\'activité', choices=NAF_CHOICES, default='', validators=[Optional()])
 
-    d = RadioField(
-        'Rayon de recherche',
-        choices=DISTANCE_CHOICES,
-        default=settings.DISTANCE_FILTER_DEFAULT,
-        validators=[Optional()])
+    d = RadioField('Rayon de recherche',
+                   choices=DISTANCE_CHOICES,
+                   default=settings.DISTANCE_FILTER_DEFAULT,
+                   validators=[Optional()])
 
     def validate(self):
         """
@@ -90,22 +79,27 @@ class CompanySearchForm(FlaskForm):
             return False
         return True
 
+    def set_auto_focus_on_searched_job(self):
+        if not self.j.render_kw:
+            self.j.render_kw = {}
+        self.j.render_kw['autofocus'] = True
+
 
 class ProCompanySearchForm(CompanySearchForm):
 
     AUDIENCE_CHOICES = (
         (str(AudienceFilter.ALL.value), 'Tout'),
-        (str(AudienceFilter.JUNIOR.value), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="moins de 26 ans">Junior</span>'),
-        (str(AudienceFilter.SENIOR.value), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="plus de 50 ans">Senior</span>'),
-        (str(AudienceFilter.HANDICAP.value), '<span class="badge badge-large badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">BOE</span>'),
+        (str(AudienceFilter.JUNIOR.value),
+         '<span class="badge badge-large badge-info" data-toggle="tooltip" title="moins de 26 ans">Junior</span>'),
+        (str(AudienceFilter.SENIOR.value),
+         '<span class="badge badge-large badge-info" data-toggle="tooltip" title="plus de 50 ans">Senior</span>'),
+        (str(AudienceFilter.HANDICAP.value),
+         '<span class="badge badge-large badge-info" data-toggle="tooltip" title="Bénéficiaire de l\'Obligation d\'Emploi">BOE</span>'
+         ),
     )
 
     # this field is activated only in pro mode
-    p = RadioField(
-        'Public',
-        choices=AUDIENCE_CHOICES,
-        default=0,
-        validators=[Optional()])
+    p = RadioField('Public', choices=AUDIENCE_CHOICES, default=0, validators=[Optional()])
 
 
 def make_company_search_form(**kwargs):
