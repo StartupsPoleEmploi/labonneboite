@@ -1,0 +1,31 @@
+.mobiville-banner h3,
+.mobiville-banner .company-naf-text,
+.mobiville-banner .mobiville-btn-label {
+  color: #000;
+}
+
+.mobiville-banner .company-naf-text {
+    margin-top: 11px;
+}
+
+.mobiville-banner .mobiville-btn {
+    padding: 12.5px 58px;
+    padding: 0.78125rem 3.625rem;
+}
+
+.mobiville-banner .mobiville-btn-label {
+    margin-top: 12px;
+    margin-top: 0.75rem;
+}
+
+.mobiville-info-alert {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.mobiville-info-alert > p {
+    margin: 0;
+}
+.mobiville-info-alert > img {
+    margin-right: 10px;
+}

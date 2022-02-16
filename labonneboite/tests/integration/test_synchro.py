@@ -2,12 +2,14 @@
 import random
 import unittest
 
+from labonneboite.common import departements as dpt
+from labonneboite.common import env
 from labonneboite.common.es import Elasticsearch
 from labonneboite.common.models import Office
-from labonneboite.common import departements as dpt
 from labonneboite.conf import settings
 
 
+@unittest.skipIf(env.get_current_env() == env.ENV_TEST, 'Should run on a real database')
 class SynchronizationIndexAndDatabaseTest(unittest.TestCase):
     """
     WARNING: this test class should probably talk to the "real" database, not

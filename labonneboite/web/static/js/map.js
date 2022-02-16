@@ -29,7 +29,7 @@ function createMap(element, center, zoom) {
 
     var minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
     var companies = [];
-    $(".lbb-result").each(function() {
+    $(".lbb-company").each(function() {
       var companyName = $(this).find('input[name="company-name"]').val();
       var lat = $(this).find('input[name="company-latitude"]').val();
       var lng = $(this).find('input[name="company-longitude"]').val();

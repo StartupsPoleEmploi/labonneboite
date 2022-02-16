@@ -2,7 +2,7 @@
 
   <h3>
     <span>{{ company.name }}</span>
-    - <span class="small">{{ company.city }}</span>
+    {% if company.city %}- <span class="small">{{ company.city }}</span>{% endif %}
     {% if pro_version_enabled %}
       {% if company.flag_junior %}
         - <span class="small badge badge-info" data-toggle="tooltip" title="Cette entreprise recrute une proportion élevée de juniors (moins de 26 ans) - indicateur exclusif version PRO">
@@ -46,6 +46,7 @@
     </div>
   </div>
 
+  {% if hide_footer is none or not hide_footer %}
   <div class="lbb-result__actions">
     <div class="grid-row">
       <div class="grid-col-9">
@@ -131,5 +132,5 @@
 
 
   </div>
-
+  {% endif %}
 </div>

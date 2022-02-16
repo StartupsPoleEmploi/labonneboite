@@ -1,18 +1,21 @@
 <!DOCTYPE HTML>
 <html lang="fr">
+
 <head>
-    <meta charset="utf-8">
-    <meta name=viewport content="width=device-width, initial-scale=1">
-    <meta name="google-site-verification" content="u049KXeNisFhYyb2alIBRJGWP1E6Y0YFfgyk1nWH1Xs" />
-    <title>CookBook</title>
-    {% assets "css_all" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
+  <meta charset="utf-8">
+  <meta name=viewport content="width=device-width, initial-scale=1">
+  <meta name="google-site-verification" content="u049KXeNisFhYyb2alIBRJGWP1E6Y0YFfgyk1nWH1Xs" />
+  <title>CookBook</title>
+  {% assets "css_all" %}
+  <link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
 </head>
+
 <body>
-  
+
   <!-- ********************************** Header ********************************** -->
   <header class="lbb-header-wrapper">
     <ul class="lbb-header">
-      
+
       <li class="lbb-header-logo-mariane">
         <img src="{{ url_for('static', filename='images/logo-mariane.svg') }}" alt="Logo La Bonne Boite - Pôle emploi">
       </li>
@@ -22,11 +25,12 @@
           <img src="{{ url_for('static', filename='images/logo-lbb.svg') }}" alt="Logo La Bonne Boite">
         </a>
       </li>
-      
+
       <li class="text-left">
-        <small class="badge badge-info" data-toggle="tooltip" data-placement="bottom" title="Tooltip.">Version PRO</small>
+        <small class="badge badge-info" data-toggle="tooltip" data-placement="bottom" title="Tooltip.">Version
+          PRO</small>
       </li>
-      
+
       <li class="float-right lbb-header-logo-pole-emploi">
         <img src="{{ url_for('static', filename='images/logo-pe.svg') }}" alt="Logo Pôle emploi">
       </li>
@@ -39,8 +43,11 @@
           </a>
           <div class="lbb-dropdown lbb-dropdown-right text-right">
             <p>
-              <a class="logo-pe-connect" href="{{ login_url() }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Se connecter avec Pôle emploi"></a><br>
-              <i>Connectez-vous à La Bonne Boite en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
+              <a class="logo-pe-connect" href="{{ login_url() }}"><img
+                  src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}"
+                  alt="Se connecter avec Pôle emploi"></a><br>
+              <i>Connectez-vous à La Bonne Boite en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ?
+                Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
             </p>
           </div>
         </div>
@@ -73,19 +80,22 @@
           </a>
           <div class="lbb-dropdown lbb-dropdown-right text-right">
             <p>
-              <a class="logo-pe-connect" href="{{ login_url }}"><img src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}" alt="Se connecter avec Pôle emploi"></a><br>
-              <i>Connectez-vous à La Bonne Boîte en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ? Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
+              <a class="logo-pe-connect" href="{{ login_url }}"><img
+                  src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}"
+                  alt="Se connecter avec Pôle emploi"></a><br>
+              <i>Connectez-vous à La Bonne Boîte en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ?
+                Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
             </p>
           </div>
         </div>
       </li>
-      
+
       <li class="float-right lbb-header-entry">
         <a class="lbb-header-btn" href="#">
           <span class="lbb-header-btn no-padding">
             <img src="{{ url_for('static', filename='images/pro/pro.svg') }}" alt="">
           </span>
-          
+
           <p class="lbb-switch on">
             <span class="off">On</span>
             <span class="on">Off</span>
@@ -98,7 +108,7 @@
           <span class="lbb-header-btn no-padding">
             <img src="{{ url_for('static', filename='images/pro/pro-color.svg') }}" alt="">
           </span>
-          
+
           <p class="lbb-switch">
             <span class="off">On</span>
             <span class="on">Off</span>
@@ -153,7 +163,11 @@
         <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
       </div>
 
-      <div class="alert alert-error js-alert-close">
+      <div class="alert alert-error  js-alert-close">
+        <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
+      </div>
+
+      <div class="alert alert-hilight with-bottom-arrow">
         <p><b>Lorem ipsum dolor</b> sit amet, consectetur adipiscing elit. <a href="#">Pellentesque ex ex</a>.</p>
       </div>
 
@@ -173,12 +187,10 @@
       <form class="lbb-home-form-search">
         <div class="form-search">
           <div>
-            <input class="input-icon input-icon-suitcase form-error"
-                   type="text"
-                   placeholder="Métier recherché : (boucher, cariste, secrétaire, ...)">
-            <input class="input-icon input-icon-location"
-                   type="text"
-                   placeholder="Autour de : (Paris, Bd Voltaire, 33000...)">
+            <input class="input-icon input-icon-suitcase form-error" type="text"
+              placeholder="Métier recherché : (boucher, cariste, secrétaire, ...)">
+            <input class="input-icon input-icon-location" type="text"
+              placeholder="Autour de : (Paris, Bd Voltaire, 33000...)">
           </div>
           <button class="btn" type="submit">
             <img src="{{ url_for('static', filename='images/icons/magnifier-white.svg') }}" alt="Lancer la recherche">
@@ -193,12 +205,10 @@
       <form class="lbb-home-form-search">
         <div class="form-search">
           <div>
-            <input class="input-icon input-icon-suitcase"
-                   type="text"
-                   placeholder="Métier recherché : (boucher, cariste, secrétaire, ...)">
-            <input class="input-icon input-icon-location"
-                   type="text"
-                   placeholder="Autour de : (Paris, Bd Voltaire, 33000...)">
+            <input class="input-icon input-icon-suitcase" type="text"
+              placeholder="Métier recherché : (boucher, cariste, secrétaire, ...)">
+            <input class="input-icon input-icon-location" type="text"
+              placeholder="Autour de : (Paris, Bd Voltaire, 33000...)">
           </div>
           <button class="btn" type="submit" disabled>
             <span class="spinner"></span>
@@ -207,7 +217,8 @@
       </form>
 
       <p class="lbb-home-explanation lbb-grey">
-        <small>*Potentiel d'embauche : algorithme exclusif de Pôle emploi détectant les entreprises qui vont probablement embaucher ces 6 prochains mois.</small>
+        <small>*Potentiel d'embauche : algorithme exclusif de Pôle emploi détectant les entreprises qui vont
+          probablement embaucher ces 6 prochains mois.</small>
       </p>
     </div>
   </div>
@@ -219,15 +230,20 @@
       <ul>
         <li><span class="cookbook-color" style="background: #0061E6;"></span> <b>#0061E6</b> blue (links)</li>
         <li><span class="cookbook-color" style="background: #54108E;"></span> <b>#54108E</b> purple (buttons)</li>
-        <li><span class="cookbook-color" style="background: #183152;"></span> <b>#183152</b> dark blue (buttons hover)</li>
+        <li><span class="cookbook-color" style="background: #183152;"></span> <b>#183152</b> dark blue (buttons hover)
+        </li>
         <li><span class="cookbook-color" style="background: #5d5d5d;"></span> <b>#5d5d5d</b> mid grey (text)</li>
-        <li><span class="cookbook-color" style="background: #222;"></span> <b>#222</b> dark grey, almost black (text, buttons active)</li>
+        <li><span class="cookbook-color" style="background: #222;"></span> <b>#222</b> dark grey, almost black (text,
+          buttons active)</li>
         <li><span class="cookbook-color" style="background: #cbcbcb;"></span> <b>#cbcbcb</b> light grey</li>
         <li><span class="cookbook-color" style="background: #e0e0e0;"></span> <b>#e0e0e0</b> extra light grey</li>
-        <li><span class="cookbook-color" style="background: #efefef;"></span> <b>#efefef</b> light white (used on :hover in search results)</li>
+        <li><span class="cookbook-color" style="background: #efefef;"></span> <b>#efefef</b> light white (used on :hover
+          in search results)</li>
         <li><span class="cookbook-color" style="background: #fff;"></span> <b>#fff</b> white</li>
-        <li><span class="cookbook-color" style="background: #19c158;"></span> <b>#19c158</b> green (potentiel d'embauche, alert success)</li>
-        <li><span class="cookbook-color" style="background: #f03c69;"></span> <b>#f03c69</b> red (form errors, alert errors)</li>
+        <li><span class="cookbook-color" style="background: #19c158;"></span> <b>#19c158</b> green (potentiel
+          d'embauche, alert success)</li>
+        <li><span class="cookbook-color" style="background: #f03c69;"></span> <b>#f03c69</b> red (form errors, alert
+          errors)</li>
         <li><span class="cookbook-color" style="background: #f7ba45;"></span> <b>#f7ba45</b> yellow (alert warning)</li>
         <li><span class="cookbook-color" style="background: #1c86f2;"></span> <b>#1c86f2</b> blue (alert info)</li>
       </ul>
@@ -382,7 +398,8 @@
         </li>
         <li>
           <a href="#">
-            <img src="{{ url_for('static', filename='images/press/liaisons-sociales.png') }}" alt="Liaisons Sociales Magazine">
+            <img src="{{ url_for('static', filename='images/press/liaisons-sociales.png') }}"
+              alt="Liaisons Sociales Magazine">
           </a>
         </li>
         <li>
@@ -474,7 +491,8 @@
               <li>Quisque varius urna a sagittis facilisis</li>
               <li>Vestibulum ante nisi, tempus sit amet faucibus sed...</li>
             </ul>
-            <p>Integer ac malesuada dui. Curabitur sodales risus ut lorem varius auctor. Etiam id luctus arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
+            <p>Integer ac malesuada dui. Curabitur sodales risus ut lorem varius auctor. Etiam id luctus arcu. Interdum
+              et malesuada fames ac ante ipsum primis in faucibus.</p>
             <p><a target="_blank" href="#">Lorem ipsum dolor sit amet.</a></p>
           </div>
         </div>
@@ -490,7 +508,8 @@
               <li>Quisque varius urna a sagittis facilisis</li>
               <li>Vestibulum ante nisi, tempus sit amet faucibus sed...</li>
             </ul>
-            <p>Integer ac malesuada dui. Curabitur sodales risus ut lorem varius auctor. Etiam id luctus arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
+            <p>Integer ac malesuada dui. Curabitur sodales risus ut lorem varius auctor. Etiam id luctus arcu. Interdum
+              et malesuada fames ac ante ipsum primis in faucibus.</p>
             <p><a target="_blank" href="#">Lorem ipsum dolor sit amet.</a></p>
           </div>
         </div>
@@ -566,7 +585,8 @@
       <div class="cookbook-title">Tooltips</div>
 
       <p>
-        <span data-toggle="tooltip" title="Ceci est un tooltip.">Survolez ce texte avec la souris pour voir apparaitre un tooltip.</span>
+        <span data-toggle="tooltip" title="Ceci est un tooltip.">Survolez ce texte avec la souris pour voir apparaitre
+          un tooltip.</span>
       </p>
 
     </div>
@@ -577,20 +597,20 @@
     <div class="lbb-single-column-content">
       <div class="cookbook-title">Breadcrumb</div>
       <ol class="breadcrumb">
-          <li><a href="#">Mon compte</a></li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
-          <li>Mes favoris</li>
+        <li><a href="#">Mon compte</a></li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
+        <li>Mes favoris</li>
       </ol>
     </div>
   </div>
@@ -601,7 +621,8 @@
 
       <div class="cookbook-title">Common HTML elements</div>
 
-      <p>This is a test page filled with common HTML elements to be used to provide visual feedback whilst building CSS systems and frameworks.</p>
+      <p>This is a test page filled with common HTML elements to be used to provide visual feedback whilst building CSS
+        systems and frameworks.</p>
 
       <main>
 
@@ -619,17 +640,26 @@
 
           <div>
             <div class="cookbook-title">Long headings</div>
-            <h1>Heading 1 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h1>
-            <h2>Heading 2 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h2>
-            <h3>Heading 3 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h3>
-            <h4>Heading 4 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h4>
-            <h5>Heading 5 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h5>
-            <h6>Heading 6 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.</h6>
+            <h1>Heading 1 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.
+            </h1>
+            <h2>Heading 2 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.
+            </h2>
+            <h3>Heading 3 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.
+            </h3>
+            <h4>Heading 4 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.
+            </h4>
+            <h5>Heading 5 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.
+            </h5>
+            <h6>Heading 6 Vivamus ac mauris quis orci tincidunt laoreet. Vivamus ultricies eu turpis accumsan varius.
+            </h6>
           </div>
 
           <div class="cookbook-title">Paragraphs</div>
           <div>
-            <p>A paragraph (from the Greek paragraphos, “to write beside” or “written beside”) is a self-contained unit of a discourse in writing dealing with a particular point or idea. A paragraph consists of one or more sentences. Though not required by the syntax of any language, paragraphs are usually an expected part of formal writing, used to organize longer prose.</p>
+            <p>A paragraph (from the Greek paragraphos, “to write beside” or “written beside”) is a self-contained unit
+              of a discourse in writing dealing with a particular point or idea. A paragraph consists of one or more
+              sentences. Though not required by the syntax of any language, paragraphs are usually an expected part of
+              formal writing, used to organize longer prose.</p>
           </div>
 
           <section>
@@ -639,7 +669,10 @@
                 <h3>Article</h3>
               </header>
               <div>
-                <p>A paragraph (from the Greek paragraphos, “to write beside” or “written beside”) is a self-contained unit of a discourse in writing dealing with a particular point or idea. A paragraph consists of one or more sentences. Though not required by the syntax of any language, paragraphs are usually an expected part of formal writing, used to organize longer prose.</p>
+                <p>A paragraph (from the Greek paragraphos, “to write beside” or “written beside”) is a self-contained
+                  unit of a discourse in writing dealing with a particular point or idea. A paragraph consists of one or
+                  more sentences. Though not required by the syntax of any language, paragraphs are usually an expected
+                  part of formal writing, used to organize longer prose.</p>
               </div>
               <footer>
                 <p>Footer</p>
@@ -650,8 +683,10 @@
           <div class="cookbook-title">Blockquotes</div>
           <div>
             <blockquote>
-              <p>A block quotation (also known as a long quotation or extract) is a quotation in a written document, that is set off from the main text as a paragraph, or block of text.</p>
-              <p>It is typically distinguished visually using indentation and a different typeface or smaller size quotation. It may or may not include a citation, usually placed at the bottom.</p>
+              <p>A block quotation (also known as a long quotation or extract) is a quotation in a written document,
+                that is set off from the main text as a paragraph, or block of text.</p>
+              <p>It is typically distinguished visually using indentation and a different typeface or smaller size
+                quotation. It may or may not include a citation, usually placed at the bottom.</p>
               <cite><a href="#!">Said no one, ever.</a></cite>
             </blockquote>
           </div>
@@ -789,7 +824,8 @@
                   <code>&lt;u&gt;</code>
                 </td>
                 <td>
-                  The <u>u element</u> is text with an unarticulated, though explicitly rendered, non-textual annotation.
+                  The <u>u element</u> is text with an unarticulated, though explicitly rendered, non-textual
+                  annotation.
                 </td>
               </tr>
               <tr>
@@ -845,7 +881,8 @@
                   <code>&lt;q&gt;</code>
                 </td>
                 <td>
-                  <q cite="https://developer.mozilla.org/en-US/docs/HTML/Element/q">This text is a short inline quotation.</q>
+                  <q cite="https://developer.mozilla.org/en-US/docs/HTML/Element/q">This text is a short inline
+                    quotation.</q>
                 </td>
               </tr>
               <tr>
@@ -898,12 +935,14 @@
               <img src="{{ url_for('static', filename='images/cookbook/construction.jpg') }}" alt="Image alt text">
             </p>
 
-            <div class="cookbook-title">Image - Wrapped in a <code>&lt;figure&gt;</code> element, no <code>&lt;figcaption&gt;</code></div>
+            <div class="cookbook-title">Image - Wrapped in a <code>&lt;figure&gt;</code> element, no
+              <code>&lt;figcaption&gt;</code></div>
             <figure>
               <img src="{{ url_for('static', filename='images/cookbook/construction.jpg') }}" alt="Image alt text">
             </figure>
 
-            <div class="cookbook-title">Image - Wrapped in a <code>&lt;figure&gt;</code> element, with a <code>&lt;figcaption&gt;</code></div>
+            <div class="cookbook-title">Image - Wrapped in a <code>&lt;figure&gt;</code> element, with a
+              <code>&lt;figcaption&gt;</code></div>
             <figure>
               <img src="{{ url_for('static', filename='images/cookbook/construction.jpg') }}" alt="Image alt text">
               <figcaption>Here is a caption for this image.</figcaption>
@@ -932,12 +971,14 @@
 
           <div class="cookbook-title">Spinners</div>
           <div>
-              <p style="background-color: black; color: white;">Dark background: <span class="spinner"></span></p>
-              <p>Light background: <span class="spinner spinner-dark"></span></p>
+            <p style="background-color: black; color: white;">Dark background: <span class="spinner"></span></p>
+            <p>Light background: <span class="spinner spinner-dark"></span></p>
           </div>
 
           <div class="cookbook-title">Inline SVG</div>
-          <div><svg width="100px" height="100px"><circle cx="100" cy="100" r="100" fill="#1fa3ec"></circle></svg></div>
+          <div><svg width="100px" height="100px">
+              <circle cx="100" cy="100" r="100" fill="#1fa3ec"></circle>
+            </svg></div>
 
 
 
@@ -1022,7 +1063,8 @@
             <fieldset>
               <legend>Checkboxes</legend>
               <ul>
-                <li><label for="checkbox1"><input id="checkbox1" name="checkbox" type="checkbox" checked="checked"> Choice A</label></li>
+                <li><label for="checkbox1"><input id="checkbox1" name="checkbox" type="checkbox" checked="checked">
+                    Choice A</label></li>
                 <li><label for="checkbox2"><input id="checkbox2" name="checkbox" type="checkbox"> Choice B</label></li>
                 <li><label for="checkbox3"><input id="checkbox3" name="checkbox" type="checkbox"> Choice C</label></li>
               </ul>
@@ -1031,7 +1073,8 @@
             <fieldset>
               <legend>Radio buttons</legend>
               <ul>
-                <li><label for="radio1"><input id="radio1" name="radio" type="radio" checked="checked">Option 1</label></li>
+                <li><label for="radio1"><input id="radio1" name="radio" type="radio" checked="checked">Option 1</label>
+                </li>
                 <li><label for="radio2"><input id="radio2" name="radio" type="radio">Option 2</label></li>
                 <li><label for="radio3"><input id="radio3" name="radio" type="radio">Option 3</label></li>
               </ul>
@@ -1254,16 +1297,32 @@
 
       <div class="grid-row grid-spacing">
         <div class="grid-col-3">
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
+            anim id est laborum.</p>
         </div>
         <div class="grid-col-3">
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
+            anim id est laborum.</p>
         </div>
         <div class="grid-col-3">
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
+            anim id est laborum.</p>
         </div>
         <div class="grid-col-3">
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
+            anim id est laborum.</p>
         </div>
       </div>
 
@@ -1322,7 +1381,8 @@
               <div class="lbb-sidebar-item">
                 <p>
                   Distance
-                  <small class="badge badge-info" data-toggle="tooltip" data-placement="top" title="Tooltip">TOOLTIP</small>
+                  <small class="badge badge-info" data-toggle="tooltip" data-placement="top"
+                    title="Tooltip">TOOLTIP</small>
                 </p>
                 <ul>
                   <li><label><input name="checkbox" type="checkbox" checked="checked"> Choice A</label></li>
@@ -1336,15 +1396,14 @@
           <div class="lbb-bright-container">
             <div class="form-search">
               <div>
-                <input class="input-icon input-icon-suitcase"
-                       type="text"
-                       placeholder="Métier recherché : (boucher, cariste, secrétaire, ...)">
-                <input class="input-icon input-icon-location"
-                       type="text"
-                       placeholder="Autour de : (Paris, Bd Voltaire, 33000...)">
+                <input class="input-icon input-icon-suitcase" type="text"
+                  placeholder="Métier recherché : (boucher, cariste, secrétaire, ...)">
+                <input class="input-icon input-icon-location" type="text"
+                  placeholder="Autour de : (Paris, Bd Voltaire, 33000...)">
               </div>
               <button class="btn" type="submit">
-                <img src="{{ url_for('static', filename='images/icons/magnifier-white.svg') }}" alt="Lancer la recherche">
+                <img src="{{ url_for('static', filename='images/icons/magnifier-white.svg') }}"
+                  alt="Lancer la recherche">
               </button>
             </div>
             <div class="lbb-sidebar-toggle-wrapper">
@@ -1354,136 +1413,33 @@
 
         </form>
 
-        <!-- Header NOT wrapped in a link -->
-        <div class="lbb-bright-container lbb-result">
-          <div class="lbb-result__header">
-            <h2>
-              <span>INTERMARCHE MAGNY</span> - <small>METZ</small>
-            </h2>
-            <div class="grid-row grid-spacing">
-              <div class="grid-col-4">
-                <h3>Supermarchés</h3>
-                <p>20 à 49 salariés</p>
-              </div>
-              <div class="grid-col-4">
-                <h3 class="lbb-green">
-                  Potentiel d'embauche<br>
-                  <span class="rating-stars">
-                    <b style="width: 80%;">4</b>
-                  </span>
-                  <span class="rating-value">4</span>
-                </h3>
-              </div>
-              <div class="grid-col-4">
-                <h3>4 Km</h3>
-              </div>
-            </div>
-          </div>
-        </div>
+        <h2 class="cookbook-title">Resultat</h2>
+        <h3 id="result--show_more_info" class="cookbook-title">avec le bouton "Plus d'info"</h3>
+        
+        {% with cb_include="includes/cookbook/result/show_more_info.html" %}
+          {% include "includes/cookbook/example_with_code.html" %}
+        {% endwith %}
+        
+        
+        <h3 id="result--expended" class="cookbook-title">expended</h3>
+        with class=active
 
-        <!-- Header wrapped in a link -->
-        <div class="lbb-bright-container lbb-result">
-          <div class="lbb-result__header">
-            <h2>
-              <span>SIMPLY MARKET</span> - <small>METZ</small>
-            </h2>
-            <div class="grid-row grid-spacing">
-              <div class="grid-col-4">
-                <h3>Supermarchés</h3>
-                <p>20 à 49 salariés</p>
-              </div>
-              <div class="grid-col-4">
-                <h3 class="lbb-green">
-                  Potentiel d'embauche<br>
-                  <span class="rating-stars">
-                    <b style="width: 80%;">4</b>
-                  </span>
-                  <span class="rating-value">4</span>
-                </h3>
-              </div>
-              <div class="grid-col-4">
-                <h3>2 Km</h3>
-              </div>
-            </div>
-          </div>
-          <div class="lbb-result__actions">
-            <a class="btn btn-small js-result-toggle-details" href="#">Plus d'infos</a>
-            <a class="btn btn-light btn-small" href="#">Télécharger la fiche en PDF</a>
-            <a class="btn btn-light btn-small" href="#">Ajouter aux favoris</a>
-          </div>
-        </div>
+        {% with cb_include="includes/cookbook/result/active.html" %}
+          {% include "includes/cookbook/example_with_code.html" %}
+        {% endwith %}
 
-        <!-- Header wrapped in a link -->
-        <div class="lbb-bright-container lbb-result active">
-          <div class="lbb-result__header">
-            <h2>
-              <span>SIMPLY MARKET</span> - <small>METZ</small>
-            </h2>
-            <div class="grid-row grid-spacing">
-              <div class="grid-col-4">
-                <h3>Supermarchés</h3>
-                <p>20 à 49 salariés</p>
-              </div>
-              <div class="grid-col-4">
-                <h3 class="lbb-green">
-                  Potentiel d'embauche<br>
-                  <span class="rating-stars">
-                    <b style="width: 80%;">4</b>
-                  </span>
-                  <span class="rating-value">4</span>
-                </h3>
-              </div>
-              <div class="grid-col-4">
-                <h3>2 Km</h3>
-              </div>
-            </div>
-          </div>
-          <div class="lbb-result__actions">
-            <a class="btn btn-small js-result-toggle-details" href="#">Plus d'infos</a>
-            <a class="btn btn-light btn-small" href="#">Télécharger la fiche en PDF</a>
-            <a class="btn btn-light btn-small" href="#">Ajouter aux favoris</a>
-          </div>
-          <div class="lbb-result__details">
-            <div class="lbb-result__content">
-              <div class="grid-row grid-spacing">
-                <div class="grid-col-4">
-                  <h3>Raison sociale</h3>
-                  <p>ATAC</p>
-                  <h3>Enseigne</h3>
-                  <p>SIMPLY MARKET</p>
-                  <h3>Adresse</h3>
-                  <p>
-                      ATAC<br>
-                      SIMPLY MARKET<br>
-                      Service des ressources humaines<br>
-                      23 RUE DU XXE CORPS AMERICAIN<br>
-                      57000 METZ<br>
-                  </p>
-                </div>
-                <div class="grid-col-4">
-                  <h3 class="lbb-purple">C'est mon entreprise !</h3>
-                  <p><a href="#">Modifier ces informations</a></p>
-                </div>
-                <div class="grid-col-4">
-                  <h3>Mode de contact à privilégier</h3>
-                  <p>Se présenter spontanément</p>
-                  <h3>Informations supplémentaires</h3>
-                  <ul>
-                    <li>
-                      <a href="#">Google</a>
-                    </li>
-                    <li>
-                      <a href="#">Kompass</a>
-                    </li>
-                    <li>
-                      <small>SIRET : 123456789</small>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div><!-- END .result__content -->
-          </div>
-        </div>
+        <h3 id="result--hide_footer" class="cookbook-title">without footer</h3>
+        with hide_footer=1
+
+        {% with cb_include="includes/cookbook/result/hide_footer.html" %}
+          {% include "includes/cookbook/example_with_code.html" %}
+        {% endwith %}
+
+        <h2 id="result--mobiville" class="cookbook-title">Banniere mobiville</h2>
+
+        {% with cb_include="includes/cookbook/result/mobiville.html" %}
+          {% include "includes/cookbook/example_with_code.html" %}
+        {% endwith %}
 
         <div class="lbb-bright-container">
           <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
@@ -1608,21 +1564,21 @@
       <div class="cookbook-title">steps-view</div>
 
       {% set steps = [
-        (
-          "components/icon/transparency.svg",
-          "Recherchez un <strong>métier</strong> et la <strong>ville</strong> où vous voulez travailler" | safe
-        ), (
-          "components/icon/job.svg",
-          "Identifiez <strong>les entreprises qui vous intéressent</strong>" | safe
-        ), (
-          "components/icon/check.svg",
-          "Envoyez votre <strong>candidature spontanée</strong> !" | safe
-        )
+      (
+      "components/icon/transparency.svg",
+      "Recherchez un <strong>métier</strong> et la <strong>ville</strong> où vous voulez travailler" | safe
+      ), (
+      "components/icon/job.svg",
+      "Identifiez <strong>les entreprises qui vous intéressent</strong>" | safe
+      ), (
+      "components/icon/check.svg",
+      "Envoyez votre <strong>candidature spontanée</strong> !" | safe
+      )
       ] %}
       {% include "components/steps-view.html" %}
     </div>
   </div>
-  
+
   <!-- ********************************** Footer ********************************** -->
   <div class="cookbook-title">Footer</div>
   <footer class="lbb-footer-wrapper">
@@ -1650,7 +1606,9 @@
     </div>
   </footer>
 
-  {% assets "js_all" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% assets "js_all" %}
+  <script src="{{ ASSET_URL }}"></script>{% endassets %}
 
 </body>
+
 </html>

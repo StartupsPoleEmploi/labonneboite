@@ -2,11 +2,11 @@
 
   $(document).on('lbbready', function () {
     $().updateTextAndMap();
-    $('#map-switch-button, #map-switch-text').switchButton();
+    $('#map-switch-button, #map-switch-text').initMapSwitchButton();
   });
 
 
-  $.fn.switchButton = function () {
+  $.fn.initMapSwitchButton = function () {
     var switchButton = $(this);
     switchButton.on('click', function (e) {
       e.preventDefault();
