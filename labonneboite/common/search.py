@@ -446,7 +446,6 @@ def build_json_body_elastic_search(
 
     # Build filters.
     filters = [{"range": {"score": {"gt": 0,}}}]
-    should_filters = []
     if naf_codes:
         filters = [{
             "terms": {
@@ -510,10 +509,6 @@ def build_json_body_elastic_search(
         filters.append({"term": {"flag_pmsmp": 1,}})
 
     main_query = {"filtered": {"filter": {"bool": {"must": filters,}}}}
-
-    if should_filters:
-        # 'should' filters means that at least 1 of the filters should match
-        main_query['filtered']['filter']['bool']['should'] = should_filters
 
     # Build sorting.
 
