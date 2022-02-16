@@ -1,20 +1,20 @@
-from datetime import datetime
 import collections
 import logging
-
+from datetime import datetime
 from enum import auto, Enum
+from typing import Any, Dict, List, Optional, Sequence, Union
+
 from slugify import slugify
 
-from labonneboite.common import mapping as mapping_util
-from labonneboite.common import sorting
 from labonneboite.common import hiring_type_util
-from labonneboite.common import util
-from labonneboite.common.pagination import OFFICES_PER_PAGE
-from labonneboite.common.models import Office
-from labonneboite.common.fetcher import Fetcher
+from labonneboite.common import mapping as mapping_util
+from labonneboite.common import sorting, util
 from labonneboite.common.es import Elasticsearch
-from labonneboite.conf import settings
+from labonneboite.common.fetcher import Fetcher
+from labonneboite.common.models import Office
+from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
+from labonneboite.conf import settings
 
 logger = logging.getLogger('main')
 
@@ -25,6 +25,12 @@ class AudienceFilter(Enum):
     SENIOR = 2
     HANDICAP = 3
 
+
+TermType = Union[str, int]
+TermsType = Sequence[TermType]
+RangeType = Dict[str, int]
+ValueType = Union[TermsType, TermType, RangeType]
+Filter = Dict[str, Dict[str, Any]]
 
 KEY_TO_LABEL_DISTANCES = {
     '*-10.0': 'less_10_km',
@@ -397,11 +403,17 @@ def aggregate_distance(aggregations_raw):
     return distances_aggregations
 
 
-def get_score_for_rome_field_name(hiring_type, rome_code):
-    return {
-        hiring_type_util.DPAE: DPAE_SCORE_FIELD_NAME + ".%s",
-        hiring_type_util.ALTERNANCE: ALTERNANCE_SCORE_FIELD_NAME + ".%s",
-    }[hiring_type] % rome_code
+def get_score_field_name(hiring_type: str):
+    mapping = {
+        hiring_type_util.DPAE: DPAE_SCORE_FIELD_NAME,
+        hiring_type_util.ALTERNANCE: ALTERNANCE_SCORE_FIELD_NAME,
+    }
+    return mapping[hiring_type]
+
+
+def get_score_for_rome_field_name(hiring_type: str, rome_code: str):
+    field_name = get_score_field_name(hiring_type)
+    return f"{field_name}.{rome_code}"
 
 
 def get_boosted_rome_field_name(hiring_type, rome_code):
@@ -413,84 +425,87 @@ def get_boosted_rome_field_name(hiring_type, rome_code):
     }[hiring_type] % rome_code
 
 
-def build_json_body_elastic_search(
-    naf_codes,
-    rome_codes,
-    latitude,
-    longitude,
-    distance,
-    travel_mode=None,
-    from_number=None,
-    to_number=None,
-    headcount=settings.HEADCOUNT_WHATEVER,
-    sort=sorting.SORT_FILTER_DEFAULT,
-    hiring_type=None,
-    flag_junior=0,
-    flag_senior=0,
-    flag_handicap=0,
-    aggregate_by=None,
-    departments=None,
-    flag_pmsmp=None,
-):
+def addFilterRange(key: str, *, to: List[Filter], if_=True, **kwargs):
+    conditionallyAddFilter("range", key, kwargs, to=to, if_=if_)
 
-    hiring_type = hiring_type or hiring_type_util.DEFAULT
-    gps_available = latitude is not None and longitude is not None
 
-    score_for_rome_field_names = [get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes]
+def addFilterTerms(key: str, value: TermsType, *, to: List[Filter], if_=True):
+    conditionallyAddFilter("terms", key, value, to=to, if_=if_)
 
-    # FIXME one day make boosted_rome logic compatible with multi rome, right now it only
-    # works based on the first of the romes. Not urgent, as multi rome is API only,
-    # and also this would increase complexity of the ES sorting mechanism.
-    rome_code = rome_codes[0]
-    boosted_rome_field_name = get_boosted_rome_field_name(hiring_type, rome_code)
 
-    # Build filters.
-    filters = [{"range": {"score": {"gt": 0,}}}]
-    if naf_codes:
-        filters = [{
-            "terms": {
-                "naf": naf_codes,
-            },
-        }]
+def addFilterTerm(key: str, value: TermType = 1, *, to: List[Filter], if_=True):
+    conditionallyAddFilter("term", key, value, to=to, if_=if_)
 
+
+def conditionallyAddFilter(type_: str, key: str, value: ValueType, *, to: List[Filter], if_=True):
+    if if_:
+        addFilter(type_, key, value, to=to)
+
+
+def addFilter(type_: str, key: str, value: ValueType, *, to: List[Filter]):
+    to.append({
+        type_: {
+            key: value
+        },
+    })
+
+
+def addHeadcountFilter(headcount: Union[str, int], *, to: list):
     # in some cases, a string is given as input, let's ensure it is an int from now on
     try:
         headcount = int(headcount)
     except ValueError:
         headcount = settings.HEADCOUNT_WHATEVER
 
-    max_office_size = None
-    min_office_size = None
-    if headcount == settings.HEADCOUNT_SMALL_ONLY:
-        max_office_size = settings.HEADCOUNT_SMALL_ONLY_MAXIMUM
-    elif headcount == settings.HEADCOUNT_BIG_ONLY:
-        min_office_size = settings.HEADCOUNT_BIG_ONLY_MINIMUM
+    addFilterRange("headcount",
+                   to=to,
+                   lte=settings.HEADCOUNT_SMALL_ONLY_MAXIMUM,
+                   if_=headcount == settings.HEADCOUNT_SMALL_ONLY)
+    addFilterRange("headcount",
+                   to=to,
+                   gte=settings.HEADCOUNT_BIG_ONLY_MINIMUM,
+                   if_=headcount == settings.HEADCOUNT_BIG_ONLY)
 
-    if min_office_size or max_office_size:
-        if min_office_size:
-            headcount = {"gte": min_office_size}
-        if max_office_size:
-            headcount = {"lte": max_office_size}
-        filters.append({"numeric_range": {"headcount": headcount,}})
 
-    if flag_junior == 1:
-        filters.append({"term": {"flag_junior": 1,}})
-
-    if flag_senior == 1:
-        filters.append({"term": {"flag_senior": 1,}})
-
-    if flag_handicap == 1:
-        filters.append({"term": {"flag_handicap": 1,}})
-
-    # at least one of these fields should exist
-    filters.append(
-        {"bool": {
+def unsureRomeIsInScores(rome_codes: Sequence[str], hiring_type: str, to: list):
+    to.append({
+        "bool": {
             "should": [{
                 "exists": {
-                    "field": field_name,
+                    "field": get_score_for_rome_field_name(hiring_type, rome_code),
                 }
-            } for field_name in score_for_rome_field_names]
-        }})
+            } for rome_code in rome_codes]
+        }
+    })
+
+
+def buildFilters(
+    naf_codes: Sequence[str],
+    rome_codes: Sequence[str],
+    latitude: Optional[float],
+    longitude: Optional[float],
+    distance: str,
+    headcount: int,
+    hiring_type: Optional[str],
+    flag_junior: int,
+    flag_senior: int,
+    flag_handicap: int,
+    departments: TermsType,
+    flag_pmsmp: Optional[int],
+    gps_available: bool,
+) -> List[Filter]:
+    filters: List[Filter] = []
+    addFilterRange('score', gt=0, to=filters)
+    addFilterTerms('naf', naf_codes, to=filters, if_=naf_codes)
+
+    addHeadcountFilter(headcount, to=filters)
+
+    addFilterTerm('flag_junior', to=filters, if_=flag_junior == 1)
+    addFilterTerm('flag_senior', to=filters, if_=flag_senior == 1)
+    addFilterTerm('flag_handicap', to=filters, if_=flag_handicap == 1)
+
+    # at least one of these fields should exist
+    unsureRomeIsInScores(rome_codes, hiring_type, to=filters)
 
     if gps_available:
         filters.append(
@@ -502,13 +517,52 @@ def build_json_body_elastic_search(
                 }
             }})
 
-    if departments:
-        filters.append({'terms': {'department': departments,}})
+    addFilterTerms('department', departments, to=filters, if_=departments)
+    addFilterTerm('flag_pmsmp', 1, to=filters, if_=flag_pmsmp == 1)
+    return filters
 
-    if flag_pmsmp == 1:
-        filters.append({"term": {"flag_pmsmp": 1,}})
 
-    main_query = {"filtered": {"filter": {"bool": {"must": filters,}}}}
+def build_json_body_elastic_search(
+    naf_codes: Sequence[str],
+    rome_codes: Sequence[str],
+    latitude: Optional[float],
+    longitude: Optional[float],
+    distance: str,
+    travel_mode=None,  # todo: remove
+    from_number: Optional[int] = None,
+    to_number: Optional[int] = None,
+    headcount: int = settings.HEADCOUNT_WHATEVER,
+    sort: str = sorting.SORT_FILTER_DEFAULT,
+    hiring_type: Optional[str] = None,
+    flag_junior: int = 0,
+    flag_senior: int = 0,
+    flag_handicap: int = 0,
+    aggregate_by: Sequence[str] = None,
+    departments: Sequence[str] = None,
+    flag_pmsmp: Optional[int] = None,
+):
+
+    hiring_type = hiring_type or hiring_type_util.DEFAULT
+    gps_available = latitude is not None and longitude is not None
+
+    # Build filters.
+    filters = buildFilters(
+        naf_codes,
+        rome_codes,
+        latitude,
+        longitude,
+        distance,
+        headcount,
+        hiring_type,
+        flag_junior,
+        flag_senior,
+        flag_handicap,
+        departments,
+        flag_pmsmp,
+        gps_available,
+    )
+
+    main_query: Dict = {"filtered": {"filter": {"bool": {"must": filters,}}}}
 
     # Build sorting.
 
@@ -523,12 +577,12 @@ def build_json_body_elastic_search(
                     {
                         # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-field-value-factor
                         "field_value_factor": {
-                            "field": score_for_rome_field_name,
+                            "field": get_score_for_rome_field_name(hiring_type, rome_code),
                             "modifier": "none",
                             # Fallback value used in case the field score_for_rome_field_name is absent.
                             "missing": 0,
                         }
-                    } for score_for_rome_field_name in score_for_rome_field_names
+                    } for rome_code in rome_codes
                 ],
                 # How to combine the result of the various functions 'field_value_factor' (1 per rome_code).
                 # We keep the maximum score amongst scores of all requested rome_codes.
@@ -584,19 +638,25 @@ def build_json_body_elastic_search(
         }
     }
 
-    boosted_romes_sort = {
-        boosted_rome_field_name: {
-            # offices without boost (missing field) are showed last
-            "missing": "_last",
-            # required, see
-            # https://stackoverflow.com/questions/17051709/no-mapping-found-for-field-in-order-to-sort-on-in-elasticsearch
-            "ignore_unmapped": True,
-        }
-    }
-
-    sort_attrs = []
+    sort_attrs: List[Any] = []
 
     if sort == sorting.SORT_FILTER_SCORE:
+        # FIXME one day make boosted_rome logic compatible with multi rome, right now it only
+        # works based on the first of the romes. Not urgent, as multi rome is API only,
+        # and also this would increase complexity of the ES sorting mechanism.
+        rome_code = rome_codes[0]
+        boosted_rome_field_name = get_boosted_rome_field_name(hiring_type, rome_code)
+
+        boosted_romes_sort = {
+            boosted_rome_field_name: {
+                # offices without boost (missing field) are showed last
+                "missing": "_last",
+                # required, see
+                # https://stackoverflow.com/questions/17051709/no-mapping-found-for-field-in-order-to-sort-on-in-elasticsearch
+                "ignore_unmapped": True,
+            }
+        }
+
         # always show boosted offices first then sort by randomized score
         sort_attrs.append(boosted_romes_sort)
         randomized_score_sort = "_score"
@@ -611,7 +671,7 @@ def build_json_body_elastic_search(
         # no randomization nor boosting happens when sorting by distance
         sort_attrs.append(distance_sort)
 
-    json_body = {
+    json_body: Dict = {
         "sort": sort_attrs,
         "query": main_query,
     }
@@ -625,7 +685,7 @@ def build_json_body_elastic_search(
                 json_body['aggs']['distance'] = {
                     'geo_distance': {
                         "field": "locations",
-                        "origin": "%s,%s" % (latitude, longitude),
+                        "origin": f"{latitude},{longitude}",
                         'unit': 'km',
                         'ranges': [{
                             'to': 10
