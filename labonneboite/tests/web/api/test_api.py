@@ -1559,7 +1559,6 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
 
     def test_multiple_romes(self):
-        # with mock.patch.object(settings, 'ALTERNANCE_SEARCH_MODE', 'xxx'):
         with self.test_request_context():
             params = self.add_security_params({
                 'contract': 'alternance',

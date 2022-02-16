@@ -436,15 +436,7 @@ def build_json_body_elastic_search(
     hiring_type = hiring_type or hiring_type_util.DEFAULT
     gps_available = latitude is not None and longitude is not None
 
-    if hiring_type == hiring_type_util.DPAE or settings.ALTERNANCE_SEARCH_MODE == 'ONLY_ALTERNANCE_COMPANIES':
-        # Case of a search for DPAE **or** ALTERNANCE companies
-        score_for_rome_field_names = [get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes]
-    else:
-        # Case of a search for DPAE **and** ALTERNANCE companies
-        score_for_rome_field_names = [
-            get_score_for_rome_field_name(h_type, r_code)
-            for h_type, r_code in [(h_type, r_code) for h_type in hiring_type_util.VALUES for r_code in rome_codes]
-        ]
+    score_for_rome_field_names = [get_score_for_rome_field_name(hiring_type, rome_code) for rome_code in rome_codes]
 
     # FIXME one day make boosted_rome logic compatible with multi rome, right now it only
     # works based on the first of the romes. Not urgent, as multi rome is API only,
