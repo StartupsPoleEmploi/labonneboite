@@ -2,8 +2,9 @@
 # Used on the frontend
 # to offer alternative ROME codes to search
 # in case the current search has no result.
+from typing import Dict, Sequence
 
-ROME_MOBILITIES = {
+ROME_MOBILITIES: Dict[str, Sequence[str]] = {
     'E1106':[
         'E1103',
         'E1108',

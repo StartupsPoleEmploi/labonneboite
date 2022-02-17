@@ -2,7 +2,7 @@ import collections
 import logging
 from datetime import datetime
 from enum import auto, Enum
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from slugify import slugify
 
@@ -18,6 +18,8 @@ from labonneboite.conf import settings
 
 logger = logging.getLogger('main')
 
+unset = object()
+
 
 class AudienceFilter(Enum):
     ALL = 0
@@ -31,6 +33,15 @@ TermsType = Sequence[TermType]
 RangeType = Dict[str, int]
 ValueType = Union[TermsType, TermType, RangeType]
 Filter = Dict[str, Dict[str, Any]]
+
+OfficeType = Dict
+OfficesType = List[OfficeType]
+NafAggregationType = List[Dict]
+HeadcountAggregationType = Dict
+DistanceAggregationType = Dict
+
+AggregationType = Union[NafAggregationType, HeadcountAggregationType, DistanceAggregationType]
+AggregationsType = Dict[str, AggregationType]
 
 KEY_TO_LABEL_DISTANCES = {
     '*-10.0': 'less_10_km',
@@ -57,10 +68,10 @@ class HiddenMarketFetcher(Fetcher):
         self,
         longitude,
         latitude,
-        departments,
+        departments=None,
         romes=None,
         distance=None,
-        travel_mode=None,
+        travel_mode=None,  # TODO: remove unused travel mode
         sort=None,
         hiring_type=None,
         from_number=1,
@@ -72,14 +83,17 @@ class HiddenMarketFetcher(Fetcher):
         aggregate_by=None,
         flag_pmsmp=None,
     ):
+        self.office_count = None
         self.latitude = latitude
         self.longitude = longitude
 
         self.romes = romes
         self.distance = distance
         self.travel_mode = travel_mode
-        self.sort = sort
-        self.hiring_type = hiring_type
+        self.sort = sort or sorting.SORT_FILTER_DEFAULT
+        assert self.sort in sorting.SORT_FILTERS, 'invalid sort type'
+        self.hiring_type = hiring_type or hiring_type_util.DEFAULT
+        assert self.hiring_type in hiring_type_util.VALUES, f'invalid hiring type {hiring_type!r}'
 
         # Pagination.
         self.from_number = from_number
@@ -110,6 +124,27 @@ class HiddenMarketFetcher(Fetcher):
         self.departments = departments
         self.flag_pmsmp = flag_pmsmp
 
+    def clone(self, **kwargs):
+        kwargs.setdefault('longitude', self.longitude)
+        kwargs.setdefault('latitude', self.latitude)
+        kwargs.setdefault('departments', self.departments)
+        kwargs.setdefault('romes', self.romes)
+        kwargs.setdefault('distance', self.distance)
+        kwargs.setdefault('travel_mode', self.travel_mode)
+        kwargs.setdefault('sort', self.sort)
+        kwargs.setdefault('hiring_type', self.hiring_type)
+        kwargs.setdefault('from_number', self.from_number)
+        kwargs.setdefault('to_number', self.to_number)
+        kwargs.setdefault('audience', self.audience)
+        kwargs.setdefault('headcount', self.headcount)
+        kwargs.setdefault('naf', self.naf)
+        kwargs.setdefault('naf_codes', self.naf_codes)
+        kwargs.setdefault('aggregate_by', self.aggregate_by)
+        kwargs.setdefault('flag_pmsmp', self.flag_pmsmp)
+        clone = HiddenMarketFetcher(**kwargs)
+        clone.office_count = self.office_count
+        return clone
+
     @property
     def flag_handicap(self):
         return self.audience == AudienceFilter.HANDICAP
@@ -130,8 +165,12 @@ class HiddenMarketFetcher(Fetcher):
         if self.naf and 'naf' in aggregations:
             aggregations['naf'] = self.get_naf_aggregations()
 
-    def _get_office_count(self, rome_codes, distance):
-        return count_offices(
+    def _get_office_count(self, rome_codes=unset, distance=unset, hiring_type=unset):
+        rome_codes = rome_codes if rome_codes != unset else self.romes
+        distance = distance if distance != unset else self.distance
+        hiring_type = hiring_type if hiring_type != unset else self.hiring_type
+
+        json_body = build_json_body_elastic_search(
             self.naf_codes,
             rome_codes,
             self.latitude,
@@ -142,49 +181,36 @@ class HiddenMarketFetcher(Fetcher):
             flag_senior=self.flag_senior,
             flag_handicap=self.flag_handicap,
             headcount=self.headcount,
-            hiring_type=self.hiring_type,
+            hiring_type=hiring_type,
             departments=self.departments,
             flag_pmsmp=self.flag_pmsmp,
             aggregate_by=None,
             sort=self.sort,
         )
+        # Drop the sorting clause as it is not needed anyway for a simple count.
+        del json_body["sort"]
+        return self._count_offices_from_es(json_body)
+
+    @staticmethod
+    def _count_offices_from_es(json_body):
+        es = Elasticsearch()
+        res = es.count(index=settings.ES_INDEX, doc_type="office", body=json_body)
+        return res["count"]
 
     def get_naf_aggregations(self):
-        _, _, aggregations = fetch_offices(
-            {},  # No naf filter
-            self.romes,
-            self.latitude,
-            self.longitude,
-            self.distance,
-            travel_mode=self.travel_mode,
+        clone = self.clone(
+            naf_codes={},  # No naf filter
             aggregate_by=["naf"],  # Only naf aggregate
-            flag_junior=self.flag_junior,
-            flag_senior=self.flag_senior,
-            flag_handicap=self.flag_handicap,
-            headcount=self.headcount,
-            hiring_type=self.hiring_type,
-            departments=self.departments,
-            flag_pmsmp=self.flag_pmsmp,
         )
+        _, aggregations = clone.get_offices()
         return aggregations['naf']
 
     def get_headcount_aggregations(self):
-        _, _, aggregations = fetch_offices(
-            self.naf_codes,
-            self.romes,
-            self.latitude,
-            self.longitude,
-            self.distance,
-            travel_mode=self.travel_mode,
+        clone = self.clone(
             aggregate_by=["headcount"],  # Only headcount aggregate
-            flag_junior=self.flag_junior,
-            flag_senior=self.flag_senior,
-            flag_handicap=self.flag_handicap,
             headcount=settings.HEADCOUNT_WHATEVER,  # No headcount filter
-            hiring_type=self.hiring_type,
-            departments=self.departments,
-            flag_pmsmp=self.flag_pmsmp,
         )
+        _, aggregations = clone.get_offices()
         return aggregations['headcount']
 
     def get_contract_aggregations(self):
@@ -193,63 +219,25 @@ class HiddenMarketFetcher(Fetcher):
         we cannot do a regular aggregation about it. Instead we manually
         do two ES calls everytime.
         """
-        total_dpae = count_offices(
-            self.naf_codes,
-            self.romes,
-            self.latitude,
-            self.longitude,
-            self.distance,
-            travel_mode=self.travel_mode,
-            flag_junior=self.flag_junior,
-            flag_senior=self.flag_senior,
-            flag_handicap=self.flag_handicap,
-            headcount=self.headcount,
-            hiring_type=hiring_type_util.DPAE,
-            departments=self.departments,
-            flag_pmsmp=self.flag_pmsmp,
-        )
+        total_dpae = self._get_office_count(hiring_type=hiring_type_util.DPAE)
 
-        total_alternance = count_offices(
-            self.naf_codes,
-            self.romes,
-            self.latitude,
-            self.longitude,
-            self.distance,
-            flag_junior=self.flag_junior,
-            flag_senior=self.flag_senior,
-            flag_handicap=self.flag_handicap,
-            headcount=self.headcount,
-            hiring_type=hiring_type_util.ALTERNANCE,
-            departments=self.departments,
-            flag_pmsmp=self.flag_pmsmp,
-        )
+        total_alternance = self._get_office_count(hiring_type=hiring_type_util.ALTERNANCE)
 
         return {'alternance': total_alternance, 'dpae': total_dpae}
 
     def get_distance_aggregations(self):
-        _, _, aggregations = fetch_offices(
-            self.naf_codes,
-            self.romes,
-            self.latitude,
-            self.longitude,
-            DISTANCE_FILTER_MAX,  # France
-            travel_mode=self.travel_mode,
+        clone = self.clone(
+            distance=DISTANCE_FILTER_MAX,  # France
             aggregate_by=["distance"],
-            flag_junior=self.flag_junior,
-            flag_senior=self.flag_senior,
-            flag_handicap=self.flag_handicap,
-            headcount=self.headcount,
-            hiring_type=self.hiring_type,
-            departments=self.departments,
-            flag_pmsmp=self.flag_pmsmp,
         )
+        _, aggregations = clone.get_offices()
         return aggregations['distance']
 
     def compute_office_count(self):
-        self.office_count = self._get_office_count(self.romes, self.distance)
+        self.office_count = self._get_office_count()
         logger.debug("set office_count to %s", self.office_count)
 
-    def get_offices(self, add_suggestions=False):
+    def get_offices(self, add_suggestions=False) -> Tuple[OfficesType, AggregationsType]:
         self.compute_office_count()
 
         current_page_size = self.to_number - self.from_number + 1
@@ -265,28 +253,10 @@ class HiddenMarketFetcher(Fetcher):
         if self.to_number > self.office_count + 1:
             self.to_number = self.office_count + 1
 
-        result = {}
-        aggregations = {}
+        result: OfficesType = []
+        aggregations: AggregationsType = {}
         if self.office_count:
-            result, _, aggregations = fetch_offices(
-                self.naf_codes,
-                self.romes,
-                self.latitude,
-                self.longitude,
-                self.distance,
-                travel_mode=self.travel_mode,
-                from_number=self.from_number,
-                to_number=self.to_number,
-                flag_junior=self.flag_junior,
-                flag_senior=self.flag_senior,
-                flag_handicap=self.flag_handicap,
-                headcount=self.headcount,
-                sort=self.sort,
-                hiring_type=self.hiring_type,
-                departments=self.departments,
-                flag_pmsmp=self.flag_pmsmp,
-                aggregate_by=self.aggregate_by,
-            )
+            result, _, aggregations = self._fetch_offices()
 
         if self.office_count <= current_page_size and add_suggestions:
 
@@ -294,13 +264,13 @@ class HiddenMarketFetcher(Fetcher):
             # Build a flat list of all the alternative romes of all searched romes.
             alternative_rome_codes = [alt_rome for rome in self.romes for alt_rome in ROME_MOBILITIES[rome]]
             for rome in set(alternative_rome_codes) - set(self.romes):
-                office_count = self._get_office_count([rome], self.distance)
+                office_count = self._get_office_count(rome_codes=[rome])
                 self.alternative_rome_codes[rome] = office_count
 
             # Suggest other distances.
             last_count = 0
             for distance, distance_label in [(30, '30 km'), (50, '50 km'), (3000, 'France entière')]:
-                office_count = self._get_office_count(self.romes, distance)
+                office_count = self._get_office_count(distance=distance)
                 if office_count > last_count:
                     last_count = office_count
                     self.alternative_distances[distance] = (distance_label, last_count)
@@ -317,54 +287,53 @@ class HiddenMarketFetcher(Fetcher):
         return alternative_rome_descriptions
 
 
-def count_offices(naf_codes, rome_codes, latitude, longitude, distance, **kwargs):
-    json_body = build_json_body_elastic_search(naf_codes, rome_codes, latitude, longitude, distance, **kwargs)
-    # Drop the sorting clause as it is not needed anyway for a simple count.
-    del json_body["sort"]
-    return count_offices_from_es(json_body)
+    def _fetch_offices(self) -> Tuple[OfficesType, int, AggregationsType]:
+        aggregate_by = self.aggregate_by
+        distance = self.distance
+        sort = self.sort or sorting.SORT_FILTER_DEFAULT
+
+        json_body = build_json_body_elastic_search(self.naf_codes,
+                                                self.romes,
+                                                self.latitude,
+                                                self.longitude,
+                                                self.distance,
+                                                travel_mode=self.travel_mode,
+                                                from_number=self.from_number,
+                                                to_number=self.to_number,
+                                                flag_junior=self.flag_junior,
+                                                flag_senior=self.flag_senior,
+                                                flag_handicap=self.flag_handicap,
+                                                headcount=self.headcount,
+                                                sort=self.sort,
+                                                hiring_type=self.hiring_type,
+                                                departments=self.departments,
+                                                flag_pmsmp=self.flag_pmsmp,
+                                                aggregate_by=self.aggregate_by)
+
+        offices, office_count, aggregations_raw = get_offices_from_es_and_db(
+            json_body,
+            sort=self.sort,
+            rome_codes=self.romes,
+            hiring_type=self.hiring_type,
+        )
+
+        # Extract aggregations
+        aggregations: AggregationsType = {}
+        if aggregate_by:
+            if 'naf' in aggregate_by:
+                aggregations['naf'] = aggregate_naf(aggregations_raw)
+            if 'hiring_type' in aggregate_by:
+                pass  # hiring_type cannot technically be aggregated and is thus processed at a later step
+            if 'headcount' in aggregate_by:
+                aggregations['headcount'] = aggregate_headcount(aggregations_raw)
+            if 'distance' in aggregate_by:
+                if distance == DISTANCE_FILTER_MAX:
+                    aggregations['distance'] = aggregate_distance(aggregations_raw)
+
+        return offices, office_count, aggregations
 
 
-def count_offices_from_es(json_body):
-    es = Elasticsearch()
-    res = es.count(index=settings.ES_INDEX, doc_type="office", body=json_body)
-    return res["count"]
-
-
-def fetch_offices(naf_codes, rome_codes, latitude, longitude, distance, aggregate_by=None, **kwargs):
-    json_body = build_json_body_elastic_search(naf_codes,
-                                               rome_codes,
-                                               latitude,
-                                               longitude,
-                                               distance,
-                                               aggregate_by=aggregate_by,
-                                               **kwargs)
-
-    sort = kwargs.get('sort', sorting.SORT_FILTER_DEFAULT)
-
-    offices, office_count, aggregations_raw = get_offices_from_es_and_db(
-        json_body,
-        sort=sort,
-        rome_codes=rome_codes,
-        hiring_type=kwargs['hiring_type'],
-    )
-
-    # Extract aggregations
-    aggregations = {}
-    if aggregate_by:
-        if 'naf' in aggregate_by:
-            aggregations['naf'] = aggregate_naf(aggregations_raw)
-        if 'hiring_type' in aggregate_by:
-            pass  # hiring_type cannot technically be aggregated and is thus processed at a later step
-        if 'headcount' in aggregate_by:
-            aggregations['headcount'] = aggregate_headcount(aggregations_raw)
-        if 'distance' in aggregate_by:
-            if distance == DISTANCE_FILTER_MAX:
-                aggregations['distance'] = aggregate_distance(aggregations_raw)
-
-    return offices, office_count, aggregations
-
-
-def aggregate_naf(aggregations_raw):
+def aggregate_naf(aggregations_raw) -> NafAggregationType:
     return [{
         "code": naf_aggregate['key'],
         "count": naf_aggregate['doc_count'],
@@ -372,7 +341,7 @@ def aggregate_naf(aggregations_raw):
     } for naf_aggregate in aggregations_raw['naf']['buckets']]
 
 
-def aggregate_headcount(aggregations_raw):
+def aggregate_headcount(aggregations_raw) -> HeadcountAggregationType:
     small = 0
     big = 0
 
@@ -387,7 +356,7 @@ def aggregate_headcount(aggregations_raw):
     return {'small': small, 'big': big}
 
 
-def aggregate_distance(aggregations_raw):
+def aggregate_distance(aggregations_raw) -> DistanceAggregationType:
     distances_aggregations = {}
     for distance_aggregate in aggregations_raw['distance']['buckets']:
         key = distance_aggregate['key']
@@ -490,7 +459,7 @@ def buildFilters(
     flag_junior: int,
     flag_senior: int,
     flag_handicap: int,
-    departments: TermsType,
+    departments: Optional[TermsType],
     flag_pmsmp: Optional[int],
     gps_available: bool,
 ) -> List[Filter]:
@@ -538,7 +507,7 @@ def build_json_body_elastic_search(
     flag_senior: int = 0,
     flag_handicap: int = 0,
     aggregate_by: Sequence[str] = None,
-    departments: Sequence[str] = None,
+    departments: Optional[Sequence[str]] = None,
     flag_pmsmp: Optional[int] = None,
 ):
 
@@ -720,7 +689,7 @@ def build_json_body_elastic_search(
     return json_body
 
 
-def get_offices_from_es_and_db(json_body, sort, rome_codes, hiring_type):
+def get_offices_from_es_and_db(json_body, sort: str, rome_codes: Sequence[str], hiring_type: str):
     """
     Fetch offices first from Elasticsearch, then from the database.
 

@@ -26,7 +26,7 @@ from labonneboite.common.database import db_session
 from labonneboite.common.load_data import load_ogr_labels, load_siret_to_remove, OGR_ROME_CODES
 from labonneboite.common.models import HistoryBlacklist, Office, OfficeAdminAdd, OfficeAdminExtraGeoLocation, \
     OfficeAdminRemove, OfficeAdminUpdate, OfficeThirdPartyUpdate
-from labonneboite.common.search import fetch_offices
+from labonneboite.common.search import HiddenMarketFetcher
 from labonneboite.common.util import timeit
 from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
@@ -288,7 +288,8 @@ def get_office_as_es_doc(office):
 
 
 def get_scores_by_rome_and_boosted_romes(office: Office,
-                                         office_to_update: Optional[Union[OfficeAdminUpdate, OfficeThirdPartyUpdate]] = None):
+                                         office_to_update: Optional[Union[OfficeAdminUpdate,
+                                                                          OfficeThirdPartyUpdate]] = None):
 
     ## 0 - Get all romes related to the company
 
@@ -831,9 +832,9 @@ def sanity_check_rome_codes():
     for rome_id in romes_from_rome_naf_mapping:
         naf_code_list = mapping_util.map_romes_to_nafs([rome_id])
         disable_verbose_loggers()
-        offices, _, _ = fetch_offices(
+        fetcher = HiddenMarketFetcher(
             naf_codes=naf_code_list,
-            rome_codes=[rome_id],
+            romes=[rome_id],
             latitude=latitude,
             longitude=longitude,
             distance=distance,
@@ -841,6 +842,7 @@ def sanity_check_rome_codes():
             to_number=10,
             hiring_type=hiring_type_util.DPAE,
         )
+        offices, _ = fetcher.get_offices()
         enable_verbose_loggers()
         if len(offices) < 5:
             logger.info("%s|%s|%s", rome_id, rome_labels[rome_id], len(offices))
