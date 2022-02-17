@@ -1,0 +1,9 @@
+{
+    "naf_codes": ["naf1"],
+    "rome_codes": ["rome1"],
+    "latitude": 1.256,
+    "longitude": 2.123,
+    "distance": "10",
+    "from_number": 1,
+    "to_number": 30
+}
