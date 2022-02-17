@@ -283,7 +283,7 @@ def entreprises():
     job_doesnt_exist = not rome
 
     # Related romes
-    if settings.ENABLE_RELATED_ROMES:
+    if rome and settings.ENABLE_RELATED_ROMES:
         related_romes = None
         hide_suggestions = False
         if (named_location):
@@ -344,6 +344,7 @@ def entreprises():
     # Stop here in case of invalid arguments
     if not form.validate() or job_doesnt_exist:
         log_search_activity(activity_log_properties)
+        form.set_auto_focus_on_searched_job()
         return render_template(template, job_doesnt_exist=job_doesnt_exist, form=form)
 
     # Convert request arguments to fetcher parameters
