@@ -61,7 +61,7 @@ script:
   - echo GREPME started indexing data for selenium tests
   - create_index --full > /dev/null 2>&1  # avoid spamming travis logs
   - echo GREPME started selenium tests
-  - nosetests labonneboite/tests/selenium
+  - SELENIUM_IS_SETUP=1 nosetests labonneboite/tests/selenium
   # Test that building the docker image does not fail
   - echo GREPME started building docker image
   - docker build .

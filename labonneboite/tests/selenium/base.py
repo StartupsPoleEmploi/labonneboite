@@ -1,5 +1,7 @@
 import distutils.spawn
 import logging
+import unittest
+import os
 
 import easyprocess
 from flask import url_for as flask_url_for
@@ -12,6 +14,7 @@ from labonneboite.conf import settings
 from labonneboite.web.app import app
 
 
+@unittest.skipUnless('SELENIUM_IS_SETUP' in os.environ, 'Selenium database is not defined as setup')
 class LbbSeleniumTestCase(LiveServerTestCase):
     """
     Sets up the environment for Selenium tests and exposes

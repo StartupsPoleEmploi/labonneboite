@@ -73,7 +73,7 @@ populate-data-test:
 populate-data-test-selenium:
 	LBB_ENV=test alembic upgrade head
 	$(MYSQL) -D lbb_test < ./labonneboite/alembic/sql/etablissements_tests_selenium.sql
-	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
+	LBB_ENV=test SELENIUM_IS_SETUP=1 python ./labonneboite/scripts/create_index.py --full
 
 clear-data: clear-data-dev clear-data-test
 
@@ -235,7 +235,7 @@ test-integration: clear-data-test database-test populate-data-test
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/integration
 
 test-selenium: clear-data-test database-test populate-data-test-selenium
-	LBB_ENV=test $(NOSETESTS) labonneboite/tests/selenium
+	LBB_ENV=test SELENIUM_IS_SETUP=1 $(NOSETESTS) labonneboite/tests/selenium
 
 test-impact-retour-emploi:
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/scripts/impact_retour_emploi
