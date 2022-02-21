@@ -3,6 +3,7 @@ import logging
 from datetime import datetime
 from enum import auto, Enum
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from astroid import decorators
 
 from slugify import slugify
 
@@ -83,7 +84,6 @@ class HiddenMarketFetcher(Fetcher):
         aggregate_by=None,
         flag_pmsmp=None,
     ):
-        self.office_count = None
         self.latitude = latitude
         self.longitude = longitude
 
@@ -124,6 +124,8 @@ class HiddenMarketFetcher(Fetcher):
         self.departments = departments
         self.flag_pmsmp = flag_pmsmp
 
+        self._distance_sort_index = None
+
     def clone(self, **kwargs):
         kwargs.setdefault('longitude', self.longitude)
         kwargs.setdefault('latitude', self.latitude)
@@ -142,7 +144,6 @@ class HiddenMarketFetcher(Fetcher):
         kwargs.setdefault('aggregate_by', self.aggregate_by)
         kwargs.setdefault('flag_pmsmp', self.flag_pmsmp)
         clone = HiddenMarketFetcher(**kwargs)
-        clone.office_count = self.office_count
         return clone
 
     @property
@@ -165,31 +166,9 @@ class HiddenMarketFetcher(Fetcher):
         if self.naf and 'naf' in aggregations:
             aggregations['naf'] = self.get_naf_aggregations()
 
-    def _get_office_count(self, rome_codes=unset, distance=unset, hiring_type=unset):
-        rome_codes = rome_codes if rome_codes != unset else self.romes
-        distance = distance if distance != unset else self.distance
-        hiring_type = hiring_type if hiring_type != unset else self.hiring_type
-
-        json_body = build_json_body_elastic_search(
-            self.naf_codes,
-            rome_codes,
-            self.latitude,
-            self.longitude,
-            distance,
-            travel_mode=self.travel_mode,
-            flag_junior=self.flag_junior,
-            flag_senior=self.flag_senior,
-            flag_handicap=self.flag_handicap,
-            headcount=self.headcount,
-            hiring_type=hiring_type,
-            departments=self.departments,
-            flag_pmsmp=self.flag_pmsmp,
-            aggregate_by=None,
-            sort=self.sort,
-        )
-        # Drop the sorting clause as it is not needed anyway for a simple count.
-        del json_body["sort"]
-        return self._count_offices_from_es(json_body)
+    def _get_office_count(self):
+        query = self._build_elastic_search_query(omit_sort=True, omit_aggretation=True, omit_pagination=True)
+        return self._count_offices_from_es(query)
 
     @staticmethod
     def _count_offices_from_es(json_body):
@@ -219,9 +198,9 @@ class HiddenMarketFetcher(Fetcher):
         we cannot do a regular aggregation about it. Instead we manually
         do two ES calls everytime.
         """
-        total_dpae = self._get_office_count(hiring_type=hiring_type_util.DPAE)
+        total_dpae = self.clone(hiring_type=hiring_type_util.DPAE)._get_office_count()
 
-        total_alternance = self._get_office_count(hiring_type=hiring_type_util.ALTERNANCE)
+        total_alternance = self.clone(hiring_type=hiring_type_util.ALTERNANCE)._get_office_count()
 
         return {'alternance': total_alternance, 'dpae': total_dpae}
 
@@ -264,13 +243,13 @@ class HiddenMarketFetcher(Fetcher):
             # Build a flat list of all the alternative romes of all searched romes.
             alternative_rome_codes = [alt_rome for rome in self.romes for alt_rome in ROME_MOBILITIES[rome]]
             for rome in set(alternative_rome_codes) - set(self.romes):
-                office_count = self._get_office_count(rome_codes=[rome])
+                office_count = self.clone(romes=[rome])._get_office_count()
                 self.alternative_rome_codes[rome] = office_count
 
             # Suggest other distances.
             last_count = 0
             for distance, distance_label in [(30, '30 km'), (50, '50 km'), (3000, 'France entière')]:
-                office_count = self._get_office_count(distance=distance)
+                office_count = self.clone(distance=distance)._get_office_count()
                 if office_count > last_count:
                     last_count = office_count
                     self.alternative_distances[distance] = (distance_label, last_count)
@@ -286,49 +265,337 @@ class HiddenMarketFetcher(Fetcher):
                 alternative_rome_descriptions.append([alternative, desc, slug, count])
         return alternative_rome_descriptions
 
-
     def _fetch_offices(self) -> Tuple[OfficesType, int, AggregationsType]:
-        aggregate_by = self.aggregate_by
-        distance = self.distance
-        sort = self.sort or sorting.SORT_FILTER_DEFAULT
+        query = self._build_elastic_search_query()
 
-        json_body = build_json_body_elastic_search(self.naf_codes,
-                                                self.romes,
-                                                self.latitude,
-                                                self.longitude,
-                                                self.distance,
-                                                travel_mode=self.travel_mode,
-                                                from_number=self.from_number,
-                                                to_number=self.to_number,
-                                                flag_junior=self.flag_junior,
-                                                flag_senior=self.flag_senior,
-                                                flag_handicap=self.flag_handicap,
-                                                headcount=self.headcount,
-                                                sort=self.sort,
-                                                hiring_type=self.hiring_type,
-                                                departments=self.departments,
-                                                flag_pmsmp=self.flag_pmsmp,
-                                                aggregate_by=self.aggregate_by)
-
-        offices, office_count, aggregations_raw = get_offices_from_es_and_db(
-            json_body,
-            sort=self.sort,
-            rome_codes=self.romes,
-            hiring_type=self.hiring_type,
-        )
+        offices, office_count, aggregations_raw = self._get_offices_from_es_and_db(query)
 
         # Extract aggregations
         aggregations: AggregationsType = {}
-        if aggregate_by:
-            if 'naf' in aggregate_by:
+        if self.aggregate_by:
+            if 'naf' in self.aggregate_by:
                 aggregations['naf'] = aggregate_naf(aggregations_raw)
-            if 'hiring_type' in aggregate_by:
+            if 'hiring_type' in self.aggregate_by:
                 pass  # hiring_type cannot technically be aggregated and is thus processed at a later step
-            if 'headcount' in aggregate_by:
+            if 'headcount' in self.aggregate_by:
                 aggregations['headcount'] = aggregate_headcount(aggregations_raw)
-            if 'distance' in aggregate_by:
-                if distance == DISTANCE_FILTER_MAX:
+            if 'distance' in self.aggregate_by:
+                if self.distance == DISTANCE_FILTER_MAX:
                     aggregations['distance'] = aggregate_distance(aggregations_raw)
+
+        return offices, office_count, aggregations
+
+    @property
+    def gps_available(self):
+        return self.latitude is not None and self.longitude is not None
+
+    def _build_elastic_search_query(self, omit_sort=False, omit_aggretation=False, omit_pagination=False):
+        # Build filters.
+        filters = self._build_es_query_filters()
+
+        query: Dict = {"query": {"filtered": {"filter": {"bool": {"must": filters,}}}}}
+        if not omit_sort:
+            query = self._apply_sort(query)
+        if not omit_aggretation:
+            query = self._add_aggretation(query)
+        if not omit_pagination:
+            query = self._add_pagination(query)
+
+        return query
+
+    @decorators.cachedproperty
+    def _distance_sort(self):
+
+        distance_sort = {
+            "_geo_distance": {
+                "locations": {
+                    "lat": self.latitude,
+                    "lon": self.longitude,
+                },
+                "order": "asc",
+                "unit": "km",
+            }
+        }
+
+        return distance_sort
+
+    def _apply_sort(self, main_query: Dict):
+
+        main_query['sort'] = []
+
+        # Build sorting.
+        if self.sort == sorting.SORT_FILTER_SCORE:
+            # always show boosted offices first then sort by randomized score
+            self._add_boosted_romes_sort(main_query)
+            self._add_score_sort(main_query)
+            self._add_distance_sort(main_query)
+        elif self.sort == sorting.SORT_FILTER_DISTANCE:
+            self._add_distance_sort(main_query)
+
+        return main_query
+
+    def _add_boosted_romes_sort(self, main_query: Dict):
+        # FIXME one day make boosted_rome logic compatible with multi rome, right now it only
+        # works based on the first of the romes. Not urgent, as multi rome is API only,
+        # and also this would increase complexity of the ES sorting mechanism.
+        rome_code = self.romes[0]
+        boosted_rome_field_name = get_boosted_rome_field_name(self.hiring_type, rome_code)
+
+        boosted_romes_sort = {
+            boosted_rome_field_name: {
+                # offices without boost (missing field) are showed last
+                "missing": "_last",
+                # required, see
+                # https://stackoverflow.com/questions/17051709/no-mapping-found-for-field-in-order-to-sort-on-in-elasticsearch
+                "ignore_unmapped": True,
+            }
+        }
+        main_query['sort'].append(boosted_romes_sort)
+        return main_query
+
+    def _add_score_sort(self, main_query: Dict):
+        query = main_query.pop('query')
+
+        # 1) overload main_query to get maximum score amongst all rome_codes
+        max_score_function = {
+            # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
+            "function_score": {
+                "query": query,
+                "functions": [
+                    {
+                        # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-field-value-factor
+                        "field_value_factor": {
+                            "field": get_score_for_rome_field_name(self.hiring_type, rome_code),
+                            "modifier": "none",
+                            # Fallback value used in case the field score_for_rome_field_name is absent.
+                            "missing": 0,
+                        }
+                    } for rome_code in self.romes
+                ],
+                # How to combine the result of the various functions 'field_value_factor' (1 per rome_code).
+                # We keep the maximum score amongst scores of all requested rome_codes.
+                "score_mode": "max",
+                # How to combine the result of function_score with the original _score from the query.
+                # We overwrite it as our combined _score == max(score_for_rome for rome in romes) is all we need.
+                "boost_mode": "replace",
+            }
+        }
+
+        # 2) overload main_query to add smart randomization aka weighted shuffling aka "Tri optimisé"
+        random_score_query = {
+            # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
+            "function_score": {
+                "query": max_score_function,
+                "functions": [
+                    {
+                        "random_score": {
+                            # Use a different seed every day. This way results are shuffled again
+                            # every 24 hours.
+                            "seed": datetime.today().strftime('%Y-%m-%d'),
+                        },
+                    },
+                ],
+                # How to combine the result of the various functions.
+                # Totally irrelevant here as we use only one function.
+                "score_mode": "multiply",
+                # How to combine the result of function_score with the original _score from the query.
+                # We multiply so that our final _score = (random x max(score_for_rome for rome in romes)).
+                # This way, on average the combined _score of a office having score 100 will be 5 times as much
+                # as the combined _score of a office having score 20, and thus will be 5 times more likely
+                # to appear on first page.
+                "boost_mode": "multiply",
+            }
+        }
+
+        # FTR we have contributed this ES weighted shuffling example to these posts:
+        # https://stackoverflow.com/questions/34128770/weighted-random-sampling-in-elasticsearch
+        # https://github.com/elastic/elasticsearch/issues/7783#issuecomment-64880008
+        main_query['query'] = random_score_query
+        main_query['sort'].append('_score')
+
+        return main_query
+
+    def _add_distance_sort(self, main_query: Dict):
+        if self.gps_available:
+            main_query['sort'].append(
+                self._distance_sort)  # required so that office distance can be extracted and displayed on frontend
+        else:
+            main_query['sort'].append({"department": {"order": "asc",}})
+
+        self._distance_sort_index = len(main_query['sort']) - 1
+
+        return main_query
+
+    def _add_aggretation(self, json_body: Dict):
+        # Add aggregate
+        if self.aggregate_by:
+            json_body['aggs'] = {}
+            for aggregate in self.aggregate_by:
+                # Distance is not an ES field, so we have to do a specific aggregation.
+                if aggregate == 'distance' and self.gps_available:
+                    json_body['aggs']['distance'] = {
+                        'geo_distance': {
+                            "field": "locations",
+                            "origin": f"{self.latitude},{self.longitude}",
+                            'unit': 'km',
+                            'ranges': [{
+                                'to': 10
+                            }, {
+                                'to': 30
+                            }, {
+                                'to': 50
+                            }, {
+                                'to': 100
+                            }, {
+                                'to': 3000
+                            }],
+                        }
+                    }
+                # We cannot use aggregation for contract=dpae/alternance, as both kinds use different
+                # logics and are not simply two different values of the same field.
+                elif aggregate == 'contract':
+                    pass
+                else:
+                    json_body['aggs'][aggregate] = {"terms": {"field": aggregate,}}
+
+        return json_body
+
+    def _add_pagination(self, json_body):
+        # Process from_number and to_number.
+        if self.from_number:
+            json_body["from"] = self.from_number - 1
+            if self.to_number:
+                if self.to_number < self.from_number:
+                    # this should never happen
+                    logger.exception("to_number < from_number : %s < %s", self.to_number, self.from_number)
+                    raise Exception("to_number < from_number")
+                json_body["size"] = self.to_number - self.from_number + 1
+
+        return json_body
+
+    def _build_es_query_filters(self) -> Sequence[Filter]:
+        filters: List[Filter] = []
+        addFilterRange('score', gt=0, to=filters)
+        addFilterTerms('naf', self.naf_codes, to=filters, if_=self.naf_codes)
+
+        addHeadcountFilter(self.headcount, to=filters)
+
+        addFilterTerm('flag_junior', to=filters, if_=self.flag_junior == 1)
+        addFilterTerm('flag_senior', to=filters, if_=self.flag_senior == 1)
+        addFilterTerm('flag_handicap', to=filters, if_=self.flag_handicap == 1)
+
+        # at least one of these fields should exist
+        unsureRomeIsInScores(self.romes, self.hiring_type, to=filters)
+
+        if self.gps_available:
+            filters.append({
+                "geo_distance": {
+                    "distance": "%skm" % self.distance,
+                    "locations": {
+                        "lat": self.latitude,
+                        "lon": self.longitude,
+                    }
+                }
+            })
+
+        addFilterTerms('department', self.departments, to=filters, if_=self.departments)
+        addFilterTerm('flag_pmsmp', 1, to=filters, if_=self.flag_pmsmp == 1)
+        return filters
+
+    def _get_offices_from_es_and_db(self, json_body):
+        """
+        Fetch offices first from Elasticsearch, then from the database.
+
+        Returns a tuple of (offices, office_count), where `offices` is a
+        list of results as Office instances (with some extra attributes only available
+        in Elasticsearch) and `office_count` an integer of the results number.
+        """
+        assert self._distance_sort_index is not None
+
+        es = Elasticsearch()
+        logger.debug("Elastic Search request : %s", json_body)
+        res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
+
+        office_count = res['hits']['total']
+        offices: List[Office] = []
+        siret_list = [office["_source"]["siret"] for office in res['hits']['hits']]
+
+        if siret_list:
+
+            office_objects = Office.query.filter(Office.siret.in_(siret_list))
+            office_dict = {obj.siret: obj for obj in office_objects}
+
+            for siret in siret_list:
+                try:
+                    office = office_dict[siret]
+                except KeyError:
+                    # ES and DB out of sync: siret is in ES but not in DB - this should never happen
+                    logger.error("ES and DB out of sync: siret %s is in ES but not in DB - this should never happen",
+                                 siret)
+                    raise
+                if office.has_city():
+                    offices.append(office)
+                else:
+                    logging.info("office siret %s does not have city, ignoring...", siret)
+
+        # FIXME it's not great to add new properties to an existing object. It
+        # would be better to wrap the office objects in a new OfficeResult
+        # class that would add new properties related to the query.
+        es_offices_by_siret = {item['_source']['siret']: item for item in res['hits']['hits']}
+        # Check each office in the results and add some fields
+        for position, office in enumerate(offices, start=1):
+            # Get the corresponding item from the Elasticsearch results.
+            es_office = es_offices_by_siret[office.siret]
+
+            if len(es_office["sort"]) <= self._distance_sort_index:
+                raise ValueError("Incorrect number of sorting fields in ES response.")
+            # Check if this is a request with long/lat
+            has_geo_distance = any([('_geo_distance' in d) for d in json_body.get('sort')])
+            # Add an extra `distance` attribute with one digit.
+            if has_geo_distance:
+                office.distance = round(es_office["sort"][self._distance_sort_index], 1)
+            # position is later used in labonneboite/web/static/js/results.js
+            office.position = position
+
+            if len(self.romes) > 1:
+                # Get self.romes actually matching this office.
+                # Case of "contract=alternance"
+                if self.hiring_type == hiring_type_util.ALTERNANCE:
+                    # beware: sometimes the key ALTERNANCE_SCORE_FIELD_NAME is in _source but equals None
+                    all_scores = es_office['_source'].get(ALTERNANCE_SCORE_FIELD_NAME, None) or {}
+                else:
+                    all_scores = {}
+
+                # Case of DPAE and alternance, keep the DPAE scores in both cases
+                dpae_scores = es_office['_source'].get(DPAE_SCORE_FIELD_NAME, None)
+                if dpae_scores:
+                    all_scores = {**dpae_scores, **all_scores}  # This will merge the 2 dicts
+
+                scores_of_searched_romes = dict([(rome, all_scores[rome]) for rome in self.romes if rome in all_scores])
+
+                # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
+                rome_with_highest_score = max(scores_of_searched_romes, key=scores_of_searched_romes.get)
+                # Store it as an extra attribute.
+                office.matched_rome = rome_with_highest_score
+                rome_code_for_contact_mode = rome_with_highest_score
+            else:
+                rome_code_for_contact_mode = self.romes[0]
+
+            # Set boost flag
+            office.boost = False
+            boosted_rome_keyname = get_boosted_rome_field_name(self.hiring_type, self.romes[0]).split('.')[0]
+            boost_romes = es_office['_source'].get(boosted_rome_keyname, None)
+            if boost_romes:
+                romes_intersection = set(self.romes).intersection(boost_romes)
+                office.boost = bool(romes_intersection)
+
+            # Set contact mode and position
+            office.contact_mode = util.get_contact_mode_for_rome_and_office(rome_code_for_contact_mode, office)
+
+        try:
+            aggregations = res['aggregations']
+        except KeyError:
+            aggregations = []
 
         return offices, office_count, aggregations
 
@@ -446,361 +713,3 @@ def unsureRomeIsInScores(rome_codes: Sequence[str], hiring_type: str, to: list):
             } for rome_code in rome_codes]
         }
     })
-
-
-def buildFilters(
-    naf_codes: Sequence[str],
-    rome_codes: Sequence[str],
-    latitude: Optional[float],
-    longitude: Optional[float],
-    distance: str,
-    headcount: int,
-    hiring_type: Optional[str],
-    flag_junior: int,
-    flag_senior: int,
-    flag_handicap: int,
-    departments: Optional[TermsType],
-    flag_pmsmp: Optional[int],
-    gps_available: bool,
-) -> List[Filter]:
-    filters: List[Filter] = []
-    addFilterRange('score', gt=0, to=filters)
-    addFilterTerms('naf', naf_codes, to=filters, if_=naf_codes)
-
-    addHeadcountFilter(headcount, to=filters)
-
-    addFilterTerm('flag_junior', to=filters, if_=flag_junior == 1)
-    addFilterTerm('flag_senior', to=filters, if_=flag_senior == 1)
-    addFilterTerm('flag_handicap', to=filters, if_=flag_handicap == 1)
-
-    # at least one of these fields should exist
-    unsureRomeIsInScores(rome_codes, hiring_type, to=filters)
-
-    if gps_available:
-        filters.append(
-            {"geo_distance": {
-                "distance": "%skm" % distance,
-                "locations": {
-                    "lat": latitude,
-                    "lon": longitude,
-                }
-            }})
-
-    addFilterTerms('department', departments, to=filters, if_=departments)
-    addFilterTerm('flag_pmsmp', 1, to=filters, if_=flag_pmsmp == 1)
-    return filters
-
-
-def build_json_body_elastic_search(
-    naf_codes: Sequence[str],
-    rome_codes: Sequence[str],
-    latitude: Optional[float],
-    longitude: Optional[float],
-    distance: str,
-    travel_mode=None,  # todo: remove
-    from_number: Optional[int] = None,
-    to_number: Optional[int] = None,
-    headcount: int = settings.HEADCOUNT_WHATEVER,
-    sort: str = sorting.SORT_FILTER_DEFAULT,
-    hiring_type: Optional[str] = None,
-    flag_junior: int = 0,
-    flag_senior: int = 0,
-    flag_handicap: int = 0,
-    aggregate_by: Sequence[str] = None,
-    departments: Optional[Sequence[str]] = None,
-    flag_pmsmp: Optional[int] = None,
-):
-
-    hiring_type = hiring_type or hiring_type_util.DEFAULT
-    gps_available = latitude is not None and longitude is not None
-
-    # Build filters.
-    filters = buildFilters(
-        naf_codes,
-        rome_codes,
-        latitude,
-        longitude,
-        distance,
-        headcount,
-        hiring_type,
-        flag_junior,
-        flag_senior,
-        flag_handicap,
-        departments,
-        flag_pmsmp,
-        gps_available,
-    )
-
-    main_query: Dict = {"filtered": {"filter": {"bool": {"must": filters,}}}}
-
-    # Build sorting.
-
-    if sort == sorting.SORT_FILTER_SCORE:
-
-        # 1) overload main_query to get maximum score amongst all rome_codes
-        main_query = {
-            # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
-            "function_score": {
-                "query": main_query,
-                "functions": [
-                    {
-                        # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-field-value-factor
-                        "field_value_factor": {
-                            "field": get_score_for_rome_field_name(hiring_type, rome_code),
-                            "modifier": "none",
-                            # Fallback value used in case the field score_for_rome_field_name is absent.
-                            "missing": 0,
-                        }
-                    } for rome_code in rome_codes
-                ],
-                # How to combine the result of the various functions 'field_value_factor' (1 per rome_code).
-                # We keep the maximum score amongst scores of all requested rome_codes.
-                "score_mode": "max",
-                # How to combine the result of function_score with the original _score from the query.
-                # We overwrite it as our combined _score == max(score_for_rome for rome in romes) is all we need.
-                "boost_mode": "replace",
-            }
-        }
-
-        # 2) overload main_query to add smart randomization aka weighted shuffling aka "Tri optimisé"
-        main_query = {
-            # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
-            "function_score": {
-                "query": main_query,
-                "functions": [
-                    {
-                        "random_score": {
-                            # Use a different seed every day. This way results are shuffled again
-                            # every 24 hours.
-                            "seed": datetime.today().strftime('%Y-%m-%d'),
-                        },
-                    },
-                ],
-                # How to combine the result of the various functions.
-                # Totally irrelevant here as we use only one function.
-                "score_mode": "multiply",
-                # How to combine the result of function_score with the original _score from the query.
-                # We multiply so that our final _score = (random x max(score_for_rome for rome in romes)).
-                # This way, on average the combined _score of a office having score 100 will be 5 times as much
-                # as the combined _score of a office having score 20, and thus will be 5 times more likely
-                # to appear on first page.
-                "boost_mode": "multiply",
-            }
-        }
-
-        # FTR we have contributed this ES weighted shuffling example to these posts:
-        # https://stackoverflow.com/questions/34128770/weighted-random-sampling-in-elasticsearch
-        # https://github.com/elastic/elasticsearch/issues/7783#issuecomment-64880008
-
-    if sort not in sorting.SORT_FILTERS:
-        logger.info('unknown sort: %s', sort)
-        sort = sorting.SORT_FILTER_DEFAULT
-
-    distance_sort = {
-        "_geo_distance": {
-            "locations": {
-                "lat": latitude,
-                "lon": longitude,
-            },
-            "order": "asc",
-            "unit": "km",
-        }
-    }
-
-    sort_attrs: List[Any] = []
-
-    if sort == sorting.SORT_FILTER_SCORE:
-        # FIXME one day make boosted_rome logic compatible with multi rome, right now it only
-        # works based on the first of the romes. Not urgent, as multi rome is API only,
-        # and also this would increase complexity of the ES sorting mechanism.
-        rome_code = rome_codes[0]
-        boosted_rome_field_name = get_boosted_rome_field_name(hiring_type, rome_code)
-
-        boosted_romes_sort = {
-            boosted_rome_field_name: {
-                # offices without boost (missing field) are showed last
-                "missing": "_last",
-                # required, see
-                # https://stackoverflow.com/questions/17051709/no-mapping-found-for-field-in-order-to-sort-on-in-elasticsearch
-                "ignore_unmapped": True,
-            }
-        }
-
-        # always show boosted offices first then sort by randomized score
-        sort_attrs.append(boosted_romes_sort)
-        randomized_score_sort = "_score"
-        sort_attrs.append(randomized_score_sort)
-        if gps_available:
-            sort_attrs.append(
-                distance_sort)  # required so that office distance can be extracted and displayed on frontend
-        else:
-            sort_attrs.append({"department": {"order": "asc",}})
-
-    elif sort == sorting.SORT_FILTER_DISTANCE:
-        # no randomization nor boosting happens when sorting by distance
-        sort_attrs.append(distance_sort)
-
-    json_body: Dict = {
-        "sort": sort_attrs,
-        "query": main_query,
-    }
-
-    # Add aggregate
-    if aggregate_by:
-        json_body['aggs'] = {}
-        for aggregate in aggregate_by:
-            # Distance is not an ES field, so we have to do a specific aggregation.
-            if aggregate == 'distance' and gps_available:
-                json_body['aggs']['distance'] = {
-                    'geo_distance': {
-                        "field": "locations",
-                        "origin": f"{latitude},{longitude}",
-                        'unit': 'km',
-                        'ranges': [{
-                            'to': 10
-                        }, {
-                            'to': 30
-                        }, {
-                            'to': 50
-                        }, {
-                            'to': 100
-                        }, {
-                            'to': 3000
-                        }],
-                    }
-                }
-            # We cannot use aggregation for contract=dpae/alternance, as both kinds use different
-            # logics and are not simply two different values of the same field.
-            elif aggregate == 'contract':
-                pass
-            else:
-                json_body['aggs'][aggregate] = {"terms": {"field": aggregate,}}
-
-    # Process from_number and to_number.
-    if from_number:
-        json_body["from"] = from_number - 1
-        if to_number:
-            if to_number < from_number:
-                # this should never happen
-                logger.exception("to_number < from_number : %s < %s", to_number, from_number)
-                raise Exception("to_number < from_number")
-            json_body["size"] = to_number - from_number + 1
-
-    return json_body
-
-
-def get_offices_from_es_and_db(json_body, sort: str, rome_codes: Sequence[str], hiring_type: str):
-    """
-    Fetch offices first from Elasticsearch, then from the database.
-
-    Returns a tuple of (offices, office_count), where `offices` is a
-    list of results as Office instances (with some extra attributes only available
-    in Elasticsearch) and `office_count` an integer of the results number.
-
-    `sort` is needed to find back the distance between each office and the search location,
-    to store it and display it later on the frontend or in the API result.
-
-    `rome_codes` and `hiring_type` are needed in the case of multi rome search, to find
-    back for each office which rome_code actually did match.
-    """
-    if sort not in sorting.SORT_FILTERS:
-        # This should never happen.
-        # An API request would have already raised a InvalidFetcherArgument exception,
-        # and a Frontend request would have fallbacked to default sorting.
-        raise ValueError("unknown sorting : %s" % sort)
-
-    es = Elasticsearch()
-    logger.debug("Elastic Search request : %s", json_body)
-    res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
-
-    office_count = res['hits']['total']
-    offices = []
-    siret_list = [office["_source"]["siret"] for office in res['hits']['hits']]
-
-    if siret_list:
-
-        office_objects = Office.query.filter(Office.siret.in_(siret_list))
-        office_dict = {obj.siret: obj for obj in office_objects}
-
-        for siret in siret_list:
-            try:
-                office = office_dict[siret]
-            except KeyError:
-                # ES and DB out of sync: siret is in ES but not in DB - this should never happen
-                logger.error("ES and DB out of sync: siret %s is in ES but not in DB - this should never happen", siret)
-                raise
-            if office.has_city():
-                offices.append(office)
-            else:
-                logging.info("office siret %s does not have city, ignoring...", siret)
-
-    # FIXME it's not great to add new properties to an existing object. It
-    # would be better to wrap the office objects in a new OfficeResult
-    # class that would add new properties related to the query.
-    es_offices_by_siret = {item['_source']['siret']: item for item in res['hits']['hits']}
-    # FIXME These hardcoded values are soooooo ugly, unfortunately it is not so
-    # easy to make it DNRY. For the corresponding code see method build_json_body_elastic_search().
-    distance_sort_index = {
-        sorting.SORT_FILTER_DISTANCE: 0,
-        sorting.SORT_FILTER_SCORE: 2,
-    }[sort]
-    sort_fields_total = {
-        sorting.SORT_FILTER_DISTANCE: 1,  # (distance_sort)
-        sorting.SORT_FILTER_SCORE: 3,  # (boosted_romes_sort, randomized_score_sort, distance_sort)
-    }[sort]
-    # Check each office in the results and add some fields
-    for position, office in enumerate(offices, start=1):
-        # Get the corresponding item from the Elasticsearch results.
-        es_office = es_offices_by_siret[office.siret]
-
-        if len(es_office["sort"]) != sort_fields_total:
-            raise ValueError("Incorrect number of sorting fields in ES response.")
-        # Check if this is a request with long/lat
-        has_geo_distance = any([('_geo_distance' in d) for d in json_body.get('sort')])
-        # Add an extra `distance` attribute with one digit.
-        if has_geo_distance:
-            office.distance = round(es_office["sort"][distance_sort_index], 1)
-        # position is later used in labonneboite/web/static/js/results.js
-        office.position = position
-
-        if len(rome_codes) > 1:
-            # Get rome_codes actually matching this office.
-            # Case of "contract=alternance"
-            if hiring_type == hiring_type_util.ALTERNANCE:
-                # beware: sometimes the key ALTERNANCE_SCORE_FIELD_NAME is in _source but equals None
-                all_scores = es_office['_source'].get(ALTERNANCE_SCORE_FIELD_NAME, None) or {}
-            else:
-                all_scores = {}
-
-            # Case of DPAE and alternance, keep the DPAE scores in both cases
-            dpae_scores = es_office['_source'].get(DPAE_SCORE_FIELD_NAME, None)
-            if dpae_scores:
-                all_scores = {**dpae_scores, **all_scores}  # This will merge the 2 dicts
-
-            scores_of_searched_romes = dict([(rome, all_scores[rome]) for rome in rome_codes if rome in all_scores])
-
-            # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
-            rome_with_highest_score = max(scores_of_searched_romes, key=scores_of_searched_romes.get)
-            # Store it as an extra attribute.
-            office.matched_rome = rome_with_highest_score
-            rome_code_for_contact_mode = rome_with_highest_score
-        else:
-            rome_code_for_contact_mode = rome_codes[0]
-
-        # Set boost flag
-        office.boost = False
-        boosted_rome_keyname = get_boosted_rome_field_name(hiring_type, rome_codes[0]).split('.')[0]
-        boost_romes = es_office['_source'].get(boosted_rome_keyname, None)
-        if boost_romes:
-            romes_intersection = set(rome_codes).intersection(boost_romes)
-            office.boost = bool(romes_intersection)
-
-        # Set contact mode and position
-        office.contact_mode = util.get_contact_mode_for_rome_and_office(rome_code_for_contact_mode, office)
-
-    try:
-        aggregations = res['aggregations']
-    except KeyError:
-        aggregations = []
-
-    return offices, office_count, aggregations

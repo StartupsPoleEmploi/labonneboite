@@ -1,12 +1,15 @@
 import unittest
+from unittest.mock import patch, Mock
 import os
 import json
 from typing import Sequence
 
-from labonneboite.common.search import AudienceFilter, HiddenMarketFetcher, hiring_type_util, settings, sorting, build_json_body_elastic_search
+from labonneboite.common.search import AudienceFilter, HiddenMarketFetcher, hiring_type_util, settings, sorting, datetime as search_datetime
+from labonneboite.common import search
 
 PROPS_SUFFIX = '.props.json'
 RESULT_SUFFIX = '.result.json'
+
 
 class TestHiddenMarketFetcher(unittest.TestCase):
     test_dir: str = os.path.join(os.path.dirname(__file__), 'data', 'test_search')
@@ -30,8 +33,13 @@ class TestHiddenMarketFetcher(unittest.TestCase):
             aggregate_by=['naf'],
             flag_pmsmp=1,
         )
+        init.office_count = 10
         clone = init.clone()
-        self.assertIn('office_count', init.__dict__, 'The test case is incorrect, all fields aren\'t in __dict__...')
+        init_dict = init.__dict__
+        clone_dict = clone.__dict__
+        self.assertEqual(10, init_dict.pop('office_count', 'unset'))
+        self.assertIsNone(clone_dict.pop('office_count', 'unset'),
+                          'Clone office count should be reset, props may have change')
         self.assertEqual(init.__dict__, clone.__dict__,
                          'Missing field after clonning the object. Did you forget to clone it ?')
 
@@ -54,14 +62,15 @@ class TestHiddenMarketFetcher(unittest.TestCase):
                 json.load(open(result_path, 'r')),
             )
 
+    @patch.object(search, 'datetime', Mock(today=Mock(return_value=Mock(strftime=Mock(return_value='2022-02-17')))))
     def test_build_json_body_elastic_search(self):
-        self.assertEqual(2, len(self._get_data_files(PROPS_SUFFIX)))
         self.assertEqual(len(self._get_data_files(PROPS_SUFFIX)), len(self._get_data_files(RESULT_SUFFIX)))
-        count = 0
         for name, props, expected_result in self._get_expected_results():
-            count += 1
             with self.subTest(name, **props):
-                result = build_json_body_elastic_search(**props)
+                try:
+                    fetcher = HiddenMarketFetcher(**props)
+                except TypeError as e:
+                    self.fail(f'Invalid props in {self.test_dir}/{name}{PROPS_SUFFIX} : {e}')
+                result = fetcher._build_elastic_search_query()
                 self.maxDiff = None
-                self.assertDictEqual(expected_result, result)
-        self.assertEqual(2, count)
+                self.assertDictEqual(expected_result, result, f"in subTest({name})")

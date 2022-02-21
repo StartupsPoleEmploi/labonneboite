@@ -5,5 +5,6 @@
     "longitude": 2.123,
     "distance": "10",
     "from_number": null,
-    "to_number": null
+    "to_number": null,
+    "sort": "distance"
 }
