@@ -1,10 +1,11 @@
 import collections
 import logging
+from collections import OrderedDict
 from datetime import datetime
 from enum import auto, Enum
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
-from astroid import decorators
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
+from astroid import decorators
 from slugify import slugify
 
 from labonneboite.common import hiring_type_util
@@ -12,7 +13,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common import sorting, util
 from labonneboite.common.es import Elasticsearch
 from labonneboite.common.fetcher import Fetcher
-from labonneboite.common.models import Office
+from labonneboite.common.models import Office, OfficeResult
 from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
 from labonneboite.conf import settings
@@ -143,7 +144,7 @@ class HiddenMarketFetcher(Fetcher):
         kwargs.setdefault('naf_codes', self.naf_codes)
         kwargs.setdefault('aggregate_by', self.aggregate_by)
         kwargs.setdefault('flag_pmsmp', self.flag_pmsmp)
-        clone = HiddenMarketFetcher(**kwargs)
+        clone = self.__class__(**kwargs)
         return clone
 
     @property
@@ -235,7 +236,7 @@ class HiddenMarketFetcher(Fetcher):
         result: OfficesType = []
         aggregations: AggregationsType = {}
         if self.office_count:
-            result, _, aggregations = self._fetch_offices()
+            result, aggregations = self._fetch_offices()
 
         if self.office_count <= current_page_size and add_suggestions:
 
@@ -265,25 +266,25 @@ class HiddenMarketFetcher(Fetcher):
                 alternative_rome_descriptions.append([alternative, desc, slug, count])
         return alternative_rome_descriptions
 
-    def _fetch_offices(self) -> Tuple[OfficesType, int, AggregationsType]:
+    def _fetch_offices(self) -> Tuple[OfficesType, AggregationsType]:
         query = self._build_elastic_search_query()
 
-        offices, office_count, aggregations_raw = self._get_offices_from_es_and_db(query)
+        offices, aggregations_raw = self._get_offices_from_es_and_db(query)
 
         # Extract aggregations
         aggregations: AggregationsType = {}
         if self.aggregate_by:
             if 'naf' in self.aggregate_by:
-                aggregations['naf'] = aggregate_naf(aggregations_raw)
+                aggregations['naf'] = self._aggregate_naf(aggregations_raw)
             if 'hiring_type' in self.aggregate_by:
                 pass  # hiring_type cannot technically be aggregated and is thus processed at a later step
             if 'headcount' in self.aggregate_by:
-                aggregations['headcount'] = aggregate_headcount(aggregations_raw)
+                aggregations['headcount'] = self._aggregate_headcount(aggregations_raw)
             if 'distance' in self.aggregate_by:
                 if self.distance == DISTANCE_FILTER_MAX:
-                    aggregations['distance'] = aggregate_distance(aggregations_raw)
+                    aggregations['distance'] = self._aggregate_distance(aggregations_raw)
 
-        return offices, office_count, aggregations
+        return offices, aggregations
 
     @property
     def gps_available(self):
@@ -339,7 +340,7 @@ class HiddenMarketFetcher(Fetcher):
         # works based on the first of the romes. Not urgent, as multi rome is API only,
         # and also this would increase complexity of the ES sorting mechanism.
         rome_code = self.romes[0]
-        boosted_rome_field_name = get_boosted_rome_field_name(self.hiring_type, rome_code)
+        boosted_rome_field_name = self._get_boosted_rome_field_name(self.hiring_type, rome_code)
 
         boosted_romes_sort = {
             boosted_rome_field_name: {
@@ -365,7 +366,7 @@ class HiddenMarketFetcher(Fetcher):
                     {
                         # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-field-value-factor
                         "field_value_factor": {
-                            "field": get_score_for_rome_field_name(self.hiring_type, rome_code),
+                            "field": self._get_score_for_rome_field_name(self.hiring_type, rome_code),
                             "modifier": "none",
                             # Fallback value used in case the field score_for_rome_field_name is absent.
                             "missing": 0,
@@ -475,17 +476,17 @@ class HiddenMarketFetcher(Fetcher):
 
     def _build_es_query_filters(self) -> Sequence[Filter]:
         filters: List[Filter] = []
-        addFilterRange('score', gt=0, to=filters)
-        addFilterTerms('naf', self.naf_codes, to=filters, if_=self.naf_codes)
+        self._addFilterRange('score', gt=0, to=filters)
+        self._addFilterTerms('naf', self.naf_codes, to=filters, if_=self.naf_codes)
 
-        addHeadcountFilter(self.headcount, to=filters)
+        self._addHeadcountFilter(self.headcount, to=filters)
 
-        addFilterTerm('flag_junior', to=filters, if_=self.flag_junior == 1)
-        addFilterTerm('flag_senior', to=filters, if_=self.flag_senior == 1)
-        addFilterTerm('flag_handicap', to=filters, if_=self.flag_handicap == 1)
+        self._addFilterTerm('flag_junior', to=filters, if_=self.flag_junior == 1)
+        self._addFilterTerm('flag_senior', to=filters, if_=self.flag_senior == 1)
+        self._addFilterTerm('flag_handicap', to=filters, if_=self.flag_handicap == 1)
 
         # at least one of these fields should exist
-        unsureRomeIsInScores(self.romes, self.hiring_type, to=filters)
+        self._unsureRomeIsInScores(self.romes, self.hiring_type, to=filters)
 
         if self.gps_available:
             filters.append({
@@ -498,11 +499,11 @@ class HiddenMarketFetcher(Fetcher):
                 }
             })
 
-        addFilterTerms('department', self.departments, to=filters, if_=self.departments)
-        addFilterTerm('flag_pmsmp', 1, to=filters, if_=self.flag_pmsmp == 1)
+        self._addFilterTerms('department', self.departments, to=filters, if_=self.departments)
+        self._addFilterTerm('flag_pmsmp', 1, to=filters, if_=self.flag_pmsmp == 1)
         return filters
 
-    def _get_offices_from_es_and_db(self, json_body):
+    def _get_offices_from_es_and_db(self, query) -> Tuple[Sequence[OfficeResult], Sequence[Dict]]:
         """
         Fetch offices first from Elasticsearch, then from the database.
 
@@ -512,204 +513,224 @@ class HiddenMarketFetcher(Fetcher):
         """
         assert self._distance_sort_index is not None
 
-        es = Elasticsearch()
-        logger.debug("Elastic Search request : %s", json_body)
-        res = es.search(index=settings.ES_INDEX, doc_type="office", body=json_body)
+        es_res: Dict = self._get_offices_from_es(query)
+        office_results: List[OfficeResult] = self._get_office_results_from_es_results(es_res)
+        aggregations: Sequence[Dict] = es_res.get('aggregations', list())
 
-        office_count = res['hits']['total']
+        return office_results, aggregations
+
+    def _get_office_results_from_es_results(self, es_res: Dict) -> Sequence[OfficeResult]:
+        office_count: int = es_res['hits']['total']
+        es_offices_by_siret: 'OrderedDict[str, Dict]' = self._es_office_to_office_by_siret(es_res)
+
+        offices: List[Office] = self._get_offices_from_db(es_offices_by_siret)
+        office_results: List[OfficeResult] = self._format_offices_in_office_results(
+            offices,
+            es_offices_by_siret,
+            office_count,
+        )
+
+        return office_results
+
+    def _get_offices_from_db(self, es_offices_by_siret: 'OrderedDict[str, Dict]') -> List[Office]:
         offices: List[Office] = []
-        siret_list = [office["_source"]["siret"] for office in res['hits']['hits']]
+        if es_offices_by_siret:
+            office_objects: Iterable[Office] = Office.query.filter(Office.siret.in_(es_offices_by_siret.keys()))
+            offices_by_siret: Dict[str, Office] = {office.siret: office for office in office_objects}
+            contained_sirets: Iterable[str] = filter(offices_by_siret.__contains__, es_offices_by_siret.keys())
+            sorted_offices: Iterable[Office] = map(offices_by_siret.get, contained_sirets)
 
-        if siret_list:
-
-            office_objects = Office.query.filter(Office.siret.in_(siret_list))
-            office_dict = {obj.siret: obj for obj in office_objects}
-
-            for siret in siret_list:
-                try:
-                    office = office_dict[siret]
-                except KeyError:
-                    # ES and DB out of sync: siret is in ES but not in DB - this should never happen
-                    logger.error("ES and DB out of sync: siret %s is in ES but not in DB - this should never happen",
-                                 siret)
-                    raise
+            for office in sorted_offices:
                 if office.has_city():
                     offices.append(office)
                 else:
                     logging.info("office siret %s does not have city, ignoring...", siret)
+        return offices
 
-        # FIXME it's not great to add new properties to an existing object. It
-        # would be better to wrap the office objects in a new OfficeResult
-        # class that would add new properties related to the query.
-        es_offices_by_siret = {item['_source']['siret']: item for item in res['hits']['hits']}
+    def _get_offices_from_es(self, query) -> Dict:
+        res: Dict
+        es = Elasticsearch()
+        logger.debug("Elastic Search request : %s", query)
+        res = es.search(index=settings.ES_INDEX, doc_type="office", body=query)
+        return res
+
+    def _es_office_to_office_by_siret(self, es_res: Dict) -> 'OrderedDict[str, Dict]':
+        es_offices_by_siret = OrderedDict((item['_source']['siret'], item) for item in es_res['hits']['hits'])
+        return es_offices_by_siret
+
+    def _get_rome_with_highest_score(self, es_office: Dict) -> Optional[str]:
+        rome_with_highest_score: Optional[str] = None
+        if len(self.romes) > 1:
+            # Get self.romes actually matching this office.
+            # Case of "contract=alternance"
+            if self.hiring_type == hiring_type_util.ALTERNANCE:
+                # beware: sometimes the key ALTERNANCE_SCORE_FIELD_NAME is in _source but equals None
+                all_scores = es_office['_source'].get(ALTERNANCE_SCORE_FIELD_NAME, None) or {}
+            else:
+                all_scores = {}
+
+            # Case of DPAE and alternance, keep the DPAE scores in both cases
+            dpae_scores = es_office['_source'].get(DPAE_SCORE_FIELD_NAME, None)
+            if dpae_scores:
+                all_scores = {**dpae_scores, **all_scores}  # This will merge the 2 dicts
+
+            scores_of_searched_romes = dict([(rome, all_scores[rome]) for rome in self.romes if rome in all_scores])
+
+            # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
+            rome_with_highest_score = max(scores_of_searched_romes, key=scores_of_searched_romes.get)
+        elif self.romes:
+            rome_with_highest_score = self.romes[0]
+        return rome_with_highest_score
+
+    def _format_offices_in_office_results(
+        self,
+        offices: Sequence[Office],
+        es_offices_by_siret: Dict[str, Dict],
+        office_count: int,
+    ) -> Sequence[OfficeResult]:
+        office_results: List[OfficeResult] = []
+
         # Check each office in the results and add some fields
         for position, office in enumerate(offices, start=1):
+            result = OfficeResult(office, offers_count=office_count, position=position)
+
             # Get the corresponding item from the Elasticsearch results.
             es_office = es_offices_by_siret[office.siret]
 
             if len(es_office["sort"]) <= self._distance_sort_index:
                 raise ValueError("Incorrect number of sorting fields in ES response.")
-            # Check if this is a request with long/lat
-            has_geo_distance = any([('_geo_distance' in d) for d in json_body.get('sort')])
+
             # Add an extra `distance` attribute with one digit.
-            if has_geo_distance:
-                office.distance = round(es_office["sort"][self._distance_sort_index], 1)
-            # position is later used in labonneboite/web/static/js/results.js
-            office.position = position
+            if self.gps_available:
+                result.distance = round(es_office["sort"][self._distance_sort_index], 1)
 
-            if len(self.romes) > 1:
-                # Get self.romes actually matching this office.
-                # Case of "contract=alternance"
-                if self.hiring_type == hiring_type_util.ALTERNANCE:
-                    # beware: sometimes the key ALTERNANCE_SCORE_FIELD_NAME is in _source but equals None
-                    all_scores = es_office['_source'].get(ALTERNANCE_SCORE_FIELD_NAME, None) or {}
-                else:
-                    all_scores = {}
+            # Set contact mode and position
+            result.matched_rome = rome_with_highest_score = self._get_rome_with_highest_score(es_office)
 
-                # Case of DPAE and alternance, keep the DPAE scores in both cases
-                dpae_scores = es_office['_source'].get(DPAE_SCORE_FIELD_NAME, None)
-                if dpae_scores:
-                    all_scores = {**dpae_scores, **all_scores}  # This will merge the 2 dicts
-
-                scores_of_searched_romes = dict([(rome, all_scores[rome]) for rome in self.romes if rome in all_scores])
-
-                # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
-                rome_with_highest_score = max(scores_of_searched_romes, key=scores_of_searched_romes.get)
-                # Store it as an extra attribute.
-                office.matched_rome = rome_with_highest_score
-                rome_code_for_contact_mode = rome_with_highest_score
-            else:
-                rome_code_for_contact_mode = self.romes[0]
+            result.contact_mode = util.get_contact_mode_for_rome_and_office(rome_with_highest_score, office)
 
             # Set boost flag
-            office.boost = False
-            boosted_rome_keyname = get_boosted_rome_field_name(self.hiring_type, self.romes[0]).split('.')[0]
+            boosted_rome_keyname = self._get_boosted_rome_field_name(self.hiring_type, self.romes[0]).split('.')[0]
             boost_romes = es_office['_source'].get(boosted_rome_keyname, None)
             if boost_romes:
                 romes_intersection = set(self.romes).intersection(boost_romes)
-                office.boost = bool(romes_intersection)
+                result.boost = bool(romes_intersection)
 
-            # Set contact mode and position
-            office.contact_mode = util.get_contact_mode_for_rome_and_office(rome_code_for_contact_mode, office)
+            office_results.append(result)
 
-        try:
-            aggregations = res['aggregations']
-        except KeyError:
-            aggregations = []
+        return office_results
 
-        return offices, office_count, aggregations
+    @staticmethod
+    def _aggregate_naf(aggregations_raw) -> NafAggregationType:
+        return [{
+            "code": naf_aggregate['key'],
+            "count": naf_aggregate['doc_count'],
+            'label': settings.NAF_CODES.get(naf_aggregate['key']),
+        } for naf_aggregate in aggregations_raw['naf']['buckets']]
 
+    @staticmethod
+    def _aggregate_headcount(aggregations_raw) -> HeadcountAggregationType:
+        small = 0
+        big = 0
 
-def aggregate_naf(aggregations_raw) -> NafAggregationType:
-    return [{
-        "code": naf_aggregate['key'],
-        "count": naf_aggregate['doc_count'],
-        'label': settings.NAF_CODES.get(naf_aggregate['key']),
-    } for naf_aggregate in aggregations_raw['naf']['buckets']]
+        # Count by HEADCOUNT_INSEE values
+        for contract_aggregate in aggregations_raw["headcount"]["buckets"]:
+            key = contract_aggregate['key']
+            if key <= settings.HEADCOUNT_SMALL_ONLY_MAXIMUM:
+                small += contract_aggregate['doc_count']
+            elif key >= settings.HEADCOUNT_BIG_ONLY_MINIMUM:
+                big += contract_aggregate['doc_count']
 
+        return {'small': small, 'big': big}
 
-def aggregate_headcount(aggregations_raw) -> HeadcountAggregationType:
-    small = 0
-    big = 0
+    @staticmethod
+    def _aggregate_distance(aggregations_raw) -> DistanceAggregationType:
+        distances_aggregations = {}
+        for distance_aggregate in aggregations_raw['distance']['buckets']:
+            key = distance_aggregate['key']
+            try:
+                label = KEY_TO_LABEL_DISTANCES[key]
+            except KeyError as e:
+                # Unknown distance aggregation key
+                logger.exception(e)
+                continue
 
-    # Count by HEADCOUNT_INSEE values
-    for contract_aggregate in aggregations_raw["headcount"]["buckets"]:
-        key = contract_aggregate['key']
-        if key <= settings.HEADCOUNT_SMALL_ONLY_MAXIMUM:
-            small += contract_aggregate['doc_count']
-        elif key >= settings.HEADCOUNT_BIG_ONLY_MINIMUM:
-            big += contract_aggregate['doc_count']
+            distances_aggregations[label] = distance_aggregate['doc_count']
 
-    return {'small': small, 'big': big}
+        return distances_aggregations
 
-
-def aggregate_distance(aggregations_raw) -> DistanceAggregationType:
-    distances_aggregations = {}
-    for distance_aggregate in aggregations_raw['distance']['buckets']:
-        key = distance_aggregate['key']
-        try:
-            label = KEY_TO_LABEL_DISTANCES[key]
-        except KeyError as e:
-            # Unknown distance aggregation key
-            logger.exception(e)
-            continue
-
-        distances_aggregations[label] = distance_aggregate['doc_count']
-
-    return distances_aggregations
-
-
-def get_score_field_name(hiring_type: str):
-    mapping = {
-        hiring_type_util.DPAE: DPAE_SCORE_FIELD_NAME,
-        hiring_type_util.ALTERNANCE: ALTERNANCE_SCORE_FIELD_NAME,
-    }
-    return mapping[hiring_type]
-
-
-def get_score_for_rome_field_name(hiring_type: str, rome_code: str):
-    field_name = get_score_field_name(hiring_type)
-    return f"{field_name}.{rome_code}"
-
-
-def get_boosted_rome_field_name(hiring_type, rome_code):
-    hiring_type = hiring_type or hiring_type_util.DEFAULT
-
-    return {
-        hiring_type_util.DPAE: "boosted_romes.%s",
-        hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s",
-    }[hiring_type] % rome_code
-
-
-def addFilterRange(key: str, *, to: List[Filter], if_=True, **kwargs):
-    conditionallyAddFilter("range", key, kwargs, to=to, if_=if_)
-
-
-def addFilterTerms(key: str, value: TermsType, *, to: List[Filter], if_=True):
-    conditionallyAddFilter("terms", key, value, to=to, if_=if_)
-
-
-def addFilterTerm(key: str, value: TermType = 1, *, to: List[Filter], if_=True):
-    conditionallyAddFilter("term", key, value, to=to, if_=if_)
-
-
-def conditionallyAddFilter(type_: str, key: str, value: ValueType, *, to: List[Filter], if_=True):
-    if if_:
-        addFilter(type_, key, value, to=to)
-
-
-def addFilter(type_: str, key: str, value: ValueType, *, to: List[Filter]):
-    to.append({
-        type_: {
-            key: value
-        },
-    })
-
-
-def addHeadcountFilter(headcount: Union[str, int], *, to: list):
-    # in some cases, a string is given as input, let's ensure it is an int from now on
-    try:
-        headcount = int(headcount)
-    except ValueError:
-        headcount = settings.HEADCOUNT_WHATEVER
-
-    addFilterRange("headcount",
-                   to=to,
-                   lte=settings.HEADCOUNT_SMALL_ONLY_MAXIMUM,
-                   if_=headcount == settings.HEADCOUNT_SMALL_ONLY)
-    addFilterRange("headcount",
-                   to=to,
-                   gte=settings.HEADCOUNT_BIG_ONLY_MINIMUM,
-                   if_=headcount == settings.HEADCOUNT_BIG_ONLY)
-
-
-def unsureRomeIsInScores(rome_codes: Sequence[str], hiring_type: str, to: list):
-    to.append({
-        "bool": {
-            "should": [{
-                "exists": {
-                    "field": get_score_for_rome_field_name(hiring_type, rome_code),
-                }
-            } for rome_code in rome_codes]
+    @staticmethod
+    def _get_score_field_name(hiring_type: str):
+        mapping = {
+            hiring_type_util.DPAE: DPAE_SCORE_FIELD_NAME,
+            hiring_type_util.ALTERNANCE: ALTERNANCE_SCORE_FIELD_NAME,
         }
-    })
+        return mapping[hiring_type]
+
+    @classmethod
+    def _get_score_for_rome_field_name(cls, hiring_type: str, rome_code: str):
+        field_name = cls._get_score_field_name(hiring_type)
+        return f"{field_name}.{rome_code}"
+
+    @staticmethod
+    def _get_boosted_rome_field_name(hiring_type, rome_code):
+        hiring_type = hiring_type or hiring_type_util.DEFAULT
+
+        return {
+            hiring_type_util.DPAE: "boosted_romes.%s",
+            hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s",
+        }[hiring_type] % rome_code
+
+    @classmethod
+    def _addFilterRange(cls, key: str, *, to: List[Filter], if_=True, **kwargs):
+        cls._conditionallyAddFilter("range", key, kwargs, to=to, if_=if_)
+
+    @classmethod
+    def _addFilterTerms(cls, key: str, value: TermsType, *, to: List[Filter], if_=True):
+        cls._conditionallyAddFilter("terms", key, value, to=to, if_=if_)
+
+    @classmethod
+    def _addFilterTerm(cls, key: str, value: TermType = 1, *, to: List[Filter], if_=True):
+        cls._conditionallyAddFilter("term", key, value, to=to, if_=if_)
+
+    @classmethod
+    def _conditionallyAddFilter(cls, type_: str, key: str, value: ValueType, *, to: List[Filter], if_=True):
+        if if_:
+            cls._addFilter(type_, key, value, to=to)
+
+    @staticmethod
+    def _addFilter(type_: str, key: str, value: ValueType, *, to: List[Filter]):
+        to.append({
+            type_: {
+                key: value
+            },
+        })
+
+    @classmethod
+    def _addHeadcountFilter(cls, headcount: Union[str, int], *, to: list):
+        # in some cases, a string is given as input, let's ensure it is an int from now on
+        try:
+            headcount = int(headcount)
+        except ValueError:
+            headcount = settings.HEADCOUNT_WHATEVER
+
+        cls._addFilterRange("headcount",
+                            to=to,
+                            lte=settings.HEADCOUNT_SMALL_ONLY_MAXIMUM,
+                            if_=headcount == settings.HEADCOUNT_SMALL_ONLY)
+        cls._addFilterRange("headcount",
+                            to=to,
+                            gte=settings.HEADCOUNT_BIG_ONLY_MINIMUM,
+                            if_=headcount == settings.HEADCOUNT_BIG_ONLY)
+
+    @classmethod
+    def _unsureRomeIsInScores(cls, rome_codes: Sequence[str], hiring_type: str, to: list):
+        to.append({
+            "bool": {
+                "should": [{
+                    "exists": {
+                        "field": cls._get_score_for_rome_field_name(hiring_type, rome_code),
+                    }
+                } for rome_code in rome_codes]
+            }
+        })

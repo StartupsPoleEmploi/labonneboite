@@ -1,5 +1,6 @@
 
 from functools import wraps
+from typing import Sequence
 
 from flask import abort, Blueprint, current_app, jsonify, request, url_for
 
@@ -13,7 +14,7 @@ from labonneboite.common import pagination
 from labonneboite.common import hiring_type_util
 from labonneboite.common.locations import Location
 from labonneboite.common.load_data import ROME_CODES
-from labonneboite.common.models import Office
+from labonneboite.common.models import Office, OfficeResult
 from labonneboite.common.fetcher import InvalidFetcherArgument
 from labonneboite.common.constants import Scope
 from labonneboite.common.util import get_enum_from_value
@@ -161,7 +162,7 @@ def company_count():
     return jsonify(result)
 
 
-def build_result(fetcher, offices, commune_id, departements, zipcode, add_url=True):
+def build_result(fetcher, offices: Sequence[OfficeResult], commune_id, departements, zipcode, add_url=True):
     offices = [
         patch_office_result_with_sensitive_information(request.args['user'], request.args.get('origin_user'), office, office.as_json(
             rome_codes=fetcher.romes,

@@ -2,7 +2,7 @@ import datetime
 
 from labonneboite.conf import settings
 from labonneboite.common.database import db_session
-from labonneboite.common.models import Office, OfficeAdminExtraGeoLocation
+from labonneboite.common.models import Office, OfficeResult, OfficeAdminExtraGeoLocation
 from labonneboite.tests.test_base import DatabaseTest
 
 
@@ -115,14 +115,18 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
             y=49.133333,
             score_alternance=80,
         )
-        office.distance = 10
+        office_result = OfficeResult(office, distance=10)
 
         office_json = office.as_json()
+        office_result_json = office_result.as_json()
+
         self.assertEqual(office.siret, office_json['siret'])
         self.assertEqual(office.company_name, office_json['name'])
         self.assertEqual(settings.HEADCOUNT_INSEE[office.headcount], office_json['headcount_text'])
         self.assertEqual(office.x, office_json['lon'])
         self.assertEqual(office.y, office_json['lat'])
         self.assertEqual(office.naf, office_json['naf'])
-        self.assertEqual(office.distance, office_json['distance'])
         self.assertTrue(office_json['alternance'])
+
+        self.assertDictContainsSubset(office_json, office_result_json)
+        self.assertDictContainsSubset({'distance': 10}, office_result_json)

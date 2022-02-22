@@ -1,12 +1,11 @@
 from collections import defaultdict
-from labonneboite.conf import settings
-from labonneboite.common.models import Office
-from labonneboite.common.fetcher import Fetcher
-from labonneboite.common.chunks import chunks
-from labonneboite.common import hiring_type_util
-from labonneboite.common import esd
-from labonneboite.common import geocoding
+from typing import Sequence
 
+from labonneboite.common import esd, geocoding, hiring_type_util
+from labonneboite.common.chunks import chunks
+from labonneboite.common.fetcher import Fetcher
+from labonneboite.common.models import Office, OfficeResult
+from labonneboite.conf import settings
 
 OFFRES_ESD_ENDPOINT_URL = "%s/partenaire/offresdemploi/v2/offres/search" % settings.PEAM_API_BASE_URL
 OFFRES_ESD_MAXIMUM_ROMES = 3
@@ -45,7 +44,7 @@ class VisibleMarketFetcher(Fetcher):
         return HIRING_TYPE_TO_CONTRACT_NATURE_CODES[self.hiring_type]
 
 
-    def get_offices(self):
+    def get_offices(self) -> Sequence[OfficeResult]:
         offers = self.get_offers_for_romes(self.romes)
 
         office_key_to_offers = defaultdict(list)
@@ -68,7 +67,9 @@ class VisibleMarketFetcher(Fetcher):
                 office_key_to_offers.keys()
             ),
         ).limit(self.page_size).all()
+        self.office_count = len(offices)
 
+        office_results: List[OfficeResult] = []
         # Add extra fields to each office to enrich the API JSON response.
         # - `distance` : distance between the office and the search location, same as
         #                in a regular hidden market search.
@@ -78,17 +79,17 @@ class VisibleMarketFetcher(Fetcher):
         for office in offices:
             office_offers = office_key_to_offers[office.siret]
             first_offer = office_offers[0]
-                    
+            office_result = OfficeResult(office)
             office_distance = geocoding.get_distance_between_commune_id_and_coordinates(
                 commune_id=self.commune_id,
                 latitude=first_offer['lieuTravail']['latitude'],
                 longitude=first_offer['lieuTravail']['longitude'],
             )
-            office.distance = round(office_distance, 1)
+            office_result.distance = round(office_distance, 1)
 
-            office.matched_rome = first_offer['romeCode']
-            office.offers_count = len(office_offers)
-            office.offers = [
+            office_result.matched_rome = first_offer['romeCode']
+            office_result.offers_count = len(office_offers)
+            office_result.offers = [
                 {
                     'id': offer['id'],
                     'name': offer['intitule'],
@@ -101,16 +102,16 @@ class VisibleMarketFetcher(Fetcher):
                 if 'contact' in offer:
                     # FIXME: the address API will soon remove the emails
                     if 'courriel' in offer: # FIXME: this should be if 'courriel' in offer['contact']
-                        office.email = offer['contact']['courriel']
+                        office_result.email = offer['contact']['courriel']
                     if 'telephone' in offer: # FIXME: same error to fix here
-                        office.tel = offer['contact']['telephone']
+                        office_result.tel = offer['contact']['telephone']
                     if 'urlPostulation' in offer: # FIXME: same error to fix here
-                        office.website = offer['contact']['urlPostulation']
+                        office_result.website = offer['contact']['urlPostulation']
                     elif 'urlRecruteur' in offer: # FIXME: same error to fix here
-                        office.website = offer['contact']['urlRecruteur']
+                        office_result.website = offer['contact']['urlRecruteur']
+            office_results.append(office_result)
 
-        self.office_count = len(offices)
-        return offices
+        return office_results
 
 
     def get_offers_for_romes(self, romes):
