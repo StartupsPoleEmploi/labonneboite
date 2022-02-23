@@ -1,4 +1,3 @@
-
 import json
 from unittest import mock
 
@@ -56,11 +55,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
         """
         Test `update_offices` boosted flag is present when all romes are boosted
         """
-        office_to_update = OfficeAdminUpdate(
-            sirets='00000000000009',
-            name='Office 9',
-            boost_alternance=True
-        )
+        office_to_update = OfficeAdminUpdate(sirets='00000000000009', name='Office 9', boost_alternance=True)
         office_to_update.save()
         script.update_offices(OfficeAdminUpdate)
         es.Elasticsearch().indices.flush()
@@ -80,6 +75,12 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             self.assertEqual(len(data_list['companies']), 2)
 
             # 00000000000009 is boosted and is the first result
-            self.assertTrue(data_list['companies'][0]['boosted'])
+            self.assertDictContainsSubset(dict(
+                siret='00000000000009',
+                boosted=True,
+            ), data_list['companies'][0])
             # 00000000000008 is not boosted and is the second result
-            self.assertFalse(data_list['companies'][1]['boosted'])
+            self.assertDictContainsSubset(dict(
+                siret='00000000000008',
+                boosted=False,
+            ), data_list['companies'][1])
