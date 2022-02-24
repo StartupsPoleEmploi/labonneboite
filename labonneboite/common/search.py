@@ -360,6 +360,7 @@ class HiddenMarketFetcher(Fetcher):
         query = self._use_max_score_for_rome(query)
         if not settings.TEST_DISABLE_SEARCH_RANDOMIZATION:
             query = self._add_smart_randomization(query)
+        query = self._promote_office_with_emails(query)
 
         # FTR we have contributed this ES weighted shuffling example to these posts:
         # https://stackoverflow.com/questions/34128770/weighted-random-sampling-in-elasticsearch
@@ -430,13 +431,35 @@ class HiddenMarketFetcher(Fetcher):
         }
         return query
 
-        # FTR we have contributed this ES weighted shuffling example to these posts:
-        # https://stackoverflow.com/questions/34128770/weighted-random-sampling-in-elasticsearch
-        # https://github.com/elastic/elasticsearch/issues/7783#issuecomment-64880008
-        main_query['query'] = random_score_query
-        main_query['sort'].append('_score')
+    def _promote_office_with_emails(self, main_query: Dict, current_max=100):
+        """
+        Increase _score of documents if the email exists and is set.
+        """
 
-        return main_query
+        query = {
+            "function_score": {
+                "boost_mode": "sum",
+                "functions": [{
+                    "weight": current_max,
+                    "filter": {
+                        "bool": {
+                            "must": {
+                                "exists": {
+                                    "field": "email"
+                                }
+                            },
+                            "must_not": {
+                                "term": {
+                                    "email": ""
+                                }
+                            }
+                        }
+                    }
+                }],
+                "query": main_query
+            }
+        }
+        return query
 
     def _add_distance_sort(self, main_query: Dict):
         if self.gps_available:
