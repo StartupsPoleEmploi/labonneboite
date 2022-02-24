@@ -1,31 +1,42 @@
 .mobiville-banner h3,
-.mobiville-banner .company-naf-text,
-.mobiville-banner .mobiville-btn-label {
+.mobiville-banner .company-naf-text {
   color: #000;
 }
 
 .mobiville-banner .company-naf-text {
-    margin-top: 11px;
+  margin-top: 11px;
 }
 
 .mobiville-banner .mobiville-btn {
-    padding: 12.5px 58px;
-    padding: 0.78125rem 3.625rem;
+  padding: 12.5px 58px;
+  padding: 0.78125rem 3.625rem;
 }
 
 .mobiville-banner .mobiville-btn-label {
-    margin-top: 12px;
-    margin-top: 0.75rem;
+  margin-top: 12px;
+  margin-top: 0.75rem;
+
+  font-size: 10px;
+  line-height: 14px;
+
+  /* identical to box height */
+  text-align: right;
+  color: #5d5d5d;
 }
 
 .mobiville-info-alert {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #f4ddef;
+  border: 1px solid #c7297e;
+  box-sizing: border-box;
+  padding: 10px 21px;
+  padding: 0.625rem 1.3125rem ;
 }
 .mobiville-info-alert > p {
-    margin: 0;
+  margin: 0;
 }
 .mobiville-info-alert > img {
-    margin-right: 10px;
+  margin-right: 10px;
 }
