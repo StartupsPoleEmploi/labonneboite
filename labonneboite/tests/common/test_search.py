@@ -72,5 +72,4 @@ class TestHiddenMarketFetcher(unittest.TestCase):
                 except TypeError as e:
                     self.fail(f'Invalid props in {self.test_dir}/{name}{PROPS_SUFFIX} : {e}')
                 result = fetcher._build_elastic_search_query()
-                self.maxDiff = None
-                self.assertDictEqual(expected_result, result, f"in subTest({name})")
+                self.assertDictEqual(expected_result, result, f"in subTest({name})\n{json.dumps(result)}")

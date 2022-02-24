@@ -17,55 +17,71 @@
   ],
   "query": {
     "function_score": {
+      "boost_mode": "sum",
+      "functions": [
+        {
+          "weight": 100,
+          "filter": {
+            "bool": {
+              "must": { "exists": { "field": "email" } },
+              "must_not": { "term": { "email": "" } }
+            }
+          }
+        }
+      ],
       "query": {
         "function_score": {
           "query": {
-            "filtered": {
-              "filter": {
-                "bool": {
-                  "must": [
-                    { "range": { "score": { "gt": 0 } } },
-                    {
-                      "bool": {
-                        "should": [
-                          {
-                            "exists": {
-                              "field": "scores_alternance_by_rome.D1211"
+            "function_score": {
+              "query": {
+                "filtered": {
+                  "filter": {
+                    "bool": {
+                      "must": [
+                        { "range": { "score": { "gt": 0 } } },
+                        {
+                          "bool": {
+                            "should": [
+                              {
+                                "exists": {
+                                  "field": "scores_alternance_by_rome.D1211"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "geo_distance": {
+                            "distance": "10km",
+                            "locations": {
+                              "lat": 47.235456880128645,
+                              "lon": -1.5498348824858057
                             }
                           }
-                        ]
-                      }
-                    },
-                    {
-                      "geo_distance": {
-                        "distance": "10km",
-                        "locations": {
-                          "lat": 47.235456880128645,
-                          "lon": -1.5498348824858057
                         }
-                      }
+                      ]
                     }
-                  ]
+                  }
                 }
-              }
+              },
+              "functions": [
+                {
+                  "field_value_factor": {
+                    "field": "scores_alternance_by_rome.D1211",
+                    "modifier": "none",
+                    "missing": 0
+                  }
+                }
+              ],
+              "score_mode": "max",
+              "boost_mode": "replace"
             }
           },
-          "functions": [
-            {
-              "field_value_factor": {
-                "field": "scores_alternance_by_rome.D1211",
-                "modifier": "none",
-                "missing": 0
-              }
-            }
-          ],
-          "score_mode": "max",
-          "boost_mode": "replace"
+          "functions": [{ "random_score": { "seed": "2022-02-17" } }],
+          "score_mode": "multiply",
+          "boost_mode": "multiply"
         }
-      },
-      "functions": [{ "random_score": { "seed": "2022-02-17" } }],
-      "score_mode": "multiply",
-      "boost_mode": "multiply"
+      }
     }
   }
 }
