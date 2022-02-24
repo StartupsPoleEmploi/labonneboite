@@ -326,13 +326,12 @@ class HiddenMarketFetcher(Fetcher):
 
         # Build sorting.
         if self.sort == sorting.SORT_FILTER_SCORE:
+            self._add_score_sort(main_query, disable_randomization=True)
+        elif self.sort == sorting.SORT_FILTER_SMART:
             # always show boosted offices first then sort by randomized score
             self._add_boosted_romes_sort(main_query)
-            self._add_score_sort(main_query)
-            self._add_distance_sort(main_query)
-        elif self.sort == sorting.SORT_FILTER_DISTANCE:
-            self._add_distance_sort(main_query)
-
+            self._add_score_sort(main_query, disable_randomization=settings.TEST_DISABLE_SEARCH_RANDOMIZATION)
+        self._add_distance_sort(main_query)
         return main_query
 
     def _add_boosted_romes_sort(self, main_query: Dict):
@@ -354,11 +353,11 @@ class HiddenMarketFetcher(Fetcher):
         main_query['sort'].append(boosted_romes_sort)
         return main_query
 
-    def _add_score_sort(self, main_query: Dict):
+    def _add_score_sort(self, main_query: Dict, disable_randomization=False):
         query = main_query.pop('query')
 
         query = self._use_max_score_for_rome(query)
-        if not settings.TEST_DISABLE_SEARCH_RANDOMIZATION:
+        if not disable_randomization:
             query = self._add_smart_randomization(query)
         query = self._promote_office_with_emails(query)
 
@@ -556,7 +555,7 @@ class HiddenMarketFetcher(Fetcher):
         list of results as Office instances (with some extra attributes only available
         in Elasticsearch) and `office_count` an integer of the results number.
         """
-        assert self._distance_sort_index is not None
+        assert self._distance_sort_index is not None, 'did you remove it from the sorts ?'
 
         es_res: Dict = self._get_offices_from_es(query)
         office_results: List[OfficeResult] = self._get_office_results_from_es_results(es_res)

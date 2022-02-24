@@ -9,6 +9,7 @@ from labonneboite.common import autocomplete, es, hiring_type_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common import scoring as scoring_util
+from labonneboite.common import sorting
 from labonneboite.common.models import Office
 from labonneboite.common.search import HiddenMarketFetcher
 from labonneboite.conf import settings
@@ -645,7 +646,7 @@ class ApiCompanyListTest(ApiBaseTest):
         with self.test_request_context():
             params = self.add_security_params({
                 'departments': '14',
-                'sort': 'distance',
+                'sort': sorting.SORT_FILTER_DISTANCE,
                 'page': 1,
                 'page_size': 2,
                 'rome_codes': 'D1405',
@@ -846,7 +847,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405,M1801',
                 'user': 'labonneboite',
-                'sort': 'distance',
+                'sort': sorting.SORT_FILTER_DISTANCE,
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 200)
@@ -866,7 +867,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 'commune_id': self.positions['caen']['commune_id'],
                 'rome_codes': 'D1405,M1801',
                 'user': 'labonneboite',
-                'sort': 'score',
+                'sort': sorting.SORT_FILTER_SMART,
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 200)
@@ -975,7 +976,7 @@ class ApiCompanyListTest(ApiBaseTest):
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 400)
-            self.assertEqual(rv.data, b'Invalid request argument: sort. Possible values : score, distance')
+            self.assertEqual(rv.data, b'Invalid request argument: sort. Possible values : smart, distance, score')
 
     def test_sort_by_distance(self):
         with self.test_request_context():
@@ -983,7 +984,7 @@ class ApiCompanyListTest(ApiBaseTest):
             params = self.add_security_params({
                 'commune_id': self.positions['nantes']['commune_id'],
                 'rome_codes': 'D1211',
-                'sort': 'distance',
+                'sort': sorting.SORT_FILTER_DISTANCE,
                 'user': 'labonneboite'
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
@@ -1002,7 +1003,7 @@ class ApiCompanyListTest(ApiBaseTest):
             params = self.add_security_params({
                 'commune_id': self.positions['nantes']['commune_id'],
                 'rome_codes': 'D1211',
-                'sort': 'score',
+                'sort': sorting.SORT_FILTER_SMART,
                 'user': 'labonneboite'
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
@@ -1030,7 +1031,7 @@ class ApiCompanyListTest(ApiBaseTest):
             params = self.add_security_params({
                 'commune_id': self.positions['nantes']['commune_id'],
                 'rome_codes': 'D1211',
-                'sort': 'score',
+                'sort': sorting.SORT_FILTER_SMART,
                 'user': 'labonneboite'
             })
             rv = self.app.get(self.url_for("api.company_list", **params))
@@ -1452,7 +1453,7 @@ class ApiCompanyListTest(ApiBaseTest):
                 # extra non default parameters
                 # let's see if they are preserved
                 'naf_codes': '4910Z',
-                'sort': 'distance',
+                'sort': sorting.SORT_FILTER_DISTANCE,
                 'distance': 20,
             })
 

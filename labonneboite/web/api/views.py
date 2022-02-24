@@ -1,4 +1,3 @@
-
 from functools import wraps
 from typing import Sequence
 
@@ -31,6 +30,7 @@ def api_auth_required(function):
     A decorator that checks that auth and security params are valid.
     This decorator must be used on each view of the API.
     """
+
     @wraps(function)
     def decorated(*args, **kwargs):
         log_api_request()
@@ -54,6 +54,7 @@ def api_auth_required(function):
 
     return decorated
 
+
 def log_api(function):
     """
     Decorator to log API calls and results.
@@ -61,6 +62,7 @@ def log_api(function):
     Keep this decorator first in the list of decorators so that it is executed last.
     This will make sure we log the final result of the API.
     """
+
     @wraps(function)
     def decorated(*args, **kwargs):
         response = function(*args, **kwargs)
@@ -71,14 +73,13 @@ def log_api(function):
             # just in case something went wrong with the status
             status = None
 
-        activity.log_api(
-            status=status,
-            user_agent=request.user_agent.string,
-            referrer=request.referrer,
-            remote_addr=request.remote_addr,
-            application=request.args.get('origin_user', request.args.get('user', 'unknown'))
-        )
+        activity.log_api(status=status,
+                         user_agent=request.user_agent.string,
+                         referrer=request.referrer,
+                         remote_addr=request.remote_addr,
+                         application=request.args.get('origin_user', request.args.get('user', 'unknown')))
         return response
+
     return decorated
 
 
@@ -135,7 +136,6 @@ def company_list():
     except InvalidFetcherArgument as e:
         return response_400(e)
 
-
     offices, _ = fetcher.get_offices(add_suggestions=False)
 
     result = build_result(fetcher, offices, commune_id, departements, zipcode)
@@ -164,14 +164,15 @@ def company_count():
 
 def build_result(fetcher, offices: Sequence[OfficeResult], commune_id, departements, zipcode, add_url=True):
     offices = [
-        patch_office_result_with_sensitive_information(request.args['user'], request.args.get('origin_user'), office, office.as_json(
-            rome_codes=fetcher.romes,
-            distance=fetcher.distance,
-            zipcode=zipcode,
-            extra_query_string=get_ga_query_string(),
-            hiring_type=fetcher.hiring_type,
-        ), fetcher.hiring_type == hiring_type_util.ALTERNANCE)
-        for office in offices
+        patch_office_result_with_sensitive_information(
+            request.args['user'], request.args.get('origin_user'), office,
+            office.as_json(
+                rome_codes=fetcher.romes,
+                distance=fetcher.distance,
+                zipcode=zipcode,
+                extra_query_string=get_ga_query_string(),
+                hiring_type=fetcher.hiring_type,
+            ), fetcher.hiring_type == hiring_type_util.ALTERNANCE) for office in offices
     ]
 
     result = get_result(fetcher, commune_id, departements, add_url)
@@ -221,8 +222,7 @@ def compute_frontend_url(fetcher, query_string, commune_id, departments):
                 # In the meantime we just provide the URL for the first rome in the list.
                 rome_id=fetcher.romes[0],
                 _external=True,
-                **query_string
-            )
+                **query_string)
         elif departments:
             department_code = departments.split(',')[0]
             return url_for(
@@ -232,8 +232,7 @@ def compute_frontend_url(fetcher, query_string, commune_id, departments):
                 # In the meantime we just provide the URL for the first rome in the list.
                 rome_id=fetcher.romes[0],
                 _external=True,
-                **query_string
-            )
+                **query_string)
 
     # In case of search by longitude+latitude,
     # return home URL since we do not have a URL ready yet.
@@ -324,7 +323,8 @@ def get_location(request_args):
         except ValueError:
             raise InvalidFetcherArgument('latitude and longitude must be float')
     elif 'departments' not in request_args:
-        raise InvalidFetcherArgument('missing arguments: either commune_id or departments or both latitude and longitude')
+        raise InvalidFetcherArgument(
+            'missing arguments: either commune_id or departments or both latitude and longitude')
 
     if 'departments' in request_args:
         departements = request_args.get('departments')
@@ -399,12 +399,15 @@ def create_hidden_market_fetcher(location, departements, request_args):
 
     # Sort
     sort = sorting.SORT_FILTER_DEFAULT
+    ACCEPTABLE_SORTS = [sorting.SORT_FILTER_SCORE, sorting.SORT_FILTER_SMART]
     if 'sort' in request_args:
         sort = request_args.get('sort')
         if sort not in sorting.SORT_FILTERS:
             raise InvalidFetcherArgument('sort. Possible values : %s' % ', '.join(sorting.SORT_FILTERS))
-    if sort != sorting.SORT_FILTER_SCORE and location is None:
-        raise InvalidFetcherArgument('sort. %s is the only possible value with departement search. Please remove sort or departments.' % sorting.SORT_FILTER_SCORE)
+    if sort not in ACCEPTABLE_SORTS and location is None:
+        raise InvalidFetcherArgument(
+            'sort. %s are the only possible value with departement search. Please remove sort or departments.' %
+            'and'.join(ACCEPTABLE_SORTS))
 
     kwargs['sort'] = sort
 
@@ -442,7 +445,8 @@ def create_hidden_market_fetcher(location, departements, request_args):
     # WARNING: MAP uses distance=0 in their use of the API.
     kwargs['distance'] = get_distance(request_args)
     if request_args.get('distance') is not None and location is None:
-        raise InvalidFetcherArgument('filter. Long/lat is not provided so distance can not be computed. Please remove the distance param.')
+        raise InvalidFetcherArgument(
+            'filter. Long/lat is not provided so distance can not be computed. Please remove the distance param.')
 
     # Naf
     naf_codes = {}
@@ -451,9 +455,8 @@ def create_hidden_market_fetcher(location, departements, request_args):
         expected_naf_codes = mapping_util.map_romes_to_nafs(kwargs['romes'])
         invalid_nafs = [naf for naf in naf_codes if naf not in expected_naf_codes]
         if invalid_nafs:
-            raise InvalidFetcherArgument('NAF code(s): %s. Possible values : %s ' % (
-                ' '.join(invalid_nafs), ', '.join(expected_naf_codes)
-            ))
+            raise InvalidFetcherArgument('NAF code(s): %s. Possible values : %s ' %
+                                         (' '.join(invalid_nafs), ', '.join(expected_naf_codes)))
     kwargs['naf_codes'] = naf_codes
 
     # Convert contract to hiring type (DPAE/LBB or Alternance/LBA)
@@ -467,7 +470,8 @@ def create_hidden_market_fetcher(location, departements, request_args):
     if 'headcount' in request_args:
         headcount = settings.HEADCOUNT_VALUES.get(request_args.get('headcount'))
         if not headcount:
-            raise InvalidFetcherArgument('headcount. Possible values : %s' % ', '.join(sorted(settings.HEADCOUNT_VALUES.keys())))
+            raise InvalidFetcherArgument('headcount. Possible values : %s' %
+                                         ', '.join(sorted(settings.HEADCOUNT_VALUES.keys())))
     kwargs['headcount'] = headcount
 
     # Departments
@@ -483,7 +487,7 @@ def create_hidden_market_fetcher(location, departements, request_args):
     # audience filter defaults to ALL
     kwargs['audience'] = get_enum_from_value(AudienceFilter, request_args.get('audience'), AudienceFilter.ALL)
 
-    if (api_util.has_scope(request.args['user'], request.args.get('origin_user'),  Scope.COMPANY_PMSMP)):
+    if (api_util.has_scope(request.args['user'], request.args.get('origin_user'), Scope.COMPANY_PMSMP)):
         kwargs['flag_pmsmp'] = check_bool_argument(request_args, 'flag_pmsmp', 0)
 
     if location is not None:
@@ -519,9 +523,8 @@ def get_page_and_page_size(request_args):
     page = check_positive_integer_argument(request_args, 'page', 1)
     page_size = check_positive_integer_argument(request_args, 'page_size', pagination.OFFICES_PER_PAGE)
     if page_size > pagination.OFFICES_MAXIMUM_PAGE_SIZE:
-        raise InvalidFetcherArgument(
-            'page_size is too large. Maximum value is %s' % pagination.OFFICES_MAXIMUM_PAGE_SIZE
-        )
+        raise InvalidFetcherArgument('page_size is too large. Maximum value is %s' %
+                                     pagination.OFFICES_MAXIMUM_PAGE_SIZE)
     return page, page_size
 
 
@@ -529,13 +532,10 @@ def validate_rome_codes(rome_code_list):
     for rome in rome_code_list:
         if rome not in ROME_CODES:  # ROME_CODES contains ascii data but rome is unicode.
             msg = 'Unknown rome_code: %s - Possible reasons: 1) %s 2) %s' % (
-                rome,
-                'This rome_code does not exist.',
-                'This rome code exists but is very recent and thus \
+                rome, 'This rome_code does not exist.', 'This rome code exists but is very recent and thus \
                     we do not have enough data yet to build relevant results for it. \
                     We typically need at least 12 months of data before we can build \
-                    relevant results for a given rome_code.'
-            )
+                    relevant results for a given rome_code.')
             raise InvalidFetcherArgument(msg)
     if len(rome_code_list) == 0:
         raise InvalidFetcherArgument("At least one rome_code is required.")
@@ -627,11 +627,16 @@ def get_office_details(siret, alternance=False):
             'zipcode': office.zipcode,
         },
     }
-    patch_office_result_with_sensitive_information(request.args['user'], request.args.get('origin_user'), office, result, alternance)
+    patch_office_result_with_sensitive_information(request.args['user'], request.args.get('origin_user'), office,
+                                                   result, alternance)
     return jsonify(result)
 
 
-def patch_office_result_with_sensitive_information(api_username, api_user_name_forwarded, office, result, alternance=False):
+def patch_office_result_with_sensitive_information(api_username,
+                                                   api_user_name_forwarded,
+                                                   office,
+                                                   result,
+                                                   alternance=False):
     # Some internal services of Pôle emploi can sometimes have access to
     # sensitive information.
     if api_util.has_scope(api_username, api_user_name_forwarded, Scope.COMPANY_EMAIL):
