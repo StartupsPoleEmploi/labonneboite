@@ -358,7 +358,8 @@ class HiddenMarketFetcher(Fetcher):
         query = main_query.pop('query')
 
         query = self._use_max_score_for_rome(query)
-        query = self._add_smart_randomization(query)
+        if not settings.TEST_DISABLE_SEARCH_RANDOMIZATION:
+            query = self._add_smart_randomization(query)
 
         # FTR we have contributed this ES weighted shuffling example to these posts:
         # https://stackoverflow.com/questions/34128770/weighted-random-sampling-in-elasticsearch
