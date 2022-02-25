@@ -1,11 +1,11 @@
 import datetime
 import json
-from unittest import mock
 import urllib.parse
+from unittest import mock
 
 from flask import url_for
-from labonneboite.common import autocomplete
-from labonneboite.common import hiring_type_util
+
+from labonneboite.common import autocomplete, es, hiring_type_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common import scoring as scoring_util
@@ -995,6 +995,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data["companies"][1]['siret'], '00000000000009')
             self.assertLess(data["companies"][0]['distance'], data["companies"][1]['distance'])
 
+    @mock.patch.object(settings, 'TEST_DISABLE_SEARCH_RANDOMIZATION', True)
     def test_sort_by_score(self):
         with self.test_request_context():
             # Reze in first place, then Nantes
@@ -1009,8 +1010,36 @@ class ApiCompanyListTest(ApiBaseTest):
             data = self.get_json(rv)
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
-            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
-            self.assertEqual(sirets, set(['00000000000009', '00000000000008']))
+            sirets = [company['siret'] for company in data['companies']]
+            self.assertEqual(sirets, ['00000000000009', '00000000000008'])
+
+    @mock.patch.object(settings, 'TEST_DISABLE_SEARCH_RANDOMIZATION', True)
+    def test_sort_by_score_with_email(self):
+        # set an email to Company 8 (which have lower score than Company 9)
+        office_with_little_score = next(filter(lambda doc: doc['siret'] == '00000000000008', self.docs))
+        office_with_little_score['email'] = 'valid@example.com'
+        self.es.update(index=settings.ES_INDEX,
+                       doc_type=es.OFFICE_TYPE,
+                       id=office_with_little_score['siret'],
+                       body={"doc": office_with_little_score})
+        # need for ES to register our new documents, flaky test here otherwise
+        self.es.indices.flush(index=settings.ES_INDEX)
+
+        with self.test_request_context():
+            # Reze in first place, then Nantes
+            params = self.add_security_params({
+                'commune_id': self.positions['nantes']['commune_id'],
+                'rome_codes': 'D1211',
+                'sort': 'score',
+                'user': 'labonneboite'
+            })
+            rv = self.app.get(self.url_for("api.company_list", **params))
+            self.assertEqual(rv.status_code, 200)
+            data = self.get_json(rv)
+            self.assertEqual(data['companies_count'], 2)
+            self.assertEqual(len(data['companies']), 2)
+            sirets = [company['siret'] for company in data['companies']]
+            self.assertEqual(sirets, ['00000000000008', '00000000000009'])
 
     def test_wrong_contract_value(self):
         with self.test_request_context():

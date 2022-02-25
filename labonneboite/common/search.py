@@ -357,11 +357,28 @@ class HiddenMarketFetcher(Fetcher):
     def _add_score_sort(self, main_query: Dict):
         query = main_query.pop('query')
 
-        # 1) overload main_query to get maximum score amongst all rome_codes
-        max_score_function = {
+        query = self._use_max_score_for_rome(query)
+        if not settings.TEST_DISABLE_SEARCH_RANDOMIZATION:
+            query = self._add_smart_randomization(query)
+        query = self._promote_office_with_emails(query)
+
+        # FTR we have contributed this ES weighted shuffling example to these posts:
+        # https://stackoverflow.com/questions/34128770/weighted-random-sampling-in-elasticsearch
+        # https://github.com/elastic/elasticsearch/issues/7783#issuecomment-64880008
+        main_query['query'] = query
+        main_query['sort'].append('_score')
+
+        return main_query
+
+    def _use_max_score_for_rome(self, main_query: Dict) -> Dict:
+        """
+        Overload main_query to get maximum score amongst all rome_codes.
+        """
+
+        query = {
             # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
             "function_score": {
-                "query": query,
+                "query": main_query,
                 "functions": [
                     {
                         # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-field-value-factor
@@ -381,12 +398,17 @@ class HiddenMarketFetcher(Fetcher):
                 "boost_mode": "replace",
             }
         }
+        return query
 
-        # 2) overload main_query to add smart randomization aka weighted shuffling aka "Tri optimisé"
-        random_score_query = {
+    def _add_smart_randomization(self, main_query: Dict) -> Dict:
+        """
+        Overload main_query to add smart randomization aka weighted shuffling aka "Tri optimisé"
+        """
+
+        query = {
             # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
             "function_score": {
-                "query": max_score_function,
+                "query": main_query,
                 "functions": [
                     {
                         "random_score": {
@@ -407,14 +429,37 @@ class HiddenMarketFetcher(Fetcher):
                 "boost_mode": "multiply",
             }
         }
+        return query
 
-        # FTR we have contributed this ES weighted shuffling example to these posts:
-        # https://stackoverflow.com/questions/34128770/weighted-random-sampling-in-elasticsearch
-        # https://github.com/elastic/elasticsearch/issues/7783#issuecomment-64880008
-        main_query['query'] = random_score_query
-        main_query['sort'].append('_score')
+    def _promote_office_with_emails(self, main_query: Dict, current_max=100):
+        """
+        Increase _score of documents if the email exists and is set.
+        """
 
-        return main_query
+        query = {
+            "function_score": {
+                "boost_mode": "sum",
+                "functions": [{
+                    "weight": current_max,
+                    "filter": {
+                        "bool": {
+                            "must": {
+                                "exists": {
+                                    "field": "email"
+                                }
+                            },
+                            "must_not": {
+                                "term": {
+                                    "email": ""
+                                }
+                            }
+                        }
+                    }
+                }],
+                "query": main_query
+            }
+        }
+        return query
 
     def _add_distance_sort(self, main_query: Dict):
         if self.gps_available:

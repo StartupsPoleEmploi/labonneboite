@@ -1,20 +1,76 @@
-{"query": {"function_score": {"boost_mode": "multiply",
-                               "functions": [{"random_score": {"seed": "2022-02-17"}}],
-                               "query": {"function_score": {"boost_mode": "replace",
-                                                            "functions": [{"field_value_factor": {"field": "scores_by_rome.rome1",
-                                                                                                  "missing": 0,
-                                                                                                  "modifier": "none"}}],
-                                                            "query": {"filtered": {"filter": {"bool": {"must": [{"range": {"score": {"gt": 0}}},
-                                                                                                                {"terms": {"naf": ["naf1"]}},
-                                                                                                                {"bool": {"should": [{"exists": {"field": "scores_by_rome.rome1"}}]}},
-                                                                                                                {"geo_distance": {"distance": "10km",
-                                                                                                                                  "locations": {"lat": 1.256,
-                                                                                                                                                "lon": 2.123}}}]}}}},
-                                                            "score_mode": "max"}},
-                               "score_mode": "multiply"}},
-  "sort": [{"boosted_romes.rome1": {"ignore_unmapped": true,
-                                    "missing": "_last"}},
-           "_score",
-           {"_geo_distance": {"locations": {"lat": 1.256, "lon": 2.123},
-                              "order": "asc",
-                              "unit": "km"}}]}
+{
+  "sort": [
+    { "boosted_romes.rome1": { "missing": "_last", "ignore_unmapped": true } },
+    "_score",
+    {
+      "_geo_distance": {
+        "locations": { "lat": 1.256, "lon": 2.123 },
+        "order": "asc",
+        "unit": "km"
+      }
+    }
+  ],
+  "query": {
+    "function_score": {
+      "boost_mode": "sum",
+      "functions": [
+        {
+          "weight": 100,
+          "filter": {
+            "bool": {
+              "must": { "exists": { "field": "email" } },
+              "must_not": { "term": { "email": "" } }
+            }
+          }
+        }
+      ],
+      "query": {
+        "function_score": {
+          "query": {
+            "function_score": {
+              "query": {
+                "filtered": {
+                  "filter": {
+                    "bool": {
+                      "must": [
+                        { "range": { "score": { "gt": 0 } } },
+                        { "terms": { "naf": ["naf1"] } },
+                        {
+                          "bool": {
+                            "should": [
+                              { "exists": { "field": "scores_by_rome.rome1" } }
+                            ]
+                          }
+                        },
+                        {
+                          "geo_distance": {
+                            "distance": "10km",
+                            "locations": { "lat": 1.256, "lon": 2.123 }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "functions": [
+                {
+                  "field_value_factor": {
+                    "field": "scores_by_rome.rome1",
+                    "modifier": "none",
+                    "missing": 0
+                  }
+                }
+              ],
+              "score_mode": "max",
+              "boost_mode": "replace"
+            }
+          },
+          "functions": [{ "random_score": { "seed": "2022-02-17" } }],
+          "score_mode": "multiply",
+          "boost_mode": "multiply"
+        }
+      }
+    }
+  }
+}
