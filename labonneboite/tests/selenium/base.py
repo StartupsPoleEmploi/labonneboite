@@ -1,5 +1,8 @@
 import distutils.spawn
 import logging
+import unittest
+from typing import Optional
+import os
 
 import easyprocess
 from flask import url_for as flask_url_for
@@ -12,6 +15,7 @@ from labonneboite.conf import settings
 from labonneboite.web.app import app
 
 
+@unittest.skipUnless('SELENIUM_IS_SETUP' in os.environ, 'Selenium database is not defined as setup')
 class LbbSeleniumTestCase(LiveServerTestCase):
     """
     Sets up the environment for Selenium tests and exposes
@@ -102,6 +106,14 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         # Convenient utility to print client-side logs
         for entry in self.driver.get_log('browser'):
             print(entry)
+    
+    @property
+    def focusElement(self):
+        return self.driver.switch_to.active_element
+
+    def assertElementIsFocus(self, element, msg: Optional[str] = None):
+        assertion_func = self._getAssertEqualityFunc(self.focusElement, element)
+        assertion_func(self.focusElement, element, msg=msg)
 
 def url_has_changed(current_url):
     def check(driver):

@@ -10,7 +10,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pagination
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common.models import Office
-from labonneboite.common.search import fetch_offices
+from labonneboite.common.search import HiddenMarketFetcher
 from labonneboite.conf import settings
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest
 
@@ -23,14 +23,15 @@ class ApiGenericTest(ApiBaseTest):
         latitude = 49.305658  # 15 Avenue François Mitterrand, 57290 Fameck, France.
         longitude = 6.116853
         distance = 100
-        companies, _, _ = fetch_offices(
-            naf_codes,
-            [rome_code],
-            latitude,
-            longitude,
-            distance,
+        fetcher = HiddenMarketFetcher(
+            naf_codes=naf_codes,
+            romes=[rome_code],
+            latitude=latitude,
+            longitude=longitude,
+            distance=distance,
             hiring_type=hiring_type_util.DPAE,
         )
+        companies, _ = fetcher.get_offices()
         sirets = [company.siret for company in companies]
         self.assertIn('00000000000001', sirets)
         self.assertIn('00000000000002', sirets)
@@ -43,15 +44,16 @@ class ApiGenericTest(ApiBaseTest):
         longitude = 6.116853
         distance = 100
         headcount = settings.HEADCOUNT_SMALL_ONLY
-        companies, _, _ = fetch_offices(
-            naf_codes,
-            [rome_code],
-            latitude,
-            longitude,
-            distance,
+        fetcher = HiddenMarketFetcher(
+            naf_codes=naf_codes,
+            romes=[rome_code],
+            latitude=latitude,
+            longitude=longitude,
+            distance=distance,
             headcount=headcount,
             hiring_type=hiring_type_util.DPAE,
         )
+        companies, _ = fetcher.get_offices()
         sirets = [company.siret for company in companies]
         self.assertIn('00000000000001', sirets)  # this is the only office with small headcount
         self.assertNotIn('00000000000002', sirets)
@@ -64,14 +66,15 @@ class ApiGenericTest(ApiBaseTest):
         latitude += 0.1  # original coordinates will unfortunately give a distance with 0 digit
         longitude = 6.116853
         distance = 100
-        companies, _, _ = fetch_offices(
-            naf_codes,
-            [rome_code],
-            latitude,
-            longitude,
-            distance,
+        fetcher = HiddenMarketFetcher(
+            naf_codes=naf_codes,
+            romes=[rome_code],
+            latitude=latitude,
+            longitude=longitude,
+            distance=distance,
             hiring_type=hiring_type_util.DPAE,
         )
+        companies, _ = fetcher.get_offices()
         self.assertEqual(len(companies), 3)
         # what is important here is that there is one digit
         self.assertEqual(companies[0].distance, 45.9)
@@ -1559,7 +1562,6 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
 
     def test_multiple_romes(self):
-        # with mock.patch.object(settings, 'ALTERNANCE_SEARCH_MODE', 'xxx'):
         with self.test_request_context():
             params = self.add_security_params({
                 'contract': 'alternance',

@@ -382,7 +382,7 @@ DOCS = [
         'siret': '00000000000019',
         'score': 76,
         'score_alternance': 18,
-        'headcount': 0o1,
+        'headcount': 1,
         'locations': POSITIONS['toulon']['coords'],
         'name': 'Office 19',
         'flag_alternance': 0,
@@ -394,7 +394,7 @@ DOCS = [
         'siret': '00000000000020',
         'score': 90,
         'score_alternance': 18,
-        'headcount': 0o3,
+        'headcount': 3,
         'locations': POSITIONS['toulon']['coords'],
         'name': 'Office 20',
         'flag_alternance': 0,
@@ -495,6 +495,19 @@ DOCS = [
             'K1303': 51
         },
         'scores_alternance_by_rome': None,
+        'department': POSITIONS['toulon']['zip_code'][0:2],
+    },
+    # To valid hidden scores
+    {
+        'naf': '4910Z',  # Map to Rome N4403
+        'siret': '00000000000028',
+        'score': 0,
+        'score_alternance': 0,
+        'headcount': 1,
+        'locations': POSITIONS['toulon']['coords'],
+        'name': 'Office 28',
+        'flag_alternance': 0,
+        'flag_pmsmp': 0,
         'department': POSITIONS['toulon']['zip_code'][0:2],
     },
 ]

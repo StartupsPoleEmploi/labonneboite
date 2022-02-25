@@ -9,7 +9,7 @@ from labonneboite.conf import settings
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import hiring_type_util
 from labonneboite.common import geocoding
-from labonneboite.common.search import fetch_offices
+from labonneboite.common.search import HiddenMarketFetcher
 
 logging.basicConfig(level=logging.INFO)
 
@@ -88,9 +88,9 @@ def get_results(commune_id, rome_1_id, rome_2_id):
         if mapping_util.rome_is_valid(rome_id):
             naf_code_list = mapping_util.map_romes_to_nafs([rome_id])
             # FIXME randomize per user to avoid spamming companies
-            offices, _, _ = fetch_offices(
+            fetcher = HiddenMarketFetcher(
                 naf_codes=naf_code_list,
-                rome_codes=[rome_id],
+                romes=[rome_id],
                 latitude=latitude,
                 longitude=longitude,
                 distance=distance,
@@ -98,6 +98,7 @@ def get_results(commune_id, rome_1_id, rome_2_id):
                 to_number=OFFICES_PER_USER,
                 hiring_type=hiring_type_util.DPAE,
             )
+            offices, _ = fetcher.get_offices()
             if len(offices) >= 1:
                 used_rome_id = rome_id
                 used_distance = distance

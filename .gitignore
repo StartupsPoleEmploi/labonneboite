@@ -4,6 +4,7 @@ local_settings.py*
 lbbenv/
 build/
 dist/
+.env
 ####
 # ansible secrets for mysql_user and mysql_password
 ####
@@ -38,6 +39,7 @@ secrets.yml
 # Logs and databases #
 ######################
 *.log
+labonneboite/logs/
 #*.sql
 *.sqlite
 
@@ -122,5 +124,5 @@ labonneboite/web/static/gen/
 # test-generated files
 .noseids
 
-# virtualenv 
+# virtualenv
 venv/

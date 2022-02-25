@@ -1,0 +1,10 @@
+{
+    "naf_codes": ["naf1"],
+    "romes": ["rome1"],
+    "latitude": 1.256,
+    "longitude": 2.123,
+    "distance": "10",
+    "from_number": null,
+    "to_number": null,
+    "sort": "distance"
+}

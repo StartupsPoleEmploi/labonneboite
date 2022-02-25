@@ -78,6 +78,7 @@ validators
 geopy
 mailjet_rest
 cryptography
+astroid
 
 # Deployment and production
 uWSGI

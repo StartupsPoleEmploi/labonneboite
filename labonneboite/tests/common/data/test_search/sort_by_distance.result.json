@@ -1,0 +1,10 @@
+{"query": {"filtered": {"filter": {"bool": {"must": [{"range": {"score": {"gt": 0}}},
+                                                     {"terms": {"naf": ["naf1"]}},
+                                                     {"bool": {"should": [{"exists": {"field": "scores_by_rome.rome1"}}]}},
+                                                     {"geo_distance": {"distance": "10km",
+                                                                       "locations": {"lat": 1.256,
+                                                                                     "lon": 2.123}}}]}}}},
+ "sort": [{"_geo_distance": {"locations": {"lat": 1.256, "lon": 2.123},
+                             "order": "asc",
+                             "unit": "km"}}]}
+  

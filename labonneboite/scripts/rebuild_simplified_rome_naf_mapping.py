@@ -10,7 +10,6 @@ from labonneboite.conf import settings
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import hiring_type_util
 from labonneboite.common import geocoding
-from labonneboite.common.search import fetch_offices
 
 logging.basicConfig(level=logging.INFO)
 

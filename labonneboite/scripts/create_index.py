@@ -1,34 +1,33 @@
 import argparse
 import contextlib
-import logging
+import datetime
 import glob
+import logging
+import multiprocessing as mp
 import os
 import time
-import datetime
-
-import multiprocessing as mp
 from cProfile import Profile
-from pyprof2calltree import convert
-from elasticsearch.exceptions import TransportError, NotFoundError
+from typing import Dict, Optional, Union
+
+from elasticsearch.exceptions import NotFoundError, TransportError
 from elasticsearch.helpers import bulk
-from sqlalchemy import asc, inspect, and_, or_
+from pyprof2calltree import convert
+from sqlalchemy import and_, asc, inspect, or_
 from sqlalchemy.exc import OperationalError
 
-from labonneboite.common import encoding as encoding_util
-from labonneboite.common.util import timeit
-from labonneboite.common import geocoding
 from labonneboite.common import departements as dpt
+from labonneboite.common import encoding as encoding_util
+from labonneboite.common import es, geocoding, hiring_type_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import scoring as scoring_util
-from labonneboite.common import hiring_type_util
-from labonneboite.common import es
 from labonneboite.common.chunks import chunks
-from labonneboite.common.search import fetch_offices
 from labonneboite.common.database import db_session
-from labonneboite.common.load_data import load_ogr_labels, OGR_ROME_CODES, load_siret_to_remove
-from labonneboite.common.models import Office, HistoryBlacklist
-from labonneboite.common.models import OfficeAdminAdd, OfficeAdminExtraGeoLocation, OfficeAdminUpdate, OfficeAdminRemove, OfficeThirdPartyUpdate
+from labonneboite.common.load_data import load_ogr_labels, load_siret_to_remove, OGR_ROME_CODES
+from labonneboite.common.models import HistoryBlacklist, Office, OfficeAdminAdd, OfficeAdminExtraGeoLocation, \
+    OfficeAdminRemove, OfficeAdminUpdate, OfficeThirdPartyUpdate
+from labonneboite.common.search import HiddenMarketFetcher
+from labonneboite.common.util import timeit
 from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer import util as importer_util
@@ -43,6 +42,7 @@ VERBOSE_LOGGER_NAMES = ['elasticsearch', 'sqlalchemy.engine.base.Engine', 'main'
 ES_BULK_CHUNK_SIZE = 10000  # default value is 500
 
 PSE_STUDY_IS_ENABLED = False
+
 
 class Profiling(object):
     ACTIVATED = False
@@ -163,6 +163,7 @@ class StatTracker:
     def increment_office_score_alternance_for_rome_count(self):
         self.office_score_alternance_for_rome_count += 1
 
+
 st = StatTracker()
 
 
@@ -197,12 +198,7 @@ def create_job_codes():
                 'rome_code': rome_code,
                 'rome_description': rome_description
             }
-            action = {
-                '_op_type': 'index',
-                '_index': settings.ES_INDEX,
-                '_type': es.OGR_TYPE,
-                '_source': doc
-            }
+            action = {'_op_type': 'index', '_index': settings.ES_INDEX, '_type': es.OGR_TYPE, '_source': doc}
             actions.append(action)
     bulk_actions(actions)
 
@@ -216,17 +212,15 @@ def create_locations():
     for city in geocoding.get_cities():
         doc = {
             'city_name': city['name'],
-            'location': {'lat': city['coords']['lat'], 'lon': city['coords']['lon']},
+            'location': {
+                'lat': city['coords']['lat'],
+                'lon': city['coords']['lon']
+            },
             'population': city['population'],
             'slug': city['slug'],
             'zipcode': city['zipcode'],
         }
-        action = {
-            '_op_type': 'index',
-            '_index': settings.ES_INDEX,
-            '_type': es.LOCATION_TYPE,
-            '_source': doc
-        }
+        action = {'_op_type': 'index', '_index': settings.ES_INDEX, '_type': es.LOCATION_TYPE, '_source': doc}
         actions.append(action)
 
     bulk_actions(actions)
@@ -275,10 +269,14 @@ def get_office_as_es_doc(office):
         # Use an array to allow multiple locations per document, see https://goo.gl/fdTaEM
         # Multiple locations may be added later via the admin UI.
         doc['locations'] = [
-            {'lat': office.y, 'lon': office.x},
+            {
+                'lat': office.y,
+                'lon': office.x
+            },
         ]
 
-    scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes = get_scores_by_rome_and_boosted_romes(office)
+    scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes = get_scores_by_rome_and_boosted_romes(
+        office)
     if scores_by_rome:
         doc['scores_by_rome'] = scores_by_rome
         doc['boosted_romes'] = boosted_romes
@@ -286,10 +284,12 @@ def get_office_as_es_doc(office):
         doc['scores_alternance_by_rome'] = scores_alternance_by_rome
         doc['boosted_alternance_romes'] = boosted_alternance_romes
 
-
     return doc
 
-def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
+
+def get_scores_by_rome_and_boosted_romes(office: Office,
+                                         office_to_update: Optional[Union[OfficeAdminUpdate,
+                                                                          OfficeThirdPartyUpdate]] = None):
 
     ## 0 - Get all romes related to the company
 
@@ -300,11 +300,11 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
     if office_to_update:
         office_nafs += office_to_update.as_list(office_to_update.nafs_to_add)
 
-    scores_by_rome = {}
-    scores_alternance_by_rome = {}
+    scores_by_rome: Dict[str, int] = {}
+    scores_alternance_by_rome: Dict[str, int] = {}
     # elasticsearch does not understand sets, so we use a dict of 'key => True' instead
-    boosted_romes = {}
-    boosted_alternance_romes = {}
+    boosted_romes: Dict[str, bool] = {}
+    boosted_alternance_romes: Dict[str, bool] = {}
 
     if PSE_STUDY_IS_ENABLED:
         sirets_to_remove_pse = load_siret_to_remove()
@@ -330,7 +330,6 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
         # Add unrelated rome for indexing (with boost) and remove unwanted romes
         rome_codes = set(naf_rome_codes).union(set(romes_to_boost)) - set(romes_to_remove)
 
-
         for rome_code in rome_codes:
             # Manage office boosting - DPAE
             if office_to_update and office_to_update.boost:
@@ -342,10 +341,9 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                     boosted_romes[rome_code] = True
 
             # Scoring part
-            score_dpae = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                score=office.score,
-                rome_code=rome_code,
-                naf_code=naf)
+            score_dpae = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(score=office.score,
+                                                                                   rome_code=rome_code,
+                                                                                   naf_code=naf)
 
             # Get the score minimum for a rome code with metiers en tension
             score_minimum_for_rome = scoring_util.get_score_minimum_for_rome(rome_code)
@@ -365,7 +363,6 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
                     scores_by_rome[rome_code] = score_dpae
                     st.increment_office_score_for_rome_count()
 
-
         ## 2 - Alternance
 
         romes_alternance_to_boost = []
@@ -374,9 +371,8 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
             romes_alternance_to_boost = office_to_update.as_list(office_to_update.romes_alternance_to_boost)
             romes_alternance_to_remove = office_to_update.as_list(office_to_update.romes_alternance_to_remove)
 
-        rome_codes_alternance = (
-            set(naf_rome_codes).union(set(romes_alternance_to_boost)) - set(romes_alternance_to_remove)
-        )
+        rome_codes_alternance = (set(naf_rome_codes).union(set(romes_alternance_to_boost)) -
+                                 set(romes_alternance_to_remove))
 
         for rome_code in rome_codes_alternance:
             # Manage office boosting - Alternance
@@ -390,18 +386,14 @@ def get_scores_by_rome_and_boosted_romes(office, office_to_update=None):
 
             # Scoring part
 
-            score_alternance = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-                score=office.score_alternance,
-                rome_code=rome_code,
-                naf_code=naf)
+            score_alternance = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(score=office.score_alternance,
+                                                                                         rome_code=rome_code,
+                                                                                         naf_code=naf)
 
             # Get the score minimum for a rome code with metiers en tension
             score_minimum_for_rome_alternance = scoring_util.get_score_minimum_for_rome(rome_code, alternance=True)
 
-            if (
-                score_alternance >= score_minimum_for_rome_alternance
-                or rome_code in boosted_alternance_romes
-            ):
+            if (score_alternance >= score_minimum_for_rome_alternance or rome_code in boosted_alternance_romes):
                 if rome_code in scores_alternance_by_rome:
                     # this ROME was already computed before for another NAF
                     if score_alternance > scores_alternance_by_rome[rome_code]:
@@ -433,7 +425,7 @@ def create_offices(disable_parallel_computing=False):
         # use 100% of a cpu.
         # maxtasksperchild default is infinite, which means memory is never freed up, and grows indefinitely :-/
         # maxtasksperchild=1 ensures memory is freed up after every departement computation.
-        pool = mp.Pool(processes=int(1.25*mp.cpu_count()), maxtasksperchild=1)
+        pool = mp.Pool(processes=int(1.25 * mp.cpu_count()), maxtasksperchild=1)
         pool.map(func, dpt.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
         pool.close()
         pool.join()
@@ -464,8 +456,7 @@ def create_offices_for_departement(departement):
                 # equal to all-rome-included score.
                 Office.score_alternance >= scoring_util.SCORE_ALTERNANCE_FOR_ROME_MINIMUM,
             ),
-        )
-    ).all()
+        )).all()
 
     for office in all_offices:
         st.increment_office_count()
@@ -546,8 +537,10 @@ def add_offices():
 
             # Create the new office in ES.
             doc = get_office_as_es_doc(office_to_add)
-            es.Elasticsearch().create(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE,
-                id=office_to_add.siret, body=doc)
+            es.Elasticsearch().create(index=settings.ES_INDEX,
+                                      doc_type=es.OFFICE_TYPE,
+                                      id=office_to_add.siret,
+                                      body=doc)
 
 
 @timeit
@@ -579,6 +572,8 @@ def remove_offices():
 
 
 LIMIT = 100
+
+
 def to_iterator(qry, key):
     """
     This function comes from this doc: https://github.com/sqlalchemy/sqlalchemy/wiki/RangeQuery-and-WindowedRangeQuery
@@ -599,6 +594,7 @@ def to_iterator(qry, key):
         if rec is None:
             break
         firstid = key.__get__(rec, key) if rec else None
+
 
 @timeit
 def update_offices(table):
@@ -626,10 +622,17 @@ def update_offices(table):
                 if office_to_update.new_office_name and office.office_name != office_to_update.new_office_name:
                     office.office_name = office_to_update.new_office_name
                     is_updated = True
-                offices_attributes = ["email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance", "social_network", "contact_mode"]
-                update_attributes = ["email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance", "social_network", "contact_mode"]
+                offices_attributes = [
+                    "email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance",
+                    "social_network", "contact_mode"
+                ]
+                update_attributes = [
+                    "email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance",
+                    "social_network", "contact_mode"
+                ]
                 for office_attr, update_attr in list(zip(offices_attributes, update_attributes)):
-                    if getattr(office, office_attr) != getattr(office_to_update, update_attr) and getattr(office_to_update, update_attr) is not None:
+                    if getattr(office, office_attr) != getattr(office_to_update, update_attr) and getattr(
+                            office_to_update, update_attr) is not None:
                         setattr(office, office_attr, getattr(office_to_update, update_attr))
                         is_updated = True
 
@@ -656,13 +659,19 @@ def update_offices(table):
                     office.save()
 
                     # Apply changes in ElasticSearch.
-                    body = {'doc':
-                        {'email': office.email, 'phone': office.tel, 'website': office.website,
-                         "score": office.score, "score_alternance": office.score_alternance,
-                        'flag_alternance': 1 if office.flag_alternance else 0}
+                    body = {
+                        'doc': {
+                            'email': office.email,
+                            'phone': office.tel,
+                            'website': office.website,
+                            "score": office.score,
+                            "score_alternance": office.score_alternance,
+                            'flag_alternance': 1 if office.flag_alternance else 0
+                        }
                     }
 
-                    scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)
+                    scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes = get_scores_by_rome_and_boosted_romes(
+                        office, office_to_update)
                     if scores_by_rome:
                         body['doc']['scores_by_rome'] = scores_by_rome
                         body['doc']['boosted_romes'] = boosted_romes
@@ -690,10 +699,16 @@ def update_offices(table):
                     # Unfortunately these cannot easily be bulked :-(
                     # The reason is there is no way to tell bulk to ignore missing documents (404)
                     # for a partial update. Tried it and failed it on Oct 2017 @vermeer.
-                    es.Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=delete_body,
-                            params={'ignore': 404})
-                    es.Elasticsearch().update(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret, body=body,
-                            params={'ignore': 404})
+                    es.Elasticsearch().update(index=settings.ES_INDEX,
+                                              doc_type=es.OFFICE_TYPE,
+                                              id=siret,
+                                              body=delete_body,
+                                              params={'ignore': 404})
+                    es.Elasticsearch().update(index=settings.ES_INDEX,
+                                              doc_type=es.OFFICE_TYPE,
+                                              id=siret,
+                                              body=body,
+                                              params={'ignore': 404})
 
                     # Delete the current PDF thus it will be regenerated at the next download attempt.
                     pdf_util.delete_file(office)
@@ -727,6 +742,7 @@ def update_offices_geolocations():
                 body=body,
                 params={'ignore': 404},
             )
+
 
 def get_latest_scam_emails():
     list_of_files = glob.glob(os.path.join(settings.SCAM_EMAILS_FOLDER, 'lbb_blacklist_full_*.bz2'))
@@ -791,16 +807,19 @@ def sanity_check_rome_codes():
 
         found %s rome_codes present in romes_from_rome_labels but not in romes_from_rome_naf_mapping: %s
         """ % (
-            len(romes_from_ogr_rome_mapping),
-            len(romes_from_rome_labels),
-            len(romes_from_rome_naf_mapping),
-            len(subset1), subset1,
-            len(subset2), subset2,
-            len(subset3), subset3,
-            len(subset4),
-            # CSV style output for easier manipulation afterwards
-            "".join(["\n%s|%s" % (r, rome_labels[r]) for r in subset4]),
-        )
+        len(romes_from_ogr_rome_mapping),
+        len(romes_from_rome_labels),
+        len(romes_from_rome_naf_mapping),
+        len(subset1),
+        subset1,
+        len(subset2),
+        subset2,
+        len(subset3),
+        subset3,
+        len(subset4),
+        # CSV style output for easier manipulation afterwards
+        "".join(["\n%s|%s" % (r, rome_labels[r]) for r in subset4]),
+    )
     logger.info(msg)
 
     city = geocoding.get_city_by_commune_id('75056')
@@ -813,9 +832,9 @@ def sanity_check_rome_codes():
     for rome_id in romes_from_rome_naf_mapping:
         naf_code_list = mapping_util.map_romes_to_nafs([rome_id])
         disable_verbose_loggers()
-        offices, _, _ = fetch_offices(
+        fetcher = HiddenMarketFetcher(
             naf_codes=naf_code_list,
-            rome_codes=[rome_id],
+            romes=[rome_id],
             latitude=latitude,
             longitude=longitude,
             distance=distance,
@@ -823,6 +842,7 @@ def sanity_check_rome_codes():
             to_number=10,
             hiring_type=hiring_type_util.DPAE,
         )
+        offices, _ = fetcher.get_offices()
         enable_verbose_loggers()
         if len(offices) < 5:
             logger.info("%s|%s|%s", rome_id, rome_labels[rome_id], len(offices))
@@ -830,14 +850,15 @@ def sanity_check_rome_codes():
 
 def display_performance_stats(departement):
     methods = [
-               '_get_score_from_hirings',
-               'get_hirings_from_score',
-               'get_score_adjusted_to_rome_code_and_naf_code',
-              ]
+        '_get_score_from_hirings',
+        'get_hirings_from_score',
+        'get_score_adjusted_to_rome_code_and_naf_code',
+    ]
     for method in methods:
         logger.info("[DPT%s] %s : %s", departement, method, getattr(scoring_util, method).cache_info())
 
-    logger.info("[DPT%s] indexed %s of %s offices and %s score_for_rome and %s scores_alternance_by_rome",
+    logger.info(
+        "[DPT%s] indexed %s of %s offices and %s score_for_rome and %s scores_alternance_by_rome",
         departement,
         st.indexed_office_count,
         st.office_count,
@@ -884,11 +905,7 @@ def update_data_profiling_wrapper(create_full, create_partial, disable_parallel_
     if Profiling.ACTIVATED:
         logger.info("STARTED run with profiling")
         profiler = Profile()
-        profiler.runctx(
-            "update_data(create_full, create_partial, disable_parallel_computing)",
-            locals(),
-            globals()
-        )
+        profiler.runctx("update_data(create_full, create_partial, disable_parallel_computing)", locals(), globals())
         relative_filename = 'profiling_results/create_index_run.kgrind'
         filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), relative_filename)
         convert(profiler.getstats(), filename)
@@ -900,16 +917,18 @@ def update_data_profiling_wrapper(create_full, create_partial, disable_parallel_
 
 
 def run():
-    parser = argparse.ArgumentParser(
-        description="Update elasticsearch data: offices, ogr_codes and locations.")
-    parser.add_argument('-f', '--full', action='store_true',
-        help="Create full index from scratch.")
-    parser.add_argument('-a', '--partial', action='store_true',
-        help=("Disable parallel computing and run only a single office indexing"
-              " job (departement 57) instead. This is required in order"
-              " to do a profiling from inside a job."))
-    parser.add_argument('-p', '--profile', action='store_true',
-        help="Enable code performance profiling for later visualization with Q/KCacheGrind.")
+    parser = argparse.ArgumentParser(description="Update elasticsearch data: offices, ogr_codes and locations.")
+    parser.add_argument('-f', '--full', action='store_true', help="Create full index from scratch.")
+    parser.add_argument('-a',
+                        '--partial',
+                        action='store_true',
+                        help=("Disable parallel computing and run only a single office indexing"
+                              " job (departement 57) instead. This is required in order"
+                              " to do a profiling from inside a job."))
+    parser.add_argument('-p',
+                        '--profile',
+                        action='store_true',
+                        help="Enable code performance profiling for later visualization with Q/KCacheGrind.")
     args = parser.parse_args()
 
     if args.full and args.partial:

@@ -81,6 +81,17 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 
 ### Install OS requirements:
 
+- python == 3.6.8
+- docker-compose
+- mysql-client
+- libmysqlclient-dev
+- openssl > 1.0.2
+
+For tests
+- xvfb
+- chromium-chromedriver
+
+
 On Debian-based OS:
 
     $ sudo apt-get install -y language-pack-fr git python3 python3-dev python-virtualenv python-pip mysql-server libmysqlclient-dev libncurses5-dev build-essential python-numpy python-scipy python-mysqldb chromium-chromedriver xvfb graphviz htop libblas-dev liblapack-dev libatlas-base-dev gfortran
@@ -232,7 +243,7 @@ Note that we only have data in Metz region.
 
 Any search on another region than Metz will give zero results.
 
-You may need to specify the `development` environment for the scripts to connect to local DB on port `3307`:
+You may need to specify the `development` environment for the scripts to connect to local DB on port `3306`:
 
     $ LBB_ENV=development python labonneboite/scripts/create_index.py
 

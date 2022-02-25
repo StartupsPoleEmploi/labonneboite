@@ -1,7 +1,7 @@
 from functools import lru_cache
 from urllib.parse import urlencode
 import logging
-from typing import Optional
+from typing import Any, Optional, Sequence
 
 from babel.dates import format_date
 from flask import url_for
@@ -74,7 +74,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     def as_json(
         self,
-        rome_codes: Optional[str] = None,
+        rome_codes: Optional[Sequence[str]] = None,
         hiring_type=None,
         distance=None,
         zipcode=None,
@@ -98,12 +98,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         `extra_query_string` (dict): extra query string to be added to the API
         urls for each office. Typically some Google Analytics trackers.
         """
-        if rome_codes is None:  # no rome search context
-            rome_code = None
-        elif len(rome_codes) == 1:  # single rome search context
-            rome_code = rome_codes[0]
-        else:  # multi rome search context
-            rome_code = self.matched_rome
+        rome_code = self.get_matched_rome(rome_codes)
 
         alternance = hiring_type == hiring_type_util.ALTERNANCE
 
@@ -119,43 +114,35 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             name=self.name,
             siret=self.siret,
             stars=self.get_stars_for_rome_code(rome_code, hiring_type),
-            url=self.get_url_for_rome_code(rome_code, alternance,
-                                           **extra_query_string),
-            contact_mode=util.get_contact_mode_for_rome_and_office(
-                rome_code, self),
+            url=self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
+            contact_mode=util.get_contact_mode_for_rome_and_office(rome_code, self),
             social_network=self.social_network or '',
             alternance=self.qualifies_for_alternance(),
         )
 
         # Warning: the `distance`, `boost` and `matched_rome` fields are added by `get_offices_from_es_and_db`,
         # they are NOT model fields or properties!
-        if hasattr(self, 'distance'):
-            json['distance'] = self.distance
-
-        if hasattr(self, 'boost'):
-            json['boosted'] = self.boost
-
         if rome_code:
             json['matched_rome_code'] = rome_code
             json['matched_rome_label'] = settings.ROME_DESCRIPTIONS[rome_code]
-            json['matched_rome_slug'] = slugify(
-                settings.ROME_DESCRIPTIONS[rome_code])
+            json['matched_rome_slug'] = slugify(settings.ROME_DESCRIPTIONS[rome_code])
 
         # offers* fields are added by VisibleMarketFetcher.get_offices,
         # they are NOT model fields or properties
-        if hasattr(self, 'offers_count'):
-            json['offers_count'] = self.offers_count
-        if hasattr(self, 'offers'):
-            json['offers'] = self.offers
-
         # This message should concern only a small number of companies who explicitly requested
         # to appear in extra geolocations.
-        if any([distance, zipcode
-                ]) and json['address'] and self.show_multi_geolocations_msg(
-                    distance, zipcode):
-            json[
-                'address'] += ", Cette entreprise recrute aussi dans votre région."
+        if any([distance, zipcode]) and json['address'] and self.show_multi_geolocations_msg(distance, zipcode):
+            json['address'] += ", Cette entreprise recrute aussi dans votre région."
         return json
+
+    def get_matched_rome(self, rome_codes: Sequence[str]):
+        if rome_codes is None:  # no rome search context
+            rome_code = None
+        elif len(rome_codes) == 1:  # single rome search context
+            rome_code = rome_codes[0]
+        else:
+            raise NotImplementedError()
+        return rome_code
 
     @property
     def address_fields(self):
@@ -196,8 +183,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     @property
     def google_url(self):
-        google_search = "%s+%s" % (self.name.replace(
-            ' ', '+'), self.city.replace(' ', '+'))
+        google_search = "%s+%s" % (self.name.replace(' ', '+'), self.city.replace(' ', '+'))
         return "https://www.google.fr/search?q=%s" % google_search
 
     @property
@@ -225,9 +211,8 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         # such a score.
         # We still have to check that there actually is a SAVE record
         # specifically asking for this removal.
-        office_admin_update = OfficeAdminUpdate.query.filter(
-            OfficeAdminUpdate.sirets.like("%{}%".format(
-                self.siret))).filter_by(score_alternance=0).first()
+        office_admin_update = OfficeAdminUpdate.query.filter(OfficeAdminUpdate.sirets.like("%{}%".format(
+            self.siret))).filter_by(score_alternance=0).first()
         return bool(office_admin_update)
 
     @property
@@ -286,19 +271,16 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         return set([rome.code for rome in self.romes_for_naf_mapping])
 
-    def get_score_for_rome_code(self,
-                                rome_code: Optional[str],
-                                hiring_type: Optional[str] = None):
+    def get_score_for_rome_code(self, rome_code: Optional[str], hiring_type: Optional[str] = None):
         hiring_type = hiring_type or hiring_type_util.DEFAULT
         if hiring_type not in hiring_type_util.VALUES:
             raise ValueError("Unknown hiring_type")
         raw_score = self.score if hiring_type == hiring_type_util.DPAE else self.score_alternance
-        return scoring_util.get_score_adjusted_to_rome_code_and_naf_code(
-            score=raw_score, rome_code=rome_code, naf_code=self.naf)
+        return scoring_util.get_score_adjusted_to_rome_code_and_naf_code(score=raw_score,
+                                                                         rome_code=rome_code,
+                                                                         naf_code=self.naf)
 
-    def get_stars_for_rome_code(self,
-                                rome_code: Optional[str],
-                                hiring_type: Optional[str] = None):
+    def get_stars_for_rome_code(self, rome_code: Optional[str], hiring_type: Optional[str] = None):
         score = self.get_score_for_rome_code(rome_code, hiring_type)
         return scoring_util.get_stars_from_score(score)
 
@@ -318,10 +300,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         return self.get_url_for_rome_code(None)
 
-    def get_url_for_rome_code(self,
-                              rome_code: Optional[str],
-                              alternance=False,
-                              **query_string):
+    def get_url_for_rome_code(self, rome_code: Optional[str], alternance=False, **query_string):
         try:
             if rome_code:
                 return url_for('office.details',
@@ -340,7 +319,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             # Here, we cannot properly generate an URL via url_for.
             return None
 
-    def show_multi_geolocations_msg(self, distance: Optional[int]=None, zipcode: Optional[str] = None):
+    def show_multi_geolocations_msg(self, distance: Optional[int] = None, zipcode: Optional[str] = None):
         """
         Returns True if a message that indicates that the current office recruits beyond
         the boundaries of its own departement should be displayed, False otherwise.
@@ -384,6 +363,63 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         # Formatting date in french format using locale.setlocale is strongly discouraged.
         # Using babel instead is the recommended way.
         # See https://stackoverflow.com/questions/985505/locale-date-formatting-in-python
-        last_data_deploy_date_formated_as_french = format_date(
-            last_data_deploy_date, locale='fr', format='long')
+        last_data_deploy_date_formated_as_french = format_date(last_data_deploy_date, locale='fr', format='long')
         return last_data_deploy_date_formated_as_french
+
+
+class OfficeResult(Office):
+    __abstract__ = True
+
+    matched_rome: Optional[str] = None
+    distance: Optional[float] = None
+    boost: Optional[bool] = False
+    offers_count: int
+    position: int
+    offers: Optional[Sequence[Any]]
+
+    def __init__(self,
+                 office: Office = None,
+                 *,
+                 offers_count: int = None,
+                 position: int = None,
+                 matched_rome: Optional[str] = None,
+                 distance: Optional[float] = None,
+                 boost: Optional[bool] = False,
+                 offers: Optional[Sequence[Any]] = None,
+                 **kwargs):
+        # set office props in kwargs (to __init__ the super class)
+        office_props = {}
+        if office is not None:
+            office_props = dict(office.__dict__)
+            office_props.pop('_sa_instance_state', None)  # added by : self.__dict__
+        office_props.update(kwargs)
+        super(OfficeResult, self).__init__(**office_props)
+        self.matched_rome = matched_rome
+        self.distance = distance
+        self.boost = boost
+        self.offers_count = offers_count
+        self.position = position
+        self.offers = offers
+
+    def as_json(self, *args, **kwargs):
+        json = super().as_json(*args, **kwargs)
+        if self.distance is not None:
+            json['distance'] = self.distance
+
+        json['boosted'] = self.boost
+        if self.offers_count is not None:
+            json['offers_count'] = self.offers_count
+
+        if self.offers is not None:
+            json['offers'] = self.offers
+
+        return json
+
+    def get_matched_rome(self, rome_codes: Sequence[str]):
+        if rome_codes is None:  # no rome search context
+            rome_code = None
+        elif len(rome_codes) == 1:  # single rome search context
+            rome_code = rome_codes[0]
+        else:  # multi rome search context
+            rome_code = self.matched_rome
+        return rome_code
