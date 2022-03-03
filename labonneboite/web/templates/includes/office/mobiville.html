@@ -1,9 +1,9 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobiville-banner.css') }}">
 
-<div class="alert alert-hilight with-bottom-arrow mobiville-info-alert">
-    <img alt="info" src="{{ url_for('static', filename='images/icons/info.svg') }}">
+<div class="alert mobiville-info-alert">
+    <img alt="info" src="{{ url_for('static', filename='images/icons/info-red.svg') }}">
     <p>
-      Il y a peu d’entreprises qui recrutent dans la région. Avez-vous envisagé de déménager ? Mobiville finance votre projet !
+      <strong>Il y a peu d’entreprises qui recrutent dans la région.</strong> Avez-vous envisagé de déménager ? Mobiville finance votre projet !
     </p>
 </div>
 
@@ -17,9 +17,9 @@
         </div>
         <div class="grid-col-8 text-right mobiville-footer">
             <div>
-                <a class="mobiville-btn btn btn-dark btn-small gtm-banner-mobiville"
+                <a class="mobiville-btn btn btn-small gtm-banner-mobiville"
                     href="https://mobiville.pole-emploi.fr/cities?codeRome={{rome_code}}&utm_campaign=lbb-banniere-rome-77&utm_source=lbb-banner-mobiville"
-                    about="_blank" type="submit">
+                    target="_blank" type="submit">
                     Rechercher dans la ville de vos rêves
                 </a>
             </div>
