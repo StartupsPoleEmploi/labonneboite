@@ -207,7 +207,7 @@ TESTS = 	labonneboite/tests/app/ \
 test-unit: clean-pyc rebuild-data-test
 	LBB_ENV=test $(NOSETESTS) ${TESTS}
 
-test-all: test-unit test-selenium test-integration
+test: test-unit test-selenium test-integration
 
 check-all: test-all run-importer-jobs
 
