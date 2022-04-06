@@ -250,7 +250,7 @@ def get_select_fields_for_backoffice():
     fields += ", effectif, score_regr"
     for i in range(7, 0, -1):  # [7, 6, 5, 4, 3, 2, 1]
         fields += ", `dpae-period-%s`" % i
-    fields += ", score_alternance, score_alternance_regr"
+    fields += ", score_alternance"
     for i in range(7, 0, -1):  # [7, 6, 5, 4, 3, 2, 1]
         fields += ", `alt-period-%s`" % i
     fields += ', flag_poe_afpr, flag_pmsmp'
