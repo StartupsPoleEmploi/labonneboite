@@ -9,7 +9,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office
 from labonneboite.common.database import Base
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.web.contact_form import forms
+
 
 class NoOfficeFoundException(Exception):
     pass

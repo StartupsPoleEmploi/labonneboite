@@ -5,7 +5,7 @@ from typing import Optional
 
 import elasticsearch
 
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 
 OFFICE_TYPE = 'office'
 OGR_TYPE = 'ogr'

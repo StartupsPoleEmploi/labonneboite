@@ -16,7 +16,7 @@ from labonneboite.common import util
 from labonneboite.common.database import Base, db_session, DATABASE
 from labonneboite.common.load_data import load_city_codes, load_groupements_employeurs
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 from labonneboite.importer import settings as importer_settings
 
 from labonneboite.common.models import FinalOfficeMixin, OfficeAdminUpdate

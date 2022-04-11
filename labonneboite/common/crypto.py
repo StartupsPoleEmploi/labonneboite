@@ -1,5 +1,5 @@
 # From https://nitratine.net/blog/post/encryption-and-decryption-in-python/
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 from cryptography.fernet import Fernet
 
 

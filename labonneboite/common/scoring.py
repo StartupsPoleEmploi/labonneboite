@@ -1,9 +1,8 @@
-
 import math
 from functools import lru_cache
 
 from labonneboite.common import mapping as mapping_util
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 from labonneboite.common.load_data import load_metiers_tension
 
 # scores between 0 and 100
@@ -14,8 +13,7 @@ SCORE_ALTERNANCE_FOR_ROME_MINIMUM = 20
 STARS_MINIMUM = 2.5
 STARS_MAXIMUM = 5.0
 
-
-# The threshold for the score, that defines if a company is "Bonne boîte" 
+# The threshold for the score, that defines if a company is "Bonne boîte"
 # can't be below this value.
 MINIMUM_POSSIBLE_SCORE = 5
 
@@ -31,6 +29,7 @@ MINIMUM_POSSIBLE_SCORE = 5
 # This is designed so that you *CANNOT* guess the hirings based
 # on the score you see in production.
 # #########################################################################
+
 
 def round_half_up(x):
     """
@@ -53,7 +52,7 @@ def round_half_up(x):
 
 # very good hit/miss ratio observed while running create_index.py
 # thanks to bucketing float values of hirings, see get_score_from_hirings
-@lru_cache(maxsize=512*1024)
+@lru_cache(maxsize=512 * 1024)
 def _get_score_from_hirings(hirings, as_float=False):
     """
     Note: leading underscore in method name means "private method" (python naming convention).
@@ -82,12 +81,13 @@ def _get_score_from_hirings(hirings, as_float=False):
         score = 100.0
     elif hirings <= settings.SCORE_60_HIRINGS:
         score = (50.0 + 10 * (hirings - settings.SCORE_50_HIRINGS) /
-            (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS))
+                 (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS))
     elif hirings <= settings.SCORE_80_HIRINGS:
         score = (60.0 + 20 * (hirings - settings.SCORE_60_HIRINGS) /
-            (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS))
+                 (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS))
     elif hirings <= settings.SCORE_100_HIRINGS:
-        score = 80.0 + 20.0/math.log10(settings.SCORE_100_HIRINGS) * math.log10(1 + hirings - settings.SCORE_80_HIRINGS)
+        score = 80.0 + 20.0 / math.log10(
+            settings.SCORE_100_HIRINGS) * math.log10(1 + hirings - settings.SCORE_80_HIRINGS)
     else:
         raise Exception("unexpected value of hirings : %s" % hirings)
 
@@ -122,20 +122,20 @@ def get_hirings_from_score(score):
     if score <= 50:
         hirings = settings.SCORE_50_HIRINGS * score / 50.0
     elif score <= 60:
-        hirings = (settings.SCORE_50_HIRINGS +
-            (score - 50) / 10.0 * (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS))
+        hirings = (settings.SCORE_50_HIRINGS + (score - 50) / 10.0 *
+                   (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS))
     elif score <= 80:
-        hirings = (settings.SCORE_60_HIRINGS +
-            (score - 60) / 20.0 * (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS))
+        hirings = (settings.SCORE_60_HIRINGS + (score - 60) / 20.0 *
+                   (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS))
     elif score <= 100:
-        hirings = -1 + settings.SCORE_80_HIRINGS + 10.0 ** ((score-80) / 20.0 * math.log10(settings.SCORE_100_HIRINGS))
+        hirings = -1 + settings.SCORE_80_HIRINGS + 10.0**((score - 80) / 20.0 * math.log10(settings.SCORE_100_HIRINGS))
     else:
         raise Exception("unexpected value of score : %s" % score)
     return hirings
 
 
 # very good hit/miss ratio observed while running create_index.py
-@lru_cache(maxsize=256*1024)
+@lru_cache(maxsize=256 * 1024)
 def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
     """
     Adjust the score to a rome_code (e.g. the ROME code of the current search)
@@ -147,11 +147,8 @@ def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
     # - no rome_code in context (favorites page, office page...)
     # - orphaned naf_code (no related rome_code)
     # - rome_code is not related to the naf_code (custom ROME via SAVE)
-    if (
-        not rome_code
-        or naf_code not in mapping_util.MANUAL_NAF_ROME_MAPPING
-        or rome_code not in mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code]
-    ):
+    if (not rome_code or naf_code not in mapping_util.MANUAL_NAF_ROME_MAPPING
+            or rome_code not in mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code]):
         return score
 
     total_office_hirings = get_hirings_from_score(score)
@@ -192,11 +189,12 @@ def get_stars_from_score(score):
     normalized_score = (score - score_min) / (score_max - score_min)
 
     stars = STARS_MINIMUM + normalized_score * (STARS_MAXIMUM - STARS_MINIMUM)
-    
+
     # round to 1 digit
     stars = round(stars, 1)
 
     return stars
+
 
 def get_score_from_stars(stars):
     """
@@ -213,6 +211,7 @@ def get_score_from_stars(stars):
     score = score_min + normalized_score * (score_max - score_min)
     return score
 
+
 def get_score_minimum_for_rome(rome_code, alternance=False):
     """
         rome_code : the rome code for which we want to have the minimum threshold
@@ -225,13 +224,13 @@ def get_score_minimum_for_rome(rome_code, alternance=False):
         if the companies have 100% tension, the returned score will be : 
                  `MINIMUM_POSSIBLE_SCORE`
     """
-    # https://trello.com/c/QvfphuOY/1468-m%C3%A9tiers-en-tension 
-    # 
-    # We want to increase the number of company, for code rome matching to 
+    # https://trello.com/c/QvfphuOY/1468-m%C3%A9tiers-en-tension
+    #
+    # We want to increase the number of company, for code rome matching to
     # "métiers en tension" : jobs which has more offers, than appliers
-    # To increase the number of these companies, we have to lower 
+    # To increase the number of these companies, we have to lower
     # the threshold : score for rome minimum
-    
+
     if not alternance:
         score_for_rome_minimum = SCORE_FOR_ROME_MINIMUM
     else:
@@ -244,7 +243,6 @@ def get_score_minimum_for_rome(rome_code, alternance=False):
 
     if rome_code in rome_to_tension:
         tension = rome_to_tension[rome_code]
-        score_minimum_for_rome = (interval * ((100 - tension)/100)) + MINIMUM_POSSIBLE_SCORE
-    
-    return score_minimum_for_rome
+        score_minimum_for_rome = (interval * ((100 - tension) / 100)) + MINIMUM_POSSIBLE_SCORE
 
+    return score_minimum_for_rome

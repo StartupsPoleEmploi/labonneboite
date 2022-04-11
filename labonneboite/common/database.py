@@ -1,4 +1,3 @@
-
 # http://flask.pocoo.org/docs/0.12/patterns/sqlalchemy/#declarative
 # http://docs.sqlalchemy.org/en/rel_1_1/
 import logging
@@ -8,9 +7,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT, ENV_TEST
-
 
 CURRENT_ENV = get_current_env()
 
@@ -25,6 +23,7 @@ DATABASE = {
     'PASSWORD': settings.DB_PASSWORD,
 }
 
+
 def get_db_string(db_params=None):
     """
     Returns the database URI that should be used for the connection.
@@ -37,6 +36,7 @@ def get_db_string(db_params=None):
     # Add the optional param to enable `LOAD DATA LOCAL INFILE` SQL instructions
     str = str + "&local_infile=1" if os.environ.get('ENABLE_DB_INFILE') else str
     return str
+
 
 pool_recycle = int(os.environ.get("DB_CONNECTION_TIMEOUT", "30"))
 connect_timeout = int(os.environ.get("CONNECT_TIMEOUT", "5"))

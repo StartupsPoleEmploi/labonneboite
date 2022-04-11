@@ -1,4 +1,3 @@
-
 import datetime
 import requests
 import time
@@ -12,7 +11,7 @@ from flask_login import UserMixin
 from social_flask.utils import load_strategy
 from social_flask_sqlalchemy.models import UserSocialAuth
 
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 from labonneboite.common.database import Base, db_session
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.common import constants
@@ -91,12 +90,7 @@ def get_user_social_auth(user_id):
     """
     Return the latest `UserSocialAuth` instance for the given `user_id`.
     """
-    return (
-        db_session.query(UserSocialAuth)
-        .filter_by(user_id=user_id)
-        .order_by(desc(UserSocialAuth.id))
-        .first()
-    )
+    return (db_session.query(UserSocialAuth).filter_by(user_id=user_id).order_by(desc(UserSocialAuth.id)).first())
 
 
 def find_user(strategy, details, backend, *args, user=None, **kwargs):
@@ -109,6 +103,4 @@ def find_user(strategy, details, backend, *args, user=None, **kwargs):
     subscribed twice, with different favorites.
     """
     user = user or User.query.filter_by(external_id=details.get('external_id')).first()
-    return {
-        'user': user
-    }
+    return {'user': user}

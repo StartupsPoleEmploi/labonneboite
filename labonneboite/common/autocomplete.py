@@ -2,12 +2,13 @@ from functools import lru_cache
 from slugify import slugify
 import unidecode
 from labonneboite.common.es import Elasticsearch
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 
 MAX_JOBS = 10
 MAX_LOCATIONS = 10
 
 # This file is a fallback which uses ES, we normally use the "address API" from beta.gouv.fr
+
 
 @lru_cache(maxsize=8 * 1024)
 def build_location_suggestions(term):
@@ -15,29 +16,34 @@ def build_location_suggestions(term):
         return []
     term = term.title()
     es = Elasticsearch()
-    zipcode_match = [{
-        "prefix": {
-            "zipcode": term
-        }
-    }, ]
+    zipcode_match = [
+        {
+            "prefix": {
+                "zipcode": term
+            }
+        },
+    ]
 
     city_match = [{
         "match": {
             "city_name.autocomplete": {
                 "query": term,
             }
-        }}, {
+        }
+    }, {
         "match": {
             "city_name.stemmed": {
                 "query": term,
                 "boost": 1,
             }
-        }}, {
+        }
+    }, {
         "match_phrase_prefix": {
             "city_name.stemmed": {
                 "query": term,
             }
-        }}]
+        }
+    }]
 
     filters = zipcode_match
 
@@ -135,7 +141,11 @@ def build_job_label_suggestions(term, size=MAX_JOBS):
                     # Only 1 result per rome code: include only 1 top hit on each bucket in the results.
                     # Another way of saying this is that for all OGR matching a given ROME, we only
                     # keep the most relevant OGR.
-                    "by_top_hit": {"top_hits": {"size": 1}},
+                    "by_top_hit": {
+                        "top_hits": {
+                            "size": 1
+                        }
+                    },
 
                     # FIXME `max_score` below does not work with Elasticsearch 1.7.
                     # Fixed in elasticsearch 2.0+:
@@ -188,5 +198,3 @@ def build_job_label_suggestions(term, size=MAX_JOBS):
             break
 
     return suggestions
-
-

@@ -5,7 +5,7 @@ import requests
 import json
 from urllib.parse import urlencode
 from requests.exceptions import ConnectionError, ReadTimeout
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 
 logger = logging.getLogger('main')
 
@@ -38,23 +38,17 @@ class EsdToken(object):
             cls.prepare_token()
         return cls.VALUE
 
-
     @classmethod
     def is_token_valid(cls):
         if not cls.EXPIRATION_DATE:
             return False
         return cls.EXPIRATION_DATE > datetime.datetime.now()
 
-
     @classmethod
     def prepare_token(cls):
-        data = urlencode([
-            ('realm', '/partenaire'),
-            ('grant_type', 'client_credentials'),
-            ('client_id', settings.PEAM_CLIENT_ID),
-            ('client_secret', settings.PEAM_CLIENT_SECRET),
-            ('scope', "application_%s" % settings.PEAM_CLIENT_ID)
-        ])
+        data = urlencode([('realm', '/partenaire'), ('grant_type', 'client_credentials'),
+                          ('client_id', settings.PEAM_CLIENT_ID), ('client_secret', settings.PEAM_CLIENT_SECRET),
+                          ('scope', "application_%s" % settings.PEAM_CLIENT_ID)])
         data += "%20api_offresdemploiv2 o2dsoffre"
         data += " qos_silver_offresdemploiv2"
 

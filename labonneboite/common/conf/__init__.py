@@ -1,7 +1,7 @@
 import imp
 import os
 
-from labonneboite.conf.common import settings_common
+from labonneboite.common.conf.common import settings_common
 
 # Settings
 # --------
@@ -22,9 +22,10 @@ settings = settings_common
 
 # Don't override settings in tests
 if settings_common.get_current_env() != settings_common.ENV_TEST:
+    if 'LBB_SETTINGS' not in os.environ:
+        raise Exception('LBB_SETTINGS environment variable is required')
 
-    settings_module = os.path.join(os.path.dirname(__file__), 'local_settings.py')
-    settings_module = os.environ.get('LBB_SETTINGS', settings_module)
+    settings_module: str = os.environ.get('LBB_SETTINGS')
     try:
         settings = imp.load_source('settings', settings_module)
     except FileNotFoundError:

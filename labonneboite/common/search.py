@@ -16,7 +16,7 @@ from labonneboite.common.fetcher import Fetcher
 from labonneboite.common.models import Office, OfficeResult
 from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 
 logger = logging.getLogger('main')
 
