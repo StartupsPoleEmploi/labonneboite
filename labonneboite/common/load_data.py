@@ -238,7 +238,7 @@ def load_siret_to_remove():
 
 #Used by importer job to extract etablissement
 @lru_cache(maxsize=None)
-def load_effectif_labels():
+def load_effectif_labels():  # TODO: remove after removing importer
     '''
     Dataframe to load look like this.
         code      label

@@ -1,5 +1,4 @@
 from functools import lru_cache
-from urllib.parse import urlencode
 import logging
 from typing import Any, Optional, Sequence
 
@@ -330,10 +329,6 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         if self.has_multi_geolocations:
             # If the given `zipcode` is in the same departement: the message is unnecessary.
             if zipcode and zipcode.startswith(self.zipcode[:2]):
-                return False
-            # If the given `distance` is too far: the message is unnecessary.
-            from labonneboite.web.search.forms import CompanySearchForm
-            if distance and int(distance) > int(CompanySearchForm.DISTANCE_S):
                 return False
             return True
         return False
