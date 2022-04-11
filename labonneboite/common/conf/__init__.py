@@ -22,7 +22,7 @@ settings = settings_common
 
 # Don't override settings in tests
 if settings_common.get_current_env() != settings_common.ENV_TEST:
-    
+
     settings_module = os.path.join(os.path.dirname(__file__), 'local_settings.py')
     settings_module = os.environ.get('LBB_SETTINGS', settings_module)
     try:
