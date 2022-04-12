@@ -17,7 +17,6 @@ from labonneboite.common.database import Base, db_session, DATABASE
 from labonneboite.common.load_data import load_city_codes, load_groupements_employeurs
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.common.conf import settings
-from labonneboite.importer import settings as importer_settings
 
 from labonneboite.common.models import FinalOfficeMixin, OfficeAdminUpdate
 
@@ -116,7 +115,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             url=self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
             contact_mode=util.get_contact_mode_for_rome_and_office(rome_code, self),
             social_network=self.social_network or '',
-            alternance=self.qualifies_for_alternance(),
+            alternance=False,
         )
 
         # Warning: the `distance`, `boost` and `matched_rome` fields are added by `get_offices_from_es_and_db`,
@@ -288,9 +287,6 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         Converts the number of stars adjusted to given rome_code to a percentage.
         """
         return (100 * self.get_stars_for_rome_code(rome_code)) / 5
-
-    def qualifies_for_alternance(self):
-        return self.score_alternance >= importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
 
     @property
     def url(self):
