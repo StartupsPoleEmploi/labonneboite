@@ -15,7 +15,7 @@ from pyprof2calltree import convert
 from sqlalchemy import and_, asc, inspect, or_
 from sqlalchemy.exc import OperationalError
 
-from labonneboite.common import departements as dpt
+from labonneboite_common import departements as dpt
 from labonneboite.common import encoding as encoding_util
 from labonneboite.common import es, geocoding, hiring_type_util
 from labonneboite.common import mapping as mapping_util
@@ -426,7 +426,7 @@ def create_offices(disable_parallel_computing=False):
         # maxtasksperchild default is infinite, which means memory is never freed up, and grows indefinitely :-/
         # maxtasksperchild=1 ensures memory is freed up after every departement computation.
         pool = mp.Pool(processes=int(1.25 * mp.cpu_count()), maxtasksperchild=1)
-        pool.map(func, dpt.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
+        pool.map(func, dpt.DEPARTEMENTS)
         pool.close()
         pool.join()
 

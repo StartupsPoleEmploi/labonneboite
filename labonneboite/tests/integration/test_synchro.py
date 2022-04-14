@@ -1,8 +1,7 @@
-
 import random
 import unittest
 
-from labonneboite.common import departements as dpt
+from labonneboite_common import departements as dpt
 from labonneboite.common import env
 from labonneboite.common.es import Elasticsearch
 from labonneboite.common.models import Office
