@@ -4,6 +4,7 @@
 #
 #    pip-compile --output-file requirements.dev.txt requirements.dev.in
 #
+-e git+https://github.com/StartupsPoleEmploi/labonneboite-common.git@80775e3933ae3b73b0c5745a32fafbc1ed28996c#egg=labonneboite-common
 alembic==0.9.10
 astroid==1.6.5
 attrs==21.4.0             # via flake8-mypy, pytest
@@ -125,7 +126,7 @@ social-auth-core[openidconnect]==1.4.0
 social-auth-storage-sqlalchemy==1.1.0
 speaklater==1.3
 sqlalchemy-utils==0.32.13
-sqlalchemy2-stubs==0.0.2a19
+sqlalchemy2-stubs==0.0.2a21
 sqlalchemy==1.3.3
 toml==0.10.2
 tomli==1.2.3              # via mypy
