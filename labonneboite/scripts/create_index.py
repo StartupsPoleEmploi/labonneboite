@@ -16,7 +16,7 @@ from sqlalchemy import and_, asc, inspect, or_
 from sqlalchemy.exc import OperationalError
 
 from labonneboite_common import departements as dpt
-from labonneboite.common import encoding as encoding_util
+from labonneboite_common import encoding as encoding_util
 from labonneboite.common import es, geocoding, hiring_type_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util

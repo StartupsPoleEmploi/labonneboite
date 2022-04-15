@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file requirements.dev.txt requirements.dev.in
 #
--e git+https://github.com/StartupsPoleEmploi/labonneboite-common.git@80775e3933ae3b73b0c5745a32fafbc1ed28996c#egg=labonneboite-common
+-e git+https://github.com/StartupsPoleEmploi/labonneboite-common.git@1d60bf675e3992abe4e5d7be4bb9f9ea33fb7340#egg=labonneboite-common
 alembic==0.9.10
 astroid==1.6.5
 attrs==21.4.0             # via flake8-mypy, pytest

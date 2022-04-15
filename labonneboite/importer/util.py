@@ -16,7 +16,7 @@ from labonneboite.common.util import timeit
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.models.computing import ImportTask, HistoryImporterJobs, StatusJobExecution
 from labonneboite.common.database import DATABASE
-from labonneboite.common import encoding as encoding_util
+from labonneboite_common import encoding as encoding_util
 from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
 from labonneboite.common.database import db_session
 
