@@ -11,7 +11,7 @@ from labonneboite.importer.models.computing import ImportTask
 from labonneboite.importer.models.computing import RawOffice
 from labonneboite_common import departements as dpt
 from labonneboite_common import encoding as encoding_util
-from labonneboite.common import siret as siret_util
+from labonneboite_common import siret as siret_util
 from labonneboite.common.database import db_session
 from labonneboite.common.chunks import chunks
 from labonneboite.importer.jobs.base import Job
