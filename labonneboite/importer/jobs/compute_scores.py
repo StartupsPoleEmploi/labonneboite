@@ -116,7 +116,8 @@ class ScoreComputingJob(Job):
         logger.info("compute_scores FINISHED")
         return results
 
-@history_importer_job_decorator(os.path.basename(__file__))
+# comment decorator for cbs extract
+#@history_importer_job_decorator(os.path.basename(__file__))
 @timeit
 def run_main():
     import_util.clean_temporary_tables()

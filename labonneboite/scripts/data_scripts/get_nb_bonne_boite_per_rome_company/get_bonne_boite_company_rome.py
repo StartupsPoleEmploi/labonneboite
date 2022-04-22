@@ -7,6 +7,7 @@ from labonneboite.common import mapping as mapping_util
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer.jobs.common import logger
 from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
+import argparse
 
 
 def get_total_hirings_per_office():
@@ -160,17 +161,22 @@ def get_nb_bonne_boite_per_rome(df):
 
 
 def run_main():
+    date_today = str(datetime.date.today())
+    parser = argparse.ArgumentParser(description="""Get stats for PSE and CBS studies""")
+    parser.add_argument("-o", "--office_name", type=str, default=f"nb_hirings_per_office-{date_today}.csv")
+    parser.add_argument("-r", "--rome_name", type=str, default=f"nb_bonne_boite_per_rome-{date_today}.csv")
+    args = parser.parse_args()
     # Get the file for PSE that compute the nb of hirings per rome per office
     df_total_hirings = get_total_hirings_per_office()
     df_total_hirings = get_offices_are_bonne_boite(df_total_hirings)
-    date_today = str(datetime.date.today())
-    path = f'{importer_settings.INPUT_SOURCE_FOLDER}/nb_hirings_per_office-{date_today}.csv'
+
+    path = f'{importer_settings.INPUT_SOURCE_FOLDER}/{args.office_name}'
     df_total_hirings.to_csv(path)
     print(f"File has been saved in {path}")
 
     # Get the file for PSE that compute the nb of hirings per rome per office
     df_nb_bonne_boite_per_rome = get_nb_bonne_boite_per_rome(df_total_hirings)
-    path = f'{importer_settings.INPUT_SOURCE_FOLDER}/nb_bonne_boite_per_rome-{date_today}.csv'
+    path = f'{importer_settings.INPUT_SOURCE_FOLDER}/{args.rome_name}'
     df_nb_bonne_boite_per_rome.to_csv(path, header=['nb_bonnes_boites'])
     print(f"File has been saved in {path}")
 
