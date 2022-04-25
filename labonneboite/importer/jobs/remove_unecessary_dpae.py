@@ -7,7 +7,7 @@ def remove_hiring_until_date(floor_date):
     logger.info("deleting hiring to %s... ", floor_date)
     con, cur = import_util.create_cursor()
     query = """
-        DELETE FROM hiring where date_insertion > "%s"
+        DELETE FROM hirings where date_insertion > "%s"
     """ % floor_date
     cur.execute(query)
     con.commit()
