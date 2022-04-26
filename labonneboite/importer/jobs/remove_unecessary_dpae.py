@@ -11,7 +11,7 @@ def remove_hiring_until_date(floor_date):
     """ % floor_date
     cur.execute(query)
     con.commit()
-    logger.info("completed populating %s ... ", flag)
+    logger.info("deleting hiring to %s DONE", floor_date)
     cur.close()
     con.close()
 
