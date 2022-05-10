@@ -4,13 +4,12 @@ services:
     restart: always
     image: nginx:1.13
     volumes:
-    - ./nginx/etc/nginx/conf.d:/etc/nginx/conf.d
-    - ./nginx/var/log/jepostule:/var/log/nginx/jepostule
-    - ./nginx/jepostule/static:/jepostule/static
+      - ./nginx/etc/nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/var/log/labonneboite:/var/log/nginx/labonneboite
     ports:
-    - ${HTTP_PORT:-8000}:8000
+      - ${HTTP_PORT:-8000}:8000
     depends_on:
-    - labonneboite
+      - labonneboite
 
   ###### 3rd-party services
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
@@ -60,19 +59,17 @@ services:
     networks:
       - labonneboite_default
 
-  
   ###### Je Postule
   labonneboite:
     restart: always
     build:
       context: .
     volumes:
-    - ./labonneboite/logs:/labonneboite/logs
-    - .:/labonneboite/src
+      - ./labonneboite/logs:/labonneboite/logs
+      - .:/labonneboite/src
     depends_on:
-    - elasticsearch
-    - mysql
-
+      - elasticsearch
+      - mysql
   # backups:
   #   restart: always
   #   build:
