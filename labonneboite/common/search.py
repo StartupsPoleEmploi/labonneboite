@@ -636,7 +636,7 @@ class HiddenMarketFetcher(Fetcher):
 
         # Check each office in the results and add some fields
         for position, office in enumerate(offices, start=1):
-            result = OfficeResult(office, offers_count=office_count, position=position)
+            result = OfficeResult(office, position=position)
 
             # Get the corresponding item from the Elasticsearch results.
             es_office = es_offices_by_siret[office.siret]
