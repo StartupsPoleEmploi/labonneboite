@@ -5,7 +5,8 @@ DB_PORT = 3306
 DB_HOST = 127.0.0.1
 DB_USER = root
 DB_NAME = labonneboite
-MYSQL = mysql -u ${DB_USER} --host ${DB_HOST} --port ${DB_PORT}
+MYSQL_PARAMS = -u ${DB_USER} --host ${DB_HOST} --port ${DB_PORT}
+MYSQL = mysql ${MYSQL_PARAMS}
 
 init: init-venv init-databases init-test-data
 
@@ -75,6 +76,13 @@ populate-data-test-selenium:
 	$(MYSQL) -D lbb_test < ./labonneboite/alembic/sql/etablissements_tests_selenium.sql
 	LBB_ENV=test SELENIUM_IS_SETUP=1 python ./labonneboite/scripts/create_index.py --full
 
+data-dev:
+	echo "-- this script should only run in local development and AFTER all migrations have completed" >  ./labonneboite/alembic/sql/etablissements.sql
+	echo "" >>  ./labonneboite/alembic/sql/etablissements.sql
+	echo "-- this only injects data in existing table etablissements" >>  ./labonneboite/alembic/sql/etablissements.sql
+	echo "" >>  ./labonneboite/alembic/sql/etablissements.sql
+	mysqldump ${MYSQL_PARAMS} --no-create-info --column-statistics=0 --complete-insert ${DB_NAME} etablissements  | sed -r 's/INSERT INTO (`[^`]+`)/TRUNCATE TABLE \1;\nINSERT INTO \1/g' | sed 's$$VALUES ($$VALUES\n    ($$g' | sed 's$$),($$),\n    ($$g' >> ./labonneboite/alembic/sql/etablissements.sql
+
 clear-data: clear-data-dev clear-data-test
 
 clear-data-dev: services
@@ -82,6 +90,7 @@ clear-data-dev: services
 
 clear-data-test: services
 	$(MYSQL) -e 'DROP DATABASE IF EXISTS lbb_test;'
+	$(MAKE) database-test
 
 rebuild-data-dev : clear-data-dev database-dev alembic-migrate populate-data-dev
 
@@ -261,10 +270,10 @@ test-custom:
 # ------------------
 
 alembic-migrate:
-	LBB_ENV=development alembic upgrade head
+	LBB_ENV=development PYTHONPATH=. alembic upgrade head
 
 alembic-rollback:
-	LBB_ENV=development alembic downgrade -1
+	LBB_ENV=development PYTHONPATH=. alembic downgrade -1
 
 alembic-generate-migration:
 	@echo "Run for example:"
@@ -388,3 +397,5 @@ run-importer-job-10-performance-compute-data:
 
 get-signed-api-url:
 	python labonneboite/scripts/get_signed_api_url.py $(URL)
+
+.PHONY: init init-databases init-services init-test-data init-venv compile-requirements compile-dev-requirements services database databases database-wait-mysql database-dev database-test data populate-data-dev populate-data-test populate-data-test-selenium data-dev clear-data clear-data-dev clear-data-test rebuild-data stop-services clean clean-pyc clean-services pylint-all pylint serve-web-app create-sitemap prepare-mailing-data create-index create-index-from-scratch create-index-from-scratch-with-profiling create-index-from-scratch-with-profiling-on-staging create-index-from-scratch-with-profiling-single-job create-index-from-scratch-with-profiling-line-by-line mysql-local-shell rebuild-simplified-rome-naf-mapping rebuild-importer-tests-compressed-files rebuild-city-codes update_metiers_tension get_nb_clic_per_siret get-total-lbb-offices-by-rome maj_rome start-locust-against-localhost test-unit test check-all test-app test-importer check-importer test-api test-front test-web test-scripts test-integration test-selenium test-impact-retour-emploi test-custom alembic-migrate alembic-rollback alembic-generate-migration run-impact-retour-emploi-jobs prepare-impact-retour-emploi-00 daily-json-activity-parser-01 join-activity-logs-and-dpae-02 clean-activity-logs-and-dpae-03 make-report-04 run-importer-jobs run-importer-job-00-prepare-all run-importer-job-01-check-etablissements run-importer-job-02-extract-etablissements run-importer-job-03-check-dpae run-importer-job-04-extract-dpae run-importer-job-04hack-create-fake-alternance-hirings run-importer-job-04-check-lba run-importer-job-04-extract-lba run-importer-job-05-compute-scores run-importer-job-06-validate-scores run-importer-job-07-geocode run-importer-job-08-populate-flags run-importer-job-09-performance-insert-data run-importer-job-10-performance-compute-data get-signed-api-url

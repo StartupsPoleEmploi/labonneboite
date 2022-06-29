@@ -26,12 +26,12 @@ class VisibleMarketFetcher(Fetcher):
     """
 
     def __init__(
-        self,
-        romes,
-        commune_id,
-        distance,
-        hiring_type,
-        page_size,
+            self,
+            romes,
+            commune_id,
+            distance,
+            hiring_type,
+            page_size,
     ):
         self.romes = romes
         self.commune_id = commune_id
@@ -47,15 +47,20 @@ class VisibleMarketFetcher(Fetcher):
 
         office_key_to_offers = defaultdict(list)
         for offer in offers:
-            offer_is_valid = ('entreprise' in offer and 'siret' in offer['entreprise'] and 'lieuTravail' in offer
-                              and 'latitude' in offer['lieuTravail'] and 'longitude' in offer['lieuTravail'])
+            offer_is_valid = (
+                    'entreprise' in offer
+                    and 'siret' in offer['entreprise']
+                    and 'lieuTravail' in offer
+                    and 'latitude' in offer['lieuTravail']
+                    and 'longitude' in offer['lieuTravail']
+            )
             if offer_is_valid:
                 office_key = offer['entreprise']['siret']
                 office_key_to_offers[office_key].append(offer)
 
         # Fetch matching offices from db. Offers without a match
         # will silently be dropped.
-        offices = Office.query.filter(Office.siret.in_(office_key_to_offers.keys()),).limit(self.page_size).all()
+        offices = Office.query.filter(Office.siret.in_(office_key_to_offers.keys()), ).limit(self.page_size).all()
         self.office_count = len(offices)
 
         office_results: List[OfficeResult] = []

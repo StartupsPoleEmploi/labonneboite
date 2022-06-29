@@ -4,6 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import create_engine
 
+import labonneboite.conf
 from labonneboite.common.database import Base, get_db_string
 import labonneboite.common.models
 import labonneboite.importer.models
