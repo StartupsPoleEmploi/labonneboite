@@ -8,6 +8,8 @@ DB_NAME = labonneboite
 MYSQL_PARAMS = -u ${DB_USER} --host ${DB_HOST} --port ${DB_PORT}
 MYSQL = mysql ${MYSQL_PARAMS}
 
+PYTHON = ${VIRTUAL_ENV}/bin/python
+
 init: init-venv init-databases init-test-data
 
 init-databases: init-services data create-index
@@ -117,6 +119,16 @@ clean-services: stop-services ## Delete containers and attached volumes
 
 # Code quality
 # ------------
+
+lint: lint-flake8 lint-mypy  ## Lint and type check the project
+
+lint-flake8:
+	${PYTHON_ENV} ${PYTHON} -m flake8 labonneboite
+
+MYPY_FILES ?= labonneboite
+
+lint-mypy:
+	${PYTHON_ENV} ${PYTHON} -m mypy --config-file=setup.cfg ${MYPY_FILES}
 
 # Run pylint on the whole project.
 pylint-all:

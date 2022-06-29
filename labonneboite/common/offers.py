@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Sequence
+from typing import Sequence, Tuple, List
 
 from labonneboite.common import esd, geocoding, hiring_type_util
 from labonneboite.common.chunks import chunks
@@ -42,7 +42,7 @@ class VisibleMarketFetcher(Fetcher):
     def get_contract_nature_codes(self):
         return HIRING_TYPE_TO_CONTRACT_NATURE_CODES[self.hiring_type]
 
-    def get_offices(self) -> Sequence[OfficeResult]:
+    def get_offices(self, *_, **__) -> Tuple[Sequence[OfficeResult], None]:
         offers = self.get_offers_for_romes(self.romes)
 
         office_key_to_offers = defaultdict(list)
@@ -103,7 +103,7 @@ class VisibleMarketFetcher(Fetcher):
                         office_result.website = offer['contact']['urlRecruteur']
             office_results.append(office_result)
 
-        return office_results
+        return office_results, None
 
     def get_offers_for_romes(self, romes):
         offers = []

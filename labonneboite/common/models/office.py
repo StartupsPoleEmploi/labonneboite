@@ -50,7 +50,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     Then, be sure to double check that both `make run_importer_jobs` and
     `make test_all` complete successfully.
     """
-
+    query = db_session.query_property()
     __tablename__ = settings.OFFICE_TABLE
 
     __table_args__ = (
