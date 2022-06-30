@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Iterable, Container
 from slugify import slugify
 
 from labonneboite.common.load_data import load_rome_naf_mapping
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 
 Naf = str
 Rome = str

@@ -24,6 +24,8 @@ pip-tools
 ##########
 # typing #
 ##########
+sqlalchemy-stubs
+
 types-Flask<0.13
 # *missing*: types-Flask-Script
 

@@ -1,4 +1,3 @@
-
 import ipaddress
 from urllib.parse import urlparse
 import logging
@@ -11,18 +10,19 @@ from flask import request
 
 from labonneboite.common.contact_mode import CONTACT_MODE_DEFAULT
 from labonneboite.common.load_data import load_contact_modes
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 
 logger = logging.getLogger('main')
 
 
 def timeit(func):
+
     @wraps(func)
     def wrap(*args, **kw):
         ts = time()
         result = func(*args, **kw)
         te = time()
-        duration = te-ts
+        duration = te - ts
         # anything under 1sec is not worth polluting the logs
         if settings.ENABLE_TIMEIT_TIMERS and duration >= 1.0:
             msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
@@ -32,6 +32,7 @@ def timeit(func):
             # print messages are displayed all at once when the job ends in jenkins console output
             print(msg)
         return result
+
     return wrap
 
 
@@ -144,12 +145,13 @@ def unique_elements(iterable, key=None):
             seen.add(hashed)
     return result
 
-def get_enum_from_value(EnumClass, value, default = None):
+
+def get_enum_from_value(EnumClass, value, default=None):
     '''
     Get an enum member out of a string value, e.g. Color.BLUE out of 1 if Color.BLUE.value is 1
     Used to convert value in GET to enum
     '''
     try:
         return EnumClass(value)
-    except(ValueError):
+    except (ValueError):
         return default

@@ -9,9 +9,9 @@ from labonneboite.importer.util import history_importer_job_decorator
 from labonneboite.common.util import timeit
 from labonneboite.importer.models.computing import ImportTask
 from labonneboite.importer.models.computing import RawOffice
-from labonneboite.common import departements as dpt
-from labonneboite.common import encoding as encoding_util
-from labonneboite.common import siret as siret_util
+from labonneboite_common import departements as dpt
+from labonneboite_common import encoding as encoding_util
+from labonneboite_common import siret as siret_util
 from labonneboite.common.database import db_session
 from labonneboite.common.chunks import chunks
 from labonneboite.importer.jobs.base import Job
@@ -22,18 +22,22 @@ from labonneboite.common.env import get_current_env, ENV_TEST
 # This list contains siret that must not be found in data,
 # we use it as a test : if one of those is found in data, we stop the importer
 # and need to extract data again
-WRONG_SIRETS = ['50468025700020', #siret of Oxynel : old siret which has been replaced with this one : 50468025700038
-                '48791579500024', #old siret for "L’entreprise Philippe Murielle a changé de SIRET en avril 2018 suite à un changement d’adresse"
-                '41006536100041', #old siret for equant france sa - cesson sevigne
+WRONG_SIRETS = [
+    '50468025700020',  #siret of Oxynel : old siret which has been replaced with this one : 50468025700038
+    '48791579500024',  #old siret for "L’entreprise Philippe Murielle a changé de SIRET en avril 2018 suite à un changement d’adresse"
+    '41006536100041',  #old siret for equant france sa - cesson sevigne
 ]
 
 DF_EFFECTIF_TO_LABEL = load_effectif_labels()
 
+
 class WrongSiretException(Exception):
     pass
 
+
 def has_text_content(s):
     return s is not None and len(s) > 0 and not s.isspace()
+
 
 def merge_and_normalize_websites(websites):
     for website in websites:
@@ -41,6 +45,7 @@ def merge_and_normalize_websites(websites):
         if clean_website:
             return clean_website
     return ""
+
 
 def normalize_website_url(url):
     """
@@ -71,7 +76,6 @@ def normalize_website_url(url):
     return url
 
 
-
 @timeit
 def check_departements(departements):
     for dep in departements:
@@ -100,9 +104,7 @@ class EtablissementExtractJob(Job):
 
         if len(departements) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
             msg = "wrong number of departements : %s instead of expected %s" % (
-                len(departements),
-                settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
-            )
+                len(departements), settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES)
             raise Exception(msg)
 
         # FIXME parallelize for better performance
@@ -111,9 +113,7 @@ class EtablissementExtractJob(Job):
             logger.info("number of companies in departement %s : %i", departement, count)
             if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
                 msg = "too few companies in departement : %s instead of expected %s" % (
-                    count,
-                    settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT
-                )
+                    count, settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT)
                 raise Exception(msg)
 
     @timeit
@@ -139,37 +139,35 @@ class EtablissementExtractJob(Job):
             logger.info("nombre d'etablissement dans le csv : %i" % len(csv_set))
 
             i = 0
-            logger.info("liste de 20 sirets dans le csv" )
-            if csv_set :
-                while  i < 20 :
-                    i=i+1
+            logger.info("liste de 20 sirets dans le csv")
+            if csv_set:
+                while i < 20:
+                    i = i + 1
                     value_test = csv_set.pop()
                     csv_set.add(value_test)
-                    logger.info(" siret : %s" % value_test )
-
+                    logger.info(" siret : %s" % value_test)
 
             logger.info("nombre d'etablissement existant : %i" % len(existing_set))
 
             i = 0
-            logger.info("liste de 20 sirets existant" )
-            if existing_set :
-                while  i < 20 :
-                    i=i+1
+            logger.info("liste de 20 sirets existant")
+            if existing_set:
+                while i < 20:
+                    i = i + 1
                     value_test = existing_set.pop()
                     existing_set.add(value_test)
-                    logger.info(" siret : %s" % value_test )
-
+                    logger.info(" siret : %s" % value_test)
 
             logger.info("nombre d'etablissement à créer : %i" % len(self.creatable_sirets))
 
             i = 0
-            logger.info("liste de 20 sirets à créer" )
-            if self.creatable_sirets :
-                while  i < 20 :
-                    i=i+1
+            logger.info("liste de 20 sirets à créer")
+            if self.creatable_sirets:
+                while i < 20:
+                    i = i + 1
                     value_test = self.creatable_sirets.pop()
                     self.creatable_sirets.add(value_test)
-                    logger.info(" siret : %s" % value_test )
+                    logger.info(" siret : %s" % value_test)
 
             self.create_update_offices()
             sirets_inserted = sirets_inserted.union(csv_set)
@@ -299,7 +297,7 @@ class EtablissementExtractJob(Job):
     @timeit
     def benchmark_loading_using_pandas(self):
         return  # not working yet, see below
-        
+
         # FIXME retry this very soon, as soon as we have the pipe delimiter
 
         # ValueError: Falling back to the 'python' engine because the separator encoded in UTF-8 is > 1 char long,
@@ -311,7 +309,6 @@ class EtablissementExtractJob(Job):
             error_bad_lines=False,  # no longer raise Exception when a row is incorrect (wrong number of fields...)
             warn_bad_lines=True,  # still display warning about those ignored incorrect rows
         )
-
 
     @timeit
     def get_offices_from_file(self):
@@ -326,11 +323,10 @@ class EtablissementExtractJob(Job):
         unprocessable_departement_errors = 0
         format_errors = 0
         # KPI expected after the add of the RGPD email column
-        emails_here_before_rgpd = 0 # Number of offices who did not have email before, and now have one
-        emails_not_here_before_rgpd = 0 # Number of offices who had an existing email, which has been replaced by the new rgpd mail clean
+        emails_here_before_rgpd = 0  # Number of offices who did not have email before, and now have one
+        emails_not_here_before_rgpd = 0  # Number of offices who had an existing email, which has been replaced by the new rgpd mail clean
         departement_counter_dic = {}
         offices = {}
-
 
         with import_util.get_reader(self.input_filename) as myfile:
             header_line = myfile.readline().strip()  # FIXME detect column positions from header
@@ -340,7 +336,6 @@ class EtablissementExtractJob(Job):
             for line in myfile:
                 line = line.decode()
                 count += 1
-
 
                 try:
                     fields = import_util.get_fields_from_csv_line(line)
@@ -360,7 +355,8 @@ class EtablissementExtractJob(Job):
                         raise ValueError
 
                     if siret in WRONG_SIRETS:
-                        logger.exception("wrong siret : %s, should not be here - need other extract from datalake", siret)
+                        logger.exception("wrong siret : %s, should not be here - need other extract from datalake",
+                                         siret)
                         raise WrongSiretException
 
                 except ValueError:
@@ -370,14 +366,13 @@ class EtablissementExtractJob(Job):
 
                 # We cant rely on the field trancheeffectif_etablissement which is in etablissement file
                 # We have to rely on the field effectif_reel
-                # We take the number of employees and we use a dataframe which will help us to determine which category the number of employees is related to 
+                # We take the number of employees and we use a dataframe which will help us to determine which category the number of employees is related to
                 # If there is no effectif reel in the dataset OR it is 0, we use the old field tranche_effectif
                 if effectif_reel != '':
                     if int(effectif_reel) > 0:
-                        trancheeffectif_etablissement = DF_EFFECTIF_TO_LABEL[ 
-                            (DF_EFFECTIF_TO_LABEL.start_effectif <= int(effectif_reel)) & 
-                            (DF_EFFECTIF_TO_LABEL.end_effectif >= int(effectif_reel))
-                        ]['code'].values[0]
+                        trancheeffectif_etablissement = DF_EFFECTIF_TO_LABEL[
+                            (DF_EFFECTIF_TO_LABEL.start_effectif <= int(effectif_reel)) &
+                            (DF_EFFECTIF_TO_LABEL.end_effectif >= int(effectif_reel))]['code'].values[0]
 
                 website = merge_and_normalize_websites([website1, website2, website3])
 
@@ -396,7 +391,7 @@ class EtablissementExtractJob(Job):
                     process_this_departement = departement in departements
                     if process_this_departement:
                         # Trello Pz5UlnFh : supprimer-les-emails-pe-des-entreprises-qui-ne-sont-pas-des-agences-pe
-                        if  "@pole-emploi." in email and raisonsociale != "POLE EMPLOI":
+                        if "@pole-emploi." in email and raisonsociale != "POLE EMPLOI":
                             email = ""
                         if len(codepostal) == 4:
                             codepostal = "0%s" % codepostal
@@ -449,9 +444,7 @@ class EtablissementExtractJob(Job):
                 raise ValueError("too many format_errors")
             if len(departement_counter_dic) != settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES:
                 msg = "incorrect total number of departements : %s instead of expected %s" % (
-                    len(departement_counter_dic),
-                    settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES
-                )
+                    len(departement_counter_dic), settings.DISTINCT_DEPARTEMENTS_HAVING_OFFICES)
                 raise ValueError(msg)
             for departement, count in departement_count:
                 if not count >= settings.MINIMUM_OFFICES_TO_BE_EXTRACTED_PER_DEPARTEMENT:
@@ -460,12 +453,13 @@ class EtablissementExtractJob(Job):
 
         yield offices
 
+
 @history_importer_job_decorator(os.path.basename(__file__))
 def run():
     etablissement_filename = import_util.detect_runnable_file("etablissements")
     task = EtablissementExtractJob(etablissement_filename)
     task.run()
 
+
 if __name__ == "__main__":
     run()
-

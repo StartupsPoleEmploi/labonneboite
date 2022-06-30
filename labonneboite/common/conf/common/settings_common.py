@@ -169,7 +169,7 @@ JEPOSTULE_QUOTA = 0
 # Google site verification code - for linking with Google Search Console
 GOOGLE_SITE_VERIFICATION_CODE = None
 
-SCAM_EMAILS_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'scripts', 'scam_emails')
+SCAM_EMAILS_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', '..', 'scripts', 'scam_emails')
 
 # Ids of spreadsheets for local dev
 # SPREADSHEET_IDS = [

@@ -9,7 +9,7 @@ import uuid
 from flask import has_request_context, request
 from flask_login import current_user
 
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 
 # Produce json-formatter logs about user activity. This can be used for debugging
 # and analytics, but stats are mostly used to be dumped in the Pôle Emploi data
@@ -35,8 +35,8 @@ def log(event_name, user=None, source=None, **properties):
         # In local dev it has but not in production, because of a header and security
         # So we expect ajax calls to send params explicitely
         dic = request.values.to_dict()
-        args = dict((k.lower(), v) for k, v in dic.items()) # all keys to lowercase as this will be stored as JSON
-        args.pop('csrf_token', None) # Keep this out of the logs
+        args = dict((k.lower(), v) for k, v in dic.items())  # all keys to lowercase as this will be stored as JSON
+        args.pop('csrf_token', None)  # Keep this out of the logs
     else:
         args = None
 
@@ -54,6 +54,7 @@ def log(event_name, user=None, source=None, **properties):
     data['proprietes'] = properties
     userLogger.info(json.dumps(data))
 
+
 def log_search(sirets=None, count=None, page=None, source=None, **properties):
     resultats = {
         'page': page,
@@ -62,10 +63,12 @@ def log_search(sirets=None, count=None, page=None, source=None, **properties):
     }
     log('recherche', source=source, resultats=resultats, **properties)
 
+
 apiLogger = logging.getLogger('apiactivity')
 apiLogger.setLevel(settings.LOG_LEVEL_USER_ACTIVITY)
 settings.LOGGING_HANDLER_API_ACTIVITY.setFormatter(logging.Formatter(settings.LOG_FORMAT_USER_ACTIVITY))
 apiLogger.addHandler(settings.LOGGING_HANDLER_API_ACTIVITY)
+
 
 def log_api(status, application, user_agent, referrer, remote_addr):
     data = OrderedDict()

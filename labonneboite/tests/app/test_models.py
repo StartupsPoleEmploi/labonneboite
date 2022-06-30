@@ -126,7 +126,6 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
         self.assertEqual(office.x, office_json['lon'])
         self.assertEqual(office.y, office_json['lat'])
         self.assertEqual(office.naf, office_json['naf'])
-        self.assertTrue(office_json['alternance'])
 
         self.assertDictContainsSubset(office_json, office_result_json)
         self.assertDictContainsSubset({'distance': 10}, office_result_json)

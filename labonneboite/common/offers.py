@@ -1,11 +1,11 @@
 from collections import defaultdict
-from typing import Sequence
+from typing import Sequence, Tuple, List
 
 from labonneboite.common import esd, geocoding, hiring_type_util
 from labonneboite.common.chunks import chunks
 from labonneboite.common.fetcher import Fetcher
 from labonneboite.common.models import Office, OfficeResult
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 
 OFFRES_ESD_ENDPOINT_URL = "%s/partenaire/offresdemploi/v2/offres/search" % settings.PEAM_API_BASE_URL
 OFFRES_ESD_MAXIMUM_ROMES = 3
@@ -26,12 +26,12 @@ class VisibleMarketFetcher(Fetcher):
     """
 
     def __init__(
-        self,
-        romes,
-        commune_id,
-        distance,
-        hiring_type,
-        page_size,
+            self,
+            romes,
+            commune_id,
+            distance,
+            hiring_type,
+            page_size,
     ):
         self.romes = romes
         self.commune_id = commune_id
@@ -39,22 +39,20 @@ class VisibleMarketFetcher(Fetcher):
         self.hiring_type = hiring_type
         self.page_size = page_size
 
-
     def get_contract_nature_codes(self):
         return HIRING_TYPE_TO_CONTRACT_NATURE_CODES[self.hiring_type]
 
-
-    def get_offices(self) -> Sequence[OfficeResult]:
+    def get_offices(self, *_, **__) -> Tuple[Sequence[OfficeResult], None]:
         offers = self.get_offers_for_romes(self.romes)
 
         office_key_to_offers = defaultdict(list)
         for offer in offers:
             offer_is_valid = (
-                'entreprise' in offer
-                and 'siret' in offer['entreprise']
-                and 'lieuTravail' in offer
-                and 'latitude' in offer['lieuTravail']
-                and 'longitude' in offer['lieuTravail']
+                    'entreprise' in offer
+                    and 'siret' in offer['entreprise']
+                    and 'lieuTravail' in offer
+                    and 'latitude' in offer['lieuTravail']
+                    and 'longitude' in offer['lieuTravail']
             )
             if offer_is_valid:
                 office_key = offer['entreprise']['siret']
@@ -62,11 +60,7 @@ class VisibleMarketFetcher(Fetcher):
 
         # Fetch matching offices from db. Offers without a match
         # will silently be dropped.
-        offices = Office.query.filter(
-            Office.siret.in_(
-                office_key_to_offers.keys()
-            ),
-        ).limit(self.page_size).all()
+        offices = Office.query.filter(Office.siret.in_(office_key_to_offers.keys()), ).limit(self.page_size).all()
         self.office_count = len(offices)
 
         office_results: List[OfficeResult] = []
@@ -89,30 +83,27 @@ class VisibleMarketFetcher(Fetcher):
 
             office_result.matched_rome = first_offer['romeCode']
             office_result.offers_count = len(office_offers)
-            office_result.offers = [
-                {
-                    'id': offer['id'],
-                    'name': offer['intitule'],
-                    'url': offer['origineOffre']['urlOrigine'],
-                } for offer in office_offers
-            ]
+            office_result.offers = [{
+                'id': offer['id'],
+                'name': offer['intitule'],
+                'url': offer['origineOffre']['urlOrigine'],
+            } for offer in office_offers]
             # Contact data coming from offers take precedence
             # over LBB ones.
             for offer in office_offers:
                 if 'contact' in offer:
                     # FIXME: the address API will soon remove the emails
-                    if 'courriel' in offer: # FIXME: this should be if 'courriel' in offer['contact']
+                    if 'courriel' in offer:  # FIXME: this should be if 'courriel' in offer['contact']
                         office_result.email = offer['contact']['courriel']
-                    if 'telephone' in offer: # FIXME: same error to fix here
+                    if 'telephone' in offer:  # FIXME: same error to fix here
                         office_result.tel = offer['contact']['telephone']
-                    if 'urlPostulation' in offer: # FIXME: same error to fix here
+                    if 'urlPostulation' in offer:  # FIXME: same error to fix here
                         office_result.website = offer['contact']['urlPostulation']
-                    elif 'urlRecruteur' in offer: # FIXME: same error to fix here
+                    elif 'urlRecruteur' in offer:  # FIXME: same error to fix here
                         office_result.website = offer['contact']['urlRecruteur']
             office_results.append(office_result)
 
-        return office_results
-
+        return office_results, None
 
     def get_offers_for_romes(self, romes):
         offers = []

@@ -112,7 +112,7 @@ def offers_offices_list():
 
     _, zipcode, _, departements = get_location(request.args)
 
-    offices = fetcher.get_offices()
+    offices, _ = fetcher.get_offices()
 
     result = build_result(fetcher, offices, fetcher.commune_id, departements, zipcode, add_url=False)
 
@@ -616,7 +616,7 @@ def get_office_details(siret, alternance=False):
         'raison_sociale': office.company_name,
         'siret': office.siret,
         'stars': office.stars,
-        'alternance': office.qualifies_for_alternance(),
+        'alternance': False,
         'url': office.url,
         'social_network': office.social_network or '',
         'address': {

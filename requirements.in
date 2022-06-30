@@ -1,3 +1,5 @@
+-e git+https://github.com/StartupsPoleEmploi/labonneboite-common.git@4a46124844ba76af63800da77156ec3a6b31f43c#egg=labonneboite-common
+
 Flask<0.13
 Flask-Script
 

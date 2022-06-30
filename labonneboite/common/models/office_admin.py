@@ -18,7 +18,7 @@ from labonneboite.common import geocoding
 from labonneboite.common.database import Base
 from labonneboite.common.models import OfficeMixin
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 
 
 class OfficeAdminAdd(OfficeMixin, CRUDMixin, Base):
@@ -36,8 +36,12 @@ class OfficeAdminAdd(OfficeMixin, CRUDMixin, Base):
     def __init__(self, *args, **kwargs):
         # The `headcount` field must be different form the one of `Office`
         # to be able to provide a clean <select> choice in the admin UI.
-        self.headcount = Column('trancheeffectif', ChoiceType(settings.HEADCOUNT_INSEE_CHOICES), default="00",
-            nullable=False,)
+        self.headcount = Column(
+            'trancheeffectif',
+            ChoiceType(settings.HEADCOUNT_INSEE_CHOICES),
+            default="00",
+            nullable=False,
+        )
         super(OfficeAdminAdd, self).__init__(*args, **kwargs)
 
     id = Column(Integer, primary_key=True)
@@ -99,6 +103,7 @@ class OfficeAdminRemove(CRUDMixin, Base):
     __mapper_args__ = {
         'order_by': desc(date_created),  # Default order_by for all queries.
     }
+
 
 class OfficeUpdateMixin(object):
     SEPARATORS = ['\n', '\r']
@@ -200,6 +205,7 @@ class OfficeUpdateMixin(object):
             html.append("{0} - {1}".format(rome, settings.ROME_DESCRIPTIONS[rome]))
         return '<br>'.join(html)
 
+
 class OfficeAdminUpdate(OfficeUpdateMixin, CRUDMixin, Base):
     """
     Upon requests received from employers, we can update some offices info.
@@ -212,6 +218,7 @@ class OfficeAdminUpdate(OfficeUpdateMixin, CRUDMixin, Base):
     __mapper_args__ = {
         'order_by': desc(text('etablissements_admin_update.date_created')),  # Default order_by for all queries.
     }
+
 
 class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     """
@@ -278,10 +285,11 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
             {"lat" : 48.86, "lon" : 2.35},
         ]
         """
-        return sorted(
-            [{'lat': coords[0], 'lon': coords[1]} for coords in json.loads(self.geolocations)],
-            key=lambda x: (x['lat'], x['lon'])
-        )
+        return sorted([{
+            'lat': coords[0],
+            'lon': coords[1]
+        } for coords in json.loads(self.geolocations)],
+                      key=lambda x: (x['lat'], x['lon']))
 
     def geolocations_as_html_links(self):
         """

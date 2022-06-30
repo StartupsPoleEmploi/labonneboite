@@ -1,46 +1,37 @@
-
 # Python standard library.
-from urllib.parse import urlparse
 import locale
 import logging
+from urllib.parse import urlparse
 
 # External packages.
 import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
-from social_core import exceptions as social_exceptions
-from social_flask_sqlalchemy.models import init_social
-from werkzeug.contrib.fixers import ProxyFix
-from slugify import slugify
-
 # Flask.
-from flask import g, flash, Flask, redirect, render_template, request, session, url_for
+from flask import flash, Flask, g, redirect, render_template, request, session, url_for
 from flask_admin import Admin
-from flask_assets import Environment, Bundle
+from flask_assets import Bundle, Environment
 from flask_babelex import Babel
 from flask_login import current_user, LoginManager
 from flask_wtf.csrf import CSRFProtect
+from sentry_sdk.integrations.flask import FlaskIntegration
+from slugify import slugify
+from social_core import exceptions as social_exceptions
+from social_flask_sqlalchemy.models import init_social
+from werkzeug.contrib.fixers import ProxyFix
 
-# labonneboite.
-from labonneboite.common import pro
-from labonneboite.common.database import db_session, engine  # This is how we talk to the database.
-from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT
-from labonneboite.common.models import User
-from labonneboite.common.models import Office
-from labonneboite.common import mailjet
 from labonneboite.conf import settings
-
-# labonneboite web.
+from labonneboite.common import mailjet, pro
+from labonneboite.common.database import db_session, engine  # This is how we talk to the database.
+from labonneboite.common.env import ENV_DEVELOPMENT, get_current_env
+from labonneboite.common.models import Office, User
 from labonneboite.web.auth import utils as auth_utils
 from labonneboite.web.auth.backends.exceptions import AuthFailedMissingReturnValues
 from labonneboite.web.config import CONFIG
 from labonneboite.web.jepostule.utils import jepostule_enabled
 from labonneboite.web.templates_functions import register_templates_functions
 
-
 # Fix a bug with Python 2, strftime and Unicode.
 # http://www.regisblog.fr/2015/01/08/python-strftime-unicode/
 locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
-
 
 # The login manager contains the code that lets the application and Flask-Login
 # work together, such as how to load a user from an ID, where to send users when
@@ -75,12 +66,10 @@ def activate_logging(flask_app):
         engine.logger.addHandler(handler)
 
     if settings.SENTRY_DSN:
-        sentry_sdk.init(
-            dsn=settings.SENTRY_DSN,
-            integrations=[FlaskIntegration()],
-            traces_sample_rate=settings.SENTRY_SAMPLE_RATE,
-            environment=settings.SENTRY_ENVIRONMENT
-        )
+        sentry_sdk.init(dsn=settings.SENTRY_DSN,
+                        integrations=[FlaskIntegration()],
+                        traces_sample_rate=settings.SENTRY_SAMPLE_RATE,
+                        environment=settings.SENTRY_ENVIRONMENT)
         flask_app.logger.debug("sentry is enabled")
     else:
         flask_app.logger.debug("sentry is disabled")
@@ -100,17 +89,18 @@ def register_blueprints(flask_app):
     """
     Register Flask blueprints to split the application into small modules.
     """
+    from social_flask.routes import social_auth
+
     from labonneboite.web.api.views import apiBlueprint
     from labonneboite.web.auth.views import authBlueprint
+    from labonneboite.web.contact_form.views import contactFormBlueprint
     from labonneboite.web.data.views import dataBlueprint
     from labonneboite.web.health.views import healthBlueprint
-    from labonneboite.web.office.views import officeBlueprint
-    from labonneboite.web.contact_form.views import contactFormBlueprint
     from labonneboite.web.jepostule.views import jepostuleBlueprint
+    from labonneboite.web.office.views import officeBlueprint
     from labonneboite.web.root.views import rootBlueprint
     from labonneboite.web.search.views import searchBlueprint
     from labonneboite.web.user.views import userBlueprint
-    from social_flask.routes import social_auth
     flask_app.register_blueprint(apiBlueprint, url_prefix='/api/v1')
     flask_app.register_blueprint(authBlueprint, url_prefix='/authentication')
     flask_app.register_blueprint(dataBlueprint, url_prefix='/data')
@@ -132,6 +122,7 @@ def register_admin(flask_app):
     admin = Admin(flask_app, name='Administration LBB', index_view=LbbAdminIndexView(), template_mode='bootstrap3')
 
     from labonneboite.web.admin.views.user import UserModelView
+
     # Use the `endpoint` argument to avoid a Blueprint name collision:
     # https://github.com/flask-admin/flask-admin/issues/1474
     admin.add_view(UserModelView(User, db_session, endpoint='users', name='Utilisateurs'))
@@ -150,14 +141,15 @@ def register_admin(flask_app):
 
     from labonneboite.common.models import OfficeAdminExtraGeoLocation
     from labonneboite.web.admin.views.office_admin_extra_geolocation import OfficeAdminExtraGeoLocationModelView
-    admin.add_view(OfficeAdminExtraGeoLocationModelView(OfficeAdminExtraGeoLocation, db_session,
-        name='Géolocalisations'))
+    admin.add_view(
+        OfficeAdminExtraGeoLocationModelView(OfficeAdminExtraGeoLocation, db_session, name='Géolocalisations'))
 
 
 def register_before_requests(flask_app):
     """
     Register before_request functions.
     """
+
     def global_user():
         """
         Retrieve the current user from Flask-Login and make it available
@@ -180,6 +172,7 @@ def register_context_processors(flask_app):
     """
     Register context_processor functions.
     """
+
     def inject_dict_for_all_templates():
         return {
             'memo_url': settings.MEMO_URL,
@@ -213,9 +206,11 @@ def register_teardown_appcontext(flask_app):
     """
     Register teardown_appcontext functions.
     """
+
     def shutdown_session(exception=None):
         db_session.remove()
         engine.dispose()
+
     flask_app.teardown_appcontext(shutdown_session)
 
 
@@ -281,8 +276,7 @@ def create_app():
             'js/recruiter-forms.js',
             filters='jsmin',
             output='gen/packed.recruiter_form.%(version)s.js',
-        )
-    )
+        ))
 
     css = Bundle(
         # LBB.
@@ -341,7 +335,8 @@ def social_auth_error(error):
     """
     flash_message = "Une erreur est survenue lors de votre connexion. Veuillez réessayer."
 
-    if isinstance(error, social_exceptions.AuthFailed) and error.args[0] == 'The request requires some interaction that is not allowed.':
+    if isinstance(error, social_exceptions.AuthFailed
+                  ) and error.args[0] == 'The request requires some interaction that is not allowed.':
         # We thought user was connected on PE.fr, but in fact he wasn't, so we
         # can't log the user in without interaction.
         # flash_message += " [Code erreur 001]"
@@ -398,9 +393,11 @@ def internal_error(error):
     # Exception was already logged by flask somewhere, no need to process it
     return render_template('error/500.html'), 500
 
+
 @app.template_filter('slugify')
 def slugify_filter(text):
     return slugify(text)
+
 
 if __name__ == '__main__':
     if get_current_env() == ENV_DEVELOPMENT:

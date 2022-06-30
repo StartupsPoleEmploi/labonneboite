@@ -2,21 +2,20 @@ import collections
 import logging
 from collections import OrderedDict
 from datetime import datetime
-from enum import auto, Enum
+from enum import Enum
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 from astroid import decorators
 from slugify import slugify
 
-from labonneboite.common import hiring_type_util
 from labonneboite.common import mapping as mapping_util
-from labonneboite.common import sorting, util
+from labonneboite.common import hiring_type_util, sorting, util
+from labonneboite.common.conf import settings
 from labonneboite.common.es import Elasticsearch
 from labonneboite.common.fetcher import Fetcher
 from labonneboite.common.models import Office, OfficeResult
 from labonneboite.common.pagination import OFFICES_PER_PAGE
 from labonneboite.common.rome_mobilities import ROME_MOBILITIES
-from labonneboite.conf import settings
 
 logger = logging.getLogger('main')
 
@@ -36,9 +35,8 @@ RangeType = Dict[str, int]
 ValueType = Union[TermsType, TermType, RangeType]
 Filter = Dict[str, Dict[str, Any]]
 
-OfficeType = Dict
-OfficesType = List[OfficeType]
-NafAggregationType = List[Dict]
+OfficesType = Sequence[OfficeResult]
+NafAggregationType = Sequence[Dict]
 HeadcountAggregationType = Dict
 DistanceAggregationType = Dict
 
@@ -67,23 +65,23 @@ class HiddenMarketFetcher(Fetcher):
     """
 
     def __init__(
-        self,
-        longitude,
-        latitude,
-        departments=None,
-        romes=None,
-        distance=None,
-        travel_mode=None,  # TODO: remove unused travel mode
-        sort=None,
-        hiring_type=None,
-        from_number=1,
-        to_number=OFFICES_PER_PAGE,
-        audience=None,
-        headcount=None,
-        naf=None,
-        naf_codes=None,
-        aggregate_by=None,
-        flag_pmsmp=None,
+            self,
+            longitude,
+            latitude,
+            departments=None,
+            romes=None,
+            distance=None,
+            travel_mode=None,  # TODO: remove unused travel mode
+            sort=None,
+            hiring_type=None,
+            from_number=1,
+            to_number=OFFICES_PER_PAGE,
+            audience=None,
+            headcount=None,
+            naf=None,
+            naf_codes=None,
+            aggregate_by=None,
+            flag_pmsmp=None,
     ):
         self.latitude = latitude
         self.longitude = longitude
@@ -121,7 +119,7 @@ class HiddenMarketFetcher(Fetcher):
         # Other properties.
         self.alternative_rome_codes = {}
         self.alternative_distances = collections.OrderedDict()
-        self.office_count = None
+        self.office_count = 0
         self.departments = departments
         self.flag_pmsmp = flag_pmsmp
 
@@ -172,7 +170,7 @@ class HiddenMarketFetcher(Fetcher):
         return self._count_offices_from_es(query)
 
     @staticmethod
-    def _count_offices_from_es(json_body):
+    def _count_offices_from_es(json_body) -> int:
         es = Elasticsearch()
         res = es.count(index=settings.ES_INDEX, doc_type="office", body=json_body)
         return res["count"]
@@ -294,7 +292,7 @@ class HiddenMarketFetcher(Fetcher):
         # Build filters.
         filters = self._build_es_query_filters()
 
-        query: Dict = {"query": {"filtered": {"filter": {"bool": {"must": filters,}}}}}
+        query: Dict = {"query": {"filtered": {"filter": {"bool": {"must": filters, }}}}}
         if not omit_sort:
             query = self._apply_sort(query)
         if not omit_aggretation:
@@ -465,7 +463,7 @@ class HiddenMarketFetcher(Fetcher):
             main_query['sort'].append(
                 self._distance_sort)  # required so that office distance can be extracted and displayed on frontend
         else:
-            main_query['sort'].append({"department": {"order": "asc",}})
+            main_query['sort'].append({"department": {"order": "asc", }})
 
         self._distance_sort_index = len(main_query['sort']) - 1
 
@@ -501,7 +499,7 @@ class HiddenMarketFetcher(Fetcher):
                 elif aggregate == 'contract':
                     pass
                 else:
-                    json_body['aggs'][aggregate] = {"terms": {"field": aggregate,}}
+                    json_body['aggs'][aggregate] = {"terms": {"field": aggregate, }}
 
         return json_body
 
@@ -520,17 +518,17 @@ class HiddenMarketFetcher(Fetcher):
 
     def _build_es_query_filters(self) -> Sequence[Filter]:
         filters: List[Filter] = []
-        self._addFilterRange('score', gt=0, to=filters)
-        self._addFilterTerms('naf', self.naf_codes, to=filters, if_=self.naf_codes)
+        self._add_filter_range('score', gt=0, to=filters)
+        self._add_filter_terms('naf', self.naf_codes, to=filters, if_=bool(self.naf_codes))
 
-        self._addHeadcountFilter(self.headcount, to=filters)
+        self._add_headcount_filter(self.headcount, to=filters)
 
-        self._addFilterTerm('flag_junior', to=filters, if_=self.flag_junior == 1)
-        self._addFilterTerm('flag_senior', to=filters, if_=self.flag_senior == 1)
-        self._addFilterTerm('flag_handicap', to=filters, if_=self.flag_handicap == 1)
+        self._add_filter_term('flag_junior', to=filters, if_=self.flag_junior == 1)
+        self._add_filter_term('flag_senior', to=filters, if_=self.flag_senior == 1)
+        self._add_filter_term('flag_handicap', to=filters, if_=self.flag_handicap == 1)
 
         # at least one of these fields should exist
-        self._unsureRomeIsInScores(self.romes, self.hiring_type, to=filters)
+        self._unsure_rome_is_in_scores(self.romes, self.hiring_type, to=filters)
 
         if self.gps_available:
             filters.append({
@@ -543,11 +541,11 @@ class HiddenMarketFetcher(Fetcher):
                 }
             })
 
-        self._addFilterTerms('department', self.departments, to=filters, if_=self.departments)
-        self._addFilterTerm('flag_pmsmp', 1, to=filters, if_=self.flag_pmsmp == 1)
+        self._add_filter_terms('department', self.departments, to=filters, if_=self.departments)
+        self._add_filter_term('flag_pmsmp', 1, to=filters, if_=self.flag_pmsmp == 1)
         return filters
 
-    def _get_offices_from_es_and_db(self, query) -> Tuple[Sequence[OfficeResult], Sequence[Dict]]:
+    def _get_offices_from_es_and_db(self, query) -> Tuple[OfficesType, Sequence[Dict]]:
         """
         Fetch offices first from Elasticsearch, then from the database.
 
@@ -558,21 +556,17 @@ class HiddenMarketFetcher(Fetcher):
         assert self._distance_sort_index is not None, 'did you remove it from the sorts ?'
 
         es_res: Dict = self._get_offices_from_es(query)
-        office_results: List[OfficeResult] = self._get_office_results_from_es_results(es_res)
+        office_results: OfficesType = self._get_office_results_from_es_results(es_res)
         aggregations: Sequence[Dict] = es_res.get('aggregations', list())
 
         return office_results, aggregations
 
-    def _get_office_results_from_es_results(self, es_res: Dict) -> Sequence[OfficeResult]:
+    def _get_office_results_from_es_results(self, es_res: Dict) -> OfficesType:
         office_count: int = es_res['hits']['total']
         es_offices_by_siret: 'OrderedDict[str, Dict]' = self._es_office_to_office_by_siret(es_res)
 
         offices: List[Office] = self._get_offices_from_db(es_offices_by_siret)
-        office_results: List[OfficeResult] = self._format_offices_in_office_results(
-            offices,
-            es_offices_by_siret,
-            office_count,
-        )
+        office_results: OfficesType = self._format_offices_in_office_results(offices, es_offices_by_siret, office_count)
 
         return office_results
 
@@ -588,7 +582,7 @@ class HiddenMarketFetcher(Fetcher):
                 if office.has_city():
                     offices.append(office)
                 else:
-                    logging.info("office siret %s does not have city, ignoring...", siret)
+                    logging.info("office siret %s does not have city, ignoring...", office.siret)
         return offices
 
     def _get_offices_from_es(self, query) -> Dict:
@@ -627,11 +621,11 @@ class HiddenMarketFetcher(Fetcher):
         return rome_with_highest_score
 
     def _format_offices_in_office_results(
-        self,
-        offices: Sequence[Office],
-        es_offices_by_siret: Dict[str, Dict],
-        office_count: int,
-    ) -> Sequence[OfficeResult]:
+            self,
+            offices: Sequence[Office],
+            es_offices_by_siret: Dict[str, Dict],
+            office_count: int,
+    ) -> OfficesType:
         office_results: List[OfficeResult] = []
 
         # Check each office in the results and add some fields
@@ -721,29 +715,29 @@ class HiddenMarketFetcher(Fetcher):
         hiring_type = hiring_type or hiring_type_util.DEFAULT
 
         return {
-            hiring_type_util.DPAE: "boosted_romes.%s",
-            hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s",
-        }[hiring_type] % rome_code
+                   hiring_type_util.DPAE: "boosted_romes.%s",
+                   hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s",
+               }[hiring_type] % rome_code
 
     @classmethod
-    def _addFilterRange(cls, key: str, *, to: List[Filter], if_=True, **kwargs):
-        cls._conditionallyAddFilter("range", key, kwargs, to=to, if_=if_)
+    def _add_filter_range(cls, key: str, *, to: List[Filter], if_=True, **kwargs):
+        cls._conditionally_add_filter("range", key, kwargs, to=to, if_=if_)
 
     @classmethod
-    def _addFilterTerms(cls, key: str, value: TermsType, *, to: List[Filter], if_=True):
-        cls._conditionallyAddFilter("terms", key, value, to=to, if_=if_)
+    def _add_filter_terms(cls, key: str, value: TermsType, *, to: List[Filter], if_=True):
+        cls._conditionally_add_filter("terms", key, value, to=to, if_=if_)
 
     @classmethod
-    def _addFilterTerm(cls, key: str, value: TermType = 1, *, to: List[Filter], if_=True):
-        cls._conditionallyAddFilter("term", key, value, to=to, if_=if_)
+    def _add_filter_term(cls, key: str, value: TermType = 1, *, to: List[Filter], if_=True):
+        cls._conditionally_add_filter("term", key, value, to=to, if_=if_)
 
     @classmethod
-    def _conditionallyAddFilter(cls, type_: str, key: str, value: ValueType, *, to: List[Filter], if_=True):
+    def _conditionally_add_filter(cls, type_: str, key: str, value: ValueType, *, to: List[Filter], if_=True):
         if if_:
-            cls._addFilter(type_, key, value, to=to)
+            cls._add_filter(type_, key, value, to=to)
 
     @staticmethod
-    def _addFilter(type_: str, key: str, value: ValueType, *, to: List[Filter]):
+    def _add_filter(type_: str, key: str, value: ValueType, *, to: List[Filter]):
         to.append({
             type_: {
                 key: value
@@ -751,24 +745,24 @@ class HiddenMarketFetcher(Fetcher):
         })
 
     @classmethod
-    def _addHeadcountFilter(cls, headcount: Union[str, int], *, to: list):
+    def _add_headcount_filter(cls, headcount: Union[str, int], *, to: list):
         # in some cases, a string is given as input, let's ensure it is an int from now on
         try:
             headcount = int(headcount)
         except ValueError:
             headcount = settings.HEADCOUNT_WHATEVER
 
-        cls._addFilterRange("headcount",
-                            to=to,
-                            lte=settings.HEADCOUNT_SMALL_ONLY_MAXIMUM,
-                            if_=headcount == settings.HEADCOUNT_SMALL_ONLY)
-        cls._addFilterRange("headcount",
-                            to=to,
-                            gte=settings.HEADCOUNT_BIG_ONLY_MINIMUM,
-                            if_=headcount == settings.HEADCOUNT_BIG_ONLY)
+        cls._add_filter_range("headcount",
+                              to=to,
+                              lte=settings.HEADCOUNT_SMALL_ONLY_MAXIMUM,
+                              if_=headcount == settings.HEADCOUNT_SMALL_ONLY)
+        cls._add_filter_range("headcount",
+                              to=to,
+                              gte=settings.HEADCOUNT_BIG_ONLY_MINIMUM,
+                              if_=headcount == settings.HEADCOUNT_BIG_ONLY)
 
     @classmethod
-    def _unsureRomeIsInScores(cls, rome_codes: Sequence[str], hiring_type: str, to: list):
+    def _unsure_rome_is_in_scores(cls, rome_codes: Sequence[str], hiring_type: str, to: list):
         to.append({
             "bool": {
                 "should": [{

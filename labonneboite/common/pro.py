@@ -4,9 +4,8 @@ import ipaddress
 from flask import session, request
 from flask_login import current_user
 
-from labonneboite.conf import settings
+from labonneboite.common.conf import settings
 from .util import get_user_ip
-
 
 PRO_VERSION_SESSION_KEY = 'pro_version'
 
@@ -32,7 +31,6 @@ def ips_from_ip_ranges(ip_ranges):
             ips.append(ip)
 
     return ips
-
 
 
 def user_is_pro():
@@ -64,16 +62,19 @@ def user_is_pro():
         current_user_email = current_user.email.lower()
 
         return (current_user_email in settings.VERSION_PRO_ALLOWED_EMAILS
-            or any(current_user_email.endswith(suffix) for suffix in settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
-            or any(re.match(
-                regexp, current_user_email) is not None for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS))
+                or any(current_user_email.endswith(suffix) for suffix in settings.VERSION_PRO_ALLOWED_EMAIL_SUFFIXES)
+                or any(
+                    re.match(regexp, current_user_email) is not None
+                    for regexp in settings.VERSION_PRO_ALLOWED_EMAIL_REGEXPS))
 
     return False
+
 
 def pro_version_enabled():
     if not user_is_pro() and PRO_VERSION_SESSION_KEY in session:
         session.pop(PRO_VERSION_SESSION_KEY)
     return session.get(PRO_VERSION_SESSION_KEY, False)
+
 
 def toggle_pro_version():
     if pro_version_enabled():

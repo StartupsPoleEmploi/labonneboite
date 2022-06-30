@@ -4,8 +4,9 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
+-e git+https://github.com/StartupsPoleEmploi/labonneboite-common.git@4a46124844ba76af63800da77156ec3a6b31f43c#egg=labonneboite-common
 alembic==0.9.10
-astroid==1.6.5            # via pylint
+astroid==1.6.5
 babel==2.6.0              # via flask-babelex
 backcall==0.1.0           # via ipython
 blinker==1.4              # via flask-debugtoolbar, raven

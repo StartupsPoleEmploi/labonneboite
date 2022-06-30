@@ -1,5 +1,4 @@
 from functools import lru_cache
-from urllib.parse import urlencode
 import logging
 from typing import Any, Optional, Sequence
 
@@ -9,7 +8,7 @@ from slugify import slugify
 from sqlalchemy import PrimaryKeyConstraint, Index
 from werkzeug import cached_property
 
-from labonneboite.common import encoding as encoding_util
+from labonneboite_common import encoding as encoding_util
 from labonneboite.common import hiring_type_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import scoring as scoring_util
@@ -17,8 +16,7 @@ from labonneboite.common import util
 from labonneboite.common.database import Base, db_session, DATABASE
 from labonneboite.common.load_data import load_city_codes, load_groupements_employeurs
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.conf import settings
-from labonneboite.importer import settings as importer_settings
+from labonneboite.common.conf import settings
 
 from labonneboite.common.models import FinalOfficeMixin, OfficeAdminUpdate
 
@@ -52,7 +50,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     Then, be sure to double check that both `make run_importer_jobs` and
     `make test_all` complete successfully.
     """
-
+    query = db_session.query_property()
     __tablename__ = settings.OFFICE_TABLE
 
     __table_args__ = (
@@ -117,7 +115,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             url=self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
             contact_mode=util.get_contact_mode_for_rome_and_office(rome_code, self),
             social_network=self.social_network or '',
-            alternance=self.qualifies_for_alternance(),
+            alternance=False,
         )
 
         # Warning: the `distance`, `boost` and `matched_rome` fields are added by `get_offices_from_es_and_db`,
@@ -290,9 +288,6 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         return (100 * self.get_stars_for_rome_code(rome_code)) / 5
 
-    def qualifies_for_alternance(self):
-        return self.score_alternance >= importer_settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
-
     @property
     def url(self):
         """
@@ -330,10 +325,6 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         if self.has_multi_geolocations:
             # If the given `zipcode` is in the same departement: the message is unnecessary.
             if zipcode and zipcode.startswith(self.zipcode[:2]):
-                return False
-            # If the given `distance` is too far: the message is unnecessary.
-            from labonneboite.web.search.forms import CompanySearchForm
-            if distance and int(distance) > int(CompanySearchForm.DISTANCE_S):
                 return False
             return True
         return False

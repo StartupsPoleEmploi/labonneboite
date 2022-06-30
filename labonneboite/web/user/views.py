@@ -27,6 +27,7 @@ from labonneboite.web.auth.views import logout
 from labonneboite.common.pagination import Pagination, FAVORITES_PER_PAGE
 from labonneboite.web.user.forms import UserAccountDeleteForm
 from labonneboite.web.utils import fix_csrf_session
+from labonneboite.web import WEB_DIR
 
 userBlueprint = Blueprint('user', __name__)
 
@@ -128,7 +129,7 @@ def favorites_list_as_pdf():
         UserFavoriteOffice.user_id == current_user.id)
     # TODO this is probably wildly inefficient. Can we do this in just one query?
     companies = [favorite.office for favorite in favorites]
-    pdf_file = pdf_util.render_favorites(companies)
+    pdf_file = pdf_util.render_favorites(companies, WEB_DIR)
     return send_file(pdf_file,
                      mimetype='application/pdf',
                      as_attachment=True,

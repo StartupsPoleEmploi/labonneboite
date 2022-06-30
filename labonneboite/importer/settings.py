@@ -12,7 +12,7 @@ conf/bonaparte.py
 import os
 from datetime import datetime
 from labonneboite.common.env import get_current_env, ENV_BONAPARTE, ENV_DEVELOPMENT, ENV_TEST
-from labonneboite.common import departements as dpt
+from labonneboite_common import departements as dpt
 
 # Folder that contains the repo
 LBB_ROOT_FOLDER = os.path.join(os.path.dirname(__file__), '..', '..', '..')

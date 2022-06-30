@@ -6,10 +6,9 @@ import geopy.distance
 
 from slugify import slugify
 
-from labonneboite.common import departements
+from labonneboite_common import departements
 from labonneboite.common.util import unique_elements
 from . import datagouv
-
 
 CACHE = {}
 
@@ -65,10 +64,30 @@ def load_cities_cache():
         # Communes without `population` attribute.
         # ----------------------------------------
         # Meuse (starting with 55), because there is no more inhabitants.
-        "55039", "55050", "55139", "55189", "55239", "55307",
+        "55039",
+        "55050",
+        "55139",
+        "55189",
+        "55239",
+        "55307",
         # Mayotte (starting with 976), because there is no accurate population data available yet.
-        "97601", "97602", "97603", "97604", "97605", "97606", "97607", "97608", "97609",
-        "97610", "97611", "97612", "97613", "97614", "97615", "97616", "97617",
+        "97601",
+        "97602",
+        "97603",
+        "97604",
+        "97605",
+        "97606",
+        "97607",
+        "97608",
+        "97609",
+        "97610",
+        "97611",
+        "97612",
+        "97613",
+        "97614",
+        "97615",
+        "97616",
+        "97617",
     ]
 
     cities = []
@@ -102,6 +121,7 @@ def cities_cache_required(function):
     """
     A decorator that ensures that cities cache is loaded.
     """
+
     @wraps(function)
     def decorated(*args, **kwargs):
         if not CACHE:
@@ -148,9 +168,7 @@ def get_all_cities_from_departement(departement):
     Returns a list of all cities for the given departement.
     """
     return [
-        city
-        for commune_id, city in list(CACHE['cities_by_commune_id'].items())
-        if commune_id.startswith(departement)
+        city for commune_id, city in list(CACHE['cities_by_commune_id'].items()) if commune_id.startswith(departement)
     ]
 
 

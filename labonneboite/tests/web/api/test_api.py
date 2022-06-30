@@ -217,24 +217,6 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies_count'], 2)
             self.assertEqual(len(data['companies']), 2)
 
-    def test_contract_alternance(self):
-        with self.test_request_context():
-            params = self.add_security_params({
-                'commune_id': self.positions['lille']['commune_id'],
-                'rome_codes': 'D1213',
-                'user': 'labonneboite',
-                'contract': 'alternance',
-            })
-            rv = self.app.get(self.url_for("api.company_list", **params))
-            self.assertEqual(rv.status_code, 200)
-            data = self.get_json(rv)
-
-            self.assertEqual(data['companies_count'], 1)
-            self.assertEqual(len(data['companies']), 1)
-            self.assertEqual(data['companies'][0]['siret'], '00000000000011')
-            self.assertTrue(data['companies'][0]['alternance'])
-            self.assertIn('://labonneboite.pole-emploi.fr/00000000000011/details', data['companies'][0]['url'])
-
     def test_missing_communeid_or_latitudelongitude(self):
         with self.test_request_context():
             params = self.add_security_params({
@@ -615,7 +597,7 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = self.get_json(rv)
             self.assertEqual(data['companies_count'], 2)
-            self.assertEqual(set([c['siret'] for c in data['companies']]), set(['00000000000004', '00000000000007']))
+            self.assertEqual(set([c['siret'] for c in data['companies']]), {'00000000000004', '00000000000007'})
             self.assertFalse('distance' in data['companies'][0])
 
     def test_query_by_departement_geoloc(self):
@@ -1127,21 +1109,6 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(data['companies'][0]['siret'], '00000000000004')
             self.assertEqual(data['companies'][0]['contact_mode'], 'Se présenter spontanément')
 
-    def test_flag_alternance(self):
-        with self.test_request_context():
-            params = self.add_security_params({
-                'commune_id': self.positions['poitiers']['commune_id'],
-                'rome_codes': 'B1603',
-                'user': 'labonneboite',
-            })
-            rv = self.app.get(self.url_for("api.company_list", **params))
-            self.assertEqual(rv.status_code, 200)
-            data = self.get_json(rv)
-            sirets = {c['siret']: c for c in data['companies']}
-            self.assertEqual(sorted(sirets.keys()), ['00000000000015', '00000000000016'])
-            self.assertFalse(sirets['00000000000015']['alternance'])
-            self.assertTrue(sirets['00000000000016']['alternance'])
-
     def test_flag_pmsmp_filter_incorrect_value(self):
         with self.test_request_context():
             # Invalid flag_pmsmp filter => Expected error message
@@ -1171,8 +1138,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = self.get_json(rv)
             self.assertEqual(data['companies_count'], 2)
-            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
-            self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
+            sirets = {data['companies'][0]['siret'], data['companies'][1]['siret']}
+            self.assertEqual(sirets, {'00000000000017', '00000000000018'})
 
     def test_flag_pmsmp_filter_silently_ignored_if_user_is_not_authorized(self):
         with self.test_request_context():
@@ -1187,8 +1154,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = self.get_json(rv)
             self.assertEqual(data['companies_count'], 2)
-            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
-            self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
+            sirets = {data['companies'][0]['siret'], data['companies'][1]['siret']}
+            self.assertEqual(sirets, {'00000000000017', '00000000000018'})
 
     def test_flag_pmsmp_filter_normal_behavior(self):
         with self.test_request_context():
@@ -1202,8 +1169,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = self.get_json(rv)
             self.assertEqual(data['companies_count'], 2)
-            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
-            self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
+            sirets = {data['companies'][0]['siret'], data['companies'][1]['siret']}
+            self.assertEqual(sirets, {'00000000000017', '00000000000018'})
 
             # flag_pmsmp=1 (only pmsmp companies) => Expected 1 result
             params = self.add_security_params({
@@ -1241,8 +1208,8 @@ class ApiCompanyListTest(ApiBaseTest):
             self.assertEqual(rv.status_code, 200)
             data = self.get_json(rv)
             self.assertEqual(data['companies_count'], 2)
-            sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
-            self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
+            sirets = {data['companies'][0]['siret'], data['companies'][1]['siret']}
+            self.assertEqual(sirets, {'00000000000017', '00000000000018'})
 
             # Check two departments => Expected 2 results
             params = self.add_security_params({
@@ -1256,7 +1223,7 @@ class ApiCompanyListTest(ApiBaseTest):
             data = self.get_json(rv)
             self.assertEqual(data['companies_count'], 2)
             sirets = set([data['companies'][0]['siret'], data['companies'][1]['siret']])
-            self.assertEqual(sirets, set(['00000000000017', '00000000000018']))
+            self.assertEqual(sirets, {'00000000000017', '00000000000018'})
 
             # Check department 75 => Expected 1 result
             params = self.add_security_params({

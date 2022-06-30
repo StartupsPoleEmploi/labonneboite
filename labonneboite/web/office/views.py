@@ -1,23 +1,18 @@
-
 import os
 import time
 
+from flask import abort, Blueprint, jsonify, make_response, render_template, request, send_file, url_for
 from slugify import slugify
 from sqlalchemy.orm.exc import NoResultFound
-
-from flask import abort, render_template, jsonify
-from flask import Blueprint
-from flask import make_response, send_file
-from flask import request
 
 from labonneboite.common import activity
 from labonneboite.common import pdf as pdf_util
 from labonneboite.common import util
 from labonneboite.common.contact_mode import CONTACT_MODE_STAGES
-from labonneboite.web.utils import fix_csrf_session
 from labonneboite.common.models import Office
 from labonneboite.conf import settings
-from flask import url_for
+from labonneboite.web import WEB_DIR
+from labonneboite.web.utils import fix_csrf_session
 
 officeBlueprint = Blueprint('office', __name__)
 
@@ -99,7 +94,7 @@ def office_detail_pdf_path(office):
         os.remove(path)
     if not os.path.exists(path):
         pdf_data = office_detail_html(office)
-        pdf_target = pdf_util.convert_to_pdf(pdf_data)
+        pdf_target = pdf_util.convert_to_pdf(pdf_data, WEB_DIR)
         data_to_write = pdf_target.getvalue()
         pdf_util.write_file(office, data_to_write, path)
     return path
@@ -110,11 +105,12 @@ def office_detail_html(office):
     Return the html corresponding to the office details.
     """
     contact_mode = util.get_contact_mode_for_rome_and_office(None, office)
-    return render_template('office/pdf_detail.html', **{
-        'company': office,
-        'contact_mode': contact_mode,
-        'stages': CONTACT_MODE_STAGES.get(contact_mode, [contact_mode]),
-    })
+    return render_template(
+        'office/pdf_detail.html', **{
+            'company': office,
+            'contact_mode': contact_mode,
+            'stages': CONTACT_MODE_STAGES.get(contact_mode, [contact_mode]),
+        })
 
 
 @officeBlueprint.route('/events/toggle-details/<siret>', methods=['POST'])

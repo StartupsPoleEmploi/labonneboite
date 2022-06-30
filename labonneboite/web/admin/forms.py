@@ -1,6 +1,6 @@
-
 from wtforms import ValidationError
-from labonneboite.common.siret import is_siret
+from labonneboite_common.siret import is_siret
+
 
 def siret_validator(form, field):
     """

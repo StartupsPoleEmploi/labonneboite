@@ -11,12 +11,14 @@ from typing import Dict, Optional, Union
 
 from elasticsearch.exceptions import NotFoundError, TransportError
 from elasticsearch.helpers import bulk
+from labonneboite_common import departements as dpt
+from labonneboite_common import encoding as encoding_util
+from labonneboite_common.models.office_mixin import OfficeMixin
 from pyprof2calltree import convert
-from sqlalchemy import and_, asc, inspect, or_
+from sqlalchemy import and_, inspect, or_
 from sqlalchemy.exc import OperationalError
 
-from labonneboite.common import departements as dpt
-from labonneboite.common import encoding as encoding_util
+from labonneboite.conf import settings
 from labonneboite.common import es, geocoding, hiring_type_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import pdf as pdf_util
@@ -28,7 +30,6 @@ from labonneboite.common.models import HistoryBlacklist, Office, OfficeAdminAdd,
     OfficeAdminRemove, OfficeAdminUpdate, OfficeThirdPartyUpdate
 from labonneboite.common.search import HiddenMarketFetcher
 from labonneboite.common.util import timeit
-from labonneboite.conf import settings
 from labonneboite.importer import settings as importer_settings
 from labonneboite.importer import util as importer_util
 
@@ -226,7 +227,7 @@ def create_locations():
     bulk_actions(actions)
 
 
-def get_office_as_es_doc(office):
+def get_office_as_es_doc(office: OfficeMixin):
     """
     Return the office as a JSON document suitable for indexation in ElasticSearch.
     The `office` parameter can be an `Office` or an `OfficeAdminAdd` instance.
@@ -426,7 +427,7 @@ def create_offices(disable_parallel_computing=False):
         # maxtasksperchild default is infinite, which means memory is never freed up, and grows indefinitely :-/
         # maxtasksperchild=1 ensures memory is freed up after every departement computation.
         pool = mp.Pool(processes=int(1.25 * mp.cpu_count()), maxtasksperchild=1)
-        pool.map(func, dpt.DEPARTEMENTS_WITH_LARGEST_ONES_FIRST)
+        pool.map(func, dpt.DEPARTEMENTS)
         pool.close()
         pool.join()
 
