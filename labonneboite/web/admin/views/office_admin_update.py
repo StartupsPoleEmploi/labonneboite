@@ -1,19 +1,18 @@
-from collections import namedtuple
 import logging
 
 from flask import flash, redirect, request, url_for
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView
 from wtforms import validators
-from sqlalchemy.orm.exc import NoResultFound
+from labonneboite_common.siret import is_siret
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import models
-from labonneboite_common.siret import is_siret
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
-from labonneboite.importer.settings import SCORE_REDUCING_MINIMUM_THRESHOLD, SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
+from labonneboite.importer.settings import SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD, \
+    HIRING_REDUCING_MINIMUM_THRESHOLD
 
 logger = logging.getLogger('main')
 
@@ -394,7 +393,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         ]
 
         if office and ask_job_or_coordinate_changes:
-            if office.score <= SCORE_REDUCING_MINIMUM_THRESHOLD:
+            if office.hiring <= HIRING_REDUCING_MINIMUM_THRESHOLD:
                 self.set_update_style('score')
                 self.set_little_boost(form['score'], office.score)
 

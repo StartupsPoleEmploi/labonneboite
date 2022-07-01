@@ -1,28 +1,32 @@
 from functools import lru_cache
 import logging
-from typing import Any, Optional, Sequence
+from typing import Any, Optional, Sequence, Dict, Union, Mapping, Set, List
+from decimal import Decimal
 
 from babel.dates import format_date
 from flask import url_for
 from slugify import slugify
 from sqlalchemy import PrimaryKeyConstraint, Index
 from werkzeug import cached_property
-
 from labonneboite_common import encoding as encoding_util
+
 from labonneboite.common import hiring_type_util
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import util
 from labonneboite.common.database import Base, db_session, DATABASE
 from labonneboite.common.load_data import load_city_codes, load_groupements_employeurs
+from labonneboite.common.mapping import RomeTuple
 from labonneboite.common.models.base import CRUDMixin
 from labonneboite.common.conf import settings
-
 from labonneboite.common.models import FinalOfficeMixin, OfficeAdminUpdate
+from labonneboite.common.scoring import get_score_from_hirings
 
 logger = logging.getLogger('main')
 
 CITY_NAMES = load_city_codes()
+
+JsonType = Mapping[str, Union[str, None, int, bool, float, Optional[Sequence[Mapping[str, Union[str, int]]]]]]
 
 
 class Office(FinalOfficeMixin, CRUDMixin, Base):
@@ -50,7 +54,6 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     Then, be sure to double check that both `make run_importer_jobs` and
     `make test_all` complete successfully.
     """
-    query = db_session.query_property()
     __tablename__ = settings.OFFICE_TABLE
 
     __table_args__ = (
@@ -67,17 +70,17 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     # You should normally *not* add any column here - see documentation above.
 
-    def __unicode__(self):
+    def __unicode__(self) -> str:
         return "%s - %s" % (self.siret, self.name)
 
     def as_json(
-        self,
-        rome_codes: Optional[Sequence[str]] = None,
-        hiring_type=None,
-        distance=None,
-        zipcode=None,
-        extra_query_string=None,
-    ):
+            self,
+            rome_codes: Optional[Sequence[str]] = None,
+            hiring_type: Optional[str] = None,
+            distance: Optional[int] = None,
+            zipcode: Optional[str] = None,
+            extra_query_string: Optional[Dict[str, Any]] = None,
+    ) -> JsonType:
         """
         `rome_codes`: optional parameter, used only in case of being in the context
         of a search by ROME codes (single rome or multi rome).
@@ -101,12 +104,12 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         alternance = hiring_type == hiring_type_util.ALTERNANCE
 
         extra_query_string = extra_query_string or {}
-        json = dict(
+        json: Dict[str, Union[str, float, int, None]] = dict(
             address=self.address_as_text,
             city=self.city,
             headcount_text=self.headcount_text,
-            lat=self.y,
-            lon=self.x,
+            lat=float(self.y),
+            lon=float(self.x),
             naf=self.naf,
             naf_text=self.naf_text,
             name=self.name,
@@ -129,11 +132,15 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         # they are NOT model fields or properties
         # This message should concern only a small number of companies who explicitly requested
         # to appear in extra geolocations.
-        if any([distance, zipcode]) and json['address'] and self.show_multi_geolocations_msg(distance, zipcode):
-            json['address'] += ", Cette entreprise recrute aussi dans votre région."
+        if any([distance, zipcode]) and self.address_as_text and self.show_multi_geolocations_msg(zipcode):
+            json['address'] = self.address_as_text + ", Cette entreprise recrute aussi dans votre région."
         return json
 
-    def get_matched_rome(self, rome_codes: Sequence[str]):
+    @property
+    def score(self) -> 'Decimal':
+        return Decimal(get_score_from_hirings(self.hiring))
+
+    def get_matched_rome(self, rome_codes: Sequence[str]) -> Optional[str]:
         if rome_codes is None:  # no rome search context
             rome_code = None
         elif len(rome_codes) == 1:  # single rome search context
@@ -143,7 +150,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return rome_code
 
     @property
-    def address_fields(self):
+    def address_fields(self) -> Sequence[str]:
         result = []
         if not self.is_small:
             result.append("Service des ressources humaines")
@@ -153,13 +160,13 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return result
 
     @property
-    def address_as_text(self):
+    def address_as_text(self) -> Optional[str]:
         if self.address_fields:
             return ", ".join([f for f in self.address_fields if f is not None])
         return None
 
     @property
-    def phone(self):
+    def phone(self) -> Optional[str]:
         has_phone = self.tel and not self.tel.isspace()
         if has_phone:
             # not sure why, the import botched the phone number...
@@ -170,7 +177,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return None
 
     @property
-    def name(self):
+    def name(self) -> str:
         if self.office_name:
             result = self.office_name.upper()
         elif self.company_name:
@@ -180,16 +187,16 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return encoding_util.sanitize_string(result)
 
     @property
-    def google_url(self):
+    def google_url(self) -> str:
         google_search = "%s+%s" % (self.name.replace(' ', '+'), self.city.replace(' ', '+'))
         return "https://www.google.fr/search?q=%s" % google_search
 
     @property
-    def kompass_url(self):
+    def kompass_url(self) -> str:
         return "http://fr.kompass.com/searchCompanies?text=%s" % self.siret
 
     @property
-    def is_groupement_employeurs(self):
+    def is_groupement_employeurs(self) -> bool:
         """
         A "groupement d'employeurs" is a French-only juridical entity
         which is basically a collection of offices.
@@ -197,7 +204,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return self.siret in load_groupements_employeurs()
 
     @property
-    def is_removed_from_lba(self):
+    def is_removed_from_lba(self) -> bool:
         """
         Returns True if the company has explicitly asked via SAVE
         to be removed from LBA.
@@ -214,20 +221,20 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return bool(office_admin_update)
 
     @property
-    def headcount_text(self):
+    def headcount_text(self) -> str:
         try:
             return settings.HEADCOUNT_INSEE[self.headcount]
         except KeyError:
             return ''
 
     @property
-    def is_small(self):
+    def is_small(self) -> bool:
         try:
             return int(self.headcount) < settings.HEADCOUNT_SMALL_ONLY_MAXIMUM
         except (ValueError, TypeError):
             return True
 
-    def has_city(self):
+    def has_city(self) -> bool:
         try:
             city = bool(CITY_NAMES[self.city_code])
         except KeyError:
@@ -238,9 +245,9 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         return city
 
     @property
-    def city(self):
+    def city(self) -> str:
         try:
-            return CITY_NAMES[self.city_code]
+            return CITY_NAMES[self.city_code]  # type: ignore
         except KeyError:
             if self.city_code.startswith('75'):
                 return 'Paris'
@@ -248,54 +255,54 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
                 raise
 
     @property
-    def naf_text(self):
-        return settings.NAF_CODES[self.naf]
+    def naf_text(self) -> str:
+        return settings.NAF_CODES[self.naf]  # type: ignore
 
     @property
-    def stars(self):
+    def stars(self) -> float:
         return self.get_stars_for_rome_code(None)
 
     @cached_property
-    def romes_for_naf_mapping(self):
+    def romes_for_naf_mapping(self) -> List[RomeTuple]:
         """
         Returns a list of named tuples for ROME codes matching the company's NAF code.
         """
         return mapping_util.romes_for_naf(self.naf)
 
     @cached_property
-    def romes_codes(self):
+    def romes_codes(self) -> Set[str]:
         """
         Returns the default set of ROME codes for the current company.
         """
         return set([rome.code for rome in self.romes_for_naf_mapping])
 
-    def get_score_for_rome_code(self, rome_code: Optional[str], hiring_type: Optional[str] = None):
+    def get_score_for_rome_code(self, rome_code: Optional[str], hiring_type: Optional[str] = None) -> int:
         hiring_type = hiring_type or hiring_type_util.DEFAULT
         if hiring_type not in hiring_type_util.VALUES:
             raise ValueError("Unknown hiring_type")
-        raw_score = self.score if hiring_type == hiring_type_util.DPAE else self.score_alternance
-        return scoring_util.get_score_adjusted_to_rome_code_and_naf_code(score=raw_score,
-                                                                         rome_code=rome_code,
-                                                                         naf_code=self.naf)
+        return scoring_util.get_score_adjusted_to_rome_code_and_naf_code(rome_code=rome_code,
+                                                                         naf_code=self.naf,
+                                                                         hiring=self.hiring)
 
-    def get_stars_for_rome_code(self, rome_code: Optional[str], hiring_type: Optional[str] = None):
+    def get_stars_for_rome_code(self, rome_code: Optional[str], hiring_type: Optional[str] = None) -> float:
         score = self.get_score_for_rome_code(rome_code, hiring_type)
         return scoring_util.get_stars_from_score(score)
 
-    def get_stars_for_rome_code_as_percentage(self, rome_code: Optional[str]):
+    def get_stars_for_rome_code_as_percentage(self, rome_code: Optional[str]) -> float:
         """
         Converts the number of stars adjusted to given rome_code to a percentage.
         """
         return (100 * self.get_stars_for_rome_code(rome_code)) / 5
 
     @property
-    def url(self):
+    def url(self) -> Optional[str]:
         """
         Returns the URL of the `details` page or `None` if we are outside of a Flask's application context.
         """
         return self.get_url_for_rome_code(None)
 
-    def get_url_for_rome_code(self, rome_code: Optional[str], alternance=False, **query_string):
+    def get_url_for_rome_code(self, rome_code: Optional[str], alternance: bool = False, **query_string: Any
+                              ) -> Optional[str]:
         try:
             if rome_code:
                 return url_for('office.details',
@@ -314,7 +321,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             # Here, we cannot properly generate an URL via url_for.
             return None
 
-    def show_multi_geolocations_msg(self, distance: Optional[int] = None, zipcode: Optional[str] = None):
+    def show_multi_geolocations_msg(self, zipcode: Optional[str] = None) -> bool:
         """
         Returns True if a message that indicates that the current office recruits beyond
         the boundaries of its own departement should be displayed, False otherwise.
@@ -331,7 +338,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
 
     @classmethod
     @lru_cache(maxsize=None)
-    def get_date_of_last_data_deploy(cls):
+    def get_date_of_last_data_deploy(cls) -> Optional[str]:
         """
         Get date of when the 'etablissements' table was (re)created by the deploy_data process.
 
@@ -354,7 +361,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         # Formatting date in french format using locale.setlocale is strongly discouraged.
         # Using babel instead is the recommended way.
         # See https://stackoverflow.com/questions/985505/locale-date-formatting-in-python
-        last_data_deploy_date_formated_as_french = format_date(last_data_deploy_date, locale='fr', format='long')
+        last_data_deploy_date_formated_as_french: str = format_date(last_data_deploy_date, locale='fr', format='long')
         return last_data_deploy_date_formated_as_french
 
 
@@ -366,18 +373,18 @@ class OfficeResult(Office):
     boost: Optional[bool] = False
     offers_count: int
     position: int
-    offers: Optional[Sequence[Any]]
+    offers: Optional[Sequence[Dict[str, Union[str, int]]]]
 
     def __init__(self,
-                 office: Office = None,
+                 office: Optional[Office] = None,
                  *,
-                 offers_count: int = None,
-                 position: int = None,
+                 offers_count: Optional[int] = None,
+                 position: Optional[int] = None,
                  matched_rome: Optional[str] = None,
                  distance: Optional[float] = None,
                  boost: Optional[bool] = False,
-                 offers: Optional[Sequence[Any]] = None,
-                 **kwargs):
+                 offers: Optional[Sequence[Dict[str, Union[str, int]]]] = None,
+                 **kwargs: Any) -> None:
         # set office props in kwargs (to __init__ the super class)
         office_props = {}
         if office is not None:
@@ -392,8 +399,16 @@ class OfficeResult(Office):
         self.position = position
         self.offers = offers
 
-    def as_json(self, *args, **kwargs):
-        json = super().as_json(*args, **kwargs)
+    def as_json(
+            self,
+            rome_codes: Optional[Sequence[str]] = None,
+            hiring_type: Optional[str] = None,
+            distance: Optional[int] = None,
+            zipcode: Optional[str] = None,
+            extra_query_string: Optional[Dict[str, Any]] = None,
+    ) -> JsonType:
+        json = dict(super().as_json(rome_codes=rome_codes, hiring_type=hiring_type, distance=distance, zipcode=zipcode,
+                                    extra_query_string=extra_query_string))
         if self.distance is not None:
             json['distance'] = self.distance
 
@@ -406,7 +421,7 @@ class OfficeResult(Office):
 
         return json
 
-    def get_matched_rome(self, rome_codes: Sequence[str]):
+    def get_matched_rome(self, rome_codes: Sequence[str]) -> Optional[str]:
         if rome_codes is None:  # no rome search context
             rome_code = None
         elif len(rome_codes) == 1:  # single rome search context

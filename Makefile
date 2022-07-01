@@ -83,7 +83,19 @@ data-dev:
 	echo "" >>  ./labonneboite/alembic/sql/etablissements.sql
 	echo "-- this only injects data in existing table etablissements" >>  ./labonneboite/alembic/sql/etablissements.sql
 	echo "" >>  ./labonneboite/alembic/sql/etablissements.sql
-	mysqldump ${MYSQL_PARAMS} --no-create-info --column-statistics=0 --complete-insert ${DB_NAME} etablissements  | sed -r 's/INSERT INTO (`[^`]+`)/TRUNCATE TABLE \1;\nINSERT INTO \1/g' | sed 's$$VALUES ($$VALUES\n    ($$g' | sed 's$$),($$),\n    ($$g' >> ./labonneboite/alembic/sql/etablissements.sql
+	mysqldump ${MYSQL_PARAMS} --no-create-info --column-statistics=0 --complete-insert ${DB_NAME} etablissements  | sed -r 's/LOCK TABLES (`[^`]+`) WRITE;/\0\nTRUNCATE TABLE \1;/g' | sed 's$$VALUES ($$VALUES\n    ($$g' | sed 's$$),($$),\n    ($$g' >> ./labonneboite/alembic/sql/etablissements.sql
+
+dev-replace-db:
+	echo 'DROP DATABASE IF EXISTS ${DEST_DB};' | mysql ${MYSQL_PARAMS};
+	mysqladmin ${MYSQL_PARAMS} create ${DEST_DB};
+	mysqldump ${MYSQL_PARAMS} --column-statistics=0 ${SOURCE_DB} | mysql ${MYSQL_PARAMS} ${DEST_DB};
+
+
+dev-create-backup:
+	$(MAKE) dev-replace-db DEST_DB=labonneboite_backup SOURCE_DB=${DB_NAME}
+
+dev-restore-backup:
+	$(MAKE) dev-replace-db DEST_DB=${DB_NAME} SOURCE_DB=labonneboite_backup
 
 clear-data: clear-data-dev clear-data-test
 
@@ -119,16 +131,16 @@ clean-services: stop-services ## Delete containers and attached volumes
 
 # Code quality
 # ------------
+LINT_FILES ?= labonneboite
 
 lint: lint-flake8 lint-mypy  ## Lint and type check the project
 
 lint-flake8:
-	${PYTHON_ENV} ${PYTHON} -m flake8 labonneboite
+	${PYTHON_ENV} ${PYTHON} -m flake8 ${LINT_FILES}
 
-MYPY_FILES ?= labonneboite
 
 lint-mypy:
-	${PYTHON_ENV} ${PYTHON} -m mypy --config-file=setup.cfg ${MYPY_FILES}
+	${PYTHON_ENV} ${PYTHON} -m mypy --config-file=setup.cfg ${LINT_FILES}
 
 # Run pylint on the whole project.
 pylint-all:
@@ -276,7 +288,7 @@ test-custom:
 	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/scripts/test_create_index.py:DeleteOfficeAdminTest.test_office_admin_add"
 	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/selenium/test_search_selecting_car.py:TestSearchSelectingCar.test_commute_time_is_displayed"
 	@echo
-	@echo "Note that you can set the env var `NOSE_NOCAPTURE=1` to keep logs in the console
+	@echo "Note that you can set the env var `NOSE_NOCAPTURE=1` to keep logs in the console"
 
 # Alembic migrations
 # ------------------

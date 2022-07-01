@@ -1,3 +1,13 @@
+import os
+import gzip
+import logging
+from datetime import datetime
+import re
+import argparse
+
+from dateutil import relativedelta
+import pandas as pd
+
 from labonneboite.importer import util as import_util
 from labonneboite.importer import settings
 from labonneboite.importer.models.computing import PerfImporterCycleInfos, PerfPredictionAndEffectiveHirings, \
@@ -6,21 +16,11 @@ from labonneboite.common.database import db_session
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common import load_data
 
-import os
-import gzip
-import logging
-from datetime import datetime, timedelta
-from dateutil.relativedelta import *
-import re
-import argparse
-
-import pandas as pd
-
 logger = logging.getLogger(__name__)
 
 
 def get_date_from_file_name(file_name):
-    req = re.search("(\d*_\d*_\d*_\d*).sql.gz", file_name)
+    req = re.search(r"(\d*_\d*_\d*_\d*).sql.gz", file_name)
     date_str = req.group(1)
     date_time_object = datetime.strptime(date_str, '%Y_%m_%d_%H%M')
     return date_time_object
@@ -118,7 +118,7 @@ def insert_into_importer_cycle_infos(file_name, months_time):
 def insert_into_etablissements_predicted_and_effective_hirings(importer_cycle_infos_id, file_name):
     logger.info(f"\n Start : Insert data into perf_prediction_and_effective_hirings from file {file_name}")
 
-    query = f'SELECT siret, \
+    query = 'SELECT siret, \
                     raisonsociale, \
                     enseigne, \
                     codenaf, \
@@ -173,7 +173,7 @@ def load_perf_division_per_rome_dict():
         perf_division_per_rome_dict[naf_code][rome_code] = {
             "threshold_lbb": scoring_util.get_score_minimum_for_rome(rome_code),
             "nb_bonne_boites_lbb": 0,
-            "threshold_lba": scoring_util.get_score_minimum_for_rome(rome_code, alternance=True),
+            "threshold_lba": scoring_util.get_score_minimum_for_rome(rome_code),
             "nb_bonne_boites_lba": 0
         }
 
@@ -181,9 +181,10 @@ def load_perf_division_per_rome_dict():
 
 
 def compute_effective_and_predicted_hirings():
-    logger.info(f"\n Start : Computing effective hirings")
+    logger.info("\n Start : Computing effective hirings")
 
-    importer_cycles_infos = PerfImporterCycleInfos.query.filter(PerfImporterCycleInfos.computed == False).all()
+    importer_cycles_infos = PerfImporterCycleInfos.query.filter(
+        PerfImporterCycleInfos.computed == False).all()  # noqa: E712
     importer_cycles_infos_to_compute = []
     for ici in importer_cycles_infos:
         if os.environ["LBB_ENV"] in ["development", "test"]:
@@ -192,8 +193,8 @@ def compute_effective_and_predicted_hirings():
         if ici.prediction_end_date < datetime.now():
             importer_cycles_infos_to_compute.append(ici)
 
-    logger.info(
-        f"Importer cycles infos which have not been computed yet : {[i.file_name for i in importer_cycles_infos_to_compute]}")
+    logger.info("Importer cycles infos which have not been computed yet :"
+                f"{[i.file_name for i in importer_cycles_infos_to_compute]}")
 
     for ici in importer_cycles_infos_to_compute:
         perf_division_per_rome_dict = load_perf_division_per_rome_dict()
@@ -204,7 +205,8 @@ def compute_effective_and_predicted_hirings():
         logger.info(f"Start computing for importer cycle infos : {ici._id} - {ici.file_name}")
 
         engine = import_util.create_sqlalchemy_engine()
-        ppaeh = PerfPredictionAndEffectiveHirings.query.filter(PerfPredictionAndEffectiveHirings.importer_cycle_infos_id==ici._id)
+        ppaeh = PerfPredictionAndEffectiveHirings.query.filter(
+            PerfPredictionAndEffectiveHirings.importer_cycle_infos_id == ici._id)
         columns_companies = ["_id", "siret", "naf", "lbb_nb_predicted_hirings_score", "lba_nb_predicted_hirings_score"]
         dict_df_companies = {}
         dict_ppaeh = {}
@@ -270,7 +272,7 @@ def compute_effective_and_predicted_hirings():
         updated_ppaeh = []
         for row in values_to_update:
             row_id = row[0]
-            siret = row[1]
+            # siret = row[1]
             naf = row[2]
             params = dict(zip(["lbb_nb_effective_hirings", "lba_nb_effective_hirings", "lbb_nb_predicted_hirings",
                                "lba_nb_predicted_hirings"], row[3:7]))
@@ -331,8 +333,8 @@ def compute_effective_and_predicted_hirings():
 
         logger.info(f"Number of naf not found in the mapping rome naf for this importer cycle : {len(naf_not_founds)}")
         logger.info(f"List of naf not found in the mapping rome naf for this importer cycle : {naf_not_founds}")
-        logger.info(
-            f"Number of companies with naf not found in the mapping rome naf for this importer cycle : {nb_companies_with_naf_not_found}")
+        logger.info("Number of companies with naf not found in the mapping rome naf for this importer cycle : "
+                    f"{nb_companies_with_naf_not_found}")
         logger.info(f"Number of total companies : {count}")
 
         for naf_code, romes_list in perf_division_per_rome_dict.items():
@@ -357,8 +359,8 @@ def compute_effective_and_predicted_hirings():
 
 def run_main():
     # First part of insertion : Get data from the file exported after each importer cycle
-    parser = argparse.ArgumentParser(description="""Import into the database archives older than a certain amount of time, 
-            to generate indicators""")
+    parser = argparse.ArgumentParser(
+        description="""Import into the database archives older than a certain amount of time, to generate indicators""")
     parser.add_argument("-m", "--months", type=int, default=4)
     args = parser.parse_args()
     files_list = get_available_files_list()

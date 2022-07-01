@@ -1,10 +1,11 @@
 import ipaddress
+from enum import Enum
+from typing import Callable, Type, Optional, Any, Iterable, Collection, TYPE_CHECKING, Union, Dict, TypeVar
 from urllib.parse import urlparse
 import logging
-import unicodedata
-import urllib.request, urllib.parse, urllib.error
 from functools import wraps
 from time import time
+from ipaddress import IPv4Address, IPv6Address
 
 from flask import request
 
@@ -12,13 +13,16 @@ from labonneboite.common.contact_mode import CONTACT_MODE_DEFAULT
 from labonneboite.common.load_data import load_contact_modes
 from labonneboite.common.conf import settings
 
+if TYPE_CHECKING:
+    from labonneboite_common.models.office_mixin import OfficeMixin
+
+T_co = TypeVar('T_co', covariant=True)
 logger = logging.getLogger('main')
 
 
-def timeit(func):
-
+def timeit(func: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(func)
-    def wrap(*args, **kw):
+    def wrap(*args: Any, **kw: Any) -> Any:
         ts = time()
         result = func(*args, **kw)
         te = time()
@@ -26,7 +30,7 @@ def timeit(func):
         # anything under 1sec is not worth polluting the logs
         if settings.ENABLE_TIMEIT_TIMERS and duration >= 1.0:
             msg = 'func:%r - took: %2.4f sec - args:[%r, %r] ' % \
-              (func.__name__, duration, args, kw)
+                  (func.__name__, duration, args, kw)
             msg = msg[:200]  # cut if msg too long
             logger.info(msg)
             # print messages are displayed all at once when the job ends in jenkins console output
@@ -36,32 +40,7 @@ def timeit(func):
     return wrap
 
 
-def get_search_url(base_url, request_args, naf=None):
-    query_string = {}
-    if naf:
-        query_string['naf'] = naf
-
-    if request_args.get('q'):
-        query_string['q'] = request_args.get('q').encode('utf8')
-    if request_args.get('r'):
-        query_string['r'] = request_args.get('r')
-    if request_args.get('l'):
-        query_string['l'] = request_args.get('l').encode('utf8')
-    if request_args.get('d'):
-        query_string['d'] = request_args.get('d')
-    if request_args.get('lon'):
-        query_string['lon'] = request_args.get('lon')
-    if request_args.get('lat'):
-        query_string['lat'] = request_args.get('lat')
-    if request_args.get('j'):
-        query_string['j'] = request_args.get('j').encode('utf8')
-    if request_args.get('mode'):
-        query_string['mode'] = request_args.get('mode')
-
-    return "%s?%s" % (base_url, urllib.parse.urlencode(query_string))
-
-
-def get_user_ip():
+def get_user_ip() -> Optional[Union[IPv4Address, IPv6Address]]:
     """
     Return the current user_ip as an ipaddress.IPv4Address object.
     """
@@ -72,18 +51,10 @@ def get_user_ip():
     # otherwise, fallback to remote_addr.
     # http://werkzeug.pocoo.org/docs/0.10/wrappers/#werkzeug.wrappers.BaseRequest.access_route
     ip = request.access_route[0] if request.access_route else request.remote_addr
-    return ipaddress.ip_address(ip) if ip else None
+    return ipaddress.ip_address(ip) if ip else None  # type: ignore
 
 
-def sanitize_string(s):
-    if isinstance(s, bytes):
-        return s.decode('utf-8')
-    elif isinstance(s, str):
-        return s
-    raise Exception("not a string")
-
-
-def is_decoded_url_safe(url):
+def is_decoded_url_safe(url: str) -> bool:
     """
     Ripped and adapted from Django:
     https://github.com/django/django/blob/13cd5b/django/utils/http.py#L347-L370
@@ -106,12 +77,12 @@ def is_decoded_url_safe(url):
     return not url_info.netloc and not url_info.scheme
 
 
-def get_contact_mode_for_rome_and_office(rome, office):
+def get_contact_mode_for_rome_and_office(rome: str, office: 'OfficeMixin') -> str:
     if office.contact_mode:
         return office.contact_mode
 
     naf_prefix = office.naf[:2]
-    naf_prefix_to_rome_to_contact_mode = load_contact_modes()
+    naf_prefix_to_rome_to_contact_mode: Dict[str, Dict[str, str]] = load_contact_modes()
     try:
         return naf_prefix_to_rome_to_contact_mode[naf_prefix][rome]
     except KeyError:
@@ -122,7 +93,7 @@ def get_contact_mode_for_rome_and_office(rome, office):
         return CONTACT_MODE_DEFAULT
 
 
-def unique_elements(iterable, key=None):
+def unique_elements(iterable: Iterable[T_co], key: Optional[Callable[[T_co], Any]] = None) -> Collection[T_co]:
     """
     Filter elements from an iterable so that only unique items are preserved.
     This supports some non-hashable values, such as dict or lists.
@@ -146,12 +117,12 @@ def unique_elements(iterable, key=None):
     return result
 
 
-def get_enum_from_value(EnumClass, value, default=None):
+def get_enum_from_value(EnumClass: Type[Enum], value: str, default: Optional[Any] = None) -> Any:
     '''
     Get an enum member out of a string value, e.g. Color.BLUE out of 1 if Color.BLUE.value is 1
     Used to convert value in GET to enum
     '''
     try:
         return EnumClass(value)
-    except (ValueError):
+    except ValueError:
         return default

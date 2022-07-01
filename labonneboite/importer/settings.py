@@ -15,6 +15,8 @@ from labonneboite.common.env import get_current_env, ENV_BONAPARTE, ENV_DEVELOPM
 from labonneboite_common import departements as dpt
 
 # Folder that contains the repo
+from ..common import scoring
+
 LBB_ROOT_FOLDER = os.path.join(os.path.dirname(__file__), '..', '..', '..')
 IMPORTER_ROOT_FOLDER = os.path.dirname(__file__)
 
@@ -49,7 +51,7 @@ HIGH_SCORE_COMPANIES_COUNT_MIN = 100
 ALTERNANCE_LAST_HISTORICAL_DATA_DATE = datetime(2017, 12, 31)
 
 # --- job 6/8 : validate_scores
-SCORE_REDUCING_MINIMUM_THRESHOLD = 50
+HIRING_REDUCING_MINIMUM_THRESHOLD = scoring.get_hirings_from_score(50)
 SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD = 50
 MINIMUM_OFFICES_PER_DEPARTEMENT_FOR_DPAE = 1
 MINIMUM_OFFICES_PER_DEPARTEMENT_FOR_ALTERNANCE = 0
@@ -63,11 +65,8 @@ BACKUP_OUTPUT_FOLDER = os.path.join(IMPORTER_ROOT_FOLDER, 'output')
 BACKUP_FOLDER = os.path.join(IMPORTER_ROOT_FOLDER, 'output')
 
 if get_current_env() == ENV_BONAPARTE:
-    # pylint: disable=wildcard-import,unused-wildcard-import
-    from .conf.bonaparte import *
+    from .conf.bonaparte import *  # noqa: F401, F403
 elif get_current_env() == ENV_DEVELOPMENT:
-    # pylint: disable=wildcard-import,unused-wildcard-import
-    from .conf.development import *
+    from .conf.development import *  # noqa: F401, F403
 elif get_current_env() == ENV_TEST:
-    # pylint: disable=wildcard-import,unused-wildcard-import
-    from .conf.test import *
+    from .conf.test import *  # noqa: F401, F403

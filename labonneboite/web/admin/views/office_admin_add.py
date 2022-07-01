@@ -1,16 +1,19 @@
 from flask import flash, url_for
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.form import BaseForm
 from wtforms import validators
 
+from labonneboite.common import scoring
 from labonneboite.common.models import OfficeAdminRemove
+from labonneboite.common.scoring import get_hirings_from_score
 from labonneboite.conf import settings
 from labonneboite.web.admin.forms import code_commune_validator, zip_code_validator
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter, siret_validator
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin, SelectForChoiceTypeField
 
 
-class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
+class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):  # type: ignore
     """
     Admin interface for the `OfficeAdminAdd` model.
     http://flask-admin.readthedocs.io/en/latest/api/mod_model/
@@ -47,7 +50,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         'flag_handicap',
         'departement',
         'headcount',
-        'score',
+        'hiring',
         'score_alternance',
         'x',
         'y',
@@ -81,7 +84,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         'flag_handicap': "Drapeau handicap",
         'departement': "Département",
         'headcount': "Tranche effectif",
-        'score': "Score",
+        'hiring': "hiring",
         'score_alternance': "Score alternance",
         'x': "Longitude",
         'y': "Latitude",
@@ -94,7 +97,8 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
 
     column_descriptions = {
         'reason': "Raison de l'ajout.",
-        'score': "Valeur recommandée : entre 80 et 90",
+        'hiring': "Valeur recommandée : entre "
+                  f"{scoring.get_hirings_from_score(80)} et {scoring.get_hirings_from_score(90)}",
         'score_alternance': "Valeur recommandée : entre 80 et 90",
     }
 
@@ -116,7 +120,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         'flag_senior',
         'flag_handicap',
         'headcount',
-        'score',
+        'hiring',
         'score_alternance',
         'y',
         'x',
@@ -173,8 +177,8 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         'headcount': {
             'choices': settings.HEADCOUNT_INSEE_CHOICES,
         },
-        'score': {
-            'validators': [validators.NumberRange(min=0, max=100)],
+        'hiring': {
+            'validators': [validators.NumberRange(min=0, max=get_hirings_from_score(100))],
         },
         'score_alternance': {
             'validators': [validators.NumberRange(min=0, max=100)],
@@ -192,11 +196,11 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):
         },
     }
 
-    def validate_form(self, form):
+    def validate_form(self, form: BaseForm) -> bool:
         """
         Ensure that the office to add does not already exist in `OfficeAdminRemove`.
         """
-        is_valid = super(OfficeAdminAddModelView, self).validate_form(form)
+        is_valid: bool = super(OfficeAdminAddModelView, self).validate_form(form)
         if is_valid and 'siret' in list(form.data.keys()):
             office_to_remove = OfficeAdminRemove.query.filter_by(siret=form.data['siret']).first()
             if office_to_remove:
