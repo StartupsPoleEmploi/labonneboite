@@ -31,19 +31,6 @@ class TestPerfInsertData(DatabaseTest):
         self.assertTrue(len(files_list) == 1)
         self.assertTrue("export_etablissement_backup_2019_11_10_1716.sql.gz" in files_list[0])
 
-    def test_insert_data_from_file(self):
-        file = get_available_files_list(path_folder=os.path.join(os.path.dirname(__file__),
-                                                                       "data"))[0]
-        insert_into_sql_table_old_prediction_file(file)
-        insert_data(file, months_time=4)
-        con, cur = import_util.create_cursor()
-        cur.execute("select count(*) from etablissements_new;")
-        number_new_offices = cur.fetchone()[0]
-        self.assertTrue(number_new_offices == 2)
-        self.assertTrue(
-            PerfImporterCycleInfos.query.filter(
-                PerfImporterCycleInfos.file_name==file).count() == 1)
-
     def test_compute_data(self):
         compute_effective_and_predicted_hirings()
         fields_not_null = ["lbb_nb_predicted_hirings",

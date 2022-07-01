@@ -16,15 +16,15 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
     def setUp(self, *args, **kwargs):
         super(ApiScriptsTest, self).setUp(*args, **kwargs)
 
-    def test_update_office_boost_flag_specific_romes_alternance(self):
+    def test_update_office_boost_flag_specific_romes(self):
         """
         Test `update_offices` boosted flag is present
         """
         office_to_update = OfficeAdminUpdate(
             sirets='00000000000008',
             name='Office 8',
-            boost_alternance=True,
-            romes_alternance_to_boost="D1211",  # Boost score only for this ROME.
+            boost=True,
+            romes_to_boost="D1211",  # Boost score only for this ROME.
         )
         office_to_update.save(commit=True)
         script.update_offices(OfficeAdminUpdate)
@@ -33,8 +33,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
         params = self.add_security_params({
             'commune_id': self.positions['nantes']['commune_id'],
             'rome_codes': 'D1211',
-            'user': 'labonneboite',
-            'contract': 'alternance'
+            'user': 'labonneboite'
         })
 
         with self.test_request_context():
@@ -51,11 +50,15 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             # 00000000000009 should not be boosted and be the second result
             self.assertFalse(data_list['companies'][1]['boosted'])
 
-    def test_update_office_boost_flag_all_romes_alternance(self):
+    def test_update_office_boost_flag_all_romes(self):
         """
         Test `update_offices` boosted flag is present when all romes are boosted
         """
-        office_to_update = OfficeAdminUpdate(sirets='00000000000009', name='Office 9', boost_alternance=True)
+        office_to_update = OfficeAdminUpdate(
+            sirets='00000000000009',
+            name='Office 9',
+            boost=True
+        )
         office_to_update.save()
         script.update_offices(OfficeAdminUpdate)
         es.Elasticsearch().indices.flush()
@@ -63,8 +66,7 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
         params = self.add_security_params({
             'commune_id': self.positions['nantes']['commune_id'],
             'rome_codes': 'D1211',
-            'user': 'labonneboite',
-            'contract': 'alternance'
+            'user': 'labonneboite'
         })
 
         with self.test_request_context():

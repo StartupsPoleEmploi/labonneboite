@@ -156,6 +156,7 @@ DOCS = [
         'siret': '00000000000001',
         'company_name': 'Raison sociale 1',
         'score': 68,
+        'hiring': scoring_util.get_hirings_from_score(68),
         'score_alternance': 18,
         'headcount': 11,
         'locations': POSITIONS['bayonville_sur_mad']['coords'],
@@ -169,6 +170,7 @@ DOCS = [
         'siret': '00000000000002',
         'company_name': 'Raison sociale 2',
         'score': 69,
+        'hiring': scoring_util.get_hirings_from_score(69),
         'score_alternance': 18,
         'headcount': 31,
         'locations': POSITIONS['bayonville_sur_mad']['coords'],
@@ -181,6 +183,7 @@ DOCS = [
         'naf': '4646Z',  # Map to ROME D1405.
         'siret': '00000000000003',
         'score': 70,
+        'hiring': scoring_util.get_hirings_from_score(70),
         'score_alternance': 18,
         'headcount': 31,
         'locations': POSITIONS['bayonville_sur_mad']['coords'],
@@ -193,6 +196,7 @@ DOCS = [
         'naf': '4646Z',  # Map to ROME D1405.
         'siret': '00000000000004',
         'score': 71,
+        'hiring': scoring_util.get_hirings_from_score(71),
         'score_alternance': 18,
         'headcount': 31,
         'locations': POSITIONS['caen']['coords'],
@@ -205,6 +209,7 @@ DOCS = [
         'naf': '9511Z',  # Map to ROME M1801.
         'siret': '00000000000005',
         'score': 71,
+        'hiring': scoring_util.get_hirings_from_score(71),
         'score_alternance': 18,
         'headcount': 31,
         'locations': POSITIONS['caen']['coords'],
@@ -218,6 +223,7 @@ DOCS = [
         'naf': '4771Z',  # Map to ROME D1508.
         'siret': '00000000000006',
         'score': 75,
+        'hiring': scoring_util.get_hirings_from_score(75),
         'score_alternance': 18,
         'headcount': 31,
         'locations': POSITIONS['metz']['coords'],
@@ -230,6 +236,7 @@ DOCS = [
         'naf': '4711F',  # Map to ROME D1508.
         'siret': '00000000000007',
         'score': 70,
+        'hiring': scoring_util.get_hirings_from_score(70),
         'score_alternance': 18,
         'headcount': 50,
         'locations': POSITIONS['metz']['coords'],
@@ -243,6 +250,7 @@ DOCS = [
         'naf': '9529Z',  # Map to ROME D1211
         'siret': '00000000000008',
         'score': 75,
+        'hiring': scoring_util.get_hirings_from_score(75),
         'score_alternance': 51,
         'headcount': 50,
         'locations': POSITIONS['nantes']['coords'],
@@ -255,6 +263,7 @@ DOCS = [
         'naf': '4741Z',  # Map to ROME D1211
         'siret': '00000000000009',
         'score': 99,
+        'hiring': scoring_util.get_hirings_from_score(99),
         'score_alternance': 51,
         'headcount': 50,
         'locations': POSITIONS['reze']['coords'],  # City close to Nantes
@@ -268,6 +277,7 @@ DOCS = [
         'naf': '4752B',  # Map to Rome D1213
         'siret': '00000000000010',
         'score': 78,
+        'hiring': scoring_util.get_hirings_from_score(78),
         'score_alternance': 0,
         'headcount': 34,
         'locations': POSITIONS['lille']['coords'],
@@ -280,6 +290,7 @@ DOCS = [
         'naf': '4752B',  # Map to Rome D1213
         'siret': '00000000000011',
         'score': 82,
+        'hiring': scoring_util.get_hirings_from_score(82),
         'score_alternance': 80,
         'headcount': 65,
         'locations': POSITIONS['lille']['coords'],
@@ -293,6 +304,7 @@ DOCS = [
         'naf': '7022Z',  # Map to Rome M1202
         'siret': '00000000000012',
         'score': 82,
+        'hiring': scoring_util.get_hirings_from_score(82),
         'score_alternance': 18,
         'headcount': 11,
         'locations': POSITIONS['toulouse']['coords'],
@@ -305,6 +317,7 @@ DOCS = [
         'naf': '7022Z',  # Map to Rome M1202
         'siret': '00000000000013',
         'score': 82,
+        'hiring': scoring_util.get_hirings_from_score(82),
         'score_alternance': 18,
         'headcount': 22,
         'locations': POSITIONS['toulouse']['coords'],
@@ -318,6 +331,7 @@ DOCS = [
         'naf': '3212Z',  # Map to Rome B1603
         'siret': '00000000000014',
         'score': 80,
+        'hiring': scoring_util.get_hirings_from_score(80),
         'score_alternance': 18,
         'headcount': 53,  # headcount_text : '10 000 salariés et plus'
         'locations': POSITIONS['pau']['coords'],
@@ -331,6 +345,7 @@ DOCS = [
         'naf': '3212Z',  # Map to Rome B1603
         'siret': '00000000000015',
         'score': 80,
+        'hiring': scoring_util.get_hirings_from_score(80),
         'score_alternance': 18,
         'headcount': 53,
         'locations': POSITIONS['poitiers']['coords'],
@@ -343,6 +358,7 @@ DOCS = [
         'naf': '3212Z',  # Map to Rome B1603
         'siret': '00000000000016',
         'score': 70,
+        'hiring': scoring_util.get_hirings_from_score(70),
         'score_alternance': 80,
         'headcount': 53,
         'locations': POSITIONS['poitiers']['coords'],
@@ -356,6 +372,7 @@ DOCS = [
         'naf': '5229A',  # Map to Rome N1202
         'siret': '00000000000017',
         'score': 90,
+        'hiring': scoring_util.get_hirings_from_score(90),
         'score_alternance': 18,
         'headcount': 53,
         'locations': POSITIONS['paris']['coords'],
@@ -368,6 +385,7 @@ DOCS = [
         'naf': '5229A',  # Map to Rome N1202
         'siret': '00000000000018',
         'score': 78,
+        'hiring': scoring_util.get_hirings_from_score(78),
         'score_alternance': 18,
         'headcount': 53,
         'locations': POSITIONS['neuilly-sur-seine']['coords'],
@@ -381,6 +399,7 @@ DOCS = [
         'naf': '4910Z',  # Map to Rome N4403
         'siret': '00000000000019',
         'score': 76,
+        'hiring': scoring_util.get_hirings_from_score(76),
         'score_alternance': 18,
         'headcount': 1,
         'locations': POSITIONS['toulon']['coords'],
@@ -393,6 +412,7 @@ DOCS = [
         'naf': '4910Z',  # Map to Rome N4403
         'siret': '00000000000020',
         'score': 90,
+        'hiring': scoring_util.get_hirings_from_score(90),
         'score_alternance': 18,
         'headcount': 3,
         'locations': POSITIONS['toulon']['coords'],
@@ -405,6 +425,7 @@ DOCS = [
         'naf': '4920Z',  # Map to Rome N4403
         'siret': '00000000000021',
         'score': 43,
+        'hiring': scoring_util.get_hirings_from_score(43),
         'score_alternance': 18,
         'headcount': 53,
         'locations': POSITIONS['toulon']['coords'],
@@ -418,6 +439,7 @@ DOCS = [
         'naf': '4910Z',  # Map to Rome N4403
         'siret': '00000000000023',
         'score': 89,
+        'hiring': scoring_util.get_hirings_from_score(89),
         'score_alternance': 18,
         'headcount': 31,
         'locations': POSITIONS['hyeres']['coords'],  # 15km of Toulon
@@ -431,6 +453,7 @@ DOCS = [
         'naf': '4910Z',  # Map to Rome N4403
         'siret': '00000000000024',
         'score': 30,
+        'hiring': scoring_util.get_hirings_from_score(30),
         'score_alternance': 18,
         'headcount': 12,
         'locations': POSITIONS['aubagne']['coords'],  # 35km of Toulon
@@ -444,6 +467,7 @@ DOCS = [
         'naf': '4910Z',  # Map to Rome N4403
         'siret': '00000000000025',
         'score': 82,
+        'hiring': scoring_util.get_hirings_from_score(82),
         'score_alternance': 18,
         'headcount': 11,
         'locations': POSITIONS['draguignan']['coords'],  # 60km of Toulon
@@ -457,6 +481,7 @@ DOCS = [
         'naf': '4910Z',  # Map to Rome N4403
         'siret': '00000000000026',
         'score': 67,
+        'hiring': scoring_util.get_hirings_from_score(67),
         'score_alternance': 18,
         'headcount': 51,
         'locations': POSITIONS['limoges']['coords'],  # 500km of Toulon
@@ -470,6 +495,7 @@ DOCS = [
         'naf': '4646Z',  # Map to Rome D1405
         'siret': '00000000000027',
         'score': 43,
+        'hiring': scoring_util.get_hirings_from_score(43),
         'score_alternance': 18,
         'headcount': 53,
         'locations': POSITIONS['toulon']['coords'],
@@ -502,6 +528,7 @@ DOCS = [
         'naf': '4910Z',  # Map to Rome N4403
         'siret': '00000000000028',
         'score': 0,
+        'hiring': scoring_util.get_hirings_from_score(0),
         'score_alternance': 0,
         'headcount': 1,
         'locations': POSITIONS['toulon']['coords'],
@@ -585,7 +612,7 @@ class ApiBaseTest(DatabaseTest):
             office = Office(
                 office_name=doc['name'],
                 siret=doc['siret'],
-                score=doc['score'],
+                hiring=doc['hiring'],
                 score_alternance=doc['score_alternance'],
                 naf=doc['naf'],
                 city_code=commune_id,

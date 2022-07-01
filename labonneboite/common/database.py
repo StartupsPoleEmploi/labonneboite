@@ -1,7 +1,7 @@
 # http://flask.pocoo.org/docs/0.12/patterns/sqlalchemy/#declarative
 # http://docs.sqlalchemy.org/en/rel_1_1/
 import os
-from typing import Optional, Dict, Union
+from typing import Optional, Dict, Union, TYPE_CHECKING
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -72,9 +72,12 @@ db_session = scoped_session(sessionmaker(
 # Base
 # -----------------------------------------------------------------------------
 
-
-class Base(declarative_base()):  # type: ignore
-    query = db_session.query_property()
+if TYPE_CHECKING:
+    class Base(declarative_base()):  # type: ignore
+        query = db_session.query_property()
+else:
+    Base = declarative_base()
+    Base.query = db_session.query_property()
 
 
 def init_db() -> None:

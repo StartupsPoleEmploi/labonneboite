@@ -4,7 +4,7 @@ import requests
 from flask import abort, Blueprint, current_app, flash, redirect, render_template, request, send_from_directory, url_for
 from flask_login import current_user
 
-from labonneboite.common import activity, pro
+from labonneboite.common import activity, pro, scoring
 from labonneboite.common.database import db_session
 from labonneboite.common.models import Office
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
@@ -18,7 +18,7 @@ rootBlueprint = Blueprint('root', __name__)
 @rootBlueprint.route('/')
 def home():
     fix_csrf_session()
-    activity.log(event_name='home',)
+    activity.log(event_name='home', )
 
     refresh_token_result = attempt_to_refresh_peam_token()
     if refresh_token_result["token_has_expired"]:
@@ -76,7 +76,8 @@ def cgu():
 
 @rootBlueprint.route('/cookbook')
 def cookbook():
-    office = Office(company_name='Nom SAS', siret='0000000000001', city_code='75056', naf='0111Z', score=3)
+    office = Office(company_name='Nom SAS', siret='0000000000001', city_code='75056', naf='0111Z',
+                    hiring=scoring.get_hirings_from_score(3))
     return render_template('root/cookbook.html', company=office)
 
 

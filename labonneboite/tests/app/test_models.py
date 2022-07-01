@@ -1,5 +1,6 @@
 import datetime
 
+from labonneboite.common import scoring
 from labonneboite.conf import settings
 from labonneboite.common.database import db_session
 from labonneboite.common.models import Office, OfficeResult, OfficeAdminExtraGeoLocation
@@ -110,7 +111,7 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
             city_code='57070',
             zipcode='57070',
             naf='4646Z',
-            score=90,
+            hiring=scoring.get_hirings_from_score(90),
             x=6.166667,
             y=49.133333,
             score_alternance=80,

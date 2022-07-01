@@ -31,7 +31,7 @@ class UserAccountTest(DatabaseTest):
             city_code='57070',
             zipcode='57070',
             naf='4646Z',
-            score=90,
+            hiring=120,  # aka score 90
             x=6.166667,
             y=49.133333,
         )
@@ -43,7 +43,7 @@ class UserAccountTest(DatabaseTest):
             city_code='57070',
             zipcode='57070',
             naf='4646Z',
-            score=90,
+            hiring=120,  # aka score 90
             x=6.166667,
             y=49.133333,
         )

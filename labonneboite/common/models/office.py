@@ -114,7 +114,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
             naf_text=self.naf_text,
             name=self.name,
             siret=self.siret,
-            stars=self.get_stars_for_rome_code(rome_code, hiring_type),
+            stars=self.get_stars_for_rome_code(rome_code),
             url=self.get_url_for_rome_code(rome_code, alternance, **extra_query_string),
             contact_mode=util.get_contact_mode_for_rome_and_office(rome_code, self),
             social_network=self.social_network or '',
@@ -276,16 +276,13 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
         """
         return set([rome.code for rome in self.romes_for_naf_mapping])
 
-    def get_score_for_rome_code(self, rome_code: Optional[str], hiring_type: Optional[str] = None) -> int:
-        hiring_type = hiring_type or hiring_type_util.DEFAULT
-        if hiring_type not in hiring_type_util.VALUES:
-            raise ValueError("Unknown hiring_type")
+    def get_score_for_rome_code(self, rome_code: Optional[str]) -> int:
         return scoring_util.get_score_adjusted_to_rome_code_and_naf_code(rome_code=rome_code,
                                                                          naf_code=self.naf,
                                                                          hiring=self.hiring)
 
-    def get_stars_for_rome_code(self, rome_code: Optional[str], hiring_type: Optional[str] = None) -> float:
-        score = self.get_score_for_rome_code(rome_code, hiring_type)
+    def get_stars_for_rome_code(self, rome_code: Optional[str]) -> float:
+        score = self.get_score_for_rome_code(rome_code)
         return scoring_util.get_stars_from_score(score)
 
     def get_stars_for_rome_code_as_percentage(self, rome_code: Optional[str]) -> float:

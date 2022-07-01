@@ -17,36 +17,6 @@ FIFTEEN_MONTHS = 15 * 30
 
 class ScoringTest(DatabaseTest):
 
-    def test_high_scoring_company_has_at_least_one_dpae(self):
-
-        # Test a bunch of departements - not all because some do break.
-        departements = ["10", "20", "30", "40", "50", "57", "60", "70", "75", "80", "90", "92"]
-
-        for departement in departements:
-            offices = Office.query.filter(
-                and_(Office.departement == departement, Office.score > 50)).limit(1000)
-
-            last_year = datetime.now() - timedelta(days=FIFTEEN_MONTHS)
-
-            for office in offices:
-                dpae = Hiring.query.filter(and_(Hiring.siret == office.siret, Hiring.hiring_date > last_year)).all()
-                dpae_all = Hiring.query.filter(Hiring.siret == office.siret).all()
-                try:
-                    self.assertTrue(len(dpae) > 0)
-                except:
-                    print(office)
-                    for dpae in dpae_all:
-                        print(dpae)
-                    raise
-
-
-    def test_converting_hirings_into_scores_back_and_forth(self):
-        for score in range(101):  # [0, 1, 2, 3.. 100]
-            self.assertEqual(
-                score,
-                scoring_util.get_score_from_hirings(scoring_util.get_hirings_from_score(score), skip_bucketing=True)
-            )
-
     # ############### WARNING about matching scores vs hirings ################
     # Methods scoring_util.get_hirings_from_score
     # and scoring_util.get_score_from_hirings

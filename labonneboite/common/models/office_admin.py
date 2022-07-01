@@ -7,7 +7,7 @@ from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import Boolean, DateTime, Integer, String, Text
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy import desc
+from sqlalchemy import desc, text
 from sqlalchemy.dialects import mysql
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm import relationship
@@ -162,7 +162,7 @@ class OfficeUpdateMixin(object):
     remove_website = Column(Boolean, default=False, nullable=False)
 
     # Hide company visibility depending of the hyring type
-    score = Column(Integer, default=None, nullable=True)
+    hiring = Column(Integer, default=None, nullable=True)
     score_alternance = Column(Integer, default=None, nullable=True)
 
     # Update requested by.
@@ -224,7 +224,7 @@ class OfficeAdminUpdate(OfficeUpdateMixin, CRUDMixin, Base):
     id = Column(Integer, primary_key=True)
 
     __mapper_args__ = {
-        'order_by': desc('etablissements_admin_update.date_created'),  # Default order_by for all queries.
+        'order_by': desc(text('etablissements_admin_update.date_created')),  # Default order_by for all queries.
     }
 
 

@@ -137,7 +137,7 @@ def get_hirings_from_score(score: Score) -> Hiring:
         hirings += 10.0 ** ((score - 80) / 20.0 * math.log10(settings.SCORE_100_HIRINGS))
     else:
         raise Exception("unexpected value of score : %s" % score)
-    return Hiring(hirings)
+    return Hiring(round(hirings))
 
 
 # very good hit/miss ratio observed while running create_index.py
@@ -156,7 +156,7 @@ def get_score_adjusted_to_rome_code_and_naf_code(*, rome_code: Rome, naf_code: N
     # - rome_code is not related to the naf_code (custom ROME via SAVE)
     if (not rome_code or naf_code not in mapping_util.MANUAL_NAF_ROME_MAPPING
             or rome_code not in mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code]):
-        return score
+        return get_score_from_hirings(hiring) if hiring is not None else score
 
     total_office_hirings = hiring if hiring is not None else get_hirings_from_score(score)
     affinity = mapping_util.get_affinity_between_rome_and_naf(rome_code, naf_code)
@@ -238,7 +238,7 @@ def get_score_minimum_for_rome(rome_code: str) -> int:
     # To increase the number of these companies, we have to lower
     # the threshold : score for rome minimum
 
-    score_for_rome_minimum = SCORE_ALTERNANCE_FOR_ROME_MINIMUM
+    score_for_rome_minimum = SCORE_FOR_ROME_MINIMUM
 
     rome_to_tension = load_metiers_tension()
     score_minimum_for_rome = score_for_rome_minimum

@@ -4,7 +4,8 @@ import os
 import json
 from typing import Sequence
 
-from labonneboite.common.search import AudienceFilter, HiddenMarketFetcher, hiring_type_util, settings, sorting, datetime as search_datetime
+from labonneboite.common.search import AudienceFilter, HiddenMarketFetcher, hiring_type_util, settings, sorting, \
+    datetime as search_datetime
 from labonneboite.common import search
 
 PROPS_SUFFIX = '.props.json'
@@ -38,8 +39,8 @@ class TestHiddenMarketFetcher(unittest.TestCase):
         init_dict = init.__dict__
         clone_dict = clone.__dict__
         self.assertEqual(10, init_dict.pop('office_count', 'unset'))
-        self.assertIsNone(clone_dict.pop('office_count', 'unset'),
-                          'Clone office count should be reset, props may have change')
+        self.assertEqual(0, clone_dict.pop('office_count', 'unset'),
+                         'Clone office count should be reset, props may have change')
         self.assertEqual(init.__dict__, clone.__dict__,
                          'Missing field after clonning the object. Did you forget to clone it ?')
 

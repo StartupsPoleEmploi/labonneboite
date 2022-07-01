@@ -280,14 +280,10 @@ def get_office_as_es_doc(
             },
         ]
 
-    scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes = \
-        get_scores_by_rome_and_boosted_romes(office)
+    scores_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office)
     if scores_by_rome:
         doc['scores_by_rome'] = scores_by_rome
         doc['boosted_romes'] = boosted_romes
-    if scores_alternance_by_rome:
-        doc['scores_alternance_by_rome'] = scores_alternance_by_rome
-        doc['boosted_alternance_romes'] = boosted_alternance_romes
 
     return doc
 
@@ -295,7 +291,7 @@ def get_office_as_es_doc(
 def get_scores_by_rome_and_boosted_romes(
         office: OfficeMixin,
         office_to_update: Optional[Union[OfficeAdminUpdate, OfficeThirdPartyUpdate]] = None
-) -> Tuple[Dict[str, int], Dict[str, int], Dict[str, bool], Dict[str, bool]]:
+) -> Tuple[Dict[str, int], Dict[str, bool]]:
     # 0 - Get all romes related to the company
 
     # fetch all rome_codes mapped to the naf of this office
@@ -306,10 +302,8 @@ def get_scores_by_rome_and_boosted_romes(
         office_nafs += office_to_update.as_list(office_to_update.nafs_to_add)
 
     scores_by_rome: Dict[str, int] = {}
-    scores_alternance_by_rome: Dict[str, int] = {}
     # elasticsearch does not understand sets, so we use a dict of 'key => True' instead
     boosted_romes: Dict[str, bool] = {}
-    boosted_alternance_romes: Dict[str, bool] = {}
 
     if PSE_STUDY_IS_ENABLED:
         sirets_to_remove_pse = load_siret_to_remove()
@@ -368,47 +362,7 @@ def get_scores_by_rome_and_boosted_romes(
                     scores_by_rome[rome_code] = score_dpae
                     st.increment_office_score_for_rome_count()
 
-        # 2 - Alternance
-
-        romes_alternance_to_boost = []
-        romes_alternance_to_remove = []
-        if office_to_update:
-            romes_alternance_to_boost = office_to_update.as_list(office_to_update.romes_alternance_to_boost)
-            romes_alternance_to_remove = office_to_update.as_list(office_to_update.romes_alternance_to_remove)
-
-        rome_codes_alternance = set(naf_rome_codes).union(set(romes_alternance_to_boost)) - set(
-            romes_alternance_to_remove)
-
-        for rome_code in rome_codes_alternance:
-            # Manage office boosting - Alternance
-            if office_to_update and office_to_update.boost_alternance:
-                if not office_to_update.romes_alternance_to_boost:
-                    # Boost the score for all ROME codes.
-                    boosted_alternance_romes[rome_code] = True
-                elif rome_code in romes_alternance_to_boost:
-                    # Boost the score for some ROME codes only.
-                    boosted_alternance_romes[rome_code] = True
-
-            # Scoring part
-
-            score_alternance = scoring_util.get_score_adjusted_to_rome_code_and_naf_code(score=office.score_alternance,
-                                                                                         rome_code=rome_code,
-                                                                                         naf_code=naf)
-
-            # Get the score minimum for a rome code with metiers en tension
-            score_minimum_for_rome_alternance = scoring_util.get_score_minimum_for_rome(rome_code, alternance=True)
-
-            if (score_alternance >= score_minimum_for_rome_alternance or rome_code in boosted_alternance_romes):
-                if rome_code in scores_alternance_by_rome:
-                    # this ROME was already computed before for another NAF
-                    if score_alternance > scores_alternance_by_rome[rome_code]:
-                        # keep highest score for this rome among all possible NAF codes
-                        scores_alternance_by_rome[rome_code] = score_alternance
-                else:
-                    scores_alternance_by_rome[rome_code] = score_alternance
-                    st.increment_office_score_alternance_for_rome_count()
-
-    return scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes
+    return scores_by_rome, boosted_romes
 
 
 def create_offices(disable_parallel_computing: bool = False) -> None:
@@ -625,11 +579,11 @@ def update_offices(table: Union[Type[OfficeAdminUpdate], Type[OfficeThirdPartyUp
                     office.office_name = office_to_update.new_office_name
                     is_updated = True
                 offices_attributes = [
-                    "email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance",
+                    "email_alternance", "phone_alternance", "website_alternance", "hiring", "score_alternance",
                     "social_network", "contact_mode"
                 ]
                 update_attributes = [
-                    "email_alternance", "phone_alternance", "website_alternance", "score", "score_alternance",
+                    "email_alternance", "phone_alternance", "website_alternance", "hiring", "score_alternance",
                     "social_network", "contact_mode"
                 ]
                 for office_attr, update_attr in list(zip(offices_attributes, update_attributes)):
@@ -671,14 +625,10 @@ def update_offices(table: Union[Type[OfficeAdminUpdate], Type[OfficeThirdPartyUp
                         }
                     }
 
-                    scores_by_rome, scores_alternance_by_rome, boosted_romes, boosted_alternance_romes = \
-                        get_scores_by_rome_and_boosted_romes(office, office_to_update)
+                    scores_by_rome, boosted_romes = get_scores_by_rome_and_boosted_romes(office, office_to_update)
                     if scores_by_rome:
                         body['doc']['scores_by_rome'] = scores_by_rome
                         body['doc']['boosted_romes'] = boosted_romes
-                    if scores_alternance_by_rome:
-                        body['doc']['scores_alternance_by_rome'] = scores_alternance_by_rome
-                        body['doc']['boosted_alternance_romes'] = boosted_alternance_romes
 
                     # The update API makes partial updates: existing `scalar` fields are overwritten,
                     # but `objects` fields are merged together.

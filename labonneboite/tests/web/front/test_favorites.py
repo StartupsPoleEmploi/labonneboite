@@ -44,6 +44,7 @@ class FavoriteBaseTest(DatabaseTest):
             {
                 'naf': '4711F',
                 'siret': '00000000000001',
+                'hiring': 350,
                 'score': 98,
                 'headcount': 32,
                 'locations': self.positions['metz']['coords'],
@@ -52,6 +53,7 @@ class FavoriteBaseTest(DatabaseTest):
             {
                 'naf': '4722Z',
                 'siret': '00000000000002',
+                'hiring': 350,
                 'score': 98,
                 'headcount': 12,
                 'locations': self.positions['metz']['coords'],
@@ -60,6 +62,7 @@ class FavoriteBaseTest(DatabaseTest):
             {
                 'naf': '4711F',
                 'siret': '00000000000003',
+                'hiring': 350,
                 'score': 98,
                 'headcount': 32,
                 'locations': self.positions['paris']['coords'],
@@ -68,6 +71,7 @@ class FavoriteBaseTest(DatabaseTest):
             {
                 'naf': '4722Z',
                 'siret': '00000000000004',
+                'hiring': 350,
                 'score': 98,
                 'headcount': 84,
                 'locations': self.positions['paris']['coords'],
@@ -104,7 +108,7 @@ class FavoriteBaseTest(DatabaseTest):
             office = Office(
                 company_name=doc['name'],
                 siret=doc['siret'],
-                score=doc['score'],
+                hiring=doc['hiring'],
                 naf=doc['naf'],
                 city_code=commune_id,
                 zipcode=zip_code,
