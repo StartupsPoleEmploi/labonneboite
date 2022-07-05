@@ -32,6 +32,7 @@ def create_table(name: str) -> TableClause:
 office = create_table('etablissements')
 office_admin_add = create_table('etablissements_admin_add')
 office_admin_update = create_table('etablissements_admin_update')
+office_third_party_update = create_table('etablissements_third_party_update')
 
 
 # source:
@@ -103,9 +104,11 @@ def upgrade() -> None:
     upgrade_table(office)
     upgrade_table(office_admin_add)
     upgrade_table(office_admin_update)
+    upgrade_table(office_third_party_update)
 
 
 def downgrade() -> None:
+    downgrade_table(office_third_party_update)
     downgrade_table(office_admin_update)
     downgrade_table(office_admin_add)
     downgrade_table(office)

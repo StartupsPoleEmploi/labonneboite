@@ -74,9 +74,9 @@ populate-data-test:
 	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
 
 populate-data-test-selenium:
-	LBB_ENV=test alembic upgrade head
+	LBB_ENV=test PYTHONPATH=. alembic upgrade head
 	$(MYSQL) -D lbb_test < ./labonneboite/alembic/sql/etablissements_tests_selenium.sql
-	LBB_ENV=test SELENIUM_IS_SETUP=1 python ./labonneboite/scripts/create_index.py --full
+	LBB_ENV=test SELENIUM_IS_SETUP=1 PYTHONPATH=. python ./labonneboite/scripts/create_index.py --full
 
 data-dev:
 	echo "-- this script should only run in local development and AFTER all migrations have completed" >  ./labonneboite/alembic/sql/etablissements.sql
@@ -156,7 +156,7 @@ pylint:
 # ---------
 
 serve-web-app: services
-	LBB_ENV=development python labonneboite/web/app.py
+	LBB_ENV=development PYTHONPATH=. python labonneboite/web/app.py
 
 create-sitemap:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_sitemap.py sitemap
