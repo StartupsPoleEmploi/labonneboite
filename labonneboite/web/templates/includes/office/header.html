@@ -36,7 +36,7 @@
       </h4>
     </div>
     <div class="grid-col-8">
-      {% if distance and zipcode and company.show_multi_geolocations_msg(distance, zipcode) %}
+      {% if distance and zipcode and company.show_multi_geolocations_msg(zipcode) %}
         <h4>Cette entreprise recrute aussi dans votre région.</h4>
       {% elif company.distance %}
         <p class="travel-distance-duration">

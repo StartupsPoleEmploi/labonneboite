@@ -21,7 +21,7 @@ class DownloadTest(DatabaseTest):
             zipcode='75010',
             naf='4646Z',
             tel='0100000000',
-            score=80,
+            hiring=100,  # aka: score 80
             x=2.3488,
             y=48.8534,
         )

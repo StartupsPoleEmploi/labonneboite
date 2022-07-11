@@ -1,10 +1,11 @@
 import datetime
 import json
 import re
+from typing import Union, Any, List, Optional, Tuple, Dict, TYPE_CHECKING
+from decimal import Decimal
 
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import Boolean, DateTime, Integer, String, Text
-from sqlalchemy.dialects import mysql
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import desc, text
 from sqlalchemy.dialects import mysql
@@ -12,13 +13,16 @@ from sqlalchemy.event import listens_for
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
 
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
-
 from labonneboite.common import geocoding
+from labonneboite.common.conf import settings
 from labonneboite.common.database import Base
 from labonneboite.common.models import OfficeMixin
 from labonneboite.common.models.base import CRUDMixin
-from labonneboite.common.conf import settings
+from labonneboite.common.scoring import get_score_from_hirings
+
+if TYPE_CHECKING:
+    from labonneboite.common.models import User
+    from sqlalchemy.orm import RelationshipProperty
 
 
 class OfficeAdminAdd(OfficeMixin, CRUDMixin, Base):
@@ -33,10 +37,10 @@ class OfficeAdminAdd(OfficeMixin, CRUDMixin, Base):
 
     __tablename__ = 'etablissements_admin_add'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         # The `headcount` field must be different form the one of `Office`
         # to be able to provide a clean <select> choice in the admin UI.
-        self.headcount = Column(
+        self.headcount = Column(  # type: ignore
             'trancheeffectif',
             ChoiceType(settings.HEADCOUNT_INSEE_CHOICES),
             default="00",
@@ -55,12 +59,16 @@ class OfficeAdminAdd(OfficeMixin, CRUDMixin, Base):
     created_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
     updated_by_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
-    created_by = relationship('User', foreign_keys=[created_by_id])
-    updated_by = relationship('User', foreign_keys=[updated_by_id])
+    created_by: 'RelationshipProperty[User]' = relationship('User', foreign_keys=[created_by_id])
+    updated_by: 'RelationshipProperty[User]' = relationship('User', foreign_keys=[updated_by_id])
 
     __mapper_args__ = {
         'order_by': desc(date_created),  # Default order_by for all queries.
     }
+
+    @property
+    def score(self) -> 'Decimal':
+        return Decimal(get_score_from_hirings(self.hiring))
 
 
 class OfficeAdminRemove(CRUDMixin, Base):
@@ -154,7 +162,7 @@ class OfficeUpdateMixin(object):
     remove_website = Column(Boolean, default=False, nullable=False)
 
     # Hide company visibility depending of the hyring type
-    score = Column(Integer, default=None, nullable=True)
+    hiring = Column(Integer, default=None, nullable=True)
     score_alternance = Column(Integer, default=None, nullable=True)
 
     # Update requested by.
@@ -174,7 +182,7 @@ class OfficeUpdateMixin(object):
     date_created = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
     date_updated = Column(DateTime, nullable=True)
 
-    def clean(self):
+    def clean(self) -> None:
         """
         Clean some fields before saving or updating the instance.
         This method should not be called manually since it's automatically triggered
@@ -185,17 +193,17 @@ class OfficeUpdateMixin(object):
         self.romes_to_boost = separator.join(self.as_list(self.romes_to_boost))
 
     @staticmethod
-    def as_list(codes):
+    def as_list(codes: str) -> List[str]:
         """
         Converts the given string of codes to a Python list of unique codes.
         """
         if not codes:
             return []
         separators = OfficeUpdateMixin.SEPARATORS
-        codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
-        return sorted(set(codes))
+        striped_codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
+        return sorted(set(striped_codes))
 
-    def romes_as_html(self, romes):
+    def romes_as_html(self, romes: str) -> str:
         """
         Returns the content of the `romes_to_boost` field as HTML.
         Used in the admin UI.
@@ -257,7 +265,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         'order_by': desc(date_created),  # Default order_by for all queries.
     }
 
-    def clean(self):
+    def clean(self) -> None:
         """
         Clean some fields before saving or updating the instance.
         This method should not be called manually since it's automatically triggered
@@ -269,13 +277,13 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         # Get and store the content of `geolocations` as JSON.
         self.geolocations = self.codes_as_json_geolocations(self.codes)
 
-    def is_outdated(self):
+    def is_outdated(self) -> bool:
         """
         Returns True if extra geolocations are outdated, False otherwise.
         """
         return datetime.datetime.utcnow() > self.date_end
 
-    def geolocations_as_lat_lon_properties(self):
+    def geolocations_as_lat_lon_properties(self) -> List[Dict[str, float]]:
         """
         Returns the content of the `geolocations` field as a Python list of `lat/lon dicts`.
         This stucture maps to an Elasticsearch's geo_point "Lat Lon as Properties" format.
@@ -285,13 +293,13 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
             {"lat" : 48.86, "lon" : 2.35},
         ]
         """
-        return sorted([{
-            'lat': coords[0],
-            'lon': coords[1]
-        } for coords in json.loads(self.geolocations)],
-                      key=lambda x: (x['lat'], x['lon']))
+        coords = [{
+            'lat': row[0],
+            'lon': row[1]
+        } for row in json.loads(self.geolocations)]
+        return sorted(coords, key=lambda x: (x['lat'], x['lon']))
 
-    def geolocations_as_html_links(self):
+    def geolocations_as_html_links(self) -> str:
         """
         Returns the content of the `geolocations` field as HTML links.
         Used in the admin UI.
@@ -303,18 +311,18 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         return '<br>'.join(html)
 
     @staticmethod
-    def codes_as_list(codes):
+    def codes_as_list(codes: Optional[str]) -> List[str]:
         """
         Converts the given string of codes to a Python list of unique codes.
         """
         if not codes:
             return []
         separators = OfficeAdminExtraGeoLocation.GEOLOCATIONS_TEXT_SEPARATORS
-        codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
-        return sorted(set(codes))
+        striped_codes = [v.strip() for v in re.split('|'.join(separators), codes) if v.strip()]
+        return sorted(set(striped_codes))
 
     @staticmethod
-    def codes_as_geolocations(codes):
+    def codes_as_geolocations(codes: str) -> List[Tuple[float, float]]:
         """
         Converts the given string of codes to an array of `lat/lon tuples`.
         E.g.:
@@ -335,7 +343,7 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         return geolocations
 
     @staticmethod
-    def codes_as_json_geolocations(codes):
+    def codes_as_json_geolocations(codes: str) -> str:
         """
         Converts the given string of codes to a JSON object suitable to be stored in the `geolocations` field.
         E.g.:
@@ -344,11 +352,11 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
         return json.dumps(OfficeAdminExtraGeoLocation.codes_as_geolocations(codes))
 
 
-@listens_for(OfficeAdminUpdate, 'before_insert')
-@listens_for(OfficeAdminUpdate, 'before_update')
-@listens_for(OfficeAdminExtraGeoLocation, 'before_insert')
-@listens_for(OfficeAdminExtraGeoLocation, 'before_update')
-def clean(mapper, connect, self):
+@listens_for(OfficeAdminUpdate, 'before_insert')  # type: ignore
+@listens_for(OfficeAdminUpdate, 'before_update')  # type: ignore
+@listens_for(OfficeAdminExtraGeoLocation, 'before_insert')  # type: ignore
+@listens_for(OfficeAdminExtraGeoLocation, 'before_update')  # type: ignore
+def clean(mapper: Any, connect: Any, self: Union[OfficeAdminUpdate, OfficeAdminExtraGeoLocation]) -> None:
     """
     Trigger the `clean()` method before an insert or an update.
     """

@@ -70,6 +70,8 @@ services:
     depends_on:
       - elasticsearch
       - mysql
+    expose:
+      - 8000
   # backups:
   #   restart: always
   #   build:

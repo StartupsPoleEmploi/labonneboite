@@ -1,19 +1,18 @@
-from collections import namedtuple
 import logging
 
 from flask import flash, redirect, request, url_for
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView
 from wtforms import validators
-from sqlalchemy.orm.exc import NoResultFound
+from labonneboite_common.siret import is_siret
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common import models
-from labonneboite_common.siret import is_siret
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
-from labonneboite.importer.settings import SCORE_REDUCING_MINIMUM_THRESHOLD, SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD
+from labonneboite.importer.settings import SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD, \
+    HIRING_REDUCING_MINIMUM_THRESHOLD
 
 logger = logging.getLogger('main')
 
@@ -81,7 +80,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     column_details_list = [
         'sirets',
         'name',
-        'score',
+        'hiring',
         'score_alternance',
         'contact_mode',
         'boost',
@@ -146,7 +145,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'email_alternance': "Email dédié à l'alternance",
         'phone_alternance': "Téléphone dédié à l'alternance",
         'website_alternance': "Site web dédié à l'alternance",
-        'score': 'Modifier le score LBB',
+        'hiring': 'Modifier le nombre de recrutement (impactant fortement le score LBB)',
         'score_alternance': 'Modifier le score LBA',
         'requested_by_email': "Email",
         'requested_by_first_name': "Prénom",
@@ -197,7 +196,8 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'remove_email': "Cocher cette case pour supprimer l'email",
         'remove_phone': "Cocher cette case pour supprimer le téléphone",
         'remove_website': "Cocher cette case pour supprimer le site web",
-        'score': "Nouveau score (si 0 : suppression de l'entreprise sur LBB mais pas LBA)",
+        'hiring': "Nouveau nombre de recrutement dans les 6 mois (si 0 : suppression de l'entreprise sur LBB mais pas "
+                  "LBA)",
         'score_aternance': "Nouveau score alternance (si 0 : suppression de l'entreprise pour l'alternance)",
         'reason': "Raison de la modification.",
         'certified_recruiter': 'Identifiant unique du recruteur',
@@ -209,7 +209,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         'sirets',
         'name',
         'contact_mode',
-        'score',
+        'hiring',
         'score_alternance',
         'boost',
         'romes_to_boost',
@@ -394,9 +394,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         ]
 
         if office and ask_job_or_coordinate_changes:
-            if office.score <= SCORE_REDUCING_MINIMUM_THRESHOLD:
-                self.set_update_style('score')
-                self.set_little_boost(form['score'], office.score)
+            if office.hiring <= HIRING_REDUCING_MINIMUM_THRESHOLD:
+                self.set_update_style('hiring')
+                self.set_little_boost(form['hiring'], office.hiring)
 
             if office.score_alternance <= SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD:
                 self.set_update_style('score_alternance')
@@ -436,9 +436,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
 
         elif recruiter_message.name == models.RemoveRecruiterMessage.name:
             # The field is a boolean in contact form but an integer in the OfficeAdminpdate
-            new_score = 0 if recruiter_message.remove_lbb else form.score.data
+            new_hiring = 0 if recruiter_message.remove_lbb else form.hiring.data
             new_score_alternance = 0 if recruiter_message.remove_lba else form.score_alternance.data
-            self.handle_diff('score', new_score, office_admin_update, form)
+            self.handle_diff('hiring', new_hiring, office_admin_update, form)
             self.handle_diff('score_alternance', new_score_alternance, office_admin_update, form)
 
         elif recruiter_message.name == models.UpdateJobsRecruiterMessage.name:
@@ -686,15 +686,15 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
             return None
         return MODELS_MAPPING[model_name].get(id)
 
-    def set_little_boost(self, form_field, score):
+    def set_little_boost(self, form_field, hiring):
         form_field.data = LITTLE_BOOST_VALUE
 
         form_field.description = Markup("""
             <strong style="color: red;">
-                Le recruteur nous ayant contacté et son score étant trop bas ({}).
+                Le recruteur nous ayant contacté et le nombre de recrutement prédit étant trop bas ({}).
                 Nous supposons qu'il souhaite apparaître davantage et lui attribuons un léger boost.
             </strong>
-        """).format(score)
+        """).format(hiring)
 
     def set_update_style(self, field_name):
         self.form_widget_args.update({field_name: {'style': UPDATE_STYLE}})

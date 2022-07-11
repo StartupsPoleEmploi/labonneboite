@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file requirements.dev.txt requirements.dev.in
 #
--e git+https://github.com/StartupsPoleEmploi/labonneboite-common.git@4a46124844ba76af63800da77156ec3a6b31f43c#egg=labonneboite-common
+-e git+https://github.com/StartupsPoleEmploi/labonneboite-common.git@f0dadcbb79338522169e586a9f4ec0a750920d00#egg=labonneboite-common
 alembic==0.9.10
 astroid==1.6.5
 attrs==21.4.0             # via flake8-mypy, pytest
@@ -26,7 +26,6 @@ elasticsearch-stubs==0
 elasticsearch==1.9.0
 first==2.0.1
 flake8-mypy==17.8.0
-flake8-pylint==0.1.3
 flake8==4.0.1
 flask-admin==1.5.3
 flask-assets==0.12

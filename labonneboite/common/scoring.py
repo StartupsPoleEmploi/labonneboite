@@ -1,9 +1,15 @@
 import math
 from functools import lru_cache
+from typing import Optional, Union
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common.conf import settings
 from labonneboite.common.load_data import load_metiers_tension
+from labonneboite.common.mapping import Rome, Naf
+
+Score = int
+Hiring = int
+Stars = float
 
 # scores between 0 and 100
 SCORE_FOR_ROME_MINIMUM = 20
@@ -16,6 +22,7 @@ STARS_MAXIMUM = 5.0
 # The threshold for the score, that defines if a company is "Bonne boîte"
 # can't be below this value.
 MINIMUM_POSSIBLE_SCORE = 5
+
 
 # ############### WARNING about matching scores vs hirings ################
 # Methods scoring_util.get_hirings_from_score
@@ -31,7 +38,7 @@ MINIMUM_POSSIBLE_SCORE = 5
 # #########################################################################
 
 
-def round_half_up(x):
+def round_half_up(x: float) -> int:
     """
     The 'round' function from Python 3 is different from Python 2.7's:
     https://docs.python.org/2.7/library/functions.html#round
@@ -53,7 +60,7 @@ def round_half_up(x):
 # very good hit/miss ratio observed while running create_index.py
 # thanks to bucketing float values of hirings, see get_score_from_hirings
 @lru_cache(maxsize=512 * 1024)
-def _get_score_from_hirings(hirings, as_float=False):
+def _get_score_from_hirings(hirings: Hiring) -> Score:
     """
     Note: leading underscore in method name means "private method" (python naming convention).
 
@@ -80,26 +87,24 @@ def _get_score_from_hirings(hirings, as_float=False):
     elif hirings >= settings.SCORE_100_HIRINGS:
         score = 100.0
     elif hirings <= settings.SCORE_60_HIRINGS:
-        score = (50.0 + 10 * (hirings - settings.SCORE_50_HIRINGS) /
-                 (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS))
+        score = 50.0
+        score += 10 * (hirings - settings.SCORE_50_HIRINGS) / (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS)
     elif hirings <= settings.SCORE_80_HIRINGS:
-        score = (60.0 + 20 * (hirings - settings.SCORE_60_HIRINGS) /
-                 (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS))
+        score = 60.0
+        score += 20 * (hirings - settings.SCORE_60_HIRINGS) / (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS)
     elif hirings <= settings.SCORE_100_HIRINGS:
-        score = 80.0 + 20.0 / math.log10(
-            settings.SCORE_100_HIRINGS) * math.log10(1 + hirings - settings.SCORE_80_HIRINGS)
+        score = 80.0
+        score += 20.0 / math.log10(settings.SCORE_100_HIRINGS) * math.log10(1 + hirings - settings.SCORE_80_HIRINGS)
     else:
         raise Exception("unexpected value of hirings : %s" % hirings)
 
     # score should always be positive
     score = max(0.0, score)
 
-    if as_float:
-        return score
     return round_half_up(score)
 
 
-def get_score_from_hirings(hirings, as_float=False, skip_bucketing=False):
+def get_score_from_hirings(hirings: Union[float, Hiring], skip_bucketing: bool = False) -> Score:
     """
     Bucket values of float hirings in order to improve hit/miss ratio of underlying
     private method _get_score_from_hirings.
@@ -110,33 +115,35 @@ def get_score_from_hirings(hirings, as_float=False, skip_bucketing=False):
         hirings = round(hirings, 1)
     else:
         hirings = round_half_up(hirings)
-    return _get_score_from_hirings(hirings, as_float=False)
+    return _get_score_from_hirings(hirings)
 
 
 # very good hit/miss ratio observed while running create_index.py
 @lru_cache(maxsize=1024)
-def get_hirings_from_score(score):
+def get_hirings_from_score(score: Score) -> Hiring:
     """
     does exactly the reverse operation of get_score_from_hirings
     """
     if score <= 50:
         hirings = settings.SCORE_50_HIRINGS * score / 50.0
     elif score <= 60:
-        hirings = (settings.SCORE_50_HIRINGS + (score - 50) / 10.0 *
-                   (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS))
+        hirings = settings.SCORE_50_HIRINGS
+        hirings += (score - 50) / 10.0 * (settings.SCORE_60_HIRINGS - settings.SCORE_50_HIRINGS)
     elif score <= 80:
-        hirings = (settings.SCORE_60_HIRINGS + (score - 60) / 20.0 *
-                   (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS))
+        hirings = settings.SCORE_60_HIRINGS
+        hirings += (score - 60) / 20.0 * (settings.SCORE_80_HIRINGS - settings.SCORE_60_HIRINGS)
     elif score <= 100:
-        hirings = -1 + settings.SCORE_80_HIRINGS + 10.0**((score - 80) / 20.0 * math.log10(settings.SCORE_100_HIRINGS))
+        hirings = -1 + settings.SCORE_80_HIRINGS
+        hirings += 10.0 ** ((score - 80) / 20.0 * math.log10(settings.SCORE_100_HIRINGS))
     else:
         raise Exception("unexpected value of score : %s" % score)
-    return hirings
+    return Hiring(round(hirings))
 
 
 # very good hit/miss ratio observed while running create_index.py
 @lru_cache(maxsize=256 * 1024)
-def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
+def get_score_adjusted_to_rome_code_and_naf_code(*, rome_code: Rome, naf_code: Naf, score: Optional[Score] = None,
+                                                 hiring: Optional[Hiring] = None) -> Score:
     """
     Adjust the score to a rome_code (e.g. the ROME code of the current search)
     and a naf_code (e.g. NAF code of an office)
@@ -149,17 +156,17 @@ def get_score_adjusted_to_rome_code_and_naf_code(score, rome_code, naf_code):
     # - rome_code is not related to the naf_code (custom ROME via SAVE)
     if (not rome_code or naf_code not in mapping_util.MANUAL_NAF_ROME_MAPPING
             or rome_code not in mapping_util.MANUAL_NAF_ROME_MAPPING[naf_code]):
-        return score
+        return get_score_from_hirings(hiring) if hiring is not None else score
 
-    total_office_hirings = get_hirings_from_score(score)
+    total_office_hirings = hiring if hiring is not None else get_hirings_from_score(score)
     affinity = mapping_util.get_affinity_between_rome_and_naf(rome_code, naf_code)
     office_hirings_for_current_rome = total_office_hirings * affinity
 
     # result should be integer
-    return get_score_from_hirings(office_hirings_for_current_rome, as_float=False)
+    return get_score_from_hirings(office_hirings_for_current_rome)
 
 
-def get_stars_from_score(score):
+def get_stars_from_score(score: float) -> float:
     """
     Convert the score (integer theoretically between 0 and 100)
     to a number of stars (float theoretically between 0.0 and 5.0).
@@ -196,7 +203,7 @@ def get_stars_from_score(score):
     return stars
 
 
-def get_score_from_stars(stars):
+def get_score_from_stars(stars: float) -> float:
     """
     Reverse of get_stars_from_score(score).
     """
@@ -212,16 +219,16 @@ def get_score_from_stars(stars):
     return score
 
 
-def get_score_minimum_for_rome(rome_code, alternance=False):
+def get_score_minimum_for_rome(rome_code: str) -> int:
     """
         rome_code : the rome code for which we want to have the minimum threshold
 
-        return score between `MINIMUM_POSSIBLE_SCORE` and the parameter `scoring_util.SCORE_FOR_ROME_MINIMUM` 
+        return score between `MINIMUM_POSSIBLE_SCORE` and the parameter `scoring_util.SCORE_FOR_ROME_MINIMUM`
 
-        if the companies have 0% tension, the returned score will be : 
+        if the companies have 0% tension, the returned score will be :
                  `scoring_util.SCORE_FOR_ROME_MINIMUM`
 
-        if the companies have 100% tension, the returned score will be : 
+        if the companies have 100% tension, the returned score will be :
                  `MINIMUM_POSSIBLE_SCORE`
     """
     # https://trello.com/c/QvfphuOY/1468-m%C3%A9tiers-en-tension
@@ -231,10 +238,7 @@ def get_score_minimum_for_rome(rome_code, alternance=False):
     # To increase the number of these companies, we have to lower
     # the threshold : score for rome minimum
 
-    if not alternance:
-        score_for_rome_minimum = SCORE_FOR_ROME_MINIMUM
-    else:
-        score_for_rome_minimum = SCORE_ALTERNANCE_FOR_ROME_MINIMUM
+    score_for_rome_minimum = SCORE_FOR_ROME_MINIMUM
 
     rome_to_tension = load_metiers_tension()
     score_minimum_for_rome = score_for_rome_minimum

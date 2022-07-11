@@ -2,7 +2,6 @@
 
 # dev tools
 flake8
-flake8-pylint
 coverage
 isort
 flake8-mypy

@@ -713,7 +713,7 @@ class ApiCompanyListTest(ApiBaseTest):
 
                 # general score/hirings values (all rome_codes included)
                 self.assertEqual(office.score, 71)
-                self.assertEqual(scoring_util.get_hirings_from_score(office.score), 77.5)
+                self.assertAlmostEqual(scoring_util.get_hirings_from_score(office.score), 77.5, delta=0.5)
 
                 # now let's see values adjusted for current rome_code
                 stars_for_rome_code = office_json['stars']

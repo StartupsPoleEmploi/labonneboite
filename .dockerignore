@@ -1,5 +1,6 @@
 # as a .gitignore, a .dockerignore file enables to tell docker to not take the 
 # files/folders that are listed below 
+labonneboite/logs/
 
 # ignore virtualenvs
-venv 
+venv
