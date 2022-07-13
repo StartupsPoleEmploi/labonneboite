@@ -1,8 +1,11 @@
+from flask_admin.form import BaseForm
 from wtforms import ValidationError
+from wtforms.fields import Field
 from labonneboite_common.siret import is_siret
+from labonneboite.common.mapping import naf_is_valid
 
 
-def siret_validator(form, field):
+def siret_validator(form: BaseForm, field: Field) -> None:
     """
     Validate siret number.
     http://wtforms.readthedocs.io/en/latest/validators.html#custom-validators
@@ -11,7 +14,15 @@ def siret_validator(form, field):
         raise ValidationError("Le numéro SIRET doit être composé de 14 chiffres")
 
 
-def phone_validator(form, field):
+def naf_validator(form: BaseForm, field: Field) -> None:
+    """
+    Validate NAF code.
+    """
+    if not naf_is_valid(field.data):
+        raise ValidationError("Le code NAF n'est pas valide")
+
+
+def phone_validator(form: BaseForm, field: Field) -> None:
     """
     Validate phone number.
     """
@@ -19,7 +30,7 @@ def phone_validator(form, field):
         raise ValidationError("Le numéro de téléphone doit être composé de 10 chiffres")
 
 
-def zip_code_validator(form, field):
+def zip_code_validator(form: BaseForm, field: Field) -> None:
     """
     Validate zip code.
     """
@@ -27,7 +38,7 @@ def zip_code_validator(form, field):
         raise ValidationError("Le code postal doit être composé de 5 chiffres.")
 
 
-def code_commune_validator(form, field):
+def code_commune_validator(form: BaseForm, field: Field) -> None:
     """
     Validate code commune.
     """

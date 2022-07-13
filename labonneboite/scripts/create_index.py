@@ -454,6 +454,53 @@ def profile_create_offices_for_departement(departement: str) -> None:
     convert(profiler.getstats(), filename)  # type: ignore
 
 
+def add_individual_inexistant_office(office_to_add: OfficeAdminAdd) -> None:
+    """
+    Add office in ElasticSearch and MySQL DB. Do not call this function
+    directly, use add_individual_office() instead.
+    """
+    # The `headcount` field of an `OfficeAdminAdd` instance has a `code` attribute.
+    if hasattr(office_to_add.headcount, 'code'):
+        headcount = office_to_add.headcount.code  # type: ignore
+    else:
+        headcount = office_to_add.headcount
+    # Create the new office in DB.
+    new_office = Office()
+    # Use `inspect` because `Office` columns are named distinctly from attributes.
+    for field_name in list(inspect(Office).columns.keys()):
+        try:
+            value = getattr(office_to_add, field_name)
+        except AttributeError:
+            # Some fields are not shared between `Office` and `OfficeAdminAdd`.
+            continue
+        if field_name == 'headcount':
+            value = headcount
+        setattr(new_office, field_name, value)
+    db_session.add(new_office)
+    db_session.commit()
+
+    # Create the new office in ES.
+    doc = get_office_as_es_doc(office_to_add)
+    es.Elasticsearch().create(index=settings.ES_INDEX,
+                              doc_type=es.OFFICE_TYPE,
+                              id=office_to_add.siret,
+                              body=doc)
+
+
+def add_individual_office(office_to_add: OfficeAdminAdd) -> None:
+    """
+    Add individual office (complete the data provided by the importer).
+    """
+    office = Office.query.filter_by(siret=office_to_add.siret).first()
+
+    # Only create a new office if it does not already exist.
+    # This guarantees that the importer data will always have precedence.
+    if not office:
+        add_individual_inexistant_office(office_to_add)
+    else:
+        logger.debug(f"Office with siret {office_to_add.siret} already exists, skip adding")
+
+
 @timeit
 def add_offices() -> None:
     """
@@ -461,40 +508,7 @@ def add_offices() -> None:
     """
     office_to_add: OfficeAdminAdd
     for office_to_add in db_session.query(OfficeAdminAdd).all():
-
-        office = Office.query.filter_by(siret=office_to_add.siret).first()
-
-        # Only create a new office if it does not already exist.
-        # This guarantees that the importer data will always have precedence.
-        if not office:
-
-            # The `headcount` field of an `OfficeAdminAdd` instance has a `code` attribute.
-            if hasattr(office_to_add.headcount, 'code'):
-                headcount = office_to_add.headcount.code  # type: ignore
-            else:
-                headcount = office_to_add.headcount
-            # Create the new office in DB.
-            new_office = Office()
-            # Use `inspect` because `Office` columns are named distinctly from attributes.
-            for field_name in list(inspect(Office).columns.keys()):
-                try:
-                    value = getattr(office_to_add, field_name)
-                except AttributeError:
-                    # Some fields are not shared between `Office` and `OfficeAdminAdd`.
-                    continue
-                if field_name == 'headcount':
-                    value = headcount
-                setattr(new_office, field_name, value)
-            db_session.add(new_office)
-            db_session.commit()
-
-            # Create the new office in ES.
-            doc = get_office_as_es_doc(office_to_add)
-            es.Elasticsearch().create(index=settings.ES_INDEX,
-                                      doc_type=es.OFFICE_TYPE,
-                                      id=office_to_add.siret,
-                                      body=doc)
-
+        add_individual_office(office_to_add)
 
 @timeit
 def remove_offices() -> None:

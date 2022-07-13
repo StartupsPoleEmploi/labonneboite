@@ -1,16 +1,17 @@
-from flask import flash, url_for
-from flask import Markup
+import time
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import BaseForm
 from wtforms import validators
+from sqlalchemy.exc import OperationalError
 
 from labonneboite.common import scoring
-from labonneboite.common.models import OfficeAdminRemove
+from labonneboite.common.models import OfficeAdminRemove, OfficeAdminAdd
 from labonneboite.common.scoring import get_hirings_from_score
 from labonneboite.conf import settings
 from labonneboite.web.admin.forms import code_commune_validator, zip_code_validator
-from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter, siret_validator
+from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter, siret_validator, naf_validator
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin, SelectForChoiceTypeField
+from labonneboite.scripts import create_index
 
 
 class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):  # type: ignore
@@ -19,6 +20,8 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):  # type: ignore
     http://flask-admin.readthedocs.io/en/latest/api/mod_model/
     """
 
+    can_delete = False
+    can_edit = False
     can_view_details = True
     column_searchable_list = ['siret', 'company_name', 'office_name']
     column_default_sort = ('date_created', True)
@@ -145,6 +148,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):  # type: ignore
         },
         'naf': {
             'filters': [strip_filter, nospace_filter],
+            'validators': [naf_validator]
         },
         'street_number': {
             'filters': [strip_filter, nospace_filter],
@@ -196,23 +200,10 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):  # type: ignore
         },
     }
 
-    def validate_form(self, form: BaseForm) -> bool:
+    def after_model_change(self, form: BaseForm, model: OfficeAdminAdd, is_created: bool) -> None:
         """
-        Ensure that the office to add does not already exist in `OfficeAdminRemove`.
+        Add new office in ElacticSearch and MySQL DB and remove it from OfficeAdminRemove
+        if it exists in such DB
         """
-        is_valid: bool = super(OfficeAdminAddModelView, self).validate_form(form)
-        if is_valid and 'siret' in list(form.data.keys()):
-            office_to_remove = OfficeAdminRemove.query.filter_by(siret=form.data['siret']).first()
-            if office_to_remove:
-                # Use the link of the list view with a filter on the `siret`, because
-                # the delete button is missing on the edit and/or detail view.
-                # https://github.com/flask-admin/flask-admin/issues/1327
-                office_to_remove_url = url_for('officeadminremove.index_view', search=office_to_remove.siret)
-                msg = (
-                    "Vous ne pouvez pas ajouter cette entreprise car elle existe déjà dans la liste "
-                    "<b>Supprimer une entreprise</b>.<br>Vous devez d'abord "
-                    '<a target="_blank" href="{url}">la supprimer de cette liste</a>.'.format(url=office_to_remove_url)
-                )
-                flash(Markup(msg), 'error')
-                return False
-        return is_valid
+        OfficeAdminRemove.query.filter_by(siret=form.data['siret']).delete()
+        create_index.add_individual_office(model)
