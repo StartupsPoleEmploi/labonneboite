@@ -3,6 +3,7 @@ import logging
 from flask import flash, redirect, request, url_for
 from flask import Markup
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.form import BaseForm
 from wtforms import validators
 from labonneboite_common.siret import is_siret
 
@@ -11,6 +12,7 @@ from labonneboite.common import models
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
+from labonneboite.scripts import create_index
 from labonneboite.importer.settings import SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD, \
     HIRING_REDUCING_MINIMUM_THRESHOLD
 
@@ -522,6 +524,9 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         form[checkbox_field_name].data = False
         form[checkbox_field_name].description = Markup(
             DESCRIPTION_TEMPLATE.format("Case cochée", checkbox_current_description))
+
+    def after_model_change(self, form: BaseForm, model: models.OfficeAdminUpdate, is_created: bool) -> None:
+        create_index.update_offices_by_sirets(model.as_list(form.data['sirets']), model)
 
     def validate_form(self, form):
         # Add http:// is missing
