@@ -496,6 +496,21 @@ def add_offices() -> None:
                                       body=doc)
 
 
+def remove_individual_office(siret: str) -> None:
+    # Apply changes in ElasticSearch.
+    try:
+        es.Elasticsearch().delete(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
+    except TransportError as e:
+        if e.status_code != 404:
+            raise
+    # Apply changes in DB.
+    office = Office.query.filter_by(siret=siret).first()
+    if office:
+        office.delete()
+        # Delete the current PDF.
+        pdf_util.delete_file(office)
+
+
 @timeit
 def remove_offices() -> None:
     """
@@ -506,22 +521,7 @@ def remove_offices() -> None:
     offices_to_remove = [siret for (siret,) in db_session.query(OfficeAdminRemove.siret).all()]
 
     for siret in offices_to_remove:
-        # Apply changes in ElasticSearch.
-        try:
-            es.Elasticsearch().delete(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=siret)
-        except TransportError as e:
-            if e.status_code != 404:
-                raise
-        # Apply changes in DB.
-        office = Office.query.filter_by(siret=siret).first()
-        if office:
-            try:
-                office.delete()
-            except OperationalError:  # retry once in case of deadlock error
-                time.sleep(10)
-                office.delete()
-            # Delete the current PDF.
-            pdf_util.delete_file(office)
+        remove_individual_office(siret)
 
 
 LIMIT = 100

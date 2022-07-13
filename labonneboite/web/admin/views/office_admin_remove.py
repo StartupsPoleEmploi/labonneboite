@@ -1,11 +1,13 @@
-from flask import flash, request, url_for
-from flask import Markup
+from flask import request
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.form import BaseForm
 from wtforms import validators
 
-from labonneboite.common.models import OfficeAdminAdd, OfficeAdminRemove
+
+from labonneboite.common.models import OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter, siret_validator
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin, SelectForChoiceTypeField
+from labonneboite.scripts import create_index
 
 
 class OfficeAdminRemoveModelView(AdminModelViewMixin, ModelView):
@@ -141,23 +143,35 @@ class OfficeAdminRemoveModelView(AdminModelViewMixin, ModelView):
 
         return form
 
-    def validate_form(self, form):
+    def _remove_office_admin_update(self, offices_to_update: OfficeAdminUpdate) -> None:
         """
-        Ensure that the office to remove does not already exist in `OfficeAdminAdd`.
+        Remove offices to update if all offices are present in OfficeAdminRemove
         """
-        is_valid = super(OfficeAdminRemoveModelView, self).validate_form(form)
-        if is_valid and 'siret' in list(form.data.keys()):
-            office_to_add = OfficeAdminAdd.query.filter_by(siret=form.data['siret']).first()
-            if office_to_add:
-                # Use the link of the list view with a filter on the `siret`, because
-                # the delete button is missing on the edit and/or detail view.
-                # https://github.com/flask-admin/flask-admin/issues/1327
-                office_to_add_url = url_for('officeadminadd.index_view', search=office_to_add.siret)
-                msg = (
-                    "Vous ne pouvez pas supprimer cette entreprise car elle existe déjà dans la liste "
-                    "<b>Ajouter une entreprise</b>.<br>Vous devez d'abord "
-                    '<a target="_blank" href="{url}">la supprimer de cette liste</a>.'.format(url=office_to_add_url)
-                )
-                flash(Markup(msg), 'error')
-                return False
-        return is_valid
+
+        sirets = OfficeAdminUpdate.as_list(offices_to_update.sirets)
+        are_all_in_remove_table = True
+        for siret in sirets:
+            if not OfficeAdminRemove.query.filter_by(siret=siret).first():
+                are_all_in_remove_table = False
+                break
+        if are_all_in_remove_table:
+            offices_to_update.delete()
+
+    def after_model_change(self, form: BaseForm,
+                           model: OfficeAdminRemove,
+                           is_created: bool) -> None:
+        """
+        Remove office in ElacticSearch and MySQL DB and remove it from
+        OfficeAdminAdd and OfficeAdminUpdate if it exists in such DB
+        """
+
+        # remove office in OfficeAdminAdd
+        OfficeAdminAdd.query.filter_by(siret=model.siret).delete()
+
+        # remove office if it exists in OfficeAdminUpdate
+        offices_to_update = OfficeAdminUpdate.query.\
+            filter(OfficeAdminUpdate.sirets.contains(model.siret)).first()
+        if offices_to_update:
+            self._remove_office_admin_update(offices_to_update)
+
+        create_index.remove_individual_office(model.siret)
