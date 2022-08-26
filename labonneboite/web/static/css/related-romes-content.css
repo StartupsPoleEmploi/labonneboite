@@ -1,0 +1,39 @@
+.related-romes-polygon {
+  position:relative;
+  margin-bottom:-40px;
+  top:-45px;
+  left:50%;
+  transform:rotate(45deg);
+  fill: #c8287e
+}
+
+.related-romes-content h6{
+  font-weight: 600;
+  color: #5d5d5d
+}
+
+.related-romes-content .related-romes-footer{
+  text-align: right;
+}
+
+.related-romes-content .related-romes-button{
+  font-size: 13px;
+}
+
+.related-romes-info {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 10px 21px;
+  padding: 0.625rem 1.3125rem ;
+}
+
+.related-romes-info > p {
+  margin: 0;
+}
+
+.related-romes-info > img {
+  margin-right: 27px;
+  margin-left: 8px;
+}
