@@ -25,11 +25,6 @@
                  <hr>
                </div>
 
-               {% if related_romes %}
-               <div class="lbb-feature-banner lbb-feature-banner-small">Nouveau filtre de recherche</div>
-               {% endif %}
-
- 
                <h3 class="sr-only lbb-result-info">Triez les résultats de recherche</h3>
               {% if related_rome_initial %}
                   <div class="lbb-sidebar-item">
@@ -42,26 +37,7 @@
                       >{{ related_rome_initial }}</a>
                   </div>
               {% endif %}
-              {% if related_romes %}
-                  <h3 class="flex-title">
-                    Ciblez d'autres métiers <span class="badge badge-large badge-info" data-show data-hide-on-rollout data-original-title="{{ text_reco }}" data-toggle="tooltip" data-placement="right" title="Métiers proches en terme de compétences, à plus fort potentiel d’embauche">?</span>
-                  </h3>
-                  <div class="lbb-sidebar-item">
-                    <ul id="form-related_romes" class="gtm-related-rome-suggest">
-                    {% for rome in related_romes %}
-                    <li><a
-                        href="#"
-                        data-rome-description="{{ rome.description }}"
-                        data-rome-description-slug="{{ rome.description | slugify }}"
-                        >{{ rome.description }}</a></li>
-                    {% endfor %}
-                    </ul>
-                  </div>
-                  <!-- END RELATED ROMES -->
-              {% endif %}
-              {% if related_romes or related_rome_initial %}
-                  <hr>
-              {% endif %}
+
                <h3>Affinez votre recherche</h3>
                <div class="lbb-sidebar-item">
                  <p>
@@ -146,9 +122,7 @@
 
         <div id="lbb-result-map" class="lbb-bright-container" aria-hidden="true"></div>
 
-        {% if related_romes %}
-        <div class="lbb-feature-banner">Nouveau filtre « Ciblez d’autres métiers »: des métiers proches du vôtre à fort potentiel d’embauche</div>
-        {% elif related_rome_initial %}
+        {% if related_rome_initial %}
         <div class="lbb-feature-banner">Métier similaire à votre recherche: {{ rome_description }}</div>
         {% endif %}
 
@@ -194,12 +168,17 @@
 
 
         {% for company in companies %}
-        <div id="company-{{ company.siret }}" class="lbb-bright-container lbb-result lbb-company">
-            {% with show_more_info=1 %}
-              {% include "includes/office/header.html" %}
-              {% include "includes/office/content.html" %}
-            {% endwith %}
+          <div id="company-{{ company.siret }}" class="lbb-bright-container lbb-result lbb-company">
+              {% with show_more_info=1 %}
+                {% include "includes/office/header.html" %}
+                {% include "includes/office/content.html" %}
+              {% endwith %}
           </div>
+          {% if loop.index == 2 or (companies|length < 3 and loop.index == companies|length) %}
+            {% if related_romes %}
+                {% include "includes/office/related_romes.html" %}
+            {% endif %}
+          {% endif %}
         {% endfor %}
 
         {% if show_mobiville %}
