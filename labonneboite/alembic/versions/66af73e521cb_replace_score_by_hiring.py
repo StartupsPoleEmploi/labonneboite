@@ -11,6 +11,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 from sqlalchemy.sql import TableClause
+from sqlalchemy.sql.elements import TextClause
 
 from labonneboite.conf import settings
 
@@ -21,18 +22,22 @@ branch_labels = None
 depends_on = None
 
 
-def create_table(name: str) -> TableClause:
+def create_table(name: str, nullable=False) -> TableClause:
+    default = None if nullable else 0
+    server_default = None if nullable else TextClause('0')
     return sa.table(
         name,
-        sa.Column('score', mysql.INTEGER(display_width=11), default=0, nullable=False, server_default='0'),
-        sa.Column('hiring', mysql.INTEGER(display_width=11), default=0, nullable=False, server_default='0')
+        sa.Column('score', mysql.INTEGER(display_width=11), default=default, nullable=nullable,
+                  server_default=server_default),
+        sa.Column('hiring', mysql.INTEGER(display_width=11), default=default, nullable=nullable,
+                  server_default=server_default)
     )
 
 
 office = create_table('etablissements')
 office_admin_add = create_table('etablissements_admin_add')
-office_admin_update = create_table('etablissements_admin_update')
-office_third_party_update = create_table('etablissements_third_party_update')
+office_admin_update = create_table('etablissements_admin_update', nullable=True)
+office_third_party_update = create_table('etablissements_third_party_update', nullable=True)
 
 
 # source:
