@@ -7,14 +7,12 @@ from flask_admin.form import BaseForm
 from wtforms import validators
 from labonneboite_common.siret import is_siret
 
-from labonneboite.common import mapping as mapping_util
+from labonneboite.common import mapping as mapping_util, scoring
 from labonneboite.common import models
 from labonneboite.web.admin.forms import nospace_filter, phone_validator, strip_filter
 from labonneboite.web.admin.utils import datetime_format, AdminModelViewMixin
 from labonneboite.conf import settings
 from labonneboite.scripts import create_index
-from labonneboite.importer.settings import SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD, \
-    HIRING_REDUCING_MINIMUM_THRESHOLD
 
 logger = logging.getLogger('main')
 
@@ -396,11 +394,11 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
         ]
 
         if office and ask_job_or_coordinate_changes:
-            if office.hiring <= HIRING_REDUCING_MINIMUM_THRESHOLD:
+            if office.hiring <= scoring.get_hirings_from_score(settings.SCORE_REDUCING_MINIMUM_THRESHOLD):
                 self.set_update_style('hiring')
                 self.set_little_boost(form['hiring'], office.hiring)
 
-            if office.score_alternance <= SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD:
+            if office.score_alternance <= settings.SCORE_ALTERNANCE_REDUCING_MINIMUM_THRESHOLD:
                 self.set_update_style('score_alternance')
                 self.set_little_boost(form['score_alternance'], office.score_alternance)
 

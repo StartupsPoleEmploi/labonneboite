@@ -9,6 +9,7 @@ MYSQL_PARAMS = -u ${DB_USER} --host ${DB_HOST} --port ${DB_PORT}
 MYSQL = mysql ${MYSQL_PARAMS}
 
 PYTHON = ${VIRTUAL_ENV}/bin/python
+export PYTHONPATH=.
 
 init: init-venv init-databases init-test-data
 
@@ -74,9 +75,9 @@ populate-data-test:
 	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full
 
 populate-data-test-selenium:
-	LBB_ENV=test PYTHONPATH=. alembic upgrade head
+	LBB_ENV=test alembic upgrade head
 	$(MYSQL) -D lbb_test < ./labonneboite/alembic/sql/etablissements_tests_selenium.sql
-	LBB_ENV=test SELENIUM_IS_SETUP=1 PYTHONPATH=. python ./labonneboite/scripts/create_index.py --full
+	LBB_ENV=test SELENIUM_IS_SETUP=1 python ./labonneboite/scripts/create_index.py --full
 
 data-dev:
 	echo "-- this script should only run in local development and AFTER all migrations have completed" >  ./labonneboite/alembic/sql/etablissements.sql
@@ -156,7 +157,7 @@ pylint:
 # ---------
 
 serve-web-app: services
-	LBB_ENV=development PYTHONPATH=. python labonneboite/web/app.py
+	LBB_ENV=development python labonneboite/web/app.py
 
 create-sitemap:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/create_sitemap.py sitemap
@@ -194,24 +195,8 @@ mysql-local-shell:
 rebuild-simplified-rome-naf-mapping:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/rebuild_simplified_rome_naf_mapping.py
 
-rebuild-importer-tests-compressed-files:
-	cd labonneboite/tests/importer/data && \
-	rm -f lbb_xdpdpae_delta_201611102200.csv.gz && \
-	gzip --keep lbb_xdpdpae_delta_201611102200.csv && \
-	rm -f lbb_xdpdpae_delta_201611102200.csv.bz2 && \
-	bzip2 --keep lbb_xdpdpae_delta_201611102200.csv
-
-rebuild-city-codes:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python importer/scripts/clean_csv_city_codes.py
-
 update_metiers_tension:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/update_metiers_tension.py
-
-get_nb_clic_per_siret:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/data_scripts/get_nb_clic_per_siret_pse.py
-	
-get-total-lbb-offices-by-rome:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/data_scripts/get_nb_bonne_boite_per_rome_company/get_bonne_boite_company_rome.py
 
 maj_rome:
 	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/maj_rome.py
@@ -234,24 +219,17 @@ NOSETESTS_OPTS ?=
 NOSETESTS = nosetests -s $(NOSETESTS_OPTS)
 TESTS = 	labonneboite/tests/app/ \
 			labonneboite/tests/web/ \
-			labonneboite/tests/scripts/ \
-			labonneboite/tests/importer/
+			labonneboite/tests/scripts/
 
 test-unit: clean-pyc rebuild-data-test
 	LBB_ENV=test $(NOSETESTS) ${TESTS}
 
 test: test-unit test-selenium test-integration
 
-check-all: test-all run-importer-jobs
+check-all: test-all
 
 test-app:
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/app
-
-test-importer:
-	LBB_ENV=test $(NOSETESTS) labonneboite/tests/importer
-
-# convenient shortcut when working on the importer
-check-importer: test-importer run-importer-jobs
 
 test-api:
 	LBB_ENV=test $(NOSETESTS) labonneboite/tests/web/api
@@ -269,9 +247,6 @@ test-integration: clear-data-test database-test populate-data-test
 
 test-selenium: clear-data-test database-test populate-data-test-selenium
 	LBB_ENV=test SELENIUM_IS_SETUP=1 $(NOSETESTS) labonneboite/tests/selenium
-
-test-impact-retour-emploi:
-	LBB_ENV=test $(NOSETESTS) labonneboite/tests/scripts/impact_retour_emploi
 
 # Convenient reminder about how to run a specific test manually.
 test-custom:
@@ -294,125 +269,15 @@ test-custom:
 # ------------------
 
 alembic-migrate:
-	LBB_ENV=development PYTHONPATH=. alembic upgrade head
+	LBB_ENV=development alembic upgrade head
 
 alembic-rollback:
-	LBB_ENV=development PYTHONPATH=. alembic downgrade -1
+	LBB_ENV=development alembic downgrade -1
 
 alembic-generate-migration:
 	@echo "Run for example:"
 	@echo
 	@echo "    $$ alembic revision -m 'create account table'"
-
-# Impact retour à l'emploi
-# ------------------------
-
-#Main command which runs all scripts
-
-run-impact-retour-emploi-jobs:
-	make prepare-impact-retour-emploi-00 && \
-	make daily-json-activity-parser-01 && \
-	make join-activity-logs-and-dpae-02 && \
-	make clean-activity-logs-and-dpae-03 && \
-	make make-report-04 && \
-	echo "The new report has been built successfully."
-
-prepare-impact-retour-emploi-00:
-	export LBB_ENV=development && \
-		echo delete from logs_activity            | $(MYSQL) -D ${DB_NAME} && \
-		echo delete from logs_activity_recherche  | $(MYSQL) -D ${DB_NAME} && \
-		echo delete from logs_idpe_connect        | $(MYSQL) -D ${DB_NAME} && \
-		echo delete from logs_activity_dpae_clean | $(MYSQL) -D ${DB_NAME} && \
-		rm labonneboite/importer/data/act_dpae-*.csv && \
-		echo "completed impact retour emploi run preparation."
-
-daily-json-activity-parser-01:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/daily_json_activity_parser.py
-
-join-activity-logs-and-dpae-02:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/join_activity_logs_dpae.py
-
-clean-activity-logs-and-dpae-03:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/clean_activity_logs_dpae.py
-
-# Runs every month
-make-report-04:
-	export LBB_ENV=development && cd $(PACKAGE_DIR) && python scripts/impact_retour_emploi/make_report.py
-
-# Importer jobs
-# -------------
-run-importer-jobs:
-	make run-importer-job-00-prepare-all && \
-	make run-importer-job-01-check-etablissements && \
-	make run-importer-job-02-extract-etablissements && \
-	make run-importer-job-03-check-dpae && \
-	make run-importer-job-04-extract-dpae && \
-	make run-importer-job-04hack-create-fake-alternance-hirings && \
-	make run-importer-job-04-check-lba && \
-	make run-importer-job-04-extract-lba && \
-	make run-importer-job-05-compute-scores && \
-	make run-importer-job-06-validate-scores && \
-	make run-importer-job-07-geocode && \
-	make run-importer-job-08-populate-flags && \
-	echo "all importer jobs completed successfully."
-
-run-importer-job-00-prepare-all: alembic-migrate
-	export LBB_ENV=development && \
-		cd labonneboite/importer && \
-		echo delete from hirings                   | $(MYSQL) -D ${DB_NAME} && \
-		echo delete from import_tasks              | $(MYSQL) -D ${DB_NAME} && \
-		echo delete from etablissements_raw        | $(MYSQL) -D ${DB_NAME} && \
-		echo delete from etablissements_backoffice | $(MYSQL) -D ${DB_NAME} && \
-		echo delete from etablissements_exportable | $(MYSQL) -D ${DB_NAME} && \
-		echo delete from geolocations              | $(MYSQL) -D ${DB_NAME} && \
-		echo delete from dpae_statistics           | $(MYSQL) -D ${DB_NAME} && \
-		rm data/lbb_xdpdpae_delta_201611102200.csv data/lbb_etablissement_full_201612192300.csv jenkins/*.jenkins output/*.bz2 output/*.gz ; \
-		cp ../tests/importer/data/lbb_xdpdpae_delta_201611102200.csv data/ && \
-		cp ../tests/importer/data/lbb_etablissement_full_201612192300.csv data/ && \
-		echo "completed importer run preparation."
-
-
-run-importer-job-01-check-etablissements:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/check_etablissements.py
-
-run-importer-job-02-extract-etablissements:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/extract_etablissements.py
-
-run-importer-job-03-check-dpae:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/check_dpae.py
-
-run-importer-job-04-extract-dpae:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/extract_dpae.py
-
-run-importer-job-04hack-create-fake-alternance-hirings:
-	export LBB_ENV=development && \
-		cd labonneboite/importer && \
-		cat scripts/create_fake_alternance_hirings.sql | $(MYSQL) -D ${DB_NAME}
-
-run-importer-job-04-check-lba:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/check_lba.py
-
-run-importer-job-04-extract-lba:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/extract_lba.py
-
-run-importer-job-05-compute-scores:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/compute_scores.py
-
-run-importer-job-06-validate-scores:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/validate_scores.py
-
-run-importer-job-07-geocode:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/geocode.py
-
-run-importer-job-08-populate-flags:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/populate_flags.py
-
-run-importer-job-09-performance-insert-data:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/performance_insert_data.py
-
-
-run-importer-job-10-performance-compute-data:
-	export LBB_ENV=development && cd labonneboite/importer && python jobs/performance_compute_data.py
 
 # Test API with key
 # -----
@@ -422,4 +287,4 @@ run-importer-job-10-performance-compute-data:
 get-signed-api-url:
 	python labonneboite/scripts/get_signed_api_url.py $(URL)
 
-.PHONY: init init-databases init-services init-test-data init-venv compile-requirements compile-dev-requirements services database databases database-wait-mysql database-dev database-test data populate-data-dev populate-data-test populate-data-test-selenium data-dev clear-data clear-data-dev clear-data-test rebuild-data stop-services clean clean-pyc clean-services pylint-all pylint serve-web-app create-sitemap prepare-mailing-data create-index create-index-from-scratch create-index-from-scratch-with-profiling create-index-from-scratch-with-profiling-on-staging create-index-from-scratch-with-profiling-single-job create-index-from-scratch-with-profiling-line-by-line mysql-local-shell rebuild-simplified-rome-naf-mapping rebuild-importer-tests-compressed-files rebuild-city-codes update_metiers_tension get_nb_clic_per_siret get-total-lbb-offices-by-rome maj_rome start-locust-against-localhost test-unit test check-all test-app test-importer check-importer test-api test-front test-web test-scripts test-integration test-selenium test-impact-retour-emploi test-custom alembic-migrate alembic-rollback alembic-generate-migration run-impact-retour-emploi-jobs prepare-impact-retour-emploi-00 daily-json-activity-parser-01 join-activity-logs-and-dpae-02 clean-activity-logs-and-dpae-03 make-report-04 run-importer-jobs run-importer-job-00-prepare-all run-importer-job-01-check-etablissements run-importer-job-02-extract-etablissements run-importer-job-03-check-dpae run-importer-job-04-extract-dpae run-importer-job-04hack-create-fake-alternance-hirings run-importer-job-04-check-lba run-importer-job-04-extract-lba run-importer-job-05-compute-scores run-importer-job-06-validate-scores run-importer-job-07-geocode run-importer-job-08-populate-flags run-importer-job-09-performance-insert-data run-importer-job-10-performance-compute-data get-signed-api-url
+.PHONY: init init-databases init-services init-test-data init-venv compile-requirements compile-dev-requirements services database databases database-wait-mysql database-dev database-test data populate-data-dev populate-data-test populate-data-test-selenium data-dev clear-data clear-data-dev clear-data-test rebuild-data stop-services clean clean-pyc clean-services pylint-all pylint serve-web-app create-sitemap prepare-mailing-data create-index create-index-from-scratch create-index-from-scratch-with-profiling create-index-from-scratch-with-profiling-on-staging create-index-from-scratch-with-profiling-single-job create-index-from-scratch-with-profiling-line-by-line mysql-local-shell rebuild-simplified-rome-naf-mapping rebuild-city-codes update_metiers_tension maj_rome start-locust-against-localhost test-unit test check-all test-app test-api test-front test-web test-scripts test-integration test-selenium test-custom alembic-migrate alembic-rollback alembic-generate-migration get-signed-api-url

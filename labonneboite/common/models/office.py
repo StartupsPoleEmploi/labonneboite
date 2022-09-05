@@ -48,10 +48,7 @@ class Office(FinalOfficeMixin, CRUDMixin, Base):
     Then you need to add a migration to create this column in each relevant model,
     not just the Office model, see your Mixin documentation for the list of models.
 
-    You also need to add this new column in the method:
-    - importer.util.get_select_fields_for_main_db
-
-    Then, be sure to double check that both `make run_importer_jobs` and
+    Then, be sure to double check that both labonneboite-importer project and
     `make test_all` complete successfully.
     """
     __tablename__ = settings.OFFICE_TABLE

@@ -63,10 +63,6 @@ Thumbs.db
 # folder to store backups used on some environments
 srv
 
-# Importer outputs #
-####################
-labonneboite/importer/pickle_exports/*.pickle
-
 # Data #
 ########
 ROME_NAF/opendata/sir*.csv
@@ -80,23 +76,6 @@ ROME_NAF/*.txt
 labonneboite/scripts/profiling_results/*.kgrind
 labonneboite/scripts/profiling_results/staging/*.kgrind
 labonneboite/*.lprof
-
-# Importer #
-############
-pickle_exports/*.pickle
-labonneboite/importer/data/lbb_xdpdpae_delta_201611102200.csv
-labonneboite/importer/data/lbb_etablissement_full_201612192300.csv
-labonneboite/importer/data/backup_sql_logs_activity_dpae_clean.csv
-labonneboite/importer/data/act_dpae*.csv
-labonneboite/importer/data/clics_per_siret_pse*.csv
-labonneboite/importer/data/nb_bonne_boite_per_rome*.csv
-labonneboite/importer/data/nb_hirings_per_company*.csv
-labonneboite/tests/scripts/impact_retour_emploi/data/act_dpae*.csv
-
-labonneboite/importer/jenkins/*.jenkins
-labonneboite/importer/output/*.bz2
-labonneboite/importer/output/*.gz
-labonneboite/importer/output/*.sql
 
 # Mailing data #
 ################

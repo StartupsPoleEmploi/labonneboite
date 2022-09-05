@@ -1,4 +1,3 @@
-
 """
 Load testing API+Frontend using Locust framework.
 
@@ -34,20 +33,41 @@ import logging
 import math
 import random
 import urllib.request, urllib.parse, urllib.error
+from typing import Dict, Union
 
+import MySQLdb
 from locust import HttpLocust, TaskSet, task
 from slugify import slugify
 
 from labonneboite.common import geocoding
 from labonneboite.conf import settings
-from labonneboite.importer import util as import_util
 from labonneboite.web.api import util
-
 
 logger = logging.getLogger(__name__)
 logger.info("loading locustfile")
 
-con, cur = import_util.create_cursor()
+DATABASE: Dict[str, Union[str, int, None]] = {
+    'HOST': settings.DB_HOST,
+    'PORT': settings.DB_PORT,
+    'NAME': settings.DB_NAME,
+    'USER': settings.DB_USER,
+    'PASSWORD': settings.DB_PASSWORD,
+}
+
+
+def create_cursor():
+    con = MySQLdb.connect(host=DATABASE['HOST'],
+                          port=DATABASE['PORT'],
+                          user=DATABASE['USER'],
+                          passwd=DATABASE['PASSWORD'],
+                          db=DATABASE['NAME'],
+                          use_unicode=True,
+                          charset="utf8")
+    cur = con.cursor()
+    return con, cur
+
+
+con, cur = create_cursor()
 
 # For each locust, number of seconds between its tasks. Default value: 1.
 SECONDS_BETWEEN_TASKS = 1
@@ -74,9 +94,7 @@ def generate_city_choices():
 
 CITY_CHOICES = generate_city_choices()
 
-
 COMMUNE_CHOICES = [city_['commune_id'] for city_ in geocoding.get_cities()]
-
 
 SIRET_CHOICES = generate_siret_choices()
 
@@ -110,7 +128,6 @@ def pick_job_rome():
 
 
 class UserBehavior(TaskSet):
-
     companies = []
 
     def on_start(self):

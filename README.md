@@ -64,7 +64,6 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 - [Algo LBB : about the ROME dataset, our OGR-ROME mapping, job autocomplete and thesaurus](/labonneboite/doc/README-ogr-rome-mapping.md)
 - [Algo LBB : about our custom ROME-NAF mapping](/labonneboite/doc/README-rome-naf-mapping.md)
 - [Algo LBB : hiring potential for each company in each ROME code, number of stars](/labonneboite/doc/README-algo.md)
-- [Algo LBB : importer scripts and cycle](#importer)
 - [Algo LBB : weighted shuffling aka randomization of results](/labonneboite/doc/README-randomization.md)
 - [Single ROME versus multi-ROME search](#single-rome-vs-multi-rome-search)
 - [External services we use](#external-services-we-use)
@@ -406,33 +405,6 @@ API_USERS = {
 `scopes` is an option used to let specific users access sensitive data.
 
 Note for API proxies such as ESD (emploi store dev): the real user name needs to be forwarded in the GET param `origin_user` for each request. This will be taken into acccount to match a user to options in `API_USERS`.
-
-## Importer
-
-The importer jobs are designed to recreate from scratch a complete dataset of offices.
-
-Here is their normal workflow:
-
-`check_etab` => `extract_etab` => `check_dpae` => `extract_dpae` => `compute_scores` => `validate_scores` => `geocode` => `populate_flags`
-
-Use `make run-importer-jobs` to run all these jobs in local development environment.
-
-
-After the importer has run, we execute the `labonneboite/scripts/create_index.py` which updates the importer data from the table `etablissements`, with several goals:
-
-* Populate the `office` type in ElasticSearch
-* Create the `ogr` type in ElasticSearch
-* Create the `location` type in ElasticSearch
-* Add offices to DB and ES - these changes are made with the back office (SAVE)
-* Remove offices from DB and ES - these changes are made with the back office (SAVE)
-* Update offices in DB and ES with changes are made with the back office (SAVE)
-* Update offices in DB and ES with changes from experiments (see `labonneboite/scripts/manage_third_party_updates.py`)
-
-Notes:
-
-* the table `etablissements_third_party_update` has the same structure as the table `etablissements_admin_update `
-* both table are used in `labonneboite/scripts/create_index.py` to update the table etablissements after the execution of the importer
-* the table `etablissements_third_party_update` is managed with the script `labonneboite/scripts/manage_third_party_updates.py`, and it contains changes necessary for experiments with third party researcherse
 
 ## Single-ROME vs Multi-ROME search
 
