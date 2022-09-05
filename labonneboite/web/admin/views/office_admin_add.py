@@ -3,6 +3,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import BaseForm
 from wtforms import validators
 from sqlalchemy.exc import OperationalError
+from wtforms.validators import DataRequired
 
 from labonneboite.common import scoring
 from labonneboite.common.models import OfficeAdminRemove, OfficeAdminAdd
@@ -137,7 +138,7 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):  # type: ignore
     form_args = {
         'siret': {
             'filters': [strip_filter, nospace_filter],
-            'validators': [siret_validator],
+            'validators': [DataRequired(), siret_validator],
         },
 
         'company_name': {
