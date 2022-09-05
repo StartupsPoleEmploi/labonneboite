@@ -49,8 +49,8 @@
   {% if hide_footer is none or not hide_footer %}
   <div class="lbb-result__actions">
     <div class="grid-row">
-      <div class="grid-col-9">
-        <div class="row">
+      <div class="grid-col-9 text-left">
+        <div class="row btn-more-infos">
           {% if show_more_info %}
             <a href="#" class="btn btn-small js-result-toggle-details gtm-company-detail">Plus d'infos</a>
           {% endif %}
@@ -74,7 +74,7 @@
                   action="{{ url_for('user.favorites_add', siret=company.siret, rome_code=rome_code) }}"
                   method="post"
                   class="form-inline">
-                <button class="invisible no-padding gtm-favorites-add" type="submit">
+                <button class="invisible no-padding btn-favorite" type="submit">
                   <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/heart.svg') }}"></span>
                   <span class="btn btn-small invisible">Garder pour plus tard</span>
                 </button>
@@ -83,7 +83,7 @@
               </form>
             {% else %}
               <form action="{{ url_for('user.favorites_delete', siret=company.siret) }}" method="post" class="form-inline">
-                <button class="invisible no-padding" type="submit">
+                <button class="invisible no-padding btn-favorite" type="submit">
                   <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/heart.svg') }}"></span>
                   <span class="btn btn-small invisible">Supprimer des favoris</span>
                 </button>
@@ -112,18 +112,17 @@
         <div class="row">
           {% if jepostule_globally_enabled %}
             {% if jepostule_enabled(user, company) %}
-              <a class="jepostule-button no-underline" href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}" target="_blank" rel="noopener">
-                <button class="btn btn-small full-width gtm-company-apply" type="submit">Postuler
-                </button>
+              <a class="btn btn-small btn-postulate" href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}" target="_blank" rel="noopener"> Postuler
               </a>
             {% endif %}
 
             {% if not user.is_authenticated and company.email %}
-              <button class="jepostule-not-authentified jepostule-buttoninvisible btn btn-small full-width gtm-company-apply-unlogged" id="">Postuler
-              </button>
+              <a class="jepostule-not-authentified btn-postulate jepostule-buttoninvisible btn btn-small gtm-company-apply-unlogged" id="">Postuler
+              </a>
             {% endif %}
           {% endif %}
         </div>
+
       </div> <!-- right buttons -->
     </div>
 
