@@ -327,7 +327,11 @@ def entreprises():
     form = make_company_search_form(**form_kwargs)
 
     # Render different template if it's an ajax call
-    template = 'search/results.html' if not request.is_xhr else 'search/results_content.html'
+    is_xhr = False
+    request_xhr_key = request.headers.get('X-Requested-With')
+    if request_xhr_key and request_xhr_key == 'XMLHttpRequest':
+        is_xhr = True
+    template = 'search/results.html' if not is_xhr else 'search/results_content.html'
 
     activity_log_properties = dict(
         emploi=occupation,

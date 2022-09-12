@@ -1,6 +1,6 @@
 -e git+https://github.com/StartupsPoleEmploi/labonneboite-common.git@f0dadcbb79338522169e586a9f4ec0a750920d00#egg=labonneboite-common
 
-Flask<0.13
+Flask
 Flask-Script
 
 # Flask assets.
@@ -27,6 +27,9 @@ ipdb
 ipython
 pylint
 pip-tools
+
+# force importlib version for flake8 compatibility
+importlib-metadata<4.3
 
 # profiling tools used in create_index.py
 # pycallgraph
@@ -88,7 +91,7 @@ pyzmq
 remote-pdb
 
 #Fix markupsafe issue 1.0
-markupsafe==1.1.1
+markupsafe
 
 #Impact retour emploi.
 google-api-python-client
