@@ -215,53 +215,53 @@ start-locust-against-localhost:
 
 # Tests
 # -----
-NOSETESTS_OPTS ?= 
-NOSETESTS = nosetests -s $(NOSETESTS_OPTS)
+PYTEST_OPTS ?= -vx
+PYTEST = pytest $(PYTEST_OPTS)
 TESTS = 	labonneboite/tests/app/ \
 			labonneboite/tests/web/ \
 			labonneboite/tests/scripts/
 
 test-unit: clean-pyc rebuild-data-test
-	LBB_ENV=test $(NOSETESTS) ${TESTS}
+	LBB_ENV=test $(PYTEST) ${TESTS}
 
 test: test-unit test-selenium test-integration
 
 check-all: test-all
 
 test-app:
-	LBB_ENV=test $(NOSETESTS) labonneboite/tests/app
+	LBB_ENV=test $(PYTEST) labonneboite/tests/app
 
 test-api:
-	LBB_ENV=test $(NOSETESTS) labonneboite/tests/web/api
+	LBB_ENV=test $(PYTEST) labonneboite/tests/web/api
 
 test-front:
-	LBB_ENV=test $(NOSETESTS) labonneboite/tests/web/front
+	LBB_ENV=test $(PYTEST) labonneboite/tests/web/front
 
 test-web: test-api test-front test-web-integration
 
 test-scripts:
-	LBB_ENV=test $(NOSETESTS) labonneboite/tests/scripts
+	LBB_ENV=test $(PYTEST) labonneboite/tests/scripts
 
 test-integration: clear-data-test database-test populate-data-test
-	LBB_ENV=test $(NOSETESTS) labonneboite/tests/integration
+	LBB_ENV=test $(PYTEST) labonneboite/tests/integration
 
 test-selenium: clear-data-test database-test populate-data-test-selenium
-	LBB_ENV=test SELENIUM_IS_SETUP=1 $(NOSETESTS) labonneboite/tests/selenium
+	LBB_ENV=test SELENIUM_IS_SETUP=1 $(PYTEST) labonneboite/tests/selenium
 
 # Convenient reminder about how to run a specific test manually.
 test-custom:
 	@echo "To run a specific test, run for example:"
 	@echo
-	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/api/test_api.py"
+	@echo "    $$ LBB_ENV=test pytest -s labonneboite/tests/web/api/test_api.py"
 	@echo
 	@echo "and you can even run a specific method, here are several examples:"
 	@echo
-	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/api/test_api.py:ApiCompanyListTest.test_query_returns_scores_adjusted_to_rome_code_context"
-	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/api/test_api.py:ApiOffersOfficesListTest"
-	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/web/front/test_routes.py"
-	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/app/test_suggest_locations.py"
-	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/scripts/test_create_index.py:DeleteOfficeAdminTest.test_office_admin_add"
-	@echo "    $$ LBB_ENV=test nosetests -s labonneboite/tests/selenium/test_search_selecting_car.py:TestSearchSelectingCar.test_commute_time_is_displayed"
+	@echo "    $$ LBB_ENV=test pytest -s labonneboite/tests/web/api/test_api.py:ApiCompanyListTest.test_query_returns_scores_adjusted_to_rome_code_context"
+	@echo "    $$ LBB_ENV=test pytest -s labonneboite/tests/web/api/test_api.py:ApiOffersOfficesListTest"
+	@echo "    $$ LBB_ENV=test pytest -s labonneboite/tests/web/front/test_routes.py"
+	@echo "    $$ LBB_ENV=test pytest -s labonneboite/tests/app/test_suggest_locations.py"
+	@echo "    $$ LBB_ENV=test pytest -s labonneboite/tests/scripts/test_create_index.py:DeleteOfficeAdminTest.test_office_admin_add"
+	@echo "    $$ LBB_ENV=test pytest -s labonneboite/tests/selenium/test_search_selecting_car.py:TestSearchSelectingCar.test_commute_time_is_displayed"
 	@echo
 	@echo "Note that you can set the env var `NOSE_NOCAPTURE=1` to keep logs in the console"
 

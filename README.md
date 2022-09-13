@@ -81,7 +81,7 @@ La Bonne Boite is a [web site](https://labonneboite.pole-emploi.fr) and an [API]
 
 ### Install OS requirements:
 
-- python == 3.6.8
+- python == 3.10.4
 - docker-compose
 - mysql-client
 - libmysqlclient-dev
@@ -108,19 +108,19 @@ On fedora
 
 You will also need to install docker and docker-compose. Follow the instructions related to your particular OS from the [official Docker documentation](https://docs.docker.com/install/).
 
-### Create a virtualenv for Python 3.6
+### Create a virtualenv for Python 3.10
 
-For now, La Bonne Boite runs in production under Python 3.6.8. You are going to have to create a virtualenv that runs this specific version of Python.
+For now, La Bonne Boite runs in production under Python 3.10.4. You are going to have to create a virtualenv that runs this specific version of Python.
 
-    $ wget https://www.python.org/ftp/python/3.6.8/Python-3.6.8.tgz
-    $ tar -xvzf Python-3.6.8.tgz
-    $ cd Python-3.6.8
+    $ wget https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
+    $ tar -xvzf Python-3.10.4.tgz
+    $ cd Python-3.10.4
     $ ./configure --prefix=/usr/local --enable-loadable-sqlite-extensions
     $ sudo make altinstall
 
 Create an [isolated Python environment](https://virtualenv.pypa.io/), for example using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/):
 
-    $ mkvirtualenv --python=`which python3.6` lbb
+    $ mkvirtualenv --python=`which python3.10` lbb
     $ workon lbb
 
 You might need to add `labonneboite` base directory to the Python path. This has to be run only once. One way to do it using `virtualenvwrapper`:

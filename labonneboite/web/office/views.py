@@ -71,7 +71,7 @@ def download(siret):
 
     attachment_name = 'fiche_entreprise_%s.pdf' % slugify(office.name, separator='_')
     pdf_path = office_detail_pdf_path(office)
-    return send_file(pdf_path, mimetype='application/pdf', as_attachment=True, attachment_filename=attachment_name)
+    return send_file(pdf_path, mimetype='application/pdf', as_attachment=True, download_name=attachment_name)
 
 
 @officeBlueprint.route('/<siret>/download.html')

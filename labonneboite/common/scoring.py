@@ -1,6 +1,7 @@
 import math
 from functools import lru_cache
 from typing import Optional, Union
+from decimal import Decimal
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common.conf import settings
@@ -124,6 +125,10 @@ def get_hirings_from_score(score: Score) -> Hiring:
     """
     does exactly the reverse operation of get_score_from_hirings
     """
+
+    if (isinstance(score, Decimal)):
+        score = int(score)
+
     if score <= 50:
         hirings = settings.SCORE_50_HIRINGS * score / 50.0
     elif score <= 60:

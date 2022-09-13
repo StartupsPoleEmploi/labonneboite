@@ -17,6 +17,7 @@ ipython
 pylint
 
 # testing
+easyprocess
 # locust
 
 ##########

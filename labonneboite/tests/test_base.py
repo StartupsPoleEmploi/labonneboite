@@ -2,7 +2,7 @@ import logging
 import unittest
 
 from flask import url_for as flask_url_for
-from flask import _request_ctx_stack
+from flask_login import FlaskLoginClient
 
 from labonneboite.common.database import db_session, delete_db, engine, init_db
 from labonneboite.common import env
@@ -30,9 +30,14 @@ class AppTest(unittest.TestCase):
     """
 
     def setUp(self):
+
         self.app = app.test_client()
         self.app_context = app.app_context
         self.test_request_context = app.test_request_context
+
+        self.login_client = app
+        self.login_client.test_client_class = FlaskLoginClient
+
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
 
@@ -45,38 +50,6 @@ class AppTest(unittest.TestCase):
         with self.app_context():
             url = flask_url_for(endpoint, **kwargs)
             return url
-
-    def login(self, user, social_auth_backend='peam-openidconnect'):
-        """
-        Logs a user in by simulating a third-party authentication process.
-
-        This method should always be called within the same request context
-        as the test that uses it in order to use the same session object:
-            with self.test_request_context():
-                self.login(user)
-                ...
-        """
-        _request_ctx_stack.top.user = user
-        with self.app.session_transaction() as sess:
-            # Session info set by Flask-Login.
-            sess['user_id'] = user.id
-            # Session info set by Python Social Auth.
-            sess['social_auth_last_login_backend'] = social_auth_backend
-            sess['%s_state' % social_auth_backend] = 'a1z2e3r4t5y6y'
-
-    def logout(self):
-        """
-        Logs a user out.
-
-        This method should always be called within the same request context
-        as the test that uses it in order to use the same session object:
-            with self.test_request_context():
-                ...
-                self.logout()
-        """
-        self.app.get('/authentication/logout')
-        del _request_ctx_stack.top.user
-
 
 class DatabaseTest(AppTest):
     """

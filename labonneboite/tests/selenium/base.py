@@ -34,18 +34,17 @@ class LbbSeleniumTestCase(LiveServerTestCase):
         settings.API_DEPARTMENTS_URL = 'https://geo.api.gouv.fr/departements'
 
         # Random port generation
-        app.config['LIVESERVER_PORT'] = 0
+        app.config['LIVESERVER_PORT'] = 8943
         app.config['SERVER_NAME'] = None
+        app.config['TESTING'] = True
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
         logging.getLogger('werkzeug').setLevel(logging.CRITICAL)
         logging.getLogger('easyprocess').setLevel(logging.CRITICAL)
-
         return app
 
     def setUp(self):
         super(LbbSeleniumTestCase, self).setUp()
-
         self.display = None
         try:
             from pyvirtualdisplay import Display
