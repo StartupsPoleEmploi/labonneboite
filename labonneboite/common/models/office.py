@@ -7,7 +7,7 @@ from babel.dates import format_date
 from flask import url_for
 from slugify import slugify
 from sqlalchemy import PrimaryKeyConstraint, Index
-from werkzeug import cached_property
+from werkzeug.utils import cached_property
 from labonneboite_common import encoding as encoding_util
 
 from labonneboite.common import hiring_type_util
