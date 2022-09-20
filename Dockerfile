@@ -1,40 +1,43 @@
-FROM ubuntu:18.04
-
+FROM python:3.6.15-slim-buster
+# FROM python:3.10.7-slim-bullseye
 # Set timezone
 ENV TZ=Europe/Paris
-
-# Install system requirements
 ENV LANG C.UTF-8
-RUN apt update && \
-    DEBIAN_FRONTEND=noninteractive apt install -y \
-        git \
-        libmysqlclient-dev \
-        mysql-client \
-        language-pack-fr \
-        python3 python3-dev python3-pip \
-        tzdata \
-        # dependency required for travis
-        libssl-dev \
-        # scipy
-        gfortran libblas-dev liblapack-dev libatlas-base-dev \
-    && pip3 install virtualenv
+# for mysql support & git
+RUN apt update && apt install -y \
+    git \
+    python3-dev \
+    default-libmysqlclient-dev \
+    build-essential \
+    locales \
+    # language-pack-fr \
+    --no-install-recommends
+# switch working directory
+WORKDIR /app
 
-# Install python requirements
-RUN mkdir -p /labonneboite/logs /labonneboite/src /labonneboite/jenkins
-WORKDIR /labonneboite/src
-COPY requirements.txt .
-RUN virtualenv ../env && \
-    ../env/bin/pip install -r requirements.txt
+RUN mkdir -p /app/logs /app/src /app/jenkins
 
-# Copy and install code
-COPY . /labonneboite/src
-RUN git clean -xfd
-RUN ../env/bin/pip install -e .
+# install gunicorn
+RUN pip install gunicorn
 
-# Generate static assets
-ENV FLASK_APP labonneboite.web.app
-RUN ../env/bin/flask assets build
+# copy the requirements file into the image
+COPY ./requirements.txt /app/requirements.txt
 
-# Run uwsgi
-EXPOSE 8000
-CMD ["../env/bin/uwsgi", "./docker/uwsgi.ini"]
+# install the dependencies and packages in the requirements file
+RUN pip install -r /app/requirements.txt
+
+COPY setup* /app/
+COPY README.md /app/README.md
+COPY ./labonneboite /app/labonneboite
+RUN pip install -e .
+
+WORKDIR /app/labonneboite
+ENV FLASK_APP web.app
+# unsupported local error : https://stackoverflow.com/questions/54802935/docker-unsupported-locale-setting-when-running-python-container
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen \
+    && sed -i -e 's/# fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/' /etc/locale.gen \
+    && locale-gen
+
+RUN flask assets build
+
+CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:8080", "web.app:app"]

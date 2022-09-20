@@ -16,11 +16,11 @@ CURRENT_ENV = get_current_env()
 # -----------------------------------------------------------------------------
 
 DATABASE: Dict[str, Union[str, int, None]] = {
-    'HOST': settings.DB_HOST,
-    'PORT': settings.DB_PORT,
-    'NAME': settings.DB_NAME,
-    'USER': settings.DB_USER,
-    'PASSWORD': settings.DB_PASSWORD,
+    "HOST": settings.DB_HOST,
+    "PORT": settings.DB_PORT,
+    "NAME": settings.DB_NAME,
+    "USER": settings.DB_USER,
+    "PASSWORD": settings.DB_PASSWORD,
 }
 
 
@@ -32,22 +32,23 @@ def get_db_string(db_params: Optional[Dict[str, Union[str, int, None]]] = None) 
     """
     # Build the connection string
     db_params = db_params or DATABASE
-    str = "mysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}?charset=utf8mb4".format(**db_params)
+    s = "mysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}?charset=utf8mb4".format(
+        **db_params
+    )
     # Add the optional param to enable `LOAD DATA LOCAL INFILE` SQL instructions
-    str = str + "&local_infile=1" if os.environ.get('ENABLE_DB_INFILE') else str
-    return str
+    s = s + "&local_infile=1" if os.environ.get("ENABLE_DB_INFILE") else s
+    print(s, flush=True)
+    return s
 
 
 pool_recycle = int(os.environ.get("DB_CONNECTION_TIMEOUT", "30"))
 connect_timeout = int(os.environ.get("CONNECT_TIMEOUT", "5"))
 
 ENGINE_PARAMS = {
-    'convert_unicode': True,
-    'echo': False,
-    'pool_recycle': pool_recycle,
-    'connect_args': {
-        'connect_timeout': connect_timeout
-    }
+    "convert_unicode": True,
+    "echo": False,
+    "pool_recycle": pool_recycle,
+    "connect_args": {"connect_timeout": connect_timeout},
 }
 
 engine = create_engine(get_db_string(), **ENGINE_PARAMS)
@@ -61,20 +62,24 @@ if CURRENT_ENV == ENV_TEST:
     # http://www.dangtrinh.com/2014/03/i-got-this-error-when-trying-to.html
     _expire_on_commit = False
 
-db_session = scoped_session(sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine,
-    expire_on_commit=_expire_on_commit,
-))
+db_session = scoped_session(
+    sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=engine,
+        expire_on_commit=_expire_on_commit,
+    )
+)
 
 
 # Base
 # -----------------------------------------------------------------------------
 
 if TYPE_CHECKING:
+
     class Base(declarative_base()):  # type: ignore
         query = db_session.query_property()
+
 else:
     Base = declarative_base()
     Base.query = db_session.query_property()
@@ -99,6 +104,7 @@ def init_db() -> None:
     # Imports are used by SQLAlchemy `metadata.create_all()` to know what tables to create.
     from social_flask_sqlalchemy.models import PSABase
     from social_flask_sqlalchemy.models import Nonce, Association, Code
+
     # pylint:enable=unused-variable
     # InnoDB has a maximum index length of 767 bytes, so for utf8mb4 we can index a maximum of 191 characters.
     Code.email.property.columns[0].type.length = 191
@@ -118,6 +124,7 @@ def delete_db() -> None:
     # pylint:disable=unused-variable
     # Imports are used by SQLAlchemy `metadata.create_all()` to know what tables to create.
     from social_flask_sqlalchemy.models import PSABase
+
     # pylint:enable=unused-variable
     PSABase.metadata.drop_all(engine)
 
