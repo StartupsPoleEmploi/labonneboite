@@ -106,3 +106,4 @@ labonneboite/web/static/gen/
 # virtualenv
 venv/
 logs/
+__pycache__

@@ -27,6 +27,7 @@ services:
     restart: always
     build:
       context: .
+      dockerfile: docker/v3.6/Dockerfile
       args:
         options: --reload
     environment:
