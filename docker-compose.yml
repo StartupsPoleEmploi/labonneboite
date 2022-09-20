@@ -1,5 +1,6 @@
 version: "3.7"
 
+# settings
 x-common-env: &cenv
       MYSQL_ROOT_PASSWORD: p@ssword
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
@@ -19,6 +20,24 @@ x-common-env: &cenv
       LBB_ENV: development 
 
 services:
+
+  labonneboite:
+    hostname: labonneboite-backend
+    restart: always
+    build:
+      context: .
+    environment:
+      <<: *cenv
+    volumes:
+      - ./labonneboite/logs:/labonneboite/logs
+      - .:/labonneboite/src
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    ports:
+      - 8080:8080
 
   # ###### 3rd-party services
   # # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
@@ -46,44 +65,25 @@ services:
       retries: 5
       timeout: 2s
 
-
+  # database
   mysql:
     image: mysql:5.6.36
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
-    #restart: unless-stopped
     environment:
       <<: *cenv
     ports:
       - 3306:3306
-    # networks:
-    #   - labonneboite_default
     healthcheck:
       test: mysql ${MYSQL_DATABASE} --user=${MYSQL_USER} --password='${MYSQL_PASSWORD}' --silent --execute "SELECT 1;"
       interval: 10s
       retries: 5
       timeout: 2s
 
-  labonneboite:
-    hostname: labonneboite-backend
+  # Dev tools
+  adminer:
+    image: adminer
     restart: always
-    build:
-      context: .
-    environment:
-      <<: *cenv
-    volumes:
-      - ./labonneboite/logs:/labonneboite/logs
-      - .:/labonneboite/src
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      mysql:
-        condition: service_healthy
     ports:
-      - 8080:8080
-    # networks:
-    #   - labonneboite_elk
-    #   - labonneboite_default
+      - 8000:8080
 
-# networks:
-#   labonneboite_elk:
-#   labonneboite_default:
+

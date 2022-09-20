@@ -20,18 +20,20 @@ RUN mkdir -p /app/logs /app/src /app/jenkins
 # install gunicorn
 RUN pip install gunicorn
 
-# copy the requirements file into the image
+# install dependencies
 COPY ./requirements.txt /app/requirements.txt
-
-# install the dependencies and packages in the requirements file
 RUN pip install -r /app/requirements.txt
 
+# import files for finishing (SYTT: Could be done better)
 COPY setup* /app/
 COPY README.md /app/README.md
+
 COPY ./labonneboite /app/labonneboite
 RUN pip install -e .
 
+# running the server
 WORKDIR /app/labonneboite
+
 ENV FLASK_APP web.app
 # unsupported local error : https://stackoverflow.com/questions/54802935/docker-unsupported-locale-setting-when-running-python-container
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen \
@@ -40,4 +42,8 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen 
 
 RUN flask assets build
 
-CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:8080", "web.app:app"]
+# add the entrypoint
+COPY alembic.ini /app/labonneboite/
+COPY run.sh /app/labonneboite/
+RUN chmod +x ./run.sh
+ENTRYPOINT ["/bin/bash", "./run.sh"]
