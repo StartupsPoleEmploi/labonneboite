@@ -36,8 +36,10 @@ services:
       - ./logs:/app/labonneboite/logs
       - ./labonneboite:/app/labonneboite
     depends_on:
-      - elasticsearch
-      - mysql
+      elasticsearch:
+        condition: service_started
+      mysql:
+        condition: service_started
     ports:
       - 8080:8080
 
@@ -72,11 +74,11 @@ services:
       <<: *dbenv
     ports:
       - 3306:3306
-    # healthcheck:
-    #   test: mysql ${MYSQL_DATABASE} --user=${MYSQL_USER} --password='${MYSQL_PASSWORD}' --silent --execute "SELECT 1;"
-    #   interval: 10s
-    #   retries: 5
-    #   timeout: 2s
+    healthcheck:
+      test: mysql ${MYSQL_DATABASE} --user=${MYSQL_USER} --password='${MYSQL_PASSWORD}' --silent --execute "SELECT 1;"
+      interval: 10s
+      retries: 5
+      timeout: 2s
 
   # Dev tools
   adminer:
