@@ -1,13 +1,14 @@
 version: "3.7"
 
 # settings
-x-common-env: &cenv
+x-db-env: &dbenv
       MYSQL_ROOT_PASSWORD: p@ssword
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_DATABASE: labonneboite
       MYSQL_USER: labonneboite
       MYSQL_PASSWORD: labonneboite
 
+x-common-env: &cenv
       DB_ROOT_PASSWORD: p@ssword
       DB_DATABASE: labonneboite
       DB_NAME: labonneboite
@@ -26,16 +27,16 @@ services:
     restart: always
     build:
       context: .
+      args:
+        options: --reload
     environment:
-      <<: *cenv
+      <<: *cenv 
     volumes:
-      - ./labonneboite/logs:/labonneboite/logs
-      - .:/labonneboite/src
+      - ./logs:/app/labonneboite/logs
+      - ./labonneboite:/app/labonneboite
     depends_on:
-      elasticsearch:
-        condition: service_healthy
-      mysql:
-        condition: service_healthy
+      - elasticsearch
+      - mysql
     ports:
       - 8080:8080
 
@@ -56,9 +57,6 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
-    # networks:
-    #   - labonneboite_elk
-    #   - labonneboite_default
     healthcheck:
       test: curl --fail localhost:9200/_cat/health || exit 1
       interval: 10s
@@ -70,14 +68,14 @@ services:
     image: mysql:5.6.36
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
     environment:
-      <<: *cenv
+      <<: *dbenv
     ports:
       - 3306:3306
-    healthcheck:
-      test: mysql ${MYSQL_DATABASE} --user=${MYSQL_USER} --password='${MYSQL_PASSWORD}' --silent --execute "SELECT 1;"
-      interval: 10s
-      retries: 5
-      timeout: 2s
+    # healthcheck:
+    #   test: mysql ${MYSQL_DATABASE} --user=${MYSQL_USER} --password='${MYSQL_PASSWORD}' --silent --execute "SELECT 1;"
+    #   interval: 10s
+    #   retries: 5
+    #   timeout: 2s
 
   # Dev tools
   adminer:

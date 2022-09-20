@@ -105,3 +105,4 @@ labonneboite/web/static/gen/
 
 # virtualenv
 venv/
+logs/

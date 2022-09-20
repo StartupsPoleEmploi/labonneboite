@@ -37,7 +37,6 @@ def get_db_string(db_params: Optional[Dict[str, Union[str, int, None]]] = None) 
     )
     # Add the optional param to enable `LOAD DATA LOCAL INFILE` SQL instructions
     s = s + "&local_infile=1" if os.environ.get("ENABLE_DB_INFILE") else s
-    print(s, flush=True)
     return s
 
 
