@@ -1,13 +1,11 @@
 import ipaddress
-from unittest import mock
 
-from flask import current_app
+import pytest
 
 from labonneboite.common import pro
 from labonneboite.common.models import User
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.conf import settings
-
 
 class ProVersionTest(DatabaseTest):
 
@@ -32,27 +30,29 @@ class ProVersionTest(DatabaseTest):
             'User_Agent': user_agent,
         }
 
-
     def test_user_is_pro(self):
         """
         Test that the Pro user is correctly detected in various cases.
         """
 
+        url = self.url_for('user.pro_version')
+
         # Email detection, without IP detection
         with self.test_request_context():
+
             # User which is not logged in should not be considered a pro user.
             self.assertFalse(pro.user_is_pro())
 
+        with self.login_client.test_client(user=self.pro_user) as client:
+            client.get(url)
+
             # # User with a pro email should be considered as a pro user.
-            self.login(self.pro_user)
             self.assertTrue(pro.user_is_pro())
-            self.logout()
-            self.assertFalse(pro.user_is_pro())
+
+        with self.login_client.test_client(user=self.public_user) as client:
+            client.get(url)
 
             # User with a non pro email should not be considered a pro user.
-            self.login(self.public_user)
-            self.assertFalse(pro.user_is_pro())
-            self.logout()
             self.assertFalse(pro.user_is_pro())
 
         # a public user logging in with the right IP address
@@ -60,48 +60,47 @@ class ProVersionTest(DatabaseTest):
         with self.test_request_context(headers=self.headers):
             self.assertTrue(pro.user_is_pro())
 
-
     def test_enable_disable_pro_version_view(self):
         """
         Test that the Pro Version is correctly enabled/disabled.
         """
 
         next_url_without_domain = '/entreprises/metz-57000/boucherie?sort=score&d=10&h=1&p=0&f_a=0'
-        next_url_with_domain = 'http://labonneboite.pole-emploi.fr' + next_url_without_domain
         url = self.url_for('user.pro_version', **{'next': next_url_without_domain})
 
         with self.test_request_context(headers=self.headers):
-            # Log the user in.
-            self.login(self.pro_user)
-            self.assertTrue(pro.user_is_pro())
-            self.assertFalse(pro.pro_version_enabled())
+            with self.login_client.test_client(user=self.pro_user) as client:
 
-            with self.app.session_transaction() as sess:
-                self.assertNotIn(pro.PRO_VERSION_SESSION_KEY, sess)
+                # Log the user in.
+                self.assertTrue(pro.user_is_pro())
+                self.assertFalse(pro.pro_version_enabled())
 
-            # Enable pro version.
-            rv = self.app.get(url)
-            self.assertEqual(rv.status_code, 302)
-            self.assertEqual(rv.location, next_url_with_domain)
-            # It is unclear what is the root cause of the following test
-            # failure. The session object manipulated in the
-            # pro_version_enabled function is different from the session
-            # provided by the self.app.session_transaction context manager, but
-            # I don't know why.
-            # self.assertTrue(pro.pro_version_enabled())
+                with client.session_transaction() as sess:
+                    self.assertNotIn(pro.PRO_VERSION_SESSION_KEY, sess)
 
-            with self.app.session_transaction() as sess:
-                self.assertIn(pro.PRO_VERSION_SESSION_KEY, sess)
-                self.assertEqual(True, sess[pro.PRO_VERSION_SESSION_KEY])
+                # Enable pro version.
+                rv = client.get(url)
+                self.assertEqual(rv.status_code, 302)
+                self.assertEqual(rv.location, next_url_without_domain)
+                # It is unclear what is the root cause of the following test
+                # failure. The session object manipulated in the
+                # pro_version_enabled function is different from the session
+                # provided by the self.app.session_transaction context manager, but
+                # I don't know why.
+                # self.assertTrue(pro.pro_version_enabled())
 
-            # Disable pro version.
-            rv = self.app.get(url)
-            self.assertEqual(rv.status_code, 302)
-            self.assertEqual(rv.location, next_url_with_domain)
-            self.assertFalse(pro.pro_version_enabled())
+                with client.session_transaction() as sess:
+                    self.assertIn(pro.PRO_VERSION_SESSION_KEY, sess)
+                    self.assertEqual(True, sess[pro.PRO_VERSION_SESSION_KEY])
 
-            with self.app.session_transaction() as sess:
-                self.assertNotIn(pro.PRO_VERSION_SESSION_KEY, sess)
+                # Disable pro version.
+                rv = client.get(url)
+                self.assertEqual(rv.status_code, 302)
+                self.assertEqual(rv.location, next_url_without_domain)
+                self.assertFalse(pro.pro_version_enabled())
+
+                with client.session_transaction() as sess:
+                    self.assertNotIn(pro.PRO_VERSION_SESSION_KEY, sess)
 
 
     def test_pro_version_in_a_pila_machine(self):

@@ -1,6 +1,7 @@
 import time
 import urllib.parse
 
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
@@ -33,7 +34,7 @@ class TestResetNaf(LbbSeleniumTestCase):
         self.assertNotIn('naf', parameters)
 
         # Filter by NAF `Activités des agents et courtiers d'assurances` (`6622Z`).
-        select = Select(self.driver.find_element_by_id('naf'))
+        select = Select(self.driver.find_element(By.ID, 'naf'))
         select.select_by_value('6622Z')
         WebDriverWait(self.driver, 60).until(url_has_changed(current_url))
 
@@ -47,7 +48,7 @@ class TestResetNaf(LbbSeleniumTestCase):
         self.assertEqual('6622Z', parameters['naf'])
 
         # Perform another search on `boucher`.
-        job_input = self.driver.find_element_by_name('j')
+        job_input = self.driver.find_element(By.NAME, 'j')
         job_input.clear()  # Reset the previous `comptabilite` search term.
         job_input.send_keys('boucher')
         time.sleep(3)
@@ -59,7 +60,7 @@ class TestResetNaf(LbbSeleniumTestCase):
         # self.driver.find_element_by_id('flHideToolBarButton').click()
 
         # Submit the search form.
-        self.driver.find_element_by_css_selector('#shown-search-form button').click()
+        self.driver.find_element(By.CSS_SELECTOR, '#shown-search-form button').click()
 
         # The NAF filter should be reset.
         WebDriverWait(self.driver, 60).until(url_has_changed(current_url))

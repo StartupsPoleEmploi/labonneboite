@@ -4,9 +4,14 @@ name: LBB CI
 
 on:
   push:
-    branches: [ "master"]
+    branches: [ "*"]
   pull_request:
     branches: [ "master"]
+  workflow_dispatch:
+    inputs:
+      git-ref:
+        description: Git Ref (Optional)    
+        required: false
 
 jobs:
   tests:
@@ -15,7 +20,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.6.8]
+        python-version: [3.10.4]
 
     steps:
     - uses: actions/checkout@v3
