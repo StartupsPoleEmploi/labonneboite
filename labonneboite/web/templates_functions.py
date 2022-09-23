@@ -16,7 +16,7 @@ class MobivilleCompany:
 
 def include_file(flask_app: Flask):
     def include_file(filename):
-        return jinja2.Markup.escape(flask_app.jinja_loader.get_source(flask_app.jinja_env, filename)[0])
+        return jinja2.utils.markupsafe.Markup.escape(flask_app.jinja_loader.get_source(flask_app.jinja_env, filename)[0])
     return include_file
 
 

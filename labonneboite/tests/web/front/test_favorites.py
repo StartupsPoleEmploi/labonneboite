@@ -139,15 +139,12 @@ class FavoriteTest(FavoriteBaseTest):
         rv = self.app.get(url)
         self.assertEqual(rv.status_code, 401)
 
-        with self.test_request_context():
-
-            self.login(self.user)
-
+        with self.login_client.test_client(user=self.user) as client:
             # Create a favorite for the user.
             UserFavoriteOffice.create(user_id=self.user.id,
                                       office_siret=office.siret)
 
-            rv = self.app.get(url)
+            rv = client.get(url)
             self.assertEqual(rv.status_code, 200)
             self.assertEqual('application/csv', rv.mimetype)
             self.assertIn('siret', rv.data.decode('utf-8'))
@@ -164,11 +161,9 @@ class FavoriteTest(FavoriteBaseTest):
         rv = self.app.get(url_list)
         self.assertEqual(rv.status_code, 401)
 
-        with self.test_request_context():
+        with self.login_client.test_client(user=self.user) as client:
 
-            self.login(self.user)
-
-            rv = self.app.get(url_list)
+            rv = client.get(url_list)
             self.assertEqual(rv.status_code, 200)
             self.assertTrue(
                 'Aucun favori pour le moment.' in rv.data.decode('utf-8'))
@@ -177,7 +172,7 @@ class FavoriteTest(FavoriteBaseTest):
             UserFavoriteOffice.create(user_id=self.user.id,
                                       office_siret=office.siret)
 
-            rv = self.app.get(url_list)
+            rv = client.get(url_list)
             self.assertEqual(rv.status_code, 200)
             self.assertTrue(office.name in rv.data.decode('utf-8'))
             self.assertTrue(office.city in rv.data.decode('utf-8'))
@@ -188,38 +183,37 @@ class FavoriteTest(FavoriteBaseTest):
         """
         rome_code = 'M1805'
         office = Office.query.filter(Office.siret == '00000000000002').one()
-        url_list = self.url_for('user.favorites_list')
+        url_list = self.url_for('user.favorites_list', _external=False)
         url_add = self.url_for('user.favorites_add',
                                siret=office.siret,
-                               rome_code=rome_code)
+                               rome_code=rome_code, _external=False)
         url_search_without_domain = '/entreprises/nancy-54100/strategie-commerciale'
-        url_search_with_domain = 'http://labonneboite.pole-emploi.fr' + url_search_without_domain
 
         # An anonymous user cannot add a favorite.
-        rv = self.app.post(url_add)
-        self.assertEqual(rv.status_code, 401)
+        with self.login_client.test_client() as client:
 
-        with self.test_request_context():
+            rv = client.post(url_add)
+            self.assertEqual(rv.status_code, 401)
 
-            self.login(self.user)
+        with self.login_client.test_client(user=self.user) as client:
 
-            rv = self.app.get(url_list)
+            rv = client.get(url_list)
             self.assertEqual(rv.status_code, 200)
             self.assertTrue(
                 'Aucun favori pour le moment.' in rv.data.decode('utf-8'))
 
             # Adding favorite without next_url :
             # User should be redirected to the favorites list by default.
-            rv = self.app.post(url_add)
+            rv = client.post(url_add)
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, url_list)
 
             # Adding favorite from search results - the realistic case.
             # User should be redirected back to the search results.
-            rv = self.app.post(url_add,
+            rv = client.post(url_add,
                                data={'next': url_search_without_domain})
             self.assertEqual(rv.status_code, 302)
-            self.assertEqual(rv.location, url_search_with_domain)
+            self.assertEqual(rv.location, url_search_without_domain)
 
             favorites = UserFavoriteOffice.query.filter(
                 UserFavoriteOffice.user_id == self.user.id).all()
@@ -227,7 +221,7 @@ class FavoriteTest(FavoriteBaseTest):
             self.assertEqual(office.siret, favorites[0].office_siret)
             self.assertEqual(rome_code, favorites[0].rome_code)
 
-            rv = self.app.get(url_list)
+            rv = client.get(url_list)
             self.assertEqual(rv.status_code, 200)
             self.assertTrue(office.name in rv.data.decode('utf-8'))
             self.assertTrue(office.city in rv.data.decode('utf-8'))
@@ -249,10 +243,9 @@ class FavoriteTest(FavoriteBaseTest):
 
         self.assertEqual(0, UserFavoriteOffice.query.filter(
             UserFavoriteOffice.user_id == self.user.id).count())
-        with self.test_request_context():
-            self.login(self.user)
+        with self.login_client.test_client(user=self.user) as client:
 
-            rv = self.app.post(url_add)
+            rv = client.post(url_add)
             self.assertEqual(rv.status_code, 302)
 
         favorites = UserFavoriteOffice.query.filter(
@@ -266,31 +259,28 @@ class FavoriteTest(FavoriteBaseTest):
         Test the deletion of a favorite.
         """
         office = Office.query.filter(Office.siret == '00000000000003').one()
-        url_list = self.url_for('user.favorites_list')
-        url_delete = self.url_for('user.favorites_delete', siret=office.siret)
+        url_list = self.url_for('user.favorites_list', _external=False)
+        url_delete = self.url_for('user.favorites_delete', siret=office.siret, _external=False)
         url_search_without_domain = '/entreprises/nancy-54100/strategie-commerciale'
-        url_search_with_domain = 'http://labonneboite.pole-emploi.fr' + url_search_without_domain
 
         # An anonymous user cannot delete a favorite.
         rv = self.app.post(url_delete)
         self.assertEqual(rv.status_code, 401)
 
-        with self.test_request_context():
-
-            self.login(self.user)
+        with self.login_client.test_client(user=self.user) as client:
 
             # Create a favorite for the user.
             UserFavoriteOffice.create(user_id=self.user.id,
                                       office_siret=office.siret)
 
-            rv = self.app.get(url_list)
+            rv = client.get(url_list)
             self.assertEqual(rv.status_code, 200)
             self.assertTrue(office.name in rv.data.decode('utf-8'))
             self.assertTrue(office.city in rv.data.decode('utf-8'))
 
             # Deleting favorite without next_url :
             # User should be redirected to the favorites list by default.
-            rv = self.app.post(url_delete)
+            rv = client.post(url_delete)
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, url_list)
 
@@ -300,12 +290,12 @@ class FavoriteTest(FavoriteBaseTest):
 
             # Deleting favorite from search results - the realistic case.
             # User should be redirected back to the search results.
-            rv = self.app.post(url_delete,
+            rv = client.post(url_delete,
                                data={'next': url_search_without_domain})
             self.assertEqual(rv.status_code, 302)
-            self.assertEqual(rv.location, url_search_with_domain)
+            self.assertEqual(rv.location, url_search_without_domain)
 
-            rv = self.app.get(url_list)
+            rv = client.get(url_list)
             self.assertEqual(rv.status_code, 200)
             self.assertTrue(
                 'Aucun favori pour le moment.' in rv.data.decode('utf-8'))
@@ -316,9 +306,8 @@ class FavoriteTest(FavoriteBaseTest):
         UserFavoriteOffice.create(user_id=self.user.id,
                                   office_siret=office.siret)
 
-        with self.test_request_context():
-            self.login(self.user)
-            rv = self.app.get(url_favorites_download)
+        with self.login_client.test_client(user=self.user) as client:
+            rv = client.get(url_favorites_download)
 
         self.assertEqual(rv.status_code, 200)
         self.assertEqual('application/pdf', rv.mimetype)

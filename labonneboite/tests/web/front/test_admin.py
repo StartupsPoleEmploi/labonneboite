@@ -67,7 +67,10 @@ class AdminTest(DatabaseTest):
             self.url_for('officeadminextrageolocation.index_view'),
         ]
 
-        with self.test_request_context():
+        db_session.query(User).update({User.active: True, User.is_admin: False})
+        db_session.commit()
+        self.user = db_session.query(User).filter_by(id=self.user.id).first()
+        with self.login_client.test_client(user=self.user) as client:
 
             for url in admin_urls:
 
@@ -77,13 +80,11 @@ class AdminTest(DatabaseTest):
                 self.user = db_session.query(User).filter_by(id=self.user.id).first()
                 self.assertTrue(self.user.active)
                 self.assertFalse(self.user.is_admin)
-                rv = self.app.get(url)
+                rv = client.get(url)
                 self.assertEqual(rv.status_code, 404)
 
-                self.login(self.user)
-
                 # Access should be denied when a user is logged in but is not an admin.
-                rv = self.app.get(url)
+                rv = client.get(url)
                 self.assertEqual(rv.status_code, 404)
 
                 # Access should be granted when a user is logged in and is admin.
@@ -92,7 +93,8 @@ class AdminTest(DatabaseTest):
                 self.user = db_session.query(User).filter_by(id=self.user.id).first()
                 self.assertTrue(self.user.active)
                 self.assertTrue(self.user.is_admin)
-                rv = self.app.get(url)
+
+                rv = client.get(url)
                 self.assertEqual(rv.status_code, 200)
 
                 # Access should be denied when a user is not active.
@@ -101,10 +103,8 @@ class AdminTest(DatabaseTest):
                 self.user = db_session.query(User).filter_by(id=self.user.id).first()
                 self.assertFalse(self.user.active)
                 self.assertTrue(self.user.is_admin)
-                rv = self.app.get(url)
+                rv = client.get(url)
                 self.assertEqual(rv.status_code, 404)
-
-                self.logout()
 
     def test_admin_office_remove(self):
         """

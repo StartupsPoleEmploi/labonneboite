@@ -204,11 +204,11 @@ class OfficeAdminAddModelView(AdminModelViewMixin, ModelView):  # type: ignore
         },
         "x": {
             "filters": [strip_filter, nospace_filter],
-            "validators": [DataRequired()],  # sytt: instead of [validators.required()]
+            "validators": [DataRequired()],
         },
         "y": {
             "filters": [strip_filter, nospace_filter],
-            "validators": [DataRequired()],  # sytt: instead of [validators.required()]
+            "validators": [DataRequired()],
         },
     }
 

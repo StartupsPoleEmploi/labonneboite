@@ -206,7 +206,7 @@ class GenericUrlSearchRedirectionTest(AppTest):
 
         url, querystring = urllib.parse.splitquery(rv.location)
         parameters = dict(parse_qsl(querystring))
-        expected_url = self.url_for('search.entreprises')
+        expected_url = self.url_for('search.entreprises', _external=False)
         expected_parameters = {
             'city': 'paris',
             'zipcode': '75000',
@@ -224,7 +224,7 @@ class GenericUrlSearchRedirectionTest(AppTest):
 
         url, querystring = urllib.parse.splitquery(rv.location)
         parameters = dict(parse_qsl(querystring))
-        expected_url = self.url_for('search.entreprises')
+        expected_url = self.url_for('search.entreprises', _external=False)
         expected_parameters = {
             'city': 'paris',
             'zipcode': '75000',
@@ -242,7 +242,7 @@ class GenericUrlSearchRedirectionTest(AppTest):
         rv = self.app.get(url)
         self.assertEqual(rv.status_code, 302)
 
-        expected_url = self.url_for('search.entreprises')
+        expected_url = self.url_for('search.entreprises', _external=False)
         expected_parameters = {
             'city': 'paris',
             'zipcode': '75000',
@@ -260,7 +260,7 @@ class GenericUrlSearchRedirectionTest(AppTest):
         with self.app_context():
             with mock.patch('labonneboite.common.geocoding.datagouv.get_department_by_code', return_value={"department": "57", "label": 'Moselle (57)'}):
                 url = get_url_for_rome('M1805', '57')
-                self.assertEqual(url, 'http://labonneboite.pole-emploi.fr/entreprises?departments=57&j=M1805&l=Moselle+%2857%29&occupation=etudes-et-developpement-informatique')
+                self.assertEqual(url, 'http://labonneboite.pole-emploi.fr/entreprises?departments=57&j=M1805&l=Moselle+(57)&occupation=etudes-et-developpement-informatique')
             with mock.patch('labonneboite.common.geocoding.datagouv.get_department_by_code', return_value=None):
                 url = get_url_for_rome('M1805', '57')
                 self.assertEqual(url, None)

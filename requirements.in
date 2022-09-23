@@ -28,9 +28,6 @@ ipython
 pylint
 pip-tools
 
-# force importlib version for flake8 compatibility
-importlib-metadata<4.3
-
 # profiling tools used in create_index.py
 # pycallgraph
 pyprof2calltree
@@ -56,10 +53,10 @@ elasticsearch<2.0.0
 Flask-Login
 social-auth-app-flask-sqlalchemy
 social-auth-app-flask
-social-auth-core[openidconnect]
+social-auth-core[openidconnect]==4.2.0
+-e git+https://github.com/python-social-auth/social-storage-sqlalchemy.git@b489c10244a45ae889c554bddc6ab69a7a7e5057#egg=social-auth-storage-sqlalchemy
 
 # Unit tests.
-nose
 selenium
 PyVirtualDisplay
 Flask-Testing
@@ -79,6 +76,11 @@ validators
 geopy
 mailjet_rest
 cryptography
+astroid
+python-dateutil
+email_validator
+-e git+https://github.com/zopefoundation/zope.interface.git@24bd6eefaecf2195977a139cdaff2ccfef4e85cd#egg=zope.interface
+-e git+https://github.com/zopefoundation/zope.event.git@cdd8d1976ef48d4a59ba49d57d4c956456640c1c#egg=zope.event
 
 # Deployment and production
 uWSGI
@@ -86,7 +88,7 @@ uwsgitop
 raven[flask]
 
 # Load testing.
-locustio
+locust
 pyzmq
 remote-pdb
 

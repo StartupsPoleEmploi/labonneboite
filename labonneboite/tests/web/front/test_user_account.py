@@ -74,12 +74,10 @@ class UserAccountTest(DatabaseTest):
 
         url = self.url_for('user.personal_data_as_csv')
 
-        with self.test_request_context():
-
-            self.login(self.user)
+        with self.login_client.test_client(user=self.user) as client:
 
             # Display the account deletion confirmation page.
-            rv = self.app.get(url)
+            rv = client.get(url)
             self.assertEqual(rv.status_code, 200)
             self.assertIn('john@doe.com', rv.data.decode('utf-8'))
 
@@ -91,16 +89,19 @@ class UserAccountTest(DatabaseTest):
 
         url = self.url_for('user.account_delete')
 
-        with self.test_request_context():
-
-            self.login(self.user)
+        with self.login_client.test_client(user=self.user) as client:
 
             # Display the account deletion confirmation page.
-            rv = self.app.get(url)
+            with client.session_transaction() as sess:
+                # Session info set by Python Social Auth.
+                sess['social_auth_last_login_backend'] = 'peam-openidconnect'
+                sess['%s_state' % 'peam-openidconnect'] = 'a1z2e3r4t5y6y'
+
+            rv = client.get(url)
             self.assertEqual(rv.status_code, 200)
 
             # Confirm account deletion.
-            rv = self.app.post(url, data={'confirm_deletion': 1})
+            rv = client.post(url, data={'confirm_deletion': 1})
             # The user should be redirected to the PEAM logout endpoint.
             self.assertEqual(rv.status_code, 302)
             self.assertIn(settings.PEAM_AUTH_BASE_URL, rv.location)
@@ -112,5 +113,5 @@ class UserAccountTest(DatabaseTest):
             self.assertEqual(db_session.query(UserSocialAuth).count(), 0)
 
             # The user should now be anonymous and cannot access protected pages.
-            rv = self.app.get(url)
+            rv = client.get(url)
             self.assertEqual(rv.status_code, 401)

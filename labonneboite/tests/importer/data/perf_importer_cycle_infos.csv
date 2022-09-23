@@ -1,4 +1,0 @@
-id;execution_date;prediction_start_date;prediction_end_date;file_name;computed;on_google_sheets
-1;2020-08-18 08:15:27.243860;2020-09-01 08:15:27.243860;2021-02-28 08:15:27.243860;export_etablissement_backup_2020_08_18_1143.sql.gz;True;False
-2;2020-01-18 08:15:27.243860;2020-02-01 08:15:27.243860;2020-07-31 08:15:27.243860;export_etablissement_backup_2020_08_18_114.sql.gz;True;False
-3;2019-12-31 08:15:27.243860;2020-01-01 08:15:27.243860;2020-07-31 08:15:27.243860;export_etablissement_backup_2019_31_12_11.sql.gz;True;False

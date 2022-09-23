@@ -145,16 +145,17 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
             # Login as user admin
             self.user = db_session.query(User).filter_by(id=self.user.id).first()
             self.assertEqual(db_session.query(User).count(), 1)
-            self.login(self.user)
 
-            # Create OfficeAdminRemove
-            self.assertEqual(0, OfficeAdminAdd.query.filter_by(id=1).count())
-            self.app.post(url_for('officeadminadd.create_view'), data=form)
-            self.assertEqual(1, OfficeAdminAdd.query.filter_by(id=1).count())
+            with self.login_client.test_client(user=self.user) as client:
 
-            # Delete OfficeAdminAdd
-            self.app.post(url_for('officeadminadd.delete_view'), data={'id': 1})
-            self.assertEqual(0, OfficeAdminRemove.query.filter_by(id=1).count())
+                # Create OfficeAdminRemove
+                self.assertEqual(0, OfficeAdminAdd.query.filter_by(id=1).count())
+                client.post(url_for('officeadminadd.create_view'), data=form)
+                self.assertEqual(1, OfficeAdminAdd.query.filter_by(id=1).count())
+
+                # Delete OfficeAdminAdd
+                client.post(url_for('officeadminadd.delete_view'), data={'id': 1})
+                self.assertEqual(0, OfficeAdminRemove.query.filter_by(id=1).count())
 
     def test_office_admin_remove(self):
         # Create officeAdminRemove
@@ -187,16 +188,17 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
             # Login as user admin
             self.user = db_session.query(User).filter_by(id=self.user.id).first()
             self.assertEqual(db_session.query(User).count(), 1)
-            self.login(self.user)
 
-            # Create OfficeAdminRemove
-            self.assertEqual(0, OfficeAdminRemove.query.filter_by(siret='01234567891234').count())
-            self.app.post(url_for('officeadminremove.create_view'), data=form)
-            self.assertEqual(1, OfficeAdminRemove.query.filter_by(siret='01234567891234').count())
+            with self.login_client.test_client(user=self.user) as client:
 
-            # Delete OfficeAdminRemove
-            self.app.post(url_for('officeadminremove.delete_view'), data={'id': 1})
-            self.assertEqual(0, OfficeAdminRemove.query.filter_by(id=1).count())
+                # Create OfficeAdminRemove
+                self.assertEqual(0, OfficeAdminRemove.query.filter_by(siret='01234567891234').count())
+                client.post(url_for('officeadminremove.create_view'), data=form)
+                self.assertEqual(1, OfficeAdminRemove.query.filter_by(siret='01234567891234').count())
+
+                # Delete OfficeAdminRemove
+                client.post(url_for('officeadminremove.delete_view'), data={'id': 1})
+                self.assertEqual(0, OfficeAdminRemove.query.filter_by(id=1).count())
 
 
 class VariousModesTest(CreateIndexBaseTest):

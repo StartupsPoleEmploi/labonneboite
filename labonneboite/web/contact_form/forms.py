@@ -1,23 +1,11 @@
 from flask import request
-
 from flask_wtf import FlaskForm
-from wtforms import (
-    BooleanField,
-    HiddenField,
-    RadioField,
-    SelectMultipleField,
-    StringField,
-    TextAreaField,
-)
-from wtforms import validators  # sytt : this is import if it works, it's a fluke...
-
-# from wtforms.fields import EmailField, TelField  # compatibility 3.10 : wtfform > 3.0.0
+from wtforms import BooleanField, HiddenField, RadioField, SelectMultipleField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, Optional, Regexp, URL
-from wtforms.widgets import ListWidget, CheckboxInput
+from wtforms.widgets import CheckboxInput, ListWidget
 
 from labonneboite.conf import settings
-
 
 PHONE_REGEX = r"^(0|\+33)[1-9]([-. ]?[0-9]{2}){4}$"
 
@@ -211,8 +199,13 @@ class OfficeUpdateCoordinatesForm(OfficeHiddenIdentificationForm):
         render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"},
     )
     rgpd_consent = BooleanField(
+<<<<<<< HEAD
         "En cochant cette case, vous consentez à diffuser des données à caractère personnel sur les services numériques de Pôle emploi.",
         validators=[DataRequired()],  # sytt: instead of [validators.required()]
+=======
+        'En cochant cette case, vous consentez à diffuser des données à caractère personnel sur les services numériques de Pôle emploi.',
+        [validators.InputRequired()]
+>>>>>>> 8e61dc28... :recycle: upgrade python to v3.10
     )
 
 
