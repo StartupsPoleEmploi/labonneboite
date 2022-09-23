@@ -39,8 +39,8 @@ import sqlalchemy
 from sqlalchemy.pool import NullPool
 from sqlalchemy import func
 from labonneboite.common.util import timeit
-from labonneboite.importer import settings as importer_settings
-from labonneboite.importer.models.computing import DpaeStatistics, Hiring, RawOffice
+from . import settings as importer_settings
+from .models.computing import DpaeStatistics, Hiring, RawOffice
 from labonneboite.common import scoring as scoring_util
 from labonneboite.common.database import get_db_string
 from labonneboite.common.env import get_current_env, ENV_DEVELOPMENT

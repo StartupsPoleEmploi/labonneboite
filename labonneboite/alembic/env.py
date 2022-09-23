@@ -7,7 +7,6 @@ from sqlalchemy import create_engine
 import labonneboite.conf
 from labonneboite.common.database import Base, get_db_string
 import labonneboite.common.models
-import labonneboite.importer.models
 
 
 # this is the Alembic Config object, which provides

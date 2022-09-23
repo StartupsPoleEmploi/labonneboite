@@ -36,8 +36,6 @@ script:
   - nosetests --nologcapture labonneboite/tests/web
   - echo GREPME started scripts tests
   - nosetests --nologcapture labonneboite/tests/scripts
-  - echo GREPME started importer tests
-  - nosetests -v --nologcapture labonneboite/tests/importer
   # Integration
   - echo GREPME started recreating database for integration tests
   - mysql -u travis -e 'DROP DATABASE IF EXISTS lbb_test;'

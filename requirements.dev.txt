@@ -74,7 +74,7 @@ nose==1.3.7
 numpy==1.16.1
 oauthlib==2.0.2
 packaging==21.3           # via pytest
-pandas-stubs==1.2.0.40
+pandas-stubs==1.2.0.62
 pandas==0.22.0
 parameterized==0.7.0
 parso==0.2.1
@@ -114,8 +114,6 @@ reportlab==3.5.21
 requests-oauthlib==0.8.0
 requests==2.21.0
 rsa==4.0
-scikit-learn==0.16.1
-scipy==1.2.1
 selenium==3.141.0
 sentry-sdk==0.20.3
 six==1.10.0
@@ -126,7 +124,7 @@ social-auth-storage-sqlalchemy==1.1.0
 speaklater==1.3
 sqlalchemy-stubs==0.4
 sqlalchemy-utils==0.32.13
-sqlalchemy2-stubs==0.0.2a24
+sqlalchemy2-stubs==0.0.2a27
 sqlalchemy==1.3.3
 toml==0.10.2
 tomli==1.2.3              # via mypy

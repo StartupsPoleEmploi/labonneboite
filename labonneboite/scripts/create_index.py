@@ -1,4 +1,5 @@
 import argparse
+import bz2
 import contextlib
 import datetime
 import glob
@@ -31,8 +32,6 @@ from labonneboite.common.models import HistoryBlacklist, Office, OfficeAdminAdd,
     OfficeAdminRemove, OfficeAdminUpdate, OfficeThirdPartyUpdate
 from labonneboite.common.search import HiddenMarketFetcher
 from labonneboite.common.util import timeit
-from labonneboite.importer import settings as importer_settings
-from labonneboite.importer import util as importer_util
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 # use this instead if you wish to investigate from which logger exactly comes each line of log
@@ -408,7 +407,7 @@ def create_offices_for_departement(departement: str) -> None:
     all_offices = db_session.query(Office).filter(
         and_(
             # Office.departement == departement,
-            Office.hiring >= importer_settings.HIRING_REDUCING_MINIMUM_THRESHOLD,
+            Office.hiring >= scoring_util.get_hirings_from_score(settings.SCORE_REDUCING_MINIMUM_THRESHOLD),
         )).all()
 
     for office in all_offices:
@@ -722,7 +721,7 @@ def get_latest_scam_emails() -> List[str]:
     if not list_of_files:
         raise ValueError("No blacklist file found. Path is most likely incorrect.")
     latest_file = max(list_of_files, key=os.path.getctime)
-    with importer_util.get_reader(latest_file) as myfile:
+    with bz2.BZ2File(latest_file) as myfile:
         logger.info("Processing scam emails file %s ...", latest_file)
         myfile.readline()  # ignore header
         emails = [email.decode().strip().replace('"', '') for email in myfile]

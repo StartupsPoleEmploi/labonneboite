@@ -63,24 +63,19 @@ Flask-Testing
 parameterized
 
 # Data and Importer.
-numpy
 pandas
-scikit-learn
-scipy
 
 # PDF utils and dependencies.
 html5lib
 xhtml2pdf
 
 # Utils.
-gevent  # only used by geocode importer job and locust load testing
 python-slugify
 requests
 validators
 geopy
 mailjet_rest
 cryptography
-astroid
 
 # Deployment and production
 uWSGI
