@@ -19,13 +19,15 @@ WORKDIR /app
 RUN mkdir -p /app/logs
 
 # Installing requirements
-# COPY docker/v3.6/requirements.txt /requirements.txt
-# RUN pip install -r /requirements.txt
+COPY pyproject.toml /app/
+COPY setup.cfg /app/
+COPY README.md /app/
 
 # File imports : source code
-COPY docker/v3.10/ /app/
 COPY ./labonneboite /app/labonneboite
-RUN pip install -e .
+RUN pip install poetry \ 
+    && poetry install
+
 WORKDIR /app/labonneboite
 
 # unsupported local error : https://stackoverflow.com/questions/54802935/docker-unsupported-locale-setting-when-running-python-container
@@ -34,9 +36,9 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen 
     && locale-gen
 
 # building flask assets
-RUN flask assets build
+RUN poetry run flask assets build
 
 # add the entrypoint
 RUN chmod +x ./run.sh
-RUN pip freeze
+
 ENTRYPOINT ["/bin/bash", "./run.sh"]

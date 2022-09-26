@@ -53,9 +53,10 @@ class UserFavoriteOffice(CRUDMixin, Base):
     else:
         office = relationship('Office', lazy='joined')
 
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
+    # sytt: __mapper_args__ not allowed https://docs.sqlalchemy.org/en/14/changelog/changelog_11.html#change-09669497f855398505a14d647f0b239c
+    # __mapper_args__ = {
+    #     'order_by': desc(date_created),  # Default order_by for all queries.
+    # }
 
     @classmethod
     def add_favorite(cls,

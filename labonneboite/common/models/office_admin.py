@@ -62,9 +62,10 @@ class OfficeAdminAdd(OfficeMixin, CRUDMixin, Base):
     created_by: 'RelationshipProperty[User]' = relationship('User', foreign_keys=[created_by_id])
     updated_by: 'RelationshipProperty[User]' = relationship('User', foreign_keys=[updated_by_id])
 
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
+    # sytt: __mapper_args__ not allowed https://docs.sqlalchemy.org/en/14/changelog/changelog_11.html#change-09669497f855398505a14d647f0b239c
+    # __mapper_args__ = {
+    #     'order_by': desc(date_created),  # Default order_by for all queries.
+    # }
 
     @property
     def score(self) -> 'Decimal':
@@ -107,10 +108,10 @@ class OfficeAdminRemove(CRUDMixin, Base):
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
     created_by = relationship('User', foreign_keys=[created_by_id])
     updated_by = relationship('User', foreign_keys=[updated_by_id])
-
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
+    # sytt: __mapper_args__ not allowed https://docs.sqlalchemy.org/en/14/changelog/changelog_11.html#change-09669497f855398505a14d647f0b239c
+    # __mapper_args__ = {
+    #     'order_by': desc(date_created),  # Default order_by for all queries.
+    # }
 
 
 class OfficeUpdateMixin(object):
@@ -223,9 +224,10 @@ class OfficeAdminUpdate(OfficeUpdateMixin, CRUDMixin, Base):
     __tablename__ = 'etablissements_admin_update'
     id = Column(Integer, primary_key=True)
 
-    __mapper_args__ = {
-        'order_by': desc(text('etablissements_admin_update.date_created')),  # Default order_by for all queries.
-    }
+    # sytt: __mapper_args__ not allowed https://docs.sqlalchemy.org/en/14/changelog/changelog_11.html#change-09669497f855398505a14d647f0b239c
+    # __mapper_args__ = {
+    #     'order_by': desc(text('etablissements_admin_update.date_created')),  # Default order_by for all queries.
+    # }
 
 
 class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
@@ -261,9 +263,10 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     created_by = relationship('User', foreign_keys=[created_by_id])
     updated_by = relationship('User', foreign_keys=[updated_by_id])
 
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
+    # sytt: __mapper_args__ not allowed https://docs.sqlalchemy.org/en/14/changelog/changelog_11.html#change-09669497f855398505a14d647f0b239c
+    # __mapper_args__ = {
+    #     'order_by': desc(date_created),  # Default order_by for all queries.
+    # }
 
     def clean(self) -> None:
         """
