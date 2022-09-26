@@ -1,6 +1,6 @@
 -e git+https://github.com/StartupsPoleEmploi/labonneboite-common.git@f0dadcbb79338522169e586a9f4ec0a750920d00#egg=labonneboite-common
 
-Flask<0.13
+Flask
 Flask-Script
 
 # Flask assets.
@@ -53,10 +53,10 @@ elasticsearch<2.0.0
 Flask-Login
 social-auth-app-flask-sqlalchemy
 social-auth-app-flask
-social-auth-core[openidconnect]
+social-auth-core[openidconnect]==4.2.0
+-e git+https://github.com/python-social-auth/social-storage-sqlalchemy.git@b489c10244a45ae889c554bddc6ab69a7a7e5057#egg=social-auth-storage-sqlalchemy
 
 # Unit tests.
-nose
 selenium
 PyVirtualDisplay
 Flask-Testing
@@ -76,6 +76,11 @@ validators
 geopy
 mailjet_rest
 cryptography
+astroid
+python-dateutil
+email_validator
+-e git+https://github.com/zopefoundation/zope.interface.git@24bd6eefaecf2195977a139cdaff2ccfef4e85cd#egg=zope.interface
+-e git+https://github.com/zopefoundation/zope.event.git@cdd8d1976ef48d4a59ba49d57d4c956456640c1c#egg=zope.event
 
 # Deployment and production
 uWSGI
@@ -83,12 +88,12 @@ uwsgitop
 raven[flask]
 
 # Load testing.
-locustio
+locust
 pyzmq
 remote-pdb
 
 #Fix markupsafe issue 1.0
-markupsafe==1.1.1
+markupsafe
 
 #Impact retour emploi.
 google-api-python-client

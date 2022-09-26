@@ -18,9 +18,9 @@ class TestSimple(LbbSeleniumTestCase):
         wait = WebDriverWait(self.driver, 5)
 
         self.driver.get(self.url_for('root.home'))
-        job_element = self.driver.find_element_by_id('j')
-        location_element = self.driver.find_element_by_id('l')
-        submit_element = self.driver.find_element_by_css_selector('.lbb-home-form-search button')
+        job_element = self.driver.find_element(By.ID, 'j')
+        location_element = self.driver.find_element(By.ID, 'l')
+        submit_element = self.driver.find_element(By.CSS_SELECTOR, '.lbb-home-form-search button')
 
         self.assertTrue(submit_element.is_enabled(), 'By default the submit button should be enable')
 
@@ -37,5 +37,5 @@ class TestSimple(LbbSeleniumTestCase):
 
         self.assertElementIsFocus(submit_element, 'When selecting a location, the submit button should be focus')
         submit_element.click()
-        elements = self.driver.find_elements_by_class_name('lbb-company')
+        elements = self.driver.find_elements(By.CLASS_NAME, 'lbb-company')
         self.assertEqual(1, len(elements))

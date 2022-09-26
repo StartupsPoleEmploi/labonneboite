@@ -23,7 +23,7 @@ install_requires = [
 
 setup(
     name="LaBonneBoite",
-    version="0.1",
+    version="0.2",
     author="La Bonne Boite",
     author_email="labonneboite@pole-emploi.fr",
     description=(""),
@@ -31,7 +31,6 @@ setup(
         "labonneboite",
     ],
     include_package_data=True,
-    long_description=read("README.md"),
     install_requires=install_requires,
     entry_points={
         "console_scripts": [
@@ -43,7 +42,6 @@ setup(
         "License :: OSI Approved :: GNU Affero General Public License v3",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.10",
     ],
 )

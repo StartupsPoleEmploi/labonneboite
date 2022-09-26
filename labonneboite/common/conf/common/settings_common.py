@@ -12,25 +12,37 @@ overrides/bonaparte.py
 import logging
 import os
 
-from labonneboite.common.env import get_current_env, ENV_BONAPARTE, ENV_DEVELOPMENT, ENV_TEST
-from labonneboite.common.load_data import load_rome_labels, load_naf_labels, load_rows_as_set, load_csv_file
+from labonneboite.common.env import (
+    get_current_env,
+    ENV_BONAPARTE,
+    ENV_DEVELOPMENT,
+    ENV_TEST,
+)
+from labonneboite.common.load_data import (
+    load_rome_labels,
+    load_naf_labels,
+    load_rows_as_set,
+    load_csv_file,
+)
 
 DEBUG = False
 TESTING = False
 
 LOG_LEVEL = logging.INFO
 LOG_LEVEL_DB_ENGINE = logging.WARNING
-LOG_API_ID = 'labonneboite.pole-emploi.fr'
+LOG_API_ID = "labonneboite.pole-emploi.fr"
 
 LOG_LEVEL_USER_ACTIVITY = logging.INFO
 LOGGING_HANDLER_USER_ACTIVITY = logging.StreamHandler()
 LOGGING_HANDLER_API_ACTIVITY = logging.StreamHandler()
-LOG_FORMAT_USER_ACTIVITY = '%(message)s'
+LOG_FORMAT_USER_ACTIVITY = "%(message)s"
 
-GLOBAL_STATIC_PATH = '/tmp'
+GLOBAL_STATIC_PATH = "/tmp"
 
 # Related ROMEs suggestions
-ENABLE_RELATED_ROMES = True # set this to False to deactivate the related romes mechanism
+ENABLE_RELATED_ROMES = (
+    True  # set this to False to deactivate the related romes mechanism
+)
 MAX_RELATED_ROMES = 5
 
 ROME_DESCRIPTIONS = load_rome_labels()
@@ -44,14 +56,14 @@ ENABLE_TIMEIT_TIMERS = True
 
 SENTRY_DSN = None
 SENTRY_ENVIRONMENT = ""
-SENTRY_SAMPLE_RATE = 0.1 # set to 0 to disable sentry performance monitoring, @see https://docs.sentry.io/platforms/python/guides/flask/performance/#configure-the-sample-rate
+SENTRY_SAMPLE_RATE = 0.1  # set to 0 to disable sentry performance monitoring, @see https://docs.sentry.io/platforms/python/guides/flask/performance/#configure-the-sample-rate
 
-ADMIN_EMAIL = 'no-reply@labonneboite.pole-emploi.fr'
-LBB_EMAIL = 'labonneboite@pole-emploi.fr'
-LBA_EMAIL = 'labonnealternance@pole-emploi.fr'
+ADMIN_EMAIL = "no-reply@labonneboite.pole-emploi.fr"
+LBB_EMAIL = "labonneboite@pole-emploi.fr"
+LBA_EMAIL = "labonnealternance@pole-emploi.fr"
 
-SERVER_NAME = 'labonneboite.pole-emploi.fr'
-PREFERRED_URL_SCHEME = 'http'
+SERVER_NAME = "labonneboite.pole-emploi.fr"
+PREFERRED_URL_SCHEME = "http"
 COOKIE_SECURE = False
 
 WTF_CSRF_ENABLED = True
@@ -83,24 +95,26 @@ VERSION_PRO_ALLOWED_EMAIL_REGEXPS = []
 
 # Headcount
 HEADCOUNT_INSEE = {
-    '00': '0 salarié',
-    '01': '1 ou 2 salariés',
-    '02': '3 à 5 salariés',
-    '03': '6 à 9 salariés',
-    '11': '10 à 19 salariés',
-    '12': '20 à 49 salariés',
-    '21': '50 à 99 salariés',
-    '22': '100 à 199 salariés',
-    '31': '200 à 249 salariés',
-    '32': '250 à 499 salariés',
-    '41': '500 à 999 salariés',
-    '42': '1 000 à 1 999 salariés',
-    '51': '2 000 à 4 999 salariés',
-    '52': '5 000 à 9 999 salariés',
-    '53': '10 000 salariés et plus',
+    "00": "0 salarié",
+    "01": "1 ou 2 salariés",
+    "02": "3 à 5 salariés",
+    "03": "6 à 9 salariés",
+    "11": "10 à 19 salariés",
+    "12": "20 à 49 salariés",
+    "21": "50 à 99 salariés",
+    "22": "100 à 199 salariés",
+    "31": "200 à 249 salariés",
+    "32": "250 à 499 salariés",
+    "41": "500 à 999 salariés",
+    "42": "1 000 à 1 999 salariés",
+    "51": "2 000 à 4 999 salariés",
+    "52": "5 000 à 9 999 salariés",
+    "53": "10 000 salariés et plus",
 }
 
-HEADCOUNT_INSEE_CHOICES = [(key, value) for key, value in sorted(HEADCOUNT_INSEE.items())]
+HEADCOUNT_INSEE_CHOICES = [
+    (key, value) for key, value in sorted(HEADCOUNT_INSEE.items())
+]
 
 HEADCOUNT_WHATEVER = 1
 HEADCOUNT_SMALL_ONLY = 2
@@ -111,65 +125,74 @@ HEADCOUNT_BIG_ONLY_MINIMUM = 21
 HEADCOUNT_FILTER_DEFAULT = 1
 
 HEADCOUNT_VALUES = {
-    'all': HEADCOUNT_WHATEVER,
-    'big': HEADCOUNT_BIG_ONLY,
-    'small': HEADCOUNT_SMALL_ONLY
+    "all": HEADCOUNT_WHATEVER,
+    "big": HEADCOUNT_BIG_ONLY,
+    "small": HEADCOUNT_SMALL_ONLY,
 }
 
 # Databases
-ES_INDEX = 'labonneboite'
+ES_INDEX = "labonneboite"
 # Set ES_TIMEOUT environment variable to 0 to remove ES timeouts entirely
-ES_TIMEOUT = int(os.environ.get('ES_TIMEOUT', 10)) or None
-ES_HOST = 'localhost:9200'
-DB_HOST = 'localhost'
-DB_PORT = 3306
-DB_NAME = 'labonneboite'
-DB_USER = 'labonneboite'
-DB_PASSWORD = 'labonneboite'
-OFFICE_TABLE = 'etablissements'
+ES_TIMEOUT = int(os.environ.get("ES_TIMEOUT", 10)) or None
+ES_HOST = os.environ.get("ES_HOST", "localhost:9200")
+DB_HOST = os.environ.get("DB_HOST", "localhost")
+DB_PORT = os.environ.get("DB_PORT", 3306)
+DB_NAME = os.environ.get("DB_NAME", "labonneboite")
+DB_USER = os.environ.get("DB_USER", "labonneboite")
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "labonneboite")
+OFFICE_TABLE = os.environ.get("OFFICE_TABLE", "etablissements")
 
 # 2020-05-13: The tile API of OpenRouteService (api.openrouteservice.org) will be discontinued in June 2020.
 TILE_SERVER_URL = "http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}"
 
 ROME_NAF_PROBABILITY_CUTOFF = 0.05
 
-FLASK_SECRET_KEY = '<set it>'
+FLASK_SECRET_KEY = "<set it>"
 
-PEAM_AUTH_BASE_URL = 'https://authentification-candidat.pole-emploi.fr'
-PEAM_AUTH_RECRUITER_BASE_URL = 'https://entreprise.pole-emploi.fr/'
-PEAM_API_BASE_URL = 'https://api.emploi-store.fr'
-PEAM_TOKEN_BASE_URL = 'https://entreprise.pole-emploi.fr'
+PEAM_AUTH_BASE_URL = "https://authentification-candidat.pole-emploi.fr"
+PEAM_AUTH_RECRUITER_BASE_URL = "https://entreprise.pole-emploi.fr/"
+PEAM_API_BASE_URL = "https://api.emploi-store.fr"
+PEAM_TOKEN_BASE_URL = "https://entreprise.pole-emploi.fr"
 PEAM_VERIFY_SSL = True
-REMEMBER_ME_ARG_NAME = 'keep'
+REMEMBER_ME_ARG_NAME = "keep"
 
 # Settings that need to be overwritten
-PEAM_CLIENT_ID = '<set it>'
-PEAM_CLIENT_SECRET = '<set it>'
+PEAM_CLIENT_ID = "<set it>"
+PEAM_CLIENT_SECRET = "<set it>"
 
-MAILJET_API_KEY = '<set it>'
-MAILJET_API_SECRET = '<set it>'
-TO_EMAILS = ['<set it>'] # this was named `FORM_EMAIL`, but it is confusing
-FROM_EMAIL = '<set it>'
+MAILJET_API_KEY = "<set it>"
+MAILJET_API_SECRET = "<set it>"
+TO_EMAILS = ["<set it>"]  # this was named `FORM_EMAIL`, but it is confusing
+FROM_EMAIL = "<set it>"
 
 # URL of a script to load for tag management
 # Leave blank to disable
-TAG_MANAGER_URL = ''
+TAG_MANAGER_URL = ""
 
-MEMO_URL = 'https://memo.pole-emploi.fr' # staging url is https://memo.beta.pole-emploi.fr
-API_ADRESSE_BASE_URL = 'https://api-adresse.data.gouv.fr'
-API_DEPARTMENTS_URL = 'https://geo.api.gouv.fr/departements'
+MEMO_URL = (
+    "https://memo.pole-emploi.fr"  # staging url is https://memo.beta.pole-emploi.fr
+)
+API_ADRESSE_BASE_URL = "https://api-adresse.data.gouv.fr"
+API_DEPARTMENTS_URL = "https://geo.api.gouv.fr/departements"
 
 # Je postule
-JEPOSTULE_BASE_URL = 'http://127.0.0.1:8000'
-JEPOSTULE_CLIENT_ID = '<set it>'
-JEPOSTULE_CLIENT_SECRET = '<set it>'
+JEPOSTULE_BASE_URL = "http://127.0.0.1:8000"
+JEPOSTULE_CLIENT_ID = "<set it>"
+JEPOSTULE_CLIENT_SECRET = "<set it>"
 JEPOSTULE_BETA_EMAILS = []
 JEPOSTULE_QUOTA = 0
 
 # Google site verification code - for linking with Google Search Console
 GOOGLE_SITE_VERIFICATION_CODE = None
 
-SCAM_EMAILS_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', '..', 'scripts', 'scam_emails')
+SCAM_EMAILS_FOLDER = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)),
+    "..",
+    "..",
+    "..",
+    "scripts",
+    "scam_emails",
+)
 
 # Ids of spreadsheets for local dev
 # SPREADSHEET_IDS = [
@@ -180,15 +203,15 @@ SCAM_EMAILS_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), '
 # ]
 
 SPREADSHEET_IDS = {
-    "stats_ire": '197iFVyuCHiNNuA0ns99TCTS-v2CmBITg-e0ztEcwPMA',
-    "delay_activity_ire": '1Gl_rWicSmLwpXAPJLR3eRbs5nWJ1ROf6GSmUGmL2DEk',
-    "perf_indicators_lba": '1hPq1X_VXM7-l38jhLFrxQaDdpoB4s5W1Ok612SVTHts',
-    "perf_indicators_lbb": '1HFkQVLxzjT0zIACCCp8c6fJII1VieKDtdvdEkLLO16M'
+    "stats_ire": "197iFVyuCHiNNuA0ns99TCTS-v2CmBITg-e0ztEcwPMA",
+    "delay_activity_ire": "1Gl_rWicSmLwpXAPJLR3eRbs5nWJ1ROf6GSmUGmL2DEk",
+    "perf_indicators_lba": "1hPq1X_VXM7-l38jhLFrxQaDdpoB4s5W1Ok612SVTHts",
+    "perf_indicators_lbb": "1HFkQVLxzjT0zIACCCp8c6fJII1VieKDtdvdEkLLO16M",
 }
 
 # Encryption of user PEAM-U token between LBB and JePostule.
 # Dummy key used everywhere but in production.
-CRYPTOGRAPHY_SECRET_KEY = b'gj6ouKvodK6PCAz4mt5tdTMUnVPHFFYWjh_P-O-IMqU='
+CRYPTOGRAPHY_SECRET_KEY = b"gj6ouKvodK6PCAz4mt5tdTMUnVPHFFYWjh_P-O-IMqU="
 
 # The only case where you don't want this is when using
 # PE Connect on the staging ESD, where we do not have this
@@ -213,7 +236,7 @@ ALLOW_INDEXING = False
 
 # Mobiville
 MOBIVILLE_MAX_COMPANY_COUNT = 5
-MOBIVILLE_ROMES = load_rows_as_set(load_csv_file('mobiville/romes.csv'))
+MOBIVILLE_ROMES = load_rows_as_set(load_csv_file("mobiville/romes.csv"))
 
 SCORE_REDUCING_MINIMUM_THRESHOLD = 50
 # HIRING_REDUCING_MINIMUM_THRESHOLD = scoring.get_hirings_from_score(50)

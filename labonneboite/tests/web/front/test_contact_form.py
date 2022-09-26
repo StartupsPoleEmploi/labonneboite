@@ -1,3 +1,4 @@
+import pdb
 from unittest import mock
 
 from labonneboite.common import models
@@ -75,43 +76,44 @@ class UpdateCoordinatesTest(ContactFormBaseTest):
         """
         Test `update_coordinates_form` view.
         """
-        with mock.patch('labonneboite.web.contact_form.mail.send_mail'):
+        with self.login_client.test_client() as client:
+            with mock.patch('labonneboite.web.contact_form.mail.send_mail'):
 
-            form_data = {
-                'new_contact_mode': 'office',
-                'new_email': 'exemple@domaine.com',
-                'new_email_alternance': 'exemple-alternance@domaine.com',
-                'new_phone': '01 77 86 39 49',
-                'new_phone_alternance': '02 77 86 39 49',
-                'new_website': 'http://exemple.com',
-                'social_network': 'https://www.facebook.com/poleemploi/',
-                'rgpd_consent': True,
-            }
-            form_data.update(self.recruiter_hidden_identification)
+                form_data = {
+                    'new_contact_mode': 'office',
+                    'new_email': 'exemple@domaine.com',
+                    'new_email_alternance': 'exemple-alternance@domaine.com',
+                    'new_phone': '01 77 86 39 49',
+                    'new_phone_alternance': '02 77 86 39 49',
+                    'new_website': 'http://exemple.com',
+                    'social_network': 'https://www.facebook.com/poleemploi/',
+                    'rgpd_consent': True,
+                }
+                form_data.update(self.recruiter_hidden_identification)
 
-            url = self.url_for('contact_form.update_coordinates_form')
-            rv = self.app.post(url, data=form_data)
+                url = self.url_for('contact_form.update_coordinates_form')
+                rv = client.post(url, data=form_data)
 
-            self.assertEqual(rv.status_code, 302)
-            self.assertIn(self.url_for('contact_form.success'), rv.location)
+                self.assertEqual(rv.status_code, 302)
+                self.assertIn(self.url_for('contact_form.success'), rv.location)
 
-            # An entry should have been created in `UpdateCoordinatesRecruiterMessage`.
-            msg = models.UpdateCoordinatesRecruiterMessage.query.filter(
-                    models.UpdateCoordinatesRecruiterMessage.siret == form_data['siret'],
-                ).one()
-            self.assertEqual(msg.new_website, form_data['new_website'])
-            self.assertEqual(msg.new_email, form_data['new_email'])
-            self.assertEqual(msg.new_phone, form_data['new_phone'])
-            self.assertEqual(msg.contact_mode, form_data['new_contact_mode'])
-            self.assertEqual(msg.new_email_alternance, form_data['new_email_alternance'])
-            self.assertEqual(msg.new_phone_alternance, form_data['new_phone_alternance'])
-            self.assertEqual(msg.social_network, form_data['social_network'])
-            self.assertEqual(msg.siret, form_data['siret'])
-            self.assertEqual(msg.requested_by_first_name, form_data['first_name'])
-            self.assertEqual(msg.requested_by_last_name, form_data['last_name'])
-            self.assertEqual(msg.requested_by_email, form_data['email'])
-            self.assertEqual(msg.requested_by_phone, form_data['phone'])
-            self.assertEqual(msg.certified_recruiter, False)
+                # An entry should have been created in `UpdateCoordinatesRecruiterMessage`.
+                msg = models.UpdateCoordinatesRecruiterMessage.query.filter(
+                        models.UpdateCoordinatesRecruiterMessage.siret == form_data['siret'],
+                    ).one()
+                self.assertEqual(msg.new_website, form_data['new_website'])
+                self.assertEqual(msg.new_email, form_data['new_email'])
+                self.assertEqual(msg.new_phone, form_data['new_phone'])
+                self.assertEqual(msg.contact_mode, form_data['new_contact_mode'])
+                self.assertEqual(msg.new_email_alternance, form_data['new_email_alternance'])
+                self.assertEqual(msg.new_phone_alternance, form_data['new_phone_alternance'])
+                self.assertEqual(msg.social_network, form_data['social_network'])
+                self.assertEqual(msg.siret, form_data['siret'])
+                self.assertEqual(msg.requested_by_first_name, form_data['first_name'])
+                self.assertEqual(msg.requested_by_last_name, form_data['last_name'])
+                self.assertEqual(msg.requested_by_email, form_data['email'])
+                self.assertEqual(msg.requested_by_phone, form_data['phone'])
+                self.assertEqual(msg.certified_recruiter, False)
 
 
 class UpdateJobsTest(ContactFormBaseTest):
@@ -179,49 +181,50 @@ class UpdateJobsTest(ContactFormBaseTest):
         """
         Test `update_jobs_form` view.
         """
-        with mock.patch('labonneboite.web.contact_form.mail.send_mail'):
+        with self.login_client.test_client() as client:
+            with mock.patch('labonneboite.web.contact_form.mail.send_mail'):
 
-            romes_to_keep = ['D1507', 'D1106']
-            romes_alternance_to_keep = ['D1214', 'D1106']
-            extra_romes_to_add = ['M1802', 'M1803', 'M1805']
-            extra_romes_alternance_to_add = ['M1805']
+                romes_to_keep = ['D1507', 'D1106']
+                romes_alternance_to_keep = ['D1214', 'D1106']
+                extra_romes_to_add = ['M1802', 'M1803', 'M1805']
+                extra_romes_alternance_to_add = ['M1805']
 
-            form_data = {
-                'romes_to_keep': romes_to_keep,
-                'romes_alternance_to_keep': romes_alternance_to_keep,
-                'extra_romes_to_add': extra_romes_to_add,
-                'extra_romes_alternance_to_add': extra_romes_alternance_to_add,
-            }
-            form_data.update(self.recruiter_hidden_identification)
+                form_data = {
+                    'romes_to_keep': romes_to_keep,
+                    'romes_alternance_to_keep': romes_alternance_to_keep,
+                    'extra_romes_to_add': extra_romes_to_add,
+                    'extra_romes_alternance_to_add': extra_romes_alternance_to_add,
+                }
+                form_data.update(self.recruiter_hidden_identification)
 
-            url = self.url_for('contact_form.update_jobs_form')
-            rv = self.app.post(url, data=form_data)
-            self.assertEqual(rv.status_code, 302)
-            self.assertIn(self.url_for('contact_form.success'), rv.location)
+                url = self.url_for('contact_form.update_jobs_form')
+                rv = client.post(url, data=form_data)
+                self.assertEqual(rv.status_code, 302)
+                self.assertIn(self.url_for('contact_form.success'), rv.location)
 
-            # An entry should have been created in `UpdateJobsRecruiterMessage`.
-            msg = models.UpdateJobsRecruiterMessage.query.filter(
-                    models.UpdateJobsRecruiterMessage.siret == self.office.siret,
-                ).one()
+                # An entry should have been created in `UpdateJobsRecruiterMessage`.
+                msg = models.UpdateJobsRecruiterMessage.query.filter(
+                        models.UpdateJobsRecruiterMessage.siret == self.office.siret,
+                    ).one()
 
-            romes_to_add = set(romes_to_keep + extra_romes_to_add)
-            self.assertCountEqual(romes_to_add, msg.romes_to_add.split(','))
+                romes_to_add = set(romes_to_keep + extra_romes_to_add)
+                self.assertCountEqual(romes_to_add, msg.romes_to_add.split(','))
 
-            romes_alternance_to_add = set(romes_alternance_to_keep + extra_romes_alternance_to_add)
-            self.assertCountEqual(romes_alternance_to_add, msg.romes_alternance_to_add.split(','))
+                romes_alternance_to_add = set(romes_alternance_to_keep + extra_romes_alternance_to_add)
+                self.assertCountEqual(romes_alternance_to_add, msg.romes_alternance_to_add.split(','))
 
-            romes_to_remove = self.office.romes_codes - romes_to_add
-            self.assertCountEqual(romes_to_remove, msg.romes_to_remove.split(','))
+                romes_to_remove = self.office.romes_codes - romes_to_add
+                self.assertCountEqual(romes_to_remove, msg.romes_to_remove.split(','))
 
-            romes_alternance_to_remove = self.office.romes_codes - romes_alternance_to_add
-            self.assertCountEqual(romes_alternance_to_remove, msg.romes_alternance_to_remove.split(','))
+                romes_alternance_to_remove = self.office.romes_codes - romes_alternance_to_add
+                self.assertCountEqual(romes_alternance_to_remove, msg.romes_alternance_to_remove.split(','))
 
-            self.assertEqual(msg.siret, form_data['siret'])
-            self.assertEqual(msg.requested_by_first_name, form_data['first_name'])
-            self.assertEqual(msg.requested_by_last_name, form_data['last_name'])
-            self.assertEqual(msg.requested_by_email, form_data['email'])
-            self.assertEqual(msg.requested_by_phone, form_data['phone'])
-            self.assertEqual(msg.certified_recruiter, False)
+                self.assertEqual(msg.siret, form_data['siret'])
+                self.assertEqual(msg.requested_by_first_name, form_data['first_name'])
+                self.assertEqual(msg.requested_by_last_name, form_data['last_name'])
+                self.assertEqual(msg.requested_by_email, form_data['email'])
+                self.assertEqual(msg.requested_by_phone, form_data['phone'])
+                self.assertEqual(msg.certified_recruiter, False)
 
 
 class DeleteFormFormTest(ContactFormBaseTest):
@@ -250,32 +253,33 @@ class DeleteFormFormTest(ContactFormBaseTest):
         """
         Test `delete_form` view.
         """
-        with mock.patch('labonneboite.web.contact_form.mail.send_mail'):
+        with self.login_client.test_client() as client:
+            with mock.patch('labonneboite.web.contact_form.mail.send_mail'):
 
-            form_data = {
-                'remove_lba': '1',
-                'remove_lbb': '',  # Empty means not checked.
-            }
-            form_data.update(self.recruiter_hidden_identification)
+                form_data = {
+                    'remove_lba': '1',
+                    'remove_lbb': '',  # Empty means not checked.
+                }
+                form_data.update(self.recruiter_hidden_identification)
 
-            url = self.url_for('contact_form.delete_form')
-            rv = self.app.post(url, data=form_data)
+                url = self.url_for('contact_form.delete_form')
+                rv = client.post(url, data=form_data)
 
-            self.assertEqual(rv.status_code, 302)
-            self.assertIn(self.url_for('contact_form.success'), rv.location)
+                self.assertEqual(rv.status_code, 302)
+                self.assertIn(self.url_for('contact_form.success'), rv.location)
 
-            # An entry should have been created in `RemoveRecruiterMessage`.
-            msg = models.RemoveRecruiterMessage.query.filter(
-                    models.RemoveRecruiterMessage.siret == form_data['siret'],
-                ).one()
-            self.assertEqual(msg.remove_lba, 1)
-            self.assertEqual(msg.remove_lbb, 0)
-            self.assertEqual(msg.siret, form_data['siret'])
-            self.assertEqual(msg.requested_by_first_name, form_data['first_name'])
-            self.assertEqual(msg.requested_by_last_name, form_data['last_name'])
-            self.assertEqual(msg.requested_by_email, form_data['email'])
-            self.assertEqual(msg.requested_by_phone, form_data['phone'])
-            self.assertEqual(msg.certified_recruiter, False)
+                # An entry should have been created in `RemoveRecruiterMessage`.
+                msg = models.RemoveRecruiterMessage.query.filter(
+                        models.RemoveRecruiterMessage.siret == form_data['siret'],
+                    ).one()
+                self.assertEqual(msg.remove_lba, 1)
+                self.assertEqual(msg.remove_lbb, 0)
+                self.assertEqual(msg.siret, form_data['siret'])
+                self.assertEqual(msg.requested_by_first_name, form_data['first_name'])
+                self.assertEqual(msg.requested_by_last_name, form_data['last_name'])
+                self.assertEqual(msg.requested_by_email, form_data['email'])
+                self.assertEqual(msg.requested_by_phone, form_data['phone'])
+                self.assertEqual(msg.certified_recruiter, False)
 
 
 class OtherFormTest(ContactFormBaseTest):
@@ -309,28 +313,29 @@ class OtherFormTest(ContactFormBaseTest):
         """
         Test `other_form` view.
         """
-        with mock.patch('labonneboite.web.contact_form.mail.send_mail'):
+        with self.login_client.test_client() as client:
+            with mock.patch('labonneboite.web.contact_form.mail.send_mail'):
 
-            form_data = {
-                'comment': 'Bonjour à tous',
-            }
-            form_data.update(self.recruiter_hidden_identification)
+                form_data = {
+                    'comment': 'Bonjour à tous',
+                }
+                form_data.update(self.recruiter_hidden_identification)
 
-            url = self.url_for('contact_form.other_form')
-            rv = self.app.post(url, data=form_data)
+                url = self.url_for('contact_form.other_form')
+                rv = client.post(url, data=form_data)
 
-            self.assertEqual(rv.status_code, 302)
-            self.assertIn(self.url_for('contact_form.success'), rv.location)
+                self.assertEqual(rv.status_code, 302)
+                self.assertIn(self.url_for('contact_form.success'), rv.location)
 
-            # An entry should have been created in `OtherRecruiterMessage`.
-            msg = models.OtherRecruiterMessage.query.filter(
-                    models.OtherRecruiterMessage.siret == form_data['siret'],
-                ).one()
+                # An entry should have been created in `OtherRecruiterMessage`.
+                msg = models.OtherRecruiterMessage.query.filter(
+                        models.OtherRecruiterMessage.siret == form_data['siret'],
+                    ).one()
 
-            self.assertEqual(msg.comment, form_data['comment'])
-            self.assertEqual(msg.siret, form_data['siret'])
-            self.assertEqual(msg.requested_by_first_name, form_data['first_name'])
-            self.assertEqual(msg.requested_by_last_name, form_data['last_name'])
-            self.assertEqual(msg.requested_by_email, form_data['email'])
-            self.assertEqual(msg.requested_by_phone, form_data['phone'])
-            self.assertEqual(msg.certified_recruiter, False)
+                self.assertEqual(msg.comment, form_data['comment'])
+                self.assertEqual(msg.siret, form_data['siret'])
+                self.assertEqual(msg.requested_by_first_name, form_data['first_name'])
+                self.assertEqual(msg.requested_by_last_name, form_data['last_name'])
+                self.assertEqual(msg.requested_by_email, form_data['email'])
+                self.assertEqual(msg.requested_by_phone, form_data['phone'])
+                self.assertEqual(msg.certified_recruiter, False)

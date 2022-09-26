@@ -1,18 +1,15 @@
 from flask import request
-
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, HiddenField, RadioField, SelectMultipleField, StringField, TextAreaField
-from wtforms import validators
+from wtforms import BooleanField, HiddenField, RadioField, SelectMultipleField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, Optional, Regexp, URL
-from wtforms.widgets import ListWidget, CheckboxInput
+from wtforms.widgets import CheckboxInput, ListWidget
 
 from labonneboite.conf import settings
 
-
 PHONE_REGEX = r"^(0|\+33)[1-9]([-. ]?[0-9]{2}){4}$"
 
-SIRET_REGEX = r'[0-9]{14}'
+SIRET_REGEX = r"[0-9]{14}"
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -24,6 +21,7 @@ class MultiCheckboxField(SelectMultipleField):
 
     https://wtforms.readthedocs.io/en/stable/specific_problems.html#specialty-field-tricks
     """
+
     widget = ListWidget(prefix_label=False)
     option_widget = CheckboxInput()
 
@@ -31,53 +29,55 @@ class MultiCheckboxField(SelectMultipleField):
 class OfficeIdentificationForm(FlaskForm):
 
     siret = StringField(
-        'N° de Siret *',
+        "N° de Siret *",
         validators=[
             DataRequired(),
-            Regexp(SIRET_REGEX, message=("Le siret de l'établissement est invalide (14 chiffres)"))
+            Regexp(
+                SIRET_REGEX,
+                message=("Le siret de l'établissement est invalide (14 chiffres)"),
+            ),
         ],
-        description=
-            "14 chiffres, sans espace. Exemple: 36252187900034<br />"
-            '<a title="Annuaire des entreprise - ouvre une nouvelle fenêtre" href="https://annuaire-entreprises.data.gouv.fr/" target="_blank" rel="noopener">Retrouver mon numéro de siret </a>',
+        description="14 chiffres, sans espace. Exemple: 36252187900034<br />"
+        '<a title="Annuaire des entreprise - ouvre une nouvelle fenêtre" href="https://annuaire-entreprises.data.gouv.fr/" target="_blank" rel="noopener">Retrouver mon numéro de siret </a>',
     )
 
-    last_name = StringField('Nom *', validators=[DataRequired()])
-    first_name = StringField('Prénom *', validators=[DataRequired()])
+    last_name = StringField("Nom *", validators=[DataRequired()])
+    first_name = StringField("Prénom *", validators=[DataRequired()])
     phone = TelField(
-        'Téléphone *',
+        "Téléphone *",
         validators=[DataRequired(), Regexp(PHONE_REGEX)],
-        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"}
+        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"},
     )
     email = EmailField(
-        'Adresse email *',
+        "Adresse email *",
         validators=[DataRequired(), Email()],
-        render_kw={"placeholder": "exemple@domaine.com"}
+        render_kw={"placeholder": "exemple@domaine.com"},
     )
 
 
 class OfficeHiddenIdentificationForm(FlaskForm):
 
-    siret = HiddenField('Siret *', validators=[DataRequired()])
-    last_name = HiddenField('Nom *', validators=[DataRequired()])
-    first_name = HiddenField('Prénom *', validators=[DataRequired()])
+    siret = HiddenField("Siret *", validators=[DataRequired()])
+    last_name = HiddenField("Nom *", validators=[DataRequired()])
+    first_name = HiddenField("Prénom *", validators=[DataRequired()])
     phone = HiddenField(
-        'Téléphone *',
+        "Téléphone *",
         validators=[DataRequired(), Regexp(PHONE_REGEX)],
-        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"}
+        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"},
     )
     email = HiddenField(
-        'Adresse email *',
+        "Adresse email *",
         validators=[DataRequired(), Email()],
-        render_kw={"placeholder": "exemple@domaine.com"}
+        render_kw={"placeholder": "exemple@domaine.com"},
     )
 
 
 class OfficeOtherRequestForm(OfficeHiddenIdentificationForm):
 
     comment = TextAreaField(
-        'Votre message*',
+        "Votre message*",
         validators=[DataRequired(), validators.length(max=15000)],
-        description="15000 caractères maximum"
+        description="15000 caractères maximum",
     )
 
 
@@ -103,8 +103,10 @@ class OfficeUpdateJobsForm(OfficeHiddenIdentificationForm):
         associated with the current office.
         """
         super().__init__(*args, **kwargs)
-        self.office = kwargs.pop('office')
-        self.romes_choices = [(rome.code, rome.name) for rome in self.office.romes_for_naf_mapping]
+        self.office = kwargs.pop("office")
+        self.romes_choices = [
+            (rome.code, rome.name) for rome in self.office.romes_for_naf_mapping
+        ]
         self.romes_to_keep.choices = self.romes_choices
         self.romes_alternance_to_keep.choices = self.romes_choices
 
@@ -123,28 +125,34 @@ class OfficeUpdateJobsForm(OfficeHiddenIdentificationForm):
         # `extra_romes_to_add` and `extra_romes_alternance_to_add` are pupulated via JavaScript.
         # Those fields are defined outside of the form class so we use `request.form` to get them.
         extra_romes_to_add = [
-            rome for rome in request.form.getlist('extra_romes_to_add')
-            if rome in settings.ROME_DESCRIPTIONS and rome not in self.office.romes_codes
+            rome
+            for rome in request.form.getlist("extra_romes_to_add")
+            if rome in settings.ROME_DESCRIPTIONS
+            and rome not in self.office.romes_codes
         ]
         extra_romes_alternance_to_add = [
-            rome for rome in request.form.getlist('extra_romes_alternance_to_add')
-            if rome in settings.ROME_DESCRIPTIONS and rome not in self.office.romes_codes
+            rome
+            for rome in request.form.getlist("extra_romes_alternance_to_add")
+            if rome in settings.ROME_DESCRIPTIONS
+            and rome not in self.office.romes_codes
         ]
 
         # Checked ROME codes.
         romes_to_keep = self.romes_to_keep.data or []
         romes_to_add = set(romes_to_keep + extra_romes_to_add)
         romes_alternance_to_keep = self.romes_alternance_to_keep.data or []
-        romes_alternance_to_add = set(romes_alternance_to_keep + extra_romes_alternance_to_add)
+        romes_alternance_to_add = set(
+            romes_alternance_to_keep + extra_romes_alternance_to_add
+        )
 
         # Unchecked ROME codes.
         romes_to_remove = self.office.romes_codes - romes_to_add
         romes_alternance_to_remove = self.office.romes_codes - romes_alternance_to_add
 
-        setattr(self, 'romes_to_add', romes_to_add)
-        setattr(self, 'romes_alternance_to_add', romes_alternance_to_add)
-        setattr(self, 'romes_to_remove', romes_to_remove)
-        setattr(self, 'romes_alternance_to_remove', romes_alternance_to_remove)
+        setattr(self, "romes_to_add", romes_to_add)
+        setattr(self, "romes_alternance_to_add", romes_alternance_to_add)
+        setattr(self, "romes_to_remove", romes_to_remove)
+        setattr(self, "romes_alternance_to_remove", romes_alternance_to_remove)
 
         return True
 
@@ -152,57 +160,62 @@ class OfficeUpdateJobsForm(OfficeHiddenIdentificationForm):
 class OfficeUpdateCoordinatesForm(OfficeHiddenIdentificationForm):
 
     CONTACT_MODES = (
-        ('mail', 'Par courrier'),
-        ('email', 'Par email'),
-        ('phone', 'Par téléphone'),
-        ('office', 'Sur place'),
-        ('website', 'Via votre site internet'),
+        ("mail", "Par courrier"),
+        ("email", "Par email"),
+        ("phone", "Par téléphone"),
+        ("office", "Sur place"),
+        ("website", "Via votre site internet"),
     )
     CONTACT_MODES_LABELS = dict(CONTACT_MODES)
 
     # Note : we add new_ to avoid conflict with request.args
     new_contact_mode = RadioField(
-        'Mode de contact à privilégier',
-        choices=CONTACT_MODES,
-        default='email'
+        "Mode de contact à privilégier", choices=CONTACT_MODES, default="email"
     )
     new_website = StringField(
-        'Site Internet',
-        validators=[URL(), Optional()], render_kw={"placeholder": "http://exemple.com"}
+        "Site Internet",
+        validators=[URL(), Optional()],
+        render_kw={"placeholder": "http://exemple.com"},
     )
     new_email = EmailField(
-        'Email recruteur',
-        validators=[Email(), Optional()], render_kw={"placeholder": "exemple@domaine.com"}
+        "Email recruteur",
+        validators=[Email(), Optional()],
+        render_kw={"placeholder": "exemple@domaine.com"},
     )
     new_phone = StringField(
-        'Téléphone',
+        "Téléphone",
         validators=[Optional(), Regexp(PHONE_REGEX)],
-        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"}
+        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"},
     )
-    social_network = StringField('Réseau social', validators=[URL(), Optional()])
+    social_network = StringField("Réseau social", validators=[URL(), Optional()])
     new_email_alternance = EmailField(
-        'Email recruteur spécialisé alternance',
+        "Email recruteur spécialisé alternance",
         validators=[validators.optional(), Email()],
-        render_kw={"placeholder": "exemple-alternance@domaine.com"}
+        render_kw={"placeholder": "exemple-alternance@domaine.com"},
     )
     new_phone_alternance = StringField(
-        'Téléphone du recruteur spécialisé alternance',
+        "Téléphone du recruteur spécialisé alternance",
         validators=[validators.optional(), Regexp(PHONE_REGEX)],
-        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"}
+        render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"},
     )
     rgpd_consent = BooleanField(
+<<<<<<< HEAD
+        "En cochant cette case, vous consentez à diffuser des données à caractère personnel sur les services numériques de Pôle emploi.",
+        validators=[DataRequired()],  # sytt: instead of [validators.required()]
+=======
         'En cochant cette case, vous consentez à diffuser des données à caractère personnel sur les services numériques de Pôle emploi.',
-        [validators.required()]
+        [validators.InputRequired()]
+>>>>>>> 8e61dc28... :recycle: upgrade python to v3.10
     )
 
 
 class OfficeRemoveForm(OfficeHiddenIdentificationForm):
 
     remove_lbb = BooleanField(
-        'Supprimer mon entreprise du service La Bonne Boite puisque je ne suis pas intéressé-e pour recevoir des candidatures spontanées via ce site',
-        [validators.optional()]
+        "Supprimer mon entreprise du service La Bonne Boite puisque je ne suis pas intéressé-e pour recevoir des candidatures spontanées via ce site",
+        [validators.optional()],
     )
     remove_lba = BooleanField(
-        'Supprimer mon entreprise du service La Bonne Alternance puisque je ne suis pas intéressé-e pour recevoir des candidatures spontanées via ce site',
-        [validators.optional()]
+        "Supprimer mon entreprise du service La Bonne Alternance puisque je ne suis pas intéressé-e pour recevoir des candidatures spontanées via ce site",
+        [validators.optional()],
     )

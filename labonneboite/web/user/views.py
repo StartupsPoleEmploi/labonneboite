@@ -133,8 +133,8 @@ def favorites_list_as_pdf():
     return send_file(pdf_file,
                      mimetype='application/pdf',
                      as_attachment=True,
-                     attachment_filename='mes_favoris.pdf',
-                     cache_timeout=5)
+                     download_name='mes_favoris.pdf',
+                     max_age=5)
 
 
 def make_csv_response(csv_text, attachment_name):

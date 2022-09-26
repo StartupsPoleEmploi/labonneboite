@@ -15,9 +15,9 @@ Flask-DebugToolbar
 ipdb
 ipython
 pylint
-pip-tools
 
 # testing
+easyprocess
 # locust
 
 ##########
@@ -25,7 +25,7 @@ pip-tools
 ##########
 sqlalchemy-stubs
 
-types-Flask<0.13
+types-Flask
 # *missing*: types-Flask-Script
 
 ### Flask assets.
@@ -115,8 +115,7 @@ types-cryptography
 # *missing*: types-pyzmq
 # *missing*: types-remote-pdb
 
-#Fix markupsafe issue 1.0
-types-markupsafe==1.1.1
+types-markupsafe
 
 #Impact retour emploi.
 # *Could not find a version that matches*: google-api-python-client-stubs

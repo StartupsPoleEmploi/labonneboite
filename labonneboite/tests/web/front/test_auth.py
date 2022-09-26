@@ -30,24 +30,30 @@ class AuthTest(DatabaseTest):
         db_session.add(user_social_auth)
         db_session.commit()
 
-        with self.test_request_context():
+        with self.login_client.test_client(user=user) as client:
 
-            with self.app.session_transaction() as sess:
+            with client.session_transaction() as sess:
                 sess['this_should_not_be_deleted'] = 'foo'  # This should not be deleted by a login or logout.
 
-            self.login(user)
+            with client.session_transaction() as sess:
+                social_auth_backend = 'peam-openidconnect'
+                # Session info set by Flask-Login.
+                sess['_user_id'] = user.id
+                # Session info set by Python Social Auth.
+                sess['social_auth_last_login_backend'] = social_auth_backend
+                sess['%s_state' % social_auth_backend] = 'a1z2e3r4t5y6y'
 
-            with self.app.session_transaction() as sess:
+            with client.session_transaction() as sess:
                 self.assertIn('this_should_not_be_deleted', sess)
-                self.assertIn('user_id', sess)
+                self.assertIn('_user_id', sess)
                 self.assertIn('social_auth_last_login_backend', sess)
                 self.assertIn('peam-openidconnect_state', sess)
 
-            self.logout()
+            client.get('/authentication/logout')
 
-            with self.app.session_transaction() as sess:
+            with client.session_transaction() as sess:
                 self.assertIn('this_should_not_be_deleted', sess)
-                self.assertNotIn('user_id', sess)
+                self.assertNotIn('_user_id', sess)
                 self.assertNotIn('social_auth_last_login_backend', sess)
                 self.assertNotIn('peam-openidconnect_state', sess)
 

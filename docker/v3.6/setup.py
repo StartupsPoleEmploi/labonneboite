@@ -31,7 +31,6 @@ setup(
         "labonneboite",
     ],
     include_package_data=True,
-    long_description=read("README.md"),
     install_requires=install_requires,
     entry_points={
         "console_scripts": [

@@ -1,20 +1,53 @@
-version: "3"
-services:
-  nginx:
-    restart: always
-    image: nginx:1.13
-    volumes:
-      - ./nginx/etc/nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/var/log/labonneboite:/var/log/nginx/labonneboite
-    ports:
-      - ${HTTP_PORT:-8000}:8000
-    depends_on:
-      - labonneboite
+version: "3.7"
 
-  ###### 3rd-party services
-  # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
-  # https://www.elastic.co/blog/how-to-make-a-dockerfile-for-elasticsearch
+# settings
+x-db-env: &dbenv
+      MYSQL_ROOT_PASSWORD: p@ssword
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: labonneboite
+      MYSQL_USER: labonneboite
+      MYSQL_PASSWORD: labonneboite
+
+x-common-env: &cenv
+      DB_ROOT_PASSWORD: p@ssword
+      DB_DATABASE: labonneboite
+      DB_NAME: labonneboite
+      DB_USER: labonneboite
+      DB_PASSWORD: labonneboite
+      DB_PORT: 3306
+      ES_HOST: elasticsearch:9200
+      DB_HOST: mysql
+      OFFICE_TABLE: etablissements
+      LBB_ENV: development 
+
+services:
+
+  labonneboite:
+    hostname: labonneboite-backend
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/v3.6/Dockerfile
+      args:
+        options: --reload
+    environment:
+      <<: *cenv 
+    volumes:
+      - ./logs:/app/labonneboite/logs
+      - ./labonneboite:/app/labonneboite
+    depends_on:
+      elasticsearch:
+        condition: service_started
+      mysql:
+        condition: service_started
+    ports:
+      - 8080:8080
+
+  # ###### 3rd-party services
+  # # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+  # # https://www.elastic.co/blog/how-to-make-a-dockerfile-for-elasticsearch
   elasticsearch:
+    hostname: elasticsearch
     image: elasticsearch:1.7.2
     environment:
       - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
@@ -24,68 +57,34 @@ services:
       memlock:
         soft: -1
         hard: -1
-    #restart: "unless-stopped"
     ports:
-      # TODO remap port
       - 9200:9200
       - 9300:9300
-    networks:
-      - labonneboite_elk
-      - labonneboite_default
+    healthcheck:
+      test: curl --fail localhost:9200/_cat/health || exit 1
+      interval: 10s
+      retries: 5
+      timeout: 2s
 
-  kibana:
-    image: kibana:1.7.2
-    environment:
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      - "cluster.name=lbb"
-      - "bootstrap.memory_lock=true"
-      - "vm.max_map_count=4g"
-    ports:
-      - 5601:5601
-    networks:
-      - labonneboite_elk
-    depends_on:
-      - elasticsearch
-
+  # database
   mysql:
     image: mysql:5.6.36
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
-    #restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ''
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      <<: *dbenv
     ports:
       - 3306:3306
-    networks:
-      - labonneboite_default
+    healthcheck:
+      test: mysql ${MYSQL_DATABASE} --user=${MYSQL_USER} --password='${MYSQL_PASSWORD}' --silent --execute "SELECT 1;"
+      interval: 10s
+      retries: 5
+      timeout: 2s
 
-  ###### Je Postule
-  labonneboite:
+  # Dev tools
+  adminer:
+    image: adminer
     restart: always
-    build:
-      context: .
-    volumes:
-      - ./labonneboite/logs:/labonneboite/logs
-      - .:/labonneboite/src
-    depends_on:
-      - elasticsearch
-      - mysql
-    expose:
-      - 8000
-  # backups:
-  #   restart: always
-  #   build:
-  #     context: .
-  #     dockerfile: dockerfile_backups
-  #     args:
-  #     - ENV_TYPE=${ENV_TYPE:-production}
-  #     - TIMEZONE=${TIMEZONE:-Europe/Paris}
-  #   hostname: backups
-  #   volumes:
-  #   - ./:/home/docker
-  #   - ./backups/home/backups:/home/backups
-  #   - /mnt:/mnt
+    ports:
+      - 8000:8080
 
-networks:
-  labonneboite_elk:
-  labonneboite_default:
+
