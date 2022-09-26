@@ -81,7 +81,7 @@ pygments==2.2.0           # via ipython
 pyjwkest==1.4.0           # via social-auth-core
 pyjwt==1.5.2              # via social-auth-core
 pylint==1.9.2
-pypdf2==1.26.0            # via xhtml2pdf
+pypdf2==1.27.5            # via xhtml2pdf
 pyprof2calltree==1.4.3
 python-dateutil==2.6.1    # via alembic
 python-editor==1.0.3      # via alembic
