@@ -1,7 +1,7 @@
 from flask import request
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, HiddenField, RadioField, SelectMultipleField, StringField, TextAreaField, validators
-from wtforms.fields.html5 import EmailField, TelField
+from wtforms.fields import EmailField, TelField
 from wtforms.validators import DataRequired, Email, Optional, Regexp, URL
 from wtforms.widgets import CheckboxInput, ListWidget
 
@@ -199,13 +199,8 @@ class OfficeUpdateCoordinatesForm(OfficeHiddenIdentificationForm):
         render_kw={"placeholder": "01 77 86 39 49, +331 77 86 39 49"},
     )
     rgpd_consent = BooleanField(
-<<<<<<< HEAD
-        "En cochant cette case, vous consentez à diffuser des données à caractère personnel sur les services numériques de Pôle emploi.",
-        validators=[DataRequired()],  # sytt: instead of [validators.required()]
-=======
         'En cochant cette case, vous consentez à diffuser des données à caractère personnel sur les services numériques de Pôle emploi.',
-        [validators.InputRequired()]
->>>>>>> 8e61dc28... :recycle: upgrade python to v3.10
+        validators=[DataRequired()],
     )
 
 

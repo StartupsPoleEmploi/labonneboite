@@ -53,9 +53,6 @@ class UserFavoriteOffice(CRUDMixin, Base):
     else:
         office = relationship('Office', lazy='joined')
 
-    __mapper_args__ = {
-        'order_by': desc(date_created),  # Default order_by for all queries.
-    }
 
     @classmethod
     def add_favorite(cls,
