@@ -79,7 +79,7 @@ pycparser==2.19           # via cffi
 pycryptodomex==3.6.3      # via pyjwkest
 pygments==2.2.0           # via ipython
 pyjwkest==1.4.0           # via social-auth-core
-pyjwt==1.5.2              # via social-auth-core
+pyjwt==2.4.0              # via social-auth-core
 pylint==1.9.2
 pypdf2==1.26.0            # via xhtml2pdf
 pyprof2calltree==1.4.3
