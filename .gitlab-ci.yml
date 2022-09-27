@@ -10,7 +10,7 @@ python-tests:
       changes:
         - labonneboite/**/*
         - pyproject.toml
-    - if: ( $CI_COMMIT_BRANCH == "main" &&   $CI_PIPELINE_SOURCE != 'schedule' )
+    - if: ( $CI_COMMIT_BRANCH == "master" &&   $CI_PIPELINE_SOURCE != 'schedule' )
       changes:
         - labonneboite/**/*
         - pyproject.toml
@@ -20,7 +20,7 @@ sonarqube:
   needs:
     - job: python-tests
   rules:
-    - if: ( $CI_COMMIT_BRANCH == "main"  &&   $CI_PIPELINE_SOURCE != 'schedule' )
+    - if: ( $CI_COMMIT_BRANCH == "master"  &&   $CI_PIPELINE_SOURCE != 'schedule' )
       changes:
         - labonneboite/**/*
         - pyproject.toml
