@@ -107,3 +107,8 @@ labonneboite/web/static/gen/
 venv/
 logs/
 __pycache__
+testResults/
+pytest.xml
+flake8.xml
+.coverage
+testrun.html

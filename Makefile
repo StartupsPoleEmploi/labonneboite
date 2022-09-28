@@ -8,9 +8,9 @@ documentation: init-docs
 
 init-dev:
 	pip3 install poetry
-	poetry install --no-root
+	poetry install
 
-test: init-dev test-lint test-coverage test-package test-results
+test: database-test init-dev test-lint test-coverage test-package test-results
 
 test-lint: 
 	# lint
@@ -18,7 +18,7 @@ test-lint:
 	poetry run flake8_junit flake8.txt flake8.xml
 	rm flake8.txt
 
-test-coverage:
+test-coverage: database-alembic
 	# unit test & coverage
 	poetry run pytest --verbose --junitxml=pytest.xml --cov
 	poetry run coverage xml
@@ -31,3 +31,25 @@ test-results:
 	# prepare test results
 	mkdir -p testResults
 	mv *.xml  ./testResults
+
+# setting database 
+database:
+	docker-compose -f labonneboite/tests/docker-compose.db.yml up -d
+
+database-alembic: 
+	# update database with model
+	cd labonneboite && LBB_ENV=test alembic upgrade head 
+	
+	# sytt: attempt at importing the sql files in db : --sql > tests/sql/00-alembic.sql || echo alembic done!
+	
+
+
+database-test:
+	docker-compose -f labonneboite/tests/docker-compose.db.yml down
+	docker-compose -f labonneboite/tests/docker-compose.db.yml up -d
+
+populate-data-test:
+	LBB_ENV=test alembic upgrade head --sql > migration.sql
+	# alembic upgrade ae1027a6acf --sql > migration.sql
+	$(MYSQL) -D lbb_test < ./labonneboite/alembic/sql/etablissements.sql
+	LBB_ENV=test python ./labonneboite/scripts/create_index.py --full

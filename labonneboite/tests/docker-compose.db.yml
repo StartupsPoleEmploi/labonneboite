@@ -1,0 +1,29 @@
+version: "3.7"
+
+# settings
+services:
+  mysql:
+    image: mysql:5.6.36
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: labonneboite
+      MYSQL_USER: labonneboite
+      MYSQL_PASSWORD: labonneboite
+    ports:
+      - 3306:3306
+    # volumes:
+    #   - ./sql/:/docker-entrypoint-initdb.d/
+    
+
+  elasticsearch:
+    hostname: elasticsearch
+    image: elasticsearch:1.7.2
+    environment:
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+      - "cluster.name=lbb"
+      - "bootstrap.memory_lock=true"
+    ports:
+      - 9200:9200
+      - 9300:9300

@@ -20,7 +20,6 @@ classifiers = [
 [tool.poetry.scripts]
 create_index = "labonneboite.scripts.create_index:run"
 
-
 [tool.poetry.dependencies]
 python = "^3.10"
 # labonneboite dependency
@@ -33,7 +32,7 @@ Brotli = "^1.0.9"
 cachetools = "^5.2.0"
 cssmin = "^0.2.0"
 dnspython = "^2.2.1"
-elasticsearch = "^8.4.2"
+elasticsearch = "^1.9.0"
 email-validator = "^1.2.1"
 Flask = "^2.2.2"
 Flask-Admin = "^1.6.0"
@@ -89,8 +88,53 @@ flake8 = "^5.0.4"
 flake8-junit-report = "^2.1.0"
 coverage = "^6.4.4"
 locust = "^2.12.1" # not sure
+selenium = "^4.4.3"
+EasyProcess = "^1.1"
+pytest-env = "^0.6.2"
+pytest-flask-sqlalchemy = "^1.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov"
+testpaths = [
+    "labonneboite/tests/app/test_api_scripts.py",
+]
+python_files = "test_*.py"
+
+env = [
+    "LBB_ENV = test",
+    "LBB_SETTINGS = test",
+    "ES_HOST = http://localhost:9200"
+]
+
+# https://github.com/jeancochrane/pytest-flask-sqlalchemy#from-pypi
+mocked-engines="labonneboite.common.database.engine"
+# mocked-sessions="labonneboite.common.database.db_session"
+
+[tool.coverage.run]
+branch = true
+parallel = true
+concurrency = ["multiprocessing"]
+
+[tool.coverage.report]
+precision = 1
+show_missing = true
+ignore_errors = true
+exclude_lines =[
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "def __repr__",
+    "if settings.DEBUG",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:"
+    ]
+omit = [
+    "*/test*",
+    "*/migrations/*",
+    "manage.py",
+    "venv/*"
+    ]
