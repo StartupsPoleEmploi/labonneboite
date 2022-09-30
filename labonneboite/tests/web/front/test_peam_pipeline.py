@@ -47,14 +47,16 @@ class AuthPipelineTest(DatabaseTest):
 
     def test_run_pipeline_with_user_email_change(self):
         user = User(email='preexisting@email.com', external_id='peconnect-userid')
-        user.save()
+        self.db_session.add(user)
+        self.db_session.commit()
+
         self.assertEqual(
-            User.query.filter_by(external_id='peconnect-userid').first().email,
+            self.db_session.query(User).filter_by(external_id='peconnect-userid').first().email,
             'preexisting@email.com',
         )
         result = self.run_pipeline(peam.PEAMOpenIdConnect)
         self.assertEqual(
-            User.query.filter_by(external_id='peconnect-userid').first().email,
+            self.db_session.query(User).filter_by(external_id='peconnect-userid').first().email,
             'my@email.com',
         )
 

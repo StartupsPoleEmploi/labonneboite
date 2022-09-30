@@ -1,10 +1,10 @@
 import logging
 import unittest
-
+import pytest
 from flask import url_for as flask_url_for
 from flask_login import FlaskLoginClient
 
-from labonneboite.common.database import db_session, delete_db, engine, init_db
+# from labonneboite.common.database import db_session, delete_db, engine, init_db
 from labonneboite.common import env
 from labonneboite.common import es
 from labonneboite.conf import settings
@@ -29,8 +29,12 @@ class AppTest(unittest.TestCase):
     http://flask.pocoo.org/docs/0.12/testing/#accessing-and-modifying-sessions
     """
 
-    def setUp(self):
-
+    # sytt: https://github.com/pytest-dev/pytest-mock/issues/174
+    @pytest.fixture(autouse=True)
+    def __inject_fixtures_forall(self, db_session):
+        self.db_session = db_session
+        self.es = es.Elasticsearch()
+        es.drop_and_create_index()
         self.app = app.test_client()
         self.app_context = app.app_context
         self.test_request_context = app.test_request_context
@@ -41,6 +45,7 @@ class AppTest(unittest.TestCase):
         # Disable logging
         app.logger.setLevel(logging.CRITICAL)
 
+    def setUp(self):
         return super(AppTest, self).setUp()
 
     def url_for(self, endpoint, **kwargs):
@@ -50,6 +55,7 @@ class AppTest(unittest.TestCase):
         with self.app_context():
             url = flask_url_for(endpoint, **kwargs)
             return url
+
 
 class DatabaseTest(AppTest):
     """
@@ -73,22 +79,12 @@ class DatabaseTest(AppTest):
         logging.getLogger('elasticsearch').setLevel(logging.CRITICAL)
         logging.getLogger('main').setLevel(logging.CRITICAL)
 
-        # Create MySQL tables.
-        delete_db()
-        init_db()
-
         # Create ES index.
         self.assertIn('test', settings.ES_INDEX)
-        self.es = es.Elasticsearch()
-        es.drop_and_create_index()
 
         return super(DatabaseTest, self).setUp()
 
     def tearDown(self):
-        # Drop MySQL tables.
-        db_session.remove()
-        engine.dispose()
-        delete_db()
 
         # Empty ES index.
         es.drop_and_create_index()

@@ -87,10 +87,10 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         """
         # Note : we use 00000000000010 because score>50 & score_alternance == 0
         siret = '00000000000010'
-        self.assertEqual(Office.query.filter_by(siret=siret).first().score_alternance, 0)
+        self.assertEqual(self.db_session.query(Office).filter_by(siret=siret).first().score_alternance, 0)
 
         # Available for LBA
-        params = self.add_security_params({'user': 'emploi_store_dev', 'contract':'alternance'})
+        params = self.add_security_params({'user': 'emploi_store_dev', 'contract': 'alternance'})
         rv = self.app.get('/api/v1/office/%s/details?%s' % (siret, urlencode(params)))
         self.assertEqual(rv.status_code, 200)
 
@@ -106,8 +106,8 @@ class ApiOfficeDetailsTest(ApiBaseTest):
             sirets=siret,
             score_alternance=0,
         )
-
-        office_to_update.save(commit=True)
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
         script.update_offices(OfficeAdminUpdate)
 
         # Available for LBB but not for LBA
@@ -115,10 +115,9 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         rv = self.app.get('/api/v1/office/%s/details?%s' % (siret, urlencode(params)))
         self.assertEqual(rv.status_code, 200)
 
-        params = self.add_security_params({'user': 'emploi_store_dev', 'contract':'alternance'})
+        params = self.add_security_params({'user': 'emploi_store_dev', 'contract': 'alternance'})
         rv = self.app.get('/api/v1/office/%s/details?%s' % (siret, urlencode(params)))
         self.assertEqual(rv.status_code, 404)
-
 
     def test_update_office_remove_lbb_details(self):
         """
@@ -132,8 +131,9 @@ class ApiOfficeDetailsTest(ApiBaseTest):
             sirets=siret,
             hiring=0,
         )
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
-        office_to_update.save(commit=True)
         script.update_offices(OfficeAdminUpdate)
 
         # Available for LBA but not for LBB
@@ -141,6 +141,6 @@ class ApiOfficeDetailsTest(ApiBaseTest):
         rv = self.app.get('/api/v1/office/%s/details?%s' % (siret, urlencode(params)))
         self.assertEqual(rv.status_code, 404)
 
-        params = self.add_security_params({'user': 'emploi_store_dev', 'contract':'alternance'})
+        params = self.add_security_params({'user': 'emploi_store_dev', 'contract': 'alternance'})
         rv = self.app.get('/api/v1/office/%s/details?%s' % (siret, urlencode(params)))
         self.assertEqual(rv.status_code, 200)

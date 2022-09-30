@@ -1,5 +1,5 @@
 import unittest.mock
-
+import pytest
 from labonneboite.common.models import Office
 from labonneboite.common import pdf
 from labonneboite.tests.test_base import DatabaseTest
@@ -8,9 +8,10 @@ from labonneboite.common.load_data import load_groupements_employeurs
 
 class DownloadTest(DatabaseTest):
 
-    def setUp(self):
-        super().setUp()
-
+    # replace setup by a pytest fixture
+    # sytt: https://github.com/pytest-dev/pytest-mock/issues/174
+    @pytest.fixture(autouse=True)
+    def _test_data(self):
         # Create an office.
         self.office = Office(
             departement='75',
@@ -25,10 +26,14 @@ class DownloadTest(DatabaseTest):
             x=2.3488,
             y=48.8534,
         )
-        self.office.save()
+        self.db_session.add(self.office)
+        self.db_session.commit()
 
         # Remove pdf file if it already exists
         pdf.delete_file(self.office)
+
+    def setUp(self):
+        super().setUp()
 
     def test_office_fields_and_properties_are_str(self):
         """
@@ -62,8 +67,8 @@ class DownloadTest(DatabaseTest):
         Test the office details page of an office having NAF 9900Z.
         """
 
-        self.office.naf = '9900Z'
-        self.office.save()
+        self.db_session.query(Office).filter(Office.siret == self.office.siret).\
+            update({"naf": "9900Z"}, synchronize_session="fetch")
 
         rv = self.app.get(self.url_for('office.details', siret=self.office.siret))
         self.assertEqual(rv.status_code, 200)
@@ -72,8 +77,8 @@ class DownloadTest(DatabaseTest):
         """
         Test the office details page of an office being a groupement d'employeurs.
         """
-        self.office.siret = '30651644400024'  # first siret in groupements_employeurs.csv
-        self.office.save()
+        self.db_session.query(Office).filter(Office.siret == self.office.siret).\
+            update({"siret": "30651644400024"}, synchronize_session="fetch")
 
         self.assertIn(self.office.siret, load_groupements_employeurs())
 
@@ -125,8 +130,8 @@ class DownloadTest(DatabaseTest):
         """
         Test the office PDF download of an office having NAF 9900Z.
         """
-        self.office.naf = '9900Z'
-        self.office.save()
+        self.db_session.query(Office).filter(Office.siret == self.office.siret).\
+            update({"naf": "9900Z"}, synchronize_session="fetch")
 
         rv = self.app.get(self.url_for('office.download', siret=self.office.siret))
         self.assertEqual(rv.status_code, 200)

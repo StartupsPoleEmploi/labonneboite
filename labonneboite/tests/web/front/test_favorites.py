@@ -4,6 +4,7 @@ from labonneboite.common.models import UserFavoriteOffice
 from labonneboite.common import es
 from labonneboite.conf import settings
 from labonneboite.tests.test_base import DatabaseTest
+import pytest
 
 
 class FavoriteBaseTest(DatabaseTest):
@@ -30,14 +31,18 @@ class FavoriteBaseTest(DatabaseTest):
         },
     }
 
-    def setUp(self):
-        super(FavoriteBaseTest, self).setUp()
-
+    # replace setup by a pytest fixture
+    # sytt: https://github.com/pytest-dev/pytest-mock/issues/174
+    @pytest.fixture(autouse=True)
+    def _test_data_test_favorites(self):
         # Create a user.
-        self.user = User.create(email='j@test.com',
-                                gender='male',
-                                first_name='John',
-                                last_name='Doe')
+        self.user = User(email='j@test.com',
+                         gender='male',
+                         first_name='John',
+                         last_name='Doe')
+
+        self.db_session.add(self.user)
+        self.db_session.commit()
 
         # Insert test data into Elasticsearch.
         docs = [
@@ -117,10 +122,15 @@ class FavoriteBaseTest(DatabaseTest):
                 x=doc['locations'][0]['lon'],
                 y=doc['locations'][0]['lat'],
             )
-            office.save()
+            self.db_session.add(office)
+            self.db_session.commit()
 
+    def setUp(self):
+        super(FavoriteBaseTest, self).setUp()
+
+    def test_setup(self):
         # We should have as much entries in MariaDB/MySQL than in Elasticsearch.
-        self.assertEqual(Office.query.count(), len(docs))
+        self.assertEqual(self.db_session.query(Office).count(), 4)
 
 
 class FavoriteTest(FavoriteBaseTest):
@@ -132,7 +142,7 @@ class FavoriteTest(FavoriteBaseTest):
         """
         Test download favorites list as csv.
         """
-        office = Office.query.filter(Office.siret == '00000000000004').one()
+        office = self.db_session.query(Office).filter(Office.siret == '00000000000004').one()
         url = self.url_for('user.favorites_list_as_csv')
 
         # An anonymous user cannot download the favorites list.
@@ -154,7 +164,7 @@ class FavoriteTest(FavoriteBaseTest):
         """
         Test favorites list.
         """
-        office = Office.query.filter(Office.siret == '00000000000004').one()
+        office = self.db_session.query(Office).filter(Office.siret == '00000000000004').one()
         url_list = self.url_for('user.favorites_list')
 
         # An anonymous user cannot access the favorites list.
@@ -182,7 +192,7 @@ class FavoriteTest(FavoriteBaseTest):
         Test the creation of a favorite.
         """
         rome_code = 'M1805'
-        office = Office.query.filter(Office.siret == '00000000000002').one()
+        office = self.db_session.query(Office).filter(Office.siret == '00000000000002').one()
         url_list = self.url_for('user.favorites_list', _external=False)
         url_add = self.url_for('user.favorites_add',
                                siret=office.siret,
@@ -211,7 +221,7 @@ class FavoriteTest(FavoriteBaseTest):
             # Adding favorite from search results - the realistic case.
             # User should be redirected back to the search results.
             rv = client.post(url_add,
-                               data={'next': url_search_without_domain})
+                             data={'next': url_search_without_domain})
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, url_search_without_domain)
 
@@ -241,14 +251,14 @@ class FavoriteTest(FavoriteBaseTest):
         siret = '00000000000002'
         url_add = self.url_for('user.favorites_add', siret=siret)
 
-        self.assertEqual(0, UserFavoriteOffice.query.filter(
+        self.assertEqual(0, self.db_session.query(UserFavoriteOffice).filter(
             UserFavoriteOffice.user_id == self.user.id).count())
         with self.login_client.test_client(user=self.user) as client:
 
             rv = client.post(url_add)
             self.assertEqual(rv.status_code, 302)
 
-        favorites = UserFavoriteOffice.query.filter(
+        favorites = self.db_session.query(UserFavoriteOffice).filter(
             UserFavoriteOffice.user_id == self.user.id).all()
         self.assertEqual(1, len(favorites))
         self.assertEqual(siret, favorites[0].office_siret)
@@ -258,7 +268,7 @@ class FavoriteTest(FavoriteBaseTest):
         """
         Test the deletion of a favorite.
         """
-        office = Office.query.filter(Office.siret == '00000000000003').one()
+        office = self.db_session.query(Office).filter(Office.siret == '00000000000003').one()
         url_list = self.url_for('user.favorites_list', _external=False)
         url_delete = self.url_for('user.favorites_delete', siret=office.siret, _external=False)
         url_search_without_domain = '/entreprises/nancy-54100/strategie-commerciale'
@@ -270,8 +280,10 @@ class FavoriteTest(FavoriteBaseTest):
         with self.login_client.test_client(user=self.user) as client:
 
             # Create a favorite for the user.
-            UserFavoriteOffice.create(user_id=self.user.id,
-                                      office_siret=office.siret)
+            office = UserFavoriteOffice(user_id=self.user.id,
+                                        office_siret=office.siret)
+            self.db_session.add(office)
+            self.db_session.commit()
 
             rv = client.get(url_list)
             self.assertEqual(rv.status_code, 200)
@@ -285,13 +297,15 @@ class FavoriteTest(FavoriteBaseTest):
             self.assertEqual(rv.location, url_list)
 
             # Create again the favorite for the user.
-            UserFavoriteOffice.create(user_id=self.user.id,
-                                      office_siret=office.siret)
+            office = UserFavoriteOffice(user_id=self.user.id,
+                                        office_siret=office.siret)
+            self.db_session.add(office)
+            self.db_session.commit()
 
             # Deleting favorite from search results - the realistic case.
             # User should be redirected back to the search results.
             rv = client.post(url_delete,
-                               data={'next': url_search_without_domain})
+                             data={'next': url_search_without_domain})
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, url_search_without_domain)
 
@@ -302,9 +316,11 @@ class FavoriteTest(FavoriteBaseTest):
 
     def test_favorites_download_list_as_pdf(self):
         url_favorites_download = self.url_for('user.favorites_list_as_pdf')
-        office = Office.query.filter(Office.siret == '00000000000001').one()
-        UserFavoriteOffice.create(user_id=self.user.id,
-                                  office_siret=office.siret)
+        office = self.db_session.query(Office).filter(Office.siret == '00000000000001').one()
+        office2 = UserFavoriteOffice(user_id=self.user.id,
+                                     office_siret=office.siret)
+        self.db_session.add(office2)
+        self.db_session.commit()
 
         with self.login_client.test_client(user=self.user) as client:
             rv = client.get(url_favorites_download)

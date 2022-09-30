@@ -2,7 +2,7 @@ import urllib.parse
 
 from social_flask_sqlalchemy.models import UserSocialAuth
 
-from labonneboite.common.database import db_session
+# from labonneboite.common.database import db_session
 from labonneboite.common.models import get_user_social_auth, User
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.app import app
@@ -18,8 +18,8 @@ class AuthTest(DatabaseTest):
         """
 
         user = User(email='j@test.com', gender='male', first_name='John', last_name='Doe')
-        db_session.add(user)
-        db_session.flush()
+        self.db_session.add(user)
+        self.db_session.flush()
 
         # This `UserSocialAuth` entry will be required later by the logout function.
         user_social_auth = UserSocialAuth(
@@ -27,8 +27,8 @@ class AuthTest(DatabaseTest):
             extra_data={'id_token': 'fake'},
             user_id=user.id,
         )
-        db_session.add(user_social_auth)
-        db_session.commit()
+        self.db_session.add(user_social_auth)
+        self.db_session.commit()
 
         with self.login_client.test_client(user=user) as client:
 
@@ -62,17 +62,17 @@ class AuthTest(DatabaseTest):
         Test the `get_user_social_auth()` function.
         """
         user = User(email='john@doe.com', gender='male', first_name='John', last_name='Doe')
-        db_session.add(user)
-        db_session.flush()
+        self.db_session.add(user)
+        self.db_session.flush()
 
         expected_user_social_auth = UserSocialAuth(provider=PEAMOpenIdConnect.name, extra_data=None, user_id=user.id)
-        db_session.add(expected_user_social_auth)
-        db_session.flush()
+        self.db_session.add(expected_user_social_auth)
+        self.db_session.flush()
 
-        db_session.commit()
+        self.db_session.commit()
 
-        self.assertEqual(db_session.query(User).count(), 1)
-        self.assertEqual(db_session.query(UserSocialAuth).count(), 1)
+        self.assertEqual(self.db_session.query(User).count(), 1)
+        self.assertEqual(self.db_session.query(UserSocialAuth).count(), 1)
 
         user_social_auth = get_user_social_auth(user.id)
         self.assertEqual(user_social_auth.id, expected_user_social_auth.id)

@@ -1,9 +1,7 @@
 import json
 from unittest import mock
 
-from flask import url_for
-
-from labonneboite.common.models import OfficeAdminUpdate
+from labonneboite.common.models import OfficeAdminUpdate, Office
 from labonneboite.common import es
 from labonneboite.scripts import create_index as script
 from labonneboite.tests.web.api.test_api_base import ApiBaseTest
@@ -26,7 +24,10 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
             boost=True,
             romes_to_boost="D1211",  # Boost score only for this ROME.
         )
-        office_to_update.save(commit=True)
+
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
+
         script.update_offices(OfficeAdminUpdate)
         es.Elasticsearch().indices.flush()
 
@@ -54,12 +55,22 @@ class ApiScriptsTest(ApiBaseTest, CreateIndexBaseTest):
         """
         Test `update_offices` boosted flag is present when all romes are boosted
         """
+
+        # add demodata
+        for office in self.offices:
+            o = Office(**office)
+            self.db_session.add(o)
+            self.db_session.commit()
+
+        # do our test
         office_to_update = OfficeAdminUpdate(
             sirets='00000000000009',
             name='Office 9',
             boost=True
         )
-        office_to_update.save()
+
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
         script.update_offices(OfficeAdminUpdate)
         es.Elasticsearch().indices.flush()
 

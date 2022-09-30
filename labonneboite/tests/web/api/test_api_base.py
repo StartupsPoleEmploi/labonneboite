@@ -594,6 +594,7 @@ class ApiBaseTest(DatabaseTest):
         # need for ES to register our new documents, flaky test here otherwise
         self.es.indices.flush(index=settings.ES_INDEX)
 
+        offices = []
         # Create related Office instances into MariaDB/MySQL.
         for doc in self.docs:
 
@@ -609,29 +610,46 @@ class ApiBaseTest(DatabaseTest):
             if not commune_id:
                 raise ValueError("Cannot create an entry in Office with a city absent from self.positions.")
 
-            office = Office(
-                office_name=doc['name'],
-                siret=doc['siret'],
-                hiring=doc['hiring'],
-                score_alternance=doc['score_alternance'],
-                naf=doc['naf'],
-                city_code=commune_id,
-                zipcode=zip_code,
-                email='foo@bar.com',
-                departement=zip_code[:2],
-                company_name=doc['company_name'] if 'company_name' in doc else '',
-                flag_alternance=doc['flag_alternance'],
-                flag_pmsmp=doc['flag_pmsmp'],
-                headcount=doc['headcount'],
-                x=doc['locations'][0]['lon'],
-                y=doc['locations'][0]['lat'],
-            )
-            office.save()
+            # office = Office(
+            #     office_name=doc['name'],
+            #     siret=doc['siret'],
+            #     hiring=doc['hiring'],
+            #     score_alternance=doc['score_alternance'],
+            #     naf=doc['naf'],
+            #     city_code=commune_id,
+            #     zipcode=zip_code,
+            #     email='foo@bar.com',
+            #     departement=zip_code[:2],
+            #     company_name=doc['company_name'] if 'company_name' in doc else '',
+            #     flag_alternance=doc['flag_alternance'],
+            #     flag_pmsmp=doc['flag_pmsmp'],
+            #     headcount=doc['headcount'],
+            #     x=doc['locations'][0]['lon'],
+            #     y=doc['locations'][0]['lat'],
+            # )
+            offices += [{
+                "office_name": doc['name'],
+                "siret": doc['siret'],
+                "hiring": doc['hiring'],
+                "score_alternance": doc['score_alternance'],
+                "naf": doc['naf'],
+                "city_code": commune_id,
+                "zipcode": zip_code,
+                "email": 'foo@bar.com',
+                "departement": zip_code[:2],
+                "company_name": doc['company_name'] if 'company_name' in doc else '',
+                "flag_alternance": doc['flag_alternance'],
+                "flag_pmsmp": doc['flag_pmsmp'],
+                "headcount": doc['headcount'],
+                "x": doc['locations'][0]['lon'],
+                "y": doc['locations'][0]['lat']
+            }]
 
+        self.offices = offices
         # We should have as much entries in MariaDB/MySQL than in Elasticsearch, except
         # one more in ES for the fake document actually.
-        es_count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={'query': {'match_all': {}}})
-        self.assertEqual(Office.query.count() + 1, es_count['count'])
+        # es_count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={'query': {'match_all': {}}})
+        # self.assertEqual(self.db_session.query(Office).count() + 1, es_count['count'])
 
     def tearDown(self):
         # Insert test data into Elasticsearch.
@@ -639,7 +657,6 @@ class ApiBaseTest(DatabaseTest):
             # just like in other environments, id should be the siret
             self.es.delete(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=doc['siret'])
         sirets = list(map(itemgetter('siret'), self.docs))
-        offices = Office.query.filter(Office.siret in sirets).delete()
         super().tearDown()
 
     def add_security_params(self, params):

@@ -2,6 +2,7 @@ from labonneboite.scripts import prepare_mailing_data as script
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.common.models import Office
 
+
 class PrepareMailingDataBaseTest(DatabaseTest):
     """
     Create Elasticsearch and DB content for the unit tests.
@@ -11,7 +12,7 @@ class PrepareMailingDataBaseTest(DatabaseTest):
         super(PrepareMailingDataBaseTest, self).setUp(*args, **kwargs)
 
         # We should have 0 offices in the DB.
-        self.assertEqual(Office.query.count(), 0)
+        self.assertEqual(self.db_session.query(Office).count(), 0)
 
 
 class MinimalisticTest(PrepareMailingDataBaseTest):

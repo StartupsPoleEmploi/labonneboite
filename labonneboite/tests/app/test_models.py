@@ -2,7 +2,7 @@ import datetime
 
 from labonneboite.common import scoring
 from labonneboite.conf import settings
-from labonneboite.common.database import db_session
+# from labonneboite.common.database import db_session
 from labonneboite.common.models import Office, OfficeResult, OfficeAdminExtraGeoLocation
 from labonneboite.tests.test_base import DatabaseTest
 
@@ -21,10 +21,10 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
             codes="75110\n\n\n\n\n\n\n57616",
             reason="Paris 10 + Metz Saint Julien",
         )
-        db_session.add(extra_geolocation)
-        db_session.commit()
+        self.db_session.add(extra_geolocation)
+        self.db_session.commit()
         # The `clean()` method should have been called automatically.
-        extra_geolocation = db_session.query(OfficeAdminExtraGeoLocation).first()
+        extra_geolocation = self.db_session.query(OfficeAdminExtraGeoLocation).first()
         # Multiple newlines should have been removed.
         self.assertEqual(extra_geolocation.codes, '57616\n75110')
         # Corresponding Lat/Lon coords should have been found and stored.
@@ -41,11 +41,15 @@ class OfficeAdminExtraGeoLocationTest(DatabaseTest):
             siret="38524664000176",
             codes="75108",
         )
-        extra_geolocation.save()
+        self.db_session.add(extra_geolocation)
+        self.db_session.commit()
+
         self.assertFalse(extra_geolocation.is_outdated())
         # Make `extra_geolocation` instance out-of-date.
         extra_geolocation.date_end = datetime.datetime.now() - datetime.timedelta(days=1)
-        extra_geolocation.update()
+        # extra_geolocation.update()
+        self.db_session.add(extra_geolocation)
+        self.db_session.commit()
         self.assertTrue(extra_geolocation.is_outdated())
 
     def test_codes_as_list(self):

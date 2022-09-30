@@ -2,7 +2,7 @@ from unittest import mock
 
 from social_flask_sqlalchemy.models import UserSocialAuth
 
-from labonneboite.common.database import db_session
+# from labonneboite.common.database import db_session
 from labonneboite.common.models import User
 from labonneboite.common.models import Office
 from labonneboite.common.models import UserFavoriteOffice
@@ -20,8 +20,8 @@ class UserAccountTest(DatabaseTest):
         super(UserAccountTest, self).setUp()
 
         self.user = User(email='john@doe.com', gender='male', first_name='John', last_name='Doe')
-        db_session.add(self.user)
-        db_session.flush()
+        self.db_session.add(self.user)
+        self.db_session.flush()
 
         self.office1 = Office(
             departement='57',
@@ -47,8 +47,8 @@ class UserAccountTest(DatabaseTest):
             x=6.166667,
             y=49.133333,
         )
-        db_session.add_all([self.office1, self.office2])
-        db_session.flush()
+        self.db_session.add_all([self.office1, self.office2])
+        self.db_session.flush()
 
         self.user_social_auth = UserSocialAuth(
             provider=PEAMOpenIdConnect.name,
@@ -57,15 +57,15 @@ class UserAccountTest(DatabaseTest):
         )
         self.fav1 = UserFavoriteOffice(user_id=self.user.id, office_siret=self.office1.siret)
         self.fav2 = UserFavoriteOffice(user_id=self.user.id, office_siret=self.office2.siret)
-        db_session.add_all([self.user_social_auth, self.fav1, self.fav2])
-        db_session.flush()
+        self.db_session.add_all([self.user_social_auth, self.fav1, self.fav2])
+        self.db_session.flush()
 
-        db_session.commit()
+        self.db_session.commit()
 
-        self.assertEqual(db_session.query(User).count(), 1)
-        self.assertEqual(db_session.query(Office).count(), 2)
-        self.assertEqual(db_session.query(UserFavoriteOffice).count(), 2)
-        self.assertEqual(db_session.query(UserSocialAuth).count(), 1)
+        self.assertEqual(self.db_session.query(User).count(), 1)
+        self.assertEqual(self.db_session.query(Office).count(), 2)
+        self.assertEqual(self.db_session.query(UserFavoriteOffice).count(), 2)
+        self.assertEqual(self.db_session.query(UserSocialAuth).count(), 1)
 
     def test_download_user_personal_data(self):
         """

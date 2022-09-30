@@ -1,13 +1,13 @@
 import datetime
 from unittest import mock
-
+import pytest
 from flask import url_for
 from social_flask_sqlalchemy.models import UserSocialAuth
 
 from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.common.models import OfficeAdminExtraGeoLocation, User
-from labonneboite.common.database import db_session
+# from labonneboite.common.database import db_session
 from labonneboite.conf import settings
 from labonneboite.common import es
 from labonneboite.scripts import create_index as script
@@ -15,11 +15,106 @@ from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
 from labonneboite.common import scoring as scoring_util
 
+OFFICES = [
+    {
+        "siret": "78548035101646",
+        "company_name": "SUPERMARCHES MATCH",
+        "office_name": "SUPERMARCHES MATCH",
+        "naf": "4711D",
+        "street_number": "45",
+        "street_name": "AVENUE ANDRE MALRAUX",
+        "city_code": "57463",
+        "zipcode": "57000",
+        "email": "supermarche@match.com",
+        "tel": "0387787878",
+        "website": "http://www.supermarchesmatch.fr",
+        "flag_alternance": 0,
+        "flag_junior": 0,
+        "flag_senior": 0,
+        "flag_handicap": 0,
+        "departement": "57",
+        "headcount": "12",
+        "hiring": 120,  # aka score 90
+        "score_alternance": 90,
+        "x": 6.17952,
+        "y": 49.1044
+    },
+    {
+        "siret": "78548035101647",
+        "company_name": "HYPER U",
+        "office_name": "HYPER U",
+        "naf": "4711D",
+        "street_number": "8",
+        "street_name": "AVENUE DE LA LIBERATION",
+        "city_code": "44101",
+        "zipcode": "44620",
+        "email": "hyper-u-lamontagne@match.com",
+        "tel": "0240659515",
+        "website": "http://www.hyper-u-lamontagne.fr",
+        "flag_alternance": 0,
+        "flag_junior": 0,
+        "flag_senior": 0,
+        "flag_handicap": 0,
+        "departement": "44",
+        "headcount": "21",
+        "hiring": 92,  # aka score 77
+        "score_alternance": 75,
+        "x": -1.68333,
+        "y": 47.183331,
+    },
+    {
+        "siret": "01625043300220",
+        "company_name": "CHAUSSURES CENDRY",
+        "office_name": "GEP",
+        "naf": "4772A",
+        "street_number": "11",
+        "street_name": "RUE FABERT",
+        "zipcode": "57000",
+        "city_code": "57463",
+        "flag_alternance": 0,
+        "flag_junior": 0,
+        "flag_senior": 0,
+        "departement": "57",
+        "headcount": '31',
+        "hiring": 100,  # aka score 80
+        "x": 6.17528,
+        "y": 49.1187,
+        "reason": "Demande de mise en avant",
+    }
+]
+
 
 class CreateIndexBaseTest(DatabaseTest):
     """
     Create Elasticsearch and DB content for the unit tests.
     """
+
+    # replace setup by a pytest fixture
+    # sytt: https://github.com/pytest-dev/pytest-mock/issues/174
+    @pytest.fixture(autouse=True)
+    def _test_data_create_index(self):
+        self.office1 = Office(**OFFICES[0])
+        self.office2 = Office(**OFFICES[1])
+
+        self.db_session.add(self.office1)
+        self.db_session.commit()
+
+        self.db_session.add(self.office2)
+        self.db_session.commit()
+
+        # # Put offices into ES.
+        # # Disable parallel computing because it does not play well with test environment (it hangs).
+        script.create_offices(disable_parallel_computing=True)
+        self.es.indices.flush(index=settings.ES_INDEX)  # required by ES to register new documents.
+
+        # # We should have 3 offices in ES (2 + the fake office).
+        # count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={'query': {'match_all': {}}})
+        # self.assertEqual(count['count'], 2 + 1)
+        # # Ensure that the office is the one that has been indexed in ES.
+        # res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office1.siret)
+        # self.assertEqual(res['_source']['email'], self.office1.email)
+        # res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office2.siret)
+        # self.assertEqual(res['_source']['email'], self.office2.email)
 
     def setUp(self):
         super(CreateIndexBaseTest, self).setUp()
@@ -27,100 +122,17 @@ class CreateIndexBaseTest(DatabaseTest):
         # Mute script logging
         script.logger.setLevel(script.logging.CRITICAL)
 
-        self.office1 = Office(
-            siret="78548035101646",
-            company_name="SUPERMARCHES MATCH",
-            office_name="SUPERMARCHES MATCH",
-            naf="4711D",
-            street_number="45",
-            street_name="AVENUE ANDRE MALRAUX",
-            city_code="57463",
-            zipcode="57000",
-            email="supermarche@match.com",
-            tel="0387787878",
-            website="http://www.supermarchesmatch.fr",
-            flag_alternance=0,
-            flag_junior=0,
-            flag_senior=0,
-            flag_handicap=0,
-            departement="57",
-            headcount="12",
-            hiring=120,  # aka score 90
-            score_alternance=90,
-            x=6.17952,
-            y=49.1044,
-        )
-        self.office1.save()
-
-        self.office2 = Office(
-            siret="78548035101647",
-            company_name="HYPER U",
-            office_name="HYPER U",
-            naf="4711D",
-            street_number="8",
-            street_name="AVENUE DE LA LIBERATION",
-            city_code="44101",
-            zipcode="44620",
-            email="hyper-u-lamontagne@match.com",
-            tel="0240659515",
-            website="http://www.hyper-u-lamontagne.fr",
-            flag_alternance=0,
-            flag_junior=0,
-            flag_senior=0,
-            flag_handicap=0,
-            departement="44",
-            headcount="21",
-            hiring=92,  # aka score 77
-            score_alternance=75,
-            x=-1.68333,
-            y=47.183331,
-        )
-        self.office2.save()
-
+    def test_setup(self):
         # We should have 2 offices in the DB.
-        self.assertEqual(Office.query.count(), 2)
-
-        # Put offices into ES.
-        # Disable parallel computing because it does not play well with test environment (it hangs).
-        script.create_offices(disable_parallel_computing=True)
-        self.es.indices.flush(index=settings.ES_INDEX)  # required by ES to register new documents.
-
-        # We should have 3 offices in ES (2 + the fake office).
-        count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={'query': {'match_all': {}}})
-        self.assertEqual(count['count'], 2 + 1)
-        # Ensure that the office is the one that has been indexed in ES.
-        res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office1.siret)
-        self.assertEqual(res['_source']['email'], self.office1.email)
-        res = self.es.get(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=self.office2.siret)
-        self.assertEqual(res['_source']['email'], self.office2.email)
+        self.assertEqual(self.db_session.query(Office).count(), 2)
 
 
 class DeleteOfficeAdminTest(CreateIndexBaseTest):
 
     def test_office_admin_add(self):
         form = {
-            "siret": "78548035101646",
-            "company_name": "SUPERMARCHES MATCH",
-            "office_name": "SUPERMARCHES MATCH",
-            "naf": "4711D",
-            "street_number": "45",
-            "street_name": "AVENUE ANDRE MALRAUX",
-            "city_code": "57463",
-            "zipcode": "57000",
-            "email": "supermarche@match.com",
-            "tel": "0387787878",
-            "website": "http://www.supermarchesmatch.fr",
-            "flag_alternance": 0,
-            "flag_junior": 0,
-            "flag_senior": 0,
-            "flag_handicap": 0,
-            "departement": "57",
-            "headcount": "12",
-            "score": 90,
-            "score_alternance": 75,
-            "x": 6.17952,
-            "y": 49.1044,
-            "reason": "Demande de mise en avant",
+            **OFFICES[0],
+            "reason": "Demande de mise en avant"
         }
 
         with self.test_request_context():
@@ -131,31 +143,31 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
                              last_name='Doe',
                              active=True,
                              is_admin=True)
-            db_session.add(self.user)
-            db_session.flush()
+            self.db_session.add(self.user)
+            self.db_session.flush()
 
             user_social_auth = UserSocialAuth(
                 provider=PEAMOpenIdConnect.name,
                 extra_data={'id_token': 'fake'},
                 user_id=self.user.id,
             )
-            db_session.add(user_social_auth)
-            db_session.commit()
+            self.db_session.add(user_social_auth)
+            self.db_session.commit()
 
             # Login as user admin
-            self.user = db_session.query(User).filter_by(id=self.user.id).first()
-            self.assertEqual(db_session.query(User).count(), 1)
+            self.user = self.db_session.query(User).filter_by(id=self.user.id).first()
+            self.assertEqual(self.db_session.query(User).count(), 1)
 
             with self.login_client.test_client(user=self.user) as client:
 
                 # Create OfficeAdminRemove
-                self.assertEqual(0, OfficeAdminAdd.query.filter_by(id=1).count())
+                self.assertEqual(0, self.db_session.query(OfficeAdminAdd).filter_by(id=1).count())
                 client.post(url_for('officeadminadd.create_view'), data=form)
-                self.assertEqual(1, OfficeAdminAdd.query.filter_by(id=1).count())
+                self.assertEqual(1, self.db_session.query(OfficeAdminAdd).filter_by(id=1).count())
 
                 # Delete OfficeAdminAdd
                 client.post(url_for('officeadminadd.delete_view'), data={'id': 1})
-                self.assertEqual(0, OfficeAdminRemove.query.filter_by(id=1).count())
+                self.assertEqual(0, self.db_session.query(OfficeAdminRemove).filter_by(id=1).count())
 
     def test_office_admin_remove(self):
         # Create officeAdminRemove
@@ -174,31 +186,31 @@ class DeleteOfficeAdminTest(CreateIndexBaseTest):
                              last_name='Doe',
                              active=True,
                              is_admin=True)
-            db_session.add(self.user)
-            db_session.flush()
+            self.db_session.add(self.user)
+            self.db_session.flush()
 
             user_social_auth = UserSocialAuth(
                 provider=PEAMOpenIdConnect.name,
                 extra_data={'id_token': 'fake'},
                 user_id=self.user.id,
             )
-            db_session.add(user_social_auth)
-            db_session.commit()
+            self.db_session.add(user_social_auth)
+            self.db_session.commit()
 
             # Login as user admin
-            self.user = db_session.query(User).filter_by(id=self.user.id).first()
-            self.assertEqual(db_session.query(User).count(), 1)
+            self.user = self.db_session.query(User).filter_by(id=self.user.id).first()
+            self.assertEqual(self.db_session.query(User).count(), 1)
 
             with self.login_client.test_client(user=self.user) as client:
 
                 # Create OfficeAdminRemove
-                self.assertEqual(0, OfficeAdminRemove.query.filter_by(siret='01234567891234').count())
+                self.assertEqual(0, self.db_session.query(OfficeAdminRemove).filter_by(siret='01234567891234').count())
                 client.post(url_for('officeadminremove.create_view'), data=form)
-                self.assertEqual(1, OfficeAdminRemove.query.filter_by(siret='01234567891234').count())
+                self.assertEqual(1, self.db_session.query(OfficeAdminRemove).filter_by(siret='01234567891234').count())
 
                 # Delete OfficeAdminRemove
                 client.post(url_for('officeadminremove.delete_view'), data={'id': 1})
-                self.assertEqual(0, OfficeAdminRemove.query.filter_by(id=1).count())
+                self.assertEqual(0, self.db_session.query(OfficeAdminRemove).filter_by(id=1).count())
 
 
 class VariousModesTest(CreateIndexBaseTest):
@@ -309,30 +321,14 @@ class AddOfficesTest(CreateIndexBaseTest):
         """
         Test `add_offices` to add an office.
         """
-        office_to_add = OfficeAdminAdd(
-            siret="01625043300220",
-            company_name="CHAUSSURES CENDRY",
-            office_name="GEP",
-            naf="4772A",
-            street_number="11",
-            street_name="RUE FABERT",
-            zipcode="57000",
-            city_code="57463",
-            flag_alternance=0,
-            flag_junior=0,
-            flag_senior=0,
-            departement="57",
-            headcount='31',
-            hiring=100,  # aka score 80
-            x=6.17528,
-            y=49.1187,
-            reason="Demande de mise en avant",
-        )
-        office_to_add.save()
+        office_to_add = OfficeAdminAdd(**OFFICES[2])
+
+        self.db_session.add(office_to_add)
+        self.db_session.commit()
 
         script.add_offices()
 
-        office = Office.get(office_to_add.siret)
+        office = self.db_session.query(OfficeAdminAdd).get(office_to_add.siret)
         self.assertEqual(office.company_name, office_to_add.company_name)
         self.assertEqual(office.score, office_to_add.score)
         self.assertEqual(office.email, "")
@@ -359,7 +355,9 @@ class RemoveOfficesTest(CreateIndexBaseTest):
             reason="N/A",
             initiative=False,
         )
-        office_to_remove1.save()
+
+        self.db_session.add(office_to_remove1)
+        self.db_session.commit()
 
         office_to_remove2 = OfficeAdminRemove(
             siret=self.office2.siret,
@@ -367,7 +365,8 @@ class RemoveOfficesTest(CreateIndexBaseTest):
             reason="N/A",
             initiative=False,
         )
-        office_to_remove2.save()
+        self.db_session.add(office_to_remove2)
+        self.db_session.commit()
 
         # We should have 3 offices in ES (2 + the fake office).
         count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={'query': {'match_all': {}}})
@@ -377,7 +376,7 @@ class RemoveOfficesTest(CreateIndexBaseTest):
         self.es.indices.flush(index=settings.ES_INDEX)  # Required by ES to register new documents.
 
         # The offices should have been removed from the DB.
-        self.assertEqual(Office.query.count(), 0)
+        self.assertEqual(self.db_session.query(Office).count(), 0)
 
         # The offices should have been removed from ES. Only the fake doc remains.
         count = self.es.count(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, body={'query': {'match_all': {}}})
@@ -424,7 +423,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             remove_phone=False,
             remove_website=False,
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         script.update_offices(OfficeAdminUpdate)
 
@@ -470,7 +470,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             remove_phone=False,
             remove_website=False,
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         script.update_offices(OfficeAdminUpdate)
 
@@ -514,7 +515,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             remove_phone=False,
             remove_website=False,
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         script.update_offices(OfficeAdminUpdate)
 
@@ -555,7 +557,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             new_company_name="",
             new_office_name="",
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         script.update_offices(OfficeAdminUpdate)
 
@@ -588,7 +591,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             boost=True,
             romes_to_boost="D1507\nD1103",  # Boost score only for those ROME.
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         script.update_offices(OfficeAdminUpdate)
 
@@ -617,7 +621,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             boost=True,
             romes_to_boost="D1506\nD1507",  # Boost score only for those ROME.
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         script.update_offices(OfficeAdminUpdate)
 
@@ -650,7 +655,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             romes_to_boost='',
             romes_to_remove="D1507",  # Remove score only for those ROME.
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         script.update_offices(OfficeAdminUpdate)
 
@@ -680,7 +686,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             phone_alternance="0699999999",
             website_alternance="http://example-alternance.com",
         )
-        office_to_update.save(commit=True)
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
         script.update_offices(OfficeAdminUpdate)
 
         office = Office.get(self.office1.siret)
@@ -703,7 +710,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office = Office.get(self.office1.siret)
         self.assertNotEqual(office.score_alternance, 0)
 
-        office_to_update.save(commit=True)
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
         script.update_offices(OfficeAdminUpdate)
 
         # Expected score alternance = 0
@@ -725,7 +733,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         office = Office.get(self.office1.siret)
         self.assertNotEqual(office.score, 0)
 
-        office_to_update.save(commit=True)
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
         script.update_offices(OfficeAdminUpdate)
 
         # Expected score_rome = 0
@@ -741,7 +750,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             name=self.office1.company_name,
             nafs_to_add="4772A",
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         # Use a mock to temporarily adjust scoring_util.SCORE_FOR_ROME_MINIMUM
         # and avoid removing romes if their score is too low.
@@ -762,7 +772,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             remove_phone=True,
             remove_website=True,
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         script.update_offices(OfficeAdminUpdate)
 
@@ -787,7 +798,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             phone_alternance="0699999999",
             website_alternance="http://example-alternance.com",
         )
-        office_to_update.save(commit=True)
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
         script.update_offices(OfficeAdminUpdate)
 
         for siret in sirets:
@@ -804,7 +816,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             name="Supermarché",
             boost=True,
         )
-        office_to_update.save(commit=True)
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
         script.update_offices(OfficeAdminUpdate)
 
         for siret in sirets:
@@ -829,7 +842,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             remove_phone=False,
             remove_website=False,
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
         script.update_offices(OfficeAdminUpdate)
 
         for siret in sirets:
@@ -854,7 +868,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             name="Supermarchés",
             nafs_to_add="4772A",
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         # Use a mock to temporarily adjust scoring_util.SCORE_FOR_ROME_MINIMUM
         # and avoid removing romes if their score is too low.
@@ -881,7 +896,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             boost=True,
             romes_to_boost="D1507\nD1103",  # Boost score only for those ROME.
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         script.update_offices(OfficeAdminUpdate)
 
@@ -907,7 +923,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             romes_to_boost='',
             romes_to_remove="D1507",  # Remove score only for those ROME.
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
 
         script.update_offices(OfficeAdminUpdate)
 
@@ -927,7 +944,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             name=self.office1.company_name,
             social_network="https://www.facebook.com/poleemploi/",
         )
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
         script.update_offices(OfficeAdminUpdate)
         office = Office.get(self.office1.siret)
         # Check contact mode
@@ -943,7 +961,8 @@ class UpdateOfficesTest(CreateIndexBaseTest):
             contact_mode="Come with his driver license",
         )
 
-        office_to_update.save()
+        self.db_session.add(office_to_update)
+        self.db_session.commit()
         script.update_offices(OfficeAdminUpdate)
 
         office = Office.get(self.office1.siret)
@@ -955,17 +974,17 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         """
         Test `get_score_minimum_for_rome` to get a score threshold that a company must have at least
         """
-        #In the metiers_tension csv file
+        # In the metiers_tension csv file
         # This row with rome K1401 should give the maximum possible threshold
         # P2Z90	#N/A	#N/A	K1401	CONCEPTION ET PILOTAGE DE LA POLITIQUE DES POUVOIRS PUBLICS
         score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('K1401')
         self.assertEqual(score_minimum_for_rome, scoring_util.SCORE_FOR_ROME_MINIMUM)
 
         # This row with rome A1101 has 61.9% tension
-        #A0Z43,Conducteurs d'engins agricoles ou forestiers,61.9,A1101,CONDUITE D'ENGINS AGRICOLES ET FORESTIERS
+        # A0Z43,Conducteurs d'engins agricoles ou forestiers,61.9,A1101,CONDUITE D'ENGINS AGRICOLES ET FORESTIERS
         score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('A1101')
-        result = ((scoring_util.SCORE_FOR_ROME_MINIMUM - scoring_util.MINIMUM_POSSIBLE_SCORE) *
-                  ((100 - 61.9) / 100)) + scoring_util.MINIMUM_POSSIBLE_SCORE
+        result = ((scoring_util.SCORE_FOR_ROME_MINIMUM - scoring_util.MINIMUM_POSSIBLE_SCORE)
+                  * ((100 - 61.9) / 100)) + scoring_util.MINIMUM_POSSIBLE_SCORE
         self.assertEqual(score_minimum_for_rome, result)
         self.assertTrue(
             scoring_util.MINIMUM_POSSIBLE_SCORE <= score_minimum_for_rome <= scoring_util.SCORE_FOR_ROME_MINIMUM)
@@ -985,11 +1004,15 @@ class UpdateOfficesGeolocationsTest(CreateIndexBaseTest):
         Test `update_offices_geolocations`.
         """
         # Add an entry in the OfficeAdminExtraGeoLocation table with extra geolocations.
+        self.db_session.add(self.office1)
+        self.db_session.commit()
+
         extra_geolocation = OfficeAdminExtraGeoLocation(
             siret=self.office1.siret,
             codes="75110\n13055",  # Paris 10 + Marseille
         )
-        extra_geolocation.save(commit=True)
+        self.db_session.add(extra_geolocation)
+        self.db_session.commit()
 
         script.update_offices_geolocations()
 
