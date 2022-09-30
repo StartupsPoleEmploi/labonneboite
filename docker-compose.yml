@@ -2,23 +2,24 @@ version: "3.7"
 
 # settings
 x-db-env: &dbenv
-      MYSQL_ROOT_PASSWORD: p@ssword
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-      MYSQL_DATABASE: labonneboite
-      MYSQL_USER: labonneboite
-      MYSQL_PASSWORD: labonneboite
+    MYSQL_ROOT_PASSWORD: password
+    MYSQL_DATABASE: labonneboite
+    MYSQL_USER: labonneboite
+    MYSQL_PASSWORD: labonneboite
 
 x-common-env: &cenv
-      DB_ROOT_PASSWORD: p@ssword
-      DB_DATABASE: labonneboite
-      DB_NAME: labonneboite
-      DB_USER: labonneboite
-      DB_PASSWORD: labonneboite
-      DB_PORT: 3306
-      ES_HOST: elasticsearch:9200
-      DB_HOST: mysql
-      OFFICE_TABLE: etablissements
-      LBB_ENV: development 
+    # database
+    DB_DATABASE: labonneboite
+    DB_NAME: labonneboite
+    DB_USER: labonneboite
+    DB_PASSWORD: labonneboite
+    DB_HOST: mysql
+    DB_PORT: 3306
+    # elastic search
+    ES_HOST: elasticsearch:9200
+    # other
+    OFFICE_TABLE: etablissements
+    LBB_ENV: development
 
 services:
 
@@ -33,13 +34,13 @@ services:
     environment:
       <<: *cenv 
     volumes:
-      - ./logs:/app/labonneboite/logs
+      - ./labonneboite/tests/sql:/sql
       - ./labonneboite:/app/labonneboite
     depends_on:
       elasticsearch:
-        condition: service_started
+        condition: service_healthy
       mysql:
-        condition: service_started
+        condition: service_healthy
     ports:
       - 8080:8080
 
@@ -69,16 +70,15 @@ services:
   # database
   mysql:
     image: mysql:5.6.36
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
     environment:
       <<: *dbenv
     ports:
       - 3306:3306
     healthcheck:
-      test: mysql ${MYSQL_DATABASE} --user=${MYSQL_USER} --password='${MYSQL_PASSWORD}' --silent --execute "SELECT 1;"
-      interval: 10s
+      test: "/usr/bin/mysql --user=root --password=password --execute \"SHOW DATABASES;\""
+      interval: 3s
+      timeout: 1s
       retries: 5
-      timeout: 2s
 
   # Dev tools
   adminer:
