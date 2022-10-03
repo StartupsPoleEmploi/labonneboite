@@ -90,6 +90,7 @@ selenium = "^4.4.3"
 EasyProcess = "^1.1"
 pytest-env = "^0.6.2"
 pytest-flask-sqlalchemy = "^1.1.0"
+pytest-html = "^3.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -99,14 +100,13 @@ build-backend = "poetry.core.masonry.api"
 minversion = "6.0"
 addopts = "--cov"
 testpaths = [
-    "labonneboite/tests/",
+    "labonneboite/tests/web"
 ]
 python_files = "test_*.py"
 
 env = [
     "LBB_ENV = test",
-    "LBB_SETTINGS = test",
-    "ES_HOST = http://localhost:9200"
+    "LBB_SETTINGS = test"
 ]
 
 # https://github.com/jeancochrane/pytest-flask-sqlalchemy#from-pypi

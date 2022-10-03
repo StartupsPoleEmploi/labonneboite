@@ -11,9 +11,8 @@ for i in `/bin/ls -1 /sql/*.sql`; do
     --password=$DB_PASSWORD \
     --host=$DB_HOST \
     --port=$DB_PORT \
-    --database=$DB_DATABASE < $i
+    --database=$DB_NAME < $i
 done
-
 
 # create the index in elastic search
 poetry run create_index --full

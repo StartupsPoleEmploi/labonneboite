@@ -43,7 +43,8 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen 
 # building flask assets
 RUN poetry run flask assets build
 
-# add the entrypoint
-RUN chmod +x ./run.sh
+# activate entrypoints
+RUN chmod +x -R ./entrypoints/
 
-ENTRYPOINT ["/bin/bash", "./run.sh"]
+# default entry point is run
+ENTRYPOINT ["/bin/bash", "./entrypoints/run.sh"]

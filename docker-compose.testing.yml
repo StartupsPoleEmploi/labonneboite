@@ -3,15 +3,14 @@ version: "3.7"
 # settings
 x-db-env: &dbenv
     MYSQL_ROOT_PASSWORD: password
-    MYSQL_DATABASE: labonneboite
-    MYSQL_USER: labonneboite
+    MYSQL_DATABASE: lbb_test
+    MYSQL_USER: lbb_test
     MYSQL_PASSWORD: labonneboite
 
 x-common-env: &cenv
     # database
-    DB_DATABASE: labonneboite
-    DB_NAME: labonneboite
-    DB_USER: labonneboite
+    DB_NAME: lbb_test
+    DB_USER: lbb_test
     DB_PASSWORD: labonneboite
     DB_HOST: mysql
     DB_PORT: 3306
@@ -19,13 +18,13 @@ x-common-env: &cenv
     ES_HOST: elasticsearch:9200
     # other
     OFFICE_TABLE: etablissements
-    LBB_ENV: development
+    LBB_ENV: test
 
 services:
 
   labonneboite:
     hostname: labonneboite-backend
-    restart: always
+    restart: "no"
     build:
       context: .
       dockerfile: docker/v3.10/Dockerfile
@@ -34,8 +33,9 @@ services:
     environment:
       <<: *cenv 
     volumes:
-      - ./labonneboite/tests/sql:/sql
-      - ./labonneboite:/app/labonneboite
+      - ./labonneboite/alembic/sql/testing:/sql
+      - ./testResults:/app/labonneboite/testResults
+    entrypoint: /bin/bash ./entrypoints/test.sh
     depends_on:
       elasticsearch:
         condition: service_healthy

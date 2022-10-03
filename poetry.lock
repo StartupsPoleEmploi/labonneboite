@@ -1241,6 +1241,29 @@ SQLAlchemy = ">=1.2.2"
 tests = ["psycopg2-binary", "pytest (>=6.0.1)", "pytest-postgresql (>=2.4.0,<4.0.0)"]
 
 [[package]]
+name = "pytest-html"
+version = "3.1.1"
+description = "pytest plugin for generating HTML reports"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+pytest = ">=5.0,<6.0.0 || >6.0.0"
+pytest-metadata = "*"
+
+[[package]]
+name = "pytest-metadata"
+version = "2.0.2"
+description = "pytest plugin for test session metadata"
+category = "dev"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[package.dependencies]
+pytest = ">=3.0.0,<8.0.0"
+
+[[package]]
 name = "pytest-mock"
 version = "3.9.0"
 description = "Thin-wrapper around the mock package for easier use with pytest"
@@ -1991,7 +2014,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "27d17b8dcb12e67144e660d4e2396e6bb74ed672a344d753c06584524081f4e2"
+content-hash = "adc2ffc21edd29f4e2ccbbad7c3465f6f50d60bfab07fe7c2e2ce8b7aa44d6f2"
 
 [metadata.files]
 alembic = [
@@ -3134,6 +3157,14 @@ pytest-env = [
 pytest-flask-sqlalchemy = [
     {file = "pytest-flask-sqlalchemy-1.1.0.tar.gz", hash = "sha256:db71a57b90435e5d854b21c37a2584056d6fc3ddb28c09d8d0a2546bd6e390ff"},
     {file = "pytest_flask_sqlalchemy-1.1.0-py3-none-any.whl", hash = "sha256:b9f272d5c4092fcbe4a6284e402a37cad84f5b9be3c0bbe1a11927f24c99ff83"},
+]
+pytest-html = [
+    {file = "pytest-html-3.1.1.tar.gz", hash = "sha256:3ee1cf319c913d19fe53aeb0bc400e7b0bc2dbeb477553733db1dad12eb75ee3"},
+    {file = "pytest_html-3.1.1-py3-none-any.whl", hash = "sha256:b7f82f123936a3f4d2950bc993c2c1ca09ce262c9ae12f9ac763a2401380b455"},
+]
+pytest-metadata = [
+    {file = "pytest-metadata-2.0.2.tar.gz", hash = "sha256:fcd2f416f15be295943527b3c8ba16a44ae5a7141939c90c3dc5ce9d167cf2a5"},
+    {file = "pytest_metadata-2.0.2-py3-none-any.whl", hash = "sha256:39261ee0086f17649b180baf2a8633e1922a4c4b6fcc28a2de7d8127a82541bf"},
 ]
 pytest-mock = [
     {file = "pytest-mock-3.9.0.tar.gz", hash = "sha256:c899a0dcc8a5f22930acd020b500abd5f956911f326864a3b979e4866e14da82"},
