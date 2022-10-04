@@ -79,11 +79,6 @@ services:
       timeout: 1s
       retries: 5
 
-  # Dev tools
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8000:8080
+
 
 

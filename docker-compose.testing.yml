@@ -22,14 +22,12 @@ x-common-env: &cenv
 
 services:
 
-  labonneboite:
+  app:
     hostname: labonneboite-backend
     restart: "no"
     build:
       context: .
       dockerfile: docker/v3.10/Dockerfile
-      args:
-        options: --reload
     environment:
       <<: *cenv 
     volumes:
@@ -80,11 +78,5 @@ services:
       timeout: 1s
       retries: 5
 
-  # Dev tools
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8000:8080
 
 

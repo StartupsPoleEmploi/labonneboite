@@ -1,8 +1,5 @@
 # /bin/bash
 
-# alembic
-# poetry run alembic upgrade head 
-
 # run custom sql scripts if any
 echo 'Running sql scripts if any'
 for i in `/bin/ls -1 /sql/*.sql`; do 

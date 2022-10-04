@@ -44,6 +44,7 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen 
 RUN poetry run flask assets build
 
 # activate entrypoints
+COPY ./docker/v3.10/entrypoints /app/labonneboite/entrypoints
 RUN chmod +x -R ./entrypoints/
 
 # default entry point is run

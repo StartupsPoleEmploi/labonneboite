@@ -14,7 +14,7 @@ develop:
 test: 
 	docker-compose -f docker-compose.testing.yml down \
 	&& docker-compose -f docker-compose.testing.yml build \
-	&& docker-compose -f docker-compose.testing.yml up --abort-on-container-exit --exit-code-from labonneboite
+	&& docker-compose -f docker-compose.testing.yml up --abort-on-container-exit --exit-code-from app
 
 # PACKAGE_DIR = labonneboite
 # LOCUST_HOST = http://localhost:5000
