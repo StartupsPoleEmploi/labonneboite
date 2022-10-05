@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "LaBonneBoite"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["La Bonne Boite <labonneboite@pole-emploi.fr>"]
 license  = "GPL-3.0-only"

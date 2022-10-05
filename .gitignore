@@ -109,9 +109,5 @@ logs/
 __pycache__
 
 
-testResults
-flake8.xml
-.coverage
-pytest.xml
-testrun.html
+testResults.tar.gz
 .pytest_cache

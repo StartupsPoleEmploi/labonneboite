@@ -29,6 +29,8 @@ poetry run coverage xml
 poetry build
 
 # prepare test results
+echo "Moving test results file..."
 mkdir -p testResults
 mv *.xml  ./testResults
 mv *.html  ./testResults
+echo "Done"
