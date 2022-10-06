@@ -9,6 +9,7 @@ python-tests:
   script:
     - set -ex
     - docker pull hello-world
+    - docker-compose -f ./$DOCKER_COMPOSE_FILENAME build
     - docker-compose -f ./$DOCKER_COMPOSE_FILENAME up --build --abort-on-container-exit --exit-code-from $SERVICE_NAME
     - docker-compose -f ./$DOCKER_COMPOSE_FILENAME logs
   rules:
