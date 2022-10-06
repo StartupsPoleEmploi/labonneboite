@@ -1,4 +1,4 @@
-import pdb
+
 from unittest import mock
 
 from labonneboite.common import models

@@ -12,7 +12,7 @@ def health_all():
     """
     Health check route designed to be regularly monitored in production (e.g. UptimeRobot).
     Returns `yes` if internal dependencies (Elastic Search, Database, Uwsgi) are all ok.
-    Does not check external dependencies (IGN) nor Redis.    
+    Does not check external dependencies (IGN) nor Redis.
     """
     return health_response(
         health_util.is_db_alive()

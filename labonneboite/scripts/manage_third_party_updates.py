@@ -1,14 +1,14 @@
 #!/usr/bin/python
 """
-    This script manages data from the `etablissements_third_party_update` table. This lets us do experiments, 
-    like the one with CBS school in 2021. Each experiment can have a key, stored in the `reason` field of 
+    This script manages data from the `etablissements_third_party_update` table. This lets us do experiments,
+    like the one with CBS school in 2021. Each experiment can have a key, stored in the `reason` field of
     the DB, which is used to get and remove the records corresponding to the given experiment.
     usage:
         ENABLE_DB_INFILE=1 python labonneboite/scripts/cbs_to_save.py [command] [option] [csv path]
     Command: insert, delete, count
     Options: key
     Path: for insert, path of the CSV file
-    When using insert you can provide the path to the CSV file (defaults to labonneboite/common/data/cbs_data_test.csv), 
+    When using insert you can provide the path to the CSV file (defaults to labonneboite/common/data/cbs_data_test.csv),
     e.g. `ENABLE_DB_INFILE=1 python labonneboite/scripts/cbs_to_save.py insert ../tirage_LBA_170621.csv`
     Note: when running the script locally it requires the `LBB_ENV=development` env var
     Note: apply in production

@@ -4,8 +4,7 @@ import os
 import json
 from typing import Sequence
 
-from labonneboite.common.search import AudienceFilter, HiddenMarketFetcher, hiring_type_util, settings, sorting, \
-    datetime as search_datetime
+from labonneboite.common.search import AudienceFilter, HiddenMarketFetcher, hiring_type_util, settings, sorting
 from labonneboite.common import search
 
 PROPS_SUFFIX = '.props.json'

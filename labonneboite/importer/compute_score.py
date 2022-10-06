@@ -10,7 +10,7 @@ The predicted number of hirings is
 then transformed and obfuscated into a "score" value
 between 0 and 100 for each office ("etablissement").
 
-We do this because we consider the predicted number of hirings to be a 
+We do this because we consider the predicted number of hirings to be a
 sensitive confidential data, this way, by storing only the obfuscated score in db,
 even if our db gets hacked you cannot transform the score back into their
 corresponding predicted number of hirings.

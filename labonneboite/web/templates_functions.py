@@ -4,8 +4,8 @@ from flask import Flask
 
 class MobivilleCompany:
 
-    name="LA ROCHELLE, STRASBOURG, LIMOGES ...."
-    naf_text='Trouvez l’emploi et la ville qui va avec !'
+    name = "LA ROCHELLE, STRASBOURG, LIMOGES ...."
+    naf_text = 'Trouvez l’emploi et la ville qui va avec !'
 
     def get_stars_for_rome_code_as_percentage(self, _=None):
         return 100

@@ -32,4 +32,3 @@ def is_uwsgi_alive():
     it obviously means uwsgi is up, so there is nothing to test.
     """
     return True
-

@@ -1,5 +1,4 @@
 import json
-import unittest
 
 from flask import url_for
 from labonneboite.tests.test_base import AppTest

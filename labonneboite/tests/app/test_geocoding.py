@@ -1,6 +1,4 @@
-import json
-import os
-from unittest import mock, TestCase
+from unittest import TestCase
 from labonneboite.common import geocoding
 
 

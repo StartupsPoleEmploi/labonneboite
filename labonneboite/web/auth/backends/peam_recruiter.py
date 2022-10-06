@@ -1,17 +1,21 @@
-import json, urllib
-import requests
+import json
+import urllib
 
 from enum import Enum
 from flask import session, url_for
 from labonneboite.conf import settings
 
+
 class PeamRecruiterError(Exception):
     pass
+
 
 class PeamRecruiterLoginCancelled(Exception):
     pass
 
 # Recruiter session value keys
+
+
 class SessionKeys(Enum):
     EMAIL = 'SESSION_EMAIL'
     EMAIL_VERIFIED = 'SESSION_EMAIL_VERIFIED'
@@ -34,8 +38,10 @@ def is_recruiter():
     ]
     return all(recruiter_values)
 
+
 def get_recruiter_uid():
     return session.get(SessionKeys.UID.value, '')
+
 
 def is_certified_recruiter():
     uid = session.get(SessionKeys.UID.value, '')
@@ -43,10 +49,12 @@ def is_certified_recruiter():
     email_verified = session.get(SessionKeys.EMAIL_VERIFIED.value, False)
     return habilitation == 'recruteurcertifie' and uid and email_verified
 
+
 def clear_pe_connect_recruiter_session():
     for key in SessionKeys:
         if key.value in session:
             del session[key.value]
+
 
 def get_token_data(code):
     token_url = settings.PEAM_AUTH_RECRUITER_BASE_URL + 'connexion/oauth2/access_token?' + urllib.parse.urlencode({
@@ -56,9 +64,9 @@ def get_token_data(code):
     return peam_recruiter_request(
         token_url,
         method='POST',
-        headers={'Content-Type':'application/x-www-form-urlencoded'},
+        headers={'Content-Type': 'application/x-www-form-urlencoded'},
         body={
-            'grant_type':'authorization_code',
+            'grant_type': 'authorization_code',
             'code': code,
             'client_id': settings.PEAM_CLIENT_ID,
             'client_secret': settings.PEAM_CLIENT_SECRET,
@@ -72,6 +80,7 @@ def get_recruiter_data(access_token):
         "{}/partenaire/peconnect-entreprise/v1/userinfo".format(settings.PEAM_API_BASE_URL),
         headers={'Authorization': 'Bearer {}'.format(access_token)}
     )
+
 
 def peam_recruiter_request(url, method='GET', headers=None, body=None):
     user_request = urllib.request.Request(

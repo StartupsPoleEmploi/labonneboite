@@ -1,6 +1,5 @@
 
 import json
-from unittest import mock
 from urllib.parse import urlencode
 
 from labonneboite.conf import settings

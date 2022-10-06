@@ -1,6 +1,6 @@
 from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.common.constants import Scope
-from labonneboite.web.api.util import has_scope, get_key, UnknownUserException
+from labonneboite.web.api.util import has_scope, get_key
 
 
 class UserTest(DatabaseTest):

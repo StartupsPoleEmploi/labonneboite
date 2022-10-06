@@ -7,7 +7,7 @@ import geopy.distance
 from slugify import slugify
 
 from labonneboite_common import departements
-from labonneboite.common.util import unique_elements
+
 from . import datagouv
 
 CACHE = {}

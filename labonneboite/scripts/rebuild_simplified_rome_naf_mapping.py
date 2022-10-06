@@ -1,15 +1,14 @@
 import os
-import re
-import itertools
+
 import logging
 import pandas as pd
-from slugify import slugify
+
 import numpy as np
 
-from labonneboite.conf import settings
-from labonneboite.common import mapping as mapping_util
-from labonneboite.common import hiring_type_util
-from labonneboite.common import geocoding
+from labonneboite.conf import settings  # noqa : F401
+from labonneboite.common import mapping as mapping_util  # noqa : F401
+from labonneboite.common import hiring_type_util  # noqa : F401
+from labonneboite.common import geocoding  # noqa : F401
 
 logging.basicConfig(level=logging.INFO)
 

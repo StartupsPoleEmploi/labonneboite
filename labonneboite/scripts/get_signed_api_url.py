@@ -79,8 +79,8 @@ def get_url(api_user: str, api_key: str, url: str):
     """
     Generate an url with the signature for a given url, api user and api key
 
-    url example: 
-    https://labonneboite.beta.pole-emploi.fr/api/v1/company/\?departments\=33\&rome_codes_keyword_search\=informatique
+    url example:
+    https://labonneboite.beta.pole-emploi.fr/api/v1/company/?departments=33&rome_codes_keyword_search=informatique
     """
     parsed_url, parsed_query = parse_url(url)
 

@@ -1,7 +1,5 @@
 import ipaddress
 
-import pytest
-
 from labonneboite.common import pro
 from labonneboite.common.models import User
 from labonneboite.tests.test_base import DatabaseTest
@@ -156,9 +154,7 @@ class ProVersionTest(DatabaseTest):
             pro.ips_from_ip_ranges([test_ip, test_ip_range])
         )
 
-    ##################################
-    ######### Utility methods ########
-    ##################################
+    # Utility methods
 
     def assert_pro_version_is_enabled(self):
         """

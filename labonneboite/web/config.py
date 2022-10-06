@@ -36,8 +36,8 @@ class Config(object):
     SOCIAL_AUTH_INACTIVE_USER_URL = '/'
 
     # Persist user authentication in cookie, and not just in session
-    SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = [settings.REMEMBER_ME_ARG_NAME] # used by social_core
-    REMEMBER_COOKIE_NAME = 'auth' # used by social_flask and flask_login
+    SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = [settings.REMEMBER_ME_ARG_NAME]  # used by social_core
+    REMEMBER_COOKIE_NAME = 'auth'  # used by social_flask and flask_login
     REMEMBER_COOKIE_DURATION = timedelta(days=365)
 
     # List of supported third party authentication providers.
@@ -80,5 +80,6 @@ class Config(object):
     # Define connection timeouts to make sure LBB is not going to timeout before PEAM
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_URLOPEN_TIMEOUT = 8
     SOCIAL_AUTH_PEAM_OPENIDCONNECT_NO_PROMPT_URLOPEN_TIMEOUT = 5
+
 
 CONFIG = Config()

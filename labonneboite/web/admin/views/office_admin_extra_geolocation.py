@@ -50,7 +50,6 @@ class OfficeAdminExtraGeoLocationModelView(AdminModelViewMixin, ModelView):
         'geolocations': lambda view, context, model, name: Markup(model.geolocations_as_html_links()),
     }
 
-
     column_labels = {
         'siret': "Siret",
         'codes': "Départements / Codes communes (INSEE)",

@@ -1,8 +1,8 @@
-from csv import excel, register_dialect
+from csv import *  # noqa: F403
 
 
-class excel_semi(excel):
+class excel_semi(excel):  # noqa: F405
     delimiter = ";"
 
 
-register_dialect('excel-semi', excel_semi)
+register_dialect('excel-semi', excel_semi)  # noqa: F405
