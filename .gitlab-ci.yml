@@ -6,13 +6,6 @@ include:
 # this should be the local file
 python-tests:
   extends: .devops::python-test
-  script:
-    - set -ex
-    - docker volume create --name=testResults
-    - docker-compose -f ./$DOCKER_COMPOSE_FILENAME up --build --abort-on-container-exit --exit-code-from $SERVICE_NAME
-    - docker run --rm -v testResults:/testResults -v $CI_PROJECT_DIR:/backup busybox tar -zcvf /backup/testResults.tar.gz /testResults
-    - tar -zx -f ./testResults.tar.gz
-
   rules:
     - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_TITLE !~ /Draft.*/
       changes:
