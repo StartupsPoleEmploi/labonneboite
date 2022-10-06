@@ -6,6 +6,12 @@ include:
 # this should be the local file
 python-tests:
   extends: .devops::python-test
+  script:
+    - set -ex
+    - docker pull hello-world
+    - docker-compose -f ./docker-compose.testing.yml up --abort-on-container-exit --exit-code-from $SERVICE_NAME
+    - docker-compose -f docker-compose.testing.yml logs
+
   after_script:
     - ls
     - docker-compose -f docker-compose.testing.yml logs
