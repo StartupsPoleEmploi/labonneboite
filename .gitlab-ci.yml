@@ -9,12 +9,8 @@ python-tests:
   script:
     - set -ex
     - docker pull hello-world
-    - docker-compose -f ./docker-compose.testing.yml up --abort-on-container-exit --exit-code-from $SERVICE_NAME
-    - docker-compose -f docker-compose.testing.yml logs
-
-  after_script:
-    - ls
-    - docker-compose -f docker-compose.testing.yml logs
+    - docker-compose -f ./$DOCKER_COMPOSE_FILENAME up --build --abort-on-container-exit --exit-code-from $SERVICE_NAME
+    - docker-compose -f ./$DOCKER_COMPOSE_FILENAME logs
   rules:
     - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_TITLE !~ /Draft.*/
       changes:
