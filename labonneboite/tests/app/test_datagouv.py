@@ -40,7 +40,8 @@ class DatagouvTest(TestCase):
     def test_long_addresses_are_shortened(self):
         long_address = 'a' * 300
         short_address = 'a' * 200
-        with mock.patch.object(datagouv, 'get_addresses', return_value=search_lelab_formatted) as mock_get_addresses:
+        with mock.patch.object(datagouv, 'get_addresses', return_value=search_lelab_formatted) as mock_get_addresses, \
+                mock.patch.object(datagouv, 'get_departments', return_value=autocomplete_cal_formatted) as mock_get_departments:  # noqa
             result = datagouv.search(long_address)
             self.assertEqual(short_address, mock_get_addresses.call_args[1]['q'])
             self.assertEqual(autocomplete_cal_formatted[0], result[0])
