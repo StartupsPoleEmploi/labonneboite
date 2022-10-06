@@ -6,7 +6,7 @@ import glob
 import logging
 import multiprocessing as mp
 import os
-import time
+
 from cProfile import Profile
 from typing import Dict, Optional, Union, List, Type, Generator, Any, Tuple
 
@@ -17,7 +17,7 @@ from labonneboite_common import encoding as encoding_util
 from labonneboite_common.models.office_mixin import OfficeMixin
 from pyprof2calltree import convert
 from sqlalchemy import and_, inspect
-from sqlalchemy.exc import OperationalError
+
 import sqlalchemy as sa
 
 from labonneboite.conf import settings
@@ -508,6 +508,7 @@ def add_offices() -> None:
     office_to_add: OfficeAdminAdd
     for office_to_add in db_session.query(OfficeAdminAdd).all():
         add_individual_office(office_to_add)
+
 
 def remove_individual_office(siret: str) -> None:
     # Apply changes in ElasticSearch.

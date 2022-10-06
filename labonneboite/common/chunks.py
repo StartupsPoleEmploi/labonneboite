@@ -1,5 +1,5 @@
 
-def chunks(l, n):
+def chunks(l, n):  # noqa
     """
     Yield successive n-sized chunks from l.
     """

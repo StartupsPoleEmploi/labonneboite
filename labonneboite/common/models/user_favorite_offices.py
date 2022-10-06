@@ -4,7 +4,7 @@ from typing import Optional
 
 from labonneboite.common import csv
 from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String,
-                        UniqueConstraint, desc)
+                        UniqueConstraint)
 from sqlalchemy.orm import relationship
 
 from ..database import Base, db_session
@@ -52,7 +52,6 @@ class UserFavoriteOffice(CRUDMixin, Base):
         pass
     else:
         office = relationship('Office', lazy='joined')
-
 
     @classmethod
     def add_favorite(cls,

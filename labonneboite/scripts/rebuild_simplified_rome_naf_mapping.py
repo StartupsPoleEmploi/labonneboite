@@ -183,7 +183,6 @@ class RomeNafMapping:
             logging.info("Nafs per rome : {}".format(nafs_per_rome))
         logging.info("90% of romes have {} nafs or less.".format(round(np.percentile(nafs_per_rome, 90), 1)))
 
-
     def export_to_file(self):
         self.df.to_csv(OUTPUT_FILENAME, sep=CSV_DELIMITER, index=False, encoding='utf-8')
 

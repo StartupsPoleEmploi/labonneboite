@@ -32,7 +32,9 @@ from operator import itemgetter
 import logging
 import math
 import random
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 from typing import Dict, Union
 
 import MySQLdb

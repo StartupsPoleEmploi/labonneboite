@@ -2,6 +2,7 @@ from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.common.constants import Scope
 from labonneboite.web.api.util import has_scope, get_key, UnknownUserException
 
+
 class UserTest(DatabaseTest):
 
     def test_has_scopes(self):
@@ -27,4 +28,3 @@ class UserTest(DatabaseTest):
         self.assertEqual(get_key('emploi_store_dev'), 'anotherdummykey')
         self.assertEqual(get_key('unknown_user'), None)
         self.assertEqual(get_key('unknown_user', 'default123'), 'default123')
-

@@ -1,7 +1,9 @@
-import json, unittest
+import json
+import unittest
 
 from flask import url_for
 from labonneboite.tests.test_base import AppTest
+
 
 class SlugDetailsTest(AppTest):
 
@@ -101,7 +103,6 @@ class CityCodeDetailsTest(AppTest):
             self.assertEqual(data['city']['slug'], 'nantes-44000')
             self.assertEqual(data['city']['latitude'], 47.235456880128645)
             self.assertEqual(data['city']['longitude'], -1.5498348824858057)
-
 
     def test_error_if_invalid_city_code(self):
         with self.test_request_context():

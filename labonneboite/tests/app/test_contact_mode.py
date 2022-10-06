@@ -4,6 +4,7 @@ from labonneboite.common import util
 from labonneboite.common.load_data import load_contact_modes
 from labonneboite.common.models import Office
 
+
 class ContactModeTest(unittest.TestCase):
 
     def test_contact_mode(self):

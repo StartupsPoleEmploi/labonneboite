@@ -8,7 +8,7 @@ from flask import url_for
 
 from labonneboite.conf import settings
 from labonneboite.tests.test_base import AppTest, DatabaseTest
-from labonneboite.web.search.views import get_canonical_results_url, get_location, get_url_for_rome 
+from labonneboite.web.search.views import get_canonical_results_url, get_location, get_url_for_rome
 
 
 class SearchEntreprisesTest(DatabaseTest):
@@ -69,7 +69,8 @@ class SearchEntreprisesTest(DatabaseTest):
         response = self.app.get(url)
 
         self.assertEqual(
-            settings.PREFERRED_URL_SCHEME + '://' + settings.SERVER_NAME + '/entreprises?city=cervieres&zipcode=05100&occupation=boucherie',
+            settings.PREFERRED_URL_SCHEME + '://' + settings.SERVER_NAME
+            + '/entreprises?city=cervieres&zipcode=05100&occupation=boucherie',
             url
         )
         self.assertEqual(200, response.status_code)
@@ -260,8 +261,8 @@ class GenericUrlSearchRedirectionTest(AppTest):
         with self.app_context():
             with mock.patch('labonneboite.common.geocoding.datagouv.get_department_by_code', return_value={"department": "57", "label": 'Moselle (57)'}):
                 url = get_url_for_rome('M1805', '57')
-                self.assertEqual(url, 'http://labonneboite.pole-emploi.fr/entreprises?departments=57&j=M1805&l=Moselle+(57)&occupation=etudes-et-developpement-informatique')
+                self.assertEqual(
+                    url, 'http://labonneboite.pole-emploi.fr/entreprises?departments=57&j=M1805&l=Moselle+(57)&occupation=etudes-et-developpement-informatique')
             with mock.patch('labonneboite.common.geocoding.datagouv.get_department_by_code', return_value=None):
                 url = get_url_for_rome('M1805', '57')
                 self.assertEqual(url, None)
-

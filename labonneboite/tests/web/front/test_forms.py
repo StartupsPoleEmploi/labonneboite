@@ -8,6 +8,7 @@ from labonneboite.tests.test_base import AppTest
     Note that there is also labonneboite/tests/web/front/test_contact_form.py
 """
 
+
 class SearchFormTest(AppTest):
     def test_validate_missing_longlat_departments(self):
         with self.app_context():

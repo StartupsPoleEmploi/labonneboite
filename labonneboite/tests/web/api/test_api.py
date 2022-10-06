@@ -123,8 +123,8 @@ class ApiSecurityTest(ApiBaseTest):
                 'rome_codes': 'D1405',
                 'user': 'labonneboite',
             })
-            params['timestamp'] = (datetime.datetime.now() -
-                                   datetime.timedelta(minutes=20)).strftime('%Y-%m-%dT%H:%M:%S')
+            params['timestamp'] = (datetime.datetime.now()
+                                   - datetime.timedelta(minutes=20)).strftime('%Y-%m-%dT%H:%M:%S')
             rv = self.app.get(self.url_for("api.company_list", **params))
             self.assertEqual(rv.status_code, 400)
             self.assertEqual(rv.data, b'timestamp has expired')

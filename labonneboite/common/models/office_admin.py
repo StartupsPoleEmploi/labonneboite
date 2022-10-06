@@ -7,7 +7,6 @@ from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import Boolean, DateTime, Integer, String, Text
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy import desc, text
 from sqlalchemy.dialects import mysql
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm import relationship
@@ -61,7 +60,6 @@ class OfficeAdminAdd(OfficeMixin, CRUDMixin, Base):
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
     created_by: 'RelationshipProperty[User]' = relationship('User', foreign_keys=[created_by_id])
     updated_by: 'RelationshipProperty[User]' = relationship('User', foreign_keys=[updated_by_id])
-
 
     @property
     def score(self) -> 'Decimal':
@@ -217,7 +215,6 @@ class OfficeAdminUpdate(OfficeUpdateMixin, CRUDMixin, Base):
     id = Column(Integer, primary_key=True)
 
 
-
 class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     """
     Upon requests received from employers, we can add some geolocations to offices.
@@ -250,7 +247,6 @@ class OfficeAdminExtraGeoLocation(CRUDMixin, Base):
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
     created_by = relationship('User', foreign_keys=[created_by_id])
     updated_by = relationship('User', foreign_keys=[updated_by_id])
-
 
     def clean(self) -> None:
         """

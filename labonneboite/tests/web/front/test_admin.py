@@ -7,6 +7,7 @@ from labonneboite.tests.test_base import DatabaseTest
 from labonneboite.web.auth.backends.peam import PEAMOpenIdConnect
 from labonneboite.web.admin.views.office_admin_remove import OfficeAdminRemoveModelView
 
+
 class AdminTest(DatabaseTest):
 
     def setUp(self, *args, **kwargs):
@@ -151,4 +152,3 @@ class AdminTest(DatabaseTest):
         self.assertEqual(OfficeAdminAdd.query.count(), 0)
         self.assertEqual(OfficeAdminUpdate.query.count(), 0)
         self.assertEqual(Office.query.count(), 0)
-
