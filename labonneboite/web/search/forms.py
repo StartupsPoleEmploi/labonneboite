@@ -48,7 +48,7 @@ class CompanySearchForm(FlaskForm):
     occupation = HiddenField('', validators=[DataRequired()])
 
     # Typed location
-    loc = StringField('Lieu de recherche', validators=[DataRequired()])
+    l = StringField('Lieu de recherche', validators=[DataRequired()])  # noqa
     # Corresponding coordinates found by autocomplete
     lat = DecimalField(widget=HiddenInput(), validators=[Optional(), NumberRange(-90, 90)])
     lon = DecimalField(widget=HiddenInput(), validators=[Optional(), NumberRange(-180, 180)])
