@@ -1,0 +1,84 @@
+version: "3.7"
+
+# settings
+x-db-env: &dbenv
+    MYSQL_ROOT_PASSWORD: password
+    MYSQL_DATABASE: labonneboite
+    MYSQL_USER: labonneboite
+    MYSQL_PASSWORD: labonneboite
+
+x-common-env: &cenv
+    # database
+    DB_NAME: labonneboite
+    DB_USER: labonneboite
+    DB_PASSWORD: labonneboite
+    DB_HOST: mysql
+    DB_PORT: 3306
+    # elastic search
+    ES_HOST: elasticsearch:9200
+    # other
+    OFFICE_TABLE: etablissements
+    LBB_ENV: development
+
+services:
+
+  labonneboite:
+    hostname: labonneboite-backend
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/v3.10/Dockerfile
+      args:
+        options: --reload
+    environment:
+      <<: *cenv 
+    volumes:
+      - ./labonneboite/alembic/sql/dev:/sql
+      - ./labonneboite:/app/labonneboite
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+
+  # ###### 3rd-party services
+  # # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+  # # https://www.elastic.co/blog/how-to-make-a-dockerfile-for-elasticsearch
+  elasticsearch:
+    hostname: elasticsearch
+    image: elasticsearch:1.7.2
+    environment:
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+      - "cluster.name=lbb"
+      - "bootstrap.memory_lock=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    healthcheck:
+      test: curl --fail localhost:9200/_cat/health || exit 1
+      interval: 10s
+      retries: 5
+      timeout: 2s
+
+  # database
+  mysql:
+    image: mysql:5.6.36
+    environment:
+      <<: *dbenv
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=password --execute \"SHOW DATABASES;\""
+      interval: 3s
+      timeout: 1s
+      retries: 5
+
+
+
+

@@ -25,10 +25,10 @@ COLUMNS_FOR_EACH_OFFICE = ['siret', 'name', 'commune_id', 'url']
 OFFICES_PER_USER = 5
 ADDITIONAL_COLUMNS = ['search_url', 'used_distance', 'used_rome_id'] + \
     [
-        'office%s_%s' % (1+office_index, column_name)
-            for office_index in range(OFFICES_PER_USER)
-            for column_name in COLUMNS_FOR_EACH_OFFICE
-    ] + \
+        'office%s_%s' % (1 + office_index, column_name)
+    for office_index in range(OFFICES_PER_USER)
+    for column_name in COLUMNS_FOR_EACH_OFFICE
+] + \
     ['INFO1']  # stands for 'main_text'
 
 DISTANCE_ATTEMPTS = [10, 20, 30, 50, 100, 200]
@@ -53,6 +53,7 @@ SEND_ALL_EMAILS_TO_DEBUG_EMAIL = IS_THIS_MAILING_WORK_IN_PROGRESS
 
 ENABLE_FAKE_METZ_INSEE_CODE_FOR_ALL = False  # sometimes convenient while working on local dev
 METZ_INSEE_CODE = '57463'
+
 
 def get_results(commune_id, rome_1_id, rome_2_id):
     """
@@ -186,7 +187,7 @@ def compute_additional_data(commune_id, rome_1_id, rome_2_id):
 
 def prepare_mailing_data():
     """
-	Enrich CSV user data in order to prepare mailing.
+        Enrich CSV user data in order to prepare mailing.
     """
     df = pd.read_table(INPUT_FILENAME, sep=INPUT_FILE_CSV_DELIMITER)
 
@@ -194,7 +195,8 @@ def prepare_mailing_data():
     # inspired by
     # https://stackoverflow.com/questions/16236684/apply-pandas-function-to-column-to-create-multiple-new-columns
     # and https://stackoverflow.com/questions/13331698/how-to-apply-a-function-to-two-columns-of-pandas-dataframe
-    temp = list(zip(*df[[COMMUNE_COLUMN, ROME_1_COLUMN, ROME_2_COLUMN]].apply(lambda x: compute_additional_data(*x), axis=1)))
+    temp = list(zip(*df[[COMMUNE_COLUMN, ROME_1_COLUMN, ROME_2_COLUMN]
+                        ].apply(lambda x: compute_additional_data(*x), axis=1)))
     for index, column in enumerate(ADDITIONAL_COLUMNS):
         df[column] = temp[index]
 
@@ -202,8 +204,8 @@ def prepare_mailing_data():
 
     # delete rows with empty or buggy results
     # df = df[condition] will remove from df all rows which do not match condition
-    df = df[df.search_url.isnull() == False]  # pylint: disable=C0121
-    df = df[df.office1_url.isnull() == False]  # pylint: disable=C0121
+    df = df[df.search_url.isnull() == False]  # noqa
+    df = df[df.office1_url.isnull() == False]  # noqa
 
     net_total_rows = len(df)
     empty_rows = raw_total_rows - net_total_rows
@@ -218,7 +220,7 @@ def prepare_mailing_data():
 
     # index=False avoids writing leading index column
     # encoding='ascii' is the default, see
-    # https://stackoverflow.com/questions/31331358/unicode-encode-error-when-writing-pandas-df-to-csv 
+    # https://stackoverflow.com/questions/31331358/unicode-encode-error-when-writing-pandas-df-to-csv
     df.to_csv(OUTPUT_FILENAME, sep=',', index=False, encoding='utf-8')
 
     logging.info("please consult result in file %s", OUTPUT_FILENAME)

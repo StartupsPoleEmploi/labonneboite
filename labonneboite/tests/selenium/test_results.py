@@ -3,6 +3,7 @@ import time
 from .base import LbbSeleniumTestCase
 from selenium.webdriver.common.by import By
 
+
 class TestResults(LbbSeleniumTestCase):
 
     def test_toggle_office_details(self):

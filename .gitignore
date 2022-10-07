@@ -107,3 +107,7 @@ labonneboite/web/static/gen/
 venv/
 logs/
 __pycache__
+
+
+testResults.tar.gz
+.pytest_cache

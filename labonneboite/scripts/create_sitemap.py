@@ -19,6 +19,7 @@ app = Flask(__name__)
 
 manager = Manager(app)
 
+
 @manager.command
 def sitemap():
     """
@@ -48,7 +49,8 @@ def sitemap():
     initialCount = len(pages)
     if initialCount > MAX_URLS:
         lineStart = '\n * SKIPPED: '
-        print('Warning: sitemap should have at most 50K URLs\nDrop these URLs, they will not be indexed in sitemap.xml', lineStart, lineStart.join(map(lambda p: p[0], pages[50000:])))
+        print('Warning: sitemap should have at most 50K URLs\nDrop these URLs, they will not be indexed in sitemap.xml',
+              lineStart, lineStart.join(map(lambda p: p[0], pages[50000:])))
         pages = pages[:MAX_URLS]
 
     # Write the sitemap to file
@@ -65,6 +67,7 @@ def sitemap():
         len(rome_descriptions),
         initialCount,
     ))
+
 
 if __name__ == "__main__":
     manager.run()

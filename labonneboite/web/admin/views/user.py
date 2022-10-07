@@ -25,7 +25,7 @@ class UserModelView(AdminModelViewMixin, ModelView):
     ]
 
     column_labels = {
-        'gender':  "Genre",
+        'gender': "Genre",
         'first_name': "Prénom",
         'last_name': "Nom",
         'date_created': "Date de création",

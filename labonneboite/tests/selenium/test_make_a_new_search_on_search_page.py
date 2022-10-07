@@ -79,7 +79,7 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
             wait.until(title_present)
         except TimeoutException:
             self.fail('The result title is not locatable')
-        
+
         try:
             wait.until(EC.text_to_be_present_in_element(title_selector, city))
         except TimeoutException:
@@ -114,7 +114,7 @@ class TestMakeANewSearchOnSearchPage(LbbSeleniumTestCase):
         WebDriverWait(self.driver, 60)\
             .until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, "h1.lbb-result-info"))
-            )
+        )
 
         results_sentence = self.driver.find_element(By.CSS_SELECTOR, 'h1.lbb-result-info').text
         last_results = re.match(r'(\d+)', results_sentence).group()

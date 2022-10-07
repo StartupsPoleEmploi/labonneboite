@@ -1,11 +1,8 @@
 import os
 
 import requests
-from flask import abort, Blueprint, current_app, flash, redirect, render_template, request, send_from_directory, url_for
-from flask_login import current_user
-
+from flask import abort, Blueprint, current_app, redirect, render_template, request, send_from_directory
 from labonneboite.common import activity, pro, scoring
-from labonneboite.common.database import db_session
 from labonneboite.common.models import Office
 from labonneboite.common.refresh_peam_token import attempt_to_refresh_peam_token
 from labonneboite.conf import settings

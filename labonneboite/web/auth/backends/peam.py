@@ -16,6 +16,8 @@ from labonneboite.common.models import User
 from .exceptions import AuthFailedMissingReturnValues
 
 # pylint:disable=abstract-method
+
+
 class PEAMOpenIdConnect(OpenIdConnectAuth):
     """
     Pôle Emploi Access Management OpenId Connect backend.
@@ -49,7 +51,7 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
                 headers={'Authorization': 'Bearer {0}'.format(access_token)}
             )
         except requests.HTTPError as e:
-            if e.response.status_code == 502: # Bad Gateway
+            if e.response.status_code == 502:  # Bad Gateway
                 # 502 errors are not properly handled by social_core (see
                 # handle_http_errors decorator in social_core.utils)
                 # If we don't raise an exception, the user sees a spinning wheel.

@@ -27,11 +27,11 @@ def update_percentages():
     df_old_tension = pd.read_csv("common/data/metiers_tension.csv", sep=',')
     # In the right order, the fap codes to change : E1Z42, K0Z40, U1Z82, E1Z41, E1Z40, D1Z40, D2Z42
     dict_new_names_fap = {
-        'Ouvriers qualifiés des industries agroalimentaires (hors viandes)': 'Autres ouvriers qualifiés des industries agro-alimentaires (hors transformation des viandes)',
-        'Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d\'art…)': 'Artisans et ouvriers qualifiés divers de type artisanal',
-        'Graphistes, dessinateurs, stylistes, décorateurs, créateurs supports…': 'Créateurs de supports de communication visuelle, stylistes, décorateurs',
-        'Ouvriers qualifiés des industries chimiques et plastiques': 'Autres ouvriers qualifiés des industries chimiques et plastiques',
-        'Pilotes d\'installations lourdes des industries de transformation': 'Pilotes d\'installation lourde des industries de transformation',
+        'Ouvriers qualifiés des industries agroalimentaires (hors viandes)': 'Autres ouvriers qualifiés des industries agro-alimentaires (hors transformation des viandes)',  # noqa
+        'Ouvriers qualifiés divers de type artisanal (reliure, gravure, métallerie d\'art…)': 'Artisans et ouvriers qualifiés divers de type artisanal',  # noqa
+        'Graphistes, dessinateurs, stylistes, décorateurs, créateurs supports…': 'Créateurs de supports de communication visuelle, stylistes, décorateurs',  # noqa
+        'Ouvriers qualifiés des industries chimiques et plastiques': 'Autres ouvriers qualifiés des industries chimiques et plastiques',  # noqa
+        'Pilotes d\'installations lourdes des industries de transformation': 'Pilotes d\'installation lourde des industries de transformation',  # noqa
         'Régleurs qualifiés': 'Régleurs',
         'Soudeurs qualifiés': 'Soudeurs'
     }
@@ -39,7 +39,8 @@ def update_percentages():
     df_old_tension = df_old_tension.replace(
         {'fap': dict_new_names_fap})  # 701 rows
 
-    # Merge both dataframes on the fap name (would have been easier to do it on the fap code, but not available in new data)
+    # Merge both dataframes on the fap name (would have been easier to do it on the fap code,
+    # but not available in new data)
     df_merge = df_old_tension.merge(df_new_tension, how='left')
 
     '''

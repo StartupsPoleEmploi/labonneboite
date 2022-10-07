@@ -1,8 +1,8 @@
 import json
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple, Union
 from urllib.parse import urlencode
 
-from flask import abort, Blueprint, flash, make_response, redirect, render_template, request, session, url_for
+from flask import abort, Blueprint, make_response, redirect, render_template, request, url_for
 from flask_login import current_user
 from sentry_sdk import start_transaction
 from slugify import slugify
@@ -25,6 +25,7 @@ searchBlueprint = Blueprint('search', __name__)
 RELATED_ROMES = load_related_rome() if settings.ENABLE_RELATED_ROMES else []
 RELATED_ROMES_AREAS = load_related_rome_areas() if settings.ENABLE_RELATED_ROMES else []
 
+
 @searchBlueprint.route('/suggest_job_labels')
 def suggest_job_labels():
     term = request.args.get('term', '')
@@ -37,7 +38,7 @@ def suggest_locations():
     """
     This route uses our internal search mechanism (elastic)
     It does not use the api-adresse.data.gouv.fr API
-    
+
     Query string arguments:
 
         term (str)
@@ -248,11 +249,13 @@ def results(city, zipcode, occupation):
 #         rome_object['nafs'] = nafs
 #     return rome_object
 
+
 def add_descriptions(rome_object):
     description = settings.ROME_DESCRIPTIONS[rome_object.get('rome')]
-    if(description):
+    if (description):
         rome_object['description'] = description
     return rome_object
+
 
 @searchBlueprint.route('/entreprises')
 def entreprises():
@@ -288,7 +291,7 @@ def entreprises():
         hide_suggestions = False
         if (named_location):
             with start_transaction(op='related_romes_get', name='rome_' + rome):
-                related_area = RELATED_ROMES_AREAS.get(named_location.city_code,None)
+                related_area = RELATED_ROMES_AREAS.get(named_location.city_code, None)
                 if (related_area):
                     # Hide suggestions for places which may have suggestions
                     hide_suggestions = True
@@ -542,6 +545,7 @@ def get_location(request_args: Dict[str, Union[str, int]]) -> Tuple[Optional[Loc
 
     return location, named_location, departments
 
+
 @searchBlueprint.route('/entreprises/commune/<commune_id>/rome/<rome_id>')
 def results_by_commune_and_rome(commune_id, rome_id):
     """
@@ -574,6 +578,7 @@ def results_by_commune_and_rome(commune_id, rome_id):
     # roughly equivalent to the result of an API call - see Trello #971.
     return redirect(url)
 
+
 @searchBlueprint.route('/entreprises/department/<department_code>/rome/<rome_id>')
 def results_by_departments_and_rome(department_code, rome_id):
     """
@@ -589,6 +594,7 @@ def results_by_departments_and_rome(department_code, rome_id):
         abort(400, 'Department or rome not found')
     return redirect(url)
 
+
 def get_url_for_rome(rome_id, department_code):
     try:
         rome_description = settings.ROME_DESCRIPTIONS[rome_id.upper()]
@@ -600,8 +606,8 @@ def get_url_for_rome(rome_id, department_code):
         departmentData = geocoding.datagouv.get_department_by_code(department_code)
         if departmentData:
             return url_for('search.entreprises',
-                departments=department_code,
-                j=rome_id,
-                l=departmentData.get('label'),
-                occupation=slugified_rome_description)
+                           departments=department_code,
+                           j=rome_id,
+                           l=departmentData.get('label'),
+                           occupation=slugified_rome_description)
     return None

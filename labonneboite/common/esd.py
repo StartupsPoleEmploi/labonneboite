@@ -2,7 +2,7 @@ import logging
 import datetime
 import time
 import requests
-import json
+
 from urllib.parse import urlencode
 from requests.exceptions import ConnectionError, ReadTimeout
 from labonneboite.common.conf import settings

@@ -125,7 +125,6 @@ def sirets_for_email():
             sirets = ','.join([office.siret for office in offices])
             save_link = url_for('officeadminupdate.create_view', _external=True, sirets=sirets)
 
-
     context = {
         'current_tab': 'sirets_for_email',
         'companies': companies,

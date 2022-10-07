@@ -211,7 +211,7 @@ class FavoriteTest(FavoriteBaseTest):
             # Adding favorite from search results - the realistic case.
             # User should be redirected back to the search results.
             rv = client.post(url_add,
-                               data={'next': url_search_without_domain})
+                             data={'next': url_search_without_domain})
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, url_search_without_domain)
 
@@ -291,7 +291,7 @@ class FavoriteTest(FavoriteBaseTest):
             # Deleting favorite from search results - the realistic case.
             # User should be redirected back to the search results.
             rv = client.post(url_delete,
-                               data={'next': url_search_without_domain})
+                             data={'next': url_search_without_domain})
             self.assertEqual(rv.status_code, 302)
             self.assertEqual(rv.location, url_search_without_domain)
 

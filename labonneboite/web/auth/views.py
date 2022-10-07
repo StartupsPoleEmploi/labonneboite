@@ -22,6 +22,7 @@ authBlueprint = Blueprint('auth', __name__)
 
 logger = logging.getLogger('main')
 
+
 def random_string(length=10):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(length))
 
@@ -122,7 +123,8 @@ def peam_recruiter_connect():
     session['STATE'] = state
     session['NONCE'] = nonce
 
-    scope = "application_{} api_peconnect-entreprisev1 openid profile email habilitation".format(settings.PEAM_CLIENT_ID)
+    scope = "application_{} api_peconnect-entreprisev1 openid profile email habilitation".format(
+        settings.PEAM_CLIENT_ID)
 
     url = settings.PEAM_AUTH_RECRUITER_BASE_URL + "connexion/oauth2/authorize?" + urlencode({
         'realm': '/employeur',
@@ -182,6 +184,7 @@ def peam_recruiter_token_callback():
     except PeamRecruiterError as e:
         logger.exception(e)
     except PeamRecruiterLoginCancelled as e:
+        print(e, flush=True)
         pass
     else:
         # Profile need to be certified (email and habilitation)

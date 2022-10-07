@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from datetime import datetime
-from urllib.parse import urlparse, parse_qs
+
 import json
 import logging
 import socket

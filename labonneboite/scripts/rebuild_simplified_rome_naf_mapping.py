@@ -1,15 +1,14 @@
 import os
-import re
-import itertools
+
 import logging
 import pandas as pd
-from slugify import slugify
+
 import numpy as np
 
-from labonneboite.conf import settings
-from labonneboite.common import mapping as mapping_util
-from labonneboite.common import hiring_type_util
-from labonneboite.common import geocoding
+from labonneboite.conf import settings  # noqa : F401
+from labonneboite.common import mapping as mapping_util  # noqa : F401
+from labonneboite.common import hiring_type_util  # noqa : F401
+from labonneboite.common import geocoding  # noqa : F401
 
 logging.basicConfig(level=logging.INFO)
 
@@ -182,7 +181,6 @@ class RomeNafMapping:
         if SHOW_DETAILED_STATS:
             logging.info("Nafs per rome : {}".format(nafs_per_rome))
         logging.info("90% of romes have {} nafs or less.".format(round(np.percentile(nafs_per_rome, 90), 1)))
-
 
     def export_to_file(self):
         self.df.to_csv(OUTPUT_FILENAME, sep=CSV_DELIMITER, index=False, encoding='utf-8')

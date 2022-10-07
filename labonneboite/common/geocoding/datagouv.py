@@ -7,8 +7,6 @@ from requests.exceptions import ConnectionError, ReadTimeout
 from labonneboite.common.util import unique_elements
 from labonneboite.common.conf import settings
 
-import json
-
 logger = logging.getLogger('main')
 
 BAN_TIMEOUT = 3

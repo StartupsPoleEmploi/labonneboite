@@ -1,8 +1,6 @@
-import time
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import BaseForm
 from wtforms import validators
-from sqlalchemy.exc import OperationalError
 from wtforms.validators import DataRequired
 
 from labonneboite.common import scoring

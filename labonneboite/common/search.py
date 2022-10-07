@@ -715,9 +715,9 @@ class HiddenMarketFetcher(Fetcher):
         hiring_type = hiring_type or hiring_type_util.DEFAULT
 
         return {
-                   hiring_type_util.DPAE: "boosted_romes.%s",
-                   hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s",
-               }[hiring_type] % rome_code
+            hiring_type_util.DPAE: "boosted_romes.%s",
+            hiring_type_util.ALTERNANCE: "boosted_alternance_romes.%s",
+        }[hiring_type] % rome_code
 
     @classmethod
     def _add_filter_range(cls, key: str, *, to: List[Filter], if_=True, **kwargs):

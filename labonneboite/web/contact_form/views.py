@@ -27,7 +27,7 @@ ERROR_CONTACT_MODE_MESSAGE = 'Vous avez indiqué vouloir être contacté \'{}\' 
 ERROR_MISSING_CONTACT_INFO = "Veuillez tout d'abord renseigner vos informations de contact"
 
 # Get form value from office.contact_mode text
-CONTACT_MODES_LABEL_TO_FORM_VALUE = {v:k for k, v in CONTACT_MODES.items()}
+CONTACT_MODES_LABEL_TO_FORM_VALUE = {v: k for k, v in CONTACT_MODES.items()}
 
 ACTION_NAMES = [
     'update_coordinates',
@@ -104,7 +104,10 @@ def unknown_siret_message():
 def get_office_identification_data():
     return forms.OfficeHiddenIdentificationForm(data=request.args, meta={'csrf': False}).data
 
+
 MAX_ATTEMPTS = 2
+
+
 def sendMail(mail_content, subject):
     '''
         This function will send an email to us and retry in case of failure
@@ -122,6 +125,7 @@ def sendMail(mail_content, subject):
     else:
         logger.critical('Mail not sent (to settings.TO_EMAILS)', subject, mail_content)
         flash(generate_fail_flash_content(), 'error')
+
 
 @contactFormBlueprint.route('/verification-informations-entreprise', methods=['GET'])
 @contactFormBlueprint.route('/verification-informations-entreprise/<siret>', methods=['GET'])
@@ -210,31 +214,31 @@ def change_info():
         else:
             params = {key: form.data[key] for key in ['siret', 'last_name', 'first_name', 'phone', 'email']}
             if is_recruiter_from_lba():
-                params.update({"origin":"labonnealternance"})
+                params.update({"origin": "labonnealternance"})
             action_form_url = "contact_form.%s_form" % action_name
             url = url_for(action_form_url, **params)
             return redirect(url)
 
     return render_template('contact_form/form.html',
-        title='Identifiez-vous',
-        submit_text='suivant',
-        extra_submit_class='identification-form',
-        form=form,
-        is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
-        is_recruiter=peam_recruiter.is_recruiter(),
-        use_lba_template=is_recruiter_from_lba(),
-        show_disclaimer=True,
-        hide_return=True,
-    )
+                           title='Identifiez-vous',
+                           submit_text='suivant',
+                           extra_submit_class='identification-form',
+                           form=form,
+                           is_certified_recruiter=peam_recruiter.is_certified_recruiter(),
+                           is_recruiter=peam_recruiter.is_recruiter(),
+                           use_lba_template=is_recruiter_from_lba(),
+                           show_disclaimer=True,
+                           hide_return=True,
+                           )
 
 
 @contactFormBlueprint.route('/informations-entreprise/action', methods=['GET'])
 def ask_action():
     return render_template('contact_form/ask_action.html',
-        title='Que voulez-vous faire ?',
-        use_lba_template=is_recruiter_from_lba(),
-        siret=request.args.get('siret', ''),
-    )
+                           title='Que voulez-vous faire ?',
+                           use_lba_template=is_recruiter_from_lba(),
+                           siret=request.args.get('siret', ''),
+                           )
 
 
 @contactFormBlueprint.route('/informations-entreprise/modifier-coordonnees', methods=['GET', 'POST'])
@@ -264,8 +268,8 @@ def update_coordinates_form():
     # retrive sensible data but keep it private (do not display)
     new_email = request.form.get('new_email', office.email)
     new_phone = request.form.get('new_phone', office.phone)
-    new_phone_alternance = request.form.get('new_phone_alternance', office.phone_alternance)
-    new_email_alternance = request.form.get('new_email_alternance', office.email_alternance)
+    # new_phone_alternance = request.form.get('new_phone_alternance', office.phone_alternance)
+    # new_email_alternance = request.form.get('new_email_alternance', office.email_alternance)
 
     if form.validate_on_submit():
         form_valid = True
@@ -299,13 +303,13 @@ def update_coordinates_form():
             return redirect(url_for('contact_form.success', **params))
 
     return render_template('contact_form/form.html',
-        title='Modifier ma fiche entreprise',
-        form=form,
-        params=urlencode(get_office_identification_data()),
-        use_lba_template=is_recruiter_from_lba(),
-        show_entreprise_page=True,
-        show_coordinates_disclaimer=True,
-    )
+                           title='Modifier ma fiche entreprise',
+                           form=form,
+                           params=urlencode(get_office_identification_data()),
+                           use_lba_template=is_recruiter_from_lba(),
+                           show_entreprise_page=True,
+                           show_coordinates_disclaimer=True,
+                           )
 
 
 @contactFormBlueprint.route('/informations-entreprise/modifier-metiers', methods=['GET', 'POST'])
@@ -377,12 +381,12 @@ def update_jobs_form():
     ]
 
     return render_template('contact_form/change_job_infos.html',
-        title='Demande de modification des métiers',
-        form=form,
-        params=urlencode(get_office_identification_data()),
-        use_lba_template=is_recruiter_from_lba(),
-        extra_added_jobs=extra_added_jobs,
-    )
+                           title='Demande de modification des métiers',
+                           form=form,
+                           params=urlencode(get_office_identification_data()),
+                           use_lba_template=is_recruiter_from_lba(),
+                           extra_added_jobs=extra_added_jobs,
+                           )
 
 
 @contactFormBlueprint.route('/informations-entreprise/supprimer', methods=['GET', 'POST'])
@@ -407,11 +411,11 @@ def delete_form():
         return redirect(url_for('contact_form.success', **params))
 
     return render_template('contact_form/form.html',
-        title='Supprimer mon entreprise',
-        form=form,
-        params=urlencode(get_office_identification_data()),
-        use_lba_template=is_recruiter_from_lba(),
-    )
+                           title='Supprimer mon entreprise',
+                           form=form,
+                           params=urlencode(get_office_identification_data()),
+                           use_lba_template=is_recruiter_from_lba(),
+                           )
 
 
 @contactFormBlueprint.route('/informations-entreprise/autre-demande', methods=['GET', 'POST'])
@@ -454,12 +458,12 @@ def success():
         params.update({'origin': 'labonnealternance'})
 
     return render_template('contact_form/success_message.html',
-        use_lba_template=is_lba,
-        email=settings.LBA_EMAIL if is_lba else settings.LBB_EMAIL,
-        home_url="https://labonnealternance.pole-emploi.fr" if is_lba else url_for('root.home'),
-        site_name="La Bonne alternance" if is_lba else "La Bonne Boite",
-        params=urlencode(params),
-        action_form_url=url_for('contact_form.ask_action', **request.args),
-        suggest_update_coordinates='suggest_update_coordinates' in request.args,
-        suggest_update_jobs='suggest_update_jobs' in request.args,
-    )
+                           use_lba_template=is_lba,
+                           email=settings.LBA_EMAIL if is_lba else settings.LBB_EMAIL,
+                           home_url="https://labonnealternance.pole-emploi.fr" if is_lba else url_for('root.home'),
+                           site_name="La Bonne alternance" if is_lba else "La Bonne Boite",
+                           params=urlencode(params),
+                           action_form_url=url_for('contact_form.ask_action', **request.args),
+                           suggest_update_coordinates='suggest_update_coordinates' in request.args,
+                           suggest_update_jobs='suggest_update_jobs' in request.args,
+                           )

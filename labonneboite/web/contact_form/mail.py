@@ -1,14 +1,14 @@
 from flask import escape, session
 
-from flask import current_app, url_for
+from flask import url_for
 
 from labonneboite.conf import settings
-from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office, OfficeAdminAdd, OfficeAdminRemove, OfficeAdminUpdate
 from labonneboite.common import models
 from labonneboite.common import mailjet
 from labonneboite.web.contact_form import forms
 from labonneboite.web.auth.backends.peam_recruiter import SessionKeys, is_certified_recruiter
+
 
 def compute_action_name(form):
     form_to_action = {
@@ -47,8 +47,10 @@ def common_mail_template(form):
         unique_recruiter_id,
     )
 
+
 # get ready to send emails
 mailJetClient = mailjet.MailJetClient(settings.MAILJET_API_KEY, settings.MAILJET_API_SECRET)
+
 
 def send_mail(mail_content, subject):
     mailJetClient.send(
@@ -57,6 +59,7 @@ def send_mail(mail_content, subject):
         from_email=settings.FROM_EMAIL,
         recipients=settings.TO_EMAILS
     )
+
 
 def generate_update_coordinates_mail(form, recruiter_message):
     return """

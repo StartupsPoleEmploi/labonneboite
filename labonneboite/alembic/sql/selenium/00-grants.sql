@@ -1,0 +1,1 @@
+GRANT ALL ON lbb_test.* TO "lbb_test"@"%" IDENTIFIED BY "";

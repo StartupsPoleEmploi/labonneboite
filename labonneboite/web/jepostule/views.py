@@ -1,7 +1,7 @@
 import logging
 from urllib.parse import urlencode
 
-from flask import abort, Blueprint, render_template, request, flash, url_for, redirect
+from flask import abort, Blueprint, render_template, request, redirect
 from flask_login import current_user
 import requests
 
@@ -25,7 +25,7 @@ def application(siret):
     refresh_token_result = attempt_to_refresh_peam_token()
     if refresh_token_result["token_has_expired"]:
         return redirect(refresh_token_result["redirect_url"])
-    
+
     data = {
         'candidate_first_name': current_user.first_name,
         'candidate_last_name': current_user.last_name,
@@ -53,6 +53,7 @@ def application(siret):
         iframe_path="/embed/candidater/?" + urlencode(data),
         iframe_base=settings.JEPOSTULE_BASE_URL,
     )
+
 
 def get_token(**params):
     params['client_secret'] = settings.JEPOSTULE_CLIENT_SECRET

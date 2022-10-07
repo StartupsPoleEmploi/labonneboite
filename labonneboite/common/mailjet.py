@@ -13,20 +13,21 @@ If you update one, please keep the other in sync
 Also when more code is shared between JP and LBB we will probably want to use pip modules
 """
 
+
 class MailJetClient:
     def __init__(self, MAILJET_API_KEY, MAILJET_API_SECRET):
         self.MAILJET_API_KEY = MAILJET_API_KEY
         self.MAILJET_API_SECRET = MAILJET_API_SECRET
 
     def send(self,
-            subject,
-            html_content,
-            from_email,
-            recipients,
-            from_name=None,
-            reply_to=None,
-            attachments=None,
-            monitoring_category=None):
+             subject,
+             html_content,
+             from_email,
+             recipients,
+             from_name=None,
+             reply_to=None,
+             attachments=None,
+             monitoring_category=None):
         data = {
             "Messages": [
                 {
@@ -47,17 +48,16 @@ class MailJetClient:
         json_response = self.post_api(data)
         return self.extract_ids(json_response)
 
-
     def send_using_template(self,
-            subject,
-            mailjet_template_id,
-            mailjet_template_data,
-            from_email,
-            recipients,
-            from_name=None,
-            reply_to=None,
-            attachments=None,
-            monitoring_category=None):
+                            subject,
+                            mailjet_template_id,
+                            mailjet_template_data,
+                            from_email,
+                            recipients,
+                            from_name=None,
+                            reply_to=None,
+                            attachments=None,
+                            monitoring_category=None):
         data = {
             "Messages": [
                 {
@@ -80,10 +80,8 @@ class MailJetClient:
         json_response = self.post_api(data)
         return self.extract_ids(json_response)
 
-
     def extract_ids(self, json_response):
         return [message["MessageID"] for message in json_response["Messages"][0]["To"]]
-
 
     def encode_attachments(self, attachments):
         return [{
@@ -92,11 +90,9 @@ class MailJetClient:
             "Base64Content": base64.encodebytes(attachment[1]).decode().strip(),
         } for attachment in attachments] if attachments else []
 
-
     def mimetype(self, url):
         types = mimetypes.guess_type(url, strict=False)
         return types[0] if types and types[0] else 'application/octet-stream'
-
 
     def post_api(self, data):
         client = Client(auth=(self.MAILJET_API_KEY, self.MAILJET_API_SECRET), version='v3.1')

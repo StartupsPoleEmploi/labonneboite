@@ -17,6 +17,7 @@ class Pagination(object):
     """
     A generic pagination class.
     """
+
     def __init__(self, page, per_page, total_count):
         self.page = page
         self.per_page = per_page
@@ -62,6 +63,7 @@ class PaginationManager(object):
     """
     Specific pagination class for office search results.
     """
+
     def __init__(self, company_count, current_from_number, current_to_number,
                  full_path_url):
         self.pages = []

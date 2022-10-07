@@ -455,7 +455,6 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         Test `update_offices` to update an office: update names, email and website, keep current phone.
         """
         office = Office.get(self.office1.siret)
-        old_company_name = office.company_name
         old_office_name = office.office_name
         office_to_update = OfficeAdminUpdate(
             sirets=self.office1.siret,
@@ -501,7 +500,6 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         Test `update_offices` to update an office: update names, email and website, keep current phone.
         """
         office = Office.get(self.office1.siret)
-        old_company_name = office.company_name
         old_office_name = office.office_name
         office_to_update = OfficeAdminUpdate(
             sirets=self.office1.siret,
@@ -955,17 +953,17 @@ class UpdateOfficesTest(CreateIndexBaseTest):
         """
         Test `get_score_minimum_for_rome` to get a score threshold that a company must have at least
         """
-        #In the metiers_tension csv file
+        # In the metiers_tension csv file
         # This row with rome K1401 should give the maximum possible threshold
         # P2Z90	#N/A	#N/A	K1401	CONCEPTION ET PILOTAGE DE LA POLITIQUE DES POUVOIRS PUBLICS
         score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('K1401')
         self.assertEqual(score_minimum_for_rome, scoring_util.SCORE_FOR_ROME_MINIMUM)
 
         # This row with rome A1101 has 61.9% tension
-        #A0Z43,Conducteurs d'engins agricoles ou forestiers,61.9,A1101,CONDUITE D'ENGINS AGRICOLES ET FORESTIERS
+        # A0Z43,Conducteurs d'engins agricoles ou forestiers,61.9,A1101,CONDUITE D'ENGINS AGRICOLES ET FORESTIERS
         score_minimum_for_rome = scoring_util.get_score_minimum_for_rome('A1101')
-        result = ((scoring_util.SCORE_FOR_ROME_MINIMUM - scoring_util.MINIMUM_POSSIBLE_SCORE) *
-                  ((100 - 61.9) / 100)) + scoring_util.MINIMUM_POSSIBLE_SCORE
+        result = ((scoring_util.SCORE_FOR_ROME_MINIMUM - scoring_util.MINIMUM_POSSIBLE_SCORE)
+                  * ((100 - 61.9) / 100)) + scoring_util.MINIMUM_POSSIBLE_SCORE
         self.assertEqual(score_minimum_for_rome, result)
         self.assertTrue(
             scoring_util.MINIMUM_POSSIBLE_SCORE <= score_minimum_for_rome <= scoring_util.SCORE_FOR_ROME_MINIMUM)
