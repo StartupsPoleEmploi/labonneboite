@@ -1,6 +1,5 @@
 FROM python:3.10.7-slim-bullseye
 
-
 # Set timezone
 ENV TZ=Europe/Paris
 ENV FLASK_APP web.app
@@ -15,25 +14,16 @@ RUN apt-get update && apt-get install -y \
     locales \
     --no-install-recommends
 
-# switch working directory
-WORKDIR /app
-RUN mkdir -p /app/logs
-
-# Installing requirements
-COPY pyproject.toml /app/
-COPY poetry.lock /app/
-COPY setup.cfg /app/
-COPY README.md /app/
-
 # File imports : source code
-COPY ./labonneboite /app/labonneboite
+COPY . .
+
 RUN pip install poetry \ 
     && poetry install
 
-WORKDIR /app/labonneboite
+WORKDIR /labonneboite
 
 # This is a folder to place sql files that will be imported directly after running alembic and before the create index script
-RUN mkdir /app/labonneboite/sql
+RUN mkdir /labonneboite/sql
 
 # unsupported local error : https://stackoverflow.com/questions/54802935/docker-unsupported-locale-setting-when-running-python-container
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen \
@@ -44,7 +34,7 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen 
 RUN poetry run flask assets build
 
 # activate entrypoints
-COPY ./docker/v3.10/entrypoints /app/labonneboite/entrypoints
+COPY ./docker/v3.10/entrypoints /labonneboite/entrypoints
 RUN chmod +x -R ./entrypoints/
 
 # default entry point is run

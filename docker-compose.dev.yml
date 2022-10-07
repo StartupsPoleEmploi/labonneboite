@@ -34,7 +34,7 @@ services:
       <<: *cenv 
     volumes:
       - ./labonneboite/alembic/sql/dev:/sql
-      - ./labonneboite:/app/labonneboite
+      - ./labonneboite:/labonneboite
     depends_on:
       elasticsearch:
         condition: service_healthy
