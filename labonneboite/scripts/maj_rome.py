@@ -8,11 +8,13 @@ import pandas as pd
 #
 # We use the data updated by Pole Emploi :
 # https://www.pole-emploi.org/opendata/repertoire-operationnel-des-meti.html?type=article
-# 
-# You can download the main dataset (common/data/arbo_rome_ogr_2020.csv) on this link : https://www.pole-emploi.org/files/live/sites/peorg/files/documents/Statistiques-et-analyses/Open-data/ROME/ROME_ArboPrincipale.xlsx
+#
+# You can download the main dataset (common/data/arbo_rome_ogr_2020.csv) on this link :
+# https://www.pole-emploi.org/files/live/sites/peorg/files/documents/Statistiques-et-analyses/Open-data/ROME/ROME_ArboPrincipale.xlsx
+
 
 def concat_rome_columns(row):
-    return row['Rome1']+row['Rome2']+row['Rome3']
+    return row['Rome1'] + row['Rome2'] + row['Rome3']
 
 
 def load_main_rome_arbo():
@@ -30,7 +32,6 @@ def update_rome_labels(df_main):
     # Analysis note :
     # There are the same number of rome in both files, we can safely update the files
     df_rome_labels = df_rome_labels[['Rome', 'Intitule']]
-    #df_rome_labels_old = pd.read_csv("common/data/rome_labels_2019.csv", delimiter='|')
 
     df_rome_labels.rename(columns={
         'Rome': 'rome_id',
@@ -48,7 +49,6 @@ def update_ogr_labels(df_main):
     # Analysis note :
     # We have arround 100 ogr codes more than the previous dataset, it's ok to update !
     df_ogr_labels = df_ogr_labels[['OGR', 'Intitule']]
-    #df_ogr_labels_old = pd.read_csv("common/data/ogr_labels_2019.csv", delimiter='|')
 
     df_ogr_labels.rename(columns={
         'OGR': 'ogr_id',
@@ -68,7 +68,6 @@ def update_ogr_rome_mapping(df_main):
     # Analysis note :
     # We have arround 100 ogr codes more than the previous dataset, it's ok to update !
     df_ogr_rome_mapping = df_ogr_rome_mapping[['OGR', 'Rome']]
-    #df_ogr_rome_mapping_old = pd.read_csv("common/data/ogr_rome_mapping_2019.csv", delimiter='|')
 
     df_ogr_rome_mapping.rename(columns={
         'OGR': 'ogr_id',
@@ -90,6 +89,7 @@ def update_rome_naf_mapping(df_rome_labels):
     df_rome_naf_mapping.to_csv('common/data/rome_naf_mapping.csv', sep=',', index=False)
 
     return df_rome_naf_mapping
+
 
 if __name__ == '__main__':
     df_main_new = load_main_rome_arbo()

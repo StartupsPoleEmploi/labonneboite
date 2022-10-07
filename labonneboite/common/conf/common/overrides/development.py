@@ -1,4 +1,3 @@
-import flask.logging
 
 DEBUG = True
 SERVER_NAME = None

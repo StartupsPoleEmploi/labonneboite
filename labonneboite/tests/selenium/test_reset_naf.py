@@ -29,7 +29,7 @@ class TestResetNaf(LbbSeleniumTestCase):
         parameters = dict(urllib.parse.parse_qsl(url.query))
         self.assertEqual('/entreprises', url.path)
         self.assertEqual('comptabilite', parameters['occupation'])
-        self.assertEqual('metz', parameters['city']) # city parameter is defined on redirect
+        self.assertEqual('metz', parameters['city'])  # city parameter is defined on redirect
         self.assertEqual('57000', parameters['zipcode'])
         self.assertNotIn('naf', parameters)
 
@@ -69,5 +69,5 @@ class TestResetNaf(LbbSeleniumTestCase):
         parameters = dict(urllib.parse.parse_qsl(url.query))
         self.assertEqual('/entreprises', url.path)
         self.assertEqual('boucherie', parameters['occupation'])
-        self.assertEqual('Metz (57000)', parameters['l']) # form value is now full city name
+        self.assertEqual('Metz (57000)', parameters['l'])  # form value is now full city name
         self.assertNotIn('naf', parameters)

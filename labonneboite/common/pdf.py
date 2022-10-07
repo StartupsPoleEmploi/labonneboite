@@ -47,7 +47,9 @@ def convert_to_pdf(pdf_data, web_dir):
     # The link callback is a function that is used to determine the path of
     # local static assets required to generate the pdf. This should not point
     # to http://labonneboite.
-    link_callback = lambda uri, rel: os.path.join(web_dir, uri.strip("/"))
+
+    def link_callback(uri, rel):
+        return os.path.join(web_dir, uri.strip("/"))
     pisa.CreatePDF(io.StringIO(pdf_data), dest=pdf_target, link_callback=link_callback)
     pdf_target.seek(0)
     return pdf_target

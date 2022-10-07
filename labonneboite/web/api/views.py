@@ -69,10 +69,10 @@ def log_api(function):
         # get the status: from a real response object or from the error tuple returned by api_auth_required
         try:
             status = response.status_code if hasattr(response, 'status_code') else response[1]
-        except:
+        except Exception as e:
             # just in case something went wrong with the status
+            print(e)
             status = None
-
         activity.log_api(status=status,
                          user_agent=request.user_agent.string,
                          referrer=request.referrer,
@@ -139,9 +139,6 @@ def company_list():
     offices, _ = fetcher.get_offices(add_suggestions=False)
 
     result = build_result(fetcher, offices, commune_id, departements, zipcode)
-
-    latitude = location.latitude if location is not None else None
-    longitude = location.longitude if location is not None else None
 
     return jsonify(result)
 

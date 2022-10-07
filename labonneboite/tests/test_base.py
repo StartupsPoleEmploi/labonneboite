@@ -51,6 +51,7 @@ class AppTest(unittest.TestCase):
             url = flask_url_for(endpoint, **kwargs)
             return url
 
+
 class DatabaseTest(AppTest):
     """
     Configure MySQL and Elasticsearch for unit tests.

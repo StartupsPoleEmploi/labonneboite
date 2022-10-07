@@ -1,5 +1,6 @@
 from flask import session
 
+
 def fix_csrf_session():
     """
     csrf_token session cookies placed by python 2.7 is stored in bytes format.

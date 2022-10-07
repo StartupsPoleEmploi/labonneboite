@@ -10,7 +10,7 @@ from labonneboite.common import pdf as pdf_util
 from labonneboite.common import util
 from labonneboite.common.contact_mode import CONTACT_MODE_STAGES
 from labonneboite.common.models import Office
-from labonneboite.conf import settings
+from labonneboite.conf import settings  # noqa
 from labonneboite.web import WEB_DIR
 from labonneboite.web.utils import fix_csrf_session
 

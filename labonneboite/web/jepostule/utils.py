@@ -6,6 +6,7 @@ from labonneboite.conf import settings
 def jepostule_enabled(user, company):
     return is_user_enabled(user) and is_company_enabled(company)
 
+
 def is_user_enabled(user):
     """
     Return True if jepostule is enabled for this specific user.
@@ -21,8 +22,10 @@ def is_user_enabled(user):
                 return True
     return False
 
+
 def is_company_enabled(company):
     return company and company.email and is_valid_email(company.email)
+
 
 def is_valid_email(email):
     """

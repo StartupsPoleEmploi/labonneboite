@@ -1,8 +1,11 @@
 import datetime
 import hmac
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import hashlib
 from labonneboite.conf import settings
+
 
 class TimestampFormatException(Exception):
     pass
@@ -15,8 +18,10 @@ class TimestampExpiredException(Exception):
 class InvalidSignatureException(Exception):
     pass
 
+
 class UnknownUserException(Exception):
     pass
+
 
 def make_timestamp():
     timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
@@ -32,10 +37,12 @@ def get_ordered_argument_string(args):
         ordered_args.append((arg, args_copy[arg]))
     return urllib.parse.urlencode(ordered_args)
 
+
 def make_signature(args, timestamp, user='labonneboite'):
     args['timestamp'] = timestamp
     api_key = get_key(user, '')
     return compute_signature(args, api_key)
+
 
 def check_api_request(request):
     user = request.args['user']
@@ -46,7 +53,8 @@ def check_api_request(request):
     timestamp = request.args.get('timestamp')
     try:
         timestamp_dt = datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S')
-    except:
+    except Exception as e:
+        print(e, flush=True)
         raise TimestampFormatException("incorrect format")
     # check timestamp for API request and reject it if it's too old or in the future
     # needs a correctly UTC calibrated time here, for now it works because timestamps are computed on the same server
@@ -72,11 +80,13 @@ def check_signature(request, requested_signature, api_key):
     if not computed_signature == requested_signature:
         raise InvalidSignatureException
 
+
 def has_scope(api_user_name, api_user_name_forwarded, scope):
     user_data = settings.API_USERS.get(api_user_name_forwarded, settings.API_USERS.get(api_user_name))
     if user_data is None:
         return False
     return scope in user_data.get('scopes', [])
 
-def get_key(api_user_name, default = None):
+
+def get_key(api_user_name, default=None):
     return settings.API_KEYS.get(api_user_name, default)

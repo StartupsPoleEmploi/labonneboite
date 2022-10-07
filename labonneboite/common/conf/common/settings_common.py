@@ -224,13 +224,13 @@ FORWARD_PEAM_TOKEN_TO_JP_FOR_AMI = False
 
 if get_current_env() == ENV_BONAPARTE:
     # pylint: disable=wildcard-import,unused-wildcard-import
-    from .overrides.bonaparte import *
+    from .overrides.bonaparte import *  # noqa: F401, F403
 elif get_current_env() == ENV_DEVELOPMENT:
     # pylint: disable=wildcard-import,unused-wildcard-import
-    from .overrides.development import *
+    from .overrides.development import *  # noqa: F401, F403
 elif get_current_env() == ENV_TEST:
     # pylint: disable=wildcard-import,unused-wildcard-import
-    from .overrides.test import *
+    from .overrides.test import *  # noqa: F401, F403
 
 ALLOW_INDEXING = False
 

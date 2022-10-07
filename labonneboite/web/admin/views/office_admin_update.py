@@ -526,7 +526,7 @@ class OfficeAdminUpdateModelView(AdminModelViewMixin, ModelView):
     def after_model_change(self, form: BaseForm, model: models.OfficeAdminUpdate, is_created: bool) -> None:
         create_index.update_offices_by_sirets(model.as_list(form.data['sirets']), model)
 
-    def validate_form(self, form):
+    def validate_form(self, form):  # noqa : C901 'OfficeAdminUpdateModelView.validate_form' is too complex (27)
         # Add http:// is missing
         form['new_website'].data = format_url(form['new_website'].data)
         form['social_network'].data = format_url(form['social_network'].data)

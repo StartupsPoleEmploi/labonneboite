@@ -1,7 +1,7 @@
 import os
 import pickle
 import csv
-import math
+
 
 from functools import lru_cache, reduce
 from collections import defaultdict
@@ -29,11 +29,6 @@ def load_pickle_file(filename):
         return pickle.load(open(full_filename, "r"))
     return load_file(f, filename)
 
-def load_pd_dataframe(filename, delimiter='', dtype=None):
-    def f(full_filename):
-        return pd.read_csv(open(full_filename, "r"), dtype=dtype)
-
-    return load_file(f, filename)
 
 def load_csv_file(filename, delimiter='|'):
     def f(full_filename):
@@ -110,10 +105,12 @@ def load_related_rome_areas():
     rows = load_csv_file("lbb-pse_bassin-emploi_code-insee.csv", delimiter=',')
     return reduce(reduceRelateRomesAreas, rows, {})
 
+
 def reduceRelateRomesAreas(aggr, row):
     [code_insee, code_area] = row
     aggr[code_insee] = code_area
     return aggr
+
 
 @lru_cache(maxsize=None)
 def load_related_rome():
@@ -126,6 +123,7 @@ def load_related_rome():
     rows = load_csv_file("lbb-pse_bassin-emploi_rome-connexe.csv", delimiter=',')
     return reduce(reduceRelateRomes, rows, {})
 
+
 def reduceRelateRomes(aggr, row):
     [code_area, rome, rome_connexe, score] = row
     entry_code_area = aggr.get(code_area, {})
@@ -134,6 +132,7 @@ def reduceRelateRomes(aggr, row):
     entry_code_area[rome] = entry_rome
     aggr[code_area] = entry_code_area
     return aggr
+
 
 @lru_cache(maxsize=None)
 def load_city_codes():
@@ -227,7 +226,9 @@ def load_metiers_tension():
                 raise ValueError
     return rome_to_tension
 
-#Used for PSE study, it returns a list of SIRET that must not b be seen on LBB
+# Used for PSE study, it returns a list of SIRET that must not b be seen on LBB
+
+
 @lru_cache(maxsize=None)
 def load_siret_to_remove():
     rows = load_csv_file("untreated_BB.csv", ',')
@@ -238,4 +239,3 @@ def load_siret_to_remove():
 
 OGR_ROME_CODES = load_ogr_rome_mapping()
 ROME_CODES = list(OGR_ROME_CODES.values())
-

@@ -62,7 +62,7 @@ def extract_ogr_rome_data():
                         raise ValueError('unexpected duplicate ogr rome mapping')
                     else:
                         ogr_rome_mapping[ogr_id] = rome_id
-    
+
     write_csv_for_rome_labels(rome_labels)
     write_csv_for_ogr_labels(ogr_labels)
     write_csv_for_ogr_rome_mapping(ogr_rome_mapping)

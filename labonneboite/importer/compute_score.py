@@ -10,7 +10,7 @@ The predicted number of hirings is
 then transformed and obfuscated into a "score" value
 between 0 and 100 for each office ("etablissement").
 
-We do this because we consider the predicted number of hirings to be a 
+We do this because we consider the predicted number of hirings to be a
 sensitive confidential data, this way, by storing only the obfuscated score in db,
 even if our db gets hacked you cannot transform the score back into their
 corresponding predicted number of hirings.
@@ -37,7 +37,7 @@ from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
 import sqlalchemy
 from sqlalchemy.pool import NullPool
-from sqlalchemy import func
+
 from labonneboite.common.util import timeit
 from . import settings as importer_settings
 from .models.computing import DpaeStatistics, Hiring, RawOffice
@@ -49,8 +49,10 @@ from .jobs.common import logger
 
 listen()
 
+
 def get_engine():
     return sqlalchemy.create_engine(get_db_string(), poolclass=NullPool)
+
 
 # Output additional debug info about these sirets
 # To disable, set to an empty list []
@@ -216,13 +218,13 @@ def get_df_hiring(departement, prediction_beginning_date):
             and contract_type in (%s)
             and hiring_date < '%s'
         """ % (
-            ', '.join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_DPAE]),
-            ', '.join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_ALTERNANCE]),
-            Hiring.__tablename__,
-            departement,
-            ', '.join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_ALL]),
-            str(prediction_beginning_date.isoformat()),
-        ),
+        ', '.join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_DPAE]),
+        ', '.join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_ALTERNANCE]),
+        Hiring.__tablename__,
+        departement,
+        ', '.join([str(c_t) for c_t in Hiring.CONTRACT_TYPES_ALL]),
+        str(prediction_beginning_date.isoformat()),
+    ),
         get_engine(),
     )
     debug_df(df_hiring, "after loading from hiring table")
@@ -255,7 +257,7 @@ def get_df_etab_with_hiring_monthly_aggregates(departement, prediction_beginning
     logger.debug("pivoting table dpae (%s)...", departement)
     # FIXME understand why `values="hiring_date"` is needed at all
     df_dpae = pd.pivot_table(df_dpae, values="hiring_date", index="siret",
-        columns=["hiring_type", "hiring_date_year", "hiring_date_month"])
+                             columns=["hiring_type", "hiring_date_year", "hiring_date_month"])
     debug_df(df_dpae, "after pivot")
     logger.debug("pivoting table (%s) ok!", departement)
 
@@ -272,7 +274,7 @@ def get_df_etab_with_hiring_monthly_aggregates(departement, prediction_beginning
     del df_dpae[siret_raw_column_name]
     debug_df(df_dpae, "after transform")
 
-    #### joining hiring and etab
+    # joining hiring and etab
 
     # at this moment
     # df_etab has one row per siret
@@ -302,7 +304,7 @@ def compute_prediction_beginning_date():
     We predict hirings starting from the 1st of the current month.
     """
     # foo
-    dpae_statistics = DpaeStatistics.query.filter(DpaeStatistics.file_type==DpaeStatistics.DPAE)\
+    dpae_statistics = DpaeStatistics.query.filter(DpaeStatistics.file_type == DpaeStatistics.DPAE)\
         .order_by(DpaeStatistics.most_recent_data_date.desc()).first()
     now = dpae_statistics.most_recent_data_date
     prediction_beginning_date = now.replace(day=1)  # get 1st of the month
@@ -330,7 +332,7 @@ def months_between_dates(d1, d2):
 
 
 def get_features_for_lag(df_etab, prefix, training_periods, data_gap_in_periods,
-        periods_back_in_time, debug_msg="Unnamed"):
+                         periods_back_in_time, debug_msg="Unnamed"):
     temporal_features = []
     for i in range(0, training_periods):  # [0, 1, ... training_periods - 1]
         index = data_gap_in_periods + (1 + i) + periods_back_in_time
@@ -398,11 +400,11 @@ def compute_hiring_aggregates(
 
 @timeit
 def train(df_etab, departement, prediction_beginning_date, last_historical_data_date,
-        months_per_period, training_periods, prefix_for_fields, score_field_name, is_lbb=True):
+          months_per_period, training_periods, prefix_for_fields, score_field_name, is_lbb=True):
     """
     Edits in place df_etab by adding final score columns
     (e.g. score and score_regr for DPAE/LBB, or score_alternance and score_alternance_regr for LBA).
-    
+
     TODO we should trash the score and score_alternance legacy columns
     since they come from legacy binary classification model and are no longer
     used. We now only use score_regr and score_alternance_regr computed
@@ -422,12 +424,12 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
     # `1.0 * int/int` trick is needed because otherwise int/int gives the floor int value.
     data_gap_in_periods = int(math.ceil(data_gap_in_months / months_per_period))
 
-    #Since August 2020, we have all alternance data, so there should be no gap anymore
+    # Since August 2020, we have all alternance data, so there should be no gap anymore
     if get_current_env() == ENV_DEVELOPMENT:
         if data_gap_in_periods <= 0:
             raise ValueError("dpae data should have at least one period of gap")
     else:
-        #if data_gap_in_periods != 0:
+        # if data_gap_in_periods != 0:
         if data_gap_in_periods not in [0, 1]:
             # FIXME restore when we have dpae 10 april
             raise ValueError("dpae data should have no gap")
@@ -476,7 +478,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
 
     logger.debug("(%s %s) X_train_feature_names: %s", departement, prefix_for_fields, X_train_feature_names)
     logger.debug("(%s %s) regression_coefficients (fitting done on X_train) : %s",
-        departement, prefix_for_fields, regr.coef_)
+                 departement, prefix_for_fields, regr.coef_)
 
     X_test, X_test_feature_names = get_features_for_lag(
         df_etab,
@@ -533,7 +535,8 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
         logger.info("(%s %s) regression_train RMSE : %s", departement, prefix_for_fields, rmse_train)
         logger.info("(%s %s) regression_test RMSE : %s", departement, prefix_for_fields, rmse_test)
         if rmse_test >= importer_settings.RMSE_MAX:
-            raise_with_message("is_lbb: %s, rmse_test too high : %s > %s" % (is_lbb, rmse_test, importer_settings.RMSE_MAX))
+            raise_with_message("is_lbb: %s, rmse_test too high : %s > %s" %
+                               (is_lbb, rmse_test, importer_settings.RMSE_MAX))
     except IndexError:
         logger.warning("not enough data to compute RMSE for %s", departement)
 
@@ -544,7 +547,7 @@ def train(df_etab, departement, prediction_beginning_date, last_historical_data_
 
     ranges = [0, 20, 40, 60, 80, 100]
     logger.info('(%s %s) score distribution : %s', departement, prefix_for_fields,
-        df_etab.groupby(pd.cut(df_etab.score, ranges))[score_field_name].agg('count'))
+                df_etab.groupby(pd.cut(df_etab.score, ranges))[score_field_name].agg('count'))
 
     compare_new_scores_to_old_ones(departement, df_etab)
 
@@ -609,10 +612,10 @@ def compare_new_scores_to_old_ones(departement, df_etab):
 
 @timeit
 def run(
-        departement,
-        prediction_beginning_date=None,
-        return_df_etab_if_successful=False,
-    ):
+    departement,
+    prediction_beginning_date=None,
+    return_df_etab_if_successful=False,
+):
     """
     Returns True if computation successful and False otherwise.
     """
@@ -626,7 +629,7 @@ def run(
 
     if df_etab is None:
         logger.warning("no etab/hiring data found for departement %s", departement)
-        return False # failed computation (e.g. no data)
+        return False  # failed computation (e.g. no data)
 
     # LBB / DPAE.
 
@@ -634,7 +637,8 @@ def run(
         df_etab,
         departement,
         prediction_beginning_date=prediction_beginning_date,
-        last_historical_data_date=go_back_last_day_of_the_month(DpaeStatistics.get_last_historical_data_date(DpaeStatistics.DPAE)),
+        last_historical_data_date=go_back_last_day_of_the_month(
+            DpaeStatistics.get_last_historical_data_date(DpaeStatistics.DPAE)),
         months_per_period=6,
         training_periods=7,
         prefix_for_fields='dpae',
@@ -647,7 +651,8 @@ def run(
         df_etab,
         departement,
         prediction_beginning_date=prediction_beginning_date,
-        last_historical_data_date=go_back_last_day_of_the_month(DpaeStatistics.get_last_historical_data_date(DpaeStatistics.APR)),
+        last_historical_data_date=go_back_last_day_of_the_month(
+            DpaeStatistics.get_last_historical_data_date(DpaeStatistics.APR)),
         months_per_period=6,
         training_periods=7,
         prefix_for_fields='alt',

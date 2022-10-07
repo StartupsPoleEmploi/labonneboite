@@ -22,7 +22,7 @@ class NafForm(FlaskForm):
     Enter a NAF code to find associated ROME codes.
     """
     naf = StringField("NAF", validators=[DataRequired()],
-        description="Saisissez un code NAF pour trouver les codes ROME associés.", filters=[upper_filter])
+                      description="Saisissez un code NAF pour trouver les codes ROME associés.", filters=[upper_filter])
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -42,7 +42,7 @@ class RomeForm(FlaskForm):
     Enter a ROME code to find associated NAF codes.
     """
     rome = StringField("ROME", validators=[DataRequired()],
-        description="Saisissez un code ROME pour trouver les codes NAF associés.", filters=[upper_filter])
+                       description="Saisissez un code ROME pour trouver les codes NAF associés.", filters=[upper_filter])
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -62,7 +62,7 @@ class SiretForm(FlaskForm):
     Enter a SIRET to find associated ROME codes.
     """
     siret = StringField("Siret", validators=[DataRequired(), siret_validator],
-        description="Saisissez un SIRET pour trouver les codes ROME associés.")
+                        description="Saisissez un SIRET pour trouver les codes ROME associés.")
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token
@@ -87,7 +87,7 @@ class EmailForm(FlaskForm):
     Enter a MAIL to find associated SIRETS.
     """
     email = StringField("Email", validators=[DataRequired(), Email()],
-        description="Saisissez un email pour trouver les sirets associés.")
+                        description="Saisissez un email pour trouver les sirets associés.")
 
     class Meta:
         # CSRF validation is enabled globally but we don't want the CSRF token

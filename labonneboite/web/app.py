@@ -19,7 +19,7 @@ from social_flask_sqlalchemy.models import init_social
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from labonneboite.conf import settings
-from labonneboite.common import mailjet, pro
+from labonneboite.common import pro
 from labonneboite.common.database import db_session, engine  # This is how we talk to the database.
 from labonneboite.common.env import ENV_DEVELOPMENT, get_current_env
 from labonneboite.common.models import Office, User

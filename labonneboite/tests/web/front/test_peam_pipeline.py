@@ -52,7 +52,7 @@ class AuthPipelineTest(DatabaseTest):
             User.query.filter_by(external_id='peconnect-userid').first().email,
             'preexisting@email.com',
         )
-        result = self.run_pipeline(peam.PEAMOpenIdConnect)
+        self.run_pipeline(peam.PEAMOpenIdConnect)
         self.assertEqual(
             User.query.filter_by(external_id='peconnect-userid').first().email,
             'my@email.com',

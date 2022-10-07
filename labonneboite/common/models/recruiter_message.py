@@ -5,7 +5,6 @@ from sqlalchemy import Column
 from sqlalchemy import Boolean, DateTime, Integer, String, Text
 from sqlalchemy.orm.exc import NoResultFound
 
-from labonneboite.common import mapping as mapping_util
 from labonneboite.common.models import Office
 from labonneboite.common.database import Base
 from labonneboite.common.models.base import CRUDMixin
@@ -104,7 +103,7 @@ class UpdateJobsRecruiterMessage(RecruiterMessageCommon, CRUDMixin, Base):
 
     def fill_values(self, form):
         try:
-            office = Office.query.filter(Office.siret == form.siret.data).first()
+            office = Office.query.filter(Office.siret == form.siret.data).first()  # noqa
         except NoResultFound:
             raise NoOfficeFoundException('No office found with siret : {}'.format(form.data.siret))
 

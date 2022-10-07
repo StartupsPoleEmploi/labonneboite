@@ -1,0 +1,34 @@
+docs_dir: docs
+theme:
+  name: "material"
+  features:
+    - navigation.sections
+  font:
+    text: "Roboto"
+    code: "Roboto Mono"
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - pymdownx.critic
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.snippets
+
+# Do your stuff below
+site_name: lbb
+site_description: "La Bonne Boite"
+site_author: "La Bonne Boite"
+
+nav:
+  - index.md

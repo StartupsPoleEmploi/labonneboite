@@ -639,7 +639,7 @@ class ApiBaseTest(DatabaseTest):
             # just like in other environments, id should be the siret
             self.es.delete(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=doc['siret'])
         sirets = list(map(itemgetter('siret'), self.docs))
-        offices = Office.query.filter(Office.siret in sirets).delete()
+        Office.query.filter(Office.siret in sirets).delete()
         super().tearDown()
 
     def add_security_params(self, params):

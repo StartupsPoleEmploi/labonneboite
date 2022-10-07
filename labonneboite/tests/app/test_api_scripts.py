@@ -1,8 +1,6 @@
 import json
 from unittest import mock
 
-from flask import url_for
-
 from labonneboite.common.models import OfficeAdminUpdate
 from labonneboite.common import es
 from labonneboite.scripts import create_index as script
