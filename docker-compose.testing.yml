@@ -32,7 +32,7 @@ services:
       <<: *cenv 
     volumes:
       - ./labonneboite/alembic/sql/testing:/sql
-      - testResults:/app/labonneboite/testResults
+      - testResults:/labonneboite/testResults
     entrypoint: /bin/bash ./entrypoints/test.sh
     depends_on:
       elasticsearch:
