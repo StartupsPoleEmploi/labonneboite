@@ -49,4 +49,4 @@ pypi-publish:
 docker-publish:
   extends: .devops::docker-publish
   rules:
-    - if: ( $CI_COMMIT_TAG && $CI_COMMIT_BRANCH == "test/dockerhub" )
+    - if: ( $CI_COMMIT_TAG )
