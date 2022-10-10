@@ -33,3 +33,20 @@ pypi-publish:
   extends: .devops::pypi-publish
   rules:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+(\+.*)?$/
+
+.devops::docker-publish:
+  stage: publish
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$CI_DEPENDENCY_PROXY_SERVER\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/docker/v3.10/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+
+docker-publish:
+  extends: .devops::docker-publish
+  rules:
+    - if: ( $CI_COMMIT_TAG && $CI_COMMIT_BRANCH == "test/dockerhub" )
