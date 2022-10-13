@@ -7,5 +7,6 @@ develop:
 	&& docker-compose -f docker-compose.dev.yml up --build
 
 test:
+	docker volume create --name=testResults
 	docker-compose -f docker-compose.testing.yml up --build --abort-on-container-exit --exit-code-from app
 	docker run --rm -v testResults:/testResults -v $$(pwd):/backup busybox tar -zcvf /backup/testResults.tar.gz /testResults
