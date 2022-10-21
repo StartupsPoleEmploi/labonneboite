@@ -34,16 +34,9 @@ pypi-publish:
   rules:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+(\+.*)?$/
 
-docker-publish-beta:
-  extends: .devops::docker-publish
+docker-build:
+  extends: .devops::build
   variables:
     DOCKER_FILE: ${CI_PROJECT_DIR}/docker/v3.10/Dockerfile
   rules:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+-rc\.\d+(\+.*)?$/
-
-docker-publish-prod:
-  extends: .devops::docker-publish
-  variables:
-    DOCKER_FILE: ${CI_PROJECT_DIR}/docker/v3.10/Dockerfile
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+(\+.*)?$/
