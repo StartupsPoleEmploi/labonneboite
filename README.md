@@ -27,7 +27,7 @@ The documentation is based on [mkdocs](https://www.mkdocs.org/)
 To open the docs:
 
 ```
-make documentation
+make help
 ```
 
 It will be accessible [here](http://127.0.0.1:9999/)
