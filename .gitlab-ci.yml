@@ -5,7 +5,7 @@ include:
 
 # this should be the local file
 python-tests:
-  extends: .devops::python-test
+  extends: .devops::test
   after_script:
     # fix for coverage test not read by sonar
     - sed -i 's/\/labonneboite/\.\/labonneboite/g' testResults/coverage.xml
