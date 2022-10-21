@@ -1,6 +1,6 @@
-documentation:
-	pip3 install mkdocs mkdocs-material
-	python3 -m mkdocs serve --dev-addr '127.0.0.1:9999'
+help:
+	poetry install --only help
+	poetry run mkdocs serve --dev-addr '127.0.0.1:9999'
 
 develop: 
 	docker-compose -f docker-compose.dev.yml down \
