@@ -7,8 +7,9 @@ import multiprocessing as mp
 import os
 import time
 from cProfile import Profile
-from typing import Dict, Optional, Union, List, Type, Generator, Any, Tuple
+from typing import Any, Dict, Generator, List, Optional, Tuple, Type, Union
 
+import sqlalchemy as sa
 from elasticsearch.exceptions import NotFoundError, TransportError
 from elasticsearch.helpers import bulk
 from labonneboite_common import departements as dpt
@@ -17,7 +18,6 @@ from labonneboite_common.models.office_mixin import OfficeMixin
 from pyprof2calltree import convert
 from sqlalchemy import and_, inspect
 from sqlalchemy.exc import OperationalError
-import sqlalchemy as sa
 
 from labonneboite.conf import settings
 from labonneboite.common import es, geocoding, hiring_type_util
@@ -229,8 +229,7 @@ def create_locations() -> None:
 
 
 def get_office_as_es_doc(
-        office: OfficeMixin
-) -> Dict[str, Union[int, str, None, List[Dict[str, int]], Dict[str, int], Dict[str, bool]]]:
+        office: OfficeMixin) -> Dict[str, Union[int, str, None, List[Dict[str, int]], Dict[str, int], Dict[str, bool]]]:
     """
     Return the office as a JSON document suitable for indexation in ElasticSearch.
     The `office` parameter can be an `Office` or an `OfficeAdminAdd` instance.
@@ -289,8 +288,8 @@ def get_office_as_es_doc(
 
 
 def get_scores_by_rome_and_boosted_romes(
-        office: OfficeMixin,
-        office_to_update: Optional[Union[OfficeAdminUpdate, OfficeThirdPartyUpdate]] = None
+    office: OfficeMixin,
+    office_to_update: Optional[Union[OfficeAdminUpdate, OfficeThirdPartyUpdate]] = None
 ) -> Tuple[Dict[str, int], Dict[str, bool]]:
     # 0 - Get all romes related to the company
 
@@ -407,7 +406,7 @@ def create_offices_for_departement(departement: str) -> None:
     # more relevant smaller companies.
     all_offices = db_session.query(Office).filter(
         and_(
-            # Office.departement == departement,
+            Office.departement == departement,
             Office.hiring >= importer_settings.HIRING_REDUCING_MINIMUM_THRESHOLD,
         )).all()
 
@@ -481,10 +480,7 @@ def add_individual_inexistant_office(office_to_add: OfficeAdminAdd) -> None:
 
     # Create the new office in ES.
     doc = get_office_as_es_doc(office_to_add)
-    es.Elasticsearch().create(index=settings.ES_INDEX,
-                              doc_type=es.OFFICE_TYPE,
-                              id=office_to_add.siret,
-                              body=doc)
+    es.Elasticsearch().create(index=settings.ES_INDEX, doc_type=es.OFFICE_TYPE, id=office_to_add.siret, body=doc)
 
 
 def add_individual_office(office_to_add: OfficeAdminAdd) -> None:
@@ -509,6 +505,7 @@ def add_offices() -> None:
     office_to_add: OfficeAdminAdd
     for office_to_add in db_session.query(OfficeAdminAdd).all():
         add_individual_office(office_to_add)
+
 
 def remove_individual_office(siret: str) -> None:
     # Apply changes in ElasticSearch.
@@ -543,8 +540,7 @@ LIMIT = 100
 
 def to_iterator(
         qry: 'sa.orm.query.Query[Union[OfficeAdminUpdate, OfficeThirdPartyUpdate]]',
-        key: 'sa.Column[sa.Integer]'
-) -> Generator[Union[OfficeAdminUpdate, OfficeThirdPartyUpdate], None, None]:
+        key: 'sa.Column[sa.Integer]') -> Generator[Union[OfficeAdminUpdate, OfficeThirdPartyUpdate], None, None]:
     """
     This function comes from this doc: https://github.com/sqlalchemy/sqlalchemy/wiki/RangeQuery-and-WindowedRangeQuery
     Specialized windowed query generator (using LIMIT/OFFSET)
@@ -566,8 +562,8 @@ def to_iterator(
         firstid = key.__get__(rec, key) if rec else None
 
 
-def update_offices_by_sirets(sirets: list,
-                             office_to_update: Union[Type[OfficeAdminUpdate], Type[OfficeThirdPartyUpdate]]) -> None:
+def update_offices_by_sirets(sirets: list, office_to_update: Union[Type[OfficeAdminUpdate],
+                                                                   Type[OfficeThirdPartyUpdate]]) -> None:
     """
     Update offices after office admin update
     (overload the data provided by the importer).
@@ -874,7 +870,8 @@ def update_data(create_full: bool, create_partial: bool, disable_parallel_comput
         sanity_check_rome_codes()
 
 
-def update_data_profiling_wrapper(create_full: bool, create_partial: bool,
+def update_data_profiling_wrapper(create_full: bool,
+                                  create_partial: bool,
                                   disable_parallel_computing: bool = False) -> None:
     if Profiling.ACTIVATED:
         logger.info("STARTED run with profiling")
