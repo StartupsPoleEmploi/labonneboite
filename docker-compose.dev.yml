@@ -36,8 +36,7 @@ services:
       <<: *cenv
     volumes:
       - ./labonneboite/alembic/sql/dev:/sql
-      - ./labonneboite:/labonneboite
-      - ./docker/v3.10/entrypoints:/labonneboite/entrypoints
+      - ./labonneboite:/app/labonneboite
     depends_on:
       elasticsearch:
         condition: service_healthy
