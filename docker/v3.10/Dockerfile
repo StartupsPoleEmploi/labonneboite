@@ -23,7 +23,7 @@ RUN mkdir -p ./labonneboite \
     && touch ./labonneboite/__init__.py ./README.md
 
 RUN pip install poetry \ 
-    && poetry install
+    && poetry install --no-root
 
 # File imports : source code
 COPY ./labonneboite /labonneboite
