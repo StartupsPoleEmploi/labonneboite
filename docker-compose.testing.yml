@@ -7,24 +7,26 @@ x-test-base:
     - lbb_testing_network
 
 # settings
-x-db-env: &dbenv
-    MYSQL_ROOT_PASSWORD: password
-    MYSQL_DATABASE: lbb_test
-    MYSQL_USER: lbb_test
-    MYSQL_PASSWORD: labonneboite
+x-db-env:
+  &dbenv
+  MYSQL_ROOT_PASSWORD: password
+  MYSQL_DATABASE: lbb_test
+  MYSQL_USER: lbb_test
+  MYSQL_PASSWORD: labonneboite
 
-x-common-env: &cenv
-    # database
-    DB_NAME: lbb_test
-    DB_USER: lbb_test
-    DB_PASSWORD: labonneboite
-    DB_HOST: mysql
-    DB_PORT: 3306
-    # elastic search
-    ES_HOST: elasticsearch:9200
-    # other
-    OFFICE_TABLE: etablissements
-    LBB_ENV: test
+x-common-env:
+  # database
+  &cenv
+  DB_NAME: lbb_test
+  DB_USER: lbb_test
+  DB_PASSWORD: labonneboite
+  DB_HOST: testing_mysql
+  DB_PORT: 3306
+  # elastic search
+  ES_HOST: testing_elasticsearch:9200
+  # other
+  OFFICE_TABLE: etablissements
+  LBB_ENV: test
 
 services:
 
@@ -41,15 +43,15 @@ services:
       - testResults:/labonneboite/testResults
     entrypoint: /bin/bash ./entrypoints/test.sh
     depends_on:
-      elasticsearch:
+      testing_elasticsearch:
         condition: service_healthy
-      mysql:
+      testing_mysql:
         condition: service_healthy
 
   # ###### 3rd-party services
   # # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
   # # https://www.elastic.co/blog/how-to-make-a-dockerfile-for-elasticsearch
-  elasticsearch:
+  testing_elasticsearch:
     <<: *test-base
     hostname: elasticsearch
     image: elasticsearch:1.7.2
@@ -68,7 +70,7 @@ services:
       timeout: 2s
 
   # database
-  mysql:
+  testing_mysql:
     <<: *test-base
     image: mysql:5.6.36
     environment:
