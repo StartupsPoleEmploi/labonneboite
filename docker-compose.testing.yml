@@ -1,5 +1,11 @@
 version: "3.7"
 
+x-test-base:
+  &test-base
+  restart: "no"
+  networks:
+    - lbb_testing_network
+
 # settings
 x-db-env: &dbenv
     MYSQL_ROOT_PASSWORD: password
@@ -23,13 +29,13 @@ x-common-env: &cenv
 services:
 
   app:
+    <<: *test-base
     hostname: labonneboite-backend
-    restart: "no"
     build:
       context: .
       dockerfile: docker/v3.10/Dockerfile
     environment:
-      <<: *cenv 
+      <<: *cenv
     volumes:
       - ./labonneboite/alembic/sql/testing:/sql
       - testResults:/labonneboite/testResults
@@ -44,6 +50,7 @@ services:
   # # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
   # # https://www.elastic.co/blog/how-to-make-a-dockerfile-for-elasticsearch
   elasticsearch:
+    <<: *test-base
     hostname: elasticsearch
     image: elasticsearch:1.7.2
     environment:
@@ -62,6 +69,7 @@ services:
 
   # database
   mysql:
+    <<: *test-base
     image: mysql:5.6.36
     environment:
       <<: *dbenv
@@ -71,8 +79,10 @@ services:
       timeout: 1s
       retries: 5
 
-
 # the volume to collect testResults xml files should be defined like this
 volumes:
-  testResults: 
+  testResults:
     external: true
+
+networks:
+  lbb_testing_network: {}
