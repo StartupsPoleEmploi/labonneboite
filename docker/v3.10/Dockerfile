@@ -14,11 +14,19 @@ RUN apt-get update && apt-get install -y \
     locales \
     --no-install-recommends
 
-# File imports : source code
-COPY . .
+WORKDIR /
+
+# File imports : requirements
+COPY ./poetry.lock ./poetry.lock
+COPY ./pyproject.toml ./pyproject.toml
+RUN mkdir -p ./labonneboite \
+    && touch ./labonneboite/__init__.py ./README.md
 
 RUN pip install poetry \ 
     && poetry install
+
+# File imports : source code
+COPY ./labonneboite /labonneboite
 
 WORKDIR /labonneboite
 
