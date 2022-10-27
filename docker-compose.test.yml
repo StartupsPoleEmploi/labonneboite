@@ -3,6 +3,8 @@ version: "3.7"
 x-test-base:
   &test-base
   restart: "no"
+  profiles:
+    - test
   networks:
     - lbb_testing_network
 
