@@ -1,9 +1,7 @@
 # /bin/bash
 
-set -ex
-
 # alembic
-poetry run alembic upgrade head 
+poetry run alembic -c labonneboite/alembic.ini upgrade head 
 
 # run custom sql scripts if any
 echo 'Running sql scripts if any'
