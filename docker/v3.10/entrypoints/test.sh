@@ -8,10 +8,10 @@ echo 'Running sql scripts if any'
 for i in `/bin/ls -1 /sql/*.sql`; do 
     echo $i
     mysql --user=$DB_USER \
-    --password=$DB_PASSWORD \
-    --host=$DB_HOST \
-    --port=$DB_PORT \
-    --database=$DB_NAME < $i
+        --password=$DB_PASSWORD \
+        --host=$DB_HOST \
+        --port=$DB_PORT \
+        --database=$DB_NAME < $i
 done
 
 # create the index in elastic search
@@ -25,7 +25,7 @@ rm flake8.txt
 
 # -- unit test & coverage
 # -- api
-poetry run pytest --junitxml=pytest-web-api.xml --cov --html=pytest-web-api.html
+poetry run pytest --junitxml=pytest-web-api.xml --cov --html=pytest-web-api.html -x
 poetry run coverage xml
 
 # -- build package
