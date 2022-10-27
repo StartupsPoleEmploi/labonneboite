@@ -33,7 +33,7 @@ services:
     volumes:
       - ./labonneboite/alembic/sql/testing:/sql
       - testResults:/labonneboite/testResults
-    entrypoint: /bin/bash ./entrypoints/test.sh
+    entrypoint: /bin/bash /entrypoints/test.sh
     depends_on:
       elasticsearch:
         condition: service_healthy
