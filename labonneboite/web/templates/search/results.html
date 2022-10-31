@@ -1,26 +1,31 @@
 {% extends 'base.html' %}
-
-{% block title %}Entreprises qui recrutent{% if city_name %} à {{ city_name }}{% endif %}{% if rome_description %} dans
-{{ rome_description }}{% endif %}{% endblock %}
-
+{% block title %}
+  Entreprises qui recrutent
+  {% if city_name %}à {{ city_name }}{% endif %}
+  {% if rome_description %}
+    dans
+    {{ rome_description }}
+  {% endif %}
+{% endblock title %}
 {% block extrahead %}
-{{ super() }}
-{% if city_name and rome_description %}
-<meta name="title" content="Entreprises qui recrutent à {{ city_name }} dans {{ rome_description }} | La Bonne Boite">
-{% endif %}
-{% include "includes/map-styles.html" %}
-{% if canonical_url %}
-<link rel="canonical" href="{{ canonical_url }}">
-{% endif %}
-{% endblock %}
-
+  {{ super() }}
+  {% if city_name and rome_description %}
+    <meta name="title"
+          content="Entreprises qui recrutent à {{ city_name }} dans {{ rome_description }} | La Bonne Boite"/>
+  {% endif %}
+  {% include "includes/map-styles.html" %}
+  {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}" />{% endif %}
+{% endblock extrahead %}
 {% block scripts %}
-{{ super() }}
-{% include "includes/map-scripts.html" %}
-{% endblock %}
-
+  {{ super() }}
+  {% include "includes/map-scripts.html" %}
+  <script>
+  tc_vars.customVars = {
+    ise_keyword: "{{ rome_description }}",
+    ise_page: {% if company_count > 0 %}1{% else %} 0{% endif %},
+  }
+  </script>
+{% endblock scripts %}
 {% block content %}
-<div tag-page='/liste_entreprises'>
-  {% include 'search/results_content.html' %}
-</div>
-{% endblock %}
+  <div tag-page="/liste_entreprises">{% include "search/results_content.html" %}</div>
+{% endblock content %}
