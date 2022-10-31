@@ -36,7 +36,7 @@ fi
 
 # -- unit test & coverage
 # -- api
-if ! poetry run pytest --junitxml=pytest-web-api.xml --cov --html=pytest-web-api.html; then
+if ! poetry run pytest --junitxml=pytest-web-api.xml --cov --html=pytest-web-api.html --maxfail=${MAXFAIL:-1000}; then
     failed "pytest"
 fi
 poetry run coverage xml

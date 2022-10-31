@@ -40,6 +40,7 @@ services:
       dockerfile: docker/v3.10/Dockerfile
     environment:
       <<: *cenv
+      MAXFAIL: ${MAXFAIL:-1000}
     volumes:
       - ./labonneboite/alembic/sql/testing:/sql
       - ./labonneboite:/app/labonneboite

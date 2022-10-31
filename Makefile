@@ -1,4 +1,5 @@
 COMPOSE_FILE=docker-compose.testing.yml:docker-compose.dev.yml
+MAXFAIL=1000
 
 help:
 	poetry install --only help
@@ -15,7 +16,7 @@ test-init:
 	docker-compose --profile test up --build --no-start
 
 test-run:
-	docker-compose --profile test up --no-build --abort-on-container-exit --exit-code-from app; \
+	MAXFAIL=${MAXFAIL} docker-compose --profile test up --no-build --abort-on-container-exit --exit-code-from app; \
 	  r=$$?; \
 	  docker run --rm -v testResults:/testResults -v $$(pwd):/backup busybox tar -zcvf /backup/testResults.tar.gz /testResults; \
 	  exit $$r
