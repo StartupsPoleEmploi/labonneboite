@@ -1,6 +1,10 @@
-# as a .gitignore, a .dockerignore file enables to tell docker to not take the 
-# files/folders that are listed below 
+# as a .gitignore, a .dockerignore file enables to tell docker to not take the
+# files/folders that are listed below
 labonneboite/logs/
+
+# Generated files and cache #
+#############################
+labonneboite/web/static/.webassets-cache
 
 # ignore virtualenvs
 venv

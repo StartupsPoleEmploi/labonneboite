@@ -8,7 +8,14 @@ develop:
 	docker-compose --profile dev down \
 	&& docker-compose --profile dev up --build
 
-test:
+test: test-init test-run
+
+test-init:
 	docker volume create --name=testResults
-	docker-compose --profile test up --build --abort-on-container-exit --exit-code-from app
-	docker run --rm -v testResults:/testResults -v $$(pwd):/backup busybox tar -zcvf /backup/testResults.tar.gz /testResults
+	docker-compose --profile test up --build --no-start
+
+test-run:
+	docker-compose --profile test up --no-build --abort-on-container-exit --exit-code-from app; \
+	  r=$$?; \
+	  docker run --rm -v testResults:/testResults -v $$(pwd):/backup busybox tar -zcvf /backup/testResults.tar.gz /testResults; \
+	  exit $$r

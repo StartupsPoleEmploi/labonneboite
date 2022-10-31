@@ -42,6 +42,7 @@ services:
       <<: *cenv
     volumes:
       - ./labonneboite/alembic/sql/testing:/sql
+      - ./labonneboite:/app/labonneboite
       - testResults:/labonneboite/testResults
     entrypoint: /bin/bash /entrypoints/test.sh
     depends_on:
