@@ -1,5 +1,14 @@
 # /bin/bash
 
+testReturn=0
+
+failed() {
+    testReturn=1
+    echo "FAILED $1"
+}
+
+set -ex
+
 # alembic
 poetry run alembic -c labonneboite/alembic.ini upgrade head 
 
@@ -19,21 +28,29 @@ poetry run create_index --full
 
 # run the tests
 # -- lint
-poetry run flake8 --output-file flake8.txt || echo "FAILED flake"
-poetry run flake8_junit flake8.txt flake8.xml
+if ! poetry run flake8 --output-file flake8.txt; then
+    failed "flake"
+    poetry run flake8_junit flake8.txt flake8.xml && echo
 rm flake8.txt
+fi
 
 # -- unit test & coverage
 # -- api
-poetry run pytest --junitxml=pytest-web-api.xml --cov --html=pytest-web-api.html
+if ! poetry run pytest --junitxml=pytest-web-api.xml --cov --html=pytest-web-api.html; then
+    failed "pytest"
+fi
 poetry run coverage xml
 
 # -- build package
-poetry build
+if ! poetry build; then
+    failed "build"
+fi
 
 # prepare test results
 echo "Moving test results file..."
 mkdir -p testResults
-mv *.xml  ./testResults
-mv *.html  ./testResults
+mv *.xml ./testResults
+mv *.html ./testResults
 echo "Done"
+
+exit $testReturn
