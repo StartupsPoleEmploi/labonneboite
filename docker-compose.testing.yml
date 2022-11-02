@@ -42,7 +42,7 @@ services:
     volumes:
       - ./labonneboite/alembic/sql/testing:/sql
       - ./labonneboite:/app/labonneboite
-      - testResults:/app/testResults
+      - ./testResults:/app/testResults
     entrypoint: /bin/bash /entrypoints/test.sh
     depends_on:
       testing_elasticsearch:
