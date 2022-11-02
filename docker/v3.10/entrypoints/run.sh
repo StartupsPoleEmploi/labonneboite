@@ -1,7 +1,7 @@
 # /bin/bash
 
 # alembic
-poetry run alembic upgrade head 
+poetry run alembic -c labonneboite/alembic.ini upgrade head 
 
 # run custom sql scripts if any
 echo 'Running sql scripts if any'
@@ -18,4 +18,4 @@ done
 poetry run create_index --full
 
 # run the server
-poetry run gunicorn --config python:wsgi-conf web.app:app
+poetry run gunicorn --config python:labonneboite.wsgi-conf labonneboite.web.app:app

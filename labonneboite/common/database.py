@@ -120,18 +120,11 @@ def delete_db() -> None:
     """
 
     # Drop social_flask_sqlalchemy tables.
-    # pylint:disable=unused-variable
     # Imports are used by SQLAlchemy `metadata.create_all()` to know what tables to create.
     from social_flask_sqlalchemy.models import PSABase
 
-    # pylint:enable=unused-variable
     PSABase.metadata.drop_all(engine)
 
     # Drop LBB tables.
     # Import all models so that metadata can be filled in and SQLAlchemy knows what tables to deal with.
-    # pylint:disable=unused-variable
-    # pylint:enable=unused-variable
-    # for t in Base.metadata.sorted_tables:
-    #     print("drop table %s" % t.name)
-
-    Base.metadata.drop_all(bind=engine)
+    Base.metadata.drop_all(bind=engine, tables=reversed(Base.metadata.sorted_tables))

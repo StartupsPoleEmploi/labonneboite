@@ -14,24 +14,20 @@ RUN apt-get update && apt-get install -y \
     locales \
     --no-install-recommends
 
-WORKDIR /
+WORKDIR /app
 
 # File imports : requirements
 COPY ./poetry.lock ./poetry.lock
 COPY ./pyproject.toml ./pyproject.toml
-RUN mkdir -p ./labonneboite \
-    && touch ./labonneboite/__init__.py ./README.md
 
 RUN pip install poetry \ 
-    && poetry install
+    && poetry install --no-root
 
 # File imports : source code
-COPY ./labonneboite /labonneboite
-
-WORKDIR /labonneboite
+COPY . .
 
 # This is a folder to place sql files that will be imported directly after running alembic and before the create index script
-RUN mkdir /labonneboite/sql
+RUN mkdir -p /sql
 
 # unsupported local error : https://stackoverflow.com/questions/54802935/docker-unsupported-locale-setting-when-running-python-container
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen \
@@ -39,11 +35,11 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen 
     && locale-gen
 
 # building flask assets
-RUN poetry run flask assets build
+RUN cd labonneboite && poetry run flask assets build
 
 # activate entrypoints
-COPY ./docker/v3.10/entrypoints /labonneboite/entrypoints
-RUN chmod +x -R ./entrypoints/
+COPY ./docker/v3.10/entrypoints /entrypoints
+RUN chmod +x -R /entrypoints/
 
 # default entry point is run
-ENTRYPOINT ["/bin/bash", "./entrypoints/run.sh"]
+ENTRYPOINT ["/bin/bash", "/entrypoints/run.sh"]

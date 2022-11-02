@@ -6,9 +6,11 @@ include:
 # this should be the local file
 python-tests:
   extends: .devops::test
-  after_script:
-    # fix for coverage test not read by sonar
-    - sed -i 's/\/labonneboite/\.\/labonneboite/g' testResults/coverage.xml
+  variables:
+    DOCKER_COMPOSE_FILENAME: docker-compose.testing.yml
+    TEST_VOLUME_NAME: testResults
+    FIX_COVERAGE_FOR_SONAR: "true"
+    FIX_COVERAGE_FOR_SONAR_RENAMEFOLDER: s/\/labonneboite/\.\/labonneboite/g
   rules:
     - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_TITLE !~ /Draft.*/
       changes:
