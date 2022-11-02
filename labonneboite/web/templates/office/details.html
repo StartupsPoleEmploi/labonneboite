@@ -1,37 +1,31 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% block extrahead %}
   {{ super() }}
   {% include "includes/map-styles.html" %}
-{% endblock %}
-
+{% endblock extrahead %}
 {% block scripts %}
   {{ super() }}
   {% include "includes/map-scripts.html" %}
-{% endblock %}
-
-{% block title %}{{ company.name }} - {{ company.city }}{% endblock %}
-
+{% endblock scripts %}
+{% block title %}
+  {{ company.name }} - {{ company.city }}
+{% endblock title %}
 {% block content %}
-
-<div class="lbb-content-wrapper">
-  <div class="lbb-content">
-    <div class="lbb-single-column-content">
-
-      <div class="lbb-bright-container lbb-result lbb-company active">
-        {% with show_more_info=0 %}
-          {% include "includes/office/header.html" %}
-          {% include "includes/office/content.html" %}
-        {% endwith %}
+  <div class="lbb-content-wrapper" tag-page='/details_entreprise'>
+    <div class="lbb-content">
+      <div class="lbb-single-column-content">
+        <div class="lbb-bright-container lbb-result lbb-company active">
+          {% with show_more_info=0 %}
+            {% include "includes/office/header.html" %}
+            {% include "includes/office/content.html" %}
+          {% endwith %}
+        </div>
+        <div class="lbb-bright-container">
+          <p class="text-center">
+            <a href={{ url_for("root.home") }} class="btn">Faire une autre recherche</a>
+          </p>
+        </div>
       </div>
-
-      <div class="lbb-bright-container">
-        <p class="text-center">
-          <a href="/" class="btn">Faire une autre recherche</a>
-        </p>
-      </div>
-
     </div>
   </div>
-</div>
-{% endblock %}
+{% endblock content %}

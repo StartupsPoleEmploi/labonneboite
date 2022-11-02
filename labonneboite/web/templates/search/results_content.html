@@ -1,245 +1,236 @@
-  <div class="lbb-content no-padding">
-    <div class="lbb-bright-container" id="shown-search-form">
-      {% with inline=True %}
-        {% include "includes/search_form.html" %}
-      {% endwith %}
-      <div class="lbb-sidebar-toggle-wrapper">
-        <a class="lbb-sidebar-toggle" href="#lbb-sidebar-wrapper">Triez / Filtrez »</a>
-      </div>
+<div class="lbb-content no-padding">
+  <div class="lbb-bright-container" id="shown-search-form">
+    {% with inline=True %}
+    {% include "includes/search_form.html" %}
+    {% endwith %}
+    <div class="lbb-sidebar-toggle-wrapper">
+      <a class="lbb-sidebar-toggle" href="#lbb-sidebar-wrapper">Triez / Filtrez »</a>
     </div>
   </div>
+</div>
 
-  <div class="lbb-content-wrapper">
-    <div class="lbb-content">
-      <div class="lbb-content-with-sidebar">
-        <form action="{{ url_for('search.entreprises') }}" class="js-search-form no-margin no-padding" method="get" autocomplete="off">
-          <div id="hidden-search-form" class="hidden">
-            <!-- This form will be submitted via Javascript when a new filter is used. -->
-            {% include "includes/search_form.html" %}
-          </div>
-          <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
-            <div class="lbb-sidebar">
-              <div class="js-form-search-filters">
-                <div class="lbb-sidebar-toggle-wrapper">
-                  <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
-                 <hr>
-               </div>
+<div class="lbb-content-wrapper">
+  <div class="lbb-content">
+    <div class="lbb-content-with-sidebar">
+      <form action="{{ url_for('search.entreprises') }}" class="js-search-form no-margin no-padding" method="get"
+        autocomplete="off">
+        <div id="hidden-search-form" class="hidden">
+          <!-- This form will be submitted via Javascript when a new filter is used. -->
+          {% include "includes/search_form.html" %}
+        </div>
+        <div class="lbb-sidebar-wrapper" id="lbb-sidebar-wrapper">
+          <div class="lbb-sidebar">
+            <div class="js-form-search-filters">
+              <div class="lbb-sidebar-toggle-wrapper">
+                <a class="lbb-sidebar-toggle" href="#" title="Fermer le menu">« Retour</a>
+                <hr>
+              </div>
 
-               <h3 class="sr-only lbb-result-info">Triez les résultats de recherche</h3>
+              <h3 class="sr-only lbb-result-info">Triez les résultats de recherche</h3>
               {% if related_rome_initial %}
-                  <div class="lbb-sidebar-item">
-                    <p>Recherche initiale</p>
-                    <a
-                      id="related_rome_initial"
-                      href="#"
-                      data-rome-description="{{ related_rome_initial }}"
-                      data-rome-description-slug="{{ related_rome_initial | slugify }}"
-                      >{{ related_rome_initial }}</a>
-                  </div>
+              <div class="lbb-sidebar-item">
+                <p>Recherche initiale</p>
+                <a id="related_rome_initial" href="#" data-rome-description="{{ related_rome_initial }}"
+                  data-rome-description-slug="{{ related_rome_initial | slugify }}">{{ related_rome_initial }}</a>
+              </div>
               {% endif %}
 
-               <h3>Affinez votre recherche</h3>
-               <div class="lbb-sidebar-item">
-                 <p>
-                   {{ form.naf.label }}
-                 </p>
-                 {{ form.naf }}
-               </div>
-               <div class="lbb-sidebar-item">
-                 <p>{{ form.h.label.text }}</p>
-                 {{ form.h }}
-               </div>
-               <div id="distance-duration-switch"
-                 data-switch-value-selected="{{ "duration" if duration_filter_enabled else "distance"}}">
+              <h3>Affinez votre recherche</h3>
+              <div class="lbb-sidebar-item">
+                <p>
+                  {{ form.naf.label }}
+                </p>
+                {{ form.naf }}
+              </div>
+              <div class="lbb-sidebar-item">
+                <p>{{ form.h.label.text }}</p>
+                {{ form.h }}
+              </div>
+              <div id="distance-duration-switch" data-switch-value-selected="{{ " duration" if duration_filter_enabled
+                else "distance" }}">
 
-               {% if not departments %}
-                 <div class="lbb-sidebar-item gtm-filter-distance" data-switch-display-on="distance">
-                   <p>{{ form.d.label.text }}</p>
-                   {{ form.d }}
-                 </div>
-                 <!-- END DISTANCE DURATION SWITCH -->
-                 <hr>
-                 <h3>Triez</h3>
-                 <div class="lbb-sidebar-item">
-                   {{ form.sort }}
-                 </div>
-                 <!-- END SORT AND FILTERS -->
-               {% endif %} {# endif not departments #}
-               </div>
-               {% if pro_version_enabled %}
-                 <div class="lbb-sidebar-item">
-                   <p>
-                     {{ form.p.label }}
-                     <span class="badge badge-info small" data-toggle="tooltip" data-placement="top" title="Entreprises recrutant une proportion élevée de juniors (- de 26 ans)
+                {% if not departments %}
+                <div class="lbb-sidebar-item gtm-filter-distance" data-switch-display-on="distance">
+                  <p>{{ form.d.label.text }}</p>
+                  {{ form.d }}
+                </div>
+                <!-- END DISTANCE DURATION SWITCH -->
+                <hr>
+                <h3>Triez</h3>
+                <div class="lbb-sidebar-item">
+                  {{ form.sort }}
+                </div>
+                <!-- END SORT AND FILTERS -->
+                {% endif %} {# endif not departments #}
+              </div>
+              {% if pro_version_enabled %}
+              <div class="lbb-sidebar-item">
+                <p>
+                  {{ form.p.label }}
+                  <span class="badge badge-info small" data-toggle="tooltip" data-placement="top" title="Entreprises recrutant une proportion élevée de juniors (- de 26 ans)
                      / seniors (+ de 50 ans)
                      / BOE (Bénéficiaire de l'Obligation d'Emploi)
                      - indicateurs exclusifs version PRO">PRO</small>
-                   </p>
-                   {{ form.p }}
-                 </div>
-               {% endif %}               
-             </div>
-            </div> <!-- lbb-sidebar -->
-
-            <div class="lbb-sidebar-item lbb-sidebar-item__external">
-              Pour l’alternance <a href="http://labonnealternance.pole-emploi.fr" target="_blank">c'est ici</a>.
-            </div>
-
-            {% if last_data_deploy_date %}
-              <div class="lbb-sidebar-item lbb-sidebar-item__external">
-                Données mises à jour le {{ last_data_deploy_date }}
+                </p>
+                {{ form.p }}
               </div>
-            {% endif %}
-          </div> <!-- lbb-sidebar-wrapper -->
-          {{ form.hidden_tag() }}
-
-          {% if companies %}
-            <h1 class="lbb-result-info">
-              {% if page and page != 1 %}<b>Page {{ page }}</b> de{% endif %}
-              {% if company_count == 1 %}
-                {{ company_count }} entreprise est susceptible
-              {% else %}
-                {{ company_count }} entreprises sont susceptibles
               {% endif %}
-              de recruter en {{ rome_description }}
+            </div>
+          </div> <!-- lbb-sidebar -->
 
-              {% if location_name %} - {{ location_name }}{% endif %}
-            </h1>
-          {% endif %}
-
-        </form>
-
-
-        <h2 class="sr-only lbb-result-info">Résultats de la recherche</h2>
-
-        <div id="toggle-map-wrapper" class="gtm-filter-hidemap">
-          <div class="switch">
-            <input type="checkbox" id="toggle-map" checked="checked">
-            <span id="map-switch-button" class="slider round"></span>
+          <div class="lbb-sidebar-item lbb-sidebar-item__external">
+            Pour l’alternance <a href="http://labonnealternance.pole-emploi.fr" target="_blank">c'est ici</a>.
           </div>
-          <label id="map-switch-text">Masquer la carte</label>
+
+          {% if last_data_deploy_date %}
+          <div class="lbb-sidebar-item lbb-sidebar-item__external">
+            Données mises à jour le {{ last_data_deploy_date }}
+          </div>
+          {% endif %}
+        </div> <!-- lbb-sidebar-wrapper -->
+        {{ form.hidden_tag() }}
+
+        {% if companies %}
+        <h1 class="lbb-result-info">
+          {% if page and page != 1 %}<b>Page {{ page }}</b> de{% endif %}
+          {% if company_count == 1 %}
+          {{ company_count }} entreprise est susceptible
+          {% else %}
+          {{ company_count }} entreprises sont susceptibles
+          {% endif %}
+          de recruter en {{ rome_description }}
+
+          {% if location_name %} - {{ location_name }}{% endif %}
+        </h1>
+        {% endif %}
+
+      </form>
+
+
+      <h2 class="sr-only lbb-result-info">Résultats de la recherche</h2>
+
+      <div id="toggle-map-wrapper" class="gtm-filter-hidemap">
+        <div class="switch">
+          <input type="checkbox" id="toggle-map" checked="checked">
+          <span id="map-switch-button" class="slider round"></span>
         </div>
+        <label id="map-switch-text">Masquer la carte</label>
+      </div>
 
-        <div id="lbb-result-map" class="lbb-bright-container" aria-hidden="true"></div>
+      <div id="lbb-result-map" class="lbb-bright-container" aria-hidden="true"></div>
 
-        {% if related_rome_initial %}
-        <div class="lbb-feature-banner">Métier similaire à votre recherche: {{ rome_description }}</div>
-        {% endif %}
+      {% if related_rome_initial %}
+      <div class="lbb-feature-banner">Métier similaire à votre recherche: {{ rome_description }}</div>
+      {% endif %}
 
-        {% if not companies and not show_mobiville %}
-          <div class="lbb-bright-container ga-no-results">
-            {% if job_doesnt_exist %}
-              <p>Le métier que vous avez choisi n'est pas valide. Veuillez réessayer.</p>
-            {% elif not location and not departments %}
-              <p>La ville que vous avez choisie n'est pas valide. Veuillez réessayer.</p>
-            {% elif alternative_rome_descriptions or alternative_distances %}
-              <p>
-                Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour
-                <b>{{ rome_description }}</b>
-                {% if location_name %} à {{ distance }} km - {{ location_name }}{% endif %}.
-              </p>
-              {% if alternative_rome_descriptions and alternative_distances %}
-                  <div class="grid-row grid-spacing">
-                    {% if not related_romes and not hide_suggestions %}
-                        <div class="grid-col-6">
-                          <h3>Elargir aux métiers suivants :</h3>
-                          {% include "includes/alternative_rome_descriptions.html" %}
-                        </div>
-                    {% endif %}
-                    <div class="grid-col-6">
-                      <h3>Elargir aux alentours :</h3>
-                      {% include "includes/alternative_distances.html" %}
-                    </div>
-                  </div>
-              {% elif alternative_rome_descriptions %}
-                {% if not related_romes and not hide_suggestions %}
-                    <h3>Elargir aux métiers suivants :</h3>
-                    {% include "includes/alternative_rome_descriptions.html" %}
-                {% endif %}
-              {% elif alternative_distances %}
-                <h3>Elargir aux alentours :</h3>
-                {% include "includes/alternative_distances.html" %}
-              {% endif %}
-            {% else %}
-              Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour votre recherche.
-            {% endif %}
+      {% if not companies and not show_mobiville %}
+      <div class="lbb-bright-container ga-no-results">
+        {% if job_doesnt_exist %}
+        <p>Le métier que vous avez choisi n'est pas valide. Veuillez réessayer.</p>
+        {% elif not location and not departments %}
+        <p>La ville que vous avez choisie n'est pas valide. Veuillez réessayer.</p>
+        {% elif alternative_rome_descriptions or alternative_distances %}
+        <p>
+          Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour
+          <b>{{ rome_description }}</b>
+          {% if location_name %} à {{ distance }} km - {{ location_name }}{% endif %}.
+        </p>
+        {% if alternative_rome_descriptions and alternative_distances %}
+        <div class="grid-row grid-spacing">
+          {% if not related_romes and not hide_suggestions %}
+          <div class="grid-col-6">
+            <h3>Elargir aux métiers suivants :</h3>
+            {% include "includes/alternative_rome_descriptions.html" %}
           </div>
-        {% endif %}
-
-
-        {% for company in companies %}
-          <div id="company-{{ company.siret }}" class="lbb-bright-container lbb-result lbb-company">
-              {% with show_more_info=1 %}
-                {% include "includes/office/header.html" %}
-                {% include "includes/office/content.html" %}
-              {% endwith %}
-          </div>
-          {% if loop.index == 2 or (companies|length < 3 and loop.index == companies|length) %}
-            {% if related_romes %}
-                {% include "includes/office/related_romes.html" %}
-            {% endif %}
           {% endif %}
-        {% endfor %}
-
-        {% if show_mobiville %}
-          {% include "includes/office/mobiville.html" %}
-        {% endif %}
-
-        {% if companies and companies|length < companies_per_page and (alternative_rome_descriptions or alternative_distances) %}
-          <div class="lbb-bright-container">
-            <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
-            {% if not related_romes and not hide_suggestions and alternative_rome_descriptions %}
-              <p>...dans d'autres métiers :</p>
-              {% include "includes/alternative_rome_descriptions.html" %}
-            {% endif %}
-            {% if alternative_distances %}
-              <p>...plus loin :</p>
-              {% include "includes/alternative_distances.html" %}
-            {% endif %}
+          <div class="grid-col-6">
+            <h3>Elargir aux alentours :</h3>
+            {% include "includes/alternative_distances.html" %}
           </div>
+        </div>
+        {% elif alternative_rome_descriptions %}
+        {% if not related_romes and not hide_suggestions %}
+        <h3>Elargir aux métiers suivants :</h3>
+        {% include "includes/alternative_rome_descriptions.html" %}
         {% endif %}
-
-
-        {% if pagination and pagination.should_show() %}
-          <nav class="pagination-wrapper" aria-label="Page navigation">
-            <b>Plus d'entreprises</b>
-            <!-- search-successful-monitoring-tag -->
-            <ul class="pagination">
-              {% if pagination.show_first_page() %}
-                {% set first_page = pagination.get_first_page() %}
-                <li class="page-item">
-                  <a class="page-link" href="{{ first_page.get_url() }}">{{ first_page.ranking + 1 }}</a>
-                </li>
-                <li class="page-item">
-                  <span class="page-link">...</span>
-                </li>
-              {% endif %}
-              {% for page in pagination.get_pages() %}
-                {% if page.is_active() %}
-                  <li class="page-item active">
-                    <span class="page-link">{{ page.ranking + 1 }}</span>
-                  </li>
-                {% else %}
-                  <li class="page-item">
-                    <a class="page-link" href="{{ page.get_url() }}">{{ page.ranking + 1 }}</a>
-                  </li>
-                {% endif %}
-              {% endfor %}
-              {% if pagination.show_last_page() %}
-                {% set last_page = pagination.get_last_page() %}
-                <li class="page-item">
-                  <span class="page-link">...</span>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="{{ last_page.get_url() }}">{{ last_page.ranking + 1 }}</a>
-                </li>
-              {% endif %}
-            </ul>
-          </nav>
+        {% elif alternative_distances %}
+        <h3>Elargir aux alentours :</h3>
+        {% include "includes/alternative_distances.html" %}
         {% endif %}
+        {% else %}
+        Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour votre recherche.
+        {% endif %}
+      </div>
+      {% endif %}
 
 
-      </div>{# END .lbb-content-with-sidebar #}
-    </div>{# END .lbb-content #}
-  </div>{# END .lbb-content-wrapper #}
+      {% for company in companies %}
+      <div id="company-{{ company.siret }}" class="lbb-bright-container lbb-result lbb-company">
+        {% with show_more_info=1 %}
+        {% include "includes/office/header.html" %}
+        {% include "includes/office/content.html" %}
+        {% endwith %}
+      </div>
+      {% if loop.index == 2 or (companies|length < 3 and loop.index==companies|length) %} {% if related_romes %} {%
+        include "includes/office/related_romes.html" %} {% endif %} {% endif %} {% endfor %} {% if show_mobiville %} {%
+        include "includes/office/mobiville.html" %} {% endif %} {% if companies and companies|length <
+        companies_per_page and (alternative_rome_descriptions or alternative_distances) %} <div
+        class="lbb-bright-container">
+        <p><strong>Voulez-vous plus de résultats ? Découvrez les entreprises qui embauchent...</strong></p>
+        {% if not related_romes and not hide_suggestions and alternative_rome_descriptions %}
+        <p>...dans d'autres métiers :</p>
+        {% include "includes/alternative_rome_descriptions.html" %}
+        {% endif %}
+        {% if alternative_distances %}
+        <p>...plus loin :</p>
+        {% include "includes/alternative_distances.html" %}
+        {% endif %}
+    </div>
+    {% endif %}
 
+
+    {% if pagination and pagination.should_show() %}
+    <nav class="pagination-wrapper" aria-label="Page navigation">
+      <b>Plus d'entreprises</b>
+      <!-- search-successful-monitoring-tag -->
+      <ul class="pagination">
+        {% if pagination.show_first_page() %}
+        {% set first_page = pagination.get_first_page() %}
+        <li class="page-item">
+          <a class="page-link" href="{{ first_page.get_url() }}" tag-navigation='liste_entreprises/plus_entreprises'>{{
+            first_page.ranking + 1 }}</a>
+        </li>
+        <li class="page-item">
+          <span class="page-link">...</span>
+        </li>
+        {% endif %}
+        {% for page in pagination.get_pages() %}
+        {% if page.is_active() %}
+        <li class="page-item active">
+          <span class="page-link">{{ page.ranking + 1 }}</span>
+        </li>
+        {% else %}
+        <li class="page-item">
+          <a class="page-link" href="{{ page.get_url() }}" tag-navigation='liste_entreprises/plus_entreprises'>{{
+            page.ranking + 1 }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        {% if pagination.show_last_page() %}
+        {% set last_page = pagination.get_last_page() %}
+        <li class="page-item">
+          <span class="page-link">...</span>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="{{ last_page.get_url() }}" tag-navigation='liste_entreprises/plus_entreprises'>{{
+            last_page.ranking + 1 }}</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+
+
+  </div>{# END .lbb-content-with-sidebar #}
+</div>{# END .lbb-content #}
+</div>{# END .lbb-content-wrapper #}
