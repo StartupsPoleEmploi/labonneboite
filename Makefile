@@ -12,11 +12,9 @@ develop:
 test: test-init test-run
 
 test-init:
-	docker volume create --name=testResults
 	docker-compose -f docker-compose.testing.yml up --build --no-start
 
 test-run:
 	MAXFAIL=${MAXFAIL} docker-compose -f docker-compose.testing.yml up --no-build --abort-on-container-exit --exit-code-from app; \
 	  r=$$?; \
-	  docker run --rm -v testResults:/testResults -v $(PWD):/backup busybox tar -zcvf /backup/testResults.tar.gz /testResults; \
 	  exit $$r

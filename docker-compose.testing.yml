@@ -85,10 +85,5 @@ services:
       timeout: 1s
       retries: 5
 
-# the volume to collect testResults xml files should be defined like this
-volumes:
-  testResults:
-    external: true
-
 networks:
   lbb_testing_network: {}
