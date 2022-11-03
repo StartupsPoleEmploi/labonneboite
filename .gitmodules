@@ -1,0 +1,3 @@
+[submodule "ci"]
+	path = ci
+	url = ../devops/devops-jobs.git
