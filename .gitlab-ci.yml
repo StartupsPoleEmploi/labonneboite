@@ -1,6 +1,6 @@
 # this part should be common and maintained in another repo
 include:
-  - project: lbb/devops-jobs
+  - project: lbb/devops/devops-jobs
     file: devops.gitlab-ci.yml
 
 # this should be the local file
