@@ -31,14 +31,20 @@ sonarqube:
         - labonneboite/**/*
         - pyproject.toml
 
-pypi-publish:
+pypi:
   extends: .devops::pypi-publish
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+(\+.*)?$/
 
-docker-build:
+# recette
+build-rec:
   extends: .devops::build
   variables:
     DOCKER_FILE: ${CI_PROJECT_DIR}/docker/v3.10/Dockerfile
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+-rc\.\d+(\+.*)?$/
+
+release-rec:
+  extends: .devops::release-recette
+# production
+# promote-prod:
+#   extends: .devops::promote
+
+# release-prod:
+#   extends: .devops::release-prod
