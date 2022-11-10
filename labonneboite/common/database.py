@@ -1,6 +1,7 @@
 # http://flask.pocoo.org/docs/0.12/patterns/sqlalchemy/#declarative
 # http://docs.sqlalchemy.org/en/rel_1_1/
 import os
+import urllib.parse
 from typing import Optional, Dict, Union, TYPE_CHECKING
 
 from sqlalchemy import create_engine
@@ -14,13 +15,13 @@ CURRENT_ENV = get_current_env()
 
 # Engine
 # -----------------------------------------------------------------------------
-
+# fix for special character in passwords https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls
 DATABASE: Dict[str, Union[str, int, None]] = {
     "HOST": settings.DB_HOST,
     "PORT": settings.DB_PORT,
     "NAME": settings.DB_NAME,
     "USER": settings.DB_USER,
-    "PASSWORD": settings.DB_PASSWORD,
+    "PASSWORD": urllib.parse.quote_plus(settings.DB_PASSWORD),
 }
 
 
