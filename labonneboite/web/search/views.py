@@ -352,7 +352,7 @@ def entreprises():
     if not form.validate() or job_doesnt_exist:
         log_search_activity(activity_log_properties)
         form.set_auto_focus_on_searched_job()
-        return render_template(template, job_doesnt_exist=job_doesnt_exist, form=form)
+        return render_template(template, job_doesnt_exist=job_doesnt_exist, company_count=0, form=form)
 
     # Convert request arguments to fetcher parameters
     parameters = get_parameters(args)
