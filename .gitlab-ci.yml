@@ -8,7 +8,6 @@ python-tests:
   extends: .devops::test
   variables:
     DOCKER_COMPOSE_FILENAME: docker-compose.testing.yml
-    TEST_VOLUME_NAME: testResults
     FIX_COVERAGE_FOR_SONAR: "true"
     FIX_COVERAGE_FOR_SONAR_RENAMEFOLDER: s/\/labonneboite/\.\/labonneboite/g
   rules:
