@@ -1,39 +1,52 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='css/related-romes-content.css') }}">
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/related-romes-content.css') }}"
+/>
 
-    {% if related_romes %}
-      <div class="lbb-feature-banner related-romes-info">
-          <img src="{{ url_for('static', filename='images/icons/info-red.svg') }}" alt="info">
-          <p >
-              Il y a peu d’entreprises qui recrutent dans la région. Découvrez d’autres métiers à fort potentel d’embauche proche du vôtre ! Voici quelques suggestions qui peuvent vous intéresser.
-          </p>
-      </div>
+{% if related_romes %}
+<div class="lbb-feature-banner related-romes-info">
+  <img
+    src="{{ url_for('static', filename='images/icons/info-red.svg') }}"
+    alt="info"
+  />
+  <p>
+    Il y a peu d’entreprises qui recrutent dans la région. Découvrez d’autres
+    métiers à fort potentel d’embauche proche du vôtre ! Voici quelques
+    suggestions qui peuvent vous intéresser.
+  </p>
+</div>
 
-      <svg class="related-romes-polygon" width="40px" height="40px" >
-        <polygon points="40,0 0,40 40,40"/>
-      </svg>
-    {% endif %}
+<svg class="related-romes-polygon" width="40px" height="40px">
+  <polygon points="40,0 0,40 40,40" />
+</svg>
+{% endif %}
 
-    <div id="form-related_romes" class="related-romes-content" >
-      {% for rome in related_romes %}
-        <div class="grid-row lbb-bright-container lbb-result">
-          <div class="grid-col-8 lbb-sidebar-item" >
-              <h6>
-                  {{ rome.description }}
-              </h6>
-          </div>
-          <div class="grid-col-4 md-text-right lbb-result__header">
-            <h4>
-              Potentiel d'embauche<br>
-              <span class="rating-stars text-left">
-                <b style="width: {{ rome.score * 100 }}%;">
-                </b>
-              </span>
-              <span class="rating-value">{{ '%0.1f' % (rome.score * 5) }}</span>
-            </h4>
-          </div>
-          <div class="lbb-result__actions related-romes-footer">
-                <button href="#" data-rome-description="{{ rome.description }}" data-rome-description-slug="{{ rome.description | slugify }}" class="btn lbb-sidebar-item related-romes-button" type="submit">Voir les entreprises correspondant </button>
-          </div>
-        </div>
-    {% endfor %}
+<div id="form-related_romes" class="related-romes-content">
+  {% for rome in related_romes %}
+  <div class="grid-row lbb-bright-container lbb-result">
+    <div class="grid-col-8 lbb-sidebar-item">
+      <h6>{{ rome.description }}</h6>
     </div>
+    <div class="grid-col-4 md-text-right lbb-result__header">
+      <h4>
+        Potentiel d'embauche<br />
+        <span class="rating-stars text-left">
+          <strong style="width: {{ rome.score * 100 }}%;"> </strong>
+        </span>
+        <span class="rating-value">{{ '%0.1f' % (rome.score * 5) }}</span>
+      </h4>
+    </div>
+    <div class="lbb-result__actions related-romes-footer">
+      <button
+        href="#"
+        data-rome-description="{{ rome.description }}"
+        data-rome-description-slug="{{ rome.description | slugify }}"
+        class="btn lbb-sidebar-item related-romes-button"
+        type="submit"
+      >
+        Voir les entreprises correspondant
+      </button>
+    </div>
+  </div>
+  {% endfor %}
+</div>

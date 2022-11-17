@@ -2,45 +2,65 @@
 <html>
   <head>
     <style type="text/css">
-        {% include "includes/office/pdf_style.css" %}
+      {% include "includes/office/pdf_style.css" %}
     </style>
   </head>
   <body>
-
     {% include "includes/office/pdf_header.html" %}
 
-    <h1 class="headline">L'entreprise <span class="company-name">{{ company.name }}</span> est recommandée (*) par La Bonne Boite</h1>
+    <h1 class="headline">
+      L'entreprise <span class="company-name">{{ company.name }}</span> est
+      recommandée (*) par La Bonne Boite
+    </h1>
 
     {% include "includes/office/info_table.html" %}
 
-    <h2>La voie du succès pour travailler chez <span class="company-name">{{ company.name }}</span></h2>
+    <h2>
+      La voie du succès pour travailler chez
+      <span class="company-name">{{ company.name }}</span>
+    </h2>
 
     <table class="planning">
       <tr>
-        <th style="width: 15%;" class="bigcell">Etape</th>
-        <th style="width: 35%;" class="bigcell">Action</th>
-        <th style="width: 15%;" class="bigcell">Réalisé</th>
-        <th style="width: 35%;" class="bigcell">Commentaire</th>
+        <th style="width: 15%" class="bigcell">Etape</th>
+        <th style="width: 35%" class="bigcell">Action</th>
+        <th style="width: 15%" class="bigcell">Réalisé</th>
+        <th style="width: 35%" class="bigcell">Commentaire</th>
       </tr>
       <tr>
         <td class="done bigcell">1</td>
-        <td class="done">Trouver une entreprise qui embauche via <img src="{{ url_for('static',filename='images/logo-lbb-vertical.jpg') }}" width="128"></td>
+        <td class="done">
+          Trouver une entreprise qui embauche via
+          <img
+            src="{{ url_for('static',filename='images/logo-lbb-vertical.jpg') }}"
+            width="128"
+          />
+        </td>
         <td class="done"></td>
-        <td class="done" style="color: #19c158;"><b>Bravo, vous avez déjà réussi la première étape !</b></td>
+        <td class="done" style="color: #19c158">
+          <strong>Bravo, vous avez déjà réussi la première étape !</strong>
+        </td>
       </tr>
       {% for stage in stages %}
-        <tr>
-          <td class="bigcell">{{ loop.index + 1 }}</td>
-          <td>{{ stage }}</td>
-          <td>.................</td>
-          <td>.................</td>
-        </tr>
+      <tr>
+        <td class="bigcell">{{ loop.index + 1 }}</td>
+        <td>{{ stage }}</td>
+        <td>.................</td>
+        <td>.................</td>
+      </tr>
       {% endfor %}
     </table>
 
-    <div>* : En effet, nos données indiquent des possibilités d'embauche dans les 6 prochains mois. Attention, il ne s'agit pas d'une garantie d'emploi et vous devez faire le nécessaire pour convaincre cette entreprise de vous embaucher.</div>
+    <div>
+      * : En effet, nos données indiquent des possibilités d'embauche dans les 6
+      prochains mois. Attention, il ne s'agit pas d'une garantie d'emploi et
+      vous devez faire le nécessaire pour convaincre cette entreprise de vous
+      embaucher.
+    </div>
 
-    <div style="text-align: center;">Avez-vous une question ou une suggestion pour La Bonne Boite ? Consultez notre <a href="{{ url_for('root.faq', _external=True) }}">F.A.Q</a>.</div>
-
+    <div style="text-align: center">
+      Avez-vous une question ou une suggestion pour La Bonne Boite ? Consultez
+      notre <a href="{{ url_for('root.faq', _external=True) }}">F.A.Q</a>.
+    </div>
   </body>
 </html>

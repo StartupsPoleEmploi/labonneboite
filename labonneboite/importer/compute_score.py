@@ -118,7 +118,7 @@ def check_mean_between_existing_and_new_score(departement, df):
     logger.info("checking mean_between_existing_and_new_score: %s", mean)
     if not discarded_check(departement):
         if not np.nan_to_num(df[["diff_score"]].mean())[0] < importer_settings.SCORE_COMPUTING_MAX_DIFF_MEAN:
-            raise "np.nan_to_num(df[[\"diff_score\"]].mean())[0] too high"
+            raise ValueError("np.nan_to_num(df[[\"diff_score\"]].mean())[0] too high")
 
 
 def check_highly_scored_companies_evolution(departement, high_existing_scores, high_new_scores):
