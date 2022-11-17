@@ -4,7 +4,7 @@
 
   // Save user data when submitting the identification form
   $('.identification-form').submit(function(e) {
-    $form = $(e.target);
+    var $form = $(e.target);
 
     var siret     = $form.find("input[name='siret']").val();
     var lastName  = $form.find("input[name='last_name']").val();
