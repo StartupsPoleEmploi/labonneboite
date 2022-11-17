@@ -39,6 +39,7 @@ services:
     environment:
       <<: *cenv
       MAXFAIL: ${MAXFAIL:-1000}
+      TEST_FILES: ${TEST_FILES:-}
     volumes:
       - ./labonneboite/alembic/sql/testing:/sql
       - ./labonneboite:/app/labonneboite
