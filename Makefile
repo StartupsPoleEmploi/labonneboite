@@ -1,5 +1,7 @@
-COMPOSE_FILE=docker-compose.testing.yml:docker-compose.dev.yml
-MAXFAIL=1000
+COMPOSE_FILE = docker-compose.testing.yml:docker-compose.dev.yml
+MAXFAIL      = 1000
+TEST_FILES   =
+TEST_ARGS    = --build --abort-on-container-exit --exit-code-from
 
 help:
 	poetry install --only help
@@ -9,12 +11,10 @@ develop:
 	docker-compose -f docker-compose.dev.yml down \
 	&& docker-compose -f docker-compose.dev.yml up --build
 
-test: test-init test-run
-
-test-init:
-	docker-compose -f docker-compose.testing.yml up --build --no-start
-
-test-run:
-	MAXFAIL=${MAXFAIL} docker-compose -f docker-compose.testing.yml up --no-build --abort-on-container-exit --exit-code-from app; \
+test:
+	MAXFAIL=${MAXFAIL} TEST_FILES=${TEST_FILES} docker-compose -f docker-compose.testing.yml up ${TEST_ARGS} app; \
 	  r=$$?; \
 	  exit $$r
+
+test-run:
+	$(MAKE) test TEST_ARGS=--no-build

@@ -9,6 +9,7 @@ from labonneboite.common.models import Office
 from labonneboite.conf import settings
 from labonneboite.web.data.forms import NafForm, RomeForm, SiretForm, EmailForm
 
+from typing import List
 
 dataBlueprint = Blueprint('data', __name__)
 
@@ -106,16 +107,19 @@ def sirets_for_email():
     """
     Find SIRETS associated with a given email
     """
-    email = request.args.get('email', '')
-    companies = []
+    email: str = request.args.get('email', '')
+    companies: List[Office] = []
     save_link = ''
+    status = 400
 
     form = EmailForm(email=email)
 
     if email and form.validate():
-        offices = Office.query.filter(Office.email == email, Office.score > 0).all()
+        offices = Office.query.filter(Office.email == email, Office.hiring > 0).all()
+        status = 404
 
         if offices:
+            status = 200
             for office in offices:
                 companies.append({
                     'siret': office.siret,
@@ -133,4 +137,4 @@ def sirets_for_email():
         'save_link': save_link,
     }
 
-    return render_template('data/sirets_for_email.html', **context)
+    return render_template('data/sirets_for_email.html', **context), status
