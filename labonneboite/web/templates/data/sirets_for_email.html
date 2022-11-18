@@ -1,41 +1,42 @@
-{% extends 'data/base.html' %}
-
-{% block title %}Sirets associés à un e-mail{% endblock %}
+<!-- prettier-ignore -->
+{% extends 'data/base.html' %} 
+{% block title %}
+Sirets associés à un e-mail
+{% endblock %} 
 
 {% block data_content %}
 
 <h2>Sirets associés à un e-mail</h2>
 
 <form class="form-vertical" action="" method="get">
-    {% include "includes/form_content.html" %}
+  {% include "includes/form_content.html" %}
 </form>
 
 {% if companies %}
 <table>
-    <caption>
-        Voici la liste des sirets associés à l'email : {{ email }}
-    </caption>
-    <thead>
-        <tr>
-            <th>Siret</th>
-            <th>Nom</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for company in companies %}
-        <tr>
-            <td>{{ company.siret }}</td>
-            <td>{{ company.name }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <caption>
+    Voici la liste des sirets associés à l'email : {{ email }}
+  </caption>
+  <thead>
+    <tr>
+      <th scope="col">Siret</th>
+      <th scope="col">Nom</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for company in companies %}
+    <tr>
+      <td>{{ company.siret }}</td>
+      <td>{{ company.name }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 
 {% if save_link %}
 <h3>Lien SAVE</h3>
-<a href={{ save_link }}>Lien SAVE</a>
-{% endif %}
-
-{% endif %}
-
+<a href="{{ save_link }}">Lien SAVE</a>
+<!-- prettier-ignore -->
+{% endif %} 
+{% endif %} 
 {% endblock %}

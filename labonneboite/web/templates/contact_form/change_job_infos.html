@@ -30,18 +30,18 @@
       <table class="jobs full-width">
         <thead>
           <tr>
-            <th></th>
+            <th scope="col"></th>
             <th class="text-center">{{ form.romes_to_keep.label.text }}</th>
             <th class="text-center">{{ form.romes_alternance_to_keep.label.text }}</th>
           </tr>
           <tr>
-            <th></th>
+            <th scope="col"></th>
             <th class="text-center">
               <label>
                 <input type="checkbox" class="js-check-all" data-target="romes_to_keep">
               </label>
             </th>
-            <th class="text-center">
+            <th  scope="col" class="text-center">
               <label>
                 <input type="checkbox" class="js-check-all" data-target="romes_alternance_to_keep">
               </label>
@@ -75,12 +75,12 @@
         <table class="jobs full-width {% if not extra_added_jobs %}hidden{% endif %}">
           <thead>
             <tr>
-              <th></th>
+              <th scope="col"></th>
               <th class="text-center">{{ form.romes_to_keep.label.text }}</th>
               <th class="text-center">{{ form.romes_alternance_to_keep.label.text }}</th>
             </tr>
             <tr>
-              <th></th>
+              <th scope="col"></th>
               <th class="text-center">
                 <label>
                   <input type="checkbox" class="js-check-all" data-target="extra_romes_to_add">
