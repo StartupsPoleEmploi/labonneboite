@@ -92,7 +92,7 @@
 
         {% if companies %}
         <h1 class="lbb-result-info">
-          {% if page and page != 1 %}<b>Page {{ page }}</b> de{% endif %}
+          {% if page and page != 1 %}<strong>Page {{ page }}</strong> de{% endif %}
           {% if company_count == 1 %}
           {{ company_count }} entreprise est susceptible
           {% else %}
@@ -132,7 +132,7 @@
         {% elif alternative_rome_descriptions or alternative_distances %}
         <p>
           Nous n'avons pas de résultat d'entreprise susceptible d'embaucher pour
-          <b>{{ rome_description }}</b>
+          <strong>{{ rome_description }}</strong>
           {% if location_name %} à {{ distance }} km - {{ location_name }}{% endif %}.
         </p>
         {% if alternative_rome_descriptions and alternative_distances %}
@@ -191,7 +191,7 @@
 
     {% if pagination and pagination.should_show() %}
     <nav class="pagination-wrapper" aria-label="Page navigation">
-      <b>Plus d'entreprises</b>
+      <strong>Plus d'entreprises</strong>
       <!-- search-successful-monitoring-tag -->
       <ul class="pagination">
         {% if pagination.show_first_page() %}
