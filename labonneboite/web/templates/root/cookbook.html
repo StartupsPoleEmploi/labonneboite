@@ -46,8 +46,8 @@
               <a class="logo-pe-connect" href="{{ login_url() }}"><img
                   src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}"
                   alt="Se connecter avec Pôle emploi"></a><br>
-              <i>Connectez-vous à La Bonne Boite en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ?
-                Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
+              <em>Connectez-vous à La Bonne Boite en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ?
+                Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</em>
             </p>
           </div>
         </div>
@@ -83,8 +83,8 @@
               <a class="logo-pe-connect" href="{{ login_url }}"><img
                   src="{{ url_for('static', filename='images/logo-pe-connect.svg') }}"
                   alt="Se connecter avec Pôle emploi"></a><br>
-              <i>Connectez-vous à La Bonne Boîte en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ?
-                Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</i>
+              <em>Connectez-vous à La Bonne Boîte en utilisant des identifiants Pôle emploi. Vous n'avez pas de compte ?
+                Créez-en un et profitez de tous les services dédiés à l'emploi de nos partenaires.</em>
             </p>
           </div>
         </div>
@@ -735,9 +735,9 @@
             <caption>Table Caption</caption>
             <thead>
               <tr>
-                <th>Table Heading 1</th>
-                <th>Table Heading 2</th>
-                <th>Table Heading 3</th>
+                <th scope="col">Table Heading 1</th>
+                <th scope="col">Table Heading 2</th>
+                <th scope="col">Table Heading 3</th>
               </tr>
             </thead>
             <tbody>
@@ -759,9 +759,9 @@
             </tbody>
             <tfoot>
               <tr>
-                <th>Table Footer 1</th>
-                <th>Table Footer 2</th>
-                <th>Table Footer 3</th>
+                <th scope="col">Table Footer 1</th>
+                <th scope="col">Table Footer 2</th>
+                <th scope="col">Table Footer 3</th>
               </tr>
             </tfoot>
           </table>
@@ -770,8 +770,8 @@
           <table>
             <thead>
               <tr>
-                <th>Element</th>
-                <th>Description</th>
+                <th scope="col">Element</th>
+                <th scope="col">Description</th>
               </tr>
             </thead>
             <tbody>
@@ -812,7 +812,7 @@
                   <code>&lt;i&gt;</code>
                 </td>
                 <td>
-                  The <i>i element</i> is text that is offset from the normal text.
+                  The <em>i element</em> is text that is offset from the normal text.
                 </td>
               </tr>
               <tr>
