@@ -22,7 +22,7 @@ if ('querySelector' in document &&
         // add listener for each button
         toggleButton.addEventListener('click', function () {
 
-            fullTextWrapper = this.parentElement.querySelector('.fulltext');
+            let fullTextWrapper = this.parentElement.querySelector('.fulltext');
             toggleButtonText = this.querySelector('.text');
 
             // change attributes and text if full text is shown/hidden

@@ -1,20 +1,25 @@
-<div class="company-block"><span class="company-name">{{ company.name }}</span> en un clin d'oeil</div>
+<div class="company-block">
+  <span class="company-name">{{ company.name }}</span> en un clin d'oeil
+</div>
 
 <table class="company-info">
   <tr>
-    <td style="vertical-align: top;">
-      <b>Secteur d'activités</b> {{ company.naf_text }}<br>
-      <b>Nombre de salariés</b> {{ company.headcount_text }}<br>
+    <td style="vertical-align: top">
+      <strong>Secteur d'activités</strong> {{ company.naf_text }}<br />
+      <strong>Nombre de salariés</strong> {{ company.headcount_text }}<br />
     </td>
-    <td style="vertical-align: top;">
-      {% if company.website %}<b><a href="{{ company.website }}">{{ company.website }}</a></b><br>{% endif %}
-      {% if company.phone %}<b>Téléphone</b> : {{ company.phone }}<br>{% endif %}
-      <b>Adresse</b>
-      {% for field in  company.address_fields %}
-      {{ field }}<br>
+    <td style="vertical-align: top">
+      {% if company.website %}<strong
+        ><a href="{{ company.website }}">{{ company.website }}</a></strong
+      ><br />{% endif %} {% if company.phone %}<strong>Téléphone</strong> : {{
+      company.phone }}<br />{% endif %}
+      <strong>Adresse</strong>
+      {% for field in company.address_fields %} {{ field }}<br />
       {% endfor %}
     </td>
   </tr>
 </table>
 
-<div class="contact-mode"><b>Mode de contact à privilégier :</b> {{ contact_mode }}</div>
+<div class="contact-mode">
+  <strong>Mode de contact à privilégier :</strong> {{ contact_mode }}
+</div>
