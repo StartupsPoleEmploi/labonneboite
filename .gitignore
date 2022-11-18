@@ -115,3 +115,4 @@ __pycache__
 testResults/
 testResults.tar.gz
 .pytest_cache
+test.py

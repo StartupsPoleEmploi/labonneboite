@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 from labonneboite.tests.test_base import DatabaseTest
 
-from .....common.models import Office
+from labonneboite.common.models import Office
 
 if t.TYPE_CHECKING:  # pragma: no cover
     from flask.testing import FlaskClient
@@ -41,7 +41,7 @@ class BaseTest(ABC):
         return response
 
 
-class TestEmpty(BaseTest, DatabaseTest):
+class TestEmpty(DatabaseTest, BaseTest):
     def test_not_found(self):
         response = self.call("invalid@example.com")
         self.assertEqual(404, response.status_code)
@@ -52,7 +52,7 @@ class TestEmpty(BaseTest, DatabaseTest):
         self.assertEqual(400, response.status_code)
 
 
-class TestNoHiring(BaseTest, DatabaseTest):
+class TestNoHiring(DatabaseTest, BaseTest):
     def setUp(self):
         super().setUp()
         self.office = create_office(email="valid@example.com", hiring=0)
@@ -67,7 +67,7 @@ class TestNoHiring(BaseTest, DatabaseTest):
         self.assertEqual(404, response.status_code)
 
 
-class TestValid(BaseTest, DatabaseTest):
+class TestValid(DatabaseTest, BaseTest):
     def setUp(self):
         super().setUp()
         self.office = create_office(email="valid@example.com", hiring=1)
