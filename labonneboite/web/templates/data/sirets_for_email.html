@@ -1,5 +1,10 @@
-{% extends 'data/base.html' %} {% block title %}Sirets associés à un e-mail{%
-endblock %} {% block data_content %}
+<!-- prettier-ignore -->
+{% extends 'data/base.html' %} 
+{% block title %}
+Sirets associés à un e-mail
+{% endblock %} 
+
+{% block data_content %}
 
 <h2>Sirets associés à un e-mail</h2>
 
@@ -30,5 +35,8 @@ endblock %} {% block data_content %}
 
 {% if save_link %}
 <h3>Lien SAVE</h3>
-<a href="{{" save_link }}>Lien SAVE</a>
-{% endif %} {% endif %} {% endblock %}
+<a href="{{ save_link }}">Lien SAVE</a>
+<!-- prettier-ignore -->
+{% endif %} 
+{% endif %} 
+{% endblock %}
