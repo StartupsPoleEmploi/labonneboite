@@ -42,9 +42,10 @@ build-rec:
 
 release-rec:
   extends: .devops::release-recette
+  
 # production
-# promote-prod:
-#   extends: .devops::promote
+promote-prod:
+  extends: .devops::promote
 
-# release-prod:
-#   extends: .devops::release-prod
+release-prod:
+  extends: .devops::release-prod
