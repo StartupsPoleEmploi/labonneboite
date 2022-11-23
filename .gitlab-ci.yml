@@ -31,8 +31,9 @@ sonarqube:
         - labonneboite/**/*
         - pyproject.toml
 
-pypi:
-  extends: .devops::pypi-publish
+# pypi:
+#   extends: .devops::pypi-publish
+
 
 # recette
 build-rec:
