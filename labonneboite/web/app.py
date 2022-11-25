@@ -175,7 +175,6 @@ def register_context_processors(flask_app):
 
     def inject_dict_for_all_templates():
         return {
-            'memo_url': settings.MEMO_URL,
             'user_is_pro': pro.user_is_pro(),
             'pro_version_enabled': pro.pro_version_enabled(),
             'last_data_deploy_date': Office.get_date_of_last_data_deploy(),

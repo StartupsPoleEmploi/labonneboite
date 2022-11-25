@@ -169,9 +169,6 @@ FROM_EMAIL = "<set it>"
 # Leave blank to disable
 TAG_MANAGER_URL = ""
 
-MEMO_URL = (
-    "https://memo.pole-emploi.fr"  # staging url is https://memo.beta.pole-emploi.fr
-)
 API_ADRESSE_BASE_URL = "https://api-adresse.data.gouv.fr"
 API_DEPARTMENTS_URL = "https://geo.api.gouv.fr/departements"
 
