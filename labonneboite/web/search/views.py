@@ -29,7 +29,7 @@ RELATED_ROMES_AREAS = load_related_rome_areas() if settings.ENABLE_RELATED_ROMES
 def suggest_job_labels():
     term = request.args.get('term', '')
     suggestions = autocomplete.build_job_label_suggestions(term)
-    return make_response(jsonify(suggestions))
+    return jsonify(suggestions)
 
 
 @searchBlueprint.route('/suggest_locations')
@@ -45,7 +45,7 @@ def suggest_locations():
     """
     term = request.args.get('term', '')
     suggestions = autocomplete.build_location_suggestions(term)
-    return make_response(jsonify(suggestions))
+    return jsonify(suggestions)
 
 
 @searchBlueprint.route('/autocomplete/locations')
@@ -91,7 +91,7 @@ def job_slug_details():
                 'label': settings.ROME_DESCRIPTIONS.get(rome, ''),
             })
 
-    return make_response(jsonify(result))
+    return jsonify(result)
 
 
 @searchBlueprint.route('/city_slug_details')
@@ -124,7 +124,7 @@ def city_slug_details():
         'latitude': city_location.location.latitude,
     }
 
-    return make_response(jsonify(result))
+    return jsonify(result)
 
 
 @searchBlueprint.route('/city_code_details')
@@ -151,7 +151,7 @@ def city_code_details():
         'latitude': city['coords']['lat'],
     }
 
-    return make_response(jsonify(result))
+    return jsonify(result)
 
 
 PARAMETER_FIELD_MAPPING = {
