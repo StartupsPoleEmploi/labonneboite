@@ -32,3 +32,10 @@ site_author: "La Bonne Boite"
 
 nav:
   - index.md
+  - algo.md
+  - ami-api-csp.md
+  - code-profiling.md
+  - load-testing.md
+  - ogr-rome-mapping.md
+  - randomization.md
+  - rome-naf-mapping.md

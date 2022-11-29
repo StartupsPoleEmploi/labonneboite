@@ -1,8 +1,7 @@
-import json
 from typing import Dict, Optional, Tuple, Union
 from urllib.parse import urlencode
 
-from flask import abort, Blueprint, make_response, redirect, render_template, request, url_for
+from flask import abort, Blueprint, make_response, redirect, render_template, request, url_for, jsonify
 from flask_login import current_user
 from sentry_sdk import start_transaction
 from slugify import slugify
@@ -30,7 +29,7 @@ RELATED_ROMES_AREAS = load_related_rome_areas() if settings.ENABLE_RELATED_ROMES
 def suggest_job_labels():
     term = request.args.get('term', '')
     suggestions = autocomplete.build_job_label_suggestions(term)
-    return make_response(json.dumps(suggestions))
+    return jsonify(suggestions)
 
 
 @searchBlueprint.route('/suggest_locations')
@@ -46,7 +45,7 @@ def suggest_locations():
     """
     term = request.args.get('term', '')
     suggestions = autocomplete.build_location_suggestions(term)
-    return make_response(json.dumps(suggestions))
+    return jsonify(suggestions)
 
 
 @searchBlueprint.route('/autocomplete/locations')
@@ -71,7 +70,7 @@ def autocomplete_locations():
             pass  # FIXME log BAN LIKELY DOWN event
     for suggestion in suggestions:
         suggestion['value'] = suggestion['label']
-    return make_response(json.dumps(suggestions))
+    return make_response(jsonify(suggestions))
 
 
 @searchBlueprint.route('/job_slug_details')
@@ -80,7 +79,7 @@ def job_slug_details():
 
     job_slug = request.args.get('job-slug', '')
     if not job_slug:
-        return 'no job-slug given', 400
+        return jsonify({'response': 'no job-slug given'}), 400
 
     slugs = job_slug.split(',')
     for slug in slugs:
@@ -92,7 +91,7 @@ def job_slug_details():
                 'label': settings.ROME_DESCRIPTIONS.get(rome, ''),
             })
 
-    return make_response(json.dumps(result))
+    return jsonify(result)
 
 
 @searchBlueprint.route('/city_slug_details')
@@ -108,22 +107,24 @@ def city_slug_details():
     result = {}
 
     city_slug = request.args.get('city-slug', '')
+
     if not city_slug:
-        return 'no city-slug given', 400
+        return jsonify({'response': 'no city-slug given'}), 400
 
     city = city_slug.split('-')
     zipcode = ''.join(city[-1:])
     city_location = CityLocation(zipcode, city_slug)
 
     if not city_location.is_location_correct:
-        return 'no city found associated to the slug {}'.format(city_slug), 400
+        return jsonify({'response': f'no city found associated to the slug {city_slug}'}), 400
 
     result['city'] = {
         'name': city_location.name,
         'longitude': city_location.location.longitude,
         'latitude': city_location.location.latitude,
     }
-    return make_response(json.dumps(result))
+
+    return jsonify(result)
 
 
 @searchBlueprint.route('/city_code_details')
@@ -137,11 +138,11 @@ def city_code_details():
 
     city_code = request.args.get('city-code', '')
     if not city_code:
-        return 'no city-code given', 400
+        return jsonify({'response': 'no city-code given'}), 400
 
     city = geocoding.get_city_by_commune_id(city_code)
     if not city:
-        return 'no city found associated to the code {}'.format(city_code), 400
+        return jsonify({'response': f'no city found associated to the code {city_code}'}), 400
 
     result['city'] = {
         'name': city['name'],
@@ -150,7 +151,7 @@ def city_code_details():
         'latitude': city['coords']['lat'],
     }
 
-    return make_response(json.dumps(result))
+    return jsonify(result)
 
 
 PARAMETER_FIELD_MAPPING = {
@@ -166,6 +167,8 @@ PARAMETER_FIELD_MAPPING = {
     'from': 'from_number',
     'to': 'to_number',
     'p': 'audience',
+
+
 }
 
 
