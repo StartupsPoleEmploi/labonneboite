@@ -190,7 +190,7 @@
     }
 }
 
-/* Actions (after the header): toggle details, add to MEMO, etc.
+/* Actions (after the header): toggle details, etc.
 =========================================================================== */
 
 .lbb-result__actions {
@@ -200,19 +200,10 @@
     vertical-align: middle;
 }
 
-.lbb-result__actions .btn,
-.lbb-result__actions .btn-memo {
+.lbb-result__actions .btn {
     vertical-align: middle;
     display: inline-block;
     margin: 5px 5px 5px -10px;
-}
-
-.lbb-result__actions .btn-memo {
-    width: 215px;
-    color: #54108E;
-    font-size: 13px;
-    font-size: 0.8125rem;
-    font-family: inherit; /*"Open Sans", sans-serif*/
 }
 
 .lbb-result__actions .btn-favorite {
