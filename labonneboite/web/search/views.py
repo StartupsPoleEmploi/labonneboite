@@ -230,7 +230,7 @@ def get_parameters(args):
     return kwargs
 
 
-@ searchBlueprint.route('/entreprises/<city>-<zipcode>/<occupation>')
+@searchBlueprint.route('/entreprises/<city>-<zipcode>/<occupation>')
 def results(city, zipcode, occupation):
     """
     All this does is a redirect to the 'search.entreprises' view with
@@ -260,7 +260,7 @@ def add_descriptions(rome_object):
     return rome_object
 
 
-@ searchBlueprint.route('/entreprises')
+@searchBlueprint.route('/entreprises')
 def entreprises():
     """
     This view takes arguments as a query string.
