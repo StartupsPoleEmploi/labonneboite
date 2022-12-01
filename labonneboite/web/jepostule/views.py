@@ -37,6 +37,7 @@ def application(siret):
         'siret': siret,
         'client_id': settings.JEPOSTULE_CLIENT_ID,
         'next_url': request.referrer or '',
+        'consent_categories': get_consent_categories(),
     }
 
     if settings.FORWARD_PEAM_TOKEN_TO_JP_FOR_AMI:
@@ -48,11 +49,16 @@ def application(siret):
     token, timestamp = get_token(**data)
     data['token'] = token
     data['timestamp'] = timestamp
+
     return render_template(
         'jepostule/candidater.html',
         iframe_path="/embed/candidater/?" + urlencode(data),
         iframe_base=settings.JEPOSTULE_BASE_URL,
     )
+
+
+def get_consent_categories():
+    return request.cookies.get('TC_PRIVACY_LBB_CENTER', '')
 
 
 def get_token(**params):
