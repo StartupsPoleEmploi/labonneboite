@@ -1,9 +1,13 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-    <body>
-        <script>
-            // Signal parent window that user is connected
-            window.parent.postMessage('USER_SSO_CONNECTED', window.location.origin);
-        </script>
-    </body>
+    <head>
+        <meta charset="utf-8">
+        <title>La Bonne Boite</title>
+    </head>
+  <body>
+    <script>
+      // Signal parent window that user is connected
+      window.parent.postMessage("USER_SSO_CONNECTED", window.location.origin);
+    </script>
+  </body>
 </html>

@@ -1,5 +1,6 @@
-<div class="lbb-result__header">
 
+
+<div class="lbb-result__header">
   <h3>
     <span>{{ company.name }}</span>
     {% if company.city %}- <span class="small">{{ company.city }}</span>{% endif %}
@@ -26,22 +27,32 @@
     </div>
     <div class="grid-col-4 md-text-right">
       <h4>
-        Potentiel d'embauche<br>
+        Potentiel d'embauche<br />
         <span class="rating-stars text-left">
-          <b style="width: {{ company.get_stars_for_rome_code_as_percentage(rome_code) }}%;">
+          <strong
+            style="width: {{ company.get_stars_for_rome_code_as_percentage(rome_code) }}%;"
+          >
             {{ company.get_stars_for_rome_code(rome_code) }}
           </strong>
         </span>
-        <span class="rating-value">{{ '%0.1f' % company.get_stars_for_rome_code(rome_code) }}</span>
+        <span class="rating-value"
+          >{{ '%0.1f' % company.get_stars_for_rome_code(rome_code) }}</span
+        >
       </h4>
     </div>
     <div class="grid-col-8">
-      {% if distance and zipcode and company.show_multi_geolocations_msg(zipcode) %}
-        <h4>Cette entreprise recrute aussi dans votre région.</h4>
+      {% if distance and zipcode and
+      company.show_multi_geolocations_msg(zipcode) %}
+      <h4>Cette entreprise recrute aussi dans votre région.</h4>
       {% elif company.distance %}
-        <p class="travel-distance-duration">
-          <img class="img-icon-large" alt="" src="{{ url_for('static', filename='images/icons/travel/km.svg') }}"> {{ company.distance }} km de votre lieu de recherche
-        </p>
+      <p class="travel-distance-duration">
+        <img
+          class="img-icon-large"
+          alt=""
+          src="{{ url_for('static', filename='images/icons/travel/km.svg') }}"
+        />
+        {{ company.distance }} km de votre lieu de recherche
+      </p>
       {% endif %}
     </div>
   </div>
@@ -52,76 +63,119 @@
       <div class="grid-col-9 text-left">
         <div class="row btn-more-infos">
           {% if show_more_info %}
-            <a href="#" class="btn btn-small js-result-toggle-details gtm-company-detail">Plus d'infos</a>
+          <a
+            href="#"
+            class="btn btn-small js-result-toggle-details gtm-company-detail"
+            >Plus d'infos</a
+          >
           {% endif %}
         </div>
         <div class="row">
-          {# Tilkee #}
+          {# Tilkee #} 
           {% if tilkee_enabled %}
-          <a class="tilkee-button no-underline no-margin" href="{{ url_for('tilkee.upload', siret=company.siret) }}" data-toggle="tooltip" title="En postulant, vous pourrez suivre votre candidature ! Découvrez qui a ouvert votre CV et quand. Et relancez le recruteur au bon moment !" data-placement="bottom" data-siret="{{ company.siret }}" onclick="return false;">
+          <a
+            class="tilkee-button no-underline no-margin"
+            href="{{ url_for('tilkee.upload', siret=company.siret) }}"
+            data-toggle="tooltip"
+            title="En postulant, vous pourrez suivre votre candidature ! Découvrez qui a ouvert votre CV et quand. Et relancez le recruteur au bon moment !"
+            data-placement="bottom"
+            data-siret="{{ company.siret }}"
+            onclick="return false;"
+          >
             <button class="invisible no-padding" type="submit">
-              <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/pencil.svg') }}"></span>
+              <span class="rounded-icon"
+                ><img
+                  class="img-icon"
+                  alt=""
+                  src="{{ url_for('static', filename='images/icons/pencil.svg') }}"
+              /></span>
               <span class="btn btn-small invisible">Créer ma candidature</span>
             </button>
           </a>
           {% endif %}
         </div>
         <div class="row">
-          {# START favorites. #}
-          {% if show_favorites and user.is_authenticated %}
+          {# START favorites. #} 
+          {% if show_favorites and user.is_authenticated %} 
             {% if (user_favs_as_sirets is defined) and (company.siret not in user_favs_as_sirets) %}
-              <form
-                  action="{{ url_for('user.favorites_add', siret=company.siret, rome_code=rome_code) }}"
-                  method="post"
-                  class="form-inline">
-                <button class="invisible no-padding btn-favorite" type="submit">
-                  <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/heart.svg') }}"></span>
-                  <span class="btn btn-small invisible">Garder pour plus tard</span>
-                </button>
-                <input type="hidden" name="next" value="{{ request.full_path | urlencode }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              </form>
-            {% else %}
-              <form action="{{ url_for('user.favorites_delete', siret=company.siret) }}" method="post" class="form-inline">
-                <button class="invisible no-padding btn-favorite" type="submit">
-                  <span class="rounded-icon"><img class="img-icon" alt="" src="{{ url_for('static', filename='images/icons/heart.svg') }}"></span>
-                  <span class="btn btn-small invisible">Supprimer des favoris</span>
-                </button>
-                <input type="hidden" name="next" value="{{ request.full_path | urlencode }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              </form>
-            {% endif %}
-          {% endif %}
+          <form
+            action="{{ url_for('user.favorites_add', siret=company.siret, rome_code=rome_code) }}"
+            method="post"
+            class="form-inline"
+          >
+            <button class="invisible no-padding btn-favorite" type="submit">
+              <span class="rounded-icon"
+                ><img
+                  class="img-icon"
+                  alt=""
+                  src="{{ url_for('static', filename='images/icons/heart.svg') }}"
+              /></span>
+              <span class="btn btn-small invisible">Garder pour plus tard</span>
+            </button>
+            <input
+              type="hidden"
+              name="next"
+              value="{{ request.full_path | urlencode }}"
+            />
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          </form>
+          {% else %}
+          <form
+            action="{{ url_for('user.favorites_delete', siret=company.siret) }}"
+            method="post"
+            class="form-inline"
+          >
+            <button class="invisible no-padding btn-favorite" type="submit">
+              <span class="rounded-icon"
+                ><img
+                  class="img-icon"
+                  alt=""
+                  src="{{ url_for('static', filename='images/icons/heart.svg') }}"
+              /></span>
+              <span class="btn btn-small invisible">Supprimer des favoris</span>
+            </button>
+            <input
+              type="hidden"
+              name="next"
+              value="{{ request.full_path | urlencode }}"
+            />
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          </form>
+          {% endif %} 
+          {% endif %} 
           {# END favorites. #}
         </div>
-      </div> <!-- left buttons -->
+      </div>
+      <!-- left buttons -->
 
-      <div class="grid-col-1">
-
-      </div> <!-- empty space -->
+      <div class="grid-col-1"></div>
+      <!-- empty space -->
 
       <div class="grid-col-2 text-right">
         <div class="row">
-          {% if jepostule_globally_enabled %}
-            {% if jepostule_enabled(user, company) %}
-              <a class="btn btn-small btn-postulate" href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}" target="_blank" rel="noopener"> Postuler
-              </a>
-            {% endif %}
-
-            {% if not user.is_authenticated and company.email %}
-              <a class="jepostule-not-authentified btn-postulate jepostule-buttoninvisible btn btn-small gtm-company-apply-unlogged" id="">Postuler
-              </a>
-            {% endif %}
+          {% if jepostule_globally_enabled %} 
+          {% if jepostule_enabled(user, company) %}
+          <a
+            class="btn btn-small btn-postulate"
+            href="{{ url_for('jepostule.application', siret=company.siret, rome_code=rome_code) }}"
+            target="_blank"
+            rel="noopener"
+          >
+            Postuler
+          </a>
+          {% endif %} 
+          {% if not user.is_authenticated and company.email %}
+          <a
+            class="jepostule-not-authentified btn-postulate jepostule-buttoninvisible btn btn-small gtm-company-apply-unlogged"
+            id=""
+            >Postuler
+          </a>
+          {% endif %} 
           {% endif %}
         </div>
-
-      </div> <!-- right buttons -->
+      </div>
+      <!-- right buttons -->
     </div>
-
-
-
-
-
   </div>
   {% endif %}
 </div>
