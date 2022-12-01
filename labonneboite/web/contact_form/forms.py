@@ -175,7 +175,7 @@ class OfficeUpdateCoordinatesForm(OfficeHiddenIdentificationForm):
     new_website = StringField(
         "Site Internet",
         validators=[URL(), Optional()],
-        render_kw={"placeholder": "http://exemple.com"},
+        render_kw={"placeholder": "https://exemple.com"},
     )
     new_email = EmailField(
         "Email recruteur",
