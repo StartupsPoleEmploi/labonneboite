@@ -37,7 +37,7 @@ def application(siret):
         'siret': siret,
         'client_id': settings.JEPOSTULE_CLIENT_ID,
         'next_url': request.referrer or '',
-        'consent_categories': self.get_consent_categories(),
+        'consent_categories': get_consent_categories(),
     }
 
     if settings.FORWARD_PEAM_TOKEN_TO_JP_FOR_AMI:
