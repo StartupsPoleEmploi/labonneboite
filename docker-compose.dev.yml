@@ -1,7 +1,5 @@
 version: "3.7"
 
-
-
 # settings
 x-db-env:
   &dbenv
@@ -26,6 +24,17 @@ x-common-env:
 
 services:
 
+  labonneboite-es-index:
+    build:
+      context: .
+      dockerfile: docker/v3.10/Dockerfile
+    environment:
+      <<: *cenv
+    entrypoint: /bin/bash /entrypoints/index.sh
+    depends_on:
+      labonneboite:
+        condition: service_healthy
+
   labonneboite:
     hostname: labonneboite-backend
     restart: always
@@ -39,6 +48,11 @@ services:
     volumes:
       - ./labonneboite/alembic/sql/dev:/sql
       - ./labonneboite:/app/labonneboite
+    healthcheck:
+      test: curl localhost:8080 || exit 1
+      interval: 10s
+      retries: 5
+      timeout: 2s
     depends_on:
       elasticsearch:
         condition: service_healthy

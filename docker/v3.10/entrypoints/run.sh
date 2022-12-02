@@ -16,8 +16,5 @@ if [ ! -z "$(ls -A /sql)" ]; then
     done
 fi;
 
-# create the index in elastic search
-poetry run create_index --full
-
 # run the server
 poetry run gunicorn --config python:labonneboite.wsgi-conf labonneboite.web.app:app

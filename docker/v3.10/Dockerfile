@@ -7,6 +7,7 @@ ENV FLASK_APP web.app
 # for mysql support & git & french langage support
 RUN apt-get update && apt-get install -y \
     git \
+    curl \
     python3-dev \
     default-mysql-client \
     default-libmysqlclient-dev \

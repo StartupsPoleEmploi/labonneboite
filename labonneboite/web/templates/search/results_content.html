@@ -58,7 +58,7 @@
                 <hr>
                 <h3>Triez</h3>
                 <div class="lbb-sidebar-item">
-                  {{ form.sort }}
+                  {{ form.sort |replace('"',"") }}
                 </div>
                 <!-- END SORT AND FILTERS -->
                 {% endif %} {# endif not departments #}
