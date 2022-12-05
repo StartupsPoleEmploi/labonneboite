@@ -24,7 +24,7 @@ create_index = "labonneboite.scripts.create_index:run"
 [tool.poetry.dependencies]
 python = "^3.10"
 # labonneboite dependency
-labonneboite-common = "0.3.0"
+labonneboite-common = "0.5.3"
 # for this app
 alembic = "^1.8.1"
 async_generator = "^1.10"
