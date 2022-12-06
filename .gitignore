@@ -116,3 +116,7 @@ testResults/
 testResults.tar.gz
 .pytest_cache
 test.py
+
+data
+config
+query

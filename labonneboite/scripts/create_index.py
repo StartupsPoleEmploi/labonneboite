@@ -407,7 +407,7 @@ def create_offices_for_departement(departement: str) -> None:
             Office.departement == departement,
             Office.hiring >= scoring_util.get_hirings_from_score(settings.SCORE_REDUCING_MINIMUM_THRESHOLD),
         )).all()
-
+    logger.info(f"[DPT{departement}] FOUND {len(all_offices)} offices! ")
     for office in all_offices:
         st.increment_office_count()
 

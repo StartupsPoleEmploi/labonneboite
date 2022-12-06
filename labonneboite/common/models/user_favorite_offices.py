@@ -45,13 +45,8 @@ class UserFavoriteOffice(CRUDMixin, Base):
                           nullable=False)
     rome_code = Column(String(5), default=None, nullable=True)
 
-    user = relationship('User')
-    if get_current_env() == ENV_BONAPARTE:
-        # Disable relationship which mysteriously breaks on lbbdev only, not needed there anyway.
-        # FIXME very ugly, try again to fix this bug. Bug happens in lbbdev environment only.
-        pass
-    else:
-        office = relationship('Office', lazy='joined')
+    user = relationship('User', back_populates='favorite_offices')
+    office = relationship('Office', lazy='joined')
 
     @classmethod
     def add_favorite(cls,
