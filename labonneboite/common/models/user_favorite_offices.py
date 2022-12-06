@@ -8,7 +8,6 @@ from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String,
 from sqlalchemy.orm import relationship
 
 from ..database import Base, db_session
-from ..env import ENV_BONAPARTE, get_current_env
 from . import Office, User
 from .base import CRUDMixin
 
