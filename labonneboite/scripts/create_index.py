@@ -712,16 +712,20 @@ def update_offices_geolocations() -> None:
 
 
 def get_latest_scam_emails() -> List[str]:
-    list_of_files = glob.glob(os.path.join(settings.SCAM_EMAILS_FOLDER, 'lbb_blacklist_full_*.bz2'))
-    if not list_of_files:
-        raise ValueError("No blacklist file found. Path is most likely incorrect.")
-    latest_file = max(list_of_files, key=os.path.getctime)
-    with bz2.BZ2File(latest_file) as myfile:
-        logger.info("Processing scam emails file %s ...", latest_file)
-        myfile.readline()  # ignore header
-        emails = [email.decode().strip().replace('"', '') for email in myfile]
-        emails = [email for email in emails if email != '']
-    logger.info("The emails file contains {} emails".format(len(emails)))
+
+    if os.path.exists(settings.SCAM_EMAILS_FOLDER):
+        list_of_files = glob.glob(os.path.join(settings.SCAM_EMAILS_FOLDER, 'lbb_blacklist_full_*.bz2'))
+        if not list_of_files:
+            raise ValueError("No blacklist file found. Path is most likely incorrect.")
+        latest_file = max(list_of_files, key=os.path.getctime)
+        with bz2.BZ2File(latest_file) as myfile:
+            logger.info("Processing scam emails file %s ...", latest_file)
+            myfile.readline()  # ignore header
+            emails = [email.decode().strip().replace('"', '') for email in myfile]
+            emails = [email for email in emails if email != '']
+        logger.info("The emails file contains {} emails".format(len(emails)))
+    else:
+        emails = []
     return emails
 
 
