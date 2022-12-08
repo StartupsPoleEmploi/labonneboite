@@ -18,7 +18,7 @@ from labonneboite.common.conf.common import settings_common
 # Dynamically import LBB_SETTINGS environment variable as the `settings`
 # module, or import `local_settings.py` as the `settings` module if it does not
 # exist.
-
+logger = logging.getLogger('main')
 settings = settings_common
 
 # Don't override settings in tests
@@ -36,9 +36,9 @@ if settings_common.get_current_env() != settings_common.ENV_TEST:
         for setting in dir(settings_common):
 
             if not hasattr(settings, setting):
-                print(f"Setting {setting} not found. Using default.")
+                logger.info(f"Setting {setting} not found. Using default.")
                 setattr(settings, setting, getattr(settings_common, setting))
     else:
         # we don't want to block the docker build, so this should only be a warning
-        print(
+        logger.warn(
             f"Could not find configuration file LBB_SETTINGS : {settings_module}. Check your file path! It will be ignored!")
