@@ -30,6 +30,9 @@ COPY . .
 # This is a folder to place sql files that will be imported directly after running alembic and before the create index script
 RUN mkdir -p /sql
 
+# same for logs
+RUN mkdir -p /app/logs
+
 # unsupported local error : https://stackoverflow.com/questions/54802935/docker-unsupported-locale-setting-when-running-python-container
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'        /etc/locale.gen \
     && sed -i -e 's/# fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/' /etc/locale.gen \

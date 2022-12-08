@@ -1,7 +1,8 @@
 import imp
 import os
-
+import logging
 from labonneboite.common.conf.common import settings_common
+
 
 # Settings
 # --------
@@ -22,17 +23,22 @@ settings = settings_common
 
 # Don't override settings in tests
 if settings_common.get_current_env() != settings_common.ENV_TEST:
+
     if 'LBB_SETTINGS' not in os.environ:
         raise Exception('LBB_SETTINGS environment variable is required')
 
     settings_module: str = os.environ.get('LBB_SETTINGS')
-    try:
+
+    if os.path.exists(settings_module):
+
         settings = imp.load_source('settings', settings_module)
-    except FileNotFoundError:
-        pass
-    else:
-        # Iterate over each setting defined in the `settings_common` module and add them to the dynamically
-        # imported `settings` module if they don't already exist.
+
         for setting in dir(settings_common):
+
             if not hasattr(settings, setting):
+                print(f"Setting {setting} not found. Using default.")
                 setattr(settings, setting, getattr(settings_common, setting))
+    else:
+        # we don't want to block the docker build, so this should only be a warning
+        print(
+            f"Could not find configuration file LBB_SETTINGS : {settings_module}. Check your file path! It will be ignored!")
