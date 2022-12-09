@@ -13,7 +13,7 @@ build==0.8.0
 CacheControl==0.12.11
 cachetools==5.2.0
 cachy==0.3.0
-certifi==2022.9.24
+certifi==2022.12.7
 cffi==1.15.1
 charset-normalizer==2.1.1
 cleo==1.0.0a5
