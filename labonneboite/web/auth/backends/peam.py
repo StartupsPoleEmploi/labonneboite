@@ -25,10 +25,10 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     name = 'peam-openidconnect'
 
     OIDC_ENDPOINT = "{}/connexion/oauth2/individu".format(settings.PEAM_AUTH_BASE_URL)
-    AUTHORIZATION_URL = "{}/connexion/oauth2/authorize".format(settings.PEAM_AUTH_BASE_URL)
-    ACCESS_TOKEN_URL = "{}/connexion/oauth2/access_token".format(settings.PEAM_AUTH_BASE_URL)
-    REFRESH_TOKEN_URL = "{}/connexion/oauth2/access_token?realm=%2Findividu".format(settings.PEAM_AUTH_BASE_URL)
-    USERINFO_URL = "{}/partenaire/peconnect-individu/v1/userinfo".format(settings.PEAM_API_BASE_URL)
+    # AUTHORIZATION_URL = "{}/connexion/oauth2/authorize".format(settings.PEAM_AUTH_BASE_URL)
+    # ACCESS_TOKEN_URL = "{}/connexion/oauth2/access_token".format(settings.PEAM_AUTH_BASE_URL)
+    # REFRESH_TOKEN_URL = "{}/connexion/oauth2/access_token?realm=%2Findividu".format(settings.PEAM_AUTH_BASE_URL)
+    # USERINFO_URL = "{}/partenaire/peconnect-individu/v1/userinfo".format(settings.PEAM_API_BASE_URL)
 
     # as documented in https://python-social-auth.readthedocs.io/en/latest/use_cases.html#multiple-scopes-per-provider
     def get_scope(self):
