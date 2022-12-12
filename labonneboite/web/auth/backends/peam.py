@@ -24,6 +24,7 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     """
     name = 'peam-openidconnect'
 
+    OIDC_ENDPOINT = "{}/connexion/oauth2/individu".format(settings.PEAM_AUTH_BASE_URL)
     AUTHORIZATION_URL = "{}/connexion/oauth2/authorize".format(settings.PEAM_AUTH_BASE_URL)
     ACCESS_TOKEN_URL = "{}/connexion/oauth2/access_token".format(settings.PEAM_AUTH_BASE_URL)
     REFRESH_TOKEN_URL = "{}/connexion/oauth2/access_token?realm=%2Findividu".format(settings.PEAM_AUTH_BASE_URL)
