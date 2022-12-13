@@ -28,7 +28,7 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     # AUTHORIZATION_URL = "{}/connexion/oauth2/authorize".format(settings.PEAM_AUTH_BASE_URL)
     # ACCESS_TOKEN_URL = "{}/connexion/oauth2/access_token".format(settings.PEAM_AUTH_BASE_URL)
     # REFRESH_TOKEN_URL = "{}/connexion/oauth2/access_token?realm=%2Findividu".format(settings.PEAM_AUTH_BASE_URL)
-    USERINFO_URL = "{}/partenaire/peconnect-individu/v1/userinfo".format(settings.PEAM_API_BASE_URL)
+    # USERINFO_URL = "{}/partenaire/peconnect-individu/v1/userinfo".format(settings.PEAM_API_BASE_URL)
 
     # as documented in https://python-social-auth.readthedocs.io/en/latest/use_cases.html#multiple-scopes-per-provider
     def get_scope(self):
@@ -47,6 +47,13 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         print(f"args : {args}", flush=True)
         print(f"kwargs : {kwargs}", flush=True)
 
+        kwargs["client_id"] = settings.PEAM_CLIENT_ID
+        kwargs["client_secret"] = settings.PEAM_CLIENT_SECRET
+
+        if "auth" in kwargs:
+            del kwargs["auth"]
+
+        print(f"kwargs : {kwargs}", flush=True)
         r = self.request(*args, **kwargs)
         print(f"response : {r.content}", flush=True)
         print(f"status code : {r.status_code}", flush=True)
