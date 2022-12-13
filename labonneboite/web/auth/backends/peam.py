@@ -47,8 +47,8 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         print(f"args : {args}", flush=True)
         print(f"kwargs : {kwargs}", flush=True)
 
-        kwargs["client_id"] = settings.PEAM_CLIENT_ID
-        kwargs["client_secret"] = settings.PEAM_CLIENT_SECRET
+        kwargs["data"]["client_id"] = settings.PEAM_CLIENT_ID
+        kwargs["data"]["client_secret"] = settings.PEAM_CLIENT_SECRET
 
         if "auth" in kwargs:
             del kwargs["auth"]
