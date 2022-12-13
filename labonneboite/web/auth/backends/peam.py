@@ -28,7 +28,7 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     # AUTHORIZATION_URL = "{}/connexion/oauth2/authorize".format(settings.PEAM_AUTH_BASE_URL)
     # ACCESS_TOKEN_URL = "{}/connexion/oauth2/access_token".format(settings.PEAM_AUTH_BASE_URL)
     # REFRESH_TOKEN_URL = "{}/connexion/oauth2/access_token?realm=%2Findividu".format(settings.PEAM_AUTH_BASE_URL)
-    # USERINFO_URL = "{}/partenaire/peconnect-individu/v1/userinfo".format(settings.PEAM_API_BASE_URL)
+    USERINFO_URL = "{}/partenaire/peconnect-individu/v1/userinfo".format(settings.PEAM_API_BASE_URL)
 
     # as documented in https://python-social-auth.readthedocs.io/en/latest/use_cases.html#multiple-scopes-per-provider
     def get_scope(self):
@@ -38,6 +38,20 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
             scope += ['qos_silver_peconnect-individuv1']
         scope += ['api_candidaturespontaneev1', 'ami', 'amiW']
         return scope
+
+    def request_access_token(self, *args, **kwargs):
+        """
+        Retrieve the access token. Also, validate the id_token and
+        store it (temporarily).
+        """
+        print(args, flush=True)
+        print(kwargs, flush=True)
+        response = self.get_json(*args, **kwargs)
+        self.id_token = self.validate_and_return_id_token(
+            response['id_token'],
+            response['access_token']
+        )
+        return response
 
     # def request_access_token(self, *args, **kwargs):
     #     kwargs['params'] = {'realm': '/individu'}
