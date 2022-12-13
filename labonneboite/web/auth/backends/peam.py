@@ -47,8 +47,7 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         print(f"args : {args}", flush=True)
         print(f"kwargs : {kwargs}", flush=True)
 
-        url = args[0]
-        r = self.request(url, *args, **kwargs)
+        r = self.request(*args, **kwargs)
         print(f"response : {r.content}", flush=True)
         print(f"status code : {r.status_code}", flush=True)
 
