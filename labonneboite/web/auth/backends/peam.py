@@ -39,26 +39,26 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         scope += ['api_candidaturespontaneev1', 'ami', 'amiW']
         return scope
 
-    def request_access_token(self, *args, **kwargs):
-        kwargs['params'] = {'realm': '/individu'}
-        result = self.get_json(*args, **kwargs)
-        return result
+    # def request_access_token(self, *args, **kwargs):
+    #     kwargs['params'] = {'realm': '/individu'}
+    #     result = self.get_json(*args, **kwargs)
+    #     return result
 
-    def user_data(self, access_token, *args, **kwargs):
-        url = self.userinfo_url()
-        try:
-            return self.get_json(
-                url, params={'realm': '/individu'},
-                headers={'Authorization': 'Bearer {0}'.format(access_token)}
-            )
-        except requests.HTTPError as e:
-            if e.response.status_code == 502:  # Bad Gateway
-                # 502 errors are not properly handled by social_core (see
-                # handle_http_errors decorator in social_core.utils)
-                # If we don't raise an exception, the user sees a spinning wheel.
-                # This exception must be caught by an error handler of the app.
-                raise AuthUnreachableProvider(url)
-            raise
+    # def user_data(self, access_token, *args, **kwargs):
+    #     url = self.userinfo_url()
+    #     try:
+    #         return self.get_json(
+    #             url, params={'realm': '/individu'},
+    #             headers={'Authorization': 'Bearer {0}'.format(access_token)}
+    #         )
+    #     except requests.HTTPError as e:
+    #         if e.response.status_code == 502:  # Bad Gateway
+    #             # 502 errors are not properly handled by social_core (see
+    #             # handle_http_errors decorator in social_core.utils)
+    #             # If we don't raise an exception, the user sees a spinning wheel.
+    #             # This exception must be caught by an error handler of the app.
+    #             raise AuthUnreachableProvider(url)
+    #         raise
 
     def get_user_details(self, response):
         user_details = {
