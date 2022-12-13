@@ -4,9 +4,7 @@ Provides user registration and login using PEAM (Pôle Emploi Access Management)
 Useful documentation of social-auth-core:
 https://python-social-auth.readthedocs.io/en/latest/
 """
-import requests
 
-from social_core.exceptions import AuthUnreachableProvider
 from social_core.backends.open_id_connect import OpenIdConnectAuth
 
 from labonneboite.conf import settings
@@ -24,11 +22,8 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
     """
     name = 'peam-openidconnect'
 
+    # just use the oidc endpoint to get all endpoint definition using wellknown
     OIDC_ENDPOINT = "{}/connexion/oauth2/individu".format(settings.PEAM_AUTH_BASE_URL)
-    # AUTHORIZATION_URL = "{}/connexion/oauth2/authorize".format(settings.PEAM_AUTH_BASE_URL)
-    # ACCESS_TOKEN_URL = "{}/connexion/oauth2/access_token".format(settings.PEAM_AUTH_BASE_URL)
-    # REFRESH_TOKEN_URL = "{}/connexion/oauth2/access_token?realm=%2Findividu".format(settings.PEAM_AUTH_BASE_URL)
-    # USERINFO_URL = "{}/partenaire/peconnect-individu/v1/userinfo".format(settings.PEAM_API_BASE_URL)
 
     # as documented in https://python-social-auth.readthedocs.io/en/latest/use_cases.html#multiple-scopes-per-provider
     def get_scope(self):
@@ -40,25 +35,31 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         return scope
 
     def request_access_token(self, *args, **kwargs):
-        kwargs['params'] = {'realm': '/individu'}
-        result = self.get_json(*args, **kwargs)
-        return result
+        """
+        Retrieve the access token. Also, validate the id_token and
+        store it (temporarily).
+        """
 
-    def user_data(self, access_token, *args, **kwargs):
-        url = self.userinfo_url()
-        try:
-            return self.get_json(
-                url, params={'realm': '/individu'},
-                headers={'Authorization': 'Bearer {0}'.format(access_token)}
-            )
-        except requests.HTTPError as e:
-            if e.response.status_code == 502:  # Bad Gateway
-                # 502 errors are not properly handled by social_core (see
-                # handle_http_errors decorator in social_core.utils)
-                # If we don't raise an exception, the user sees a spinning wheel.
-                # This exception must be caught by an error handler of the app.
-                raise AuthUnreachableProvider(url)
-            raise
+        # DN: We need to avoid using auth parameter for requests has it is badly interpreted by backend (error 409)
+        # we can pass the client id and secret in the data parameter instead.
+
+        # -- add secrets in data
+        kwargs["data"]["client_id"] = settings.PEAM_CLIENT_ID
+        kwargs["data"]["client_secret"] = settings.PEAM_CLIENT_SECRET
+
+        # -- remove auth
+        if "auth" in kwargs:
+            del kwargs["auth"]
+
+        # make the query
+        response = self.request(*args, **kwargs).json()
+
+        self.id_token = self.validate_and_return_id_token(
+            response['id_token'],
+            response['access_token']
+        )
+
+        return response
 
     def get_user_details(self, response):
         user_details = {
