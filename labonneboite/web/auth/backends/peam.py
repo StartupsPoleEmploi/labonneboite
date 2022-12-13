@@ -4,9 +4,7 @@ Provides user registration and login using PEAM (Pôle Emploi Access Management)
 Useful documentation of social-auth-core:
 https://python-social-auth.readthedocs.io/en/latest/
 """
-import requests
 
-from social_core.exceptions import AuthUnreachableProvider
 from social_core.backends.open_id_connect import OpenIdConnectAuth
 
 from labonneboite.conf import settings
