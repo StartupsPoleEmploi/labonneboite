@@ -44,9 +44,16 @@ class PEAMOpenIdConnect(OpenIdConnectAuth):
         Retrieve the access token. Also, validate the id_token and
         store it (temporarily).
         """
-        print(args, flush=True)
-        print(kwargs, flush=True)
-        response = self.get_json(*args, **kwargs)
+        print(f"args : {args}", flush=True)
+        print(f"kwargs : {kwargs}", flush=True)
+
+        url = args[0]
+        r = self.request(url, *args, **kwargs)
+        print(f"response : {r.content}", flush=True)
+        print(f"status code : {r.status_code}", flush=True)
+
+        response = r.json()
+
         self.id_token = self.validate_and_return_id_token(
             response['id_token'],
             response['access_token']
