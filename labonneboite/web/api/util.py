@@ -68,7 +68,7 @@ def check_api_request(request):
 
 def compute_signature(args, api_key):
     ordered_arg_string = get_ordered_argument_string(args)
-    return hmac.new(api_key.encode(), ordered_arg_string.encode(), hashlib.sha256).hexdigest()
+    return hmac.new(api_key.encode(), ordered_arg_string.encode(), hashlib.md5).hexdigest()
 
 
 def check_signature(request, requested_signature, api_key):

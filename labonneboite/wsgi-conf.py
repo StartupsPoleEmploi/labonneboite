@@ -8,3 +8,6 @@ max_requests_jitter = 50
 log_file = "-"
 reload = True
 reload_engine = "poll"
+
+loglevel = "debug"
+enable_stdio_inheritance = True

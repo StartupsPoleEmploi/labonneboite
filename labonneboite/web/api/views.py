@@ -38,17 +38,16 @@ def api_auth_required(function):
         if 'user' not in request.args:
             return 'missing argument: user', 400
 
-        if not current_app.debug:
-            try:
-                api_util.check_api_request(request)
-            except api_util.TimestampFormatException:
-                return 'timestamp format: %Y-%m-%dT%H:%M:%S', 400
-            except api_util.TimestampExpiredException:
-                return 'timestamp has expired', 400
-            except api_util.InvalidSignatureException:
-                return 'signature is invalid', 400
-            except api_util.UnknownUserException:
-                return 'user is unknown', 400
+        try:
+            api_util.check_api_request(request)
+        except api_util.TimestampFormatException:
+            return 'timestamp format: %Y-%m-%dT%H:%M:%S', 400
+        except api_util.TimestampExpiredException:
+            return 'timestamp has expired', 400
+        except api_util.InvalidSignatureException:
+            return 'signature is invalid', 400
+        except api_util.UnknownUserException:
+            return 'user is unknown', 400
 
         return function(*args, **kwargs)
 
