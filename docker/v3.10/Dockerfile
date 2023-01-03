@@ -3,6 +3,7 @@ FROM python:3.10.7-slim-bullseye
 # Set timezone
 ENV TZ=Europe/Paris
 ENV FLASK_APP web.app
+ENV PYTHONUNBUFFERED=1
 
 # for mysql support & git & french langage support
 RUN apt-get update && apt-get install -y \

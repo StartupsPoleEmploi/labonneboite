@@ -6,5 +6,9 @@ workers = 2
 max_requests = 1000
 max_requests_jitter = 50
 log_file = "-"
+
+# for dev only
 reload = True
 reload_engine = "poll"
+loglevel = "debug"
+enable_stdio_inheritance = True

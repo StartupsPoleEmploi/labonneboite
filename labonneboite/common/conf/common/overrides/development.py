@@ -1,3 +1,4 @@
+from labonneboite.common.constants import Scope, SCOPES_SAFE, SCOPES_TRUSTED
 
 DEBUG = True
 SERVER_NAME = None
@@ -16,3 +17,16 @@ LOG_FORMAT_USER_ACTIVITY = (
 PEAM_VERIFY_SSL = False
 
 SENTRY_ENVIRONMENT = "development"
+
+API_KEYS = {
+
+    'foo': '8a21c5b3cfc0293c0198888888f315e5b4afcf17a88593ab68394e',
+
+}
+
+API_USERS = {
+
+    'foo': {
+        'scopes': SCOPES_TRUSTED,
+    }
+}
