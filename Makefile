@@ -20,4 +20,4 @@ test-run:
 	$(MAKE) test TEST_ARGS=--no-build
 
 changelog:
-	conventional-changelog -p conventionalcommit --i CHANGELOG.md -s -r 0 
+	conventional-changelog -p conventionalcommit --i CHANGELOG.md -s
