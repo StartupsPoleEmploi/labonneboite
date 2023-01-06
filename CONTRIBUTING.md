@@ -1,10 +1,19 @@
-# Contribuer et améliorer le service La Bonne Boite
+# Contributing to Labonneboite
 
-Comme expliqué dans le fichier README.md, nous accueillons les contributions de tous les développeurs volontaires à notre base de code, sous la forme de pull requests (https://help.github.com/articles/about-pull-requests/).
+First off, thanks for taking the time to contribute! 
 
-Avant de soumettre votre pull request:
-  * Merci de vous assurer que vos changements ne cassent pas les tests (`make test_all`, cf `README.md`).
-  * Accompagnez votre code de tests unitaires le cas échéant.
-  * Expliquez clairement ce que vous faites dans la description de votre pull request de façon à ce que n'importe qui puisse comprendre rapidement votre objectif.
+All types of contributions are encouraged and valued. Please read the rest of this document before making your contribution. It will make it a lot easier for us maintainers and smooth out the experience for all involved. The community looks forward to your contributions. 
 
-Pour les développeurs de l'équipe officielle, nous suivons le [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow). 
+# How to contribute
+
+We follow the [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow). You can therefore submit your changes in the form a pull requests (https://help.github.com/articles/about-pull-requests/).
+
+Before submitting your pupll request:
+* make sure the test are succeeding by running `make test`. 
+* If needed, add some unit tests.
+* Be explicit in your naming and description of your pull request.
+
+# Commits
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification) convention for our commits.
+
