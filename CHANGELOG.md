@@ -13,21 +13,18 @@
 ## 1.62.4 (2022-12-12)
 
 * testing configuration by oidc endpoint only ([e9816f5](https://git.beta.pole-emploi.fr:23/lbb/lbb/commits/e9816f5))
-
-> **Full Changelog**: https://github.com/StartupsPoleEmploi/labonneboite/compare/1.62.0...1.62.4
-
-
-## <small>1.62.4-rc.1 (2022-12-12)</small>
-
 * :fixed: relationship backpopulates user favotire offices ([771a7ed](https://git.beta.pole-emploi.fr:23/lbb/lbb/commits/771a7ed))
 * :rotating_light: fix configuration import ([8b72a4a](https://git.beta.pole-emploi.fr:23/lbb/lbb/commits/8b72a4a))
 * :spade: removed useless imports ([abce126](https://git.beta.pole-emploi.fr:23/lbb/lbb/commits/abce126))
 * :sparkles: added OIDC endpoint for peam connect ([303c863](https://git.beta.pole-emploi.fr:23/lbb/lbb/commits/303c863))
 
+> **Full Changelog**: https://github.com/StartupsPoleEmploi/labonneboite/compare/1.62.1...1.62.4
+
 ## 1.62.1 (2022-12-05)
 
 * :apple: update to lbb-common ([c92fb26](https://git.beta.pole-emploi.fr:23/lbb/lbb/commits/c92fb26))
 
+> **Full Changelog**: https://github.com/StartupsPoleEmploi/labonneboite/compare/1.62.0...1.62.1
 
 ## 1.62.0 (2022-12-02)
 
@@ -39,7 +36,15 @@
 * :sparkles: add consent_categories query param to jepostule iframe ([235dd38](https://git.beta.pole-emploi.fr:23/lbb/lbb/commits/235dd38))
 * :sparkles: remove memo ([289ad9d](https://git.beta.pole-emploi.fr:23/lbb/lbb/commits/289ad9d))
 
-> **Full Changelog**: https://github.com/StartupsPoleEmploi/labonneboite/compare/v1.58...1.62.0
+### New Contributors
+* @sylvaintouret made their first contribution in https://git.beta.pole-emploi.fr/lbb/lbb/-/merge_requests/637
+
+> **Full Changelog**: https://github.com/StartupsPoleEmploi/labonneboite/compare/v1.61...1.62.0
+
+## 1.61 (2022-10-17)
+- ✏ retire le i tréma de la bonne boite dans les CGU
+
+> **Full Changelog**: https://github.com/StartupsPoleEmploi/labonneboite/compare/v1.60...v1.61
 
 ## 1.60 (2022-09-05)
 * ♻️ extract common module by @lmarvaud in https://github.com/StartupsPoleEmploi/labonneboite/pull/622
@@ -51,6 +56,8 @@
 * migrate ci to Github CI by @lmarvaud in https://github.com/StartupsPoleEmploi/labonneboite/pull/629
 * revert nullable hiring by @lmarvaud in https://github.com/StartupsPoleEmploi/labonneboite/pull/631
 * PELBB-85: corrige le bouton postuler sur mobile by @lmarvaud in https://github.com/StartupsPoleEmploi/labonneboite/pull/630
+
+> **Full Changelog**: https://github.com/StartupsPoleEmploi/labonneboite/compare/v1.58...v1.60
 
 ## 1.58 (2022-04-13)
 * fix: PELBB-429: 🐛 revert the unexpected add of the offers_count api field by @lmarvaud in https://github.com/StartupsPoleEmploi/labonneboite/pull/621
