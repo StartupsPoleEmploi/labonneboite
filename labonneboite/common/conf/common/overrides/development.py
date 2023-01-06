@@ -1,4 +1,4 @@
-from labonneboite.common.constants import Scope, SCOPES_SAFE, SCOPES_TRUSTED
+from labonneboite.common.constants import SCOPES_TRUSTED
 
 DEBUG = True
 SERVER_NAME = None
