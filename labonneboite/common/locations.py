@@ -5,12 +5,18 @@ from slugify import slugify
 
 from labonneboite.common import geocoding
 
-
 logger = logging.getLogger('main')
 
 
 class Location(object):
     def __init__(self, latitude, longitude):
+
+        if isinstance(latitude, str):
+            latitude = float(latitude)
+
+        if isinstance(longitude, str):
+            longitude = float(longitude)
+
         self.latitude = latitude
         self.longitude = longitude
 

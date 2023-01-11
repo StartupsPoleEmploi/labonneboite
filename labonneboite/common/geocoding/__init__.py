@@ -55,47 +55,13 @@ def load_cities_cache():
     https://www.insee.fr/fr/statistiques/fichier/2525755/dep13.pdf
     https://www.insee.fr/fr/statistiques/fichier/2525755/dep69.pdf
     """
-
-    # GeoAPI known issues, waiting for a fix.
-    COMMUNES_TO_SKIP = [
-        # Communes without `centre` attribute.
-        # ------------------------------------
-        "17004",  # Île-d'Aix (Fort-Boyard)
-        # Communes without `population` attribute.
-        # ----------------------------------------
-        # Meuse (starting with 55), because there is no more inhabitants.
-        "55039",
-        "55050",
-        "55139",
-        "55189",
-        "55239",
-        "55307",
-        # Mayotte (starting with 976), because there is no accurate population data available yet.
-        "97601",
-        "97602",
-        "97603",
-        "97604",
-        "97605",
-        "97606",
-        "97607",
-        "97608",
-        "97609",
-        "97610",
-        "97611",
-        "97612",
-        "97613",
-        "97614",
-        "97615",
-        "97616",
-        "97617",
-    ]
-
     cities = []
 
-    json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/cities.json")
+    json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/cities-2023-01-11.json")
     with open(json_file, 'r') as json_data:
         for item in json.load(json_data):
-            if item['code'] not in COMMUNES_TO_SKIP:
+            # ignore cities with no population? (It was the case before but hardcoded. Not sure it makes any sense though)
+            if item.get("population", 0) > 0:
                 cities.append(city_as_dict(item))
 
     json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/arrondissements_as_cities.json")
