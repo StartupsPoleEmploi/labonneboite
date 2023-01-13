@@ -61,15 +61,16 @@ def autocomplete_locations():
         term (str)
     """
     term = request.args.get('term', '').strip()
+
     suggestions = []
     if term:
         suggestions = geocoding.get_coordinates(term, limit=autocomplete.MAX_LOCATIONS)
     if not suggestions:
+        # this one is done by elasticsearch
         suggestions = autocomplete.build_location_suggestions(term)
-        if suggestions:
-            pass  # FIXME log BAN LIKELY DOWN event
     for suggestion in suggestions:
         suggestion['value'] = suggestion['label']
+
     return make_response(jsonify(suggestions))
 
 

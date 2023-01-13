@@ -57,7 +57,7 @@ def load_cities_cache():
     """
     cities = []
 
-    json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/cities-2023-01-11.json")
+    json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/cities.json")
     with open(json_file, 'r') as json_data:
         for item in json.load(json_data):
             # ignore cities with no population? (It was the case before but hardcoded. Not sure it makes any sense though)
@@ -97,6 +97,7 @@ def cities_cache_required(function):
     return decorated
 
 
+# not used apart from sitemap.xml
 @cities_cache_required
 def get_cities():
     return CACHE['cities']

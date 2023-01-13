@@ -117,6 +117,5 @@ testResults.tar.gz
 .pytest_cache
 test.py
 
-data
-config
-query
+data/mysql
+config/*.cnf
