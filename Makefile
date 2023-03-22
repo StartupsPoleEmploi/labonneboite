@@ -8,8 +8,7 @@ help:
 	poetry run mkdocs serve --dev-addr '127.0.0.1:9999'
 
 develop: 
-	docker-compose -f docker-compose.dev.yml down \
-	&& docker-compose -f docker-compose.dev.yml up --build
+	docker-compose -f docker-compose.dev.yml up --build
 
 test:
 	MAXFAIL=${MAXFAIL} TEST_FILES=${TEST_FILES} docker-compose -f docker-compose.testing.yml up ${TEST_ARGS} app; \

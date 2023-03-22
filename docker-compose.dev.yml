@@ -48,6 +48,7 @@ services:
     volumes:
       - ./labonneboite/alembic/sql/dev:/sql
       - ./labonneboite:/app/labonneboite
+      - ./debug/logs:/app/logs
     healthcheck:
       test: curl localhost:8080 || exit 1
       interval: 10s
@@ -69,9 +70,12 @@ services:
     image: elasticsearch:1.7.2
     environment:
       - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
-      - "cluster.name=lbb"
+      - "cluster.name=lbbv1"
       - "bootstrap.memory_lock=true"
     ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
       memlock:
         soft: -1
         hard: -1
@@ -86,13 +90,18 @@ services:
 
   # database
   mysql:
-    image: mysql:5.6.36
+    image: mariadb:10.5.9-focal
     environment:
       <<: *dbenv
     ports:
       - 3306:3306
+    volumes:
+      - db:/var/lib/mysql
     healthcheck:
-      test: "/usr/bin/mysql --user=root --password=password --execute \"SHOW DATABASES;\""
+      test: "/usr/bin/mysql --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD --execute \"SHOW DATABASES;\""
       interval: 3s
       timeout: 1s
       retries: 5
+
+volumes:
+  db:

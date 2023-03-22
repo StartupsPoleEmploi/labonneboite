@@ -111,7 +111,7 @@ __pycache__
 # coverage
 *.cov
 .coverage
-
+debug/*
 testResults/
 testResults.tar.gz
 .pytest_cache
