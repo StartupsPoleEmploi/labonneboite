@@ -1,29 +1,55 @@
 docs_dir: docs
+
 theme:
-  name: "material"
-  features:
-    - navigation.sections
+  name: material
   font:
-    text: "Roboto"
-    code: "Roboto Mono"
+    text: "Montserrat"
+    code: "Montserrat Sans"
+  features:
+    # - navigation.sections
+    - navigation.footer
+    - navigation.indexes
+    - search.highlight
+    - toc.follow
+    - content.code.copy
+    # - search.suggest
+  icon:
+    repo: fontawesome/brands/git-alt
   palette:
     - scheme: default
+      primary: teal
       toggle:
-        icon: material/toggle-switch-off-outline
+        icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
+      primary: teal
       toggle:
-        icon: material/toggle-switch
+        icon: material/brightness-4
         name: Switch to light mode
+extra:
+  generator: false
 
 markdown_extensions:
-  - attr_list
+  - abbr
   - admonition
-  - pymdownx.critic
+  - attr_list
+  - codehilite
+  - pymdownx.details
   - pymdownx.highlight
   - pymdownx.inlinehilite
-  - pymdownx.superfences
   - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.mark
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+# Do your stuff below
+
+repo_name: labonneboite-v1
+repo_url: https://git.beta.pole-emploi.fr/lbb/lbb
 
 # Do your stuff below
 site_name: lbb

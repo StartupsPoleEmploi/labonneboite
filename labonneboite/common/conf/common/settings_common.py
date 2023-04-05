@@ -37,7 +37,7 @@ LOG_LEVEL_USER_ACTIVITY = logging.INFO
 LOGGING_HANDLER_USER_ACTIVITY = TimedRotatingFileHandler(
     "/app/logs/activity-labonneboite.log", when="h", interval=1, utc=True, encoding="utf-8")
 LOGGING_HANDLER_API_ACTIVITY = TimedRotatingFileHandler(
-    "/app/logs/activity-api-labonneboite.log", when="h", interval=1, utc=True)
+    "/app/logs/activity-api-labonneboite.log", when="h", interval=1, utc=True, encoding="utf-8")
 LOG_FORMAT_USER_ACTIVITY = "%(message)s"
 
 GLOBAL_STATIC_PATH = "/tmp"
