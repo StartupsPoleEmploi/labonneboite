@@ -49,7 +49,6 @@ markdown_extensions:
 # Do your stuff below
 
 repo_name: labonneboite-v1
-
 repo_url: https://git.beta.pole-emploi.fr/lbb/lbb
 site_name: lbb
 site_description: "La Bonne Boite"
