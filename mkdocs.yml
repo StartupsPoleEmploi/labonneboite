@@ -28,6 +28,7 @@ theme:
         name: Switch to light mode
 extra:
   generator: false
+  homepage: https://labonneboite-m-documentation.beta.pole-emploi.fr
 
 markdown_extensions:
   - abbr
