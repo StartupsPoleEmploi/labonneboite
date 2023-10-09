@@ -2,6 +2,7 @@
 include:
   - project: lbb/devops/devops-jobs
     file: devops.gitlab-ci.yml
+    ref: 2.0.0
 
 # this should be the local file
 python-tests:
@@ -34,7 +35,6 @@ sonarqube:
 # pypi:
 #   extends: .devops::pypi-publish
 
-
 # recette
 build-rec:
   extends: .devops::build
@@ -43,7 +43,7 @@ build-rec:
 
 release-rec:
   extends: .devops::release-recette
-  
+
 # production
 promote-prod:
   extends: .devops::promote
