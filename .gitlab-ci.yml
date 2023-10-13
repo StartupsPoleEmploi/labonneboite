@@ -2,7 +2,7 @@
 include:
   - project: lbb/devops/devops-jobs
     file: devops.gitlab-ci.yml
-    ref: 2.0.0
+    ref: 2.2.0
 
 # this should be the local file
 python-tests:
